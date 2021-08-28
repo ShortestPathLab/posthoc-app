@@ -1,9 +1,9 @@
-import { JSONRPCServer } from "json-rpc-2.0";
 import express, { Express } from "express";
-import { Server as WebSocketServer } from "socket.io";
-import { Server as HTTPServer, createServer as createHTTPServer } from "http";
-import { Method, Request } from "protocol/Message";
+import { createServer as createHTTPServer, Server as HTTPServer } from "http";
+import { JSONRPCServer } from "json-rpc-2.0";
 import { forEach } from "lodash";
+import { Method, Request } from "protocol/Message";
+import { Server as WebSocketServer } from "socket.io";
 
 export interface RPCServerOptions {
   methods?: Method[];

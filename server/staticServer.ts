@@ -181,13 +181,13 @@ export function initialise() {
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = "black";
     context.strokeStyle = "black";
-    coData.coordinates.forEach((p) => {
+    coData.coordinates.forEach((p: any) => {
       context.beginPath();
       context.arc(p.x * 0.01, p.y * 0.01, 1, 0, 2 * Math.PI);
       context.fill();
     });
 
-    grData.lines.forEach((l) => {
+    grData.lines.forEach((l: any) => {
       let from = coData.coordinates[l[0]];
       let to = coData.coordinates[l[1]];
       context.beginPath();
