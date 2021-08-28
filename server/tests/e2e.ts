@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { RPCServer, RPCServerOptions } from "../RPCServer";
+import { RPCServer, RPCServerOptions } from "../src/RPCServer";
 
 export const PORT = 8001;
 
