@@ -4,7 +4,7 @@ import {
   CheckConnectionRequest,
   CheckConnectionResponse,
 } from "protocol/CheckConnection";
-import { usingE2E } from "./usingE2E";
+import { usingE2E } from "./e2e";
 
 test("RPC server responds to ping", async () => {
   let response: CheckConnectionResponse = {};
