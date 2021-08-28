@@ -19,6 +19,7 @@ async function usingServer(
   await handler(server);
   server.close();
 }
+
 export async function usingE2E(
   serverOptions: RPCServerOptions,
   handler: (client: Socket, server: RPCServer) => Promise<void>
