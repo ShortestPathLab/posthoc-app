@@ -1,5 +1,5 @@
 import { CheckConnectionMethod } from "../protocol/CheckConnection";
-import { createRPCMethod as createMethod, RPCServer } from "./rpcServer";
+import { createRPCMethod as createMethod, RPCServer } from "./RPCServer";
 import { initialise as initialiseStaticServer } from "./staticServer";
 
 initialiseStaticServer();
