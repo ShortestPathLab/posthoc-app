@@ -1,8 +1,9 @@
 export interface Message {}
 
-export interface Request<T extends string, U = any> extends Message {
+export interface Request<T extends string = any, U = any> extends Message {
   method: T;
   params: U;
+  id?: string | number;
 }
 
 export interface ResponseError {
