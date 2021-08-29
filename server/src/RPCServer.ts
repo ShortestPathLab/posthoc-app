@@ -17,16 +17,16 @@ export function createRPCMethod<T extends Method>(
 }
 
 export class RPCServer {
-  httpServer: HTTPServer;
-  rpcServer: JSONRPCServer;
+  server: HTTPServer;
+  rpc: JSONRPCServer;
   io: WebSocketServer;
 
   constructor(public options: RPCServerOptions = {}) {
-    this.httpServer = createHTTPServer();
-    this.rpcServer = new JSONRPCServer();
-    this.io = new WebSocketServer(this.httpServer);
+    this.server = createHTTPServer();
+    this.rpc = new JSONRPCServer();
+    this.io = new WebSocketServer(this.server);
     forEach(options?.methods, ({ name, handler }) => {
-      this.rpcServer.addMethod(name, handler);
+      this.rpc.addMethod(name, handler);
     });
   }
 
@@ -35,17 +35,17 @@ export class RPCServer {
       socket.on("request", async (req: Request) => {
         socket.emit(
           "response",
-          await this.rpcServer.receive({ jsonrpc: "2.0", ...req })
+          await this.rpc.receive({ jsonrpc: "2.0", ...req })
         );
       });
     });
     return new Promise<void>((res) =>
-      this.httpServer.listen(this.options.port ?? 8001, res)
+      this.server.listen(this.options.port ?? 8001, res)
     );
   }
 
   close() {
     this.io.removeAllListeners();
-    this.httpServer.close();
+    this.server.close();
   }
 }
