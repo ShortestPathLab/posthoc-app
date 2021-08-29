@@ -7,7 +7,7 @@ import { createRPCMethod as createMethod } from "../src/RPCServer";
 import { usingE2E } from "./e2e";
 
 test("RPC server responds to ping", async () => {
-  let response: CheckConnectionResponse = {};
+  let response: CheckConnectionResponse | undefined;
   await usingE2E(
     {
       methods: [
@@ -27,5 +27,5 @@ test("RPC server responds to ping", async () => {
         });
       })
   );
-  expect(response.result).toBeDefined();
+  expect(response?.result).toBeDefined();
 });

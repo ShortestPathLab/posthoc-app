@@ -20,8 +20,8 @@ export async function exec(
     path,
     ...entries(flags).map(([k, v]) => `--${k} ${v}`),
     ...params,
-  ].join(" ");
-  const { stdout, stderr } = await sh(command, true);
+  ];
+  const { stdout, stderr } = await sh(command.join(" "), true);
   if (!stderr) {
     return trim(stdout);
   } else {
