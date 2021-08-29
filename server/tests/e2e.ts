@@ -14,7 +14,7 @@ async function usingServer(
   options: RPCServerOptions,
   handler: (server: RPCServer) => Promise<void>
 ) {
-  const server = new RPCServer(options);
+  const server = new RPCServer({ port: PORT, ...options });
   await server.listen();
   await handler(server);
   server.close();
