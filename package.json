@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start:dev": "concurrently \"cd ./client && npm start\" \"cd ./server && npm start\""
+    "start:dev": "concurrently \"cd ./client && npm start\" \"cd ./server && npm start\"",
+    "build": "gulp"
   },
   "repository": {
     "type": "git",
@@ -17,5 +18,10 @@
   "homepage": "https://github.com/Pathfinding-Project/app#readme",
   "devDependencies": {
     "concurrently": "^6.2.1"
+  },
+  "dependencies": {
+    "gulp": "^4.0.2",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
   }
 }
