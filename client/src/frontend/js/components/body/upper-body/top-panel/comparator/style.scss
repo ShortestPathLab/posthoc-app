@@ -1,0 +1,43 @@
+#faulty-trace-input{
+  display: none;
+}
+#faulty-trace-label{
+  display: block;
+  border: 1px solid #ddd;
+  background: #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+  &:hover{
+    background: #a3a3a3;
+  }
+  &:active{
+    background: #b7b7b7;
+  }
+}
+
+#cp-bps ol{
+  max-height: 200px;
+  overflow: auto;
+  counter-reset: item;
+  padding: 0;
+  li{
+    list-style: none;
+    display: block;
+    cursor: pointer;
+    padding: 2px 0;
+    border-bottom: 1px solid #d2d2d2;
+    &:hover{
+      color: white;
+      background:#284570;
+      border-radius:2px;
+    }
+    &:before{
+      content: counter(item)".) ";
+      counter-increment: item;
+      color: black;
+    }
+    &:hover:before{
+      color: white;
+    }
+  }
+}

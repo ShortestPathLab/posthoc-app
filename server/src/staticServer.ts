@@ -27,29 +27,29 @@ export function initialise() {
   );
 
   app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/index.html");
+    res.sendFile(__dirname + "/static/index.html");
   });
 
   app.post("/", (req, res) => {
-    res.sendFile(__dirname + "/index.html");
+    res.sendFile(__dirname + "/static/index.html");
   });
 
   app.get("/home", (req, res) => {
-    fse.outputFileSync("frontend/files.js", `window.postFiles=null`);
-    res.sendFile(__dirname + "/index.html");
+    fse.outputFileSync(__dirname + "/static/files.js", `window.postFiles=null`);
+    res.sendFile(__dirname + "/static/index.html");
   });
 
   app.post("/home", (req, res) => {
-    fse.outputFileSync("frontend/files.js", `window.postFiles=null`);
-    res.sendFile(__dirname + "/index.html");
+    fse.outputFileSync(__dirname + "/static/files.js", `window.postFiles=null`);
+    res.sendFile(__dirname + "/static/index.html");
   });
 
   app.get("/style.css", (red, res) => {
-    res.sendFile(__dirname + "/style.css");
+    res.sendFile(__dirname + "/static/style.css");
   });
 
   app.get("/script.js", (red, res) => {
-    res.sendFile(__dirname + "/script.js");
+    res.sendFile(__dirname + "/static/script.js");
   });
 
   app.get("/docs", (req, res) => {
@@ -57,22 +57,22 @@ export function initialise() {
   });
 
   app.get("/about", (req, res) => {
-    res.sendFile(__dirname + "/about.html");
+    res.sendFile(__dirname + "/static/about.html");
   });
 
   app.get("/app", (req, res) => {
-    fse.outputFileSync("frontend/files.js", `window.postFiles=null`);
-    res.sendFile(__dirname + "/frontend/index.html");
+    fse.outputFileSync(__dirname + "/static/files.js", `window.postFiles=null`);
+    res.sendFile(__dirname + "/static/index.html");
   });
 
   app.post("/demo", (req, res) => {
     const data = req.body;
     // console.log(data);
     fse.outputFileSync(
-      "frontend/files.js",
+      __dirname + "/static/files.js",
       `window.postFiles=${JSON.stringify(data)}`
     );
-    res.sendFile(__dirname + `/frontend/index.html`);
+    res.sendFile(__dirname + `/static/index.html`);
   });
 
   app.post("/app", (req, res) => {
@@ -87,7 +87,7 @@ export function initialise() {
       meshFile,
       traceName,
       traceFile;
-    fse.outputFileSync("frontend/files.js", `window.postFiles=null`);
+    fse.outputFileSync(__dirname + "/static/files.js", `window.postFiles=null`);
     mapType = data["mapType"];
     mapName = data["mapName"];
     traceName = data["traceName"];
@@ -96,77 +96,77 @@ export function initialise() {
       case "roadnetwork":
         coFile = `maps/roadnetwork/${data["mapName"]}.co`;
         grFile = `maps/roadnetwork/${data["mapName"]}.gr`;
-        fse.outputFileSync(`frontend/${coFile}`, data["co"]);
-        fse.outputFileSync(`frontend/${grFile}`, data["gr"]);
-        fse.outputFileSync(`frontend/${traceFile}`, data["trace"]);
+        fse.outputFileSync(__dirname + `static/${coFile}`, data["co"]);
+        fse.outputFileSync(__dirname + `static/${grFile}`, data["gr"]);
+        fse.outputFileSync(__dirname + `static/${traceFile}`, data["trace"]);
         fse.outputFileSync(
-          "frontend/files.js",
+          __dirname + "/static/files.js",
           `window.postFiles={mapType:"roadnetwork",mapName:"${mapName}", coFile:"${coFile}",grFile:"${grFile}",traceName:"${traceName}",traceFile:"${traceFile}"}`
         );
-        res.sendFile(__dirname + `/frontend/index.html`);
+        res.sendFile(__dirname + `/static/index.html`);
         break;
       case "grid":
         gridFile = `maps/grid/${data["mapName"]}.grid`;
-        fse.outputFileSync(`frontend/${gridFile}`, data["grid"]);
-        fse.outputFileSync(`frontend/${traceFile}`, data["trace"]);
+        fse.outputFileSync(__dirname + `static/${gridFile}`, data["grid"]);
+        fse.outputFileSync(__dirname + `static/${traceFile}`, data["trace"]);
         fse.outputFileSync(
-          "frontend/files.js",
+          __dirname + "/static/files.js",
           `window.postFiles={mapType:"grid",mapName:"${mapName}", gridFile:"${gridFile}",traceName:"${traceName}",traceFile:"${traceFile}"}`
         );
-        res.sendFile(__dirname + `/frontend/index.html`);
+        res.sendFile(__dirname + `/static/index.html`);
         break;
       case "mesh":
         meshFile = `maps/mesh/${data["mapName"]}.mesh`;
-        fse.outputFileSync(`frontend/${meshFile}`, data["mesh"]);
-        fse.outputFileSync(`frontend/${traceFile}`, data["trace"]);
+        fse.outputFileSync(__dirname + `static/${meshFile}`, data["mesh"]);
+        fse.outputFileSync(__dirname + `static/${traceFile}`, data["trace"]);
         fse.outputFileSync(
-          "frontend/files.js",
+          __dirname + "/static/files.js",
           `window.postFiles={mapType:"mesh",mapName:"${mapName}", meshFile:"${meshFile}",traceName:"${traceName}",traceFile:"${traceFile}"}`
         );
-        res.sendFile(__dirname + `/frontend/index.html`);
+        res.sendFile(__dirname + `/static/index.html`);
         break;
       default:
-        fse.outputFileSync(`frontend/${traceFile}`, data["trace"]);
+        fse.outputFileSync(__dirname + `static/${traceFile}`, data["trace"]);
         fse.outputFileSync(
-          "frontend/files.js",
+          __dirname + "/static/files.js",
           `window.postFiles={traceName:"${traceName}",traceFile:"${traceFile}"}`
         );
-        res.sendFile(__dirname + `/frontend/index.html`);
+        res.sendFile(__dirname + `/static/index.html`);
     }
   });
 
   app.get("/maps/:map", (req, res) => {
-    res.sendFile(__dirname + `/frontend/maps/images/${req.params.map}.png`);
+    res.sendFile(__dirname + `/static/maps/images/${req.params.map}.png`);
   });
 
   app.get("/maps/:mapType/:map", (req, res) => {
     res.sendFile(
-      __dirname + `/frontend/maps/${req.params.mapType}/${req.params.map}`
+      __dirname + `/static/maps/${req.params.mapType}/${req.params.map}`
     );
   });
 
   app.get("/algorithms/:algorithm", (req, res) => {
-    res.sendFile(__dirname + `/frontend/algorithms/${req.params.algorithm}`);
+    res.sendFile(__dirname + `/static/algorithms/${req.params.algorithm}`);
   });
 
   app.get("/files.js", (req, res) => {
-    res.sendFile(__dirname + "/frontend/files.js");
+    res.sendFile(__dirname + "/static/files.js");
   });
 
   app.get("/canvas-svg.js", (req, res) => {
-    res.sendFile(__dirname + "/frontend/canvas-svg.js");
+    res.sendFile(__dirname + "/static/canvas-svg.js");
   });
 
   app.get("/dist/:file", (req, res) => {
-    res.sendFile(__dirname + `/frontend/dist/${req.params.file}`);
+    res.sendFile(__dirname + `/static/dist/${req.params.file}`);
   });
 
   app.get("/images/:image_file", (req, res) => {
-    res.sendFile(__dirname + `/frontend/images/${req.params.image_file}`);
+    res.sendFile(__dirname + `/static/images/${req.params.image_file}`);
   });
 
   app.get("/icons/:icon_file", (req, res) => {
-    res.sendFile(__dirname + `/frontend/images/icons/${req.params.icon_file}`);
+    res.sendFile(__dirname + `/static/images/icons/${req.params.icon_file}`);
   });
 
   app.post("/processRoadNetwork", (req, res) => {
@@ -200,7 +200,7 @@ export function initialise() {
     let img = canvas.toDataURL();
     let data = img.replace(/^data:image\/\w+;base64,/, "");
     var buf = Buffer.from(data, "base64");
-    fs.writeFile(`frontend/maps/images/ny.png`, buf, function (err) {
+    fs.writeFile(`static/maps/images/ny.png`, buf, function (err) {
       if (err) {
         console.log(err);
         res.send(err);
@@ -246,16 +246,20 @@ export function initialise() {
     let img = canvas.toDataURL();
     let data = img.replace(/^data:image\/\w+;base64,/, "");
     var buf = Buffer.from(data, "base64");
-    fs.writeFile(`frontend/maps/images/${fileName}.png`, buf, function (err) {
-      if (err) {
-        console.log(err);
-        res.send(err);
-      } else {
-        res.send({
-          done: true,
-        });
+    fs.writeFile(
+      __dirname + `static/maps/images/${fileName}.png`,
+      buf,
+      function (err) {
+        if (err) {
+          console.log(err);
+          res.send(err);
+        } else {
+          res.send({
+            done: true,
+          });
+        }
       }
-    });
+    );
   });
 
   app.post("/processGrid", (req, res) => {
@@ -339,16 +343,20 @@ export function initialise() {
     let img = canvas.toDataURL();
     let data = img.replace(/^data:image\/\w+;base64,/, "");
     var buf = Buffer.from(data, "base64");
-    fs.writeFile(`frontend/maps/images/${fileName}.png`, buf, function (err) {
-      if (err) {
-        console.log(err);
-        res.send(err);
-      } else {
-        res.send({
-          done: true,
-        });
+    fs.writeFile(
+      __dirname + `static/maps/images/${fileName}.png`,
+      buf,
+      function (err) {
+        if (err) {
+          console.log(err);
+          res.send(err);
+        } else {
+          res.send({
+            done: true,
+          });
+        }
       }
-    });
+    );
   });
 
   app.listen(8000, () => {

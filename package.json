@@ -1,0 +1,21 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start:dev": "concurrently \"cd ./client && npm start\" \"cd ./server && npm start\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pathfinding-Project/app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pathfinding-Project/app/issues"
+  },
+  "homepage": "https://github.com/Pathfinding-Project/app#readme",
+  "devDependencies": {
+    "concurrently": "^6.2.1"
+  }
+}

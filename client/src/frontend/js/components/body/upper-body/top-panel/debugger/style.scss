@@ -1,0 +1,19 @@
+#debug-input{
+  display: none;
+}
+#debug-label{
+  display: block;
+  border: 1px solid #ddd;
+  background: #ccc;
+  padding: 5px;
+  cursor: pointer;
+  &:hover{
+    background: #a3a3a3;
+  }
+  &:active{
+    background: #b7b7b7;
+  }
+  .terminal-icon{
+    width: 1em;
+  }
+}
