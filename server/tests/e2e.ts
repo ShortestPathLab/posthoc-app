@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { RPCServer, RPCServerOptions } from "../src/RPCServer";
 
-export const PORT = 8001;
+export const PORT = 8002;
 
 async function usingClient(handler: (client: Socket) => Promise<void>) {
   const client = io(`http://localhost:${PORT}/`);
