@@ -19,14 +19,12 @@ export function createRPCMethod<T extends Method>(
 export class RPCServer {
   server = createHTTPServer();
   rpc = new JSONRPCServer();
-  io = new WebSocketServer(this.server);
-
+  io = new WebSocketServer(this.server, { cors: { origin: "*" } });
   constructor(readonly options: RPCServerOptions = {}) {
     forEach(options?.methods, ({ name, handler }) => {
       this.rpc.addMethod(name, handler);
     });
   }
-
   listen() {
     this.io.on("connection", (socket) => {
       socket.on("request", async (req: Request) => {
@@ -40,7 +38,6 @@ export class RPCServer {
       this.server.listen(this.options.port ?? 8001, res)
     );
   }
-
   close() {
     this.io.removeAllListeners();
     this.server.close();

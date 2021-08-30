@@ -4,7 +4,7 @@ export function Title() {
   return (
     <AppBar position="static" elevation={0}>
       <Toolbar>
-        <Typography variant="h6">Path Visualiser</Typography>
+        <Typography variant="h6">Path Search Visualiser</Typography>
       </Toolbar>
     </AppBar>
   );
