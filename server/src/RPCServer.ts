@@ -1,4 +1,4 @@
-import { createServer as createHTTPServer, Server as HTTPServer } from "http";
+import { createServer as createHTTPServer } from "http";
 import { JSONRPCServer } from "json-rpc-2.0";
 import { forEach } from "lodash";
 import { Method, Request } from "protocol/Message";
@@ -17,14 +17,11 @@ export function createRPCMethod<T extends Method>(
 }
 
 export class RPCServer {
-  server: HTTPServer;
-  rpc: JSONRPCServer;
-  io: WebSocketServer;
+  server = createHTTPServer();
+  rpc = new JSONRPCServer();
+  io = new WebSocketServer(this.server);
 
-  constructor(public options: RPCServerOptions = {}) {
-    this.server = createHTTPServer();
-    this.rpc = new JSONRPCServer();
-    this.io = new WebSocketServer(this.server);
+  constructor(readonly options: RPCServerOptions = {}) {
     forEach(options?.methods, ({ name, handler }) => {
       this.rpc.addMethod(name, handler);
     });

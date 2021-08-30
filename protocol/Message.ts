@@ -1,9 +1,10 @@
-export interface Message {}
+export interface Message {
+  id?: string | number;
+}
 
 export interface Request<T extends string = any, U = any> extends Message {
   method: T;
   params?: U;
-  id?: string | number;
 }
 
 export interface ResponseError {
@@ -12,7 +13,7 @@ export interface ResponseError {
   data?: any;
 }
 
-export interface Response<T = any> {
+export interface Response<T = any> extends Message {
   result?: T;
   error?: ResponseError;
 }
