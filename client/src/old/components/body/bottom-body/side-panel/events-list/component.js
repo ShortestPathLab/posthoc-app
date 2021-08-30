@@ -214,7 +214,9 @@ let EventsListComponent = new StateMachine(
         }
         let stepId = this.events[this.events.length - 1];
         let step = Store.findById("Step", stepId);
-        LoggerOverlayComponent.setNode(step.node);
+        if (step) {
+          LoggerOverlayComponent.setNode(step.node);
+        }
       },
 
       /**
@@ -229,7 +231,9 @@ let EventsListComponent = new StateMachine(
         this.events.length = id;
         let stepId = this.events[this.events.length - 1];
         let step = Store.findById("Step", stepId);
-        LoggerOverlayComponent.setNode(step.node);
+        if (step) {
+          LoggerOverlayComponent.setNode(step.node);
+        }
       },
     },
   })

@@ -6,15 +6,15 @@
   align-content: space-between;
   height: 56px;
   vertical-align: top;
-  .legend-item{
+  .legend-item {
     display: flex;
     min-width: 100px;
-    .color-box{
+    .color-box {
       width: 10px;
       height: 10px;
-      border: 1px solid black;
+      // border: 1px solid black;
     }
-    .color-title{
+    .color-title {
       font-size: 12px;
       font-weight: bold;
       line-height: 12px;

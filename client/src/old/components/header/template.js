@@ -1,5 +1,5 @@
 let template = () => `
-  <h3>PFAlgoViz: A Debugging Visualiser for Pathfinding Search</h3>
+  <h3>Pathfinding Visualiser</h3>
 `;
 // let template = () => `
 //   <div id="menu">

@@ -112,7 +112,7 @@ export default {
             y: y,
             width: this.scale,
             height: this.scale,
-            fill: "#CDCDCD",
+            fill: "#F7F7F7",
             stroke: "#000",
           });
           this.node.appendChild(rect);

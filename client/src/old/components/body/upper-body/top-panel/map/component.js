@@ -1,20 +1,17 @@
 import StateMachine from "javascript-state-machine";
-
-import template from "./template";
-import Grid from "../../../../../models/grid";
 import $ from "jquery";
-import BaseComponent from "../../../../base-component";
-import Controller from "../../../../../controller";
 import config from "../../../../../config";
-import environment from "../../../../../environment";
-import Store from "../../../../../services/store";
+import Controller from "../../../../../controller";
 import GridService from "../../../../../services/grid";
 import MeshService from "../../../../../services/mesh";
 import RoadNetworkService from "../../../../../services/road-network";
-import CameraControlsComponent from "../camera-controls/component";
-import ScreenComponent from "../../../bottom-body/main-panel/screen/component";
 import Spinner from "../../../../../services/spinner";
-import FloatboxService from "../../../../../services/floatbox";
+import Store from "../../../../../services/store";
+import BaseComponent from "../../../../base-component";
+import ScreenComponent from "../../../bottom-body/main-panel/screen/component";
+import CameraControlsComponent from "../camera-controls/component";
+import template from "./template";
+
 /**
  * @module components/map
  * This component handles the uploading of map file.

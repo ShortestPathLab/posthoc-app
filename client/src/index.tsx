@@ -1,3 +1,4 @@
+import { CssBaseline } from "@material-ui/core";
 import { StrictMode } from "react";
 import { render } from "react-dom";
 import App from "./App";
@@ -8,7 +9,9 @@ import reportWebVitals from "./reportWebVitals";
 load().then(() => {
   render(
     <StrictMode>
-      <App />
+      <CssBaseline>
+        <App />
+      </CssBaseline>
     </StrictMode>,
     document.getElementById("root")
   );
