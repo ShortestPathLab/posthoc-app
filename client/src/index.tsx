@@ -1,17 +1,18 @@
 // import React from "react";
 // import ReactDOM from "react-dom";
 import "./index.css";
+import load from "./js/load";
 // import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
-import "./js/main";
-
-// ReactDOM.render(
-//   <React.StrictMode>
-//     <App />
-//   </React.StrictMode>,
-//   document.getElementById("root")
-// );
+load().then(() => {
+  // ReactDOM.render(
+  //   <React.StrictMode>
+  //     <App />
+  //   </React.StrictMode>,
+  //   document.getElementById("root")
+  // );
+});
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

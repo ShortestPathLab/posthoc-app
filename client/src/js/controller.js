@@ -299,7 +299,7 @@ let Controller = new StateMachine({
       this.runner();
       EventsListComponent.addEvent(currentStep);
       // EventsListComponent.highlightNodes();
-      if (!this.timeTravelling) {
+      if (!this.timeTravelling && currentStep) {
         let bpMsg = BreakpointService.check(currentStep.node);
         if (bpMsg) {
           this.preempt = true;
