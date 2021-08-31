@@ -1,4 +1,10 @@
-import { CssBaseline } from "@material-ui/core";
+import {
+  colors,
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+} from "@material-ui/core";
+import { CheckConnectionMethod } from "protocol/CheckConnection";
 import { StrictMode } from "react";
 import { render } from "react-dom";
 import { RPCClient } from "RPCClient";
@@ -6,13 +12,20 @@ import App from "./App";
 import "./index.css";
 import load from "./old/load";
 import reportWebVitals from "./reportWebVitals";
-import { CheckConnectionMethod } from "protocol/CheckConnection";
 
 load().then(() => {
   render(
     <StrictMode>
       <CssBaseline>
-        <App />
+        <ThemeProvider
+          theme={createTheme({
+            palette: {
+              primary: colors["blueGrey"],
+            },
+          })}
+        >
+          <App />
+        </ThemeProvider>
       </CssBaseline>
     </StrictMode>,
     document.getElementById("root")

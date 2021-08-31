@@ -31,7 +31,7 @@ function InputControls() {
   return (
     <>
       <Button onClick={INTEROP_selectMap}>Choose Map</Button>
-      <Button onClick={INTEROP_selectAlgorithm}>Choose Search Trace</Button>
+      <Button onClick={INTEROP_selectAlgorithm}>Choose Algorithm</Button>
     </>
   );
 }
