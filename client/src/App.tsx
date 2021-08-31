@@ -1,6 +1,6 @@
 import { Typography } from "@material-ui/core";
 import { Title } from "components/Title";
-import Controls from "./components/Controls";
+import Controls from "./components/control-bar/Controls";
 import { makePortal } from "./makePortal";
 
 const TopPanelPortal = makePortal("#top-panel");

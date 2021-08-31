@@ -5,10 +5,10 @@ import {
   SkipPreviousOutlined,
   StopOutlined,
 } from "@material-ui/icons";
+import { IconButtonWithTooltip as Button } from "components/IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import Controller from "old/controller";
 import PlaybackService from "old/services/playback";
-import { IconButtonWithTooltip as Button } from "./IconButtonWithTooltip";
 
 export function PlaybackControls() {
   const playbackState = usePlaybackState();

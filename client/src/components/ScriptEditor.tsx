@@ -4,16 +4,18 @@ import { trim } from "lodash";
 
 const PLACEHOLDER = trim(`
 /**
- * Define in what situations the debugger should break.
+ * Define in what situations the debugger should break,
+ * in addition to the conditions defined in the standard options.
  */
-function shouldBreak(arg1, arg2, arg3) {
+function shouldBreak(foo, bar, baz) {
     return false;
 }
 
 /**
- * Define which objects the renderer should display.
+ * Define which objects the renderer should display,
+ * in addition to the conditions defined in the standard options.
  */
-function shouldRender(arg1, arg2, arg3) {
+function shouldRender(foo, bar, baz) {
     return true;
 }
 `);

@@ -5,6 +5,7 @@ import {
   Fade,
   IconButton,
   Toolbar,
+  Typography,
   useTheme,
 } from "@material-ui/core";
 import { ArrowBack } from "@material-ui/icons";
@@ -23,6 +24,10 @@ import {
 import { useScrollState } from "../hooks/useScrollState";
 import { useSmallDisplay } from "../hooks/useSmallDisplay";
 import { ScrollPanel, usePanel } from "./ScrollPanel";
+
+export function AppBarTitle({ children }: { children?: ReactNode }) {
+  return <Typography variant="h6">{children}</Typography>;
+}
 
 export type Props = {
   children?: ReactNode;
@@ -233,14 +238,14 @@ export default function Modal({
 }
 
 export function ManagedModal({
-  ModalProps,
-  ModalAppBarProps,
+  options: ModalProps,
+  appBar: ModalAppBarProps,
   trigger = () => <></>,
   children,
 }: {
-  ModalProps?: Props;
+  options?: Props;
   trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void) => ReactElement;
-  ModalAppBarProps?: ModalAppBarProps;
+  appBar?: ModalAppBarProps;
   children?: ReactNode;
 }) {
   return (
