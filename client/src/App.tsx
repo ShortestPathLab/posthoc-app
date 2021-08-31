@@ -1,9 +1,8 @@
-import { Button, Typography } from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 import { Title } from "components/Title";
 import Controls from "./components/Controls";
 import { makePortal } from "./makePortal";
 
-// const BreakPointsPortal = makePortal("#breakpoints .modal__content");
 const TopPanelPortal = makePortal("#top-panel");
 const HeaderPortal = makePortal("#header");
 const CanvasHeaderPortal = makePortal("#screen-heading");

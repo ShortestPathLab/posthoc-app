@@ -1,20 +1,40 @@
-import { AppBar, Box, Button, Divider, Toolbar } from "@material-ui/core";
+import {
+  AppBar,
+  Box,
+  Button,
+  Divider,
+  Toolbar,
+  Typography,
+} from "@material-ui/core";
 import { useCompatibilityLayer } from "hooks/useCompatibilityLayer";
-import { PlaybackControls } from "./PlaybackControls";
-import { IconButtonWithTooltip as IconButton } from "./IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import Controller from "old/controller";
+import { ManagedModal } from "./Modal";
+import { PlaybackControls } from "./PlaybackControls";
+import { ScriptEditor } from "./ScriptEditor";
 
 function Utilities() {
   const ready = usePlaybackState() !== "none";
-  const INTEROP_breakpoints = useCompatibilityLayer("#breakpoints button");
   const INTEROP_compare = useCompatibilityLayer("#comparator button");
   const INTEROP_timeTravel = useCompatibilityLayer("#time-travel button");
   return (
     <>
-      <Button disabled={!ready} onClick={INTEROP_breakpoints}>
-        Breakpoints...
-      </Button>
+      <ManagedModal
+        trigger={(onClick) => (
+          <Button {...{ onClick }} disabled={!ready}>
+            Breakpoints...
+          </Button>
+        )}
+        ModalProps={{
+          width: 960,
+          scrollable: false,
+        }}
+        ModalAppBarProps={{
+          children: <Typography variant="h6">Breakpoints</Typography>,
+        }}
+      >
+        <ScriptEditor />
+      </ManagedModal>
       <Button disabled={!ready} onClick={INTEROP_compare}>
         Compare...
       </Button>

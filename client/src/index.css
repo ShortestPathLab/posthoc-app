@@ -16,11 +16,11 @@ code {
 @media (pointer: fine) {
   * {
     scrollbar-color: #888888 #f0f0f0;
-    scrollbar-width: 6px;
+    scrollbar-width: 14px;
   }
   *::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 14px;
+    height: 14px;
     background-color: #f0f0f0;
   }
   *::-webkit-scrollbar-track {
@@ -28,7 +28,7 @@ code {
   }
   *::-webkit-scrollbar-thumb {
     background: #888888;
-    height: 6px;
+    height: 14px;
     min-height: 64px;
     min-width: 64px;
   }
@@ -37,7 +37,6 @@ code {
 @media (pointer: fine) and (prefers-color-scheme: dark) {
   * {
     scrollbar-color: #888888 #242527;
-    scrollbar-width: 6px;
   }
   *::-webkit-scrollbar {
     background-color: #242527;
