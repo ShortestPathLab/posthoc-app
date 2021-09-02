@@ -11,7 +11,7 @@ export default function Controls() {
   return (
     <AppBar position="static" color="transparent" elevation={0}>
       <Toolbar>
-        <Box m={-1} display="flex">
+        <Box m={-1} display="flex" alignItems="center">
           <InputControls />
           {renderDivider()}
           <PlaybackControls />

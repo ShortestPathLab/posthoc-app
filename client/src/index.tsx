@@ -35,9 +35,9 @@ load().then(() => {
 // TODO Remove temporary connection test
 const DEV_URL = "http://localhost:8001/";
 new RPCClient({ url: DEV_URL })
-  .call<CheckConnectionMethod>("ping")
-  .then((r = 0) =>
-    console.log(`Server connection successful, server time: ${new Date(r)}`)
+  .call<CheckConnectionMethod>("about")
+  .then((r) =>
+    console.log(`Server connection successful, version ${r?.version}`)
   );
 
 // If you want to start measuring performance in your app, pass a function

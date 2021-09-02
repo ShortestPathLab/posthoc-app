@@ -6,7 +6,10 @@ initialiseStaticServer();
 
 const rpcServer = new RPCServer({
   methods: [
-    createMethod<CheckConnectionMethod>("ping", async () => Date.now()),
+    createMethod<CheckConnectionMethod>("about", async () => ({
+      name: "Warthog Visualiser Server",
+      version: "1.0.1",
+    })),
   ],
 });
 

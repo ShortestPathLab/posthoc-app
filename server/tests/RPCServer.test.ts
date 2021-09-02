@@ -11,13 +11,15 @@ test("RPC server responds to ping", async () => {
   await usingE2E(
     {
       methods: [
-        createMethod<CheckConnectionMethod>("ping", async () => Date.now()),
+        createMethod<CheckConnectionMethod>("about", async () => ({
+          version: "1.0.1",
+        })),
       ],
     },
     (client) =>
       new Promise<void>((res) => {
         const request: CheckConnectionRequest = {
-          method: "ping",
+          method: "about",
           id: 1,
         };
         client.emit("request", request);
@@ -27,5 +29,5 @@ test("RPC server responds to ping", async () => {
         });
       })
   );
-  expect(response?.result).toBeDefined();
+  expect(response?.result?.version).toBeDefined();
 });

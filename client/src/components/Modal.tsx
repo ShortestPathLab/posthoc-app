@@ -79,7 +79,6 @@ export function ModalAppBar({
         background: theme.palette.background.paper,
         ...(!simple && {
           boxShadow: theme.shadows[4],
-          // borderBottom: `1px solid ${theme.palette.background.paper}`,
         }),
         ...elevatedStyle,
       };
@@ -98,7 +97,6 @@ export function ModalAppBar({
         <IconButton
           style={{
             marginRight: theme.spacing(1),
-            // marginLeft: -theme.spacing(2),
           }}
           aria-label="open drawer"
           edge="start"
