@@ -1,5 +1,6 @@
 import { JSONRPCClient, JSONRPCResponse as Response } from "json-rpc-2.0";
-import { Method, Request, RequestOf, ResponseOf } from "protocol/Message";
+import { NameMethodMap } from "protocol";
+import { Request, RequestOf, ResponseOf } from "protocol/Message";
 import { io, Socket } from "socket.io-client";
 
 export interface RPCClientOptions {
@@ -32,10 +33,10 @@ export class RPCClient {
     this.socket.disconnect();
   }
 
-  async call<T extends Method>(
-    name: RequestOf<T>["method"],
-    params?: RequestOf<T>["params"]
-  ): Promise<ResponseOf<T>["result"]> {
+  async call<T extends keyof NameMethodMap>(
+    name: RequestOf<NameMethodMap[T]>["method"],
+    params?: RequestOf<NameMethodMap[T]>["params"]
+  ): Promise<ResponseOf<NameMethodMap[T]>["result"]> {
     return await this.rpc.request(name, params);
   }
 }

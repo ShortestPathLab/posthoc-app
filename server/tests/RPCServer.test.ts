@@ -1,5 +1,4 @@
 import {
-  CheckConnectionMethod,
   CheckConnectionRequest,
   CheckConnectionResponse,
 } from "protocol/CheckConnection";
@@ -11,7 +10,7 @@ test("RPC server responds to ping", async () => {
   await usingE2E(
     {
       methods: [
-        createMethod<CheckConnectionMethod>("about", async () => ({
+        createMethod("about", async () => ({
           version: "1.0.1",
         })),
       ],

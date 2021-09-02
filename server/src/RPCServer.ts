@@ -2,6 +2,7 @@ import { createServer as createHTTPServer } from "http";
 import { JSONRPCServer } from "json-rpc-2.0";
 import { forEach } from "lodash";
 import { Method, Request } from "protocol/Message";
+import { NameMethodMap } from "protocol";
 import { Server as WebSocketServer } from "socket.io";
 
 export interface RPCServerOptions {
@@ -9,9 +10,9 @@ export interface RPCServerOptions {
   port?: number;
 }
 
-export function createRPCMethod<T extends Method>(
-  name: T["name"],
-  handler: T["handler"]
+export function createRPCMethod<T extends keyof NameMethodMap>(
+  name: T,
+  handler: NameMethodMap[T]["handler"]
 ) {
   return { name, handler };
 }

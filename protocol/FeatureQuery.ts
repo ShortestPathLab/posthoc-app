@@ -18,7 +18,7 @@ export type AlgorithmFeatureQuery = FeatureQuery<"algorithm">;
 
 export type FeatureDescriptorListResult = Response<FeatureDescriptor[]>;
 
-export type EnvironmentFeatureQueryMethod = Method<
+export type MapTypeFeatureQueryMethod = Method<
   MapTypeFeatureQuery,
   FeatureDescriptorListResult
 >;
