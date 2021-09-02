@@ -1,8 +1,8 @@
-import { Box, Button, Divider, Typography } from "@material-ui/core";
+import { Box, Button, Typography } from "@material-ui/core";
+import { Select } from "components/Select";
 import { useCompatibilityLayer } from "hooks/useCompatibilityLayer";
 import { find, map } from "lodash";
 import { useFeatures } from "slices/features";
-import { Select } from "components/Select";
 import { useUIState } from "slices/UIState";
 
 function AlgorithmPicker() {
@@ -11,6 +11,7 @@ function AlgorithmPicker() {
   const selected = find(algorithms, { id: value });
   return (
     <Select
+      placeholder="Algorithm"
       trigger={(props) => (
         <Button {...props}>{selected?.name ?? "Choose Algorithm"}</Button>
       )}

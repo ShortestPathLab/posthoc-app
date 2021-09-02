@@ -1,8 +1,7 @@
-import { Menu, MenuItem } from "@material-ui/core";
+import { Menu, MenuItem, Tooltip } from "@material-ui/core";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { findIndex, map, max } from "lodash";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
-import { useState } from "react";
 import { ReactElement, ReactNode } from "react";
 
 type Key = string | number;
@@ -12,6 +11,7 @@ type SelectProps<T extends Key> = {
   items?: { value: T; label?: ReactNode }[];
   value?: T;
   onChange?: (value: T) => void;
+  placeholder?: string;
 };
 
 const itemHeight = (sm: boolean) => (sm ? 48 : 36);
@@ -22,6 +22,7 @@ export function Select<T extends string>({
   items,
   value,
   onChange,
+  placeholder = "Select Option",
 }: SelectProps<T>) {
   const sm = useSmallDisplay();
   const index = max([findIndex(items, { value: value as any }), 0]) ?? 0;
@@ -29,7 +30,9 @@ export function Select<T extends string>({
     <State variant="popover">
       {(state) => (
         <>
-          {trigger?.(bindTrigger(state))}
+          <Tooltip title={placeholder}>
+            <span>{trigger?.(bindTrigger(state))}</span>
+          </Tooltip>
           <Menu
             {...bindMenu(state)}
             anchorOrigin={{
