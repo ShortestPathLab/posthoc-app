@@ -5,6 +5,7 @@ import { createRPCMethod as createMethod, RPCServer } from "./RPCServer";
 import { initialise as initialiseStaticServer } from "./staticServer";
 
 const ALGORITHMS_PATH = "./static/algorithms";
+const SERVER_NAME = "warthog";
 
 initialiseStaticServer();
 
@@ -30,7 +31,7 @@ const rpcServer = new RPCServer({
         return files.map((f) => ({
           id: parse(f).name,
           name: startCase(parse(f).name),
-          description: f,
+          description: `${SERVER_NAME}/${f}`,
         }));
       })
     ),

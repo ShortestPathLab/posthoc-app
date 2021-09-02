@@ -8,6 +8,7 @@ import { StrictMode } from "react";
 import { render } from "react-dom";
 import { FeaturesProvider } from "slices/features";
 import { InfoProvider } from "slices/info";
+import { UIStateProvider } from "slices/UIState";
 import { SliceProvider as AppStateProvider } from "slices/SliceProvider";
 import App from "./App";
 import "./index.css";
@@ -25,7 +26,9 @@ load().then(() => {
             },
           })}
         >
-          <AppStateProvider slices={[InfoProvider, FeaturesProvider]}>
+          <AppStateProvider
+            slices={[InfoProvider, FeaturesProvider, UIStateProvider]}
+          >
             <App />
           </AppStateProvider>
         </ThemeProvider>
