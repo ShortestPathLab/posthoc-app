@@ -8,21 +8,25 @@ import {
   useState,
 } from "react";
 
+type Slice<T> = [T, (next: T) => void];
+
 export function createSlice<T>(
   initialState: T,
   initializer?: () => Promise<T>
 ) {
-  type V = [T, (next: T) => void];
-  const Store = createContext<V>([initialState, noop]);
+  const Store = createContext<Slice<T>>([initialState, noop]);
   return [
     // Hook
     () => useContext(Store),
     // Context
     ({ children }: { children?: ReactNode }) => {
-      const [state, setState] = useState(initialState);
-      const value = useMemo<V>(() => [state, setState], [state, setState]);
-      useEffect(() => void initializer?.().then?.(setState), [setState]);
-      return <Store.Provider value={value}>{children}</Store.Provider>;
+      const [value, setValue] = useState(initialState);
+      const slice = useMemo<Slice<T>>(
+        () => [value, setValue],
+        [value, setValue]
+      );
+      useEffect(() => void initializer?.().then?.(setValue), [setValue]);
+      return <Store.Provider value={slice}>{children}</Store.Provider>;
     },
   ] as const;
 }
