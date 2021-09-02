@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@material-ui/core";
+import { Box, Button, Typography as Type } from "@material-ui/core";
 import { Select } from "components/Select";
 import { useCompatibilityLayer } from "hooks/useCompatibilityLayer";
 import { find, map } from "lodash";
@@ -15,15 +15,15 @@ function AlgorithmPicker() {
       trigger={(props) => (
         <Button {...props}>{selected?.name ?? "Choose Algorithm"}</Button>
       )}
-      items={map(algorithms, ({ id, name, description }) => ({
+      items={map(algorithms, ({ id, name }) => ({
         value: id,
         label: (
           <>
-            <Typography>{name}</Typography>
+            <Type>{name}</Type>
             <Box px={0.5} />
-            <Typography variant="body2" color="textSecondary">
-              {description}
-            </Typography>
+            <Type variant="body2" color="textSecondary">
+              {id}
+            </Type>
           </>
         ),
       }))}
@@ -33,11 +33,15 @@ function AlgorithmPicker() {
   );
 }
 
-export function InputControls() {
+function MapPicker() {
   const INTEROP_selectMap = useCompatibilityLayer("#map input");
+  return <Button onClick={INTEROP_selectMap}>Choose Map</Button>;
+}
+
+export function InputControls() {
   return (
     <>
-      <Button onClick={INTEROP_selectMap}>Choose Map</Button>
+      <MapPicker />
       <AlgorithmPicker />
     </>
   );
