@@ -24,6 +24,6 @@ export type EnvironmentFeatureQueryMethod = Method<
 >;
 
 export type AlgorithmFeatureQueryMethod = Method<
-  MapTypeFeatureQuery,
+  AlgorithmFeatureQuery,
   FeatureDescriptorListResult
 >;
