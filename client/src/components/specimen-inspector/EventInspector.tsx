@@ -61,7 +61,7 @@ export function EventInspector({
           <Box>
             <Type
               variant="overline"
-              sx={{ mt: -0.75, display: "block" }}
+              sx={{ my: -0.75, display: "block" }}
             >{`${event?.type} #${event?.id}`}</Type>
             <Flex flexWrap="wrap">
               {event?.f !== undefined && renderProperty("f", event?.f)}
