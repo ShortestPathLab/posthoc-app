@@ -13,8 +13,6 @@ import { useEffect } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 
-const PLAYBACK_RATE = 24;
-
 export function PlaybackControls() {
   const [specimen] = useSpecimen();
   const [{ playback, step = 0 }, setUIState] = useUIState();
@@ -23,11 +21,10 @@ export function PlaybackControls() {
   useEffect(() => {
     if (playback === "playing") {
       if (maxStep > step) {
-        const handle = delay(
-          () => setUIState({ step: step + 1 }),
-          1000 / PLAYBACK_RATE
+        const handle = requestAnimationFrame(() =>
+          setUIState({ step: step + 1 })
         );
-        return () => void clearTimeout(handle);
+        return () => cancelAnimationFrame(handle);
       } else {
         setUIState({ playback: "paused" });
       }

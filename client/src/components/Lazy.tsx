@@ -1,62 +1,61 @@
+import { ceil, chunk, map, max } from "lodash";
 import { ReactNode } from "react";
-import { usePanel } from "./ScrollPanel";
 import { useInView } from "react-intersection-observer";
-import { chunk, floor, map, max } from "lodash";
 
-function Segment({
-  placeholder,
-  children,
-}: {
-  children?: ReactNode[];
-  placeholder?: ReactNode;
-}) {
-  const { ref, inView: inView } = useInView();
+type SegmentProps = {
+  children?: ReactNode;
+  estimateHeight?: number;
+  renderChildren?: () => ReactNode;
+};
 
+function Segment({ estimateHeight: height = 0, renderChildren }: SegmentProps) {
+  const { ref, inView } = useInView();
   return (
-    <div ref={ref} style={{ display: "grid" }}>
-      {inView ? (
-        <div
-          style={{
-            gridColumn: 1,
-            gridRow: 1,
-          }}
-          key="children"
-        >
-          {children}
-        </div>
-      ) : (
-        <div
-          style={{
-            gridColumn: 1,
-            gridRow: 1,
-          }}
-          key="placeholder"
-        >
-          {placeholder}
-        </div>
-      )}
+    <div ref={ref} style={{ height: inView ? undefined : height }}>
+      {inView && renderChildren?.()}
     </div>
   );
 }
 
-export function Lazy({
-  children,
-  rowHeight = 1,
-}: {
-  children?: ReactNode[];
-  rowHeight?: number;
-}) {
-  const chunkSize = max([10, floor((children?.length ?? 0) / 100)]);
+const SCALE = 10;
 
+type LazyProps<T> = {
+  items?: T[];
+  rowHeight?: number;
+  renderItem?: (item: T, index: number) => ReactNode;
+  offset?: number;
+};
+
+export function Lazy<T>({
+  items,
+  renderItem,
+  rowHeight = 1,
+  offset = 0,
+}: LazyProps<T>) {
+  const chunkSize = max([SCALE, ceil((items?.length ?? 0) / SCALE)])!;
   return (
     <>
-      {map(chunk(children, chunkSize), (c, i) => (
-        <Segment
-          placeholder={<div style={{ height: c.length * rowHeight }}></div>}
-        >
-          {c}
-        </Segment>
-      ))}
+      {map(chunk(items, chunkSize), (segment, i) => {
+        const o = offset + i * chunkSize;
+        return (
+          <Segment
+            key={i}
+            estimateHeight={segment.length * rowHeight}
+            renderChildren={() =>
+              segment.length <= SCALE ? (
+                map(segment, (child, j) => renderItem?.(child, o + j))
+              ) : (
+                <Lazy
+                  items={segment}
+                  rowHeight={rowHeight}
+                  renderItem={renderItem}
+                  offset={o}
+                />
+              )
+            }
+          />
+        );
+      })}
     </>
   );
 }

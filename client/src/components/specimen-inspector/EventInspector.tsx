@@ -10,6 +10,8 @@ import { Flex } from "components/Flex";
 import { Space } from "components/Space";
 import { entries, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
+import { useState } from "react";
+import { useEffect } from "react";
 import { ReactNode } from "react";
 import { useUIState } from "slices/UIState";
 
@@ -17,17 +19,21 @@ type EventInspectorProps = {
   event?: TraceEvent;
   index?: number;
   selected?: boolean;
-  cardRef?: (ref: HTMLDivElement | null) => void;
 } & CardProps;
 
 export function EventInspector({
   event,
   index,
   selected,
-  cardRef,
   ...props
 }: EventInspectorProps) {
   const [, setUIState] = useUIState();
+  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (ref && selected) {
+      ref.scrollIntoView();
+    }
+  }, [ref, selected]);
 
   function renderProperty(label: ReactNode, value: ReactNode) {
     return (
@@ -44,7 +50,7 @@ export function EventInspector({
   return (
     <Card
       {...props}
-      ref={cardRef}
+      ref={setRef}
       sx={
         selected
           ? {
