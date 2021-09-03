@@ -1,4 +1,5 @@
 import { Typography } from "@material-ui/core";
+import { SearchTraceViewer } from "components/SearchTraceViewer";
 import { Title } from "components/Title";
 import { useEffect } from "react";
 import { useFeatures } from "slices/features";
@@ -32,6 +33,7 @@ function App() {
           Logs
         </Typography>
       </LogsHeaderPortal>
+      <SearchTraceViewer />
     </>
   );
 }
