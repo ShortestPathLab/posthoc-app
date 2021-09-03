@@ -13,13 +13,13 @@ import { useEffect } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 
-const PLAYBACK_RATE = 60;
+const PLAYBACK_RATE = 24;
 
 export function PlaybackControls() {
   const [specimen] = useSpecimen();
   const [{ playback, step = 0 }, setUIState] = useUIState();
   const canStep = playback !== "playing";
-  const maxStep = specimen?.eventList?.length ?? 0;
+  const maxStep = (specimen?.eventList?.length ?? 1) - 1;
   useEffect(() => {
     if (playback === "playing") {
       if (maxStep > step) {

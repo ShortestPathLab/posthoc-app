@@ -1,15 +1,15 @@
 import { Container, Stage } from "@inlet/react-pixi";
 import { useTheme } from "@material-ui/core";
-import { map, slice, take } from "lodash";
+import { map, take } from "lodash";
 import { ComponentProps } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
+import { Trace, TraceEventType } from "../../../../protocol/Trace";
 import { getColor } from "./colors";
+import { SCALE, SIZE } from "./constants";
 import { Grid } from "./Grid";
 import { Node } from "./Node";
-import { SCALE, SIZE } from "./constants";
 import Viewport from "./Viewport";
-import { Trace, TraceEventType } from "../../../../protocol/Trace";
 
 type RendererProps = {} & ComponentProps<typeof Stage>;
 

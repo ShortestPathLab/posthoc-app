@@ -1,14 +1,13 @@
+import {
+  blue,
+  blueGrey,
+  green,
+  orange,
+  red,
+  yellow,
+} from "@material-ui/core/colors";
 import { mapValues } from "lodash";
 import { TraceEventType } from "protocol/Trace";
-import {
-  green,
-  blue,
-  orange,
-  yellow,
-  red,
-  purple,
-  blueGrey,
-} from "@material-ui/core/colors";
 
 const tint = "500";
 

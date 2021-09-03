@@ -6,11 +6,12 @@ import { AutoSizer as AutoSize } from "react-virtualized";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { Flex, FlexProps } from "../Flex";
+import { EventListInspector } from "./EventListInspector";
 import { Renderer } from "./Renderer";
 
-type SpecimenViewerProps = {} & FlexProps;
+type SpecimenInspectorProps = {} & FlexProps;
 
-export function SpecimenViewer({ ...props }: SpecimenViewerProps) {
+export function SpecimenInspector({ ...props }: SpecimenInspectorProps) {
   const [loading, setLoading] = useState(false);
   const [{ algorithm }] = useUIState();
   const [specimen, setSpecimen] = useSpecimen();
@@ -43,7 +44,16 @@ export function SpecimenViewer({ ...props }: SpecimenViewerProps) {
       </Fade>
       <Flex {...props}>
         {specimen ? (
-          <AutoSize>{(size) => <Renderer {...size} />}</AutoSize>
+          <>
+            <AutoSize>{(size) => <Renderer {...size} />}</AutoSize>
+            <EventListInspector
+              position="absolute"
+              right={0}
+              height="100%"
+              maxWidth={480}
+              minWidth="25vw"
+            />
+          </>
         ) : (
           <Flex
             justifyContent="center"

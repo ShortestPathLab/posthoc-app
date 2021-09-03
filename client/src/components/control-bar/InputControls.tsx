@@ -1,5 +1,6 @@
-import { Box, Button, Typography as Type } from "@material-ui/core";
+import { Button, Typography as Type } from "@material-ui/core";
 import { Select } from "components/Select";
+import { Space } from "components/Space";
 import { useCompatibilityLayer } from "hooks/useCompatibilityLayer";
 import { find, map } from "lodash";
 import { useFeatures } from "slices/features";
@@ -20,7 +21,7 @@ function AlgorithmPicker() {
         label: (
           <>
             <Type>{name}</Type>
-            <Box px={0.5} />
+            <Space />
             <Type variant="body2" color="textSecondary">
               {id}
             </Type>
