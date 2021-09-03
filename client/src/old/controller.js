@@ -19,7 +19,7 @@ import Renderer from "./services/renderer";
 import resizeTracker from "./services/resize-tracker";
 import runnerFactory from "./services/runner";
 import SearchPathService from "./services/search-path";
-import Store from "./services/store";
+import Store from "./services/Store.new";
 /**
  * @module controller
  * The controller is the main part which controls the whole app. It is a StateMachine with 3 states: none, ready and running. Init transition changes state from none to ready. Start transition changes state from ready to running.
@@ -137,7 +137,7 @@ let Controller = new StateMachine({
      * This function is called when Controller is started(start transition) i.e. ready to running state. It is basically called when the algorithm is uploaded and app can be in running state. It calculates total steps in the algorithm, setups runner and initiates Playback and Floatbox services.
      */
     onStart() {
-      this.tracer = Store.find("Tracer");
+      this.tracer = Store.get("Tracer");
       let that = this;
       this.tracer.steps.then((steps) => {
         if (this.tracer.stateStructure) {
@@ -153,13 +153,13 @@ let Controller = new StateMachine({
     },
 
     getMap() {
-      let map = Store.find("Map");
+      let map = Store.get("Map");
       if (map && map.mapType == "grid") {
-        map = Store.find("Grid");
+        map = Store.get("Grid");
       } else if (map && map.mapType == "mesh") {
-        map = Store.find("Mesh");
+        map = Store.get("Mesh");
       } else if (map && map.mapType == "roadnetwork") {
-        map = Store.find("RoadNetwork");
+        map = Store.get("RoadNetwork");
       }
       return map;
     },

@@ -6,7 +6,7 @@ import GridService from "../../../../../services/grid";
 import MeshService from "../../../../../services/mesh";
 import RoadNetworkService from "../../../../../services/road-network";
 import Spinner from "../../../../../services/spinner";
-import Store from "../../../../../services/store";
+import Store from "../../../../../services/Store.new";
 import BaseComponent from "../../../../base-component";
 import ScreenComponent from "../../../bottom-body/main-panel/screen/component";
 import CameraControlsComponent from "../camera-controls/component";
@@ -80,8 +80,8 @@ let MapComponent = new StateMachine(
           let fileName = file1Type == "gr" ? file1Name : file2Name;
           let coFile = file1Type == "co" ? file1 : file2;
           let grFile = file1Type == "gr" ? file1 : file2;
-          let map = Store.createRecord("Map", { fileType, fileName });
-          Store.createRecord("RoadNetwork", { coFile, grFile });
+          let map = Store.create("Map", { fileType, fileName });
+          Store.create("RoadNetwork", { coFile, grFile });
           config.mapType = "roadnetwork";
           this.fileName = `${file1Name} (roadnetwork)`;
           let roadNetworkPromise = RoadNetworkService.process();
@@ -93,16 +93,16 @@ let MapComponent = new StateMachine(
           let fileName = file.name.split(".");
           let fileType = fileName.pop();
           fileName = fileName.join("");
-          let map = Store.createRecord("Map", { fileType, fileName });
+          let map = Store.create("Map", { fileType, fileName });
           if (fileType == "grid") {
-            Store.createRecord("Grid", file);
+            Store.create("Grid", file);
             config.mapType = "grid";
             let gridPromise = GridService.process();
             gridPromise.finally(() => {
               Spinner.hide();
             });
           } else if (fileType == "mesh") {
-            Store.createRecord("Mesh", file);
+            Store.create("Mesh", file);
             config.mapType = "mesh";
             let meshPromise = MeshService.process();
             meshPromise.finally(() => {

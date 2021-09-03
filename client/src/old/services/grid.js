@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 
-import Store from "./store";
+import Store from "./Store.new";
 import config from "../config";
 import environment from "../environment";
 import errorNotifier from "./error-notifier";
@@ -15,8 +15,8 @@ import $ from "jquery";
 export default {
   renderMap(resolve, reject) {
     try {
-      let grid = Store.find("Grid");
-      let map = Store.find("Map");
+      let grid = Store.get("Grid");
+      let map = Store.get("Map");
       grid.gridData.then((gridData) => {
         Controller.setupRenderer();
         let mapSprite = new PIXI.Sprite.from(
@@ -35,7 +35,7 @@ export default {
   },
 
   checkMap(resolve, reject) {
-    let map = Store.find("Map");
+    let map = Store.get("Map");
     var img = new Image();
     let self = this;
     img.onerror = function () {
@@ -51,8 +51,8 @@ export default {
   },
 
   sendToServer(resolve, reject) {
-    let grid = Store.find("Grid");
-    let map = Store.find("Map");
+    let grid = Store.get("Grid");
+    let map = Store.get("Map");
     grid.gridData.then((gridData) => {
       fetch(config.processGridUrl, {
         method: "POST",
@@ -172,7 +172,7 @@ export default {
   drawer: {
     draw() {
       let mapContainer = new PIXI.Container();
-      let grid = Store.find("Grid");
+      let grid = Store.get("Grid");
       grid.cells.then(
         (cells) => {
           Controller.setupRenderer();
@@ -203,7 +203,7 @@ export default {
   },
 
   processMe() {
-    let grid = Store.find("Grid");
+    let grid = Store.get("Grid");
     grid.gridData.then((gridData) => {
       let height = gridData.height;
       let width = gridData.width;

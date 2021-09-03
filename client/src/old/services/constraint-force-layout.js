@@ -1,5 +1,5 @@
 import config from "../config";
-import Store from "./store";
+import Store from "./Store.new";
 import * as d3 from "d3-hierarchy";
 
 export default {

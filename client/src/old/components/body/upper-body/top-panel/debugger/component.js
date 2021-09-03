@@ -1,7 +1,7 @@
 import StateMachine from "javascript-state-machine";
 
 import template from "./template";
-import Store from "../../../../../services/store";
+import Store from "../../../../../services/Store.new";
 import $ from "jquery";
 import BaseComponent from "../../../../base-component";
 import Controller from "../../../../../controller";
@@ -44,7 +44,7 @@ let DebuggerComponent = new StateMachine(
         let self = this;
         $("#debug-input").on("change", (e) => {
           let debugFile = e.target.files[0];
-          Store.createRecord("Tracer", debugFile);
+          Store.create("Tracer", debugFile);
           Controller.traceTitle = debugFile.name.split(".")[0];
           this.postProcess();
         });
@@ -64,7 +64,7 @@ let DebuggerComponent = new StateMachine(
       },
 
       postProcess() {
-        this.tracer = Store.find("Tracer");
+        this.tracer = Store.get("Tracer");
         if (!Controller.mapTitle) {
           $("#map").hide();
           // $("#map").html(`<div id='map-label'>No Operating Environment Uploaded</div>`);

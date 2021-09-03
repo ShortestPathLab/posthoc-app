@@ -1,68 +1,89 @@
-import Store from './store';
-import Spinner from './spinner';
-import GridService from './grid';
-import MeshService from './mesh';
-import RoadNetworkService from './road-network';
-import $ from 'jquery';
+import Store from "./Store.new";
+import Spinner from "./spinner";
+import GridService from "./grid";
+import MeshService from "./mesh";
+import RoadNetworkService from "./road-network";
+import $ from "jquery";
 import config from "../config";
 
 export default {
   preload: false,
-  init(controller){
+  init(controller) {
     this.controller = controller;
-    if(window.postFiles){
+    if (window.postFiles) {
       this.preload = true;
       this.loadVars();
     }
   },
-  loadVars(){
+  loadVars() {
     Object.assign(this, window.postFiles);
   },
-  createRecords(){
+  createRecords() {
     let fileType = this.mapType;
     let fileName = this.mapName;
     let self = this;
-    let map = Store.createRecord("Map", {fileType: self.mapType, fileName: self.mapName});
+    let map = Store.create("Map", {
+      fileType: self.mapType,
+      fileName: self.mapName,
+    });
     return new Promise((resolve, reject) => {
       switch (self.mapType) {
         case "grid":
           $.get(self.gridFile, (data) => {
-            let file = new File(data.replace(/\n/g, "XXX\nXXX").split("XXX"), `${self.mapName}.${self.mapType}`, {
-              type: "text/plain",
-            });
-            Store.createRecord('Grid', file);
-            GridService.preProcess(resolve, reject)
+            let file = new File(
+              data.replace(/\n/g, "XXX\nXXX").split("XXX"),
+              `${self.mapName}.${self.mapType}`,
+              {
+                type: "text/plain",
+              }
+            );
+            Store.create("Grid", file);
+            GridService.preProcess(resolve, reject);
           });
           break;
         case "mesh":
           $.get(self.meshFile, (data) => {
-            let file = new File(data.replace(/\n/g, "XXX\nXXX").split("XXX"), `${self.mapName}.${self.mapType}`, {
-              type: "text/plain",
-            });
-            Store.createRecord('Mesh', file);
-            MeshService.preProcess(resolve, reject)
+            let file = new File(
+              data.replace(/\n/g, "XXX\nXXX").split("XXX"),
+              `${self.mapName}.${self.mapType}`,
+              {
+                type: "text/plain",
+              }
+            );
+            Store.create("Mesh", file);
+            MeshService.preProcess(resolve, reject);
           });
           break;
         case "roadnetwork":
-          $.when($.get(self.coFile), $.get(self.grFile)).then((coData, grData) => {
-            let coFile = new File(coData[0].replace(/\n/g, "XXX\nXXX").split("XXX"), `${self.mapName}.co`, {
-              type: "text/plain",
-            });
-            let grFile = new File(grData[0].replace(/\n/g, "XXX\nXXX").split("XXX"), `${self.mapName}.gr`, {
-              type: "text/plain",
-            });
-            Store.createRecord('RoadNetwork', {coFile, grFile});
-            RoadNetworkService.preProcess(resolve, reject)
-          });
+          $.when($.get(self.coFile), $.get(self.grFile)).then(
+            (coData, grData) => {
+              let coFile = new File(
+                coData[0].replace(/\n/g, "XXX\nXXX").split("XXX"),
+                `${self.mapName}.co`,
+                {
+                  type: "text/plain",
+                }
+              );
+              let grFile = new File(
+                grData[0].replace(/\n/g, "XXX\nXXX").split("XXX"),
+                `${self.mapName}.gr`,
+                {
+                  type: "text/plain",
+                }
+              );
+              Store.create("RoadNetwork", { coFile, grFile });
+              RoadNetworkService.preProcess(resolve, reject);
+            }
+          );
           break;
       }
-    })
+    });
   },
-  loadMap(){
-    if(!this.preload){
+  loadMap() {
+    if (!this.preload) {
       return;
     }
-    if(!this.mapType){
+    if (!this.mapType) {
       return;
     }
     Spinner.show();
@@ -79,19 +100,22 @@ export default {
     this.controller.postLoadMap();
     return promise;
   },
-  loadTrace(){
-    if(!this.preload){
+  loadTrace() {
+    if (!this.preload) {
       return;
     }
     let self = this;
     $.get(self.traceFile, (data) => {
       let fileData = JSON.stringify(data);
-      let file = new File(fileData.replace(/\n/g, "XXX\nXXX").split("XXX"), `${self.traceName}.json`, {
-        type: "text/plain",
-      });
-      Store.createRecord('Tracer', file);
+      let file = new File(
+        fileData.replace(/\n/g, "XXX\nXXX").split("XXX"),
+        `${self.traceName}.json`,
+        {
+          type: "text/plain",
+        }
+      );
+      Store.create("Tracer", file);
       this.controller.postLoadTrace();
     });
-
-  }
-}
+  },
+};

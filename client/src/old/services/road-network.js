@@ -1,23 +1,23 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from "pixi.js";
 
-import Store from './store';
-import Controller from '../controller';
-import GraphicsManager from '../services/graphics-manager';
-import config from '../config';
+import Store from "./Store.new";
+import Controller from "../controller";
+import GraphicsManager from "../services/graphics-manager";
+import config from "../config";
 
 export default {
   parser: {
     coParse(file, callback) {
       let coReader = new FileReader();
 
-      coReader.addEventListener("load", function(event) {
+      coReader.addEventListener("load", function (event) {
         let textFile = event.target;
         const data = textFile.result.split(/\n|\r\n/);
         let coordinates = [];
         let minX, minY;
         let maxX, maxY;
         for (let line of data) {
-          if (line[0] == 'v') {
+          if (line[0] == "v") {
             let vline = line.split(" ");
             let x = Number(vline[2]);
             let y = Number(vline[3]);
@@ -35,7 +35,7 @@ export default {
             }
             coordinates.push({
               x,
-              y
+              y,
             });
           }
         }
@@ -43,9 +43,9 @@ export default {
         maxY -= minY;
         coordinates = coordinates.map((c) => {
           return {
-            x: (c.x - minX),
-            y: (c.y - minY)
-          }
+            x: c.x - minX,
+            y: c.y - minY,
+          };
         });
         coordinates.unshift(-1);
         callback({
@@ -53,7 +53,7 @@ export default {
           maxY,
           minX,
           minY,
-          coordinates
+          coordinates,
         });
       });
 
@@ -62,12 +62,12 @@ export default {
     grParse(file, callback) {
       let grReader = new FileReader();
 
-      grReader.addEventListener("load", function(event) {
+      grReader.addEventListener("load", function (event) {
         let textFile = event.target;
         const data = textFile.result.split(/\n|\r\n/);
         let lines = [];
         for (let line of data) {
-          if (line[0] == 'a') {
+          if (line[0] == "a") {
             let aline = line.split(" ");
             let from = aline[1];
             let to = aline[2];
@@ -75,16 +75,16 @@ export default {
           }
         }
         callback({
-          lines
+          lines,
         });
       });
 
       grReader.readAsText(file);
-    }
+    },
   },
   renderMap(resolve, reject) {
-    try{
-      let roadNetwork = Store.find('RoadNetwork');
+    try {
+      let roadNetwork = Store.get("RoadNetwork");
       roadNetwork.roadCoordinates.coData.then((coData) => {
         roadNetwork.roadGraph.grData.then((grData) => {
           Controller.setupRenderer();
@@ -99,48 +99,48 @@ export default {
           }, 1000);
         });
       });
-    }
-    catch(e){
+    } catch (e) {
       reject(e);
     }
   },
   sendToServer(resolve, reject) {
-    let roadNetwork = Store.find('RoadNetwork');
+    let roadNetwork = Store.get("RoadNetwork");
     roadNetwork.roadCoordinates.coData.then((coData) => {
       roadNetwork.roadGraph.grData.then((grData) => {
         fetch(config.processRoadNetworkUrl, {
           method: "POST",
           body: JSON.stringify({
             coData: coData,
-            grData: grData
+            grData: grData,
           }),
           headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then((res) => res.json()).then((data) => {
-          if (data.done) {
-            this.renderMap(resolve, reject);
-          }
-          else{
-            reject();
-          }
-        });
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.done) {
+              this.renderMap(resolve, reject);
+            } else {
+              reject();
+            }
+          });
       });
     });
   },
-  checkMap(resolve, reject){
-    let map = Store.find("Map");
+  checkMap(resolve, reject) {
+    let map = Store.get("Map");
     var img = new Image();
     let self = this;
-    img.onerror = function(){
+    img.onerror = function () {
       //send request to server
       self.sendToServer(resolve, reject);
-    }
-    img.onload = function(){
+    };
+    img.onload = function () {
       //load map from image directly
       self.renderMap(resolve, reject);
       img = null;
-    }
+    };
     img.src = `${config.clientAddr}/maps/ny`;
   },
   process() {
@@ -150,5 +150,5 @@ export default {
   },
   preProcess(resolve, reject) {
     this.checkMap(resolve, reject);
-  }
-}
+  },
+};

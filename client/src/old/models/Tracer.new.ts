@@ -2,7 +2,7 @@ import config from "../config";
 import ConstraintForceLayoutService from "../services/constraint-force-layout";
 import GraphicsManager from "../services/graphics-manager";
 import Injector from "../services/injector";
-import Store from "../services/store";
+import Store from "../services/Store.new";
 import drawLine from "../utils/draw-line";
 
 type Trace = any;
@@ -35,7 +35,7 @@ class Tracer {
     const eventsList = this.trace.eventList;
     eventsList.forEach((event: any) => {
       event.tracer = this;
-      const step = Store.createRecord("Step", event);
+      const step = Store.create("Step", event);
       if (!this.layout) {
         this.checkMax(step.node);
         this.checkMin(step.node);

@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import config from "../config";
 import NodeObjectsProcessor from "../services/node-objects-processor";
-import Store from "../services/store";
+import Store from "../services/Store.new";
 import nodeColor from "../utils/node-color";
 
 let _id = 0;
@@ -197,7 +197,7 @@ class Node {
       return null;
     }
     for (let i = this._id - 1; i >= 0; i--) {
-      let node = Store.findById("Node", i);
+      let node = Store.getById("Node", i);
       if (node && node.id == this.pId && node.type == "expanding") {
         return node;
       }
@@ -210,7 +210,7 @@ class Node {
       return null;
     }
     for (let i = this._id - 1; i > 0; i--) {
-      let node = Store.findById("Node", i);
+      let node = Store.getById("Node", i);
       if (node && node.id == this.id && node.type == "expanding") {
         return node;
       }
@@ -221,7 +221,7 @@ class Node {
   currentStateNode(currentId) {
     let latestNode = this;
     for (let i = this._id + 1; i <= currentId; i++) {
-      let node = Store.findById("Node", i);
+      let node = Store.getById("Node", i);
       if (node && node.id == this.id) {
         latestNode = node;
       }
@@ -239,7 +239,7 @@ class Node {
     }
     const totalNodes = Store.count("Node");
     for (let i = this._id + 1; i < totalNodes; i++) {
-      let node = Store.findById("Node", i);
+      let node = Store.getById("Node", i);
       if (node.id == this.id && node.type == "closing") {
         return nodes;
       }
@@ -256,7 +256,7 @@ class Node {
       return nodes;
     }
     for (let i = this._id - 1; i >= 0; i--) {
-      let node = Store.find("Node", i);
+      let node = Store.get("Node", i);
       if (!node || node._id == this._id) {
         return nodes;
       }

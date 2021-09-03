@@ -34,7 +34,7 @@ export class RPCClient {
   }
 
   async call<T extends keyof NameMethodMap>(
-    name: RequestOf<NameMethodMap[T]>["method"],
+    name: T,
     params?: RequestOf<NameMethodMap[T]>["params"]
   ): Promise<ResponseOf<NameMethodMap[T]>["result"]> {
     return await this.rpc.request(name, params);

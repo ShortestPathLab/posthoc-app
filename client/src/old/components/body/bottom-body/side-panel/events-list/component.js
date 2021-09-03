@@ -5,7 +5,7 @@ import $ from "jquery";
 import BaseComponent from "../../../../base-component";
 import LoggerOverlayComponent from "../logger-overlay/component";
 import PlaybackService from "../../../../../services/playback";
-import Store from "../../../../../services/store";
+import Store from "../../../../../services/Store.new";
 import nodeColor from "../../../../../utils/node-color";
 import TimeTravelService from "../../../../../services/time-travel";
 
@@ -106,7 +106,7 @@ let EventsListComponent = new StateMachine(
           return;
         }
         let currentStepId = this.events[this.events.length - 1];
-        let currentStep = Store.findById("Step", currentStepId);
+        let currentStep = Store.getById("Step", currentStepId);
         let currentNode = currentStep.node;
         let siblingNodes = currentNode.siblingNodes;
         let parentNode = currentNode.parentNode;
@@ -153,7 +153,7 @@ let EventsListComponent = new StateMachine(
        */
       reset() {
         this.highlightedEvents = [];
-        let tracer = Store.find("Tracer");
+        let tracer = Store.get("Tracer");
         tracer.eventsListHtml.then((eventsListHtml) => {
           $("#events").html(eventsListHtml);
           $(".event").on("click", (e) => {
@@ -213,7 +213,7 @@ let EventsListComponent = new StateMachine(
           return;
         }
         let stepId = this.events[this.events.length - 1];
-        let step = Store.findById("Step", stepId);
+        let step = Store.getById("Step", stepId);
         if (step) {
           LoggerOverlayComponent.setNode(step.node);
         }
@@ -230,7 +230,7 @@ let EventsListComponent = new StateMachine(
         pruneEvents.remove();
         this.events.length = id;
         let stepId = this.events[this.events.length - 1];
-        let step = Store.findById("Step", stepId);
+        let step = Store.getById("Step", stepId);
         if (step) {
           LoggerOverlayComponent.setNode(step.node);
         }
