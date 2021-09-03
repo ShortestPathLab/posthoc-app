@@ -28,7 +28,9 @@ function AlgorithmPicker() {
         ),
       }))}
       value={selected?.id}
-      onChange={(v) => setUIState({ algorithm: v })}
+      onChange={(v) =>
+        setUIState({ algorithm: v, step: 0, playback: "paused" })
+      }
     />
   );
 }

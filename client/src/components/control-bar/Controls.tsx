@@ -17,8 +17,6 @@ export default function Controls() {
           <PlaybackControls />
           {renderDivider()}
           <UtilityControls />
-          {renderDivider()}
-          <CameraControls />
         </Box>
       </Toolbar>
     </AppBar>

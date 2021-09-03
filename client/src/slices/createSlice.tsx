@@ -1,4 +1,5 @@
 import { noop } from "lodash";
+import { useReducer } from "react";
 import {
   createContext,
   ReactNode,
@@ -16,7 +17,7 @@ const defaultReducer = (_: any, next: any) => next;
 
 export function createSlice<T, U = T>(
   initialState: T,
-  initializer?: () => Promise<T>,
+  initializer?: () => Promise<U>,
   reducer: Reducer<T, U> = defaultReducer
 ) {
   const Store = createContext<Slice<T, U>>([initialState, noop]);
@@ -25,12 +26,12 @@ export function createSlice<T, U = T>(
     () => useContext(Store),
     // Context
     ({ children }: { children?: ReactNode }) => {
-      const [value, setValue] = useState(initialState);
+      const [value, dispatch] = useReducer(reducer, initialState);
       const slice = useMemo<Slice<T, U>>(
-        () => [value, (next) => setValue(reducer(value, next))],
-        [reducer, value, setValue]
+        () => [value, dispatch],
+        [value, dispatch]
       );
-      useEffect(() => void initializer?.().then?.(setValue), [setValue]);
+      useEffect(() => void initializer?.().then?.(dispatch), [dispatch]);
       return <Store.Provider value={slice}>{children}</Store.Provider>;
     },
   ] as const;

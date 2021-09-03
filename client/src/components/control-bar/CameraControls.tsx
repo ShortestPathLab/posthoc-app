@@ -1,18 +1,18 @@
 import { Button } from "@material-ui/core";
-import { usePlaybackState } from "hooks/usePlaybackState";
 import Controller from "old/controller";
+import { useSpecimen } from "slices/specimen";
 
 export function CameraControls() {
-  const ready = usePlaybackState() !== "none";
+  const [specimen] = useSpecimen();
   return (
     <>
-      <Button disabled={!ready} onClick={() => Controller.fitMap()}>
+      <Button disabled={!specimen} onClick={() => Controller.fitMap()}>
         Fit All
       </Button>
-      <Button disabled={!ready} onClick={() => Controller.fitDebugger()}>
+      <Button disabled={!specimen} onClick={() => Controller.fitDebugger()}>
         Fit Trace
       </Button>
-      <Button disabled={!ready} onClick={() => Controller.fitScale()}>
+      <Button disabled={!specimen} onClick={() => Controller.fitScale()}>
         100%
       </Button>
     </>
