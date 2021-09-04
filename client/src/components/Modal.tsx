@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { ArrowBack } from "@material-ui/icons";
 import { ResizeSensor } from "css-element-queries";
-import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
+import PopupState from "material-ui-popup-state";
 import {
   cloneElement,
   ComponentProps,
@@ -248,13 +248,12 @@ export function ManagedModal({
 }) {
   return (
     <PopupState variant="popover">
-      {(popupState) => {
-        const { onClick } = bindTrigger(popupState);
+      {({ open, close, isOpen }) => {
         return (
           <>
-            {cloneElement(trigger(onClick))}
-            <Modal {...ModalProps} {...bindPopover(popupState)}>
-              <ModalAppBar {...bindPopover(popupState)} {...ModalAppBarProps} />
+            {cloneElement(trigger(open))}
+            <Modal open={isOpen} onClose={close} {...ModalProps}>
+              <ModalAppBar onClose={close} {...ModalAppBarProps} />
               {children ?? ModalProps?.children}
             </Modal>
           </>

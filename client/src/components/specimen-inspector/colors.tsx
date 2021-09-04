@@ -27,5 +27,5 @@ export const colors: { [K in TraceEventType]: number } = mapValues(
 );
 
 export function getColor(key?: TraceEventType) {
-  return key ? colors[key] ?? convert(orange[tint]) : convert(orange[tint]);
+  return (key && colors[key]) || convert(orange[tint]);
 }
