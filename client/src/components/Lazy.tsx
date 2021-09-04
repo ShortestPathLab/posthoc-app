@@ -17,7 +17,8 @@ function Segment({ estimateHeight: height = 0, renderChildren }: SegmentProps) {
   );
 }
 
-const SCALE = 10;
+const SCALE = 2;
+const MIN_ITEMS = 16;
 
 type LazyProps<T> = {
   items?: T[];
@@ -42,7 +43,7 @@ export function Lazy<T>({
             key={i}
             estimateHeight={segment.length * rowHeight}
             renderChildren={() =>
-              segment.length <= SCALE ? (
+              segment.length <= MIN_ITEMS ? (
                 map(segment, (child, j) => renderItem?.(child, o + j))
               ) : (
                 <Lazy

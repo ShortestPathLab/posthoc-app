@@ -6,9 +6,7 @@ import {
   StopOutlined,
 } from "@material-ui/icons";
 import { IconButtonWithTooltip as Button } from "components/IconButtonWithTooltip";
-import { defer, delay, max, min } from "lodash";
-import Controller from "old/controller";
-import PlaybackService from "old/services/playback";
+import { max, min } from "lodash";
 import { useEffect } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";

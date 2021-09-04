@@ -1,12 +1,11 @@
 import { noop } from "lodash";
-import { useReducer } from "react";
 import {
   createContext,
   ReactNode,
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useReducer,
 } from "react";
 
 type Slice<T, U = T> = [T, (next: U) => void];

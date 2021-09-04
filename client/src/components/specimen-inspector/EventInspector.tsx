@@ -27,17 +27,17 @@ export function EventInspector({
   selected,
   ...props
 }: EventInspectorProps) {
-  const [, setUIState] = useUIState();
+  const [{ playback }, setUIState] = useUIState();
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (ref && selected) {
-      ref.scrollIntoView();
+    if (ref && selected && playback === "playing") {
+      ref.scrollIntoView({ block: "center" });
     }
-  }, [ref, selected]);
+  }, [ref, selected, playback]);
 
   function renderProperty(label: ReactNode, value: ReactNode) {
     return (
-      <Flex width="auto" mr={3} mt={0.5}>
+      <Flex width="auto" mr={3} mt={0.5} key={`${label}::${value}`}>
         <Type variant="body2" sx={{ opacity: 0.54 }}>
           {label}
         </Type>

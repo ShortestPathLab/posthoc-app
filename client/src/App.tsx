@@ -1,10 +1,9 @@
-import { Divider } from "@material-ui/core";
+import Controls from "components/control-bar/Controls";
 import { Flex } from "components/Flex";
-import { SpecimenInspector as SpecimenInspector } from "components/specimen-inspector/SpecimenInspector";
+import { SpecimenInspector } from "components/specimen-inspector/SpecimenInspector";
 import { Title } from "components/Title";
 import { useEffect } from "react";
 import { useInfo } from "slices/info";
-import Controls from "components/control-bar/Controls";
 
 function App() {
   // TODO Remove temporary connection check

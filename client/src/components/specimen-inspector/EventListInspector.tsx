@@ -1,6 +1,5 @@
 import { Box, BoxProps } from "@material-ui/core";
 import { Lazy } from "components/Lazy";
-import { map } from "lodash";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { EventInspector } from "./EventInspector";
@@ -17,7 +16,7 @@ export function EventListInspector(props: BoxProps) {
         rowHeight={estimateHeight}
         items={specimen?.eventList}
         renderItem={(event, i) => (
-          <Box p={2}>
+          <Box p={2} key={i}>
             <EventInspector
               key={i}
               event={event}

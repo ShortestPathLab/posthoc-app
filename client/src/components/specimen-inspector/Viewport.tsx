@@ -30,13 +30,14 @@ const PixiComponentViewport = PixiComponent<
       worldHeight: props.height * 2,
       ticker: props.app.ticker,
       interaction: props.app.renderer.plugins.interaction,
+      stopPropagation: true,
     })
       .drag()
       .pinch()
       .wheel()
       .decelerate({ friction: 0.98 })
       .clampZoom({ maxScale: 10, minScale: 0.25 }),
-  applyProps: (viewport, { width, height }) => {
+  applyProps: (viewport, _, { width, height }) => {
     viewport.resize(width, height, width * 2, height * 2);
   },
 });

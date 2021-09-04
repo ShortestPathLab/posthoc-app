@@ -40,7 +40,7 @@ export function SpecimenInspector({ ...props }: SpecimenInspectorProps) {
   return (
     <>
       <Fade in={loading}>
-        <LinearProgress variant="indeterminate" sx={{ mb: -0.5 }} />
+        <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
       </Fade>
       <Flex {...props}>
         {specimen ? (

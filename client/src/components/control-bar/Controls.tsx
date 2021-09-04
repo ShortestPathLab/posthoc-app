@@ -1,5 +1,4 @@
 import { AppBar, Box, Divider, Toolbar } from "@material-ui/core";
-import { CameraControls } from "./CameraControls";
 import { InputControls } from "./InputControls";
 import { PlaybackControls } from "./PlaybackControls";
 import { UtilityControls } from "./UtilityControls";

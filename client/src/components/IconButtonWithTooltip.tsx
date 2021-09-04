@@ -8,7 +8,7 @@ type IconButtonWithTooltipProps = {
 } & IconButtonProps;
 
 export function IconButtonWithTooltip({
-  label: label,
+  label,
   icon,
   ...rest
 }: IconButtonWithTooltipProps) {

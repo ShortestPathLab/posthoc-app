@@ -2,12 +2,9 @@ import { readdir, readFile } from "fs/promises";
 import { memoize, startCase } from "lodash";
 import { join, parse } from "path";
 import { createRPCMethod as createMethod, RPCServer } from "./RPCServer";
-import { initialise as initialiseStaticServer } from "./staticServer";
 
 const ALGORITHMS_PATH = "./static/algorithms";
 const SERVER_NAME = "warthog";
-
-initialiseStaticServer();
 
 const rpcServer = new RPCServer({
   methods: [
