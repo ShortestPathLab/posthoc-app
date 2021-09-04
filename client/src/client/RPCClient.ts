@@ -4,15 +4,15 @@ import { Request, RequestOf, ResponseOf } from "protocol/Message";
 import { io, Socket } from "socket.io-client";
 
 export interface RPCClientOptions {
-  url?: string;
+  url: string;
 }
 
 export class RPCClient {
   rpc: JSONRPCClient;
   socket: Socket;
 
-  constructor(readonly options: RPCClientOptions = {}) {
-    this.socket = io(options.url ?? "http://localhost/");
+  constructor(readonly options: RPCClientOptions) {
+    this.socket = io(options.url);
     this.rpc = new JSONRPCClient(async (request: Request) => {
       const listener = (response: Response) => {
         if (response.id === request.id) {
