@@ -16,7 +16,7 @@ export function EventListInspector(props: BoxProps) {
         rowHeight={estimateHeight}
         items={specimen?.eventList}
         renderItem={(event, i) => (
-          <Box p={2} key={i}>
+          <Box p={1} key={i}>
             <EventInspector
               key={i}
               event={event}
