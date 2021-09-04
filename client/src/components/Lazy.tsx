@@ -17,8 +17,8 @@ function Segment({ estimateHeight: height = 0, renderChildren }: SegmentProps) {
   );
 }
 
-const SCALE = 2;
-const MIN_ITEMS = 16;
+const CHUNK_COUNT = 2;
+const MIN_CHUNK_SIZE = 8;
 
 type LazyProps<T> = {
   items?: T[];
@@ -33,7 +33,10 @@ export function Lazy<T>({
   rowHeight = 1,
   offset = 0,
 }: LazyProps<T>) {
-  const chunkSize = max([SCALE, ceil((items?.length ?? 0) / SCALE)])!;
+  const chunkSize = max([
+    CHUNK_COUNT,
+    ceil((items?.length ?? 0) / CHUNK_COUNT),
+  ])!;
   return (
     <>
       {map(chunk(items, chunkSize), (segment, i) => {
@@ -43,7 +46,7 @@ export function Lazy<T>({
             key={i}
             estimateHeight={segment.length * rowHeight}
             renderChildren={() =>
-              segment.length <= MIN_ITEMS ? (
+              segment.length <= MIN_CHUNK_SIZE ? (
                 map(segment, (child, j) => renderItem?.(child, o + j))
               ) : (
                 <Lazy
