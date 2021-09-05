@@ -51,7 +51,7 @@ export function SpecimenInspector({ ...props }: SpecimenInspectorProps) {
               right={0}
               height="100%"
               maxWidth={480}
-              minWidth="25vw"
+              minWidth="30vw"
             />
           </>
         ) : (

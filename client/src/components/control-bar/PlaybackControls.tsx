@@ -6,63 +6,59 @@ import {
   StopOutlined,
 } from "@material-ui/icons";
 import { IconButtonWithTooltip as Button } from "components/IconButtonWithTooltip";
-import { max, min } from "lodash";
-import { useEffect } from "react";
-import { useSpecimen } from "slices/specimen";
-import { useUIState } from "slices/UIState";
+import { usePlaybackState } from "hooks/usePlaybackState";
+import { PlaybackService } from "./PlaybackService";
 
 export function PlaybackControls() {
-  const [specimen] = useSpecimen();
-  const [{ playback, step = 0 }, setUIState] = useUIState();
-  const canStep = playback !== "playing";
-  const maxStep = (specimen?.eventList?.length ?? 1) - 1;
-  useEffect(() => {
-    if (playback === "playing") {
-      if (maxStep > step) {
-        const handle = requestAnimationFrame(() =>
-          setUIState({ step: step + 1 })
-        );
-        return () => cancelAnimationFrame(handle);
-      } else {
-        setUIState({ playback: "paused" });
-      }
-    }
-  }, [playback, setUIState, step, specimen, maxStep]);
+  const {
+    playing,
+    canPause,
+    canPlay,
+    canStepBackward,
+    canStepForward,
+    canStop,
+    pause,
+    play,
+    stepBackward,
+    stepForward,
+    stop,
+  } = usePlaybackState();
   return (
     <>
+      <PlaybackService />
       <Button
         label="step-backward"
         icon={<SkipPreviousOutlined />}
-        onClick={() => setUIState({ step: max([0, step - 1]) })}
-        disabled={!specimen || !canStep}
+        onClick={stepBackward}
+        disabled={!canStepBackward}
       />
       <Button
-        {...(playback === "playing"
+        {...(playing
           ? {
               label: "pause",
               icon: <PauseOutlined />,
-              onClick: () => setUIState({ playback: "paused" }),
-              disabled: !specimen,
+              onClick: pause,
+              disabled: !canPause,
             }
           : {
               label: "play",
               icon: <PlayArrowOutlined />,
-              onClick: () => setUIState({ playback: "playing" }),
-              disabled: !specimen,
+              onClick: play,
+              disabled: !canPlay,
               color: "primary",
             })}
       />
       <Button
         label="step-forward"
         icon={<SkipNextOutlined />}
-        onClick={() => setUIState({ step: min([maxStep, step + 1]) })}
-        disabled={!specimen || !canStep}
+        onClick={stepForward}
+        disabled={!canStepForward}
       />
       <Button
         label="stop"
         icon={<StopOutlined />}
-        onClick={() => setUIState({ step: 0, playback: "paused" })}
-        disabled={!specimen}
+        onClick={stop}
+        disabled={!canStop}
       />
     </>
   );

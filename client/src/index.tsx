@@ -4,6 +4,7 @@ import {
   CssBaseline,
   ThemeProvider,
 } from "@material-ui/core";
+import { SnackbarProvider } from "components/Snackbar";
 import { times } from "lodash";
 import { StrictMode } from "react";
 import { render } from "react-dom";
@@ -23,6 +24,9 @@ const slices = [
   SpecimenProvider,
 ];
 
+const SHADOW =
+  "0px 8px 18px -1px rgb(0 0 0 / 8%), 0px 10px 48px 0px rgb(0 0 0 / 1%), 0px 20px 96px 0px rgb(0 0 0 / 0.5%)";
+
 render(
   <StrictMode>
     <CssBaseline>
@@ -31,19 +35,14 @@ render(
           palette: {
             primary: colors["blueGrey"],
           },
-          shadows: [
-            "",
-            ...times(
-              24,
-              () =>
-                "0px 8px 18px -1px rgb(0 0 0 / 8%), 0px 10px 48px 0px rgb(0 0 0 / 1%), 0px 20px 96px 0px rgb(0 0 0 / 0.5%)"
-            ),
-          ] as any,
+          shadows: ["", ...times(24, () => SHADOW)] as any,
         })}
       >
-        <AppStateProvider slices={slices}>
-          <App />
-        </AppStateProvider>
+        <SnackbarProvider>
+          <AppStateProvider slices={slices}>
+            <App />
+          </AppStateProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     </CssBaseline>
   </StrictMode>,

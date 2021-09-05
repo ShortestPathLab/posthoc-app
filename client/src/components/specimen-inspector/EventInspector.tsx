@@ -10,10 +10,10 @@ import { Flex } from "components/Flex";
 import { Space } from "components/Space";
 import { entries, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
-import { useState } from "react";
-import { useEffect } from "react";
 import { ReactNode } from "react";
 import { useUIState } from "slices/UIState";
+
+export function getHeight(event: TraceEvent) {}
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -27,13 +27,7 @@ export function EventInspector({
   selected,
   ...props
 }: EventInspectorProps) {
-  const [{ playback }, setUIState] = useUIState();
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (ref && selected && playback === "playing") {
-      ref.scrollIntoView({ block: "center" });
-    }
-  }, [ref, selected, playback]);
+  const [, setUIState] = useUIState();
 
   function renderProperty(label: ReactNode, value: ReactNode) {
     return (
@@ -47,18 +41,20 @@ export function EventInspector({
     );
   }
 
+  const cardStyles = selected
+    ? {
+        color: "primary.contrastText",
+        bgcolor: "primary.main",
+      }
+    : {};
+
   return (
     <Card
       {...props}
-      ref={setRef}
-      sx={
-        selected
-          ? {
-              color: "primary.contrastText",
-              bgcolor: "primary.main",
-            }
-          : {}
-      }
+      sx={{
+        ...cardStyles,
+        ...props.sx,
+      }}
     >
       <CardActionArea sx={{ p: 2 }} onClick={() => setUIState({ step: index })}>
         <Flex alignItems="center">
@@ -69,7 +65,7 @@ export function EventInspector({
               variant="overline"
               sx={{ my: -0.75, display: "block" }}
             >{`${event?.type} #${event?.id}`}</Type>
-            <Flex flexWrap="wrap">
+            <Flex>
               {event?.f !== undefined && renderProperty("f", event?.f)}
               {event?.g !== undefined && renderProperty("g", event?.g)}
               {map(entries(event?.variables), ([k, v]) => renderProperty(k, v))}

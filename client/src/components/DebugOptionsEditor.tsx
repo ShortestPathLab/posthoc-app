@@ -2,7 +2,7 @@ import { Divider, Tab } from "@material-ui/core";
 import { TabContext, TabList, TabPanel } from "@material-ui/lab";
 import { times } from "lodash";
 import { useState } from "react";
-import { ScriptEditor } from "./ScriptEditor";
+import { ScriptEditor } from "./script-editor/ScriptEditor";
 
 export function DebugOptionsEditor() {
   const [tab, setTab] = useState("standard");

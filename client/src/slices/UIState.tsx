@@ -1,3 +1,6 @@
+import { makeTemplate } from "components/script-editor/makeTemplate";
+import { templates } from "components/script-editor/templates";
+import { values } from "lodash";
 import { createSlice } from "./createSlice";
 
 export type PlaybackStateType = "playing" | "paused" | undefined;
@@ -9,9 +12,19 @@ type InputState = {
   map?: string;
 };
 
-export type UIState = InputState & PlaybackState;
+type DebugOptionsState = {
+  code?: string;
+};
+
+export type UIState = InputState & PlaybackState & DebugOptionsState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
   Partial<UIState>
->({}, undefined, (prev, next) => ({ ...prev, ...next }));
+>(
+  {
+    code: makeTemplate(values(templates)),
+  },
+  undefined,
+  (prev, next) => ({ ...prev, ...next })
+);
