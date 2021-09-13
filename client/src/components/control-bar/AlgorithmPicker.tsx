@@ -29,7 +29,12 @@ export function AlgorithmPicker() {
       }))}
       value={selected?.id}
       onChange={(v) =>
-        setUIState({ algorithm: v, step: 0, playback: "paused" })
+        setUIState({
+          algorithm: v,
+          step: 0,
+          playback: "paused",
+          breakpoints: [],
+        })
       }
     />
   );

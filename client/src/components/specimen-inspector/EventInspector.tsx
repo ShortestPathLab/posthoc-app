@@ -56,7 +56,10 @@ export function EventInspector({
         ...props.sx,
       }}
     >
-      <CardActionArea sx={{ p: 2 }} onClick={() => setUIState({ step: index })}>
+      <CardActionArea
+        sx={{ p: 2, height: "100%" }}
+        onClick={() => setUIState({ step: index })}
+      >
         <Flex alignItems="center">
           <Type>{index}</Type>
           <Divider sx={{ mx: 2 }} flexItem orientation="vertical" />

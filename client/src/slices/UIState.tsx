@@ -2,6 +2,7 @@ import { makeTemplate } from "components/script-editor/makeTemplate";
 import { templates } from "components/script-editor/templates";
 import { values } from "lodash";
 import { createSlice } from "./createSlice";
+import { TraceEventType } from "protocol/Trace";
 
 export type PlaybackStateType = "playing" | "paused" | undefined;
 
@@ -12,8 +13,25 @@ type InputState = {
   map?: string;
 };
 
+export type Comparator = {
+  key: string;
+  apply: (value: number, reference: number) => boolean;
+};
+
+export type Breakpoint = {
+  key: string;
+  property?: string;
+  reference?: number;
+  condition?: Comparator;
+  active?: boolean;
+  type?: TraceEventType;
+};
+
 type DebugOptionsState = {
   code?: string;
+  monotonicF?: boolean;
+  monotonicG?: boolean;
+  breakpoints?: Breakpoint[];
 };
 
 export type UIState = InputState & PlaybackState & DebugOptionsState;
@@ -24,6 +42,8 @@ export const [useUIState, UIStateProvider] = createSlice<
 >(
   {
     code: makeTemplate(values(templates)),
+    monotonicF: true,
+    monotonicG: true,
   },
   undefined,
   (prev, next) => ({ ...prev, ...next })
