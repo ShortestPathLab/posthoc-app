@@ -22,8 +22,8 @@ const PixiComponentViewport = PixiComponent<
   PixiComponentViewportProps,
   PixiViewport
 >("Viewport", {
-  create: (props) => {
-    const viewport = new PixiViewport({
+  create: (props) =>
+    new PixiViewport({
       screenWidth: props.width,
       screenHeight: props.height,
       worldWidth: props.width * 2,
@@ -36,9 +36,7 @@ const PixiComponentViewport = PixiComponent<
       .pinch()
       .wheel()
       .decelerate({ friction: 0.98 })
-      .clampZoom({ maxScale: 10, minScale: 0.1 });
-    return viewport;
-  },
+      .clampZoom({ maxScale: 10, minScale: 0.1 }),
   applyProps: (viewport, _, { width, height }) => {
     viewport.resize(width, height, width * 2, height * 2);
   },

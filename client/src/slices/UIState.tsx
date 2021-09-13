@@ -39,7 +39,10 @@ type SpecimenState = {
   endNode?: number;
 };
 
-export type UIState = InputState & PlaybackState & DebugOptionsState;
+export type UIState = InputState &
+  PlaybackState &
+  DebugOptionsState &
+  SpecimenState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,

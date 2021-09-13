@@ -8,24 +8,25 @@ const TARGET_FRAME_TIME = 1000 / 60;
 function useFrameTime(playing: boolean) {
   const [lastFrame, setLastFrame] = useState(0);
   const [delta, setDelta] = useState(TARGET_FRAME_TIME);
+
   useEffect(() => {
-    if (!playing) {
-      setLastFrame(0);
-    }
-  }, [playing]);
-  const step = useCallback(() => {
+    if (!playing) setLastFrame(0);
+  }, [playing, setLastFrame]);
+
+  const tick = useCallback(() => {
     if (playing) {
       const now = Date.now();
       if (lastFrame) {
         setDelta(now - lastFrame);
         setLastFrame(now);
       } else {
-        setLastFrame(now);
         setDelta(TARGET_FRAME_TIME);
+        setLastFrame(now);
       }
     }
   }, [setDelta, setLastFrame, lastFrame, playing]);
-  return [step, delta, max([1, ceil(delta / TARGET_FRAME_TIME)]) ?? 1] as const;
+
+  return [tick, delta, max([1, ceil(delta / TARGET_FRAME_TIME)]) ?? 1] as const;
 }
 
 export function usePlaybackState() {
@@ -36,7 +37,7 @@ export function usePlaybackState() {
   const playing = playback === "playing";
   const [start, end] = [0, (specimen?.eventList?.length ?? 1) - 1];
 
-  const [record, , lag] = useFrameTime(playing);
+  const [tick, , lag] = useFrameTime(playing);
 
   return useMemo(() => {
     const state = {
@@ -60,7 +61,7 @@ export function usePlaybackState() {
       stepBackward: () => setUIState({ step: stepBy(-1) }),
       tick: () => {
         setUIState({ playback: "playing", step: stepBy(1 * lag) });
-        record();
+        tick();
       },
     };
 
@@ -69,5 +70,5 @@ export function usePlaybackState() {
       ...state,
       ...callbacks,
     };
-  }, [end, lag, playback, playing, ready, record, setUIState, start, step]);
+  }, [end, lag, playback, playing, ready, tick, setUIState, start, step]);
 }

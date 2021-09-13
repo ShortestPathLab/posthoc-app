@@ -19,6 +19,7 @@ export function useBreakpoints() {
         if (event) {
           try {
             // Check monotonic f or g values
+            // TODO Fix definition of a monotonic f or g value
             if (step) {
               for (const p of [monotonicF && "f", monotonicG && "g"]) {
                 const prev = specimen?.eventList?.[step - 1];

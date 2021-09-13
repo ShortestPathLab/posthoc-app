@@ -51,22 +51,26 @@ export function Renderer(props: RendererProps) {
   const [{ step = 0 }] = useUIState();
   const { palette } = useTheme();
 
+  const nodes = useMemo(
+    () => take(specimen?.eventList, step),
+    [specimen, step]
+  );
+
   return (
     <Stage
       options={{
-        backgroundAlpha: 0,
-        antialias: true,
+        backgroundColor: 0xffffff,
       }}
       {...props}
     >
       <Viewport width={width} height={height}>
         <NodeList nodes={specimen?.eventList} />
-        <NodeList nodes={take(specimen?.eventList, step)} color={getColor} />
+        <NodeList nodes={nodes} color={getColor} />
         <Grid
           width={SIZE * SCALE}
           height={SIZE * SCALE}
-          x={(-SIZE / 2) * SCALE}
-          y={(-SIZE / 2) * SCALE}
+          x={0}
+          y={0}
           alpha={palette.action.disabledOpacity}
         />
       </Viewport>
