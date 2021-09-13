@@ -6,8 +6,8 @@ import {
   Divider,
   Typography as Type,
 } from "@material-ui/core";
-import { Flex } from "components/Flex";
-import { Space } from "components/Space";
+import { Flex } from "components/generic/Flex";
+import { Space } from "components/generic/Space";
 import { entries, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { ReactNode } from "react";

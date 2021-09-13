@@ -8,13 +8,15 @@ import {
 } from "react";
 import { AutoSizer } from "react-virtualized";
 
+type ScrollPanelProps = {
+  onTarget?: (e: HTMLDivElement | null) => void;
+} & ComponentProps<"div">;
+
 export function ScrollPanel({
   onTarget = noop,
   onScroll,
   ...props
-}: ComponentProps<"div"> & {
-  onTarget?: (e: HTMLDivElement | null) => void;
-}) {
+}: ScrollPanelProps) {
   const [target, setTarget] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {

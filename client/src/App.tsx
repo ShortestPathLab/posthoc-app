@@ -1,5 +1,5 @@
 import Controls from "components/control-bar/Controls";
-import { Flex } from "components/Flex";
+import { Flex } from "components/generic/Flex";
 import { SpecimenInspector } from "components/specimen-inspector/SpecimenInspector";
 import { Title } from "components/Title";
 import { useEffect } from "react";

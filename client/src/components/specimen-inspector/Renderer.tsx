@@ -4,7 +4,7 @@ import { keyBy, map, take, values } from "lodash";
 import { ComponentProps, useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { Trace, TraceEventType } from "../../../../protocol/Trace";
+import { Trace, TraceEventType } from "protocol/Trace";
 import { getColor } from "./colors";
 import { SCALE, SIZE } from "./constants";
 import { Grid } from "./Grid";

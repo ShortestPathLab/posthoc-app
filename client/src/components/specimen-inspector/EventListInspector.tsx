@@ -1,9 +1,12 @@
-import { Flex } from "components/Flex";
+import { Flex } from "components/generic/Flex";
 import { TraceEvent } from "protocol/Trace";
 import { useEffect, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { LazyList as List, LazyListProps as ListProps } from "../LazyList";
+import {
+  LazyList as List,
+  LazyListProps as ListProps,
+} from "components/generic/LazyList";
 import { EventInspector } from "./EventInspector";
 
 const ROW_HEIGHT = 75.56;

@@ -21,8 +21,8 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useScrollState } from "../hooks/useScrollState";
-import { useSmallDisplay } from "../hooks/useSmallDisplay";
+import { useScrollState } from "hooks/useScrollState";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { ScrollPanel, usePanel } from "./ScrollPanel";
 
 export function AppBarTitle({ children }: { children?: ReactNode }) {

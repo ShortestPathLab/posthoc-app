@@ -1,9 +1,9 @@
 import { Box } from "@material-ui/core";
-import { Flex } from "components/Flex";
+import { Flex } from "components/generic/Flex";
 import { call } from "components/script-editor/call";
 import { transpile } from "components/script-editor/transpile";
 import { useSnackbar } from "components/Snackbar";
-import { Space } from "components/Space";
+import { Space } from "components/generic/Space";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { memoize } from "lodash";
 import { useEffect, useMemo } from "react";

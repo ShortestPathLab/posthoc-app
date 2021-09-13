@@ -1,6 +1,6 @@
 import { Button, Typography as Type } from "@material-ui/core";
-import { Select } from "components/Select";
-import { Space } from "components/Space";
+import { Select } from "components/generic/Select";
+import { Space } from "components/generic/Space";
 import { useCompatibilityLayer } from "hooks/useCompatibilityLayer";
 import { find, map } from "lodash";
 import { useFeatures } from "slices/features";

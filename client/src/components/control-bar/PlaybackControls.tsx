@@ -5,7 +5,7 @@ import {
   SkipPreviousOutlined,
   StopOutlined,
 } from "@material-ui/icons";
-import { IconButtonWithTooltip as Button } from "components/IconButtonWithTooltip";
+import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { PlaybackService } from "./PlaybackService";
 

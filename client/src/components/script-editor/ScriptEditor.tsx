@@ -1,6 +1,6 @@
 import { CircularProgress } from "@material-ui/core";
 import Editor from "@monaco-editor/react";
-import { Flex } from "components/Flex";
+import { Flex } from "components/generic/Flex";
 import { debounce } from "lodash";
 import { AutoSizer as AutoSize } from "react-virtualized";
 import { useUIState } from "slices/UIState";

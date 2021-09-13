@@ -5,7 +5,7 @@ import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { AutoSizer as AutoSize } from "react-virtualized";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { Flex, FlexProps } from "../Flex";
+import { Flex, FlexProps } from "components/generic/Flex";
 import { EventListInspector } from "./EventListInspector";
 import { Renderer } from "./Renderer";
 
