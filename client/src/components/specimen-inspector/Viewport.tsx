@@ -1,5 +1,5 @@
 /**
- * From https://codesandbox.io/s/react-pixi-viewport-9ngfd
+ * Adapted from https://codesandbox.io/s/react-pixi-viewport-9ngfd
  * @author roxgarage
  */
 
@@ -22,21 +22,23 @@ const PixiComponentViewport = PixiComponent<
   PixiComponentViewportProps,
   PixiViewport
 >("Viewport", {
-  create: (props) =>
-    new PixiViewport({
+  create: (props) => {
+    const viewport = new PixiViewport({
       screenWidth: props.width,
       screenHeight: props.height,
       worldWidth: props.width * 2,
       worldHeight: props.height * 2,
-      ticker: props.app.ticker,
       interaction: props.app.renderer.plugins.interaction,
+      ticker: props.app.ticker,
       stopPropagation: true,
     })
       .drag()
       .pinch()
       .wheel()
       .decelerate({ friction: 0.98 })
-      .clampZoom({ maxScale: 10, minScale: 0.25 }),
+      .clampZoom({ maxScale: 10, minScale: 0.1 });
+    return viewport;
+  },
   applyProps: (viewport, _, { width, height }) => {
     viewport.resize(width, height, width * 2, height * 2);
   },

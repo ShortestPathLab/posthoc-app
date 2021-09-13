@@ -1,17 +1,44 @@
-import { clamp } from "lodash";
-import { useMemo } from "react";
+import { ceil, clamp, max } from "lodash";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
+
+const TARGET_FRAME_TIME = 1000 / 60;
+
+function useFrameTime(playing: boolean) {
+  const [lastFrame, setLastFrame] = useState(0);
+  const [delta, setDelta] = useState(TARGET_FRAME_TIME);
+  useEffect(() => {
+    if (!playing) {
+      setLastFrame(0);
+    }
+  }, [playing]);
+  const step = useCallback(() => {
+    if (playing) {
+      const now = Date.now();
+      if (lastFrame) {
+        setDelta(now - lastFrame);
+        setLastFrame(now);
+      } else {
+        setLastFrame(now);
+        setDelta(TARGET_FRAME_TIME);
+      }
+    }
+  }, [setDelta, setLastFrame, lastFrame, playing]);
+  return [step, delta, max([1, ceil(delta / TARGET_FRAME_TIME)]) ?? 1] as const;
+}
 
 export function usePlaybackState() {
   const [specimen] = useSpecimen();
   const [{ playback, step = 0 }, setUIState] = useUIState();
 
-  return useMemo(() => {
-    const ready = !!specimen;
-    const playing = playback === "playing";
-    const [start, end] = [0, (specimen?.eventList?.length ?? 1) - 1];
+  const ready = !!specimen;
+  const playing = playback === "playing";
+  const [start, end] = [0, (specimen?.eventList?.length ?? 1) - 1];
 
+  const [record, , lag] = useFrameTime(playing);
+
+  return useMemo(() => {
     const state = {
       start,
       end,
@@ -31,6 +58,10 @@ export function usePlaybackState() {
       stop: () => setUIState({ step: start, playback: "paused" }),
       stepForward: () => setUIState({ step: stepBy(1) }),
       stepBackward: () => setUIState({ step: stepBy(-1) }),
+      tick: () => {
+        setUIState({ playback: "playing", step: stepBy(1 * lag) });
+        record();
+      },
     };
 
     return {
@@ -38,5 +69,5 @@ export function usePlaybackState() {
       ...state,
       ...callbacks,
     };
-  }, [specimen, playback, step, setUIState]);
+  }, [end, lag, playback, playing, ready, record, setUIState, start, step]);
 }

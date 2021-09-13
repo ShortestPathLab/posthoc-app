@@ -22,7 +22,7 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
 
 export function PlaybackService() {
   const notify = useSnackbar();
-  const { playing, end, step, pause, stepForward } = usePlaybackState();
+  const { playing, end, step, pause, tick } = usePlaybackState();
   const shouldBreak = useBreakpoints();
 
   const renderLabel = useCallback(
@@ -45,7 +45,7 @@ export function PlaybackService() {
               if (result) {
                 notify(renderLabel(`Breakpoint hit: ${result}.`));
                 pause();
-              } else stepForward();
+              } else tick();
             } else {
               notify(renderLabel(`${trimEnd(error, ".")}.`));
               pause();
@@ -53,16 +53,7 @@ export function PlaybackService() {
           }
         )
       : pause();
-  }, [
-    renderLabel,
-    playing,
-    end,
-    step,
-    pause,
-    stepForward,
-    notify,
-    shouldBreak,
-  ]);
+  }, [renderLabel, playing, end, step, pause, tick, notify, shouldBreak]);
 
   return <></>;
 }

@@ -1,14 +1,15 @@
-import { Container, Stage } from "@inlet/react-pixi";
+import { Graphics, Stage } from "@inlet/react-pixi";
 import { useTheme } from "@material-ui/core";
-import { keyBy, map, take, values } from "lodash";
-import { ComponentProps, useMemo } from "react";
+import { keyBy, take, values } from "lodash";
+import * as PIXI from "pixi.js";
+import { Trace, TraceEventType } from "protocol/Trace";
+import { ComponentProps, useCallback, useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { Trace, TraceEventType } from "protocol/Trace";
 import { getColor } from "./colors";
 import { SCALE, SIZE } from "./constants";
 import { Grid } from "./Grid";
-import { Node } from "./Node";
+import { drawNode } from "./Node";
 import Viewport from "./Viewport";
 
 function NodeList({
@@ -25,18 +26,21 @@ function NodeList({
       ),
     [nodes]
   );
-  return (
-    <Container>
-      {map(values(memo), ({ variables, type }, i) => (
-        <Node
-          key={i}
-          x={(variables?.x ?? 0) * SCALE}
-          y={(variables?.y ?? 0) * SCALE}
-          color={color?.(type) ?? 0xe0e0e0}
-        />
-      ))}
-    </Container>
+  const draw = useCallback(
+    (g: PIXI.Graphics) => {
+      g.clear();
+      for (const { variables, type } of memo) {
+        drawNode(g, {
+          color: color?.(type) ?? 0xe0e0e0,
+          x: (variables?.x ?? 0) * SCALE,
+          y: (variables?.y ?? 0) * SCALE,
+        });
+      }
+      return g;
+    },
+    [memo, color]
   );
+  return <Graphics draw={draw} />;
 }
 
 type RendererProps = {} & ComponentProps<typeof Stage>;
@@ -56,10 +60,8 @@ export function Renderer(props: RendererProps) {
       {...props}
     >
       <Viewport width={width} height={height}>
-        <Container>
-          <NodeList nodes={specimen?.eventList} />
-          <NodeList nodes={take(specimen?.eventList, step)} color={getColor} />
-        </Container>
+        <NodeList nodes={specimen?.eventList} />
+        <NodeList nodes={take(specimen?.eventList, step)} color={getColor} />
         <Grid
           width={SIZE * SCALE}
           height={SIZE * SCALE}

@@ -34,6 +34,11 @@ type DebugOptionsState = {
   breakpoints?: Breakpoint[];
 };
 
+type SpecimenState = {
+  startNode?: number;
+  endNode?: number;
+};
+
 export type UIState = InputState & PlaybackState & DebugOptionsState;
 
 export const [useUIState, UIStateProvider] = createSlice<
