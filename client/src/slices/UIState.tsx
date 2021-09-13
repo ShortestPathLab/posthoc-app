@@ -50,8 +50,6 @@ export const [useUIState, UIStateProvider] = createSlice<
 >(
   {
     code: makeTemplate(values(templates)),
-    monotonicF: true,
-    monotonicG: true,
   },
   undefined,
   (prev, next) => ({ ...prev, ...next })

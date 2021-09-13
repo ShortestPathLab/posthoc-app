@@ -31,13 +31,13 @@ export function DebugOptionsEditor() {
           <Flex>
             <Switch
               label="Monotonic f value"
-              checked={monotonicF}
+              checked={!!monotonicF}
               onChange={(_, v) => setUIState({ monotonicF: v })}
             />
             <Space />
             <Switch
               label="Monotonic g value"
-              checked={monotonicG}
+              checked={!!monotonicG}
               onChange={(_, v) => setUIState({ monotonicG: v })}
             />
           </Flex>

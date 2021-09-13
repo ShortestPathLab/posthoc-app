@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start:dev": "concurrently \"cd ./client && npm start\" \"cd ./server && npm start\"",
-    "build": "gulp"
+    "start:dev": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
+    "start": "concurrently \"cd client && npx --yes serve -s build\" \"cd server && ts-node src/index.ts\"",
+    "build": "cd client && npm run build",
+    "postinstall": "concurrently \"cd client && npm i\" \"cd server && npm i\""
   },
   "repository": {
     "type": "git",
@@ -20,7 +22,6 @@
     "concurrently": "^6.2.1"
   },
   "dependencies": {
-    "gulp": "^4.0.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   }
