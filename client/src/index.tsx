@@ -4,7 +4,7 @@ import {
   CssBaseline,
   ThemeProvider,
 } from "@material-ui/core";
-import { SnackbarProvider } from "components/Snackbar";
+import { SnackbarProvider } from "components/generic/Snackbar";
 import { times } from "lodash";
 import { StrictMode } from "react";
 import { render } from "react-dom";
