@@ -41,6 +41,7 @@ export function UNSTABLE_evaluate<T extends Key>(
   method: T,
   params: ParamsOf<T>
 ) {
+  /* eslint-disable no-eval */
   return eval(`${script}\n${makeCallExpression(method, params)}`);
 }
 
