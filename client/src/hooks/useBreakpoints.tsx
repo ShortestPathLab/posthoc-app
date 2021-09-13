@@ -23,7 +23,7 @@ export function useBreakpoints() {
               for (const p of [monotonicF && "f", monotonicG && "g"]) {
                 const prev = specimen?.eventList?.[step - 1];
                 if (p && get(prev, p) > get(event, p)) {
-                  return { result: `monotonicity violation on ${p}` };
+                  return { result: `Monotonicity violation on ${p}` };
                 }
               }
             }
@@ -47,7 +47,7 @@ export function useBreakpoints() {
             }
             // Check breakpoints in the script editor section
             if (await call(es5, "shouldBreak", [step, event], false, EVAL)) {
-              return { result: `script editor` };
+              return { result: `Script editor` };
             }
           } catch (e) {
             return { error: `${e}` };

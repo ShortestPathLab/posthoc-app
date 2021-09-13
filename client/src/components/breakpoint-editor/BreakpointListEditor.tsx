@@ -23,7 +23,7 @@ export function BreakpointListEditor() {
 
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>
-      <Box sx={{ minWidth: 720 }}>
+      <Box sx={{ minWidth: 720, mb: 2 }}>
         <ListEditor<Breakpoint>
           icon={null}
           value={breakpoints}

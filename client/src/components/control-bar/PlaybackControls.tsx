@@ -1,9 +1,9 @@
 import {
-  PauseOutlined,
-  PlayArrowOutlined,
-  SkipNextOutlined,
-  SkipPreviousOutlined,
-  StopOutlined,
+  PauseOutlined as PauseIcon,
+  PlayArrowOutlined as PlayIcon,
+  SkipNextOutlined as ForwardIcon,
+  SkipPreviousOutlined as PreviousIcon,
+  StopOutlined as StopIcon,
 } from "@material-ui/icons";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
@@ -28,7 +28,7 @@ export function PlaybackControls() {
       <PlaybackService />
       <Button
         label="step-backward"
-        icon={<SkipPreviousOutlined />}
+        icon={<PreviousIcon />}
         onClick={stepBackward}
         disabled={!canStepBackward}
       />
@@ -36,13 +36,13 @@ export function PlaybackControls() {
         {...(playing
           ? {
               label: "pause",
-              icon: <PauseOutlined />,
+              icon: <PauseIcon />,
               onClick: pause,
               disabled: !canPause,
             }
           : {
               label: "play",
-              icon: <PlayArrowOutlined />,
+              icon: <PlayIcon />,
               onClick: play,
               disabled: !canPlay,
               color: "primary",
@@ -50,13 +50,13 @@ export function PlaybackControls() {
       />
       <Button
         label="step-forward"
-        icon={<SkipNextOutlined />}
+        icon={<ForwardIcon />}
         onClick={stepForward}
         disabled={!canStepForward}
       />
       <Button
         label="stop"
-        icon={<StopOutlined />}
+        icon={<StopIcon />}
         onClick={stop}
         disabled={!canStop}
       />

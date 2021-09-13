@@ -1,5 +1,5 @@
 import { IconButton, Snackbar } from "@material-ui/core";
-import { CloseOutlined } from "@material-ui/icons";
+import { CloseOutlined as CloseIcon } from "@material-ui/icons";
 import { noop } from "lodash";
 import {
   createContext,
@@ -82,7 +82,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
               sx={{ p: 0.5 }}
               onClick={handleClose}
             >
-              <CloseOutlined />
+              <CloseIcon />
             </IconButton>
           </>
         }

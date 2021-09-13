@@ -13,9 +13,9 @@ import {
 } from "@material-ui/core";
 import {
   Add,
-  DeleteOutlined,
-  EditOutlined,
-  LabelOutlined,
+  DeleteOutlined as DeleteIcon,
+  EditOutlined as EditIcon,
+  LabelOutlined as LabelIcon,
 } from "@material-ui/icons";
 import { filter, map, sortBy, uniqBy } from "lodash";
 import { nanoid as id } from "nanoid";
@@ -88,7 +88,7 @@ function useInitialRender() {
 }
 
 export function ListEditorField({
-  icon = <LabelOutlined />,
+  icon = <LabelIcon />,
   useSwitch,
   useDelete,
   useEdit: useEditButton = true,
@@ -151,12 +151,12 @@ export function ListEditorField({
               }
             }}
           >
-            <EditOutlined />
+            <EditIcon />
           </IconButton>
         )}
         {useDelete && (
           <IconButton onClick={() => onDeleteItem(id ?? i)}>
-            <DeleteOutlined />
+            <DeleteIcon />
           </IconButton>
         )}
       </Box>
