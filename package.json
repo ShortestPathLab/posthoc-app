@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "start:dev": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
-    "start": "concurrently \"cd client && npx --yes serve -s build\" \"cd server && ts-node src/index.ts\"",
+    "start:all": "concurrently \"cd client && npx --yes serve -s build\" \"cd server && ts-node src/index.ts\"",
+    "start": "cd server && ts-node src/index.ts",
     "build": "cd client && npm run build",
     "postinstall": "concurrently \"cd client && npm i\" \"cd server && npm i\""
   },
