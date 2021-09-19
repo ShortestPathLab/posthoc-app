@@ -1,19 +1,19 @@
 import { CssBaseline, ThemeProvider } from "@material-ui/core";
-import { PlaybackService } from "client/services/PlaybackService";
-import { SpecimenService } from "client/services/SpecimenService";
 import { theme } from "client/theme";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { StrictMode } from "react";
 import { render } from "react-dom";
+import { PlaybackService } from "services/PlaybackService";
+import { SpecimenService } from "services/SpecimenService";
 import { FeaturesProvider } from "slices/features";
 import { InfoProvider } from "slices/info";
+import { LoadingStateProvider } from "slices/loadingState";
 import { SliceProvider as AppStateProvider } from "slices/SliceProvider";
 import { SpecimenProvider } from "slices/specimen";
 import { UIStateProvider } from "slices/UIState";
 import App from "./App";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import { LoadingStateProvider } from "./slices/loadingState";
 
 const slices = [
   InfoProvider,

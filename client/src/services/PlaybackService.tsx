@@ -5,7 +5,7 @@ import { Space } from "components/generic/Space";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { trimEnd } from "lodash";
 import { ReactNode, useCallback, useEffect } from "react";
-import { useBreakpoints } from "../../hooks/useBreakpoints";
+import { useBreakpoints } from "../hooks/useBreakpoints";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
