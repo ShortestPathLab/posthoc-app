@@ -4,47 +4,72 @@
  */
 
 import { PixiComponent, useApp } from "@inlet/react-pixi";
-import { Viewport as PixiViewport } from "pixi-viewport";
+import { map } from "lodash";
 import * as PIXI from "pixi.js";
 import React from "react";
+import {
+  PointerEvent,
+  PixiViewport,
+  events,
+  ViewportEventHandler,
+} from "./PixiViewport";
 
-export interface ViewportProps {
-  width: number;
-  height: number;
+export type ViewportProps = {
+  width?: number;
+  height?: number;
   children?: React.ReactNode;
-}
+  event?: PIXI.InteractionEvent;
+} & { [K in PointerEvent]?: ViewportEventHandler };
 
-export interface PixiComponentViewportProps extends ViewportProps {
+export type Props = {
   app: PIXI.Application;
+} & ViewportProps;
+
+function create(props: Props) {
+  const viewport = new PixiViewport({
+    interaction: props.app.renderer.plugins.interaction,
+    ticker: props.app.ticker,
+    stopPropagation: true,
+  })
+    .drag()
+    .pinch()
+    .wheel()
+    .decelerate({ friction: 0.98 })
+    .clampZoom({ maxScale: 10, minScale: 0.1 });
+  return viewport as PixiViewport;
 }
 
-const PixiComponentViewport = PixiComponent<
-  PixiComponentViewportProps,
-  PixiViewport
->("Viewport", {
-  create: (props) =>
-    new PixiViewport({
-      screenWidth: props.width,
-      screenHeight: props.height,
-      worldWidth: props.width * 2,
-      worldHeight: props.height * 2,
-      interaction: props.app.renderer.plugins.interaction,
-      ticker: props.app.ticker,
-      stopPropagation: true,
-    })
-      .drag()
-      .pinch()
-      .wheel()
-      .decelerate({ friction: 0.98 })
-      .clampZoom({ maxScale: 10, minScale: 0.1 }),
-  applyProps: (viewport, _, { width, height }) => {
-    viewport.resize(width, height, width * 2, height * 2);
+function applyProps(
+  v: PixiViewport,
+  prev: Props,
+  { width, height, ...next }: Props
+) {
+  for (const { equal, apply } of [
+    ...map(events, ({ prop }) => ({
+      equal: prev[prop] === next[prop],
+      apply: () => v.register(prop, next[prop]),
+    })),
+    {
+      prop: prev.width === width && prev.height === height,
+      apply: () => v.resize(width, height, (width ?? 0) * 2, (height ?? 0) * 2),
+    },
+  ]) {
+    !equal && apply();
+  }
+}
+
+const Component = PixiComponent<Props, PixiViewport>("Viewport", {
+  create: (props) => {
+    const viewport = create(props);
+    applyProps(viewport, props, props);
+    return viewport;
   },
+  applyProps,
 });
 
 const Viewport = (props: ViewportProps) => {
   const app = useApp();
-  return <PixiComponentViewport app={app} {...props} />;
+  return <Component app={app} {...props} />;
 };
 
 export default Viewport;

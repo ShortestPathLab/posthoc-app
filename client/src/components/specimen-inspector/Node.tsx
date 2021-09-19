@@ -2,12 +2,23 @@ import { makeGraphic } from "./makeGraphic";
 import { SCALE } from "./constants";
 import { Graphics } from "@pixi/graphics";
 
-export type NodeProps = { color?: number; x?: number; y?: number };
+export type NodeProps = {
+  color?: number;
+  left?: number;
+  top?: number;
+  radius?: number;
+};
 
-export const drawNode = (g: Graphics, { color, x = 0, y = 0 }: NodeProps) =>
+export const drawNode = (
+  g: Graphics,
+  { color, left = 0, top = 0, radius = 0.25 }: NodeProps
+) =>
   g
     .beginFill(color ?? 0x000000)
-    .drawCircle(1.5 * SCALE + x, 1.5 * SCALE + y, 0.25 * SCALE)
+    .drawCircle(1.5 * SCALE + left, 1.5 * SCALE + top, radius * SCALE)
     .endFill();
 
-export const Node = makeGraphic<NodeProps>(drawNode);
+export const Node = makeGraphic<NodeProps>((g, p) => {
+  g.clear();
+  drawNode(g, p);
+});

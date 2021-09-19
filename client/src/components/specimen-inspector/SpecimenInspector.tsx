@@ -1,40 +1,20 @@
 import { Fade, LinearProgress } from "@material-ui/core";
-import { getClient } from "client/getClient";
-import { useState } from "react";
-import { useAsyncAbortable as useAsync } from "react-async-hook";
-import { AutoSizer as AutoSize } from "react-virtualized";
-import { useSpecimen } from "slices/specimen";
-import { useUIState } from "slices/UIState";
 import { Flex, FlexProps } from "components/generic/Flex";
+import { useState } from "react";
+import { AutoSizer as AutoSize } from "react-virtualized";
+import { useLoadingState } from "slices/loadingState";
+import { useSpecimen } from "slices/specimen";
 import { EventListInspector } from "./EventListInspector";
-import { Renderer } from "./Renderer";
+import { Renderer, SelectEvent as RendererSelectEvent } from "./Renderer";
+import { SelectionMenu } from "./SelectionMenu";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
 export function SpecimenInspector({ ...props }: SpecimenInspectorProps) {
-  const [loading, setLoading] = useState(false);
-  const [{ algorithm }] = useUIState();
-  const [specimen, setSpecimen] = useSpecimen();
-  useAsync(
-    async (signal) => {
-      if (algorithm) {
-        setLoading(true);
-        const client = await getClient();
-        const trace = await client.call("solve/pathfinding", {
-          algorithm,
-          end: 0,
-          start: 0,
-          mapType: "",
-          mapURI: "",
-        });
-        if (!signal.aborted) {
-          setSpecimen(trace);
-          setLoading(false);
-        }
-      }
-      return () => setLoading(false);
-    },
-    [algorithm, getClient, setLoading]
+  const [{ specimen: loading }] = useLoadingState();
+  const [specimen] = useSpecimen();
+  const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
+    undefined
   );
 
   return (
@@ -45,7 +25,15 @@ export function SpecimenInspector({ ...props }: SpecimenInspectorProps) {
       <Flex {...props}>
         {specimen ? (
           <>
-            <AutoSize>{(size) => <Renderer {...size} />}</AutoSize>
+            <AutoSize>
+              {(size) => (
+                <Renderer
+                  {...size}
+                  onSelect={setSelection}
+                  selection={selection?.world}
+                />
+              )}
+            </AutoSize>
             <EventListInspector
               position="absolute"
               right={0}
@@ -64,6 +52,10 @@ export function SpecimenInspector({ ...props }: SpecimenInspectorProps) {
           </Flex>
         )}
       </Flex>
+      <SelectionMenu
+        selection={selection}
+        onClose={() => setSelection(undefined)}
+      />
     </>
   );
 }

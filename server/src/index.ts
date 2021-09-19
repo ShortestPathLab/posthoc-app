@@ -6,7 +6,10 @@ import { createRPCMethod as createMethod, RPCServer } from "./RPCServer";
 const ALGORITHMS_PATH = "./static/algorithms";
 const SERVER_NAME = "warthog";
 
+const PORT = process.env.PORT ? +process.env.PORT : undefined;
+
 const rpcServer = new RPCServer({
+  port: PORT,
   methods: [
     /**
      * Returns server information.

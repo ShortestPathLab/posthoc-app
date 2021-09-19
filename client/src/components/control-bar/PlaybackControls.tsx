@@ -7,7 +7,6 @@ import {
 } from "@material-ui/icons";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
-import { PlaybackService } from "./PlaybackService";
 
 export function PlaybackControls() {
   const {
@@ -25,7 +24,6 @@ export function PlaybackControls() {
   } = usePlaybackState();
   return (
     <>
-      <PlaybackService />
       <Button
         label="step-backward"
         icon={<PreviousIcon />}

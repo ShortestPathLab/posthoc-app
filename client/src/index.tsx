@@ -1,11 +1,8 @@
-import {
-  colors,
-  createTheme,
-  CssBaseline,
-  ThemeProvider,
-} from "@material-ui/core";
+import { CssBaseline, ThemeProvider } from "@material-ui/core";
+import { PlaybackService } from "client/services/PlaybackService";
+import { SpecimenService } from "client/services/SpecimenService";
+import { theme } from "client/theme";
 import { SnackbarProvider } from "components/generic/Snackbar";
-import { times } from "lodash";
 import { StrictMode } from "react";
 import { render } from "react-dom";
 import { FeaturesProvider } from "slices/features";
@@ -16,30 +13,23 @@ import { UIStateProvider } from "slices/UIState";
 import App from "./App";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
+import { LoadingStateProvider } from "./slices/loadingState";
 
 const slices = [
   InfoProvider,
   FeaturesProvider,
   UIStateProvider,
   SpecimenProvider,
+  LoadingStateProvider,
 ];
 
-const SHADOW =
-  "0px 8px 18px -1px rgb(0 0 0 / 8%), 0px 10px 48px 0px rgb(0 0 0 / 1%), 0px 20px 96px 0px rgb(0 0 0 / 0.5%)";
-
+const services = [PlaybackService, SpecimenService];
 render(
   <StrictMode>
     <CssBaseline>
-      <ThemeProvider
-        theme={createTheme({
-          palette: {
-            primary: colors["blueGrey"],
-          },
-          shadows: ["", ...times(24, () => SHADOW)] as any,
-        })}
-      >
+      <ThemeProvider theme={theme}>
         <SnackbarProvider>
-          <AppStateProvider slices={slices}>
+          <AppStateProvider slices={slices} services={services}>
             <App />
           </AppStateProvider>
         </SnackbarProvider>

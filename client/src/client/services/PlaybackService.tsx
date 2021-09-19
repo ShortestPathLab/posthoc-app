@@ -37,22 +37,24 @@ export function PlaybackService() {
   );
 
   useEffect(() => {
-    return playing && step < end
-      ? cancellable(
-          () => shouldBreak(step),
-          ({ result, error }) => {
-            if (!error) {
-              if (result) {
-                notify(renderLabel(`Breakpoint hit: ${result}.`));
+    if (playing) {
+      return step < end
+        ? cancellable(
+            () => shouldBreak(step),
+            ({ result, error }) => {
+              if (!error) {
+                if (result) {
+                  notify(renderLabel(`Breakpoint hit: ${result}.`));
+                  pause();
+                } else tick();
+              } else {
+                notify(renderLabel(`${trimEnd(error, ".")}.`));
                 pause();
-              } else tick();
-            } else {
-              notify(renderLabel(`${trimEnd(error, ".")}.`));
-              pause();
+              }
             }
-          }
-        )
-      : pause();
+          )
+        : pause();
+    }
   }, [renderLabel, playing, end, step, pause, tick, notify, shouldBreak]);
 
   return <></>;

@@ -1,11 +1,16 @@
 import { once } from "lodash";
 import { RPCClient } from "./RPCClient";
 
-const PORT = 8001;
+const DEV_PORT = 8001;
+
+const { hostname, protocol } = window.location;
+const isLocalHost = hostname === "localhost";
 
 export const getClient = once(
   async () =>
     new RPCClient({
-      url: `${window.location.protocol}//${window.location.hostname}:${PORT}/`,
+      url: isLocalHost
+        ? `${protocol}//${hostname}:${DEV_PORT}/`
+        : `${protocol}//${hostname}/`,
     })
 );

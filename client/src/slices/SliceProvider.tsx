@@ -8,16 +8,24 @@ import {
 
 type SliceProviderProps = {
   slices?: FunctionComponent[];
+  services?: FunctionComponent[];
   children?: ReactNode;
 };
 
-export function SliceProvider({ slices, children }: SliceProviderProps) {
+export function SliceProvider({
+  slices,
+  children,
+  services,
+}: SliceProviderProps) {
   return (
     <>
       {reduce(
         map(slices, (s) => createElement(s)),
         (prev, next) => cloneElement(next, {}, prev),
-        children
+        <>
+          {children}
+          {map(services, (s, i) => createElement(s, { key: i }))}
+        </>
       )}
     </>
   );
