@@ -22,7 +22,10 @@ export class RPCServer {
   express = express();
   server = createHTTPServer(this.express);
   rpc = new JSONRPCServer();
-  io = new WebSocketServer(this.server, { cors: { origin: "*" } });
+  io = new WebSocketServer(this.server, {
+    cors: { origin: "*" },
+    perMessageDeflate: true,
+  });
   constructor(readonly options: RPCServerOptions = {}) {
     forEach(options?.methods, ({ name, handler }) => {
       this.rpc.addMethod(name, handler);
