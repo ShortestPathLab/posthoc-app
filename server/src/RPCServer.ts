@@ -4,6 +4,7 @@ import { forEach } from "lodash";
 import { Method, Request } from "protocol/Message";
 import { NameMethodMap } from "protocol";
 import { Server as WebSocketServer } from "socket.io";
+import express from "express";
 
 export interface RPCServerOptions {
   methods?: Method[];
@@ -18,7 +19,8 @@ export function createRPCMethod<T extends keyof NameMethodMap>(
 }
 
 export class RPCServer {
-  server = createHTTPServer();
+  express = express();
+  server = createHTTPServer(this.express);
   rpc = new JSONRPCServer();
   io = new WebSocketServer(this.server, { cors: { origin: "*" } });
   constructor(readonly options: RPCServerOptions = {}) {
@@ -27,6 +29,7 @@ export class RPCServer {
     });
   }
   listen() {
+    this.express.get("/", (_, res) => res.send("JSON-RPC 2.0"));
     this.io.on("connection", (socket) => {
       socket.on("request", async (req: Request) => {
         socket.emit(
