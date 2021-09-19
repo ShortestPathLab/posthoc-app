@@ -4,9 +4,10 @@
   "description": "",
   "scripts": {
     "start:dev": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
-    "start:all": "concurrently \"cd client && npx --yes serve -s build\" \"cd server && ts-node src/index.ts\"",
     "start": "cd server && ts-node --transpile-only src/index.ts",
+    "start:all": "concurrently \"cd client && npx --yes serve -s build\" \"cd server && ts-node src/index.ts\"",
     "build:all": "cd client && npm run build",
+    "deploy:all": "gh-pages -d client/build",
     "postinstall": "concurrently \"cd client && npm i\" \"cd server && npm i\""
   },
   "repository": {
@@ -20,7 +21,8 @@
   },
   "homepage": "https://github.com/Pathfinding-Project/app#readme",
   "devDependencies": {
-    "concurrently": "^6.2.1"
+    "concurrently": "^6.2.1",
+    "gh-pages": "^3.2.3"
   },
   "dependencies": {
     "ts-node": "^10.2.1",
