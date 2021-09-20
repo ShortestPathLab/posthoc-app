@@ -6,21 +6,46 @@ export interface FeatureDescriptor {
   description?: string;
 }
 
+export interface Feature extends FeatureDescriptor {
+  content?: string;
+}
+
 export type FeatureQuery<T extends string, Params = {}> = Namespace<
   "features",
   T,
   Params
 >;
 
+//
+// ─── REQUEST ────────────────────────────────────────────────────────────────────
+//
+
 export type MapTypeFeatureQuery = FeatureQuery<"mapType">;
+
+export type MapFeatureQuery = FeatureQuery<"map">;
 
 export type AlgorithmFeatureQuery = FeatureQuery<"algorithm">;
 
+//
+// ─── RESPONSE ───────────────────────────────────────────────────────────────────
+//
+
 export type FeatureDescriptorListResult = Response<FeatureDescriptor[]>;
+
+export type MapListResult = Response<(Feature & { type: string })[]>;
+
+//
+// ─── METHOD ─────────────────────────────────────────────────────────────────────
+//
 
 export type MapTypeFeatureQueryMethod = Method<
   MapTypeFeatureQuery,
   FeatureDescriptorListResult
+>;
+
+export type MapFeatureQueryMethod = Method<
+  MapFeatureQuery, 
+  MapListResult
 >;
 
 export type AlgorithmFeatureQueryMethod = Method<
