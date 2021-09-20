@@ -2,7 +2,7 @@ import { Button } from "@material-ui/core";
 import { useSpecimen } from "slices/specimen";
 
 export function CameraControls() {
-  const [specimen] = useSpecimen();
+  const [{ specimen }] = useSpecimen();
   return (
     <>
       <Button disabled={!specimen}>Fit All</Button>

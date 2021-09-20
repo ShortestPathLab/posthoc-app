@@ -30,7 +30,7 @@ function useFrameTime(playing: boolean) {
 }
 
 export function usePlaybackState() {
-  const [specimen] = useSpecimen();
+  const [{ specimen }] = useSpecimen();
   const [{ playback, step = 0 }, setUIState] = useUIState();
 
   const ready = !!specimen;

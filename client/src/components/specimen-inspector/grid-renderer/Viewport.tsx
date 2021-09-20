@@ -67,9 +67,7 @@ const Component = PixiComponent<Props, PixiViewport>("Viewport", {
   applyProps,
 });
 
-const Viewport = (props: ViewportProps) => {
+export const Viewport = (props: ViewportProps) => {
   const app = useApp();
   return <Component app={app} {...props} />;
 };
-
-export default Viewport;

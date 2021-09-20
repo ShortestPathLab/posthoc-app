@@ -1,6 +1,9 @@
 import { createSlice } from "./createSlice";
 import { Trace } from "protocol/Trace";
+import { PathfindingTask } from "protocol/SolveTask";
 
-export const [useSpecimen, SpecimenProvider] = createSlice<Trace | undefined>(
-  undefined
-);
+type Specimen = {
+  specimen?: Trace;
+} & Partial<PathfindingTask["params"]>;
+
+export const [useSpecimen, SpecimenProvider] = createSlice<Specimen>({});

@@ -1,5 +1,5 @@
 import { makeGraphic } from "./makeGraphic";
-import { SCALE } from "./constants";
+import { scale } from "./config";
 import { Graphics } from "@pixi/graphics";
 
 export type NodeProps = {
@@ -15,7 +15,7 @@ export const drawNode = (
 ) =>
   g
     .beginFill(color ?? 0x000000)
-    .drawCircle(1.5 * SCALE + left, 1.5 * SCALE + top, radius * SCALE)
+    .drawCircle(1.5 * scale + left, 1.5 * scale + top, radius * scale)
     .endFill();
 
 export const Node = makeGraphic<NodeProps>((g, p) => {

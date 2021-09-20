@@ -8,7 +8,7 @@ import { useUIState } from "slices/UIState";
 const EVAL = true;
 
 export function useBreakpoints() {
-  const [specimen] = useSpecimen();
+  const [{ specimen }] = useSpecimen();
   const [{ code, breakpoints = [], monotonicF, monotonicG }] = useUIState();
   const es5 = useMemo(() => transpile(code), [code]) ?? "";
 

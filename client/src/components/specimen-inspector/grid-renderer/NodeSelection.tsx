@@ -1,7 +1,7 @@
 import { useTween } from "react-use";
 import { ComponentProps as PropsOf } from "react";
 import { Node } from "./Node";
-import { SCALE } from "./constants";
+import { scale } from "./config";
 
 type Props = {
   animateScale?: boolean;
@@ -20,8 +20,8 @@ export function NodeSelection({
     <Node
       {...props}
       scale={animateScale ? t : 1}
-      x={x + (animateScale ? 1.5 * SCALE - 1.5 * SCALE * t : 0)}
-      y={y + (animateScale ? 1.5 * SCALE - 1.5 * SCALE * t : 0)}
+      x={x + (animateScale ? 1.5 * scale - 1.5 * scale * t : 0)}
+      y={y + (animateScale ? 1.5 * scale - 1.5 * scale * t : 0)}
       radius={1}
       alpha={animateAlpha ? t : 1}
     />

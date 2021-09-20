@@ -1,16 +1,6 @@
-import { take, findLastIndex, findIndex } from "lodash";
-import { Trace, TraceEvent } from "protocol/Trace";
-import { Point } from "./Renderer";
-
-type Node = {
-  index: number;
-  event: TraceEvent;
-};
-
-export type SelectionInfo = {
-  current?: Node;
-  entry?: Node;
-};
+import { findIndex, findLastIndex, take } from "lodash";
+import { Trace } from "protocol/Trace";
+import { Point, SelectionInfo } from "components/specimen-inspector/Renderer";
 
 export function getSelectionInfo(
   { x, y }: Point,

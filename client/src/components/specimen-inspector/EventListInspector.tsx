@@ -14,7 +14,7 @@ const PADDING = 16;
 
 export function EventListInspector(props: ListProps<TraceEvent>) {
   const [{ step = 0, playback }] = useUIState();
-  const [specimen] = useSpecimen();
+  const [{ specimen }] = useSpecimen();
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {

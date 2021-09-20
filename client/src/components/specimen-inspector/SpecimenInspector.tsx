@@ -1,18 +1,19 @@
 import { Fade, LinearProgress } from "@material-ui/core";
 import { Flex, FlexProps } from "components/generic/Flex";
-import { useState } from "react";
+import { createElement, useState } from "react";
 import { AutoSizer as AutoSize } from "react-virtualized";
-import { useLoadingState } from "slices/loadingState";
+import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { EventListInspector } from "./EventListInspector";
-import { Renderer, SelectEvent as RendererSelectEvent } from "./Renderer";
+import { getRenderer } from "./getRenderer";
+import { SelectEvent as RendererSelectEvent } from "./Renderer";
 import { SelectionMenu } from "./SelectionMenu";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
-export function SpecimenInspector({ ...props }: SpecimenInspectorProps) {
-  const [{ specimen: loading }] = useLoadingState();
-  const [specimen] = useSpecimen();
+export function SpecimenInspector(props: SpecimenInspectorProps) {
+  const [{ specimen: loading }] = useLoading();
+  const [{ specimen, mapType }] = useSpecimen();
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
@@ -26,13 +27,13 @@ export function SpecimenInspector({ ...props }: SpecimenInspectorProps) {
         {specimen ? (
           <>
             <AutoSize>
-              {(size) => (
-                <Renderer
-                  {...size}
-                  onSelect={setSelection}
-                  selection={selection?.world}
-                />
-              )}
+              {(size) =>
+                createElement(getRenderer(mapType), {
+                  ...size,
+                  onSelect: setSelection,
+                  selection: selection?.world,
+                })
+              }
             </AutoSize>
             <EventListInspector
               position="absolute"

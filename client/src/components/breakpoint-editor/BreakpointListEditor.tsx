@@ -10,7 +10,7 @@ import { propertyPaths as paths } from "./propertyPaths";
 
 export function BreakpointListEditor() {
   const [{ breakpoints = [] }, setUIState] = useUIState();
-  const [specimen] = useSpecimen();
+  const [{ specimen }] = useSpecimen();
 
   const properties = uniq([
     ...intrinsicProperties,

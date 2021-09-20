@@ -1,11 +1,12 @@
 import { getClient } from "client/getClient";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
-import { useLoadingState } from "slices/loadingState";
+import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
+import { PathfindingTask } from "protocol/SolveTask";
 
 export function SpecimenService() {
-  const [, setLoading] = useLoadingState();
+  const [, setLoading] = useLoading();
   const [, setSpecimen] = useSpecimen();
   const [{ algorithm }] = useUIState();
 
@@ -14,15 +15,16 @@ export function SpecimenService() {
       if (algorithm) {
         setLoading({ specimen: true });
         const client = await getClient();
-        const trace = await client.call("solve/pathfinding", {
+        const params: PathfindingTask["params"] = {
           algorithm,
           end: 0,
           start: 0,
           mapType: "",
           mapURI: "",
-        });
+        };
+        const specimen = await client.call("solve/pathfinding", params);
         if (!signal.aborted) {
-          setSpecimen(trace);
+          setSpecimen({ specimen, ...params });
           setLoading({ specimen: false });
         }
       }

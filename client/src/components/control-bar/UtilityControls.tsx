@@ -8,7 +8,7 @@ import {
 import { useSpecimen } from "slices/specimen";
 
 export function UtilityControls() {
-  const [specimen] = useSpecimen();
+  const [{ specimen }] = useSpecimen();
   // const INTEROP_compare = useCompatibilityLayer("#comparator button");
   // const INTEROP_timeTravel = useCompatibilityLayer("#time-travel button");
   return (

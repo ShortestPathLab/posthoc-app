@@ -7,7 +7,7 @@ import { PlaybackService } from "services/PlaybackService";
 import { SpecimenService } from "services/SpecimenService";
 import { FeaturesProvider } from "slices/features";
 import { InfoProvider } from "slices/info";
-import { LoadingStateProvider } from "slices/loadingState";
+import { LoadingProvider } from "slices/loading";
 import { SliceProvider as AppStateProvider } from "slices/SliceProvider";
 import { SpecimenProvider } from "slices/specimen";
 import { UIStateProvider } from "slices/UIState";
@@ -20,7 +20,7 @@ const slices = [
   FeaturesProvider,
   UIStateProvider,
   SpecimenProvider,
-  LoadingStateProvider,
+  LoadingProvider,
 ];
 
 const services = [PlaybackService, SpecimenService];
