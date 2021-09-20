@@ -24,6 +24,8 @@ export type MapTypeFeatureQuery = FeatureQuery<"mapType">;
 
 export type MapFeatureQuery = FeatureQuery<"map">;
 
+export type MapsFeatureQuery = FeatureQuery<"maps">;
+
 export type AlgorithmFeatureQuery = FeatureQuery<"algorithm">;
 
 //
@@ -32,7 +34,9 @@ export type AlgorithmFeatureQuery = FeatureQuery<"algorithm">;
 
 export type FeatureDescriptorListResult = Response<FeatureDescriptor[]>;
 
-export type MapListResult = Response<(Feature & { type: string })[]>;
+export type MapListResult = Response<(FeatureDescriptor & { type: string })[]>;
+
+export type MapResult = Response<Feature & { type: string }>;
 
 //
 // ─── METHOD ─────────────────────────────────────────────────────────────────────
@@ -43,10 +47,9 @@ export type MapTypeFeatureQueryMethod = Method<
   FeatureDescriptorListResult
 >;
 
-export type MapFeatureQueryMethod = Method<
-  MapFeatureQuery, 
-  MapListResult
->;
+export type MapFeatureQueryMethod = Method<MapFeatureQuery, MapResult>;
+
+export type MapsFeatureQueryMethod = Method<MapsFeatureQuery, MapListResult>;
 
 export type AlgorithmFeatureQueryMethod = Method<
   AlgorithmFeatureQuery,
