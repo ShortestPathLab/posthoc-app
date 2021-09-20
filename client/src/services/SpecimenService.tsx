@@ -1,36 +1,43 @@
 import { getClient } from "client/getClient";
+import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { PathfindingTask } from "protocol/SolveTask";
+
+async function getMap(map: string) {
+  const client = await getClient();
+  return (await client.call("features/map", { id: map }))?.content;
+}
 
 export function SpecimenService() {
   const [, setLoading] = useLoading();
   const [, setSpecimen] = useSpecimen();
-  const [{ algorithm }] = useUIState();
+  const [{ algorithm, map }] = useUIState();
 
   useAsync(
     async (signal) => {
-      if (algorithm) {
-        setLoading({ specimen: true });
-        const client = await getClient();
-        const params: PathfindingTask["params"] = {
-          algorithm,
-          end: 0,
-          start: 0,
-          mapType: "",
-          mapURI: "",
-        };
-        const specimen = await client.call("solve/pathfinding", params);
-        if (!signal.aborted) {
-          setSpecimen({ specimen, ...params });
-          setLoading({ specimen: false });
+      setLoading({ specimen: true });
+      if (algorithm && map?.id && map?.type) {
+        const mapURI = await getMap(map.id);
+        if (mapURI) {
+          const client = await getClient();
+          const params: PathfindingTask["params"] = {
+            algorithm,
+            end: 0,
+            start: 0,
+            mapType: map?.type,
+            mapURI,
+          };
+          const specimen = await client.call("solve/pathfinding", params);
+          if (!signal.aborted) {
+            setSpecimen({ specimen, ...params });
+          }
         }
       }
-      return () => setLoading({ specimen: false });
+      setLoading({ specimen: false });
     },
-    [algorithm, getClient, setLoading]
+    [algorithm, map?.id, map?.type, getClient, setLoading]
   );
 
   return <></>;

@@ -1,6 +1,6 @@
+import { Point, SelectionInfo } from "components/specimen-inspector/Renderer";
 import { findIndex, findLastIndex, take } from "lodash";
 import { Trace } from "protocol/Trace";
-import { Point, SelectionInfo } from "components/specimen-inspector/Renderer";
 
 export function getSelectionInfo(
   { x, y }: Point,

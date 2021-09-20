@@ -1,17 +1,19 @@
 import { Stage } from "@inlet/react-pixi";
 import { Box, useTheme } from "@material-ui/core";
-import { delay, floor, map, take } from "lodash";
+import { Point, RendererProps } from "components/specimen-inspector/Renderer";
+import { delay, floor, take } from "lodash";
 import { ComponentProps, useCallback, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { getSelectionInfo } from "./getSelectionInfo";
-import { Point, RendererProps } from "components/specimen-inspector/Renderer";
 import { getColor } from "./colors";
 import { scale, size } from "./config";
+import { getSelectionInfo } from "./getSelectionInfo";
 import { Guides } from "./Guides";
+import { square } from "./Node";
 import { NodeList } from "./NodeList";
-import { NodeSelection as Node } from "./NodeSelection";
+import { parseMap } from "./parseMap";
 import { ViewportEvent } from "./PixiViewport";
+import { Selection } from "./Selection";
 import { Viewport } from "./Viewport";
 
 type GridRendererProps = RendererProps &
@@ -28,7 +30,7 @@ export function GridRenderer({
 }: GridRendererProps) {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const { width = 0, height = 0 } = props;
-  const [{ specimen }] = useSpecimen();
+  const [{ specimen, mapURI }] = useSpecimen();
   const [{ step = 0 }] = useUIState();
   const { palette } = useTheme();
 
@@ -38,6 +40,11 @@ export function GridRenderer({
   const nodes = useMemo(
     () => take(specimen?.eventList, step + 1),
     [specimen, step]
+  );
+
+  const [bgNodes, bgNodeColor] = useMemo(
+    () => [parseMap(mapURI), () => 0x121212] as const,
+    [mapURI]
   );
 
   const handleClick = useCallback(
@@ -71,8 +78,6 @@ export function GridRenderer({
     };
   }, [setHover]);
 
-  const highlight = selection || active;
-
   return (
     <Box sx={{ cursor: "pointer" }} ref={setRef}>
       <Stage options={{ backgroundColor: 0xffffff }} {...props}>
@@ -83,21 +88,7 @@ export function GridRenderer({
           onMouseDown={handleMouseEvent}
           onMouseOver={handleMouseEvent}
         >
-          {map(
-            [
-              { point: hover, color: 0xf9f9f9, animateAlpha: true },
-              { point: highlight, color: 0xf1f1f1, animateScale: true },
-            ],
-            ({ point, ...props }, i) =>
-              point && (
-                <Node
-                  key={`${i}::${point.x}::${point.y}`}
-                  x={point.x * scale}
-                  y={point.y * scale}
-                  {...props}
-                />
-              )
-          )}
+          <Selection hover={hover} highlight={selection || active} />
           <Guides
             width={size * scale}
             height={size * scale}
@@ -105,7 +96,8 @@ export function GridRenderer({
             y={0}
             alpha={palette.action.disabledOpacity}
           />
-          <NodeList nodes={specimen?.eventList} />
+          <NodeList nodes={bgNodes} color={bgNodeColor} variant={square} />
+          <NodeList nodes={specimen?.eventList} variant={square} />
           <NodeList nodes={nodes} color={getColor} />
         </Viewport>
       </Stage>

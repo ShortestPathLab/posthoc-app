@@ -25,6 +25,7 @@ export class RPCServer {
   io = new WebSocketServer(this.server, {
     cors: { origin: "*" },
     perMessageDeflate: true,
+    maxHttpBufferSize: 1e100,
   });
   constructor(readonly options: RPCServerOptions = {}) {
     forEach(options?.methods, ({ name, handler }) => {

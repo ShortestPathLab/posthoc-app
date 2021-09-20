@@ -22,7 +22,7 @@ export type FeatureQuery<T extends string, Params = {}> = Namespace<
 
 export type MapTypeFeatureQuery = FeatureQuery<"mapType">;
 
-export type MapFeatureQuery = FeatureQuery<"map">;
+export type MapFeatureQuery = FeatureQuery<"map", { id: string }>;
 
 export type MapsFeatureQuery = FeatureQuery<"maps">;
 
@@ -36,7 +36,7 @@ export type FeatureDescriptorListResult = Response<FeatureDescriptor[]>;
 
 export type MapListResult = Response<(FeatureDescriptor & { type: string })[]>;
 
-export type MapResult = Response<Feature & { type: string }>;
+export type MapResult = Response<(Feature & { type: string }) | undefined>;
 
 //
 // ─── METHOD ─────────────────────────────────────────────────────────────────────

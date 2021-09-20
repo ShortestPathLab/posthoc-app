@@ -8,7 +8,7 @@ import { useUIState } from "slices/UIState";
 export function MapPicker() {
   const [{ maps }] = useFeatures();
   const [{ map: value }, setUIState] = useUIState();
-  const selected = find(maps, { id: value });
+  const selected = find(maps, { id: value?.id });
   return (
     <Select
       placeholder="Map"
@@ -30,7 +30,7 @@ export function MapPicker() {
       value={selected?.id}
       onChange={(v) =>
         setUIState({
-          algorithm: v,
+          map: find(maps, { id: v }),
           step: 0,
           playback: "paused",
           breakpoints: [],

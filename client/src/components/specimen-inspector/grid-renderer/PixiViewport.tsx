@@ -21,16 +21,17 @@ export type PropEventPair = {
 export const events = [
   { prop: "onMouseOver", event: "mousemove" },
   { prop: "onClick", event: "click", filter: true },
+  { prop: "onClick", event: "tap", filter: true },
   { prop: "onMouseDown", event: "pointerdown", filter: true },
 ] as PropEventPair[];
 
 export class PixiViewport extends PixiViewportBase {
   events: {
-    [K in PointerEvent]?: () => void;
+    [K in string]?: () => void;
   } = {};
   register(prop: PointerEvent, handler?: ViewportEventHandler) {
     const { event, filter } = find(events, (c) => c.prop === prop)!;
-    this.events?.[prop]?.();
+    this.events?.[event]?.();
     if (handler) {
       const f = (e: PIXI.InteractionEvent) => {
         const { global } = e.data;
@@ -43,7 +44,7 @@ export class PixiViewport extends PixiViewportBase {
         }
       };
       this.on(event, f);
-      this.events[prop] = () => this.off(event, f);
+      this.events[event] = () => this.off(event, f);
     }
   }
 }

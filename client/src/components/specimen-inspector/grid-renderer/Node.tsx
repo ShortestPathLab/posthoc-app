@@ -7,18 +7,37 @@ export type NodeProps = {
   left?: number;
   top?: number;
   radius?: number;
+  resolution?: number;
 };
 
-export const drawNode = (
+export const point = (
   g: Graphics,
-  { color, left = 0, top = 0, radius = 0.25 }: NodeProps
+  { color, left = 0, top = 0, radius = 0.25, resolution: r = 1 }: NodeProps
 ) =>
   g
     .beginFill(color ?? 0x000000)
-    .drawCircle(1.5 * scale + left, 1.5 * scale + top, radius * scale)
+    .drawCircle(
+      r * (1.5 * scale + left),
+      r * (1.5 * scale + top),
+      r * radius * scale
+    )
+    .endFill();
+
+export const square = (
+  g: Graphics,
+  { color, left = 0, top = 0, radius = 0.25, resolution: r = 1 }: NodeProps
+) =>
+  g
+    .beginFill(color ?? 0x000000)
+    .drawRect(
+      r * (1.25 * scale + (radius * scale) / 2 + left),
+      r * (1.25 * scale + (radius * scale) / 2 + top),
+      r * (radius * scale),
+      r * (radius * scale)
+    )
     .endFill();
 
 export const Node = makeGraphic<NodeProps>((g, p) => {
   g.clear();
-  drawNode(g, p);
+  point(g, p);
 });

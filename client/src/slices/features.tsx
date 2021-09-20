@@ -4,7 +4,7 @@ import { createSlice } from "./createSlice";
 
 type Features = {
   algorithms: FeatureDescriptor[];
-  maps: FeatureDescriptor[];
+  maps: (FeatureDescriptor & { type: string })[];
 };
 
 export const [useFeatures, FeaturesProvider] = createSlice<Features>(
@@ -13,7 +13,7 @@ export const [useFeatures, FeaturesProvider] = createSlice<Features>(
     const client = await getClient();
     return {
       algorithms: (await client.call("features/algorithm")) ?? [],
-      maps: (await client.call("features/mapType")) ?? [],
+      maps: (await client.call("features/maps")) ?? [],
     };
   }
 );

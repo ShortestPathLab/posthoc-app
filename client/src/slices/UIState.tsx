@@ -1,8 +1,9 @@
 import { makeTemplate } from "components/script-editor/makeTemplate";
 import { templates } from "components/script-editor/templates";
 import { values } from "lodash";
-import { createSlice } from "./createSlice";
+import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { TraceEventType } from "protocol/Trace";
+import { createSlice } from "./createSlice";
 
 export type PlaybackStateType = "playing" | "paused" | undefined;
 
@@ -10,7 +11,7 @@ type PlaybackState = { playback?: PlaybackStateType; step?: number };
 
 type InputState = {
   algorithm?: string;
-  map?: string;
+  map?: Partial<FeatureDescriptor & { type: string }>;
 };
 
 export type Comparator = {

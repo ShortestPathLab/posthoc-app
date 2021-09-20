@@ -49,7 +49,7 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
             alignItems="center"
             color="text.secondary"
           >
-            Select an algorithm to get started.
+            Select a map and an algorithm to get started.
           </Flex>
         )}
       </Flex>
