@@ -38,7 +38,7 @@ export function NodeList({
       }
       return g;
     },
-    [memo, color, resolution]
+    [memo, color, resolution, variant]
   );
   return <Graphics draw={draw} scale={1 / resolution} />;
 }
