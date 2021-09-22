@@ -4,7 +4,10 @@ import { getClient } from "client/getClient";
 
 type Info = CheckConnectionResponse["result"];
 
-export const [useInfo, InfoProvider] = createSlice<Info>({}, async () => {
-  const client = await getClient();
-  return await client.call("about");
-});
+export const [useInfo, InfoProvider] = createSlice<Info | undefined>(
+  undefined,
+  async () => {
+    const client = await getClient();
+    return await client.call("about");
+  }
+);

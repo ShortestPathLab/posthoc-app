@@ -3,18 +3,17 @@ import { InputControls } from "./InputControls";
 import { PlaybackControls } from "./PlaybackControls";
 import { UtilityControls } from "./UtilityControls";
 
-export default function Controls() {
-  function renderDivider() {
-    return <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
-  }
+const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
+
+export function Controls() {
   return (
     <AppBar position="static" color="transparent" elevation={0}>
       <Toolbar>
         <Box m={-1} display="flex" alignItems="center">
           <InputControls />
-          {renderDivider()}
+          {divider}
           <PlaybackControls />
-          {renderDivider()}
+          {divider}
           <UtilityControls />
         </Box>
       </Toolbar>

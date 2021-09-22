@@ -3,6 +3,7 @@ import { theme } from "client/theme";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { StrictMode } from "react";
 import { render } from "react-dom";
+import { ConnectionStateService } from "services/ConnectionStateService";
 import { PlaybackService } from "services/PlaybackService";
 import { SpecimenService } from "services/SpecimenService";
 import { FeaturesProvider } from "slices/features";
@@ -23,7 +24,8 @@ const slices = [
   LoadingProvider,
 ];
 
-const services = [PlaybackService, SpecimenService];
+const services = [ConnectionStateService, PlaybackService, SpecimenService];
+
 render(
   <StrictMode>
     <CssBaseline>

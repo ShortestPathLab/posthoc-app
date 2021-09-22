@@ -17,7 +17,6 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
-
   return (
     <>
       <Fade in={loading}>

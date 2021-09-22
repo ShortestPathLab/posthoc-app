@@ -30,21 +30,21 @@ export function useSnackbar() {
 export function SnackbarProvider({ children }: { children?: ReactNode }) {
   const [snackPack, setSnackPack] = useState<readonly SnackbarMessage[]>([]);
   const [open, setOpen] = useState(false);
-  const [messageInfo, setMessageInfo] = useState<SnackbarMessage | undefined>(
+  const [current, setCurrent] = useState<SnackbarMessage | undefined>(
     undefined
   );
 
   useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setMessageInfo({ ...snackPack[0] });
+    if (snackPack.length && !current) {
+      setCurrent({ ...snackPack[0] });
       setSnackPack((prev) => prev.slice(1));
       setOpen(true);
-    } else if (snackPack.length && messageInfo && open) {
+    } else if (snackPack.length && current && open) {
       setOpen(false);
     }
-  }, [snackPack, messageInfo, open]);
+  }, [snackPack, current, open]);
 
-  const handleClick = useCallback(
+  const handleMessage = useCallback(
     (message: ReactNode) => {
       setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
     },
@@ -52,28 +52,23 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
   );
 
   const handleClose = (_: any, reason?: string) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpen(false);
+    reason !== "clickaway" && setOpen(false);
   };
 
-  const handleExited = () => {
-    setMessageInfo(undefined);
-  };
+  const handleExited = () => setCurrent(undefined);
 
   return (
     <>
-      <SnackbarContext.Provider value={handleClick}>
+      <SnackbarContext.Provider value={handleMessage}>
         {children}
       </SnackbarContext.Provider>
       <Snackbar
-        key={messageInfo ? messageInfo.key : undefined}
+        key={current?.key}
         open={open}
         autoHideDuration={6000}
         onClose={handleClose}
         TransitionProps={{ onExited: handleExited }}
-        message={messageInfo ? messageInfo.message : undefined}
+        message={current?.message}
         action={
           <>
             <IconButton

@@ -30,6 +30,7 @@ function create(props: Props) {
     interaction: props.app.renderer.plugins.interaction,
     ticker: props.app.ticker,
     stopPropagation: true,
+    passiveWheel: false,
   })
     .drag()
     .pinch()

@@ -13,7 +13,7 @@ async function getMap(map: string) {
 export function SpecimenService() {
   const [, setLoading] = useLoading();
   const [, setSpecimen] = useSpecimen();
-  const [{ algorithm, map }] = useUIState();
+  const [{ algorithm, map }, setUIState] = useUIState();
 
   useAsync(
     async (signal) => {
@@ -32,6 +32,7 @@ export function SpecimenService() {
           const specimen = await client.call("solve/pathfinding", params);
           if (!signal.aborted) {
             setSpecimen({ specimen, ...params });
+            setUIState({ step: 0, playback: "paused", breakpoints: [] });
           }
         }
       }
