@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import glob from "glob-promise";
 import { filter, first, map, memoize as memo, some, startCase } from "lodash";
-import { join, parse, relative } from "path";
+import { resolve, parse, relative } from "path";
 import { PORT } from "./index";
 import { createRPCMethod as createMethod, RPCServer } from "./RPCServer";
 
@@ -17,7 +17,7 @@ function mapIsSupported(path: string) {
 function getMapDescriptor(path: string) {
   const f = parse(path);
   return {
-    id: relative(join(__dirname, MAPS_PATH), path),
+    id: relative(resolve(MAPS_PATH), path),
     name: startCase(f.name),
     type: f.ext.slice(1),
     description: f.name,
@@ -25,7 +25,7 @@ function getMapDescriptor(path: string) {
 }
 
 async function getFiles(path: string) {
-  return await glob(`${join(__dirname, path)}/**/*`);
+  return await glob(`${resolve(path)}/**/*`);
 }
 
 export function createWarthogServer() {
@@ -85,7 +85,7 @@ export function createWarthogServer() {
         "features/map",
         memo(
           async ({ id }) => {
-            const map = first(await glob(join(__dirname, MAPS_PATH, id)));
+            const map = first(await glob(resolve(MAPS_PATH, id)));
             return map
               ? {
                   ...getMapDescriptor(map),
@@ -102,7 +102,7 @@ export function createWarthogServer() {
       createMethod("solve/pathfinding", async ({ algorithm }) => {
         // TODO Replace with real handler
         // Currently just returns the file from the algorithms folder
-        const path = join(__dirname, ALGORITHMS_PATH, `${algorithm}.json`);
+        const path = resolve(ALGORITHMS_PATH, `${algorithm}.json`);
         return JSON.parse(await readFile(path, "utf-8"));
       }),
     ],
