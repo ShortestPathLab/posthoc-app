@@ -1,5 +1,5 @@
 import { Stage } from "@inlet/react-pixi";
-import { Box, useTheme } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import { Point, RendererProps } from "components/specimen-renderer/Renderer";
 import { delay, floor, take } from "lodash";
 import { ComponentProps, useMemo, useState } from "react";
