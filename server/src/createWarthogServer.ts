@@ -1,36 +1,36 @@
-import { readFile } from "fs/promises";
+import { readFile as read, writeFile as write } from "fs/promises";
 import glob from "glob-promise";
-import { filter, first, map, memoize as memo, some, startCase } from "lodash";
-import { resolve, parse, relative } from "path";
-import { PORT } from "./index";
+import {
+  filter,
+  first,
+  keys,
+  map,
+  memoize as memo,
+  startCase,
+  entries,
+} from "lodash-es";
+import { resolve } from "path";
+import { warthog } from "pathfinding-binaries";
+import { algorithms } from "./algorithms";
+import { exec } from "./exec";
+import {
+  getMapDescriptor,
+  mapIsSupported,
+  mapsPath,
+  MapTypeKey,
+  mapTypes,
+} from "./maps";
+import { parseOutput } from "./parseOutput";
 import { createRPCMethod as createMethod, RPCServer } from "./RPCServer";
-
-const ALGORITHMS_PATH = "./static/algorithms";
-const MAPS_PATH = "./static/maps";
-
-const SUPPORTED_MAP_TYPES = ["grid", "co", "gr", "scen"];
-
-function mapIsSupported(path: string) {
-  return some(SUPPORTED_MAP_TYPES, (t) => path.endsWith(`.${t}`));
-}
-
-function getMapDescriptor(path: string) {
-  const f = parse(path);
-  return {
-    id: relative(resolve(MAPS_PATH), path),
-    name: startCase(f.name),
-    type: f.ext.slice(1),
-    description: f.name,
-  };
-}
+import { usingTempFiles as temp } from "./usingTempFiles";
 
 async function getFiles(path: string) {
   return await glob(`${resolve(path)}/**/*`);
 }
 
-export function createWarthogServer() {
+export function createWarthogServer(port?: number) {
   return new RPCServer({
-    port: PORT,
+    port,
     methods: [
       /**
        * Returns server information.
@@ -45,13 +45,10 @@ export function createWarthogServer() {
       createMethod(
         "features/algorithm",
         memo(async () => {
-          // TODO Replace with real handler
-          // Currently just returns the files in the algorithms folder
-          const files = await getFiles(ALGORITHMS_PATH);
-          return map(files, (f) => ({
-            id: parse(f).name,
-            name: startCase(parse(f).name),
-            description: parse(f).name,
+          return map(entries(algorithms), ([f, { name }]) => ({
+            id: f,
+            name: name,
+            description: f,
           }));
         })
       ),
@@ -61,7 +58,7 @@ export function createWarthogServer() {
       createMethod(
         "features/mapType",
         memo(async () =>
-          map(SUPPORTED_MAP_TYPES, (t) => ({
+          map(keys(mapTypes), (t) => ({
             id: t,
             name: startCase(t),
             description: t,
@@ -74,7 +71,7 @@ export function createWarthogServer() {
       createMethod(
         "features/maps",
         memo(async () => {
-          const maps = filter(await getFiles(MAPS_PATH), mapIsSupported);
+          const maps = filter(await getFiles(mapsPath), mapIsSupported);
           return map(maps, getMapDescriptor);
         })
       ),
@@ -85,11 +82,11 @@ export function createWarthogServer() {
         "features/map",
         memo(
           async ({ id }) => {
-            const map = first(await glob(resolve(MAPS_PATH, id)));
+            const map = first(await glob(resolve(mapsPath, id)));
             return map
               ? {
                   ...getMapDescriptor(map),
-                  content: await readFile(map, "utf8"),
+                  content: await read(map, "utf8"),
                 }
               : undefined;
           },
@@ -99,12 +96,31 @@ export function createWarthogServer() {
       /**
        * Returns a pathfinding solution.
        */
-      createMethod("solve/pathfinding", async ({ algorithm }) => {
-        // TODO Replace with real handler
-        // Currently just returns the file from the algorithms folder
-        const path = resolve(ALGORITHMS_PATH, `${algorithm}.json`);
-        return JSON.parse(await readFile(path, "utf-8"));
-      }),
+      createMethod("solve/pathfinding", ({ algorithm, mapType, ...params }) =>
+        temp(async (scenarioPath, mapPath) => {
+          const { create, transform } = mapTypes[mapType as MapTypeKey];
+          const scenario = create(params);
+
+          await Promise.all([
+            write(scenarioPath, scenario(mapPath), "utf-8"),
+            write(mapPath, params.mapURI, "utf-8"),
+          ]);
+
+          const output = await exec(
+            warthog,
+            {
+              flags: {
+                alg: { value: algorithm },
+                scen: { value: scenarioPath },
+                verbose: {},
+              },
+            },
+            true
+          );
+
+          return transform(parseOutput(output));
+        })
+      ),
     ],
   });
 }

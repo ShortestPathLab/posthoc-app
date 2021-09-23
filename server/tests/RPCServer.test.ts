@@ -2,7 +2,7 @@ import {
   CheckConnectionRequest,
   CheckConnectionResponse,
 } from "protocol/CheckConnection";
-import { createRPCMethod as createMethod } from "src/RPCServer";
+import { createRPCMethod as createMethod } from "../src/RPCServer";
 import { usingE2E } from "./e2e";
 
 test("RPC server responds to ping", async () => {

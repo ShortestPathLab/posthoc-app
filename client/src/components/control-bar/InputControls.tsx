@@ -3,6 +3,8 @@ import { useFeatures } from "slices/features";
 import { useUIState } from "slices/UIState";
 import { FeaturePicker } from "./FeaturePicker";
 
+const mapDefaults = { startNode: undefined, endNode: undefined };
+
 export function InputControls() {
   const [{ algorithms, maps }] = useFeatures();
   const [{ algorithm, map }, setUIState] = useUIState();
@@ -12,7 +14,9 @@ export function InputControls() {
         label="map"
         value={map?.id}
         items={maps}
-        onChange={(v) => setUIState({ map: find(maps, { id: v }) })}
+        onChange={(v) =>
+          setUIState({ ...mapDefaults, map: find(maps, { id: v }) })
+        }
       />
       <FeaturePicker
         label="algorithm"

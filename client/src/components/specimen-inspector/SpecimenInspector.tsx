@@ -1,22 +1,33 @@
-import { Fade, LinearProgress } from "@material-ui/core";
+import { Fade, LinearProgress, useTheme } from "@material-ui/core";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { createElement, useState } from "react";
 import { AutoSizer as AutoSize } from "react-virtualized";
 import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { EventListInspector } from "./EventListInspector";
-import { getRenderer } from "./getRenderer";
-import { SelectEvent as RendererSelectEvent } from "./Renderer";
+import { getRenderer } from "components/specimen-renderer/getRenderer";
+import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
 import { SelectionMenu } from "./SelectionMenu";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
 export function SpecimenInspector(props: SpecimenInspectorProps) {
+  const { palette } = useTheme();
   const [{ specimen: loading }] = useLoading();
   const [{ specimen, mapType }] = useSpecimen();
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
+
+  const [renderer] = getRenderer(mapType);
+
+  const inspectorStyles = loading
+    ? {
+        opacity: palette.action.disabledOpacity,
+        pointerEvents: "none" as const,
+      }
+    : {};
+
   return (
     <>
       <Fade in={loading}>
@@ -24,10 +35,15 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
       </Fade>
       <Flex {...props}>
         {specimen ? (
-          <>
+          <Flex
+            sx={{
+              transition: ({ transitions }) => transitions.create("opacity"),
+              ...inspectorStyles,
+            }}
+          >
             <AutoSize>
               {(size) =>
-                createElement(getRenderer(mapType), {
+                createElement(renderer, {
                   ...size,
                   onSelect: setSelection,
                   selection: selection?.world,
@@ -41,7 +57,7 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
               maxWidth={480}
               minWidth="30vw"
             />
-          </>
+          </Flex>
         ) : (
           <Flex
             justifyContent="center"

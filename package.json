@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start:dev": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
-    "start": "cd server && ts-node --transpile-only src/index.ts",
+    "start": "cd server && node --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts",
     "start:all": "concurrently \"cd client && npx --yes serve -s build\" \"cd server && ts-node src/index.ts\"",
     "build:all": "cd client && npm run build",
     "deploy:all": "gh-pages -d client/build",

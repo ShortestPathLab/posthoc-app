@@ -52,7 +52,9 @@ export function EventInspector({
           <Type>{index}</Type>
           <Divider sx={{ mx: 2 }} flexItem orientation="vertical" />
           <Box>
-            <Overline>{`${event?.type} #${event?.id}`}</Overline>
+            <Overline>{`${event?.type ?? "unsupported"} #${
+              event?.id ?? "-"
+            }`}</Overline>
             <Flex>
               {map(
                 filter(

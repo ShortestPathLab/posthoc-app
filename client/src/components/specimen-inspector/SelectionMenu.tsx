@@ -14,7 +14,8 @@ import { Overline } from "components/generic/Overline";
 import { Property } from "components/generic/Property";
 import { map } from "lodash";
 import { useUIState } from "slices/UIState";
-import { SelectEvent as RendererSelectEvent } from "./Renderer";
+import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
+import { useSnackbar } from "components/generic/Snackbar";
 
 type Props = {
   selection?: RendererSelectEvent;
@@ -22,9 +23,10 @@ type Props = {
 };
 
 export function SelectionMenu({ selection, onClose }: Props) {
+  const notify = useSnackbar();
   const [, setUIState] = useUIState();
   const { global, world, info } = selection ?? {};
-  const { current, entry } = info ?? {};
+  const { current, entry, node } = info ?? {};
 
   return (
     <Menu
@@ -49,12 +51,20 @@ export function SelectionMenu({ selection, onClose }: Props) {
           {
             label: "Set Origin",
             icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
-            action: () => {},
+            action: () => {
+              notify("Origin set.");
+              setUIState({ startNode: node?.key });
+            },
+            disabled: !node,
           },
           {
             label: "Set Destination",
             icon: <DestinationIcon />,
-            action: () => {},
+            action: () => {
+              notify("Destination set.");
+              setUIState({ endNode: node?.key });
+            },
+            disabled: !node,
           },
           {
             label: "Go to Expansion Step",

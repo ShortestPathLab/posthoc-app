@@ -1,4 +1,5 @@
 import { getClient } from "client/getClient";
+import { getRenderer } from "components/specimen-renderer/getRenderer";
 import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useLoading } from "slices/loading";
@@ -13,7 +14,7 @@ async function getMap(map: string) {
 export function SpecimenService() {
   const [, setLoading] = useLoading();
   const [, setSpecimen] = useSpecimen();
-  const [{ algorithm, map }, setUIState] = useUIState();
+  const [{ algorithm, map, startNode, endNode }, setUIState] = useUIState();
 
   useAsync(
     async (signal) => {
@@ -22,10 +23,11 @@ export function SpecimenService() {
         const mapURI = await getMap(map.id);
         if (mapURI) {
           const client = await getClient();
+          const [, defaults] = getRenderer(map.type);
           const params: PathfindingTask["params"] = {
             algorithm,
-            end: 0,
-            start: 0,
+            end: endNode ?? defaults(mapURI)?.end,
+            start: startNode ?? defaults(mapURI)?.start,
             mapType: map?.type,
             mapURI,
           };
@@ -38,7 +40,7 @@ export function SpecimenService() {
       }
       setLoading({ specimen: false });
     },
-    [algorithm, map?.id, map?.type, getClient, setLoading]
+    [algorithm, startNode, endNode, map?.id, map?.type, getClient, setLoading]
   );
 
   return <></>;

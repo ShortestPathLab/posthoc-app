@@ -1,5 +1,5 @@
 import execSh from "exec-sh";
-import { entries, trim } from "lodash";
+import { entries, join, trim } from "lodash-es";
 
 const sh = execSh.promise;
 
@@ -24,11 +24,10 @@ export async function exec(
     ),
     ...params,
   ];
-  console.log(command.join(" "));
   const { stdout, stderr } = await sh(command.join(" "), true);
   if (!stderr) {
     return trim(stdout);
   } else if (errorsAsOutput) {
-    return trim(stderr);
+    return trim(join([stderr, stdout], "\n"));
   } else throw new ExecError(stderr);
 }
