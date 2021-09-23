@@ -1,5 +1,6 @@
 import { getClient } from "client/getClient";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
+import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useLoading } from "slices/loading";
@@ -24,7 +25,7 @@ export function SpecimenService() {
         if (mapURI) {
           const client = await getClient();
           const [, defaults] = getRenderer(map.type);
-          const params: PathfindingTask["params"] = {
+          const params: ParamsOf<PathfindingTask> = {
             algorithm,
             end: endNode ?? defaults(mapURI)?.end,
             start: startNode ?? defaults(mapURI)?.start,
