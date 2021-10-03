@@ -6,7 +6,8 @@
   "module": "main.js",
   "scripts": {
     "start": "nodemon --watch . --watch src --exec \"node --experimental-specifier-resolution=node --loader ts-node/esm\" src/index.ts",
-    "test": "jest"
+    "test": "jest",
+    "build:docker": "docker build . -t server"
   },
   "author": "",
   "license": "ISC",
