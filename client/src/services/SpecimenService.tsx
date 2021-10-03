@@ -1,4 +1,8 @@
 import { getClient } from "client/getClient";
+import {
+  SnackbarLabel as Label,
+  useSnackbar,
+} from "components/generic/Snackbar";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
@@ -13,6 +17,7 @@ async function getMap(map: string) {
 }
 
 export function SpecimenService() {
+  const notify = useSnackbar();
   const [, setLoading] = useLoading();
   const [, setSpecimen] = useSpecimen();
   const [{ algorithm, map, startNode, endNode }, setUIState] = useUIState();
@@ -36,12 +41,27 @@ export function SpecimenService() {
           if (!signal.aborted) {
             setSpecimen({ specimen, ...params });
             setUIState({ step: 0, playback: "paused", breakpoints: [] });
+            notify(
+              <Label
+                primary="Solution generated."
+                secondary={`${specimen?.eventList?.length} steps`}
+              />
+            );
           }
         }
       }
       setLoading({ specimen: false });
     },
-    [algorithm, startNode, endNode, map?.id, map?.type, getClient, setLoading]
+    [
+      algorithm,
+      startNode,
+      endNode,
+      map?.id,
+      map?.type,
+      getClient,
+      setLoading,
+      notify,
+    ]
   );
 
   return <></>;

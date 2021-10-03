@@ -1,4 +1,4 @@
-import { IconButton, Snackbar } from "@material-ui/core";
+import { Box, IconButton, Snackbar } from "@material-ui/core";
 import { CloseOutlined as CloseIcon } from "@material-ui/icons";
 import { noop } from "lodash";
 import {
@@ -9,6 +9,8 @@ import {
   useEffect,
   useState,
 } from "react";
+import { Flex } from "./Flex";
+import { Space } from "./Space";
 
 const SnackbarContext = createContext<(message?: ReactNode) => void>(noop);
 
@@ -83,5 +85,20 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         }
       />
     </>
+  );
+}
+
+type SnackbarLabelProps = {
+  primary?: ReactNode;
+  secondary?: ReactNode;
+};
+
+export function SnackbarLabel({ primary, secondary }: SnackbarLabelProps) {
+  return (
+    <Flex>
+      <Box>{primary}</Box>
+      <Space />
+      <Box sx={{ opacity: 0.56 }}>{secondary}</Box>
+    </Flex>
   );
 }

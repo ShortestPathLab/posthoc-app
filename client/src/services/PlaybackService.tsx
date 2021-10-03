@@ -1,7 +1,7 @@
-import { Box } from "@material-ui/core";
-import { Flex } from "components/generic/Flex";
-import { useSnackbar } from "components/generic/Snackbar";
-import { Space } from "components/generic/Space";
+import {
+  SnackbarLabel as Label,
+  useSnackbar,
+} from "components/generic/Snackbar";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { trimEnd } from "lodash";
 import { ReactNode, useCallback, useEffect } from "react";
@@ -26,13 +26,7 @@ export function PlaybackService() {
   const shouldBreak = useBreakpoints();
 
   const renderLabel = useCallback(
-    (label: ReactNode) => (
-      <Flex>
-        <Box>{label}</Box>
-        <Space />
-        <Box sx={{ opacity: 0.56 }}>{`Step ${step}`}</Box>
-      </Flex>
-    ),
+    (label: ReactNode) => <Label primary={label} secondary={`Step ${step}`} />,
     [step]
   );
 

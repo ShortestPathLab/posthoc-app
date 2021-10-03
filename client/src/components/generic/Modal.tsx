@@ -224,11 +224,17 @@ export default function Modal({
         style={{
           height: "100%",
           width: sm ? undefined : width,
+          maxWidth: "100%",
           overflow: scrollable ? undefined : "hidden",
         }}
         onTarget={onTarget}
       >
-        <div ref={(e) => setContentRef(e)}>{content}</div>
+        <div
+          ref={(e) => setContentRef(e)}
+          style={{ width: "100%", height: "100%" }}
+        >
+          {content}
+        </div>
       </ScrollPanel>
       {actions}
     </Dialog>

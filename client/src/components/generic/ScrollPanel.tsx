@@ -6,7 +6,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import AutoSize from "react-virtualized-auto-sizer";
 
 type ScrollPanelProps = {
   onTarget?: (e: HTMLDivElement | null) => void;
@@ -27,34 +26,29 @@ export function ScrollPanel({
   }, [target, onScroll]);
 
   return (
-    <AutoSize style={{ width: "100%", height: "100%" }}>
-      {({ width, height }) => (
+    <div
+      {...props}
+      style={{
+        height: "100%",
+        width: "100%",
+        overflow: "hidden scroll",
+        ...props.style,
+      }}
+      ref={(e) => {
+        setTarget(e);
+        onTarget?.(e);
+      }}
+    >
+      <PanelContext.Provider value={target}>
         <div
-          {...props}
-          className="scroll"
           style={{
-            height,
-            overflow: "hidden scroll",
-            ...props.style,
-          }}
-          ref={(e) => {
-            setTarget(e);
-            onTarget?.(e);
+            width: "100%",
           }}
         >
-          <PanelContext.Provider value={target}>
-            <div
-              style={{
-                minHeight: height,
-                width,
-              }}
-            >
-              {props.children}
-            </div>
-          </PanelContext.Provider>
+          {props.children}
         </div>
-      )}
-    </AutoSize>
+      </PanelContext.Provider>
+    </div>
   );
 }
 const PanelContext = createContext<HTMLDivElement | null>(null);
