@@ -20,7 +20,7 @@ export function SpecimenService() {
   const notify = useSnackbar();
   const [, setLoading] = useLoading();
   const [, setSpecimen] = useSpecimen();
-  const [{ algorithm, map, startNode, endNode }, setUIState] = useUIState();
+  const [{ algorithm, map, start, end }, setUIState] = useUIState();
 
   useAsync(
     async (signal) => {
@@ -30,38 +30,35 @@ export function SpecimenService() {
         if (mapURI) {
           const client = await getClient();
           const [, defaults] = getRenderer(map.type);
+
           const params: ParamsOf<PathfindingTask> = {
             algorithm,
-            end: endNode ?? defaults(mapURI)?.end,
-            start: startNode ?? defaults(mapURI)?.start,
+            end: end ?? defaults(mapURI)?.end,
+            start: start ?? defaults(mapURI)?.start,
             mapType: map?.type,
             mapURI,
           };
-          const specimen = await client.call("solve/pathfinding", params);
-          if (!signal.aborted) {
-            setSpecimen({ specimen, ...params });
-            setUIState({ step: 0, playback: "paused", breakpoints: [] });
-            notify(
-              <Label
-                primary="Solution generated."
-                secondary={`${specimen?.eventList?.length} steps`}
-              />
-            );
+
+          try {
+            const specimen = await client.call("solve/pathfinding", params);
+            if (!signal.aborted) {
+              setSpecimen({ specimen, ...params });
+              setUIState({ step: 0, playback: "paused", breakpoints: [] });
+              notify(
+                <Label
+                  primary="Solution generated."
+                  secondary={`${specimen?.eventList?.length} steps`}
+                />
+              );
+            }
+          } catch (e) {
+            notify(`${e}`);
           }
         }
       }
       setLoading({ specimen: false });
     },
-    [
-      algorithm,
-      startNode,
-      endNode,
-      map?.id,
-      map?.type,
-      getClient,
-      setLoading,
-      notify,
-    ]
+    [algorithm, start, end, map?.id, map?.type, getClient, setLoading, notify]
   );
 
   return <></>;

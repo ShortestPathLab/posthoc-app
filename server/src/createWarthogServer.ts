@@ -24,6 +24,15 @@ import { parseOutput } from "./parseOutput";
 import { createRPCMethod as createMethod, RPCServer } from "./RPCServer";
 import { usingTempFiles as temp } from "./usingTempFiles";
 
+/**
+ * The maximum size, in UTF-8 characters of a solution,
+ * before it is discarded for being too hard.
+ * @default 50e6
+ */
+const MAX_SOLUTION_SIZE = process.env.MAX_SOLUTION_SIZE
+  ? +process.env.MAX_SOLUTION_SIZE
+  : 50e6;
+
 async function getFiles(path: string) {
   return await glob(`${resolve(path)}/**/*`);
 }
@@ -117,6 +126,10 @@ export function createWarthogServer(port?: number) {
             },
             true
           );
+
+          if (output.length > MAX_SOLUTION_SIZE) {
+            throw new Error("Solution is too large.");
+          }
 
           return transform(parseOutput(output));
         })

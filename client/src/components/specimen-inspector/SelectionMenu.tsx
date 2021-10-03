@@ -53,7 +53,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
             icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
             action: () => {
               notify("Origin set.");
-              setUIState({ startNode: node?.key });
+              setUIState({ start: node?.key });
             },
             disabled: !node,
           },
@@ -62,7 +62,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
             icon: <DestinationIcon />,
             action: () => {
               notify("Destination set.");
-              setUIState({ endNode: node?.key });
+              setUIState({ end: node?.key });
             },
             disabled: !node,
           },

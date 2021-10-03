@@ -3,7 +3,7 @@ import { useFeatures } from "slices/features";
 import { useUIState } from "slices/UIState";
 import { FeaturePicker } from "./FeaturePicker";
 
-const mapDefaults = { startNode: undefined, endNode: undefined };
+const mapDefaults = { start: undefined, end: undefined };
 
 export function InputControls() {
   const [{ algorithms, maps }] = useFeatures();

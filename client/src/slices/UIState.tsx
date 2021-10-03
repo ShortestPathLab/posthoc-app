@@ -36,8 +36,8 @@ type DebugOptionsState = {
 };
 
 type SpecimenState = {
-  startNode?: number;
-  endNode?: number;
+  start?: number;
+  end?: number;
 };
 
 export type UIState = InputState &
