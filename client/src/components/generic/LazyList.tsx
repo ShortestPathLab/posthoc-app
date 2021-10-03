@@ -1,42 +1,32 @@
 import { Box, BoxProps } from "@material-ui/core";
-import { CSSProperties, ReactElement } from "react";
-import { AutoSizer as AutoSize } from "react-virtualized";
+import { ReactElement } from "react";
 import {
-  FixedSizeList as List,
-  FixedSizeListProps as ListProps,
-} from "react-window";
+  Virtuoso as List,
+  VirtuosoHandle as Handle,
+  VirtuosoProps as ListProps,
+} from "react-virtuoso";
+
+export type LazyListHandle = Handle;
 
 export type LazyListProps<T> = {
   items?: T[];
-  itemHeight?: number;
-  renderItem?: (item: T, index: number, style: CSSProperties) => ReactElement;
-  listOptions?: Partial<ListProps>;
-  listPadding?: number;
+  renderItem?: (item: T, index: number) => ReactElement;
+  listOptions?: Partial<ListProps<T>>;
 } & BoxProps;
 
 export function LazyList<T>({
   items = [],
-  listPadding: r = 0,
-  itemHeight = 0,
   renderItem,
   listOptions: options,
   ...props
 }: LazyListProps<T>) {
   return (
     <Box {...props}>
-      <AutoSize>
-        {(dimensions) => (
-          <List
-            {...dimensions}
-            itemSize={itemHeight + r}
-            itemCount={items.length}
-            style={{ paddingBottom: r }}
-            {...options}
-          >
-            {({ index: i, style }) => renderItem?.(items[i], i, style) ?? <></>}
-          </List>
-        )}
-      </AutoSize>
+      <List
+        totalCount={items.length}
+        itemContent={(i) => renderItem?.(items[i], i)}
+        {...options}
+      />
     </Box>
   );
 }

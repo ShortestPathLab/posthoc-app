@@ -55,7 +55,7 @@ export function EventInspector({
             <Overline>{`${event?.type ?? "unsupported"} #${
               event?.id ?? "-"
             }`}</Overline>
-            <Flex>
+            <Flex flexWrap="wrap">
               {map(
                 filter(
                   [
