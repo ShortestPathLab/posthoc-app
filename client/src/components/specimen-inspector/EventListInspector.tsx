@@ -1,4 +1,3 @@
-import { useTheme } from "@material-ui/core";
 import { Flex } from "components/generic/Flex";
 import {
   LazyList as List,
@@ -15,16 +14,15 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
   const [{ step = 0, playback }] = useUIState();
   const [{ specimen }] = useSpecimen();
   const ref = useRef<ListHandle | null>(null);
-  const { spacing } = useTheme();
 
   useEffect(() => {
     ref?.current?.scrollToIndex?.({
       index: step,
       align: "start",
       behavior: playback === "playing" ? "auto" : "smooth",
-      offset: -spacing(2),
+      offset: -16,
     });
-  }, [ref, step, playback, spacing]);
+  }, [ref, step, playback]);
 
   return (
     <List
