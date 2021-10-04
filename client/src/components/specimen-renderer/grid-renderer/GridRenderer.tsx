@@ -47,7 +47,7 @@ export function GridRenderer({
       [
         ...parseMap(mapURI),
         () => 0x121212,
-        merge(getDefaults(mapURI), state),
+        merge(getDefaults(mapURI), { start: state.start, end: state.end }),
       ] as const,
     [mapURI, state.start, state.end]
   );
@@ -112,11 +112,7 @@ type OverlayProps = {
   size?: Point;
 };
 
-function Overlay({
-  start: start = 0,
-  end: end = 0,
-  size = { x: 0, y: 0 },
-}: OverlayProps) {
+function Overlay({ start = 0, end = 0, size = { x: 0, y: 0 } }: OverlayProps) {
   return (
     <>
       {map(

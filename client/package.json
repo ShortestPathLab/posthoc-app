@@ -45,7 +45,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -69,7 +70,8 @@
     "@types/babel__standalone": "^7.1.3",
     "@types/lodash": "^4.14.172",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
+    "gh-pages": "^3.2.3",
     "serve": "^12.0.1"
   },
-  "homepage": "."
+  "homepage": "https://pathfinding-project.github.io/app"
 }
