@@ -40,7 +40,7 @@ export type Renderer = FunctionComponent<RendererProps>;
 
 export type RendererEntry = [
   FunctionComponent<RendererProps>,
-  (mapURI?: string) => Pick<ParamsOf<PathfindingTask>, "start" | "end">
+  (map?: string) => Pick<ParamsOf<PathfindingTask>, "start" | "end">
 ];
 
 export type RendererMap = {

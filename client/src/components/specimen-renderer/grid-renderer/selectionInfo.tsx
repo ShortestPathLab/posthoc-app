@@ -8,11 +8,11 @@ function between(v: number, min: number, max: number) {
 }
 
 export function selectionInfo(
-  mapURI: string = "",
+  map: string = "",
   specimen: Trace = {},
   step: number = 0
 ) {
-  const [{ x: w, y: h }, , valid] = parseMap(mapURI);
+  const [{ x: w, y: h }, , valid] = parseMap(map);
   return ({ x, y }: Point) => {
     const nodes = take(specimen?.eventList, step);
     const node = findLastIndex(

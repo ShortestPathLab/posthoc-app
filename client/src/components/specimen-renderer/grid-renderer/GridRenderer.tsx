@@ -31,7 +31,7 @@ export function GridRenderer({
 }: GridRendererProps) {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const { width = 0, height = 0 } = props;
-  const [{ specimen, mapURI }] = useSpecimen();
+  const [{ specimen, map: m }] = useSpecimen();
   const [{ step = 0, ...state }] = useUIState();
 
   const [active, setActive] = useState<Point | undefined>(undefined);
@@ -45,15 +45,15 @@ export function GridRenderer({
   const [size, bgNodes, , bgNodeColor, { start, end }] = useMemo(
     () =>
       [
-        ...parseMap(mapURI),
+        ...parseMap(m),
         () => 0x121212,
-        merge(getDefaults(mapURI), { start: state.start, end: state.end }),
+        merge(getDefaults(m), { start: state.start, end: state.end }),
       ] as const,
-    [mapURI, state.start, state.end]
+    [m, state.start, state.end]
   );
 
   const handleClick = useMemo(() => {
-    const info = selectionInfo(mapURI, specimen, step);
+    const info = selectionInfo(m, specimen, step);
     return ({ global, world }: ViewportEvent) => {
       if (ref && specimen) {
         const { top, left } = ref.getBoundingClientRect();
@@ -65,7 +65,7 @@ export function GridRenderer({
         });
       }
     };
-  }, [ref, onSelect, specimen, step, mapURI]);
+  }, [ref, onSelect, specimen, step, m]);
 
   const handleMouseEvent = useMemo(() => {
     let timeout = 0;

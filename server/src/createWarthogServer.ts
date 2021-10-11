@@ -13,6 +13,7 @@ import { resolve } from "path";
 import { warthog } from "pathfinding-binaries";
 import { algorithms } from "./algorithms";
 import { exec } from "./exec";
+import { getMap, parseURI } from "./getMap";
 import {
   getMapDescriptor,
   mapIsSupported,
@@ -105,34 +106,41 @@ export function createWarthogServer(port?: number) {
       /**
        * Returns a pathfinding solution.
        */
-      createMethod("solve/pathfinding", ({ algorithm, mapType, ...params }) =>
-        temp(async (scenarioPath, mapPath) => {
-          const { create, transform } = mapTypes[mapType as MapTypeKey];
-          const scenario = create(params);
-
-          await Promise.all([
-            write(scenarioPath, scenario(mapPath), "utf-8"),
-            write(mapPath, params.mapURI, "utf-8"),
-          ]);
-
-          const output = await exec(
-            warthog,
-            {
-              flags: {
-                alg: { value: algorithm },
-                scen: { value: scenarioPath },
-                verbose: {},
-              },
-            },
-            true
-          );
-
-          if (output.length > MAX_SOLUTION_SIZE) {
-            throw new Error("Solution is too large.");
-          }
-
-          return transform(parseOutput(output));
-        })
+      createMethod(
+        "solve/pathfinding",
+        ({ algorithm, mapType, mapURI, ...params }) =>
+          temp(async (scenarioPath, mapPath) => {
+            const { create, transform } = mapTypes[mapType as MapTypeKey];
+            const { scheme, content } = parseURI(mapURI);
+            // Check if URI scheme is trace,
+            // if so, return the URI content
+            if (scheme !== "trace:") {
+              const m = getMap(mapURI);
+              // Check if the URI references a valid map
+              if (m) {
+                const scenario = create(m, params);
+                await Promise.all([
+                  write(scenarioPath, scenario(mapPath), "utf-8"),
+                  write(mapPath, m, "utf-8"),
+                ]);
+                const output = await exec(
+                  warthog,
+                  {
+                    flags: {
+                      alg: { value: algorithm },
+                      scen: { value: scenarioPath },
+                      verbose: {},
+                    },
+                  },
+                  true
+                );
+                if (output.length > MAX_SOLUTION_SIZE) {
+                  throw new Error("Solution is too large.");
+                }
+                return transform(parseOutput(output));
+              }
+            } else return JSON.parse(content);
+          })
       ),
     ],
   });

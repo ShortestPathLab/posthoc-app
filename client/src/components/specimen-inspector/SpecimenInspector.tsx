@@ -2,6 +2,7 @@ import { Fade, LinearProgress } from "@material-ui/core";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
 import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
+import { some, values } from "lodash";
 import { createElement, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { useLoading } from "slices/loading";
@@ -12,7 +13,7 @@ import { SelectionMenu } from "./SelectionMenu";
 type SpecimenInspectorProps = {} & FlexProps;
 
 export function SpecimenInspector(props: SpecimenInspectorProps) {
-  const [{ specimen: loading }] = useLoading();
+  const [loading] = useLoading();
   const [{ specimen, mapType }] = useSpecimen();
   const [renderer] = getRenderer(mapType);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
@@ -21,7 +22,7 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
 
   return (
     <>
-      <Fade in={loading}>
+      <Fade in={some(values(loading))}>
         <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
       </Fade>
       <Flex {...props}>

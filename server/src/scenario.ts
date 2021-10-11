@@ -1,11 +1,11 @@
-import { PathfindingTask } from "protocol/SolveTask";
-import { ParamsOf } from "protocol/Message";
 import { floor, join, last, map, split } from "lodash-es";
+import { ParamsOf } from "protocol/Message";
+import { PathfindingTask } from "protocol/SolveTask";
 
-type Params = Pick<ParamsOf<PathfindingTask>, "start" | "end" | "mapURI">;
+type Params = Pick<ParamsOf<PathfindingTask>, "start" | "end">;
 
-export function grid({ mapURI, start, end }: Params) {
-  const [, h, w] = split(mapURI, "\n");
+export function grid(m: string, { start, end }: Params) {
+  const [, h, w] = split(m, "\n");
   const [width, height] = map([w, h], (d) => +last(split(d, " "))!);
   return (path: string) =>
     join(

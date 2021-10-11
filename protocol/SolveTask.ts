@@ -1,4 +1,11 @@
 import { Method, Namespace, Response } from "./Message";
+import { Trace } from "./Trace";
+
+export type SchemeBase = "hash" | "trace" | "map";
+
+export type Scheme = `${SchemeBase}:`;
+
+export type MapURI = `${Scheme}${string}`;
 
 export type SolveTask<T extends string, Params = {}> = Namespace<
   "solve",
@@ -7,7 +14,7 @@ export type SolveTask<T extends string, Params = {}> = Namespace<
 >;
 
 type PathfindingTaskParams = {
-  mapURI: string;
+  mapURI: MapURI;
   algorithm: string;
   mapType: string;
   /**
@@ -22,11 +29,6 @@ type PathfindingTaskParams = {
 
 export type PathfindingTask = SolveTask<"pathfinding", PathfindingTaskParams>;
 
-/**
- * TODO Create type definition for search trace.
- */
-type SearchTrace = any;
-
-export type SearchTraceResult = Response<SearchTrace>;
+export type SearchTraceResult = Response<Trace | undefined>;
 
 export type PathfindingTaskMethod = Method<PathfindingTask, SearchTraceResult>;

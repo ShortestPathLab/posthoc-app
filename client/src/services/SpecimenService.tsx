@@ -4,16 +4,35 @@ import {
   useSnackbar,
 } from "components/generic/Snackbar";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
+import { memoize as memo } from "lodash";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
+import hash from "md5";
 
-async function getMap(map: string) {
+const getMap = memo(async (map: string) => {
   const client = await getClient();
   return (await client.call("features/map", { id: map }))?.content;
+});
+
+async function solve(
+  map: string,
+  params: Omit<ParamsOf<PathfindingTask>, "mapURI">
+) {
+  const client = await getClient();
+  if (map) {
+    for (const mapURI of [
+      `hash:${hash(encodeURIComponent(map))}`,
+      `map:${encodeURIComponent(map)}`,
+    ] as const) {
+      const p = { ...params, mapURI };
+      const specimen = await client.call("solve/pathfinding", p);
+      if (specimen) return { ...p, specimen, map };
+    }
+  }
 }
 
 export function SpecimenService() {
@@ -26,28 +45,23 @@ export function SpecimenService() {
     async (signal) => {
       setLoading({ specimen: true });
       if (algorithm && map?.id && map?.type) {
-        const mapURI = await getMap(map.id);
-        if (mapURI) {
-          const client = await getClient();
+        const m = await getMap(map.id);
+        if (m) {
           const [, defaults] = getRenderer(map.type);
-
-          const params: ParamsOf<PathfindingTask> = {
-            algorithm,
-            end: end ?? defaults(mapURI)?.end,
-            start: start ?? defaults(mapURI)?.start,
-            mapType: map?.type,
-            mapURI,
-          };
-
           try {
-            const specimen = await client.call("solve/pathfinding", params);
-            if (!signal.aborted) {
-              setSpecimen({ specimen, ...params });
+            const solution = await solve(m, {
+              algorithm,
+              end: end ?? defaults(m)?.end,
+              start: start ?? defaults(m)?.start,
+              mapType: map?.type,
+            });
+            if (solution && !signal.aborted) {
+              setSpecimen(solution);
               setUIState({ step: 0, playback: "paused", breakpoints: [] });
               notify(
                 <Label
                   primary="Solution generated."
-                  secondary={`${specimen?.eventList?.length} steps`}
+                  secondary={`${solution.specimen.eventList?.length} steps`}
                 />
               );
             }
