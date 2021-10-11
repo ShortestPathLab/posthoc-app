@@ -25,7 +25,7 @@ async function solve(
   const client = await getClient();
   if (map) {
     for (const mapURI of [
-      `hash:${hash(encodeURIComponent(map))}`,
+      `hash:${hash(map)}`,
       `map:${encodeURIComponent(map)}`,
     ] as const) {
       const p = { ...params, mapURI };

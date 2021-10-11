@@ -11,9 +11,7 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
   requestAnimationFrame(async () => {
     const result = await f();
-    if (!cancelled) {
-      g(result);
-    }
+    if (!cancelled) g(result);
   });
   return () => {
     cancelled = true;

@@ -1,7 +1,7 @@
 import { Stage } from "@inlet/react-pixi";
 import { Box } from "@material-ui/core";
 import { Point, RendererProps } from "components/specimen-renderer/Renderer";
-import { delay, floor, map, merge, take } from "lodash";
+import { delay, floor, merge, take } from "lodash";
 import { ComponentProps, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
@@ -9,9 +9,11 @@ import { getColor } from "./colors";
 import { scale } from "./config";
 import { getDefaults } from "./getDefaults";
 import { Guides } from "./Guides";
-import { Node, square } from "./Node";
+import { square } from "./Node";
 import { NodeList } from "./NodeList";
+import { Overlay } from "./Overlay";
 import { parseMap } from "./parseMap";
+import { Path } from "./Path";
 import { ViewportEvent } from "./PixiViewport";
 import { Selection } from "./Selection";
 import { selectionInfo } from "./selectionInfo";
@@ -100,36 +102,9 @@ export function GridRenderer({
           <NodeList nodes={bgNodes} color={bgNodeColor} variant={square} />
           <Overlay start={start} end={end} size={size} />
           <NodeList nodes={nodes} color={getColor} />
+          <Path nodes={specimen?.eventList} step={step} />
         </Viewport>
       </Stage>
     </Box>
-  );
-}
-
-type OverlayProps = {
-  start?: number;
-  end?: number;
-  size?: Point;
-};
-
-function Overlay({ start = 0, end = 0, size = { x: 0, y: 0 } }: OverlayProps) {
-  return (
-    <>
-      {map(
-        [
-          { color: getColor("source"), node: start },
-          { color: getColor("destination"), node: end },
-        ],
-        ({ color, node }, i) => (
-          <Node
-            key={i}
-            x={scale * (node % size.x)}
-            y={scale * floor(node / size.x)}
-            color={color}
-            alpha={0.25}
-          />
-        )
-      )}
-    </>
   );
 }

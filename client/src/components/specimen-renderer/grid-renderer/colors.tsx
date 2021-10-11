@@ -11,7 +11,7 @@ import { TraceEventType } from "protocol/Trace";
 
 const tint = "500";
 
-function convert(hex: string) {
+export function convert(hex: string) {
   return parseInt(hex.replace("#", "0x"));
 }
 
