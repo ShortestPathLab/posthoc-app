@@ -1,3 +1,5 @@
+![main](https://github.com/pathfinding-project/app/actions/workflows/main.yml/badge.svg)
+
 # Path Search Visualiser
 
 Fork of [https://github.com/krnbatta/pathfinder](https://github.com/krnbatta/pathfinder).
