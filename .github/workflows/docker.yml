@@ -29,7 +29,7 @@ jobs:
           # Name of the Docker image
           image: server
           # Target Docker registry
-          registry: rachmaninoff.duckdns.org:8001
+          registry: registry.rachmaninoff.duckdns.org
           # Location of Dockerfile, if not Dockerfile in root directory
           dockerfile: server/Dockerfile
           # Directory to run `docker build` from, if not project root
