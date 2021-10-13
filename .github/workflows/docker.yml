@@ -28,6 +28,8 @@ jobs:
         with:
           # Name of the Docker image
           image: server
+          # Tags override for Docker image
+          tags: latest
           # Target Docker registry
           registry: registry.rachmaninoff.duckdns.org
           # Location of Dockerfile, if not Dockerfile in root directory
