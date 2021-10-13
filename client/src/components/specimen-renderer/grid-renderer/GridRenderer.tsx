@@ -9,7 +9,7 @@ import { getColor } from "./colors";
 import { scale } from "./config";
 import { getDefaults } from "./getDefaults";
 import { Guides } from "./Guides";
-import { square } from "./Node";
+import { square, box } from "./Node";
 import { NodeList } from "./NodeList";
 import { Overlay } from "./Overlay";
 import { parseMap } from "./parseMap";
@@ -48,7 +48,7 @@ export function GridRenderer({
     () =>
       [
         ...parseMap(m),
-        () => 0x121212,
+        () => 0xe1e1e1,
         merge(getDefaults(m), { start: state.start, end: state.end }),
       ] as const,
     [m, state.start, state.end]
@@ -96,13 +96,13 @@ export function GridRenderer({
           onMouseOver={handleMouseEvent}
         >
           <Selection hover={hover} highlight={selection || active} />
-          <Guides width={size.x} height={size.y} alpha={0.56} grid={10} />
-          <Guides width={size.x} height={size.y} alpha={0.24} grid={1} />
           <NodeList nodes={specimen?.eventList} variant={square} />
-          <NodeList nodes={bgNodes} color={bgNodeColor} variant={square} />
+          <NodeList nodes={bgNodes} color={bgNodeColor} variant={box} />
           <Overlay start={start} end={end} size={size} />
           <NodeList nodes={nodes} color={getColor} />
           <Path nodes={specimen?.eventList} step={step} />
+          <Guides width={size.x} height={size.y} alpha={0.56} grid={10} />
+          <Guides width={size.x} height={size.y} alpha={0.24} grid={1} />
         </Viewport>
       </Stage>
     </Box>

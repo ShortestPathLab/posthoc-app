@@ -16,12 +16,14 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
   const ref = useRef<ListHandle | null>(null);
 
   useEffect(() => {
-    ref?.current?.scrollToIndex?.({
-      index: step,
-      align: "start",
-      behavior: playback === "playing" ? "auto" : "smooth",
-      offset: -16,
-    });
+    if (playback !== "playing") {
+      ref?.current?.scrollToIndex?.({
+        index: step,
+        align: "start",
+        behavior: "smooth",
+        offset: -16,
+      });
+    }
   }, [ref, step, playback]);
 
   return (

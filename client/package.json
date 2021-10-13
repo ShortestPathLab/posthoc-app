@@ -75,5 +75,5 @@
     "gh-pages": "^3.2.3",
     "serve": "^12.0.1"
   },
-  "homepage": "https://pathfinding-project.github.io/app"
+  "homepage": "."
 }

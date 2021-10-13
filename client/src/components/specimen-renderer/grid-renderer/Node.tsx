@@ -37,6 +37,20 @@ export const square = (
     )
     .endFill();
 
+export const box = (
+  g: Graphics,
+  { color, left = 0, top = 0, resolution: r = 1 }: NodeProps
+) =>
+  g
+    .beginFill(color ?? 0x000000)
+    .drawRect(
+      r * (scale + left),
+      r * (scale + top),
+      r * (1 * scale),
+      r * (1 * scale)
+    )
+    .endFill();
+
 export const Node = makeGraphic<NodeProps>((g, p) => {
   g.clear();
   point(g, p);
