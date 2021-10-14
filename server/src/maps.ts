@@ -1,35 +1,13 @@
-import { keys, map, some, startCase } from "lodash-es";
+import { keys, some, startCase } from "lodash-es";
 import { parse, relative, resolve } from "path";
-import { Trace } from "protocol/Trace";
 import { grid } from "./scenario";
 
 export const mapsPath = "./static/maps";
 
 export type MapTypeKey = keyof typeof mapTypes;
 
-/**
- * Applies temporary Y coordinate offset correction.
- * TODO Fix issue in Warthog directly.
- */
-function UNSTABLE_offsetY3(trace: Trace<"x" | "y">) {
-  return {
-    ...trace,
-    eventList: map(trace.eventList, (event) => ({
-      ...event,
-      variables: event.variables
-        ? {
-            ...event.variables,
-            y: event.variables.y - 3,
-          }
-        : undefined,
-    })),
-  };
-}
 export const mapTypes = {
-  grid: {
-    create: grid,
-    transform: UNSTABLE_offsetY3,
-  },
+  grid,
 };
 
 export function mapIsSupported(path: string) {

@@ -3,11 +3,8 @@ import { Graphics as PixiGraphics } from "@pixi/graphics";
 import { isNull, isUndefined, keyBy } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useMemo } from "react";
+import { getColor } from "./colors";
 import { scale } from "./config";
-import { deepPurple } from "@material-ui/core/colors";
-import { convert } from "./colors";
-
-const stroke = convert(deepPurple["500"]);
 
 function defined<T>(obj: T): obj is Exclude<T, undefined | null> {
   return !isUndefined(obj) && !isNull(obj);
@@ -38,11 +35,11 @@ export function Path({ nodes = [], step = 0 }: PathProps) {
       g.clear();
       for (const node of p) {
         const { x = 0, y = 0 } = node?.variables ?? {};
-        g.lineTo(x * scale, y * scale);
-        g.lineStyle(1, stroke);
+        g.lineTo((x + 1.5) * scale, (y + 1.5) * scale);
+        g.lineStyle(3, getColor(nodes[step]?.type));
       }
     };
-  }, [path, step]);
+  }, [path, step, nodes]);
 
   return <Graphics draw={draw} />;
 }

@@ -110,7 +110,7 @@ export function createWarthogServer(port?: number) {
         "solve/pathfinding",
         ({ algorithm, mapType, mapURI, ...params }) =>
           temp(async (scenarioPath, mapPath) => {
-            const { create, transform } = mapTypes[mapType as MapTypeKey];
+            const create = mapTypes[mapType as MapTypeKey];
             const { scheme, content } = parseURI(mapURI);
             // Check if URI scheme is trace,
             // if so, return the URI content
@@ -137,7 +137,7 @@ export function createWarthogServer(port?: number) {
                 if (output.length > MAX_SOLUTION_SIZE) {
                   throw new Error("Solution is too large.");
                 }
-                return transform(parseOutput(output));
+                return parseOutput(output);
               }
             } else return JSON.parse(content);
           })
