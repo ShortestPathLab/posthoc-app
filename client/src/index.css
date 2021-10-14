@@ -36,21 +36,6 @@ body {
   }
 }
 
-@media (pointer: fine) and (prefers-color-scheme: dark) {
-  * {
-    scrollbar-color: #888888 #242527;
-  }
-  *::-webkit-scrollbar {
-    background-color: #242527;
-  }
-  *::-webkit-scrollbar-track {
-    background: #242527;
-  }
-  *::-webkit-scrollbar-thumb {
-    background: #888888;
-  }
-}
-
 #pathfinder {
   position: "fixed";
   top: 100vh;
