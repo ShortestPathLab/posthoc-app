@@ -1,6 +1,7 @@
 import { makeGraphic } from "./makeGraphic";
 import { scale } from "./config";
 import { Graphics } from "@pixi/graphics";
+import { map } from "lodash";
 
 export type NodeProps = {
   color?: number;
@@ -10,7 +11,7 @@ export type NodeProps = {
   resolution?: number;
 };
 
-export const point = (
+export const node = (
   g: Graphics,
   { color, left = 0, top = 0, radius = 0.25, resolution: r = 1 }: NodeProps
 ) =>
@@ -25,13 +26,13 @@ export const point = (
 
 export const square = (
   g: Graphics,
-  { color, left = 0, top = 0, radius = 0.25, resolution: r = 1 }: NodeProps
+  { color, left = 0, top = 0, radius = 0.5, resolution: r = 1 }: NodeProps
 ) =>
   g
     .beginFill(color ?? 0x000000)
     .drawRect(
-      r * (1.25 * scale + (radius * scale) / 2 + left),
-      r * (1.25 * scale + (radius * scale) / 2 + top),
+      r * (scale + (radius * scale) / 2 + left),
+      r * (scale + (radius * scale) / 2 + top),
       r * (radius * scale),
       r * (radius * scale)
     )
@@ -51,7 +52,9 @@ export const box = (
     )
     .endFill();
 
-export const Node = makeGraphic<NodeProps>((g, p) => {
-  g.clear();
-  point(g, p);
-});
+export const [Node, Box, Square] = map([node, box, square], (f) =>
+  makeGraphic<NodeProps>((g, p) => {
+    g.clear();
+    f(g, p);
+  })
+);

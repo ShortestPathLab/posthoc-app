@@ -1,16 +1,16 @@
 import { Stage } from "@inlet/react-pixi";
 import { Box } from "@material-ui/core";
+import { blueGrey } from "@material-ui/core/colors";
 import { Point, RendererProps } from "components/specimen-renderer/Renderer";
-import { delay, floor, merge, take } from "lodash";
+import { delay, floor, merge, once } from "lodash";
 import { ComponentProps, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { getColor } from "./colors";
+import { convert, getColor } from "./colors";
 import { scale } from "./config";
 import { getDefaults } from "./getDefaults";
 import { Guides } from "./Guides";
-import { square, box } from "./Node";
-import { NodeList } from "./NodeList";
+import { LazyNodeList as LazyNodes, NodeList as Nodes } from "./NodeList";
 import { Overlay } from "./Overlay";
 import { parseMap } from "./parseMap";
 import { Path } from "./Path";
@@ -39,24 +39,19 @@ export function GridRenderer({
   const [active, setActive] = useState<Point | undefined>(undefined);
   const [hover, setHover] = useState<Point | undefined>(undefined);
 
-  const nodes = useMemo(
-    () => take(specimen?.eventList, step + 1),
-    [specimen, step]
-  );
-
-  const [size, bgNodes, , bgNodeColor, { start, end }] = useMemo(
+  const [[size, bgNodes], bgNodeColor, { start, end }] = useMemo(
     () =>
       [
-        ...parseMap(m),
-        () => 0xe1e1e1,
+        parseMap(m),
+        once(() => convert(blueGrey["500"])),
         merge(getDefaults(m), { start: state.start, end: state.end }),
       ] as const,
     [m, state.start, state.end]
   );
 
   const handleClick = useMemo(() => {
-    const info = selectionInfo(m, specimen, step);
-    return ({ global, world }: ViewportEvent) => {
+    const info = selectionInfo(m, specimen);
+    return ({ global, world }: ViewportEvent, step: number = 0) => {
       if (ref && specimen) {
         const { top, left } = ref.getBoundingClientRect();
         const point = getPoint(world);
@@ -67,7 +62,7 @@ export function GridRenderer({
         });
       }
     };
-  }, [ref, onSelect, specimen, step, m]);
+  }, [ref, onSelect, specimen, m]);
 
   const handleMouseEvent = useMemo(() => {
     let timeout = 0;
@@ -91,17 +86,16 @@ export function GridRenderer({
         <Viewport
           width={width}
           height={height}
-          onClick={handleClick}
+          onClick={(e) => handleClick(e, step)}
           onMouseDown={handleMouseEvent}
           onMouseOver={handleMouseEvent}
         >
           <Selection hover={hover} highlight={selection || active} />
-          <NodeList nodes={specimen?.eventList} variant={square} />
-          <NodeList nodes={bgNodes} color={bgNodeColor} variant={box} />
+          <Nodes nodes={specimen?.eventList} />
+          <Nodes nodes={bgNodes} color={bgNodeColor} />
+          <LazyNodes nodes={specimen?.eventList} step={step} color={getColor} />
           <Overlay start={start} end={end} size={size} />
-          <NodeList nodes={nodes} color={getColor} />
           <Path nodes={specimen?.eventList} step={step} />
-          <Guides width={size.x} height={size.y} alpha={0.56} grid={10} />
           <Guides width={size.x} height={size.y} alpha={0.24} grid={1} />
         </Viewport>
       </Stage>

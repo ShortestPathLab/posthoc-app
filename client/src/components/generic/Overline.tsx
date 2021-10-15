@@ -1,5 +1,19 @@
 import { Typography as Type } from "@material-ui/core";
-import { ReactNode } from "react";
+import { FiberManualRecord as Dot } from "@material-ui/icons";
+import { ComponentProps, ReactNode } from "react";
+
+export function OverlineDot(props: ComponentProps<typeof Dot>) {
+  return (
+    <Dot
+      {...props}
+      sx={{
+        fontSize: 12,
+        transform: "translateY(1.75px) translateX(-2px)",
+        ...props.sx,
+      }}
+    />
+  );
+}
 
 type Props = {
   children?: ReactNode;

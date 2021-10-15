@@ -1,9 +1,9 @@
 import {
-  blue,
   blueGrey,
-  green,
+  deepOrange,
   orange,
-  red,
+  pink,
+  teal,
   yellow,
 } from "@material-ui/core/colors";
 import { mapValues } from "lodash";
@@ -15,17 +15,23 @@ export function convert(hex: string) {
   return parseInt(hex.replace("#", "0x"));
 }
 
+export const colorsHex = {
+  source: teal["A400"],
+  destination: pink["A400"],
+  expanding: deepOrange[tint],
+  generating: yellow[tint],
+  closing: blueGrey["200"],
+};
+
 export const colors: { [K in TraceEventType]: number } = mapValues(
-  {
-    source: green[tint],
-    destination: red[tint],
-    expanding: blue[tint],
-    generating: yellow[tint],
-    closing: blueGrey[tint],
-  },
+  colorsHex,
   convert
 );
 
 export function getColor(key?: TraceEventType) {
   return (key && colors[key]) || convert(orange[tint]);
+}
+
+export function getColorHex(key?: TraceEventType) {
+  return (key && colorsHex[key]) ?? orange[tint];
 }

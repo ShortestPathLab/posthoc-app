@@ -7,13 +7,9 @@ function between(v: number, min: number, max: number) {
   return v >= min && v < max;
 }
 
-export function selectionInfo(
-  map: string = "",
-  specimen: Trace = {},
-  step: number = 0
-) {
+export function selectionInfo(map: string = "", specimen: Trace = {}) {
   const [{ x: w, y: h }, , valid] = parseMap(map);
-  return ({ x, y }: Point) => {
+  return ({ x, y }: Point, step: number = 0) => {
     const nodes = take(specimen?.eventList, step);
     const node = findLastIndex(
       nodes,

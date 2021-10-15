@@ -7,8 +7,9 @@ import {
   Typography as Type,
 } from "@material-ui/core";
 import { Flex } from "components/generic/Flex";
-import { Overline } from "components/generic/Overline";
+import { Overline, OverlineDot as Dot } from "components/generic/Overline";
 import { Property } from "components/generic/Property";
+import { getColorHex } from "components/specimen-renderer/grid-renderer/colors";
 import { entries, filter, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useUIState } from "slices/UIState";
@@ -52,9 +53,15 @@ export function EventInspector({
           <Type>{index}</Type>
           <Divider sx={{ mx: 2 }} flexItem orientation="vertical" />
           <Box>
-            <Overline>{`${event?.type ?? "unsupported"} #${
-              event?.id ?? "-"
-            }`}</Overline>
+            <Overline>
+              <Dot
+                sx={{
+                  color: getColorHex(event?.type),
+                  mr: 1,
+                }}
+              />
+              {`${event?.type ?? "unsupported"} #${event?.id ?? "-"}`}
+            </Overline>
             <Flex flexWrap="wrap">
               {map(
                 filter(

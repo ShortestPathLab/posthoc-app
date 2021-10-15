@@ -68,12 +68,14 @@ export function SelectionMenu({ selection, onClose }: Props) {
           },
           {
             label: "Go to Expansion Step",
-            action: () => setUIState({ step: entry?.index ?? 0 }),
+            action: () =>
+              setUIState({ step: entry?.index ?? 0, playback: "paused" }),
             disabled: !entry,
           },
           {
             label: "Rewind to This Step",
-            action: () => setUIState({ step: current?.index ?? 0 }),
+            action: () =>
+              setUIState({ step: current?.index ?? 0, playback: "paused" }),
             disabled: !current,
           },
         ],
