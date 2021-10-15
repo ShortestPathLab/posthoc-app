@@ -6,7 +6,7 @@ import {
   LazyListHandle as ListHandle,
   LazyListProps as ListProps,
 } from "components/generic/LazyList";
-import { defer } from "lodash";
+import { delay } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useEffect, useRef } from "react";
 import { useSpecimen } from "slices/specimen";
@@ -20,16 +20,18 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
 
   useEffect(() => {
     if (playback === "paused") {
-      defer(() =>
-        ref?.current?.scrollToIndex?.({
-          index: step,
-          align: "start",
-          behavior: "smooth",
-          offset: -16,
-        })
+      delay(
+        () =>
+          ref?.current?.scrollToIndex?.({
+            index: step,
+            align: "start",
+            behavior: "smooth",
+            offset: -16,
+          }),
+        150
       );
     }
-  }, [ref, step, playback]);
+  }, [step, playback]);
 
   return (
     <Fade unmountOnExit mountOnEnter in={playback === "paused"}>

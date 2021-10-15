@@ -21,6 +21,7 @@ export const colorsHex = {
   expanding: deepOrange[tint],
   generating: yellow[tint],
   closing: blueGrey["200"],
+  end: pink["A400"],
 };
 
 export const colors: { [K in TraceEventType]: number } = mapValues(

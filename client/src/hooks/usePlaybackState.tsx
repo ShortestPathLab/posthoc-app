@@ -1,32 +1,8 @@
-import { ceil, clamp, round } from "lodash";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { clamp } from "lodash";
+import { useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-
-const TARGET_FRAME_TIME = 1000 / 120;
-
-function useFrameTime(playing: boolean, step: number) {
-  const [startTime, setStartTime] = useState(0);
-  const [startFrame, setStartFrame] = useState(0);
-
-  useEffect(() => {
-    if (playing) {
-      const now = Date.now();
-      if (!startTime) {
-        setStartTime(now);
-        setStartFrame(step);
-      }
-    } else setStartTime(0);
-  }, [setStartTime, startTime, setStartFrame, startFrame, playing, step]);
-
-  return useCallback(
-    () =>
-      playing
-        ? ceil((Date.now() - startTime) / TARGET_FRAME_TIME + startFrame)
-        : 0,
-    [startTime, startFrame, playing]
-  );
-}
+import { useFrameTime } from "./useFrameTime";
 
 export function usePlaybackState() {
   const [{ specimen }] = useSpecimen();

@@ -1,4 +1,5 @@
 export type TraceEventType =
+  | "end"
   | "source"
   | "destination"
   | "expanding"

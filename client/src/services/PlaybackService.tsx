@@ -5,6 +5,7 @@ import {
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { trimEnd } from "lodash";
 import { ReactNode, useCallback, useEffect } from "react";
+import { useRaf } from "react-use";
 import { useBreakpoints } from "../hooks/useBreakpoints";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
@@ -19,6 +20,7 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
 }
 
 export function PlaybackService() {
+  useRaf();
   const notify = useSnackbar();
   const { playing, end, step, pause, tick } = usePlaybackState();
   const shouldBreak = useBreakpoints();
