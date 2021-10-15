@@ -1,5 +1,6 @@
 import { clamp } from "lodash";
 import { useMemo } from "react";
+import { usePrevious } from "react-use";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { useFrameTime } from "./useFrameTime";
@@ -11,8 +12,6 @@ export function usePlaybackState() {
   const ready = !!specimen;
   const playing = playback === "playing";
   const [start, end] = [0, (specimen?.eventList?.length ?? 1) - 1];
-
-  const tick = useFrameTime(playing, step);
 
   return useMemo(() => {
     const state = {
@@ -26,18 +25,15 @@ export function usePlaybackState() {
       canStepBackward: ready && !playing && step > 0,
     };
 
-    const stepTo = (n: number) => clamp(n, start, end);
-    const stepBy = (n: number) => stepTo(step + n);
+    const stepBy = (n: number) => clamp(step + n, start, end);
 
     const callbacks = {
       play: () => setUIState({ playback: "playing", step: stepBy(1) }),
-      pause: () => setUIState({ playback: "paused" }),
+      pause: (n = 0) => setUIState({ playback: "paused", step: stepBy(n) }),
       stop: () => setUIState({ step: start, playback: "paused" }),
       stepForward: () => setUIState({ step: stepBy(1) }),
       stepBackward: () => setUIState({ step: stepBy(-1) }),
-      tick: () => {
-        setUIState({ playback: "playing", step: stepTo(tick()) });
-      },
+      tick: (n = 1) => setUIState({ playback: "playing", step: stepBy(n) }),
     };
 
     return {
@@ -45,5 +41,5 @@ export function usePlaybackState() {
       ...state,
       ...callbacks,
     };
-  }, [end, playback, playing, ready, tick, setUIState, start, step]);
+  }, [end, playback, playing, ready, setUIState, start, step]);
 }

@@ -1,10 +1,6 @@
-import { transpile } from "./transpile";
-import Interpreter from "js-interpreter";
-import { map } from "lodash";
-import { templates } from "./templates";
+import memo from "memoizee";
 import { FunctionTemplate } from "./FunctionTemplate";
-
-const TIMEOUT = 1000;
+import { templates } from "./templates";
 
 type TemplateMap = typeof templates;
 
@@ -24,52 +20,22 @@ type ParamsOf<T extends Key> = TemplateMap[T] extends FunctionTemplate<
   ? R
   : [];
 
-export async function call<T extends Key>(
-  script: string,
-  method: T,
-  params: ParamsOf<T>,
-  es6: boolean = true,
-  fast: boolean = false
-): Promise<ReturnTypeOf<T> | undefined> {
-  return fast
-    ? UNSTABLE_evaluate(script, method, params)
-    : await interpret(script, method, params, es6);
-}
+const fn = memo(
+  (script: string, method: string) =>
+    new Function(
+      "params",
+      `${script}; return ${method}.apply(null, params);`
+    ) as (params: any[]) => any
+);
 
-export function UNSTABLE_evaluate<T extends Key>(
+export function call<T extends Key>(
   script: string,
   method: T,
   params: ParamsOf<T>
-) {
-  /* eslint-disable no-eval */
-  return eval(`${script}\n${makeCallExpression(method, params)}`);
-}
-
-export async function interpret<T extends Key>(
-  script: string,
-  method: T,
-  params: ParamsOf<T>,
-  es6: boolean = true
-): Promise<ReturnTypeOf<T> | undefined> {
-  const code = es6 ? transpile(script) : script;
-  if (code) {
-    const interpreter = new Interpreter(code);
-    interpreter.appendCode(makeCallExpression(method, params));
-    return new Promise((res) => {
-      const start = Date.now();
-      const step = () => {
-        const active = Date.now() - start <= TIMEOUT;
-        if (active && interpreter.step()) {
-          requestAnimationFrame(step);
-        } else {
-          res(interpreter.value);
-        }
-      };
-      step();
-    });
+): ReturnTypeOf<T> {
+  try {
+    return fn(script, method)(params);
+  } catch {
+    return templates[method].defaultReturnValue as ReturnTypeOf<T>;
   }
-}
-
-function makeCallExpression<T extends Key>(method: T, params: ParamsOf<T>) {
-  return `${method}(${map(params, JSON.stringify).join(", ")});`;
 }

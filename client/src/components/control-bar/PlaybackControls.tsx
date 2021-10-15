@@ -35,13 +35,13 @@ export function PlaybackControls() {
           ? {
               label: "pause",
               icon: <PauseIcon />,
-              onClick: pause,
+              onClick: () => pause(),
               disabled: !canPause,
             }
           : {
               label: "play",
               icon: <PlayIcon />,
-              onClick: play,
+              onClick: () => play(),
               disabled: !canPlay,
               color: "primary",
             })}

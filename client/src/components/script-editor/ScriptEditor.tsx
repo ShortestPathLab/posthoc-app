@@ -5,6 +5,8 @@ import { debounce } from "lodash";
 import AutoSize from "react-virtualized-auto-sizer";
 import { useUIState } from "slices/UIState";
 
+const DELAY = 2500;
+
 export function ScriptEditor() {
   const [{ code }, setUIState] = useUIState();
   return (
@@ -17,7 +19,7 @@ export function ScriptEditor() {
             height={height}
             language="javascript"
             defaultValue={code}
-            onChange={debounce((v) => setUIState({ code: v }), 1000)}
+            onChange={debounce((v) => setUIState({ code: v }), DELAY)}
             options={{
               minimap: {
                 enabled: false,

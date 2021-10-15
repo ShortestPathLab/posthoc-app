@@ -1,20 +1,16 @@
 import { call } from "components/script-editor/call";
-import { transpile } from "components/script-editor/transpile";
 import { get, keyBy, lowerCase as lower, memoize, startCase } from "lodash";
 import { useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 
-const EVAL = true;
-
 export function useBreakpoints() {
   const [{ specimen }] = useSpecimen();
   const [{ code, breakpoints = [], monotonicF, monotonicG }] = useUIState();
-  const es5 = useMemo(() => transpile(code), [code]) ?? "";
 
   return useMemo(() => {
     const memo = keyBy(specimen?.eventList, "id");
-    return memoize(async (step: number) => {
+    return memoize((step: number) => {
       const event = specimen?.eventList?.[step];
       if (event) {
         try {
@@ -46,8 +42,14 @@ export function useBreakpoints() {
             }
           }
           // Check breakpoints in the script editor section
-          if (await call(es5, "shouldBreak", [step, event], false, EVAL)) {
-            return { result: `Script editor` };
+          if (
+            call(code ?? "", "shouldBreak", [
+              step,
+              event,
+              specimen?.eventList ?? [],
+            ])
+          ) {
+            return { result: "Script editor" };
           }
         } catch (e) {
           return { error: `${e}` };
@@ -55,5 +57,5 @@ export function useBreakpoints() {
       }
       return { result: "" };
     });
-  }, [es5, specimen, breakpoints, monotonicF, monotonicG]);
+  }, [code, specimen, breakpoints, monotonicF, monotonicG]);
 }

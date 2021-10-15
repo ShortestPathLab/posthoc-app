@@ -1,5 +1,5 @@
 import { ceil } from "lodash";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const SPEED = 4;
 const TARGET_FRAME_TIME = 1000 / 60;
@@ -17,7 +17,7 @@ export function useFrameTime(playing: boolean, step: number) {
     } else setStartTime(0);
   }, [setStartTime, startTime, setStartFrame, startFrame, playing, step]);
 
-  return useCallback(
+  return useMemo(
     () =>
       playing
         ? ceil(

@@ -1,8 +1,9 @@
 import { Stage } from "@inlet/react-pixi";
 import { Box } from "@material-ui/core";
 import { blueGrey } from "@material-ui/core/colors";
+import { call } from "components/script-editor/call";
 import { Point, RendererProps } from "components/specimen-renderer/Renderer";
-import { delay, floor, merge, once } from "lodash";
+import { constant, delay, floor, memoize, merge, once } from "lodash";
 import { ComponentProps, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
@@ -34,7 +35,7 @@ export function GridRenderer({
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const { width = 0, height = 0 } = props;
   const [{ specimen, map: m }] = useSpecimen();
-  const [{ step = 0, ...state }] = useUIState();
+  const [{ step = 0, code, ...state }] = useUIState();
 
   const [active, setActive] = useState<Point | undefined>(undefined);
   const [hover, setHover] = useState<Point | undefined>(undefined);
@@ -80,6 +81,20 @@ export function GridRenderer({
     };
   }, [setHover]);
 
+  const condition = useMemo(() => {
+    if (code && specimen?.eventList) {
+      return memoize((n: number) =>
+        code && specimen?.eventList
+          ? call(code ?? "", "shouldRender", [
+              n,
+              specimen.eventList[n],
+              specimen.eventList,
+            ])
+          : true
+      );
+    } else return constant(true);
+  }, [code, specimen?.eventList]);
+
   return (
     <Box sx={{ cursor: "pointer" }} ref={setRef}>
       <Stage options={{ backgroundColor: 0xffffff }} {...props}>
@@ -93,7 +108,12 @@ export function GridRenderer({
           <Selection hover={hover} highlight={selection || active} />
           <Nodes nodes={specimen?.eventList} />
           <Nodes nodes={bgNodes} color={bgNodeColor} />
-          <LazyNodes nodes={specimen?.eventList} step={step} color={getColor} />
+          <LazyNodes
+            nodes={specimen?.eventList}
+            step={step}
+            color={getColor}
+            condition={condition}
+          />
           <Overlay start={start} end={end} size={size} />
           <Path nodes={specimen?.eventList} step={step} />
           <Guides width={size.x} height={size.y} alpha={0.24} grid={1} />
