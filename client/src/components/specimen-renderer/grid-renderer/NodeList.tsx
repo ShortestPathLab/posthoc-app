@@ -1,5 +1,5 @@
 import { Graphics } from "@inlet/react-pixi";
-import { constant, floor, keyBy, memoize, slice, values } from "lodash";
+import { chain, constant, floor, memoize, slice } from "lodash";
 import * as PIXI from "pixi.js";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { useCallback, useMemo } from "react";
@@ -25,26 +25,28 @@ export function NodeList({
 }: Props) {
   const memo = useMemo(
     () =>
-      values(keyBy(nodes, ({ variables: v }) => `${v?.x ?? 0}::${v?.y ?? 0}`)),
-    [nodes]
+      chain(nodes)
+        .filter((_, i) => condition(i))
+        .keyBy(({ variables: v }) => `${v?.x ?? 0}::${v?.y ?? 0}`)
+        .values()
+        .value(),
+    [nodes, condition]
   );
   const draw = useCallback(
     (g: PIXI.Graphics) => {
       g.clear();
-      for (const [i, { variables: v, type }] of memo.entries()) {
-        if (condition(i)) {
-          variant(g, {
-            color: color?.(type) ?? 0xf6f6f6,
-            left: (v?.x ?? 0) * scale,
-            top: (v?.y ?? 0) * scale,
-            radius: 0.25,
-            resolution,
-          });
-        }
+      for (const { variables: v, type } of memo) {
+        variant(g, {
+          color: color?.(type) ?? 0xf6f6f6,
+          left: (v?.x ?? 0) * scale,
+          top: (v?.y ?? 0) * scale,
+          radius: 0.25,
+          resolution,
+        });
       }
       return g;
     },
-    [memo, color, resolution, variant, condition]
+    [memo, color, resolution, variant]
   );
   return <Graphics draw={draw} scale={1 / resolution} />;
 }
@@ -67,7 +69,6 @@ export function LazyNodeList({
     memoize((n: number) => slice(nodes, 0, n)),
     [nodes]
   );
-
   const c = useCallback(
     (n: number) => condition?.(n + threshold) ?? true,
     [condition, threshold]
@@ -75,11 +76,11 @@ export function LazyNodeList({
 
   return (
     <>
-      <NodeList nodes={chunk(threshold)} condition={condition} {...props} />
+      <NodeList {...props} nodes={chunk(threshold)} condition={condition} />
       <NodeList
+        {...props}
         nodes={slice(nodes, threshold, step + 1)}
         condition={c}
-        {...props}
       />
     </>
   );

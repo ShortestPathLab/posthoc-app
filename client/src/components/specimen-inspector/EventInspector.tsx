@@ -6,15 +6,16 @@ import {
   Divider,
   Typography as Type,
 } from "@material-ui/core";
+import { HideSourceOutlined as HiddenIcon } from "@material-ui/icons";
 import { Flex } from "components/generic/Flex";
 import { Overline, OverlineDot as Dot } from "components/generic/Overline";
 import { Property } from "components/generic/Property";
+import { call } from "components/script-editor/call";
 import { getColorHex } from "components/specimen-renderer/grid-renderer/colors";
 import { entries, filter, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
+import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-
-export function getHeight(event: TraceEvent) {}
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -28,7 +29,8 @@ export function EventInspector({
   selected,
   ...props
 }: EventInspectorProps) {
-  const [, setUIState] = useUIState();
+  const [{ specimen }] = useSpecimen();
+  const [{ code }, setUIState] = useUIState();
 
   const cardStyles = selected
     ? {
@@ -36,6 +38,14 @@ export function EventInspector({
         bgcolor: "primary.main",
       }
     : {};
+
+  const hidden = event
+    ? !call(code ?? "", "shouldRender", [
+        index ?? 0,
+        event,
+        specimen?.eventList ?? [],
+      ])
+    : false;
 
   return (
     <Card
@@ -60,7 +70,17 @@ export function EventInspector({
                   mr: 1,
                 }}
               />
-              {`${event?.type ?? "unsupported"} #${event?.id ?? "-"}`}
+              {`${event?.type ?? "unsupported"} #${event?.id ?? "-"}`}{" "}
+              {hidden && (
+                <HiddenIcon
+                  sx={{
+                    opacity: 0.56,
+                    fontSize: 12,
+                    ml: 1,
+                    transform: "translateY(1.75px)",
+                  }}
+                />
+              )}
             </Overline>
             <Flex flexWrap="wrap">
               {map(

@@ -1,9 +1,7 @@
 import { clamp } from "lodash";
 import { useMemo } from "react";
-import { usePrevious } from "react-use";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { useFrameTime } from "./useFrameTime";
 
 export function usePlaybackState() {
   const [{ specimen }] = useSpecimen();
