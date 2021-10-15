@@ -17,7 +17,7 @@ export function NodeList({
   nodes,
   color,
   variant = box,
-  resolution = 0.15,
+  resolution = 1 / scale,
 }: Props) {
   const memo = useMemo(
     () =>
@@ -43,9 +43,7 @@ export function NodeList({
   return <Graphics draw={draw} scale={1 / resolution} />;
 }
 
-function down(n: number, a: number = 1) {
-  return floor(n / a) * a;
-}
+const down = (n: number, a: number = 1) => floor(n / a) * a;
 
 export function LazyNodeList({
   nodes,
