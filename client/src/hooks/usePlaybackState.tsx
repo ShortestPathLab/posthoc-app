@@ -1,4 +1,4 @@
-import { clamp, round } from "lodash";
+import { ceil, clamp, round } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
@@ -22,7 +22,7 @@ function useFrameTime(playing: boolean, step: number) {
   return useCallback(
     () =>
       playing
-        ? round((Date.now() - startTime) / TARGET_FRAME_TIME + startFrame)
+        ? ceil((Date.now() - startTime) / TARGET_FRAME_TIME + startFrame)
         : 0,
     [startTime, startFrame, playing]
   );
