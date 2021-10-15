@@ -36,7 +36,7 @@ function create(props: Props) {
     .pinch()
     .wheel()
     .decelerate({ friction: 0.98 })
-    .clampZoom({ maxScale: 10, minScale: 0.1 });
+    .clampZoom({ maxScale: 10, minScale: 0.02 });
   return viewport as PixiViewport;
 }
 
