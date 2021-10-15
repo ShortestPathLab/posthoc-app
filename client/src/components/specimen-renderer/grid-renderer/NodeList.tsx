@@ -69,6 +69,7 @@ export function LazyNodeList({
     memoize((n: number) => slice(nodes, 0, n)),
     [nodes]
   );
+
   const c = useCallback(
     (n: number) => condition?.(n + threshold) ?? true,
     [condition, threshold]

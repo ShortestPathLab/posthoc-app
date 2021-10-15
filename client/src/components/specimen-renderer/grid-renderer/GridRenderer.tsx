@@ -86,8 +86,8 @@ export function GridRenderer({
       return memoize((n: number) =>
         code && specimen?.eventList
           ? call(code ?? "", "shouldRender", [
-              n + 1,
-              specimen.eventList[n + 1],
+              n,
+              specimen.eventList[n],
               specimen.eventList,
             ])
           : true
