@@ -17,8 +17,7 @@ export function useBreakpoints() {
           // Check monotonic f or g values
           if (step) {
             for (const p of [monotonicF && "f", monotonicG && "g"]) {
-              const prev = memo[`${step - 1}`];
-              if (p && get(prev, p) > get(event, p)) {
+              if (p && get(memo[`${event.pId}`], p) > get(event, p)) {
                 return { result: `Monotonicity violation on ${p}` };
               }
             }
