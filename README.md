@@ -3,4 +3,4 @@
 
 # Path Search Visualiser
 
-[Open the app](https://pathfinding-project.github.io/app)
+[Open the App](https://pathfinding-project.github.io/app)
