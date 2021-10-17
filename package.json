@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Pathfinding-Project/app.git"
+    "url": "git+https://github.com/path-visualiser/app.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Pathfinding-Project/app/issues"
+    "url": "https://github.com/path-visualiser/app/issues"
   },
-  "homepage": "https://pathfinding-project.github.io/app",
+  "homepage": "https://path-visualiser.github.io/app",
   "devDependencies": {
     "concurrently": "^6.2.1"
   },

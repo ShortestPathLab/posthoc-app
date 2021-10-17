@@ -7,7 +7,7 @@ const { hostname, protocol } = window.location;
 const isLocalHost = hostname === "localhost";
 
 const registry =
-  "https://raw.githubusercontent.com/Pathfinding-Project/registry/master/index.json";
+  "https://raw.githubusercontent.com/path-visualiser/registry/master/index.json";
 
 type Registry = string[];
 
