@@ -23,6 +23,7 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
 
 export function PlaybackService() {
   useRaf();
+
   const notify = useSnackbar();
   const { playing, end, step, pause, tick } = usePlaybackState();
   const shouldBreak = useBreakpoints();

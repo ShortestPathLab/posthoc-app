@@ -9,8 +9,6 @@ import { useSpecimen } from "slices/specimen";
 
 export function UtilityControls() {
   const [{ specimen }] = useSpecimen();
-  // const INTEROP_compare = useCompatibilityLayer("#comparator button");
-  // const INTEROP_timeTravel = useCompatibilityLayer("#time-travel button");
   return (
     <>
       <Dialog
@@ -24,12 +22,6 @@ export function UtilityControls() {
       >
         <DebugOptionsEditor />
       </Dialog>
-      {/* <Button disabled={!specimen} onClick={INTEROP_compare}>
-        Compare...
-      </Button> */}
-      {/* <Button disabled={!specimen} onClick={INTEROP_timeTravel}>
-        Jump...
-      </Button> */}
     </>
   );
 }
