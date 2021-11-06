@@ -1,4 +1,3 @@
-import { noop } from "lodash";
 import {
   ComponentProps,
   createContext,
@@ -12,7 +11,7 @@ type ScrollPanelProps = {
 } & ComponentProps<"div">;
 
 export function ScrollPanel({
-  onTarget = noop,
+  onTarget,
   onScroll,
   ...props
 }: ScrollPanelProps) {
