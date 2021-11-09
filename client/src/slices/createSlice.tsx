@@ -3,10 +3,10 @@ import {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
   useMemo,
   useReducer,
 } from "react";
+import { useAsync } from "react-use";
 
 type Slice<T, U = T> = [T, (next: U) => void];
 
@@ -30,7 +30,7 @@ export function createSlice<T, U = T>(
         () => [value, dispatch],
         [value, dispatch]
       );
-      useEffect(() => void initializer?.().then?.(dispatch), [dispatch]);
+      useAsync(async () => initializer && dispatch(await initializer()));
       return <Store.Provider value={slice}>{children}</Store.Provider>;
     },
   ] as const;

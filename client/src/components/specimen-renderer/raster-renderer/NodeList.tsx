@@ -65,8 +65,8 @@ export function LazyNodeList({
 } & Props) {
   const threshold = down(step, size);
 
-  const chunk = useCallback(
-    memoize((n: number) => slice(nodes, 0, n)),
+  const chunk = useMemo(
+    () => memoize((n: number) => slice(nodes, 0, n)),
     [nodes]
   );
 

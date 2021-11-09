@@ -3,7 +3,7 @@ import { Graphics as PixiGraphics } from "@pixi/graphics";
 import { isNull, isUndefined, keyBy } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useMemo } from "react";
-import { getColor } from "./colors";
+import { getColor } from "../colors";
 import { scale } from "./config";
 import { Square } from "./Node";
 

@@ -1,6 +1,6 @@
 import { Point } from "components/specimen-renderer/Renderer";
 import { floor, map } from "lodash";
-import { getColor } from "./colors";
+import { getColor } from "../colors";
 import { scale } from "./config";
 import { Square } from "./Node";
 

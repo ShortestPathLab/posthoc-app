@@ -7,18 +7,21 @@ import { constant, delay, floor, memoize, merge, once } from "lodash";
 import { ComponentProps, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { convert, getColor } from "./colors";
-import { scale } from "./config";
+import { convert, getColor } from "../colors";
+import { scale } from "../raster-renderer/config";
+import { Guides } from "../raster-renderer/Guides";
+import {
+  LazyNodeList as LazyNodes,
+  NodeList as Nodes,
+} from "../raster-renderer/NodeList";
+import { Overlay } from "../raster-renderer/Overlay";
+import { Path } from "../raster-renderer/Path";
+import { ViewportEvent } from "../raster-renderer/PixiViewport";
+import { Selection } from "../raster-renderer/Selection";
+import { Viewport } from "../raster-renderer/Viewport";
 import { getDefaults } from "./getDefaults";
-import { Guides } from "./Guides";
-import { LazyNodeList as LazyNodes, NodeList as Nodes } from "./NodeList";
-import { Overlay } from "./Overlay";
 import { parseMap } from "./parseMap";
-import { Path } from "./Path";
-import { ViewportEvent } from "./PixiViewport";
-import { Selection } from "./Selection";
 import { selectionInfo } from "./selectionInfo";
-import { Viewport } from "./Viewport";
 
 type GridRendererProps = RendererProps &
   Omit<ComponentProps<typeof Stage>, "onSelect">;

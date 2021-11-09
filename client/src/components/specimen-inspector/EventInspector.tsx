@@ -11,7 +11,7 @@ import { Flex } from "components/generic/Flex";
 import { Overline, OverlineDot as Dot } from "components/generic/Overline";
 import { Property } from "components/generic/Property";
 import { call } from "components/script-editor/call";
-import { getColorHex } from "components/specimen-renderer/grid-renderer/colors";
+import { getColorHex } from "components/specimen-renderer/colors";
 import { entries, filter, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useSpecimen } from "slices/specimen";
