@@ -4,7 +4,7 @@ import {
   useSnackbar,
 } from "components/generic/Snackbar";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
-import memo from "memoizee";
+import { memoize as memo } from "lodash";
 import md5 from "md5";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
