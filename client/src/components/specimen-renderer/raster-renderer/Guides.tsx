@@ -30,8 +30,8 @@ export function Guides({
 }: Props) {
   return (
     <Grid
-      width={ceil(width / grid) * grid * scale}
-      height={ceil(height / grid) * grid * scale}
+      width={ceil((width + 1) / grid) * grid * scale}
+      height={ceil((height + 1) / grid) * grid * scale}
       grid={grid}
       {...params}
     />

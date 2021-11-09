@@ -4,14 +4,16 @@ import {
   useSnackbar,
 } from "components/generic/Snackbar";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
-import { memoize as memo } from "lodash";
+import memo from "memoizee";
+import md5 from "md5";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import hash from "md5";
+
+const hash = memo(md5);
 
 const getMap = memo(async (map: string) => {
   const client = await getClient();

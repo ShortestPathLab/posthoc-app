@@ -17,10 +17,10 @@ import {
 import { Overlay } from "../raster-renderer/Overlay";
 import { Path } from "../raster-renderer/Path";
 import { ViewportEvent } from "../raster-renderer/PixiViewport";
-import { Selection } from "../raster-renderer/Selection";
 import { Viewport } from "../raster-renderer/Viewport";
 import { getDefaults } from "./getDefaults";
 import { parseMap } from "./parseMap";
+import { Selection } from "./Selection";
 import { selectionInfo } from "./selectionInfo";
 
 type GridRendererProps = RendererProps &

@@ -1,4 +1,4 @@
-import { exec } from "../src/exec";
+import { exec } from "../src/methods/exec";
 import { warthog } from "pathfinding-binaries";
 
 describe("exec", () => {

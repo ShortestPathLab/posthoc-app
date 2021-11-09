@@ -1,7 +1,7 @@
-import { createWarthogServer } from "./createWarthogServer";
+import { createServer } from "./createServer";
 
 export const PORT = process.env.PORT ? +process.env.PORT : undefined;
 
-const server = createWarthogServer(PORT);
+const server = createServer(PORT);
 
 server.listen();
