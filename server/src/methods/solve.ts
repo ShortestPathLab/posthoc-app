@@ -47,7 +47,6 @@ export const solve = [
               write(mapPath, m, "utf-8"),
             ]);
             const output = await invoke(algorithm, scenarioPath, mapPath);
-            console.log(output);
             if (output.length > MAX_SOLUTION_SIZE) {
               throw new Error("Solution is too large.");
             }
