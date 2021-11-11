@@ -14,7 +14,7 @@ type SpecimenInspectorProps = {} & FlexProps;
 
 export function SpecimenInspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
-  const [{ specimen, mapType }] = useSpecimen();
+  const [{ specimen, mapType, map }] = useSpecimen();
   const [renderer] = getRenderer(mapType);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
@@ -32,6 +32,7 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
               {(size) =>
                 createElement(renderer, {
                   ...size,
+                  key: map,
                   onSelect: setSelection,
                   selection: selection?.world,
                 })

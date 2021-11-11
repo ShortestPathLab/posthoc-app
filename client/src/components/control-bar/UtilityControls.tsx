@@ -1,5 +1,5 @@
 import { Button } from "@material-ui/core";
-import { BugReport as BugIcon } from "@material-ui/icons";
+import { BugReportTwoTone as BugIcon } from "@material-ui/icons";
 import { DebugOptionsEditor } from "components/DebugOptionsEditor";
 import {
   AppBarTitle as Title,

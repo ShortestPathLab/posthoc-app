@@ -42,12 +42,15 @@ export const handlers = {
   xy: {
     create: (_, { start, end }) =>
       constant(`p aux sp p2p 1\nq ${start} ${end}\n`),
-    invoke: (alg, scen, m) =>
-      exec(
-        roadhog,
-        { args: { alg, problem: scen, input: m }, flags: ["verbose"] },
-        true
-      ),
+    invoke: () => {
+      throw new Error("The format (xy) is temporarily unsupported.");
+    },
+    // invoke: (alg, scen, m) =>
+    //   exec(
+    //     roadhog,
+    //     { args: { alg, problem: scen, input: m }, flags: ["verbose"] },
+    //     true
+    //   ),
   },
 } as Dictionary<Handler>;
 

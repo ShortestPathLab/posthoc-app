@@ -47,7 +47,7 @@ export function SpecimenService() {
     async (signal) => {
       setLoading({ specimen: true });
       if (algorithm && map?.id && map?.type) {
-        const m = await getMap(map.id);
+        const m = map?.content ?? (await getMap(map.id));
         if (m) {
           const [, defaults] = getRenderer(map.type);
           try {
@@ -74,7 +74,17 @@ export function SpecimenService() {
       }
       setLoading({ specimen: false });
     },
-    [algorithm, start, end, map?.id, map?.type, getClient, setLoading, notify]
+    [
+      algorithm,
+      start,
+      end,
+      map?.id,
+      map?.type,
+      map?.content,
+      getClient,
+      setLoading,
+      notify,
+    ]
   );
 
   return <></>;
