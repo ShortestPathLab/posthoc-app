@@ -1,5 +1,5 @@
 import execSh from "exec-sh";
-import { entries, join, trim } from "lodash-es";
+import { entries, join, trim } from "lodash";
 
 const sh = execSh.promise;
 

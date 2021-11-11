@@ -8,7 +8,7 @@ import {
   map,
   memoize as memo,
   startCase,
-} from "lodash-es";
+} from "lodash";
 import { resolve } from "path";
 import { algorithms } from "../core/algorithms";
 import { getMapDescriptor, mapIsSupported, mapsPath } from "../core/maps";

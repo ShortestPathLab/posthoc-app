@@ -1,4 +1,4 @@
-import { keys, some, startCase } from "lodash-es";
+import { keys, some, startCase } from "lodash";
 import { parse, relative, resolve } from "path";
 import { handlers } from "./scenario";
 

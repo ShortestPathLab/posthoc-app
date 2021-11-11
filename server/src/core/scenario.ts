@@ -1,5 +1,5 @@
 import { Dictionary } from "lodash";
-import { floor, join, last, map, split, constant } from "lodash-es";
+import { constant, floor, join, last, map, split } from "lodash";
 import { roadhog, warthog } from "pathfinding-binaries";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
@@ -49,23 +49,23 @@ export const handlers = {
         true
       ),
   },
-  // xy: {
-  //   create: (_, { start, end }) =>
-  //     constant(join(["p aux sp p2p-zero 1", `q ${start} ${end}`], "\n")),
-  //   invoke: async (alg, scen, m) =>
-  //     exec(
-  //       roadhog,
-  //       {
-  //         flags: {
-  //           alg: { value: alg },
-  //           problem: { value: scen },
-  //           input: { value: m },
-  //           verbose: {},
-  //         },
-  //       },
-  //       true
-  //     ),
-  // },
+  xy: {
+    create: (_, { start, end }) =>
+      constant(`p aux sp p2p 1\nq ${start} ${end}\n`),
+    invoke: (alg, scen, m) =>
+      exec(
+        roadhog,
+        {
+          flags: {
+            alg: { value: alg },
+            problem: { value: scen },
+            input: { value: m },
+            verbose: {},
+          },
+        },
+        true
+      ),
+  },
 } as Dictionary<Handler>;
 
 type Handler = {

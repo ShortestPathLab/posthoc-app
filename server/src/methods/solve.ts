@@ -1,5 +1,5 @@
 import { writeFile as write } from "fs/promises";
-import { indexOf, lastIndexOf } from "lodash-es";
+import { indexOf, lastIndexOf } from "lodash";
 import tempy from "tempy";
 import { getMap, parseURI } from "../core/map";
 import { MapTypeKey } from "../core/maps";

@@ -1,5 +1,5 @@
-import { exec } from "../src/methods/exec";
 import { warthog } from "pathfinding-binaries";
+import { exec } from "../src/helpers/exec";
 
 describe("exec", () => {
   it("returns hello", async () => {
@@ -20,6 +20,6 @@ describe("exec", () => {
 
   it("runs the warthog solver", async () => {
     const output = await exec(warthog, { flags: { help: {} } }, true);
-    expect(output.startsWith("valid parameters")).toBeTruthy();
+    expect(output.startsWith("==> manual <==")).toBeTruthy();
   });
 });
