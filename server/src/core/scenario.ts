@@ -37,17 +37,7 @@ export const handlers = {
   grid: {
     create: grid,
     invoke: (alg, scen) =>
-      exec(
-        warthog,
-        {
-          flags: {
-            alg: { value: alg },
-            scen: { value: scen },
-            verbose: {},
-          },
-        },
-        true
-      ),
+      exec(warthog, { args: { alg, scen }, flags: ["verbose"] }, true),
   },
   xy: {
     create: (_, { start, end }) =>
@@ -55,14 +45,7 @@ export const handlers = {
     invoke: (alg, scen, m) =>
       exec(
         roadhog,
-        {
-          flags: {
-            alg: { value: alg },
-            problem: { value: scen },
-            input: { value: m },
-            verbose: {},
-          },
-        },
+        { args: { alg, problem: scen, input: m }, flags: ["verbose"] },
         true
       ),
   },
