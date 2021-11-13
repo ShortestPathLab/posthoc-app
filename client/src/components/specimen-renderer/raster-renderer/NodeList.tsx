@@ -37,7 +37,7 @@ export function NodeList({
       g.clear();
       for (const { variables: v, type } of memo) {
         variant(g, {
-          color: color?.(type) ?? 0xf6f6f6,
+          color: color?.(type) ?? 0xf1f1f1,
           left: (v?.x ?? 0) * scale,
           top: (v?.y ?? 0) * scale,
           radius: 0.25,

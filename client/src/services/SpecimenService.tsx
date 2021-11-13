@@ -1,8 +1,6 @@
 import { getClient } from "client/getClient";
-import {
-  SnackbarLabel as Label,
-  useSnackbar,
-} from "components/generic/Snackbar";
+import { useSnackbar } from "components/generic/Snackbar";
+import { Label } from "components/generic/Label";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
 import { memoize as memo } from "lodash";
 import md5 from "md5";

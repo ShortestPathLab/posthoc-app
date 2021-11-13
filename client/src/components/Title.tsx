@@ -5,7 +5,7 @@ export function Title() {
     <AppBar
       position="static"
       elevation={0}
-      sx={{ background: "white", color: "black" }}
+      sx={{ bgcolor: "background.paper", color: "text.primary" }}
     >
       <Toolbar>
         <Typography variant="h6">Path Search Visualiser</Typography>

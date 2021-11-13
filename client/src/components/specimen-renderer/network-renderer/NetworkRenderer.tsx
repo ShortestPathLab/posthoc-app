@@ -22,18 +22,18 @@ import { parseMap } from "./parseMap";
 import { Selection } from "./Selection";
 import { selectionInfo } from "./selectionInfo";
 
-type GridRendererProps = RendererProps &
+type NetworkRendererProps = RendererProps &
   Omit<ComponentProps<typeof Stage>, "onSelect">;
 
 function getPoint({ x, y }: Point) {
   return { x: floor(x / scale) - 1, y: floor(y / scale) - 1 };
 }
 
-export function GridRenderer({
+export function NetworkRenderer({
   onSelect,
   selection,
   ...props
-}: GridRendererProps) {
+}: NetworkRendererProps) {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const [{ specimen, map: m }] = useSpecimen();
   const [{ step = 0, code, ...state }] = useUIState();
@@ -53,18 +53,17 @@ export function GridRenderer({
 
   const handleClick = useMemo(() => {
     const info = selectionInfo(m, specimen);
-    return (step: number = 0) =>
-      ({ global, world }: ViewportEvent) => {
-        if (ref && specimen) {
-          const { top, left } = ref.getBoundingClientRect();
-          const point = getPoint(world);
-          onSelect?.({
-            global: { x: left + global.x, y: top + global.y },
-            world: point,
-            info: info(point, step),
-          });
-        }
-      };
+    return ({ global, world }: ViewportEvent, step: number = 0) => {
+      if (ref && specimen) {
+        const { top, left } = ref.getBoundingClientRect();
+        const point = getPoint(world);
+        onSelect?.({
+          global: { x: left + global.x, y: top + global.y },
+          world: point,
+          info: info(point),
+        });
+      }
+    };
   }, [ref, onSelect, specimen, m]);
 
   const handleMouseEvent = useMemo(() => {
@@ -102,11 +101,12 @@ export function GridRenderer({
       ref={setRef}
       StageProps={props}
       ViewportProps={{
-        onClick: handleClick(step),
+        onClick: (e) => handleClick(e, step),
         onMouseDown: handleMouseEvent,
         onMouseOver: handleMouseEvent,
       }}
     >
+      <Selection hover={hover} highlight={selection || active} />
       <Nodes nodes={specimen?.eventList} />
       <Nodes nodes={bgNodes} color={bgNodeColor} />
       <LazyNodes
@@ -117,7 +117,6 @@ export function GridRenderer({
       />
       <Overlay start={start} end={end} size={size} />
       <Path nodes={specimen?.eventList} step={step} />
-      <Selection hover={hover} highlight={selection || active} />
       <Guides width={size.x} height={size.y} alpha={0.24} grid={1} />
     </RasterRenderer>
   );

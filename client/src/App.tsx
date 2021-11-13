@@ -5,7 +5,7 @@ import { Title } from "components/Title";
 
 function App() {
   return (
-    <Flex vertical>
+    <Flex vertical sx={{ bgcolor: "background.default" }}>
       <Flex vertical boxShadow={4} height="auto" zIndex={1}>
         <Title />
         <Controls />

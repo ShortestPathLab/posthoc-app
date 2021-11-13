@@ -11,8 +11,8 @@ import { TraceEventType } from "protocol/Trace";
 
 const tint = "500";
 
-export function convert(hex: string) {
-  return parseInt(hex.replace("#", "0x"));
+export function hex(h: string) {
+  return parseInt(h.replace("#", "0x"));
 }
 
 export const colorsHex = {
@@ -26,11 +26,11 @@ export const colorsHex = {
 
 export const colors: { [K in TraceEventType]: number } = mapValues(
   colorsHex,
-  convert
+  hex
 );
 
 export function getColor(key?: TraceEventType) {
-  return (key && colors[key]) || convert(orange[tint]);
+  return (key && colors[key]) || hex(orange[tint]);
 }
 
 export function getColorHex(key?: TraceEventType) {

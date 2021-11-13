@@ -6,16 +6,13 @@ import {
   Divider,
   Typography as Type,
 } from "@material-ui/core";
-import { HideSourceOutlined as HiddenIcon } from "@material-ui/icons";
 import { Flex } from "components/generic/Flex";
-import { Overline, OverlineDot as Dot } from "components/generic/Overline";
-import { Property } from "components/generic/Property";
 import { call } from "components/script-editor/call";
-import { getColorHex } from "components/specimen-renderer/colors";
-import { entries, filter, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
+import { EventLabel } from "./EventLabel";
+import { PropertyList } from "./PropertyList";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -63,40 +60,8 @@ export function EventInspector({
           <Type>{index}</Type>
           <Divider sx={{ mx: 2 }} flexItem orientation="vertical" />
           <Box>
-            <Overline>
-              <Dot
-                sx={{
-                  color: getColorHex(event?.type),
-                  mr: 1,
-                }}
-              />
-              {`${event?.type ?? "unsupported"} #${event?.id ?? "-"}`}{" "}
-              {hidden && (
-                <HiddenIcon
-                  sx={{
-                    opacity: 0.56,
-                    fontSize: 12,
-                    ml: 1,
-                    transform: "translateY(1.75px)",
-                  }}
-                />
-              )}
-            </Overline>
-            <Flex flexWrap="wrap">
-              {map(
-                filter(
-                  [
-                    ["f", event?.f],
-                    ["g", event?.g],
-                    ...entries(event?.variables),
-                  ],
-                  ([, v]) => v !== undefined
-                ),
-                ([k, v]) => (
-                  <Property label={k} value={v} type={{ variant: "body2" }} />
-                )
-              )}
-            </Flex>
+            <EventLabel event={event} hidden={hidden} />
+            <PropertyList event={event} />
           </Box>
         </Flex>
       </CardActionArea>

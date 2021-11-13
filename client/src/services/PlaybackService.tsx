@@ -1,7 +1,5 @@
-import {
-  SnackbarLabel as Label,
-  useSnackbar,
-} from "components/generic/Snackbar";
+import { useSnackbar } from "components/generic/Snackbar";
+import { Label } from "components/generic/Label";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { range, trimEnd } from "lodash";
 import { ReactNode, useCallback, useEffect } from "react";

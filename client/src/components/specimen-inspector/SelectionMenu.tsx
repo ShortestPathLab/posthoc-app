@@ -1,4 +1,5 @@
 import {
+  Box,
   Divider,
   ListItem,
   ListItemIcon,
@@ -16,6 +17,9 @@ import { map } from "lodash";
 import { useUIState } from "slices/UIState";
 import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
 import { useSnackbar } from "components/generic/Snackbar";
+import { PropertyList } from "./PropertyList";
+import { EventLabel } from "./EventLabel";
+import { Label } from "components/generic/Label";
 
 type Props = {
   selection?: RendererSelectEvent;
@@ -40,9 +44,17 @@ export function SelectionMenu({ selection, onClose }: Props) {
     >
       <ListItem>
         <ListItemText>
-          <Overline>Point</Overline>
-          <Property label="x" value={world?.x ?? "-"} />
-          <Property label="y" value={world?.y ?? "-"} />
+          <Box>
+            <Overline>Point</Overline>
+            <Property label="x" value={world?.x ?? "-"} />
+            <Property label="y" value={world?.y ?? "-"} />
+          </Box>
+          {current?.event && (
+            <Box mt={2}>
+              <EventLabel event={current?.event} />
+              <PropertyList event={current?.event} variant="body1" vertical />
+            </Box>
+          )}
         </ListItemText>
       </ListItem>
       <Divider sx={{ my: 1 }} />
@@ -67,13 +79,17 @@ export function SelectionMenu({ selection, onClose }: Props) {
             disabled: !node,
           },
           {
-            label: "Go to Expansion Step",
+            label: (
+              <Label primary="Go to Expansion Step" secondary={entry?.index} />
+            ),
             action: () =>
               setUIState({ step: entry?.index ?? 0, playback: "paused" }),
             disabled: !entry,
           },
           {
-            label: "Rewind to This Step",
+            label: (
+              <Label primary="Rewind to This Step" secondary={current?.index} />
+            ),
             action: () =>
               setUIState({ step: current?.index ?? 0, playback: "paused" }),
             disabled: !current,

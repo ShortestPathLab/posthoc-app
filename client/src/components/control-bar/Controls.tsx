@@ -7,7 +7,11 @@ const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 export function Controls() {
   return (
-    <AppBar position="static" color="transparent" elevation={0}>
+    <AppBar
+      position="static"
+      sx={{ bgcolor: "background.paper" }}
+      elevation={0}
+    >
       <Toolbar>
         <Box m={-1} display="flex" alignItems="center">
           <InputControls />

@@ -1,5 +1,5 @@
 import { colors, createTheme } from "@material-ui/core";
-import { times } from "lodash";
+import { constant, times } from "lodash";
 
 const shadow = `
     0px 8px 18px -1px rgb(0 0 0 / 8%), 
@@ -11,5 +11,5 @@ export const theme = createTheme({
   palette: {
     primary: colors["blueGrey"],
   },
-  shadows: ["", ...times(24, () => shadow)] as any,
+  shadows: ["", ...times(24, constant(shadow))] as any,
 });

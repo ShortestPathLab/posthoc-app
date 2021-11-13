@@ -42,8 +42,8 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
               position="absolute"
               right={0}
               height="100%"
-              maxWidth={480}
-              minWidth="30vw"
+              width="30vw"
+              minWidth={480}
             />
           </Flex>
         ) : (
