@@ -1,4 +1,4 @@
-import { Controls } from "components/control-bar/Controls";
+import { Controls } from "components/app-bar/Controls";
 import { Flex } from "components/generic/Flex";
 import { SpecimenInspector } from "components/specimen-inspector/SpecimenInspector";
 import { Title } from "components/Title";

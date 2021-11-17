@@ -1,6 +1,6 @@
 import { getClient } from "client/getClient";
-import { useSnackbar } from "components/generic/Snackbar";
 import { Label } from "components/generic/Label";
+import { useSnackbar } from "components/generic/Snackbar";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
 import { memoize as memo } from "lodash";
 import md5 from "md5";
@@ -72,17 +72,7 @@ export function SpecimenService() {
       }
       setLoading({ specimen: false });
     },
-    [
-      algorithm,
-      start,
-      end,
-      map?.id,
-      map?.type,
-      map?.content,
-      getClient,
-      setLoading,
-      notify,
-    ]
+    [algorithm, start, end, map, getClient, setLoading, notify]
   );
 
   return <></>;
