@@ -1,4 +1,3 @@
-import { defaultPlaybackRate } from "components/settings-editor/SettingsEditor";
 import { createSlice, withLocalStorage } from "./createSlice";
 
 const DEV_PORT = 8001;
@@ -29,7 +28,7 @@ export const [useSettings, SettingsProvider] = createSlice<Settings>(
         key: "legacy-production-server",
       },
     ],
-    playbackRate: defaultPlaybackRate,
+    playbackRate: 4,
   },
   withLocalStorage("settings")
 );

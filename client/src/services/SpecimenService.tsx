@@ -42,6 +42,7 @@ export function SpecimenService() {
   const [, setSpecimen] = useSpecimen();
 
   const { result: mapContent } = useMapContent();
+  console.log(mapContent);
 
   useAsync(
     (signal) =>
@@ -83,7 +84,7 @@ export function SpecimenService() {
           }
         }
       }),
-    [algorithm, start, end, map, notify, usingLoadingState, mapType]
+    [algorithm, start, end, map, notify, usingLoadingState, mapType, mapContent]
   );
 
   return <></>;
