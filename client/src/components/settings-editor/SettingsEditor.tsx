@@ -12,7 +12,7 @@ import { ReactNode, useState } from "react";
 import { useSettings } from "slices/settings";
 import { ServerListEditor } from "./ServerListEditor";
 
-const BASE_RATE = 4;
+export const defaultPlaybackRate = 4;
 
 const formatLabel = (v: number) => `${v}x`;
 
@@ -45,13 +45,13 @@ export function SettingsEditor() {
             <Slider
               sx={{ maxWidth: 320 }}
               marks={[0.25, 1, 5].map((v) => ({
-                value: v * BASE_RATE,
+                value: v * defaultPlaybackRate,
                 label: formatLabel(v),
               }))}
-              step={0.25 * BASE_RATE}
-              min={0.25 * BASE_RATE}
-              max={5 * BASE_RATE}
-              valueLabelFormat={(v) => formatLabel(v / BASE_RATE)}
+              step={0.25 * defaultPlaybackRate}
+              min={0.25 * defaultPlaybackRate}
+              max={5 * defaultPlaybackRate}
+              valueLabelFormat={(v) => formatLabel(v / defaultPlaybackRate)}
               valueLabelDisplay="auto"
               defaultValue={playbackRate}
               onChangeCommitted={(_, v) =>
