@@ -9,9 +9,16 @@ export type PlaybackStateType = "playing" | "paused" | undefined;
 
 type PlaybackState = { playback?: PlaybackStateType; step?: number };
 
+export type Map = Partial<
+  Feature & {
+    type: string;
+    source?: string;
+  }
+>;
+
 type InputState = {
   algorithm?: string;
-  map?: Partial<Feature & { type: string }>;
+  map?: Map;
 };
 
 export type Comparator = {
@@ -48,10 +55,6 @@ export type UIState = InputState &
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
   Partial<UIState>
->(
-  {
-    code: makeTemplate(values(templates)),
-  },
-  undefined,
-  (prev, next) => ({ ...prev, ...next })
-);
+>({
+  code: makeTemplate(values(templates)),
+});

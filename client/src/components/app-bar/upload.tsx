@@ -13,7 +13,7 @@ const customMapId = "internal/custom";
 
 export const custom = (map?: Partial<Feature>) => ({
   name: map?.id === customMapId ? `Custom - ${map?.name}` : "Custom",
-  description: "Upload Map",
+  description: "Import Map",
   id: customMapId,
 });
 

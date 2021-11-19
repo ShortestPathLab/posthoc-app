@@ -2,16 +2,13 @@ import { JSONRPCClient, JSONRPCResponse as Response } from "json-rpc-2.0";
 import { NameMethodMap } from "protocol";
 import { Request, RequestOf, ResponseOf } from "protocol/Message";
 import { io, Socket } from "socket.io-client";
+import { Transport, TransportOptions } from "./Transport";
 
-export interface RPCClientOptions {
-  url: string;
-}
-
-export class RPCClient {
+export class RPCTransport implements Transport {
   rpc: JSONRPCClient;
   socket: Socket;
 
-  constructor(readonly options: RPCClientOptions) {
+  constructor(readonly options: TransportOptions) {
     this.socket = io(options.url);
     this.rpc = new JSONRPCClient(async (request: Request) => {
       const listener = (response: Response) => {

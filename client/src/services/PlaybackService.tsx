@@ -5,8 +5,7 @@ import { range, trimEnd } from "lodash";
 import { ReactNode, useCallback, useEffect } from "react";
 import { useRaf } from "react-use";
 import { useBreakpoints } from "../hooks/useBreakpoints";
-
-const RATE = 4;
+import { useSettings } from "slices/settings";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
@@ -23,6 +22,7 @@ export function PlaybackService() {
   useRaf();
 
   const notify = useSnackbar();
+  const [{ playbackRate = 1 }] = useSettings();
   const { playing, end, step, pause, tick } = usePlaybackState();
   const shouldBreak = useBreakpoints();
 
@@ -38,7 +38,7 @@ export function PlaybackService() {
       return step < end
         ? cancellable(
             async () => {
-              for (const i of range(RATE)) {
+              for (const i of range(playbackRate)) {
                 const r = shouldBreak(step + i);
                 if (r.result || r.error) return { ...r, offset: i };
               }
@@ -49,7 +49,7 @@ export function PlaybackService() {
                 if (result) {
                   notify(renderLabel(`Breakpoint hit: ${result}.`, offset));
                   pause(offset);
-                } else tick(RATE);
+                } else tick(playbackRate);
               } else {
                 notify(renderLabel(`${trimEnd(error, ".")}.`, offset));
                 pause();
@@ -58,7 +58,17 @@ export function PlaybackService() {
           )
         : pause();
     }
-  }, [renderLabel, playing, end, step, pause, tick, notify, shouldBreak]);
+  }, [
+    renderLabel,
+    playing,
+    end,
+    step,
+    pause,
+    tick,
+    notify,
+    shouldBreak,
+    playbackRate,
+  ]);
 
   return <></>;
 }

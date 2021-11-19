@@ -8,7 +8,7 @@ import {
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
 
-export function PlaybackControls() {
+export function Playback() {
   const {
     playing,
     canPause,

@@ -1,39 +1,47 @@
 import { CssBaseline, ThemeProvider } from "@material-ui/core";
-import { theme } from "client/theme";
+import App from "App";
 import { SnackbarProvider } from "components/generic/Snackbar";
+import "index.css";
 import { StrictMode } from "react";
 import { render } from "react-dom";
-import { ConnectionStateService } from "services/ConnectionStateService";
+import reportWebVitals from "reportWebVitals";
+import { ConnectionsService } from "services/ConnectionsService";
 import { PlaybackService } from "services/PlaybackService";
+import { FeaturesService } from "services/FeaturesService";
 import { SpecimenService } from "services/SpecimenService";
+import { ConnectionsProvider } from "slices/connections";
 import { FeaturesProvider } from "slices/features";
-import { InfoProvider } from "slices/info";
 import { LoadingProvider } from "slices/loading";
-import { SliceProvider as AppStateProvider } from "slices/SliceProvider";
+import { SettingsProvider } from "slices/settings";
+import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { SpecimenProvider } from "slices/specimen";
 import { UIStateProvider } from "slices/UIState";
-import App from "./App";
-import "./index.css";
-import reportWebVitals from "./reportWebVitals";
+import { theme } from "theme";
 
 const slices = [
-  InfoProvider,
+  SettingsProvider,
+  ConnectionsProvider,
   FeaturesProvider,
   UIStateProvider,
   SpecimenProvider,
   LoadingProvider,
 ];
 
-const services = [ConnectionStateService, PlaybackService, SpecimenService];
+const services = [
+  ConnectionsService,
+  PlaybackService,
+  SpecimenService,
+  FeaturesService,
+];
 
 render(
   <StrictMode>
     <CssBaseline>
       <ThemeProvider theme={theme}>
         <SnackbarProvider>
-          <AppStateProvider slices={slices} services={services}>
+          <EnvironmentProvider slices={slices} services={services}>
             <App />
-          </AppStateProvider>
+          </EnvironmentProvider>
         </SnackbarProvider>
       </ThemeProvider>
     </CssBaseline>

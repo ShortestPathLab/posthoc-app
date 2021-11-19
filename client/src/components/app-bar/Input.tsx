@@ -1,19 +1,19 @@
-import { useSnackbar } from "components/generic/Snackbar";
-import { find } from "lodash";
-import { useFeatures } from "slices/features";
-import { useInfo } from "slices/info";
-import { useUIState } from "slices/UIState";
-import { custom, upload } from "./upload";
-import { FeaturePicker } from "./FeaturePicker";
 import { Code as CodeIcon, MapTwoTone as MapIcon } from "@material-ui/icons";
+import { useSnackbar } from "components/generic/Snackbar";
 import { Space } from "components/generic/Space";
+import { find } from "lodash";
+import { useConnections } from "slices/connections";
+import { useFeatures } from "slices/features";
+import { useUIState } from "slices/UIState";
+import { FeaturePicker } from "./FeaturePicker";
+import { custom, upload } from "./upload";
 
 export const mapDefaults = { start: undefined, end: undefined };
 
-export function InputControls() {
+export function Input() {
   const notify = useSnackbar();
-  const [info] = useInfo();
-  const [{ algorithms, maps, mapTypes: types }] = useFeatures();
+  const [connections] = useConnections();
+  const [{ algorithm: algorithms, maps, mapType: types }] = useFeatures();
   const [{ algorithm, map }, setUIState] = useUIState();
 
   return (
@@ -24,7 +24,10 @@ export function InputControls() {
         value={map?.id}
         items={[
           custom(map),
-          ...maps.map((c) => ({ ...c, description: info?.name })),
+          ...maps.map((c) => ({
+            ...c,
+            description: find(connections, { url: c.source })?.name,
+          })),
         ]}
         onChange={async (v) => {
           switch (v) {
@@ -47,7 +50,10 @@ export function InputControls() {
         icon={<CodeIcon />}
         label="algorithm"
         value={algorithm}
-        items={algorithms}
+        items={algorithms.map((c) => ({
+          ...c,
+          description: find(connections, { url: c.source })?.name,
+        }))}
         onChange={(v) => setUIState({ algorithm: v })}
       />
     </>

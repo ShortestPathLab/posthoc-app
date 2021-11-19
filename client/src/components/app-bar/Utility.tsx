@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core";
+import { Button, Tooltip } from "@material-ui/core";
 import { BugReportTwoTone as BugIcon } from "@material-ui/icons";
 import { DebugOptionsEditor } from "components/DebugOptionsEditor";
 import {
@@ -7,15 +7,22 @@ import {
 } from "components/generic/Modal";
 import { useSpecimen } from "slices/specimen";
 
-export function UtilityControls() {
+export function Utility() {
   const [{ specimen }] = useSpecimen();
+
   return (
     <>
       <Dialog
         trigger={(onClick) => (
-          <Button {...{ onClick }} disabled={!specimen} startIcon={<BugIcon />}>
-            Debug
-          </Button>
+          <Tooltip title="Debug Options">
+            <Button
+              {...{ onClick }}
+              disabled={!specimen}
+              startIcon={<BugIcon />}
+            >
+              Debug
+            </Button>
+          </Tooltip>
         )}
         options={{ width: 960, scrollable: false }}
         appBar={{ children: <Title>Debug Options</Title> }}

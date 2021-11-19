@@ -7,17 +7,19 @@ import {
   useReducer,
 } from "react";
 import { useAsync } from "react-use";
+import { Reducer, merge } from "./reducers";
 
 type Slice<T, U = T> = [T, (next: U) => void];
 
-type Reducer<T, U> = (prev: T, next: U) => T;
-
-const defaultReducer = (_: any, next: any) => next;
+type Options<T, U> = {
+  init?: () => Promise<U | undefined>;
+  effect?: (state: { prev: T; next: T }) => void;
+  reduce?: Reducer<T, U>;
+};
 
 export function createSlice<T, U = T>(
   initialState: T,
-  initializer?: () => Promise<U>,
-  reducer: Reducer<T, U> = defaultReducer
+  { init, effect, reduce = merge }: Options<T, U> = {}
 ) {
   const Store = createContext<Slice<T, U>>([initialState, noop]);
   return [
@@ -25,13 +27,27 @@ export function createSlice<T, U = T>(
     () => useContext(Store),
     // Context
     ({ children }: { children?: ReactNode }) => {
-      const [value, dispatch] = useReducer(reducer, initialState);
-      const slice = useMemo<Slice<T, U>>(
-        () => [value, dispatch],
-        [value, dispatch]
-      );
-      useAsync(async () => initializer && dispatch(await initializer()));
+      const [value, set] = useReducer((p: T, n: U) => {
+        const next = reduce(p, n);
+        effect?.({ prev: p, next });
+        return next;
+      }, initialState);
+      const slice = useMemo<Slice<T, U>>(() => [value, set], [value, set]);
+      useAsync(async () => {
+        const r = await init?.();
+        if (r) set(r);
+      });
       return <Store.Provider value={slice}>{children}</Store.Provider>;
     },
   ] as const;
+}
+
+export function withLocalStorage<T>(key: string) {
+  return {
+    init: () => {
+      const cache = localStorage.getItem(key);
+      if (cache) return JSON.parse(cache);
+    },
+    effect: ({ next }) => localStorage.setItem(key, JSON.stringify(next)),
+  } as Options<T, T>;
 }

@@ -5,7 +5,7 @@ export const general = [
    * Returns server information.
    */
   createMethod("about", async () => ({
-    name: "Warthog Adapter Server",
+    name: "Warthog",
     version: "1.0.1",
   })),
 ];

@@ -9,6 +9,7 @@ import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { EventListInspector } from "./EventListInspector";
 import { SelectionMenu } from "./SelectionMenu";
+import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
@@ -51,7 +52,9 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
             justifyContent="center"
             alignItems="center"
             color="text.secondary"
+            vertical
           >
+            <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
             Select a map and an algorithm to get started.
           </Flex>
         )}

@@ -1,78 +1,89 @@
-import { getClient } from "client/getClient";
+import { Transport } from "client/Transport";
 import { Label } from "components/generic/Label";
 import { useSnackbar } from "components/generic/Snackbar";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
-import { memoize as memo } from "lodash";
+import { useConnectionResolver } from "hooks/useConnectionResolver";
+import { find, memoize as memo } from "lodash";
 import md5 from "md5";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
-import { useLoading } from "slices/loading";
+import { useFeatures } from "slices/features";
+import { useLoadingState } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
+import { useMapContent } from "../hooks/useMapContent";
 
 const hash = memo(md5);
 
-const getMap = memo(async (map: string) => {
-  const client = await getClient();
-  return (await client.call("features/map", { id: map }))?.content;
-});
-
 async function solve(
   map: string,
-  params: Omit<ParamsOf<PathfindingTask>, "mapURI">
+  params: Omit<ParamsOf<PathfindingTask>, "mapURI">,
+  call: Transport["call"]
 ) {
-  const client = await getClient();
   if (map) {
     for (const mapURI of [
       `hash:${hash(map)}`,
       `map:${encodeURIComponent(map)}`,
     ] as const) {
       const p = { ...params, mapURI };
-      const specimen = await client.call("solve/pathfinding", p);
+      const specimen = await call("solve/pathfinding", p);
       if (specimen) return { ...p, specimen, map };
     }
   }
 }
 
 export function SpecimenService() {
+  const usingLoadingState = useLoadingState("specimen");
   const notify = useSnackbar();
-  const [, setLoading] = useLoading();
-  const [, setSpecimen] = useSpecimen();
+  const [{ mapType }] = useFeatures();
   const [{ algorithm, map, start, end }, setUIState] = useUIState();
+  const resolve = useConnectionResolver();
+  const [, setSpecimen] = useSpecimen();
+
+  const { result: mapContent } = useMapContent();
 
   useAsync(
-    async (signal) => {
-      setLoading({ specimen: true });
-      if (algorithm && map?.id && map?.type) {
-        const m = map?.content ?? (await getMap(map.id));
-        if (m) {
+    (signal) =>
+      usingLoadingState(async () => {
+        if (algorithm && map && map.type && mapContent) {
           const [, defaults] = getRenderer(map.type);
           try {
-            const solution = await solve(m, {
-              algorithm,
-              end: end ?? defaults(m)?.end,
-              start: start ?? defaults(m)?.start,
-              mapType: map?.type,
-            });
-            if (solution && !signal.aborted) {
-              setSpecimen(solution);
-              setUIState({ step: 0, playback: "paused", breakpoints: [] });
+            const type = find(mapType, { id: map.type });
+            if (type) {
+              const connection = resolve(type.source);
+              if (connection) {
+                const solution = await solve(
+                  mapContent,
+                  {
+                    algorithm,
+                    end: end ?? defaults(mapContent)?.end,
+                    start: start ?? defaults(mapContent)?.start,
+                    mapType: map.type,
+                  },
+                  connection.call
+                );
+                if (solution && !signal.aborted) {
+                  setSpecimen(solution);
+                  setUIState({ step: 0, playback: "paused", breakpoints: [] });
+                  notify(
+                    <Label
+                      primary="Solution generated."
+                      secondary={`${solution.specimen.eventList?.length} steps`}
+                    />
+                  );
+                }
+              }
+            } else
               notify(
-                <Label
-                  primary="Solution generated."
-                  secondary={`${solution.specimen.eventList?.length} steps`}
-                />
+                `No solver is available for the map format (${map.type}).`
               );
-            }
           } catch (e) {
             notify(`${e}`);
           }
         }
-      }
-      setLoading({ specimen: false });
-    },
-    [algorithm, start, end, map, getClient, setLoading, notify]
+      }),
+    [algorithm, start, end, map, notify, usingLoadingState, mapType]
   );
 
   return <></>;
