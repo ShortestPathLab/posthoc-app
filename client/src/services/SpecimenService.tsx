@@ -83,7 +83,18 @@ export function SpecimenService() {
           }
         }
       }),
-    [algorithm, start, end, map, notify, usingLoadingState, mapType, mapContent]
+    [
+      algorithm,
+      start,
+      end,
+      map,
+      notify,
+      usingLoadingState,
+      mapType,
+      mapContent,
+      resolve,
+      setSpecimen,
+    ]
   );
 
   return <></>;
