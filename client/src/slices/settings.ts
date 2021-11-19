@@ -2,8 +2,6 @@ import { createSlice, withLocalStorage } from "./createSlice";
 
 const DEV_PORT = 8001;
 
-const { hostname, protocol } = window.location;
-
 export type Remote = {
   url: string;
   transport: string;
@@ -20,7 +18,7 @@ export const [useSettings, SettingsProvider] = createSlice<Settings>(
   {
     remote: [
       {
-        url: `${protocol}//${hostname}:${DEV_PORT}/`,
+        url: `http://localhost:${DEV_PORT}/`,
         transport: "socketio",
         key: "default-development-server",
       },
