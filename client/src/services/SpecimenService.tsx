@@ -42,7 +42,6 @@ export function SpecimenService() {
   const [, setSpecimen] = useSpecimen();
 
   const { result: mapContent } = useMapContent();
-  console.log(mapContent);
 
   useAsync(
     (signal) =>
