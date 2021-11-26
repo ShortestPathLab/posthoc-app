@@ -16,7 +16,7 @@ const DEV_PORT = 8001;
 
 export const defaultRemotes = [
   {
-    url: `internal://trace`,
+    url: `internal://trace/`,
     transport: "native",
     key: "trace-provider",
   },

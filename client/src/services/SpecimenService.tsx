@@ -46,11 +46,11 @@ export function SpecimenService() {
       usingLoadingState(async () => {
         if (map?.format && map?.content) {
           const [, defaults] = getRenderer(map.format);
-          try {
-            const entry = find(format, { id: map.format });
-            if (entry) {
-              const connection = resolve({ url: entry.source });
-              if (connection) {
+          const entry = find(format, { id: map.format });
+          if (entry) {
+            const connection = resolve({ url: entry.source });
+            if (connection) {
+              try {
                 const solution = await solve(
                   map.content,
                   {
@@ -75,13 +75,15 @@ export function SpecimenService() {
                     />
                   );
                 }
+              } catch ({ message }) {
+                notify(
+                  <Label primary={`${message}`} secondary={connection.name} />
+                );
               }
             } else
               notify(
                 `No solver is available for the map format (${map.format}).`
               );
-          } catch (e) {
-            notify(`${e}`);
           }
         }
       }),
