@@ -5,7 +5,7 @@ import { Transport, TransportOptions } from "./Transport";
 import url from "url-parse";
 
 export function parseURI(uri: string) {
-  const { protocol, pathname } = new URL(uri);
+  const { protocol, pathname } = url(uri);
   return {
     scheme: protocol as Scheme,
     content: decodeURIComponent(pathname),
