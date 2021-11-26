@@ -3,8 +3,8 @@ import { Label } from "components/generic/Label";
 import { useSnackbar } from "components/generic/Snackbar";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
 import { useConnectionResolver } from "hooks/useConnectionResolver";
-import { find, memoize as memo } from "lodash";
-import md5 from "md5";
+import { useMapContent } from "hooks/useMapContent";
+import { find } from "lodash";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
@@ -12,9 +12,7 @@ import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { useMapContent } from "../hooks/useMapContent";
-
-const hash = memo(md5);
+import { hashAsync as hash } from "workers/async";
 
 async function solve(
   map: string,
@@ -23,7 +21,7 @@ async function solve(
 ) {
   if (map) {
     for (const mapURI of [
-      `hash:${hash(map)}`,
+      `hash:${await hash(map)}`,
       `map:${encodeURIComponent(map)}`,
     ] as const) {
       const p = { ...params, mapURI };
@@ -37,16 +35,16 @@ export function SpecimenService() {
   const usingLoadingState = useLoadingState("specimen");
   const notify = useSnackbar();
   const [{ formats: format }] = useFeatures();
-  const [{ algorithm, map, start, end }, setUIState] = useUIState();
+  const [{ algorithm, start, end }, setUIState] = useUIState();
   const resolve = useConnectionResolver();
   const [, setSpecimen] = useSpecimen();
 
-  const { result: mapContent } = useMapContent();
+  const { result: map } = useMapContent();
 
   useAsync(
     (signal) =>
       usingLoadingState(async () => {
-        if (algorithm && map && map.format && mapContent) {
+        if (algorithm && map?.format && map?.content) {
           const [, defaults] = getRenderer(map.format);
           try {
             const entry = find(format, { id: map.format });
@@ -54,16 +52,16 @@ export function SpecimenService() {
               const connection = resolve({ url: entry.source });
               if (connection) {
                 const solution = await solve(
-                  mapContent,
+                  map.content,
                   {
                     algorithm,
+                    format: map.format,
                     instances: [
                       {
-                        end: end ?? defaults(mapContent)?.end,
-                        start: start ?? defaults(mapContent)?.start,
+                        end: end ?? defaults(map.content)?.end,
+                        start: start ?? defaults(map.content)?.start,
                       },
                     ],
-                    format: map.format,
                   },
                   connection.call
                 );
@@ -95,7 +93,6 @@ export function SpecimenService() {
       notify,
       usingLoadingState,
       format,
-      mapContent,
       resolve,
       setSpecimen,
     ]

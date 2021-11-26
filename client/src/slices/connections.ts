@@ -5,6 +5,7 @@ import { replace } from "./reducers";
 
 export type Connection = CheckConnectionResponse["result"] & {
   call: Transport["call"];
+  disconnect: Transport["disconnect"];
   url: string;
   ping: number;
 };

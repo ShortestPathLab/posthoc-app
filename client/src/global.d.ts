@@ -1,9 +1,7 @@
-declare module "js-interpreter" {
-  declare class Interpreter {
-    constructor(code: string);
-    appendCode(code: string): void;
-    step(): boolean;
-    value: any;
+declare module "worker-loader!*" {
+  class WebpackWorker extends Worker {
+    constructor();
   }
-  export default Interpreter;
+
+  export default WebpackWorker;
 }

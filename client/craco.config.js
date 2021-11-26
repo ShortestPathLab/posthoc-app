@@ -1,5 +1,6 @@
 const esbuild = require("craco-esbuild");
 const swc = require("craco-swc");
+const worker = require("craco-worker-loader");
 
 module.exports = {
   plugins: [
@@ -18,6 +19,9 @@ module.exports = {
           },
         },
       },
+    },
+    {
+      plugin: worker,
     },
     {
       plugin: esbuild,

@@ -4,7 +4,7 @@ import { Request, RequestOf, ResponseOf } from "protocol/Message";
 import { io, Socket } from "socket.io-client";
 import { Transport, TransportOptions } from "./Transport";
 
-export class RPCTransport implements Transport {
+export class SocketIOTransport implements Transport {
   rpc: JSONRPCClient;
   socket: Socket;
 

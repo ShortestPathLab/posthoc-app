@@ -1,4 +1,4 @@
-import { defaultTransport } from "client/getTransport";
+import { defaultTransport } from "client";
 import { ListEditor } from "components/generic/ListEditor";
 import { debounce } from "lodash";
 import { Remote, useSettings } from "slices/settings";

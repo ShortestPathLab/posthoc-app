@@ -1,5 +1,6 @@
 import { Dictionary, first, keys } from "lodash";
-import { RPCTransport } from "./RPCTransport";
+import { IPCTransport } from "./IPCTransport";
+import { SocketIOTransport } from "./SocketIOTransport";
 import { TransportConstructor } from "./Transport";
 
 type TransportEntry = {
@@ -8,7 +9,8 @@ type TransportEntry = {
 };
 
 export const transports: Dictionary<TransportEntry> = {
-  socketio: { name: "socket.io", constructor: RPCTransport },
+  socketio: { name: "socket.io", constructor: SocketIOTransport },
+  ipc: { name: "Web Worker", constructor: IPCTransport },
 };
 
 export function getTransport(key: string) {

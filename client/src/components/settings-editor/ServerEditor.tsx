@@ -20,7 +20,7 @@ import { entries, startCase } from "lodash";
 import { merge } from "slices/reducers";
 import { Remote } from "slices/settings";
 import { SelectField as Select } from "components/generic/Select";
-import { transports } from "client/getTransport";
+import { transports } from "client";
 
 const statusColor = {
   connected: "success.light",
@@ -54,7 +54,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
               : startCase(status)}
           </Type>
           <Type variant="body2" color="text.secondary">
-            {value?.url || "No URL"}
+            {connection?.description ?? (value?.url || "No URL")}
           </Type>
         </Box>
         <Tooltip title={`${value.disabled ? "Enable" : "Disable"} Connection`}>

@@ -27,7 +27,11 @@ export function useMapContent() {
   return useAsync(
     () =>
       usingLoadingState(async () => {
-        if (map && map.id) return map.content ? map.content : await getMap(map);
+        if (map && map.id)
+          return {
+            ...map,
+            content: map.content ? map.content : await getMap(map),
+          };
       }),
     [getMap, map, usingLoadingState]
   );

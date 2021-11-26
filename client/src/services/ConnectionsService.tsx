@@ -1,7 +1,7 @@
-import { getTransport } from "client/getTransport";
+import { getTransport } from "client";
 import { useSnackbar } from "components/generic/Snackbar";
 import { delay, now } from "lodash";
-import { useAsyncAbortable as useAsync } from "react-async-hook";
+import { useEffect } from "react";
 import { Connection, useConnections } from "slices/connections";
 import { useLoadingState } from "slices/loading";
 import { useSettings } from "slices/settings";
@@ -22,36 +22,35 @@ export function ConnectionsService() {
   const [, setConnections] = useConnections();
   const usingLoadingState = useLoadingState("connections");
 
-  useAsync(
-    (signal) =>
-      usingLoadingState(async () => {
-        notify("Connecting...");
-        const connections: Connection[] = [];
-        for (const { transport: t, url, disabled } of remote ?? []) {
-          if (!disabled) {
-            const transport = new (getTransport(t))({ url });
-            await transport.connect();
-            const { result, delta } = await timed(() =>
-              transport.call("about")
-            );
-            if (result) {
-              connections.push({
-                ...result,
-                url,
-                call: (n, p) => transport.call(n, p),
-                ping: delta,
-              });
-            } else await transport.disconnect();
-          }
-          if (!signal.aborted) setConnections(connections);
+  useEffect(() => {
+    let aborted = false;
+    const cs: Connection[] = [];
+    usingLoadingState(async () => {
+      notify("Connecting...");
+      for (const { transport: t, url, disabled } of remote ?? []) {
+        if (!disabled) {
+          const tp = new (getTransport(t))({ url });
+          await tp.connect();
+          const { result, delta } = await timed(() => tp.call("about"));
+          if (result) {
+            cs.push({
+              ...result,
+              url,
+              ping: delta,
+              call: tp.call.bind(tp),
+              disconnect: tp.disconnect.bind(tp),
+            });
+          } else await tp.disconnect();
         }
-        if (!signal.aborted)
-          notify(
-            `Connected to ${connections.length} of ${remote?.length} solvers.`
-          );
-      }),
-    [remote, setConnections]
-  );
+        if (!aborted) setConnections(cs);
+      }
+      if (!aborted) notify(`Connected to ${cs.length} of ${remote?.length}.`);
+    });
+    return () => {
+      aborted = true;
+      cs.map((c) => c.disconnect());
+    };
+  }, [remote, setConnections, notify, usingLoadingState]);
 
   return <></>;
 }
