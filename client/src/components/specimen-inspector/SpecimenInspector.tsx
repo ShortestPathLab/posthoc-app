@@ -1,4 +1,5 @@
 import { Fade, LinearProgress } from "@material-ui/core";
+import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { getRenderer } from "components/specimen-renderer/getRenderer";
 import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
@@ -7,9 +8,8 @@ import { createElement, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
-import { EventListInspector } from "./EventListInspector";
+import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";
-import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
@@ -39,11 +39,11 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
                 })
               }
             </AutoSize>
-            <EventListInspector
+            <InfoPanel
               position="absolute"
               right={0}
               height="100%"
-              width="30vw"
+              width="25vw"
               minWidth={480}
             />
           </Flex>

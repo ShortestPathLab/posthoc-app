@@ -54,7 +54,7 @@ export const solve = [
               return JSON.parse(trim(output));
             }
           } else return JSON.parse(content);
-        } else throw new Error("You need to select an algorithm.");
+        } else throw new Error("Select an algorithm.");
       })
   ),
 ];

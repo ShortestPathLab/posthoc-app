@@ -1,20 +1,29 @@
-import { AppBar, Box, Divider, Toolbar } from "@material-ui/core";
+import { Box, Card, Divider } from "@material-ui/core";
+import { Flex } from "components/generic/Flex";
+import { glass } from "theme";
 import { Input } from "./Input";
 import { Playback } from "./Playback";
 import { Settings } from "./Settings";
+import { Title } from "./Title";
 import { Utility } from "./Utility";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 export function Controls() {
   return (
-    <AppBar
-      position="static"
-      sx={{ bgcolor: "background.paper" }}
-      elevation={0}
+    <Card
+      sx={{
+        m: 3,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        zIndex: "appBar",
+        ...glass,
+      }}
     >
-      <Toolbar>
-        <Box m={-1} display="flex" alignItems="center">
+      <Box display="flex">
+        <Title mr={1} />
+        <Flex p={1} alignItems="center">
           <Input />
           {divider}
           <Playback />
@@ -22,8 +31,8 @@ export function Controls() {
           <Utility />
           {divider}
           <Settings />
-        </Box>
-      </Toolbar>
-    </AppBar>
+        </Flex>
+      </Box>
+    </Card>
   );
 }

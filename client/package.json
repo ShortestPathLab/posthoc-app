@@ -19,7 +19,9 @@
     "@types/react-dom": "^17.0.9",
     "craco-worker-loader": "^1.0.0",
     "css-element-queries": "^1.2.3",
+    "downloadjs": "^1.4.7",
     "file-select-dialog": "^1.5.4",
+    "json-beautify": "^1.1.1",
     "json-rpc-2.0": "^0.2.18",
     "lodash": "^4.17.21",
     "material-ui-popup-state": "^1.9.3",
@@ -69,6 +71,7 @@
   },
   "devDependencies": {
     "@craco/craco": "^6.4.0",
+    "@types/downloadjs": "^1.4.2",
     "@types/lodash": "^4.14.172",
     "@types/md5": "^2.3.1",
     "@types/memoizee": "^0.4.6",

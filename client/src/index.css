@@ -15,6 +15,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
 @media (pointer: fine) {
   * {
     scrollbar-color: #888888 #f0f0f0;
