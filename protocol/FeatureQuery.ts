@@ -20,13 +20,13 @@ export type FeatureQuery<T extends string, Params = {}> = Namespace<
 // ─── REQUEST ────────────────────────────────────────────────────────────────────
 //
 
-export type MapTypeFeatureQuery = FeatureQuery<"mapType">;
+export type MapTypeFeatureQuery = FeatureQuery<"formats">;
 
 export type MapFeatureQuery = FeatureQuery<"map", { id: string }>;
 
 export type MapsFeatureQuery = FeatureQuery<"maps">;
 
-export type AlgorithmFeatureQuery = FeatureQuery<"algorithm">;
+export type AlgorithmFeatureQuery = FeatureQuery<"algorithms">;
 
 //
 // ─── RESPONSE ───────────────────────────────────────────────────────────────────
@@ -34,9 +34,11 @@ export type AlgorithmFeatureQuery = FeatureQuery<"algorithm">;
 
 export type FeatureDescriptorListResult = Response<FeatureDescriptor[]>;
 
-export type MapListResult = Response<(FeatureDescriptor & { type: string })[]>;
+export type MapListResult = Response<
+  (FeatureDescriptor & { format: string })[]
+>;
 
-export type MapResult = Response<(Feature & { type: string }) | undefined>;
+export type MapResult = Response<(Feature & { format: string }) | undefined>;
 
 //
 // ─── METHOD ─────────────────────────────────────────────────────────────────────

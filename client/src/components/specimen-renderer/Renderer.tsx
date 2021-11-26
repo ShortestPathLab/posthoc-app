@@ -1,6 +1,6 @@
 import { TraceEvent } from "protocol/Trace";
 import { FunctionComponent } from "react";
-import { PathfindingTask } from "protocol/SolveTask";
+import { PathfindingTask, PathfindingTaskInstance } from "protocol/SolveTask";
 import { ParamsOf } from "protocol/Message";
 
 type Step = {
@@ -40,7 +40,7 @@ export type Renderer = FunctionComponent<RendererProps>;
 
 export type RendererEntry = [
   FunctionComponent<RendererProps>,
-  (map?: string) => Pick<ParamsOf<PathfindingTask>, "start" | "end">
+  (map?: string) => PathfindingTaskInstance
 ];
 
 export type RendererMap = {

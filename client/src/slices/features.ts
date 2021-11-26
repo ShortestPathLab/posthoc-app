@@ -6,13 +6,13 @@ type FeatureDescriptorWithSource = FeatureDescriptor & {
 };
 
 export type Features = {
-  algorithm: FeatureDescriptorWithSource[];
+  algorithms: FeatureDescriptorWithSource[];
   maps: (FeatureDescriptorWithSource & { type: string })[];
-  mapType: FeatureDescriptorWithSource[];
+  formats: FeatureDescriptorWithSource[];
 };
 
 export const [useFeatures, FeaturesProvider] = createSlice<Features>({
-  algorithm: [],
+  algorithms: [],
   maps: [],
-  mapType: [],
+  formats: [],
 });

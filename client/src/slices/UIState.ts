@@ -11,7 +11,7 @@ type PlaybackState = { playback?: PlaybackStateType; step?: number };
 
 export type Map = Partial<
   Feature & {
-    type: string;
+    format: string;
     source?: string;
   }
 >;

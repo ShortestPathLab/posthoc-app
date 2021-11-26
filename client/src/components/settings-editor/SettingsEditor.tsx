@@ -9,10 +9,8 @@ import { TabContext, TabList, TabPanel } from "@material-ui/lab";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { ReactNode, useState } from "react";
-import { useSettings } from "slices/settings";
+import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
 import { ServerListEditor } from "./ServerListEditor";
-
-export const defaultPlaybackRate = 4;
 
 const formatLabel = (v: number) => `${v}x`;
 
@@ -45,13 +43,13 @@ export function SettingsEditor() {
             <Slider
               sx={{ maxWidth: 320 }}
               marks={[0.25, 1, 5].map((v) => ({
-                value: v * defaultPlaybackRate,
+                value: v * baseRate,
                 label: formatLabel(v),
               }))}
-              step={0.25 * defaultPlaybackRate}
-              min={0.25 * defaultPlaybackRate}
-              max={5 * defaultPlaybackRate}
-              valueLabelFormat={(v) => formatLabel(v / defaultPlaybackRate)}
+              step={0.25 * baseRate}
+              min={0.25 * baseRate}
+              max={5 * baseRate}
+              valueLabelFormat={(v) => formatLabel(v / baseRate)}
               valueLabelDisplay="auto"
               defaultValue={playbackRate}
               onChangeCommitted={(_, v) =>

@@ -11,7 +11,7 @@ test("RPC server responds to ping", async () => {
     {
       methods: [
         createMethod("about", async () => ({
-          version: "1.0.1",
+          version: "1.0.2",
         })),
       ],
     },

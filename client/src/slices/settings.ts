@@ -2,6 +2,8 @@ import { createSlice, withLocalStorage } from "./createSlice";
 
 const DEV_PORT = 8001;
 
+export const defaultPlaybackRate = 4;
+
 export type Remote = {
   url: string;
   transport: string;
@@ -28,7 +30,7 @@ export const [useSettings, SettingsProvider] = createSlice<Settings>(
         key: "legacy-production-server",
       },
     ],
-    playbackRate: 4,
+    playbackRate: defaultPlaybackRate,
   },
   withLocalStorage("settings")
 );

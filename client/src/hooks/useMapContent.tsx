@@ -14,7 +14,7 @@ export function useMapContent() {
     () =>
       memo(async ({ source, id }: Map = {}) => {
         if (source && id) {
-          const connection = resolve(source);
+          const connection = resolve({ url: source });
           if (connection) {
             const result = await connection.call("features/map", { id });
             return result?.content;

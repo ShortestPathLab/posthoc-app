@@ -16,7 +16,7 @@ export function useConnectionStatus(url?: string): ConnectionStatus {
   const entry = find(remote, { url });
 
   return entry && !entry?.disabled
-    ? resolve(url)
+    ? resolve({ url })
       ? "connected"
       : loading
       ? "connecting"

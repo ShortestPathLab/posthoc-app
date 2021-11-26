@@ -15,7 +15,7 @@ export function getMapDescriptor(path: string) {
   return {
     id: relative(resolve(mapsPath), path),
     name: file.name,
-    type: file.ext.slice(1),
+    format: file.ext.slice(1),
     description: relative(resolve(mapsPath), path),
   };
 }

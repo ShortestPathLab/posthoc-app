@@ -14,9 +14,9 @@ export function FeaturesService() {
   useAsync(
     (signal) =>
       usingLoadingState(async () => {
-        const features: Features = { algorithm: [], mapType: [], maps: [] };
+        const features: Features = { algorithms: [], formats: [], maps: [] };
         for (const { call, url } of connections) {
-          for (const prop of ["algorithm", "mapType", "maps"] as const) {
+          for (const prop of ["algorithms", "formats", "maps"] as const) {
             features[prop] = uniqBy(
               [
                 ...features[prop],

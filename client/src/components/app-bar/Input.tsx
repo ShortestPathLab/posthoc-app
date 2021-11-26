@@ -13,7 +13,7 @@ export const mapDefaults = { start: undefined, end: undefined };
 export function Input() {
   const notify = useSnackbar();
   const [connections] = useConnections();
-  const [{ algorithm: algorithms, maps, mapType: types }] = useFeatures();
+  const [{ algorithms, maps, formats: types }] = useFeatures();
   const [{ algorithm, map }, setUIState] = useUIState();
 
   return (

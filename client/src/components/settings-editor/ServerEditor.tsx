@@ -39,7 +39,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
   const status = useConnectionStatus(value.url);
 
   function handleChange(next: Partial<Remote>) {
-    return onValueChange?.(merge(value, next));
+    onValueChange?.(merge(value, next));
   }
 
   return (

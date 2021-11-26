@@ -24,7 +24,7 @@ export const features = [
    * Returns supported algorithms.
    */
   createMethod(
-    "features/algorithm",
+    "features/algorithms",
     memo(async () => {
       return map(entries(algorithms), ([f, { name }]) => ({
         id: f,
@@ -37,7 +37,7 @@ export const features = [
    * Returns supported map types.
    */
   createMethod(
-    "features/mapType",
+    "features/formats",
     memo(async () =>
       map(keys(handlers), (t) => ({
         id: t,

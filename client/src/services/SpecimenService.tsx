@@ -36,7 +36,7 @@ async function solve(
 export function SpecimenService() {
   const usingLoadingState = useLoadingState("specimen");
   const notify = useSnackbar();
-  const [{ mapType }] = useFeatures();
+  const [{ formats: format }] = useFeatures();
   const [{ algorithm, map, start, end }, setUIState] = useUIState();
   const resolve = useConnectionResolver();
   const [, setSpecimen] = useSpecimen();
@@ -46,20 +46,24 @@ export function SpecimenService() {
   useAsync(
     (signal) =>
       usingLoadingState(async () => {
-        if (algorithm && map && map.type && mapContent) {
-          const [, defaults] = getRenderer(map.type);
+        if (algorithm && map && map.format && mapContent) {
+          const [, defaults] = getRenderer(map.format);
           try {
-            const type = find(mapType, { id: map.type });
-            if (type) {
-              const connection = resolve(type.source);
+            const entry = find(format, { id: map.format });
+            if (entry) {
+              const connection = resolve({ url: entry.source });
               if (connection) {
                 const solution = await solve(
                   mapContent,
                   {
                     algorithm,
-                    end: end ?? defaults(mapContent)?.end,
-                    start: start ?? defaults(mapContent)?.start,
-                    mapType: map.type,
+                    instances: [
+                      {
+                        end: end ?? defaults(mapContent)?.end,
+                        start: start ?? defaults(mapContent)?.start,
+                      },
+                    ],
+                    format: map.format,
                   },
                   connection.call
                 );
@@ -76,7 +80,7 @@ export function SpecimenService() {
               }
             } else
               notify(
-                `No solver is available for the map format (${map.type}).`
+                `No solver is available for the map format (${map.format}).`
               );
           } catch (e) {
             notify(`${e}`);
@@ -90,7 +94,7 @@ export function SpecimenService() {
       map,
       notify,
       usingLoadingState,
-      mapType,
+      format,
       mapContent,
       resolve,
       setSpecimen,

@@ -31,9 +31,9 @@ export const solve = [
    */
   createMethod(
     "solve/pathfinding",
-    ({ algorithm, mapType, mapURI, ...params }) =>
+    ({ algorithm, format, mapURI, ...params }) =>
       usingFilePair(async (scenarioPath, mapPath) => {
-        const { create, invoke } = handlers[mapType as MapTypeKey];
+        const { create, invoke } = handlers[format as MapTypeKey];
         const { scheme, content } = parseURI(mapURI);
         // Check if URI scheme is trace,
         // if so, return the URI content

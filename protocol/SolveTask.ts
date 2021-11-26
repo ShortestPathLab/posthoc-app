@@ -13,10 +13,7 @@ export type SolveTask<T extends string, Params = {}> = Namespace<
   Params
 >;
 
-type PathfindingTaskParams = {
-  mapURI: MapURI;
-  algorithm: string;
-  mapType: string;
+export type PathfindingTaskInstance = {
   /**
    * The index of the start node.
    */
@@ -25,6 +22,13 @@ type PathfindingTaskParams = {
    * The index of the end node.
    */
   end: number;
+};
+
+type PathfindingTaskParams = {
+  mapURI: MapURI;
+  algorithm: string;
+  format: string;
+  instances: PathfindingTaskInstance[];
 };
 
 export type PathfindingTask = SolveTask<"pathfinding", PathfindingTaskParams>;
