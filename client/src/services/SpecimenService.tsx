@@ -44,7 +44,7 @@ export function SpecimenService() {
   useAsync(
     (signal) =>
       usingLoadingState(async () => {
-        if (algorithm && map?.format && map?.content) {
+        if (map?.format && map?.content) {
           const [, defaults] = getRenderer(map.format);
           try {
             const entry = find(format, { id: map.format });

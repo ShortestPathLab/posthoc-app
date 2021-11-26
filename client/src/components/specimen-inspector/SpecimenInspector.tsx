@@ -55,7 +55,7 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
             vertical
           >
             <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
-            Select a map and an algorithm to get started.
+            Select a map to get started.
           </Flex>
         )}
       </Flex>

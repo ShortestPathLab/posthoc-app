@@ -13,7 +13,7 @@ export const mapDefaults = { start: undefined, end: undefined };
 export function Input() {
   const notify = useSnackbar();
   const [connections] = useConnections();
-  const [{ algorithms, maps, formats: types }] = useFeatures();
+  const [{ algorithms, maps, formats }] = useFeatures();
   const [{ algorithm, map }, setUIState] = useUIState();
 
   return (
@@ -33,7 +33,7 @@ export function Input() {
           switch (v) {
             case custom().id:
               try {
-                const f = await upload(types);
+                const f = await upload(formats);
                 if (f) setUIState({ ...mapDefaults, map: f });
               } catch (e) {
                 notify(`${e}`);

@@ -9,6 +9,7 @@ import { RendererEntry, RendererMap } from "./Renderer";
 
 const renderers: RendererMap = {
   grid: [GridRenderer, getGridDefaults],
+  json: [GridRenderer, getGridDefaults],
   xy: [NetworkRenderer, getNetworkDefaults],
 };
 

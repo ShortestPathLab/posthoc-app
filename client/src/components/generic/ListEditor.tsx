@@ -55,6 +55,7 @@ type Item<T = any> = {
 };
 
 type Props<T = any> = {
+  extras?: ReactNode;
   addItemLabel?: ReactNode;
   label?: ReactNode;
   text?: ReactNode;
@@ -203,6 +204,7 @@ export default function Editor<T>(props: Props<T>) {
     autoFocus,
     getCategory,
     getOrder,
+    extras,
   } = props;
   const isInitialRender = useInitialRender();
   const theme = useTheme();
@@ -331,6 +333,7 @@ export default function Editor<T>(props: Props<T>) {
         >
           {addItemLabel}
         </Button>
+        {extras}
       </Box>
     </List>
   );
@@ -362,7 +365,7 @@ export default function Editor<T>(props: Props<T>) {
 
 export function ListEditor<T extends { key: string }>({
   onChange,
-  value,
+  value = [],
   editor,
   create,
   ...props
@@ -378,6 +381,9 @@ export function ListEditor<T extends { key: string }>({
     setState(next);
     onChange?.(next);
   }
+  useEffect(() => {
+    setState(value);
+  }, [value]);
   return (
     <Box sx={{ ml: -2 }}>
       <Editor
@@ -390,13 +396,13 @@ export function ListEditor<T extends { key: string }>({
         useDelete
         useEdit={false}
         onAddItem={() =>
-          handleChange([...state, { key: id(), ...create?.() } as T])
+          handleChange?.([...state, { key: id(), ...create?.() } as T])
         }
         onDeleteItem={(k) => {
-          return handleChange(filter(state, (b) => b.key !== k));
+          return handleChange?.(filter(state, (b) => b.key !== k));
         }}
         onChangeItem={(k, v) =>
-          handleChange(map(state, (b) => (b.key === k ? v : b)))
+          handleChange?.(map(state, (b) => (b.key === k ? v : b)))
         }
       />
     </Box>

@@ -1,9 +1,5 @@
 import { createSlice, withLocalStorage } from "./createSlice";
 
-const DEV_PORT = 8001;
-
-export const defaultPlaybackRate = 4;
-
 export type Remote = {
   url: string;
   transport: string;
@@ -16,20 +12,31 @@ type Settings = {
   playbackRate?: number;
 };
 
+const DEV_PORT = 8001;
+
+export const defaultRemotes = [
+  {
+    url: `internal://trace`,
+    transport: "native",
+    key: "trace-provider",
+  },
+  {
+    url: `http://localhost:${DEV_PORT}/`,
+    transport: "socketio",
+    key: "default-development-server",
+  },
+  {
+    url: `https://rachmaninoff.duckdns.org/`,
+    transport: "socketio",
+    key: "legacy-production-server",
+  },
+];
+
+export const defaultPlaybackRate = 4;
+
 export const [useSettings, SettingsProvider] = createSlice<Settings>(
   {
-    remote: [
-      {
-        url: `http://localhost:${DEV_PORT}/`,
-        transport: "socketio",
-        key: "default-development-server",
-      },
-      {
-        url: `https://rachmaninoff.duckdns.org/`,
-        transport: "socketio",
-        key: "legacy-production-server",
-      },
-    ],
+    remote: defaultRemotes,
     playbackRate: defaultPlaybackRate,
   },
   withLocalStorage("settings")

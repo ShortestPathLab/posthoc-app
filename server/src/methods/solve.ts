@@ -33,26 +33,28 @@ export const solve = [
     "solve/pathfinding",
     ({ algorithm, format, mapURI, ...params }) =>
       usingFilePair(async (scenarioPath, mapPath) => {
-        const { create, invoke } = handlers[format as MapTypeKey];
-        const { scheme, content } = parseURI(mapURI);
-        // Check if URI scheme is trace,
-        // if so, return the URI content
-        if (scheme !== "trace:") {
-          const m = getMap(mapURI);
-          // Check if the URI references a valid map
-          if (m) {
-            const scenario = create(m, params);
-            await Promise.all([
-              write(scenarioPath, scenario(mapPath), "utf-8"),
-              write(mapPath, m, "utf-8"),
-            ]);
-            const output = await invoke(algorithm, scenarioPath, mapPath);
-            if (output.length > MAX_SOLUTION_SIZE) {
-              throw new Error("Solution is too large.");
+        if (algorithm) {
+          const { create, invoke } = handlers[format as MapTypeKey];
+          const { scheme, content } = parseURI(mapURI);
+          // Check if URI scheme is trace,
+          // if so, return the URI content
+          if (scheme !== "trace:") {
+            const m = getMap(mapURI);
+            // Check if the URI references a valid map
+            if (m) {
+              const scenario = create(m, params);
+              await Promise.all([
+                write(scenarioPath, scenario(mapPath), "utf-8"),
+                write(mapPath, m, "utf-8"),
+              ]);
+              const output = await invoke(algorithm, scenarioPath, mapPath);
+              if (output.length > MAX_SOLUTION_SIZE) {
+                throw new Error("Solution is too large.");
+              }
+              return JSON.parse(trim(output));
             }
-            return JSON.parse(trim(output));
-          }
-        } else return JSON.parse(content);
+          } else return JSON.parse(content);
+        } else throw new Error("You need to select an algorithm.");
       })
   ),
 ];

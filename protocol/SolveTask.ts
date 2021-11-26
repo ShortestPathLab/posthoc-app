@@ -26,8 +26,8 @@ export type PathfindingTaskInstance = {
 
 type PathfindingTaskParams = {
   mapURI: MapURI;
-  algorithm: string;
   format: string;
+  algorithm?: string;
   instances: PathfindingTaskInstance[];
 };
 

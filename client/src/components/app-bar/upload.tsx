@@ -26,7 +26,7 @@ export async function upload(accept: FeatureDescriptor[]) {
     if (find(accept, { id: ext(f.name) })) {
       return {
         ...custom(),
-        type: ext(f.name),
+        format: ext(f.name),
         content: await f.text(),
         name: startCase(name(f.name)),
       } as Feature;

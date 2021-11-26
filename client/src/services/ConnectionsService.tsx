@@ -24,7 +24,7 @@ export function ConnectionsService() {
 
   useEffect(() => {
     let aborted = false;
-    const cs: Connection[] = [];
+    let cs: Connection[] = [];
     usingLoadingState(async () => {
       notify("Connecting...");
       for (const { transport: t, url, disabled } of remote ?? []) {
@@ -33,18 +33,22 @@ export function ConnectionsService() {
           await tp.connect();
           const { result, delta } = await timed(() => tp.call("about"));
           if (result) {
-            cs.push({
-              ...result,
-              url,
-              ping: delta,
-              call: tp.call.bind(tp),
-              disconnect: tp.disconnect.bind(tp),
-            });
+            cs = [
+              ...cs,
+              {
+                ...result,
+                url,
+                ping: delta,
+                call: tp.call.bind(tp),
+                disconnect: tp.disconnect.bind(tp),
+              },
+            ];
           } else await tp.disconnect();
         }
         if (!aborted) setConnections(cs);
       }
-      if (!aborted) notify(`Connected to ${cs.length} of ${remote?.length}.`);
+      if (!aborted)
+        notify(`Connected to ${cs.length} of ${remote?.length} solvers.`);
     });
     return () => {
       aborted = true;
