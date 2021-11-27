@@ -55,7 +55,6 @@ export function GridRenderer({
     const info = selectionInfo(m, specimen);
     return (step: number = 0) =>
       ({ global, world }: ViewportEvent) => {
-        console.log(global, world);
         if (ref && specimen) {
           const { top, left } = ref.getBoundingClientRect();
           const point = getPoint(world);
