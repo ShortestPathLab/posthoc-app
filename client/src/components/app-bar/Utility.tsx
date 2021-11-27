@@ -1,6 +1,6 @@
 import { Button, Tooltip } from "@material-ui/core";
 import { BugReportTwoTone as BugIcon } from "@material-ui/icons";
-import { DebugOptionsEditor } from "components/DebugOptionsEditor";
+import { DebugOptionsEditor } from "components/debug-options-editor/DebugOptionsEditor";
 import {
   AppBarTitle as Title,
   ManagedModal as Dialog,

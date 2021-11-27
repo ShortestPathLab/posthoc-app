@@ -1,19 +1,12 @@
-import {
-  BoxProps,
-  Button,
-  Card,
-  Fade,
-  Stack,
-  Tooltip,
-} from "@material-ui/core";
+import { BoxProps, Button, Card, Fade, Tooltip } from "@material-ui/core";
 import { SortTwoTone as StepsIcon } from "@material-ui/icons";
 import { TabContext, TabPanel } from "@material-ui/lab";
 import { Box } from "@material-ui/system";
 import { Flex } from "components/generic/Flex";
+import { Toolbar } from "components/generic/Toolbar";
 import { startCase } from "lodash";
 import { useState } from "react";
 import { useUIState } from "slices/UIState";
-import { glass } from "theme";
 import { EventListInspector } from "./EventListInspector";
 
 export function InfoPanel(props: BoxProps) {
@@ -21,45 +14,57 @@ export function InfoPanel(props: BoxProps) {
   const [tab, setTab] = useState("steps");
   return (
     <TabContext value={tab}>
-      <Flex vertical {...props}>
-        <Flex justifyContent="center" height="auto">
-          <Card sx={{ m: 3, px: 1, py: 1.25, ...glass }}>
-            <Stack spacing={2} direction="row">
-              {[
-                { icon: <StepsIcon />, key: "steps" },
-                { key: "info" },
-                { key: "parameters" },
-              ].map(({ key, icon }) => (
-                <Tooltip title={startCase(key)}>
-                  <Button
-                    onClick={() => setTab(key === tab ? "" : key)}
-                    color="primary"
-                    variant={key === tab ? "contained" : "text"}
-                    startIcon={icon}
-                  >
-                    {startCase(key)}
-                  </Button>
-                </Tooltip>
-              ))}
-            </Stack>
-          </Card>
-        </Flex>
-        <TabPanel value="info" sx={{ flex: 1, p: 0, textAlign: "center" }}>
-          No content.
-        </TabPanel>
-        <TabPanel
-          value="parameters"
-          sx={{ flex: 1, p: 0, textAlign: "center" }}
-        >
-          No content.
-        </TabPanel>
-        <TabPanel value="steps" sx={{ flex: 1, py: 0, px: 1 }}>
-          <Fade unmountOnExit mountOnEnter in={playback === "paused"}>
-            <Box height="100%" width="100%">
-              <EventListInspector height="100%" width="100%" />
-            </Box>
-          </Fade>
-        </TabPanel>
+      <Flex
+        vertical
+        sx={{ pointerEvents: "none" }}
+        alignItems="center"
+        {...props}
+      >
+        <Toolbar>
+          {[
+            { icon: <StepsIcon />, key: "steps" },
+            { key: "info" },
+            { key: "parameters" },
+          ].map(({ key, icon }) => (
+            <Tooltip title={startCase(key)}>
+              <Button
+                onClick={() => setTab(key === tab ? "" : key)}
+                color="primary"
+                variant={key === tab ? "contained" : "text"}
+                startIcon={icon}
+              >
+                {startCase(key)}
+              </Button>
+            </Tooltip>
+          ))}
+        </Toolbar>
+        {[
+          {
+            key: "steps",
+            content: (
+              <Fade unmountOnExit mountOnEnter in={playback === "paused"}>
+                <Box height="100%" width="100%" pl={1}>
+                  <EventListInspector height="100%" width="100%" />
+                </Box>
+              </Fade>
+            ),
+          },
+          {
+            key: "info",
+            content: <Card sx={{ m: 2, p: 2 }}>-</Card>,
+          },
+          {
+            key: "parameters",
+            content: <Card sx={{ m: 2, p: 2 }}>-</Card>,
+          },
+        ].map(({ content, key }) => (
+          <TabPanel
+            value={key}
+            sx={{ pointerEvents: "all", flex: 1, p: 0, width: "100%" }}
+          >
+            {content}
+          </TabPanel>
+        ))}
       </Flex>
     </TabContext>
   );

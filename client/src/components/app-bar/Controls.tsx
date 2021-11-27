@@ -1,6 +1,6 @@
 import { Box, Card, Divider } from "@material-ui/core";
 import { Flex } from "components/generic/Flex";
-import { glass } from "theme";
+import { acrylic } from "theme";
 import { Input } from "./Input";
 import { Playback } from "./Playback";
 import { Settings } from "./Settings";
@@ -18,7 +18,7 @@ export function Controls() {
         top: 0,
         left: 0,
         zIndex: "appBar",
-        ...glass,
+        ...acrylic,
       }}
     >
       <Box display="flex">
