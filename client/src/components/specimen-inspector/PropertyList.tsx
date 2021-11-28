@@ -21,6 +21,7 @@ export function PropertyList({
             ["g", event?.g],
             ...entries(event?.variables),
             ["pId", event?.pId],
+            ["info", event?.info],
           ],
           ([, v]) => v !== undefined
         ),
