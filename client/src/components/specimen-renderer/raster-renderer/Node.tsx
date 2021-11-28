@@ -21,8 +21,8 @@ export type LineProps = {
 export type NodeProps = GraphicProps & LineProps;
 
 export const coerce = (obj: any) => ({
-  x1: obj.x,
-  y1: obj.y,
+  x1: obj?.x,
+  y1: obj?.y,
   ...obj,
 });
 
