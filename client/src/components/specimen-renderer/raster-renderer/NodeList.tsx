@@ -1,9 +1,9 @@
 import { Graphics } from "@inlet/react-pixi";
-import { chain, constant, floor, memoize, slice } from "lodash";
+import { constant, filter, floor, memoize, slice } from "lodash";
 import * as PIXI from "pixi.js";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { useCallback, useMemo } from "react";
-import { box, NodeProps } from "./Node";
+import { box, coerce, NodeProps } from "./Node";
 
 type Props = {
   nodes: Trace["eventList"];
@@ -23,12 +23,7 @@ export function NodeList({
   condition = defaultCondition,
 }: Props) {
   const memo = useMemo(
-    () =>
-      chain(nodes)
-        .filter((_, i) => condition(i))
-        .keyBy(({ variables: v }) => `${v?.x ?? 0}::${v?.y ?? 0}`)
-        .values()
-        .value(),
+    () => filter(nodes, (_, i) => condition(i)),
     [nodes, condition]
   );
   const draw = useCallback(
@@ -36,9 +31,8 @@ export function NodeList({
       g.clear();
       for (const { variables: v, type } of memo) {
         variant(g, {
+          ...coerce(v),
           color: color?.(type) ?? 0xf1f1f1,
-          left: v?.x ?? 0,
-          top: v?.y ?? 0,
           radius: 0.25,
           resolution,
         });

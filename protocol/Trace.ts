@@ -12,6 +12,7 @@ export type TraceEvent<V extends string = string> = {
   variables?: { [K in V]: number };
   f?: number;
   g?: number;
+  info?: string;
   pId?: number | null;
 };
 

@@ -8,6 +8,7 @@ import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { getColor, hex } from "../colors";
 import { Guides } from "../raster-renderer/Guides";
+import { line } from "../raster-renderer/Node";
 import {
   LazyNodeList as LazyNodes,
   NodeList as Nodes,
@@ -25,7 +26,7 @@ type NetworkRendererProps = RendererProps &
   Omit<ComponentProps<typeof Stage>, "onSelect">;
 
 function getPoint({ x, y }: Point) {
-  return { x: floor(x) - 1, y: floor(y) - 1 };
+  return { x: x - 1.5, y: y - 1.5 };
 }
 
 export function NetworkRenderer({
@@ -105,9 +106,9 @@ export function NetworkRenderer({
         onMouseOver: handleMouseEvent,
       }}
     >
-      <Selection hover={hover} highlight={selection || active} />
+      <Selection highlight={selection || active} />
       <Nodes nodes={specimen?.eventList} />
-      <Nodes nodes={bgNodes} color={bgNodeColor} />
+      <Nodes nodes={bgNodes} color={bgNodeColor} variant={line} />
       <LazyNodes
         nodes={specimen?.eventList}
         step={step}

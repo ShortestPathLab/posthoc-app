@@ -3,6 +3,7 @@ import { constant, floor, join, last, map, split, first } from "lodash";
 import { roadhog, warthog } from "pathfinding-binaries";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask, PathfindingTaskInstance } from "protocol/SolveTask";
+import { Trace } from "protocol/Trace";
 import { exec } from "../helpers/exec";
 
 type Params = Omit<
@@ -52,7 +53,11 @@ export const handlers = {
         return constant(`p aux sp p2p 1\nq ${start} ${end}\n`);
       } else throw new Error("No problem instance was specified.");
     },
-    invoke: async () => JSON.stringify({}),
+    invoke: async () =>
+      JSON.stringify({
+        eventList: [{ info: "The format (xy) is temporarily unsupported." }],
+        nodeStructure: [],
+      } as Trace),
     // invoke: (alg, scen, m) =>
     //   exec(
     //     roadhog,
