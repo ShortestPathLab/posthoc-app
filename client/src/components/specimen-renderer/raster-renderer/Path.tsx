@@ -7,6 +7,8 @@ import { getColor } from "../colors";
 import { scale } from "./config";
 import { Square } from "./Node";
 
+const WEIGHT = 3 / scale;
+
 function defined<T>(obj: T): obj is Exclude<T, undefined | null> {
   return !isUndefined(obj) && !isNull(obj);
 }
@@ -36,8 +38,8 @@ export function Path({ nodes = [], step = 0 }: PathProps) {
       g.clear();
       for (const [i, node] of p.entries()) {
         const { x = 0, y = 0 } = node?.variables ?? {};
-        g.lineTo((x + 1.5) * scale, (y + 1.5) * scale);
-        if (!i) g.lineStyle(3, getColor("source"));
+        g.lineTo(x + 0.5, y + 0.5);
+        if (!i) g.lineStyle(WEIGHT, getColor("source"));
       }
     };
   }, [path, step]);
@@ -46,8 +48,8 @@ export function Path({ nodes = [], step = 0 }: PathProps) {
     <>
       <Graphics draw={draw} />
       <Square
-        x={scale * (nodes?.[step]?.variables?.x ?? 0)}
-        y={scale * (nodes?.[step]?.variables?.y ?? 0)}
+        x={nodes?.[step]?.variables?.x ?? 0}
+        y={nodes?.[step]?.variables?.y ?? 0}
         color={getColor("source")}
       />
     </>

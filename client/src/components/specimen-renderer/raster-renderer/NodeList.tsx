@@ -3,7 +3,6 @@ import { chain, constant, floor, memoize, slice } from "lodash";
 import * as PIXI from "pixi.js";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { useCallback, useMemo } from "react";
-import { scale } from "./config";
 import { box, NodeProps } from "./Node";
 
 type Props = {
@@ -20,7 +19,7 @@ export function NodeList({
   nodes,
   color,
   variant = box,
-  resolution = 1 / scale,
+  resolution = 1,
   condition = defaultCondition,
 }: Props) {
   const memo = useMemo(
@@ -38,8 +37,8 @@ export function NodeList({
       for (const { variables: v, type } of memo) {
         variant(g, {
           color: color?.(type) ?? 0xf1f1f1,
-          left: (v?.x ?? 0) * scale,
-          top: (v?.y ?? 0) * scale,
+          left: v?.x ?? 0,
+          top: v?.y ?? 0,
           radius: 0.25,
           resolution,
         });
@@ -48,7 +47,7 @@ export function NodeList({
     },
     [memo, color, resolution, variant]
   );
-  return <Graphics draw={draw} scale={1 / resolution} />;
+  return <Graphics draw={draw} />;
 }
 
 const down = (n: number, a: number = 1) => floor(n / a) * a;

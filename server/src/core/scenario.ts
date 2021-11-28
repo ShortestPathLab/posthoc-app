@@ -52,9 +52,7 @@ export const handlers = {
         return constant(`p aux sp p2p 1\nq ${start} ${end}\n`);
       } else throw new Error("No problem instance was specified.");
     },
-    invoke: () => {
-      throw new Error("The format (xy) is temporarily unsupported.");
-    },
+    invoke: async () => JSON.stringify({}),
     // invoke: (alg, scen, m) =>
     //   exec(
     //     roadhog,

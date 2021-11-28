@@ -1,6 +1,5 @@
 import { map } from "lodash";
 import { Point } from "components/specimen-renderer/Renderer";
-import { scale } from "../raster-renderer/config";
 import { useTween } from "react-use";
 import { ComponentProps as PropsOf } from "react";
 import { Node } from "../raster-renderer/Node";
@@ -28,8 +27,8 @@ export function Selected({
     <Node
       {...props}
       scale={animateScale ? t : 1}
-      x={x + (animateScale ? 1.5 * scale - 1.5 * scale * t : 0)}
-      y={y + (animateScale ? 1.5 * scale - 1.5 * scale * t : 0)}
+      x={x - 1 + (animateScale ? 1.5 - 1.5 * t : 0)}
+      y={y - 1 + (animateScale ? 1.5 - 1.5 * t : 0)}
       radius={1}
       alpha={(animateAlpha ? t : 1) * alpha}
     />
@@ -48,8 +47,8 @@ export function Selection({ hover, highlight }: Props) {
           point && (
             <Selected
               key={`${i}::${point.x}::${point.y}`}
-              x={point.x * scale}
-              y={point.y * scale}
+              x={point.x}
+              y={point.y}
               color={0x000000}
               {...props}
             />

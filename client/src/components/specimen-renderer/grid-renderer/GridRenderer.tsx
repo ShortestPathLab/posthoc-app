@@ -7,7 +7,6 @@ import { ComponentProps, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { getColor, hex } from "../colors";
-import { scale } from "../raster-renderer/config";
 import { Guides } from "../raster-renderer/Guides";
 import {
   LazyNodeList as LazyNodes,
@@ -26,7 +25,7 @@ type GridRendererProps = RendererProps &
   Omit<ComponentProps<typeof Stage>, "onSelect">;
 
 function getPoint({ x, y }: Point) {
-  return { x: floor(x / scale) - 1, y: floor(y / scale) - 1 };
+  return { x: floor(x), y: floor(y) };
 }
 
 export function GridRenderer({

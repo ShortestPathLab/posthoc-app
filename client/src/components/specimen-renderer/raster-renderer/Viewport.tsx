@@ -7,6 +7,7 @@ import { PixiComponent, useApp } from "@inlet/react-pixi";
 import { map } from "lodash";
 import * as PIXI from "pixi.js";
 import React from "react";
+import { scale } from "./config";
 import {
   PointerEvent,
   PixiViewport,
@@ -36,7 +37,8 @@ function create(props: Props) {
     .pinch()
     .wheel()
     .decelerate({ friction: 0.98 })
-    .clampZoom({ maxScale: 10, minScale: 0.02 });
+    .clampZoom({ maxScale: 10 * scale, minScale: 0.02 * scale })
+    .zoomPercent(scale);
   return viewport as PixiViewport;
 }
 

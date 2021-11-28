@@ -1,18 +1,18 @@
 import { ceil, forEach, range } from "lodash";
-import { makeGraphic } from "./makeGraphic";
-import { scale } from "./config";
 import { ComponentProps } from "react";
+import { scale } from "./config";
+import { makeGraphic } from "./makeGraphic";
 
-const WEIGHT = 1;
+const WEIGHT = 1 / scale;
 
 const Grid = makeGraphic<{ alpha?: number; grid?: number }>(
   (g, { width = 0, height = 0, alpha = 1, grid = 5 }) => {
     g.clear();
     g.lineStyle(WEIGHT, 0x000000, alpha);
-    forEach(range(scale * grid, height, scale * grid), (i) =>
+    forEach(range(grid, height, grid), (i) =>
       g.moveTo(0, i + WEIGHT / 2).lineTo(width, i + WEIGHT / 2)
     );
-    forEach(range(scale * grid, width, scale * grid), (i) =>
+    forEach(range(grid, width, grid), (i) =>
       g.moveTo(i + WEIGHT / 2, 0).lineTo(i + WEIGHT / 2, height)
     );
   }
@@ -30,8 +30,8 @@ export function Guides({
 }: Props) {
   return (
     <Grid
-      width={ceil((width + 2) / grid) * grid * scale}
-      height={ceil((height + 2) / grid) * grid * scale}
+      width={ceil((width + 2) / grid) * grid}
+      height={ceil((height + 2) / grid) * grid}
       grid={grid}
       {...params}
     />
