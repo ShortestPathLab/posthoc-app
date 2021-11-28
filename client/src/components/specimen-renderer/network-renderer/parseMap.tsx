@@ -1,5 +1,5 @@
 import { Point } from "components/specimen-renderer/Renderer";
-import { floor, max, maxBy, minBy, split } from "lodash";
+import { max, maxBy, minBy, split } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 
 enum Index {

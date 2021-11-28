@@ -2,7 +2,7 @@ import { Stage } from "@inlet/react-pixi";
 import { blueGrey } from "@material-ui/core/colors";
 import { call } from "components/script-editor/call";
 import { Point, RendererProps } from "components/specimen-renderer/Renderer";
-import { constant, delay, floor, memoize, merge, once } from "lodash";
+import { constant, delay, memoize, merge, once } from "lodash";
 import { ComponentProps, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
@@ -39,7 +39,6 @@ export function NetworkRenderer({
   const [{ step = 0, code, ...state }] = useUIState();
 
   const [active, setActive] = useState<Point | undefined>(undefined);
-  const [hover, setHover] = useState<Point | undefined>(undefined);
 
   const [[size, bgNodes], bgNodeColor, { start, end }] = useMemo(
     () =>
@@ -71,7 +70,6 @@ export function NetworkRenderer({
     return ({ world, event }: ViewportEvent) => {
       switch (event) {
         case "onMouseOver":
-          setHover(getPoint(world));
           setActive(undefined);
           clearTimeout(timeout);
           break;
@@ -80,7 +78,7 @@ export function NetworkRenderer({
           break;
       }
     };
-  }, [setHover]);
+  }, []);
 
   const condition = useMemo(() => {
     if (code && specimen?.eventList) {
