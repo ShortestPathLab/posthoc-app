@@ -76,7 +76,6 @@ export function SpecimenService() {
                   );
                 }
               } catch (e: any) {
-                console.log(e);
                 notify(
                   <Label primary={`${e.message}`} secondary={connection.name} />
                 );
