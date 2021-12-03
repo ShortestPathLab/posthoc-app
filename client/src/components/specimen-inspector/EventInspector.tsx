@@ -11,6 +11,7 @@ import { call } from "components/script-editor/call";
 import { TraceEvent } from "protocol/Trace";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
+import { useAcrylic } from "theme";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
 
@@ -26,6 +27,7 @@ export function EventInspector({
   selected,
   ...props
 }: EventInspectorProps) {
+  const acrylic = useAcrylic();
   const [{ specimen }] = useSpecimen();
   const [{ code }, setUIState] = useUIState();
 
@@ -34,7 +36,7 @@ export function EventInspector({
         color: "primary.contrastText",
         bgcolor: "primary.main",
       }
-    : {};
+    : acrylic;
 
   const hidden = event
     ? !call(code ?? "", "shouldRender", [

@@ -3,14 +3,15 @@ import { constant, filter, floor, memoize, slice } from "lodash";
 import * as PIXI from "pixi.js";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { useCallback, useMemo } from "react";
-import { box, coerce, NodeProps } from "./Node";
+import { coerce, Node } from "../Node";
+import { box } from "./Draw";
 
 type Props = {
   nodes: Trace["eventList"];
   color?: (type?: TraceEventType) => number;
-  variant?: (g: PIXI.Graphics, options: NodeProps) => PIXI.Graphics;
-  resolution?: number;
+  variant?: (g: PIXI.Graphics, options: Node) => PIXI.Graphics;
   condition?: (step: number) => boolean;
+  options?: Node;
 };
 
 const defaultCondition = constant(true);
@@ -19,8 +20,8 @@ export function NodeList({
   nodes,
   color,
   variant = box,
-  resolution = 1,
   condition = defaultCondition,
+  options,
 }: Props) {
   const memo = useMemo(
     () => filter(nodes, (_, i) => condition(i)),
@@ -34,12 +35,12 @@ export function NodeList({
           ...coerce(v),
           color: color?.(type) ?? 0xf1f1f1,
           radius: 0.25,
-          resolution,
+          ...options,
         });
       }
       return g;
     },
-    [memo, color, resolution, variant]
+    [memo, color, variant, options]
   );
   return <Graphics draw={draw} />;
 }

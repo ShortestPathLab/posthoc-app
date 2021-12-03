@@ -16,6 +16,7 @@ export type SelectionInfo = {
   current?: Step;
   entry?: Step;
   node?: Node;
+  point?: Point;
 };
 
 export type Point = {

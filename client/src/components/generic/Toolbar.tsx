@@ -1,8 +1,9 @@
 import { Card, Stack } from "@material-ui/core";
 import { ReactNode } from "react";
-import { acrylic } from "theme";
+import { useAcrylic } from "theme";
 
 export function Toolbar({ children }: { children?: ReactNode }) {
+  const acrylic = useAcrylic();
   return (
     <Card
       sx={{

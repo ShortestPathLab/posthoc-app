@@ -1,6 +1,7 @@
 import { colors, createTheme } from "@material-ui/core";
 import { alpha, SxProps, Theme } from "@material-ui/system";
 import { constant, times } from "lodash";
+import { useSettings } from "slices/settings";
 
 const shadow = `
     0px 8px 18px -1px rgb(0 0 0 / 8%), 
@@ -15,7 +16,15 @@ export const theme = createTheme({
   shadows: ["", ...times(24, constant(shadow))] as any,
 });
 
-export const acrylic: SxProps<Theme> = {
-  backdropFilter: "blur(5px)",
-  background: ({ palette }) => alpha(palette.background.paper, 0.84),
-};
+export function useAcrylic(): SxProps<Theme> {
+  const [{ acrylic }] = useSettings();
+  return acrylic
+    ? {
+        backdropFilter: "blur(5px)",
+        background: ({ palette }) => alpha(palette.background.paper, 0.84),
+      }
+    : {
+        backdropFilter: "blur(0px)",
+        background: ({ palette }) => palette.background.paper,
+      };
+}

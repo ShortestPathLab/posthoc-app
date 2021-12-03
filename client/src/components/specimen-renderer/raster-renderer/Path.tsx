@@ -5,7 +5,7 @@ import { TraceEvent } from "protocol/Trace";
 import { useMemo } from "react";
 import { getColor } from "../colors";
 import { scale } from "./config";
-import { Square } from "./Node";
+import { Square } from "./Draw";
 
 const WEIGHT = 3 / scale;
 
@@ -48,8 +48,8 @@ export function Path({ nodes = [], step = 0 }: PathProps) {
     <>
       <Graphics draw={draw} />
       <Square
-        x={nodes?.[step]?.variables?.x ?? 0}
-        y={nodes?.[step]?.variables?.y ?? 0}
+        x={0.5 + (nodes?.[step]?.variables?.x ?? 0)}
+        y={0.5 + (nodes?.[step]?.variables?.y ?? 0)}
         color={getColor("source")}
       />
     </>

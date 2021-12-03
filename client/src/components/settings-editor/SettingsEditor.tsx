@@ -2,6 +2,7 @@ import {
   Box,
   Divider,
   Slider,
+  Switch,
   Tab,
   Typography as Type,
 } from "@material-ui/core";
@@ -15,7 +16,7 @@ import { ServerListEditor } from "./ServerListEditor";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsEditor() {
-  const [{ playbackRate = 1 }, setSettings] = useSettings();
+  const [{ playbackRate = 1, acrylic }, setSettings] = useSettings();
   const [tab, setTab] = useState("general");
   function renderHeading(label: ReactNode) {
     return (
@@ -36,12 +37,12 @@ export function SettingsEditor() {
       <Divider />
       <TabPanel value="general">
         <Box>
-          {renderHeading("Visualiser")}
+          {renderHeading("Playback")}
           <Flex alignItems="center">
             {renderLabel("Playback Rate")}
             <Space flex={1} />
             <Slider
-              sx={{ maxWidth: 320 }}
+              sx={{ maxWidth: 320, mr: 2 }}
               marks={[0.25, 1, 5].map((v) => ({
                 value: v * baseRate,
                 label: formatLabel(v),
@@ -55,6 +56,15 @@ export function SettingsEditor() {
               onChangeCommitted={(_, v) =>
                 setSettings({ playbackRate: v as number })
               }
+            />
+          </Flex>
+          {renderHeading("UI")}
+          <Flex alignItems="center">
+            {renderLabel("Use Acrylic (Impacts Performance)")}
+            <Space flex={1} />
+            <Switch
+              defaultChecked={!!acrylic}
+              onChange={(_, v) => setSettings({ acrylic: v })}
             />
           </Flex>
         </Box>

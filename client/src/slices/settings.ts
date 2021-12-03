@@ -10,6 +10,7 @@ export type Remote = {
 type Settings = {
   remote?: Remote[];
   playbackRate?: number;
+  acrylic?: boolean;
 };
 
 const DEV_PORT = 8001;

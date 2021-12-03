@@ -34,6 +34,7 @@ export class PixiViewport extends PixiViewportBase {
     if (handler) {
       const f = (e: PIXI.InteractionEvent) => {
         const { global } = e.data;
+        console.log(e);
         if (!filter || this.input.last?.equals(global)) {
           handler?.({
             global,

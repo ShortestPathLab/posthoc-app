@@ -1,7 +1,7 @@
 import { Point } from "components/specimen-renderer/Renderer";
 import { floor, map } from "lodash";
 import { getColor } from "../colors";
-import { Square } from "./Node";
+import { Square } from "./Draw";
 
 type OverlayProps = {
   start?: number;
@@ -23,8 +23,8 @@ export function Overlay({
         ({ color, node }, i) => (
           <Square
             key={i}
-            x={node % size.x}
-            y={floor(node / size.x)}
+            x={0.5 + (node % size.x)}
+            y={0.5 + floor(node / size.x)}
             color={color}
           />
         )
