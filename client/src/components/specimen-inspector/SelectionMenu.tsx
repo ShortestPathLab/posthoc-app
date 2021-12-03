@@ -11,15 +11,15 @@ import {
   PlaceOutlined as DestinationIcon,
   TripOriginOutlined as StartIcon,
 } from "@material-ui/icons";
+import { Label } from "components/generic/Label";
 import { Overline } from "components/generic/Overline";
 import { Property } from "components/generic/Property";
+import { useSnackbar } from "components/generic/Snackbar";
+import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
 import { map } from "lodash";
 import { useUIState } from "slices/UIState";
-import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
-import { useSnackbar } from "components/generic/Snackbar";
-import { PropertyList } from "./PropertyList";
 import { EventLabel } from "./EventLabel";
-import { Label } from "components/generic/Label";
+import { PropertyList } from "./PropertyList";
 
 type Props = {
   selection?: RendererSelectEvent;
@@ -29,7 +29,7 @@ type Props = {
 export function SelectionMenu({ selection, onClose }: Props) {
   const notify = useSnackbar();
   const [, setUIState] = useUIState();
-  const { global, world, info } = selection ?? {};
+  const { global, info } = selection ?? {};
   const { current, entry, node } = info ?? {};
 
   return (
@@ -46,8 +46,8 @@ export function SelectionMenu({ selection, onClose }: Props) {
         <ListItemText>
           <Box>
             <Overline>Point</Overline>
-            <Property label="x" value={world?.x ?? "-"} />
-            <Property label="y" value={world?.y ?? "-"} />
+            <Property label="x" value={info?.point?.x ?? "-"} />
+            <Property label="y" value={info?.point?.y ?? "-"} />
           </Box>
           {current?.event && (
             <Box mt={2}>

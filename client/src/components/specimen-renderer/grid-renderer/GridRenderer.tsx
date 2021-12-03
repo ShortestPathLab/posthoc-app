@@ -19,16 +19,7 @@ export function GridRenderer(props: GridRendererProps) {
   const [{ map: m }] = useSpecimen();
   const [{ code, ...state }] = useUIState();
 
-  const [
-    {
-      size,
-      nodes: { walls },
-      resolve,
-      getNode,
-    },
-    bgNodeColor,
-    { start, end },
-  ] = useMemo(
+  const [map, bgNodeColor, { start, end }] = useMemo(
     () =>
       [
         parseMap(m),
@@ -38,8 +29,13 @@ export function GridRenderer(props: GridRendererProps) {
     [m, state.start, state.end]
   );
 
+  const {
+    size,
+    nodes: { walls },
+  } = map;
+
   return (
-    <BaseRasterRenderer {...{ ...props, size, resolve, getNode }}>
+    <BaseRasterRenderer {...props} {...map}>
       <Nodes nodes={walls} color={bgNodeColor} />
       <Overlay start={start} end={end} size={size} />
     </BaseRasterRenderer>

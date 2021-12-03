@@ -23,17 +23,7 @@ export function NetworkRenderer(props: NetworkRendererProps) {
   const [{ map: m }] = useSpecimen();
   const [{ code, ...state }] = useUIState();
 
-  const [
-    {
-      size,
-      nodes: { edges, verts },
-      resolve,
-      getNode,
-    },
-    edgeColor,
-    vertColor,
-    { start, end },
-  ] = useMemo(
+  const [map, edgeColor, vertColor, { start, end }] = useMemo(
     () =>
       [
         parseMap(m),
@@ -44,8 +34,13 @@ export function NetworkRenderer(props: NetworkRendererProps) {
     [m, state.start, state.end]
   );
 
+  const {
+    size,
+    nodes: { edges, verts },
+  } = map;
+
   return (
-    <BaseRasterRenderer {...{ ...props, size, resolve, getNode }}>
+    <BaseRasterRenderer {...props} {...map}>
       <Nodes nodes={edges} color={edgeColor} variant={line} />
       <Nodes
         nodes={verts}

@@ -12,7 +12,7 @@ export function Selection({ hover, highlight }: Props) {
     <>
       {map(
         [
-          { point: hover, alpha: 0.08, animateAlpha: true },
+          { point: hover, alpha: 0.04, animateAlpha: true },
           { point: highlight, alpha: 0.08, animateScale: true },
         ],
         ({ point, ...props }, i) =>

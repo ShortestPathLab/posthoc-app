@@ -26,6 +26,7 @@ export function BaseRasterRenderer({
   size,
   resolve,
   getNode,
+  from,
   onSelect,
   selection,
   children,
@@ -47,12 +48,15 @@ export function BaseRasterRenderer({
           onSelect?.({
             global: { x: left + global.x, y: top + global.y },
             world: point,
-            info: info(specimen, getNode?.(point), step),
+            info: {
+              ...info(specimen, getNode?.(point), step),
+              point: from?.(point),
+            },
           });
         }
       }
     };
-  }, [ref, onSelect, specimen, getNode, resolve]);
+  }, [ref, onSelect, specimen, getNode, resolve, from]);
 
   const handleMouseEvent = useMemo(() => {
     let timeout = 0;
