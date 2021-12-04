@@ -1,12 +1,13 @@
 import { Stage } from "@inlet/react-pixi";
 import { call } from "components/script-editor/call";
 import { Point, RendererProps } from "components/specimen-renderer/Renderer";
-import { constant, delay, memoize, throttle } from "lodash";
-import { ComponentProps, useMemo, useState } from "react";
+import { constant, delay, identity, memoize, throttle } from "lodash";
+import { ComponentProps, useCallback, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { getColor } from "../colors";
 import { info } from "../info";
+import { byPoint, NodePredicate } from "../isNode";
 import { MapHandler } from "../MapParser";
 import { Guides } from "../raster-renderer/Guides";
 import {
@@ -18,7 +19,9 @@ import { ViewportEvent } from "../raster-renderer/PixiViewport";
 import { RasterRenderer } from "../raster-renderer/RasterRenderer";
 import { Selection } from "../raster-renderer/Selection";
 
-export type BaseRasterRendererProps = Partial<MapHandler> &
+export type BaseRasterRendererProps = {
+  isNode?: NodePredicate;
+} & Partial<MapHandler> &
   RendererProps &
   Omit<ComponentProps<typeof Stage>, "onSelect">;
 
@@ -26,7 +29,8 @@ export function BaseRasterRenderer({
   size,
   resolve,
   getNode,
-  from,
+  isNode = byPoint,
+  from = identity,
   onSelect,
   selection,
   children,
@@ -39,8 +43,8 @@ export function BaseRasterRenderer({
   const [active, setActive] = useState<Point | undefined>(undefined);
   const [hover, setHover] = useState<Point | undefined>(undefined);
 
-  const handleClick = useMemo(() => {
-    return ({ global, world }: ViewportEvent, step: number = 0) => {
+  const handleClick = useCallback(
+    ({ global, world }: ViewportEvent, step: number = 0) => {
       if (ref && specimen) {
         const { top, left } = ref.getBoundingClientRect();
         const point = resolve?.(world);
@@ -49,14 +53,17 @@ export function BaseRasterRenderer({
             global: { x: left + global.x, y: top + global.y },
             world: point,
             info: {
-              ...info(specimen, getNode?.(point), step),
-              point: from?.(point),
+              ...info(specimen, step, getNode?.(point), (s) =>
+                isNode(s, from(point))
+              ),
+              point: from(point),
             },
           });
         }
       }
-    };
-  }, [ref, onSelect, specimen, getNode, resolve, from]);
+    },
+    [ref, onSelect, specimen, getNode, resolve, from, isNode]
+  );
 
   const handleMouseEvent = useMemo(() => {
     let timeout = 0;

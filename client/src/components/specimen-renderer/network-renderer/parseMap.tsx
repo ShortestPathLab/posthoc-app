@@ -15,12 +15,7 @@ const minAt = (c: Dictionary<number>[], index: string) =>
 const maxAt = (c: Dictionary<number>[], index: string) =>
   maxBy(c, index)?.[index];
 
-type Options = {
-  vert?: string;
-  edge?: string;
-};
-
-function getBounds(verts: Point[]) {
+function bounds(verts: Point[]) {
   const [[minX, minY], [maxX, maxY]] = [minAt, maxAt].map((f) =>
     ["x", "y"].map((i) => f(verts, i) ?? 0)
   );
@@ -47,11 +42,15 @@ function parse(m: string, vert: string, edge: string) {
   return { verts, edges };
 }
 
+type Options = {
+  vert?: string;
+  edge?: string;
+};
+
 export const parseMap = makeMapParser(
   (m, { vert = "v", edge = "e" }: Options) => {
     const { verts, edges } = parse(m, vert, edge);
-    // Determine map bounds
-    const { width, height, minX, minY } = getBounds(verts);
+    const { width, height, minX, minY } = bounds(verts);
     const scale = (20 * log(edges.length + 1)) / mag(max(width, height));
 
     const to = ({ x, y }: Point) => ({
@@ -78,11 +77,9 @@ export const parseMap = makeMapParser(
       resolve: (point) => {
         const a = from(point);
         const vert = minBy(verts, (b) => dist(a, b));
-        if (vert && dist(vert, a) < 2 / scale) {
-          return to(vert);
-        }
+        if (vert && dist(vert, a) < 2 / scale) return to(vert);
       },
-      getNode: ({ x, y }) => undefined,
+      getNode: () => undefined,
       to,
       from,
     };

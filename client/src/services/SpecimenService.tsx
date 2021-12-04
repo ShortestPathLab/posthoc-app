@@ -1,7 +1,7 @@
 import { Transport } from "client/Transport";
 import { Label } from "components/generic/Label";
 import { useSnackbar } from "components/generic/Snackbar";
-import { getRenderer } from "components/specimen-renderer/getRenderer";
+import { getRenderer } from "components/specimen-renderer";
 import { useConnectionResolver } from "hooks/useConnectionResolver";
 import { useMapContent } from "hooks/useMapContent";
 import { find } from "lodash";

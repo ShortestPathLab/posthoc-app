@@ -1,7 +1,7 @@
 import { Fade, LinearProgress } from "@material-ui/core";
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
-import { getRenderer } from "components/specimen-renderer/getRenderer";
+import { getRenderer } from "components/specimen-renderer";
 import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
 import { some, values } from "lodash";
 import { createElement, useState } from "react";
