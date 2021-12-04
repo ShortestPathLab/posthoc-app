@@ -10,23 +10,17 @@ import {
 import { hex } from "../colors";
 import { NodeList as Nodes } from "../raster-renderer/NodeList";
 import { Overlay } from "../raster-renderer/Overlay";
-import { getDefaults } from "./getDefaults";
-import { parseMap } from "./parseMap";
+import { parser } from "./parser";
 
 export type GridRendererProps = BaseRasterRendererProps;
 
 export function GridRenderer(props: GridRendererProps) {
   const [{ map: m }] = useSpecimen();
-  const [{ code, ...state }] = useUIState();
+  const [{ code, start, end }] = useUIState();
 
-  const [map, bgNodeColor, { start, end }] = useMemo(
-    () =>
-      [
-        parseMap(m),
-        constant(hex(blueGrey["500"])),
-        merge(getDefaults(m), { start: state.start, end: state.end }),
-      ] as const,
-    [m, state.start, state.end]
+  const [map, bgNodeColor] = useMemo(
+    () => [parser(m), constant(hex(blueGrey["500"]))] as const,
+    [m]
   );
 
   const {

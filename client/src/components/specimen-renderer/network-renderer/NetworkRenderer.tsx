@@ -12,8 +12,7 @@ import { scale } from "../raster-renderer/config";
 import { line, square } from "../raster-renderer/Draw";
 import { NodeList as Nodes } from "../raster-renderer/NodeList";
 import { Overlay } from "../raster-renderer/Overlay";
-import { getDefaults } from "./getDefaults";
-import { parseMap } from "./parseMap";
+import { parser } from "./parser";
 
 type NetworkRendererProps = BaseRasterRendererProps;
 
@@ -21,17 +20,16 @@ const vertOptions = { radius: 2 / scale };
 
 export function NetworkRenderer(props: NetworkRendererProps) {
   const [{ map: m }] = useSpecimen();
-  const [{ code, ...state }] = useUIState();
+  const [{ start, end }] = useUIState();
 
-  const [map, edgeColor, vertColor, { start, end }] = useMemo(
+  const [map, edgeColor, vertColor] = useMemo(
     () =>
       [
-        parseMap(m),
+        parser(m),
         constant(hex(blueGrey["100"])),
         constant(hex(blueGrey["500"])),
-        merge(getDefaults(m), { start: state.start, end: state.end }),
       ] as const,
-    [m, state.start, state.end]
+    [m]
   );
 
   const {

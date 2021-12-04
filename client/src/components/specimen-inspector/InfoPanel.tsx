@@ -1,8 +1,9 @@
-import { BoxProps, Button, Card, Fade, Tooltip } from "@material-ui/core";
+import { BoxProps, Button, Fade, Tooltip } from "@material-ui/core";
 import { SortTwoTone as StepsIcon } from "@material-ui/icons";
 import { TabContext, TabPanel } from "@material-ui/lab";
 import { Box } from "@material-ui/system";
 import { Flex } from "components/generic/Flex";
+import { PlaceholderCard } from "components/generic/PlaceholderCard";
 import { Toolbar } from "components/generic/Toolbar";
 import { startCase } from "lodash";
 import { useState } from "react";
@@ -51,11 +52,11 @@ export function InfoPanel(props: BoxProps) {
           },
           {
             key: "info",
-            content: <Card sx={{ m: 2, p: 2 }}>-</Card>,
+            content: <PlaceholderCard>No info to show.</PlaceholderCard>,
           },
           {
             key: "parameters",
-            content: <Card sx={{ m: 2, p: 2 }}>-</Card>,
+            content: <PlaceholderCard>No parameters to show.</PlaceholderCard>,
           },
         ].map(({ content, key }) => (
           <TabPanel

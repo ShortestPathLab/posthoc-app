@@ -1,5 +1,6 @@
 import { writeFile as write } from "fs/promises";
-import { indexOf, lastIndexOf } from "lodash";
+import { filter, indexOf, isUndefined, lastIndexOf } from "lodash";
+import { PathfindingTaskInstance } from "protocol/SolveTask";
 import tempy from "tempy";
 import { getMap, parseURI } from "../core/map";
 import { MapTypeKey } from "../core/maps";
@@ -25,13 +26,21 @@ function trim(out: string) {
   return out.substring(indexOf(out, "{"), lastIndexOf(out, "}") + 1);
 }
 
+function validateInstances(instances: PathfindingTaskInstance[]) {
+  const filtered = filter(
+    instances,
+    ({ start, end }) => ![start, end].includes(undefined)
+  );
+  return filtered.length ? filtered : undefined;
+}
+
 export const solve = [
   /**
    * Returns a pathfinding solution.
    */
   createMethod(
     "solve/pathfinding",
-    ({ algorithm, format, mapURI, ...params }) =>
+    ({ algorithm, format, mapURI, instances: inst }) =>
       usingFilePair(async (scenarioPath, mapPath) => {
         if (algorithm) {
           const { create, invoke } = handlers[format as MapTypeKey];
@@ -42,16 +51,19 @@ export const solve = [
             const m = getMap(mapURI);
             // Check if the URI references a valid map
             if (m) {
-              const scenario = create(m, params);
-              await Promise.all([
-                write(scenarioPath, scenario(mapPath), "utf-8"),
-                write(mapPath, m, "utf-8"),
-              ]);
-              const output = await invoke(algorithm, scenarioPath, mapPath);
-              if (output.length > MAX_SOLUTION_SIZE) {
-                throw new Error("Solution is too large.");
-              }
-              return JSON.parse(trim(output));
+              const instances = validateInstances(inst);
+              if (instances) {
+                const scenario = create(m, { instances: instances });
+                await Promise.all([
+                  write(scenarioPath, scenario(mapPath), "utf-8"),
+                  write(mapPath, m, "utf-8"),
+                ]);
+                const output = await invoke(algorithm, scenarioPath, mapPath);
+                if (output.length > MAX_SOLUTION_SIZE) {
+                  throw new Error("Solution is too large.");
+                }
+                return JSON.parse(trim(output));
+              } else return {};
             }
           } else return JSON.parse(content);
         } else throw new Error("Select an algorithm.");

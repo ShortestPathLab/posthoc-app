@@ -47,7 +47,7 @@ type Options = {
   edge?: string;
 };
 
-export const parseMap = makeMapParser(
+export const parser = makeMapParser(
   (m, { vert = "v", edge = "e" }: Options) => {
     const { verts, edges } = parse(m, vert, edge);
     const { width, height, minX, minY } = bounds(verts);
@@ -77,7 +77,7 @@ export const parseMap = makeMapParser(
       resolve: (point) => {
         const a = from(point);
         const vert = minBy(verts, (b) => dist(a, b));
-        if (vert && dist(vert, a) < 2 / scale) return to(vert);
+        if (vert && dist(vert, a) < 1.5 / scale) return to(vert);
       },
       getNode: () => undefined,
       to,

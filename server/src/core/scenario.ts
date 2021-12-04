@@ -1,4 +1,4 @@
-import { Dictionary } from "lodash";
+import { Dictionary, filter, isUndefined } from "lodash";
 import { constant, floor, join, last, map, split, first } from "lodash";
 import { roadhog, warthog } from "pathfinding-binaries";
 import { ParamsOf } from "protocol/Message";
@@ -25,10 +25,10 @@ export function grid(m: string, { instances }: Params) {
               path,
               width,
               height,
-              start % width,
-              floor(start / width),
-              end % width,
-              floor(end / width),
+              start! % width,
+              floor(start! / width),
+              end! % width,
+              floor(end! / width),
               0,
             ],
             " "

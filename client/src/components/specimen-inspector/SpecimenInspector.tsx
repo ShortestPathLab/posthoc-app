@@ -16,7 +16,7 @@ type SpecimenInspectorProps = {} & FlexProps;
 export function SpecimenInspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
   const [{ specimen, format, map }] = useSpecimen();
-  const [renderer] = getRenderer(format);
+  const renderer = getRenderer(format);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );

@@ -13,7 +13,7 @@ type Options = {
   wall?: string;
 };
 
-export const parseMap = makeMapParser((m, { wall = "@" }: Options) => {
+export const parser = makeMapParser((m, { wall = "@" }: Options) => {
   const lines = m.split("\n");
   const [, h, w, , ...grid] = lines;
   const [width, height] = [w, h].map((d) => +last(d.split(" "))!);

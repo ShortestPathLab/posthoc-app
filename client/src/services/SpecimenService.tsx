@@ -1,10 +1,9 @@
 import { Transport } from "client/Transport";
 import { Label } from "components/generic/Label";
 import { useSnackbar } from "components/generic/Snackbar";
-import { getRenderer } from "components/specimen-renderer";
 import { useConnectionResolver } from "hooks/useConnectionResolver";
 import { useMapContent } from "hooks/useMapContent";
-import { find } from "lodash";
+import { find, isEmpty } from "lodash";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
@@ -45,7 +44,6 @@ export function SpecimenService() {
     (signal) =>
       usingLoadingState(async () => {
         if (map?.format && map?.content) {
-          const [, defaults] = getRenderer(map.format);
           const entry = find(format, { id: map.format });
           if (entry) {
             const connection = resolve({ url: entry.source });
@@ -56,12 +54,7 @@ export function SpecimenService() {
                   {
                     algorithm,
                     format: map.format,
-                    instances: [
-                      {
-                        end: end ?? defaults(map.content)?.end,
-                        start: start ?? defaults(map.content)?.start,
-                      },
-                    ],
+                    instances: [{ end, start }],
                   },
                   connection.call
                 );
@@ -69,10 +62,14 @@ export function SpecimenService() {
                   setSpecimen(solution);
                   setUIState({ step: 0, playback: "paused", breakpoints: [] });
                   notify(
-                    <Label
-                      primary="Solution generated."
-                      secondary={`${solution.specimen.eventList?.length} steps`}
-                    />
+                    !isEmpty(solution.specimen) ? (
+                      <Label
+                        primary="Solution generated."
+                        secondary={`${solution.specimen.eventList?.length} steps`}
+                      />
+                    ) : (
+                      "Ready."
+                    )
                   );
                 }
               } catch (e: any) {

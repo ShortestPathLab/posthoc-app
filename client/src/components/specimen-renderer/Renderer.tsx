@@ -39,11 +39,6 @@ export type RendererProps = {
 
 export type Renderer = FunctionComponent<RendererProps>;
 
-export type RendererEntry = [
-  FunctionComponent<RendererProps>,
-  (map?: string) => PathfindingTaskInstance
-];
-
 export type RendererMap = {
-  [K in string]: RendererEntry;
+  [K in string]: FunctionComponent<RendererProps>;
 };

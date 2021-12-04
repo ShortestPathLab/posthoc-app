@@ -3,7 +3,7 @@ import { Trace } from "protocol/Trace";
 import { PathfindingTask } from "protocol/SolveTask";
 import { ParamsOf } from "protocol/Message";
 
-type Specimen = {
+export type Specimen = {
   specimen?: Trace;
   map?: string;
 } & Partial<ParamsOf<PathfindingTask>>;

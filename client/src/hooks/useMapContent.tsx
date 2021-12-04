@@ -1,3 +1,4 @@
+import { useSnackbar } from "components/generic/Snackbar";
 import { memoize as memo } from "lodash";
 import { useMemo } from "react";
 import { useAsync } from "react-async-hook";
@@ -6,6 +7,7 @@ import { Map, useUIState } from "slices/UIState";
 import { useConnectionResolver } from "./useConnectionResolver";
 
 export function useMapContent() {
+  const notify = useSnackbar();
   const usingLoadingState = useLoadingState("map");
   const resolve = useConnectionResolver();
   const [{ map }] = useUIState();
@@ -16,12 +18,13 @@ export function useMapContent() {
         if (source && id) {
           const connection = resolve({ url: source });
           if (connection) {
+            notify("Fetching map...");
             const result = await connection.call("features/map", { id });
             return result?.content;
           }
         }
       }, JSON.stringify),
-    [resolve]
+    [resolve, notify]
   );
 
   return useAsync(

@@ -95,7 +95,6 @@ export function BaseRasterRenderer({
       );
     } else return constant(true);
   }, [code, specimen?.eventList]);
-
   return (
     <RasterRenderer
       ref={setRef}

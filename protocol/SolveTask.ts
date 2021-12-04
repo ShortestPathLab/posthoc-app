@@ -17,11 +17,11 @@ export type PathfindingTaskInstance = {
   /**
    * The index of the start node.
    */
-  start: number;
+  start?: number;
   /**
    * The index of the end node.
    */
-  end: number;
+  end?: number;
 };
 
 type PathfindingTaskParams = {
