@@ -52,6 +52,7 @@ export const solve = [
             // Check if the URI references a valid map
             if (m) {
               const instances = validateInstances(inst);
+              // Check if there are any instances to solve
               if (instances) {
                 const scenario = create(m, { instances: instances });
                 await Promise.all([

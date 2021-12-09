@@ -4,7 +4,10 @@ import { isNull, isUndefined, keyBy } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useMemo } from "react";
 import { getColor } from "../colors";
-import { scale } from "./config";
+import { scale } from "../planar-renderer/config";
+import { Square } from "../planar-renderer/Draw";
+import { Point } from "../Renderer";
+import { Transform } from "../Transform";
 
 const WEIGHT = 3 / scale;
 
@@ -13,11 +16,12 @@ function defined<T>(obj: T): obj is Exclude<T, undefined | null> {
 }
 
 type PathProps = {
-  nodes?: TraceEvent[];
+  nodes?: TraceEvent<"x" | "y">[];
   step?: number;
+  transform: Transform<Point>;
 };
 
-export function Path({ nodes = [], step = 0 }: PathProps) {
+export function Path({ nodes = [], step = 0, transform: { to } }: PathProps) {
   const path = useMemo(() => {
     const memo = keyBy(nodes, "id");
     return (s: number) => {
@@ -36,12 +40,19 @@ export function Path({ nodes = [], step = 0 }: PathProps) {
     return (g: PixiGraphics) => {
       g.clear();
       for (const [i, node] of p.entries()) {
-        const { x = 0, y = 0 } = node?.variables ?? {};
-        g.lineTo(x + 0.5, y + 0.5);
+        const { x, y } = to({ x: 0, y: 0, ...node?.variables });
+        g.lineTo(x, y);
         if (!i) g.lineStyle(WEIGHT, getColor("source"));
       }
     };
-  }, [path, step]);
+  }, [path, step, to]);
 
-  return <Graphics draw={draw} />;
+  const point = to({ x: 0, y: 0, ...nodes[step]?.variables });
+
+  return (
+    <>
+      <Graphics draw={draw} />
+      {nodes?.[step] && <Square {...point} color={getColor("source")} />}
+    </>
+  );
 }

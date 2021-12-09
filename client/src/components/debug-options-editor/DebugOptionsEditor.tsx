@@ -63,7 +63,7 @@ export function DebugOptionsEditor() {
               variant="contained"
               disableElevation
               disabled={!specimen}
-              onClick={() => save(`${format} - ${algorithm}`, specimen)}
+              onClick={() => save(`${algorithm}.${format}`, specimen)}
             >
               Save Trace as JSON
             </Button>

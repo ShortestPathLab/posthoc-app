@@ -1,7 +1,7 @@
 import { BoxProps, Button, Fade, Tooltip } from "@material-ui/core";
 import { SortTwoTone as StepsIcon } from "@material-ui/icons";
 import { TabContext, TabPanel } from "@material-ui/lab";
-import { Box } from "@material-ui/system";
+import { alpha, Box } from "@material-ui/system";
 import { Flex } from "components/generic/Flex";
 import { PlaceholderCard } from "components/generic/PlaceholderCard";
 import { Toolbar } from "components/generic/Toolbar";
@@ -17,7 +17,12 @@ export function InfoPanel(props: BoxProps) {
     <TabContext value={tab}>
       <Flex
         vertical
-        sx={{ pointerEvents: "none" }}
+        sx={{
+          pointerEvents: "none",
+          transition: ({ transitions }) => transitions.create("background"),
+          bgcolor: ({ palette }) =>
+            tab ? alpha(palette.background.default, 0.72) : "transparent",
+        }}
         alignItems="center"
         {...props}
       >

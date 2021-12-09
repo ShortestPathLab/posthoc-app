@@ -1,7 +1,6 @@
 import { filter, flatMap as flat, last, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
-import { makeMapParser } from "../MapParser";
-import { Point } from "../Renderer";
+import { makeMapParser } from "../map-parser";
 
 const { floor } = Math;
 
@@ -18,11 +17,8 @@ export const parser = makeMapParser((m, { wall = "@" }: Options) => {
   const [, h, w, , ...grid] = lines;
   const [width, height] = [w, h].map((d) => +last(d.split(" "))!);
 
-  const to = ({ x, y }: Point) => ({ x: x + 0.5, y: y + 0.5 });
-  const from = ({ x, y }: Point) => ({ x: x - 0.5, y: y - 0.5 });
-
   return {
-    size: { x: width, y: height },
+    bounds: { width, height, minX: 0, minY: 0, maxX: width, maxY: height },
     nodes: {
       walls: filter(
         flat(grid, (row, y) =>
@@ -32,20 +28,19 @@ export const parser = makeMapParser((m, { wall = "@" }: Options) => {
         )
       ) as TraceEvent[],
     },
-    resolve: ({ x: x1, y: y1 }) => {
-      const [x, y] = [floor(x1), floor(y1)];
+    snap: ({ x: x1, y: y1 }, scale = 1) => {
+      const [x, y] = [floor(x1 + scale / 2), floor(y1 + scale / 2)];
       if (
         between(x, 0, width) &&
         between(y, 0, height) &&
         grid[y]?.[x] !== wall
       )
-        return to({ x, y });
+        return { x, y };
     },
-    getNode: (point) => {
-      const { x, y } = from(point);
+    nodeAt: (point) => {
+      const { x, y } = point;
       return y * width + x;
     },
-    to,
-    from,
+    pointOf: (node) => ({ x: node % width, y: ~~(node / width) }),
   };
 });

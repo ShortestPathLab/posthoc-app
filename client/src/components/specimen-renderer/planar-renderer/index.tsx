@@ -1,7 +1,7 @@
 import { Stage } from "@inlet/react-pixi";
 import { Box, BoxProps } from "@material-ui/core";
 import { ComponentProps, forwardRef, ReactNode } from "react";
-import { Viewport } from "../raster-renderer/Viewport";
+import { Viewport } from "./Viewport";
 import { RendererProps } from "../Renderer";
 
 type RasterRendererProps = RendererProps & {
@@ -11,7 +11,7 @@ type RasterRendererProps = RendererProps & {
   BoxProps?: BoxProps;
 };
 
-export const RasterRenderer = forwardRef<unknown, RasterRendererProps>(
+export const PlanarRenderer = forwardRef<unknown, RasterRendererProps>(
   ({ children, width, height, ViewportProps, StageProps, BoxProps }, ref) => (
     <Box {...BoxProps} ref={ref}>
       <Stage

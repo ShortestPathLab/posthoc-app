@@ -1,7 +1,5 @@
 import { TraceEvent } from "protocol/Trace";
 import { FunctionComponent } from "react";
-import { PathfindingTask, PathfindingTaskInstance } from "protocol/SolveTask";
-import { ParamsOf } from "protocol/Message";
 
 type Step = {
   index: number;
@@ -40,5 +38,5 @@ export type RendererProps = {
 export type Renderer = FunctionComponent<RendererProps>;
 
 export type RendererMap = {
-  [K in string]: FunctionComponent<RendererProps>;
+  [K in string]: Renderer;
 };

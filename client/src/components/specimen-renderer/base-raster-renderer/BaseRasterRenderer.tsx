@@ -1,41 +1,43 @@
 import { Stage } from "@inlet/react-pixi";
 import { call } from "components/script-editor/call";
 import { Point, RendererProps } from "components/specimen-renderer/Renderer";
-import { constant, delay, identity, memoize, throttle } from "lodash";
+import { constant, delay, memoize, throttle } from "lodash";
 import { ComponentProps, useCallback, useMemo, useState } from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { getColor } from "../colors";
-import { info } from "../info";
+import { info as selectionInfo } from "../info";
 import { byPoint, NodePredicate } from "../isNode";
-import { MapHandler } from "../MapParser";
-import { Guides } from "../raster-renderer/Guides";
+import { MapInfo } from "../map-parser/MapInfo";
 import {
   LazyNodeList as LazyNodes,
   NodeList as Nodes,
-} from "../raster-renderer/NodeList";
-import { Path } from "../raster-renderer/Path";
-import { ViewportEvent } from "../raster-renderer/PixiViewport";
-import { RasterRenderer } from "../raster-renderer/RasterRenderer";
-import { Selection } from "../raster-renderer/Selection";
+} from "../planar-renderer/NodeList";
+import { ViewportEvent } from "../planar-renderer/PixiViewport";
+import { PlanarRenderer } from "../planar-renderer";
+import { Selection } from "../planar-renderer/Selection";
+import { Transform } from "../Transform";
+import { Guides } from "./Guides";
+import { Path } from "./Path";
 
 export type BaseRasterRendererProps = {
+  map: MapInfo;
+  transform: Transform<Point>;
   isNode?: NodePredicate;
-} & Partial<MapHandler> &
-  RendererProps &
+} & RendererProps &
   Omit<ComponentProps<typeof Stage>, "onSelect">;
 
 export function BaseRasterRenderer({
-  size,
-  resolve,
-  getNode,
+  map,
+  transform,
   isNode = byPoint,
-  from = identity,
   onSelect,
   selection,
   children,
   ...props
 }: BaseRasterRendererProps) {
+  const info = { map, transform };
+
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const [{ specimen }] = useSpecimen();
   const [{ step = 0, code }] = useUIState();
@@ -43,44 +45,47 @@ export function BaseRasterRenderer({
   const [active, setActive] = useState<Point | undefined>(undefined);
   const [hover, setHover] = useState<Point | undefined>(undefined);
 
+  const { from, scale } = transform;
+  const { snap, nodeAt } = map;
+
   const handleClick = useCallback(
     ({ global, world }: ViewportEvent, step: number = 0) => {
       if (ref && specimen) {
         const { top, left } = ref.getBoundingClientRect();
-        const point = resolve?.(world);
+        const point = snap(from(world), scale);
         if (point) {
           onSelect?.({
             global: { x: left + global.x, y: top + global.y },
             world: point,
             info: {
-              ...info(specimen, step, getNode?.(point), (s) =>
-                isNode(s, from(point))
+              ...selectionInfo(specimen, step, nodeAt(point), (s) =>
+                isNode(s, point)
               ),
-              point: from(point),
+              point: point,
             },
           });
         }
       }
     },
-    [ref, onSelect, specimen, getNode, resolve, from, isNode]
+    [ref, onSelect, specimen, snap, scale, nodeAt, from, isNode]
   );
 
   const handleMouseEvent = useMemo(() => {
     let timeout = 0;
-    const resolveHover = throttle((p) => setHover(resolve?.(p)), 100);
+    const resolveHover = throttle((p) => setHover(snap(p, scale)), 100);
     return ({ world, event }: ViewportEvent) => {
       switch (event) {
         case "onMouseOver":
-          resolveHover(world);
+          resolveHover(from(world));
           setActive(undefined);
           clearTimeout(timeout);
           break;
         case "onMouseDown":
-          timeout = delay(() => setActive(resolve?.(world)), 100);
+          timeout = delay(() => setActive(snap(from(world), scale)), 100);
           break;
       }
     };
-  }, [resolve, setHover]);
+  }, [snap, setHover, from, scale]);
 
   const condition = useMemo(() => {
     if (code && specimen?.eventList) {
@@ -95,8 +100,9 @@ export function BaseRasterRenderer({
       );
     } else return constant(true);
   }, [code, specimen?.eventList]);
+
   return (
-    <RasterRenderer
+    <PlanarRenderer
       ref={setRef}
       StageProps={props}
       BoxProps={{ sx: { cursor: hover ? "pointer" : "auto" } }}
@@ -106,17 +112,18 @@ export function BaseRasterRenderer({
         onMouseOver: handleMouseEvent,
       }}
     >
-      <Nodes nodes={specimen?.eventList} />
+      <Nodes {...info} nodes={specimen?.eventList} />
       <LazyNodes
+        {...info}
         nodes={specimen?.eventList}
         step={step}
         color={getColor}
         condition={condition}
       />
       {children}
-      <Path nodes={specimen?.eventList} step={step} />
-      <Selection hover={hover} highlight={selection || active} />
-      <Guides width={size?.x} height={size?.y} alpha={0.24} grid={1} />
-    </RasterRenderer>
+      <Path {...info} nodes={specimen?.eventList} step={step} />
+      <Selection {...info} hover={hover} highlight={selection || active} />
+      <Guides {...info} alpha={0.24} grid={1} />
+    </PlanarRenderer>
   );
 }

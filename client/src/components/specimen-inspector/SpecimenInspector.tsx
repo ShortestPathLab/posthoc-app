@@ -1,4 +1,4 @@
-import { Fade, LinearProgress } from "@material-ui/core";
+import { Box, Fade, LinearProgress } from "@material-ui/core";
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { getRenderer } from "components/specimen-renderer";
@@ -30,14 +30,18 @@ export function SpecimenInspector(props: SpecimenInspectorProps) {
         {specimen ? (
           <Flex>
             <AutoSize>
-              {(size) =>
-                createElement(renderer, {
-                  ...size,
-                  key: map,
-                  onSelect: setSelection,
-                  selection: selection?.world,
-                })
-              }
+              {(size) => (
+                <Fade appear in>
+                  <Box>
+                    {createElement(renderer, {
+                      ...size,
+                      key: map,
+                      onSelect: setSelection,
+                      selection: selection?.world,
+                    })}
+                  </Box>
+                </Fade>
+              )}
             </AutoSize>
             <InfoPanel
               position="absolute"

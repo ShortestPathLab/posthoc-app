@@ -1,20 +1,24 @@
-export type Graphic = {
-  color?: number;
-  radius?: number;
+import { identity, merge } from "lodash";
+import { Point } from "./Renderer";
+
+type PointMapper = (point: Point) => Point;
+
+const optional =
+  (f: PointMapper) =>
+  ({ x, y }: Partial<Point> = {}) =>
+    x !== undefined && y !== undefined ? f({ x, y }) : undefined;
+
+export const coerce = (
+  { a, b, x, y, x1, x2, y1, y2, ...obj }: any = {},
+  to: PointMapper = identity
+) => {
+  const f = optional(to);
+  return merge(
+    obj,
+    { a: f({ x: x, y: y }) },
+    { a: f({ x: x1, y: y1 }) },
+    { b: f({ x: x2, y: y2 }) },
+    { a: f(a) },
+    { b: f(b) }
+  );
 };
-
-export type Line = {
-  weight?: number;
-  x1?: number;
-  y1?: number;
-  x2?: number;
-  y2?: number;
-};
-
-export type Node = Graphic & Line;
-
-export const coerce = (obj: any) => ({
-  x1: obj?.x,
-  y1: obj?.y,
-  ...obj,
-});

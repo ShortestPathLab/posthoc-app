@@ -1,18 +1,40 @@
+import { CircularProgress } from "@material-ui/core";
+import { SortOutlined as ListIcon } from "@material-ui/icons";
 import { Flex } from "components/generic/Flex";
 import {
   LazyList as List,
   LazyListHandle as ListHandle,
   LazyListProps as ListProps,
 } from "components/generic/LazyList";
+import { PlaceholderCard } from "components/generic/PlaceholderCard";
 import { delay } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useEffect, useRef } from "react";
+import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { EventInspector } from "./EventInspector";
-import { PlaceholderCard } from "components/generic/PlaceholderCard";
+
+function Placeholder() {
+  return (
+    <PlaceholderCard
+      sx={{
+        width: "100%",
+        height: "fit-content",
+      }}
+    >
+      <p>
+        <ListIcon />
+      </p>
+      <p>
+        Select a source & destination node on the map to see the steps here.
+      </p>
+    </PlaceholderCard>
+  );
+}
 
 export function EventListInspector(props: ListProps<TraceEvent>) {
+  const [loading] = useLoading();
   const [{ step = 0, playback }] = useUIState();
   const [{ specimen }] = useSpecimen();
   const ref = useRef<ListHandle | null>(null);
@@ -33,8 +55,10 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
   }, [step, playback]);
 
   return (
-    <Flex>
-      {specimen?.eventList?.length ? (
+    <Flex vertical alignItems="center">
+      {loading.map || loading.specimen ? (
+        <CircularProgress />
+      ) : specimen?.eventList?.length ? (
         <List
           {...props}
           items={specimen?.eventList}
@@ -51,18 +75,9 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
           )}
         />
       ) : (
-        <PlaceholderCard
-          sx={{
-            width: "100%",
-            height: "fit-content",
-          }}
-        >
-          <p>No solution has been generated.</p>
-          <p>
-            Select a source & destination node on the map to see the pathfinding
-            steps here.
-          </p>
-        </PlaceholderCard>
+        <Flex>
+          <Placeholder />
+        </Flex>
       )}
     </Flex>
   );

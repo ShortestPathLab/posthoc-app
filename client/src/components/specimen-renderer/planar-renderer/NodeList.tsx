@@ -3,15 +3,18 @@ import { constant, filter, floor, memoize, slice } from "lodash";
 import * as PIXI from "pixi.js";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { useCallback, useMemo } from "react";
-import { coerce, Node } from "../Node";
-import { box } from "./Draw";
+import { Transform } from "../Transform";
+import { coerce } from "../Node";
+import { Point } from "../Renderer";
+import { box, NodeOptions } from "./Draw";
 
 type Props = {
   nodes: Trace["eventList"];
   color?: (type?: TraceEventType) => number;
-  variant?: (g: PIXI.Graphics, options: Node) => PIXI.Graphics;
+  variant?: (g: PIXI.Graphics, options: NodeOptions) => PIXI.Graphics;
   condition?: (step: number) => boolean;
-  options?: Node;
+  transform: Transform<Point>;
+  options?: NodeOptions;
 };
 
 const defaultCondition = constant(true);
@@ -22,6 +25,7 @@ export function NodeList({
   variant = box,
   condition = defaultCondition,
   options,
+  transform: { to },
 }: Props) {
   const memo = useMemo(
     () => filter(nodes, (_, i) => condition(i)),
@@ -32,15 +36,14 @@ export function NodeList({
       g.clear();
       for (const { variables: v, type } of memo) {
         variant(g, {
-          ...coerce(v),
+          ...coerce(v, to),
           color: color?.(type) ?? 0xf1f1f1,
-          radius: 0.25,
           ...options,
         });
       }
       return g;
     },
-    [memo, color, variant, options]
+    [memo, color, variant, options, to]
   );
   return <Graphics draw={draw} />;
 }
