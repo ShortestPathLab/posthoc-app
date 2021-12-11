@@ -1,7 +1,7 @@
 import { Bounds } from "./Bounds";
 import { Point } from "./Renderer";
 
-export type Transform<T = Point> = Bounds & {
+export type Scale<T = Point> = Bounds & {
   scale: number;
   /**
    * Transform from world coordinate space to renderer coordinate space.

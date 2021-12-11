@@ -3,7 +3,7 @@ import { MapInfo } from "../map-parser/MapInfo";
 import { scale } from "../planar-renderer/config";
 import { makeGraphic } from "../planar-renderer/makeGraphic";
 import { Point } from "../Renderer";
-import { Transform } from "../Transform";
+import { Scale } from "../Scale";
 
 const WEIGHT = 1 / scale;
 
@@ -26,10 +26,10 @@ const Grid = makeGraphic<Props>(
 );
 
 export function Guides({
-  transform: { minX, minY, maxX, maxY, to },
+  scale: { minX, minY, maxX, maxY, to },
   grid = 5,
   alpha,
-}: Props & { map: MapInfo; transform: Transform<Point> }) {
+}: Props & { map: MapInfo; scale: Scale<Point> }) {
   const a = to({ x: minX, y: minY });
   const b = to({ x: maxX, y: maxY });
   return (

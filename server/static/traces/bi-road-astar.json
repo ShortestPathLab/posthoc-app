@@ -1,4 +1,4 @@
-{"nodeStructure": [{"type": "circle", "variables": {"cx": "x", "cy": "y"}, "persisted": true, "drawPath": true},{"type": "line", "variables": {"x1": "parent:x", "y1": "parent:y", "x2": "x", "y2": "y"}, "persisted": true}], "eventList" : [
+{"format": "xy", "nodeStructure": [{"type": "circle", "variables": {"cx": "x", "cy": "y"}, "persisted": true, "drawPath": true},{"type": "line", "variables": {"x1": "parent:x", "y1": "parent:y", "x2": "x", "y2": "y"}, "persisted": true}], "eventList" : [
 {"type":"source","id":"f-42","variables":{"x":-73533430,"y":41103106}},
 {"type":"destination","id":"b-142","variables":{"x":-73589170,"y":41118596}},
 {"type":"generating","id":"f-42","variables":{"x":-73533430,"y":41103106},"g":0,"f":0.578523,"pId":null},

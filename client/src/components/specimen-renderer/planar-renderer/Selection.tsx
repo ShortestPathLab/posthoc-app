@@ -1,15 +1,15 @@
 import { Point } from "components/specimen-renderer/Renderer";
 import { map } from "lodash";
-import { Transform } from "../Transform";
+import { Scale } from "../Scale";
 import { Selected } from "./Selected";
 
 type Props = {
   hover?: Point;
   highlight?: Point;
-  transform: Transform<Point>;
+  scale: Scale<Point>;
 };
 
-export function Selection({ transform: { to }, hover, highlight }: Props) {
+export function Selection({ scale: { to }, hover, highlight }: Props) {
   return (
     <>
       {map(

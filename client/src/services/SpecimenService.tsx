@@ -15,7 +15,7 @@ import { hashAsync as hash } from "workers/async";
 
 async function solve(
   map: string,
-  params: Omit<ParamsOf<PathfindingTask>, "mapURI">,
+  { format, ...params }: Omit<ParamsOf<PathfindingTask>, "mapURI">,
   call: Transport["call"]
 ) {
   if (map) {
@@ -23,9 +23,15 @@ async function solve(
       `hash:${await hash(map)}`,
       `map:${encodeURIComponent(map)}`,
     ] as const) {
-      const p = { ...params, mapURI };
+      const p = { ...params, format, mapURI };
       const specimen = await call("solve/pathfinding", p);
-      if (specimen) return { ...p, specimen, map };
+      if (specimen)
+        return {
+          ...p,
+          specimen,
+          map,
+          format: specimen.format ?? format,
+        };
     }
   }
 }

@@ -1,4 +1,4 @@
-{"nodeStructure": [{"type": "circle", "variables": {"cx": "x", "cy": "y"}, "persisted": true, "drawPath": true},{"type": "line", "variables": {"x1": "parent:x", "y1": "parent:y", "x2": "x", "y2": "y"}, "persisted": true}],
+{"format": "xy", "nodeStructure": [{"type": "circle", "variables": {"cx": "x", "cy": "y"}, "persisted": true, "drawPath": true},{"type": "line", "variables": {"x1": "parent:x", "y1": "parent:y", "x2": "x", "y2": "y"}, "persisted": true}],
 "eventList":[
 {"type":"source","id":41,"variables":{"x":-73533430,"y":41103106}},
 {"type":"destination","id":141,"variables":{"x":-73589170,"y":41118596}},

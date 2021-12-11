@@ -1,4 +1,4 @@
-import { map, maxBy, minBy } from "lodash";
+import { maxBy, minBy } from "lodash";
 import { Trace } from "protocol/Trace";
 import { MapInfo } from "../map-parser/MapInfo";
 import { Point } from "../Renderer";
@@ -11,10 +11,19 @@ const mag = (n: number) => 10 ** ~~log10(n);
 
 const keys = ["x", "y"] as const;
 
+const pairs = [
+  ["cx", "cy"],
+  ["x1", "y1"],
+  ["x2", "y2"],
+] as const;
+
 export function normalize(m: MapInfo<Nodes>, specimen?: Trace) {
-  const verts = map(
-    [...m.nodes.verts, ...(specimen?.eventList ?? [])],
-    "variables"
+  const verts = [...m.nodes.edges, ...(specimen?.eventList ?? [])].flatMap(
+    ({ variables }) =>
+      pairs.map(([x, y]) => ({
+        x: variables?.[x],
+        y: variables?.[y],
+      }))
   );
 
   const [[minX, minY], [maxX, maxY]] = [minBy, maxBy].map((f) =>

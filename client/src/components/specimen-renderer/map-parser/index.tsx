@@ -1,8 +1,8 @@
 import { Dictionary } from "lodash";
 import memo from "memoizee";
 import { Trace } from "protocol/Trace";
-import { Transform } from "../Transform";
 import { Point } from "../Renderer";
+import { Scale } from "../Scale";
 import { MapInfo } from "./MapInfo";
 
 export type MapParser<T extends {} = {}, M extends Dictionary<string> = {}> = (
@@ -10,10 +10,14 @@ export type MapParser<T extends {} = {}, M extends Dictionary<string> = {}> = (
   options?: Partial<T>
 ) => MapInfo<M>;
 
-export type MapParserOptions<T extends {}, M extends Dictionary<string>> = {
+export type MapParserOptions<
+  T extends {},
+  M extends Dictionary<string>,
+  K extends string
+> = {
   parse: MapParser<T, M>;
   options?: Partial<T>;
-  normalize: (m: MapInfo<M>, specimen?: Trace) => Transform<Point>;
+  normalize: (m: MapInfo<M>, specimen?: Trace<K>) => Scale<Point>;
 };
 
 export function makeMapParser<T, M extends Dictionary<string>>(

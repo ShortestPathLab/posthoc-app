@@ -8,6 +8,8 @@ const optional =
   ({ x, y }: Partial<Point> = {}) =>
     x !== undefined && y !== undefined ? f({ x, y }) : undefined;
 
+export type EventToPropsMapper<T, U> = (a?: T) => U;
+
 export const coerce = (
   { a, b, x, y, x1, x2, y1, y2, ...obj }: any = {},
   to: PointMapper = identity

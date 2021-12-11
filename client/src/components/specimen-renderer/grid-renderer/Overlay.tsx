@@ -2,20 +2,15 @@ import { getColor } from "../colors";
 import { MapInfo } from "../map-parser/MapInfo";
 import { Square } from "../planar-renderer/Draw";
 import { Point } from "../Renderer";
-import { Transform } from "../Transform";
+import { Scale } from "../Scale";
 
 type OverlayProps = {
-  map: MapInfo;
-  transform: Transform<Point>;
+  map?: MapInfo;
+  scale?: Scale<Point>;
   start?: number;
   end?: number;
 };
-export function Overlay({
-  start,
-  end,
-  map: { pointOf },
-  transform: { to },
-}: OverlayProps) {
+export function Overlay({ start, end, map, scale }: OverlayProps) {
   return (
     <>
       {[
@@ -25,7 +20,7 @@ export function Overlay({
         ({ color, node }, i) =>
           node !== undefined && (
             <Square
-              {...to({ x: 0, y: 0, ...pointOf(node) })}
+              {...scale?.to?.({ x: 0, y: 0, ...map?.pointOf?.(node) })}
               key={i}
               color={color}
             />

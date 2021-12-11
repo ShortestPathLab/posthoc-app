@@ -1,21 +1,18 @@
-import { blueGrey } from "@material-ui/core/colors";
-import { constant } from "lodash";
-import { BaseRenderer } from "../base-renderer/BaseRenderer";
-import { hex } from "../colors";
+import { useSpecimen } from "slices/specimen";
+import { useUIState } from "slices/UIState";
+import { BaseRenderer } from "../base-renderer";
+import { Path } from "../base-renderer/Path";
 import { useMap } from "../map-parser/useMap";
-import { scale } from "../planar-renderer/config";
 import { line, square } from "../planar-renderer/Draw";
 import { NodeList as Nodes } from "../planar-renderer/NodeList";
 import { RendererProps } from "../Renderer";
-import { parse } from "./parse";
 import { normalize } from "./normalize";
-
-export const vertOptions = { radius: 2 / scale };
-
-export const edgeColor = constant(hex(blueGrey["100"]));
-export const vertColor = constant(hex(blueGrey["500"]));
+import { edgeOptions, vertOptions } from "./options";
+import { parse } from "./parse";
 
 export function NetworkRenderer(props: RendererProps) {
+  const [{ specimen }] = useSpecimen();
+  const [{ step }] = useUIState();
   const info = useMap({ parse: parse, normalize: normalize });
 
   const {
@@ -26,14 +23,9 @@ export function NetworkRenderer(props: RendererProps) {
 
   return (
     <BaseRenderer {...info} {...props}>
-      <Nodes {...info} nodes={edges} color={edgeColor} variant={line} />
-      <Nodes
-        {...info}
-        nodes={verts}
-        color={vertColor}
-        variant={square}
-        options={vertOptions}
-      />
+      <Nodes nodes={edges} options={edgeOptions} variant={line} />
+      <Nodes nodes={verts} options={vertOptions} variant={square} />
+      <Path {...info} nodes={specimen?.eventList} step={step} />
     </BaseRenderer>
   );
 }

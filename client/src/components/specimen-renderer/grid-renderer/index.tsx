@@ -1,19 +1,18 @@
-import { blueGrey } from "@material-ui/core/colors";
-import { constant } from "lodash";
+import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { BaseRenderer } from "../base-renderer/BaseRenderer";
-import { hex } from "../colors";
+import { BaseRenderer } from "../base-renderer";
+import { Path } from "../base-renderer/Path";
 import { useMap } from "../map-parser/useMap";
 import { NodeList as Nodes } from "../planar-renderer/NodeList";
 import { RendererProps } from "../Renderer";
+import { normalize } from "./normalize";
+import { wallOptions } from "./options";
 import { Overlay } from "./Overlay";
 import { parse } from "./parse";
-import { normalize } from "./normalize";
-
-const wallColor = constant(hex(blueGrey["500"]));
 
 export function GridRenderer(props: RendererProps) {
-  const [{ start, end }] = useUIState();
+  const [{ specimen }] = useSpecimen();
+  const [{ start, end, step }] = useUIState();
 
   const info = useMap({ parse, normalize });
 
@@ -25,8 +24,9 @@ export function GridRenderer(props: RendererProps) {
 
   return (
     <BaseRenderer {...info} {...props}>
-      <Nodes {...info} nodes={walls} color={wallColor} />
-      <Overlay {...info} start={start} end={end} />
+      <Nodes nodes={walls} options={wallOptions} />
+      <Overlay start={start} end={end} />
+      <Path {...info} nodes={specimen?.eventList} step={step} />
     </BaseRenderer>
   );
 }

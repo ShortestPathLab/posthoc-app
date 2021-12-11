@@ -2,41 +2,56 @@ import { Stage } from "@inlet/react-pixi";
 import { call } from "components/script-editor/call";
 import { Point, RendererProps } from "components/specimen-renderer/Renderer";
 import { constant, delay, memoize, throttle } from "lodash";
-import { ComponentProps, useCallback, useMemo, useState } from "react";
+import {
+  cloneElement,
+  ComponentProps,
+  ReactElement,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { getColor } from "../colors";
 import { info as selectionInfo } from "../info";
 import { byPoint, NodePredicate } from "../isNode";
 import { MapInfo } from "../map-parser/MapInfo";
+import { PlanarRenderer } from "../planar-renderer";
 import {
   LazyNodeList as LazyNodes,
   NodeList as Nodes,
+  Props as NodesProps,
 } from "../planar-renderer/NodeList";
 import { ViewportEvent } from "../planar-renderer/PixiViewport";
-import { PlanarRenderer } from "../planar-renderer";
 import { Selection } from "../planar-renderer/Selection";
-import { Transform } from "../Transform";
+import { Scale } from "../Scale";
 import { Guides } from "./Guides";
-import { Path } from "./Path";
+import {
+  progressOptions as defaultProgressOptions,
+  shadowOptions as defaultShadowOptions,
+} from "./options";
 
-export type BaseRasterRendererProps = {
+export type BaseRendererProps = {
   map: MapInfo;
-  transform: Transform<Point>;
+  scale: Scale<Point>;
   isNode?: NodePredicate;
+  ProgressProps?: NodesProps<string>;
+  ShadowProps?: NodesProps<string>;
+  children?: ReactElement[];
 } & RendererProps &
-  Omit<ComponentProps<typeof Stage>, "onSelect">;
+  Omit<ComponentProps<typeof Stage>, "onSelect" | "children">;
 
 export function BaseRenderer({
   map,
-  transform,
+  scale,
   isNode = byPoint,
   onSelect,
   selection,
   children,
+  ShadowProps: shadowOptions,
+  ProgressProps: progressOptions,
   ...props
-}: BaseRasterRendererProps) {
-  const info = { map, transform };
+}: BaseRendererProps) {
+  const info = { map, scale };
 
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const [{ specimen }] = useSpecimen();
@@ -45,14 +60,14 @@ export function BaseRenderer({
   const [active, setActive] = useState<Point>();
   const [hover, setHover] = useState<Point>();
 
-  const { from, scale } = transform;
+  const { from, scale: s } = scale;
   const { snap, nodeAt } = map;
 
   const handleClick = useCallback(
     ({ global, world }: ViewportEvent, step: number = 0) => {
       if (ref && specimen) {
         const { top, left } = ref.getBoundingClientRect();
-        const point = snap(from(world), scale);
+        const point = snap(from(world), s);
         if (point) {
           onSelect?.({
             global: { x: left + global.x, y: top + global.y },
@@ -67,12 +82,12 @@ export function BaseRenderer({
         }
       }
     },
-    [ref, onSelect, specimen, snap, scale, nodeAt, from, isNode]
+    [ref, onSelect, specimen, snap, s, nodeAt, from, isNode]
   );
 
   const handleMouseEvent = useMemo(() => {
     let timeout = 0;
-    const resolveHover = throttle((p) => setHover(snap(p, scale)), 100);
+    const resolveHover = throttle((p) => setHover(snap(p, s)), 100);
     return ({ world, event }: ViewportEvent) => {
       switch (event) {
         case "onMouseOver":
@@ -81,11 +96,11 @@ export function BaseRenderer({
           clearTimeout(timeout);
           break;
         case "onMouseDown":
-          timeout = delay(() => setActive(snap(from(world), scale)), 100);
+          timeout = delay(() => setActive(snap(from(world), s)), 100);
           break;
       }
     };
-  }, [snap, setHover, from, scale]);
+  }, [snap, setHover, from, s]);
 
   const condition = useMemo(() => {
     if (code && specimen?.eventList) {
@@ -112,16 +127,21 @@ export function BaseRenderer({
         onMouseOver: handleMouseEvent,
       }}
     >
-      <Nodes {...info} nodes={specimen?.eventList} />
+      <Nodes
+        options={defaultShadowOptions}
+        {...shadowOptions}
+        {...info}
+        nodes={specimen?.eventList}
+      />
       <LazyNodes
+        options={defaultProgressOptions}
+        {...progressOptions}
         {...info}
         nodes={specimen?.eventList}
         step={step}
-        color={getColor}
         condition={condition}
       />
-      {children}
-      <Path {...info} nodes={specimen?.eventList} step={step} />
+      {children?.map((c) => cloneElement(c, info))}
       <Selection {...info} hover={hover} highlight={selection || active} />
       <Guides {...info} alpha={0.24} grid={1} />
     </PlanarRenderer>

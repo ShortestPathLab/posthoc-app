@@ -1,32 +1,29 @@
 import { Graphics } from "@inlet/react-pixi";
-import { constant, filter, floor, memoize, slice } from "lodash";
+import { constant, filter, floor, identity, memoize, slice } from "lodash";
 import * as PIXI from "pixi.js";
-import { Trace, TraceEventType } from "protocol/Trace";
+import { Trace } from "protocol/Trace";
 import { useCallback, useMemo } from "react";
-import { Transform } from "../Transform";
-import { coerce } from "../Node";
 import { Point } from "../Renderer";
-import { box, NodeOptions } from "./Draw";
+import { Scale } from "../Scale";
+import { box, NodeOptions, NodeOptionsMapper } from "./Draw";
 
-type Props = {
-  nodes: Trace["eventList"];
-  color?: (type?: TraceEventType) => number;
+export type Props<T extends string> = {
+  nodes?: Trace<T>["eventList"];
   variant?: (g: PIXI.Graphics, options: NodeOptions) => PIXI.Graphics;
   condition?: (step: number) => boolean;
-  transform: Transform<Point>;
-  options?: NodeOptions;
+  scale?: Scale<Point>;
+  options?: NodeOptionsMapper<T>;
 };
 
 const defaultCondition = constant(true);
 
-export function NodeList({
+export function NodeList<T extends string>({
   nodes,
-  color,
   variant = box,
   condition = defaultCondition,
-  options,
-  transform: { to },
-}: Props) {
+  scale,
+  options = identity,
+}: Props<T>) {
   const memo = useMemo(
     () => filter(nodes, (_, i) => condition(i)),
     [nodes, condition]
@@ -34,23 +31,17 @@ export function NodeList({
   const draw = useCallback(
     (g: PIXI.Graphics) => {
       g.clear();
-      for (const { variables: v, type } of memo) {
-        variant(g, {
-          ...coerce(v, to),
-          color: color?.(type) ?? 0xf1f1f1,
-          ...options,
-        });
-      }
+      for (const s of memo) variant(g, options(s, scale));
       return g;
     },
-    [memo, color, variant, options, to]
+    [memo, variant, scale, options]
   );
   return <Graphics draw={draw} />;
 }
 
 const down = (n: number, a: number = 1) => floor(n / a) * a;
 
-export function LazyNodeList({
+export function LazyNodeList<T extends string>({
   nodes,
   step = 0,
   size = 2500,
@@ -59,7 +50,7 @@ export function LazyNodeList({
 }: {
   step?: number;
   size?: number;
-} & Props) {
+} & Props<T>) {
   const threshold = down(step, size);
 
   const chunk = useMemo(

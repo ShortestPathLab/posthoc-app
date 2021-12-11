@@ -16,12 +16,12 @@ function defined<T>(obj: T): obj is Exclude<T, undefined | null> {
 }
 
 type PathProps = {
-  nodes?: TraceEvent<"x" | "y">[];
+  nodes?: TraceEvent<"cx" | "cy">[];
   step?: number;
-  scale: Scale<Point>;
+  scale?: Scale<Point>;
 };
 
-export function Path({ nodes = [], step = 0, scale: { to } }: PathProps) {
+export function Path({ nodes = [], step = 0, scale }: PathProps) {
   const path = useMemo(() => {
     const memo = keyBy(nodes, "id");
     return (s: number) => {
@@ -40,19 +40,22 @@ export function Path({ nodes = [], step = 0, scale: { to } }: PathProps) {
     return (g: PixiGraphics) => {
       g.clear();
       for (const [i, node] of p.entries()) {
-        const { x, y } = to({ x: 0, y: 0, ...node?.variables });
+        const { cx, cy } = node?.variables ?? {};
+        const { x = 0, y = 0 } = scale?.to?.({ x: cx, y: cy }) ?? {};
         g.lineTo(x, y);
         if (!i) g.lineStyle(WEIGHT, getColor("source"));
       }
     };
-  }, [path, step, to]);
+  }, [path, step, scale]);
 
-  const point = to({ x: 0, y: 0, ...nodes[step]?.variables });
+  const { cx = 0, cy = 0 } = nodes[step]?.variables ?? {};
 
   return (
     <>
       <Graphics draw={draw} />
-      {nodes?.[step] && <Square {...point} color={getColor("source")} />}
+      {nodes?.[step] && (
+        <Square {...scale?.to?.({ x: cx, y: cy })} color={getColor("source")} />
+      )}
     </>
   );
 }
