@@ -3,14 +3,14 @@ import { useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
 import { MapParserOptions } from "./index";
 
-export function useMapInfo<T extends {}, M extends Dictionary<string>>({
-  parser,
+export function useMap<T extends {}, M extends Dictionary<string>>({
+  parse,
   options,
-  transformer,
+  normalize,
 }: MapParserOptions<T, M>) {
   const [{ map, specimen }] = useSpecimen();
-  const m = useMemo(() => parser(map ?? "", options), [map, parser, options]);
-  const t = useMemo(() => transformer(m, specimen), [m, specimen, transformer]);
+  const m = useMemo(() => parse(map ?? "", options), [map, parse, options]);
+  const t = useMemo(() => normalize(m, specimen), [m, specimen, normalize]);
   return useMemo(
     () => ({
       map: m,

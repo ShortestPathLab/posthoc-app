@@ -1,14 +1,14 @@
 import { blueGrey } from "@material-ui/core/colors";
 import { constant } from "lodash";
-import { BaseRasterRenderer } from "../base-raster-renderer/BaseRasterRenderer";
+import { BaseRenderer } from "../base-renderer/BaseRenderer";
 import { hex } from "../colors";
-import { useMapInfo } from "../map-parser/useMapInfo";
+import { useMap } from "../map-parser/useMap";
 import { scale } from "../planar-renderer/config";
 import { line, square } from "../planar-renderer/Draw";
 import { NodeList as Nodes } from "../planar-renderer/NodeList";
 import { RendererProps } from "../Renderer";
-import { parser } from "./parser";
-import { transformer } from "./transformer";
+import { parse } from "./parse";
+import { normalize } from "./normalize";
 
 export const vertOptions = { radius: 2 / scale };
 
@@ -16,7 +16,7 @@ export const edgeColor = constant(hex(blueGrey["100"]));
 export const vertColor = constant(hex(blueGrey["500"]));
 
 export function NetworkRenderer(props: RendererProps) {
-  const info = useMapInfo({ parser, transformer });
+  const info = useMap({ parse: parse, normalize: normalize });
 
   const {
     map: {
@@ -25,7 +25,7 @@ export function NetworkRenderer(props: RendererProps) {
   } = info;
 
   return (
-    <BaseRasterRenderer {...info} {...props}>
+    <BaseRenderer {...info} {...props}>
       <Nodes {...info} nodes={edges} color={edgeColor} variant={line} />
       <Nodes
         {...info}
@@ -34,6 +34,6 @@ export function NetworkRenderer(props: RendererProps) {
         variant={square}
         options={vertOptions}
       />
-    </BaseRasterRenderer>
+    </BaseRenderer>
   );
 }

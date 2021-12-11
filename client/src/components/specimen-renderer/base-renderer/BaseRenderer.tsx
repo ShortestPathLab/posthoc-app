@@ -27,7 +27,7 @@ export type BaseRasterRendererProps = {
 } & RendererProps &
   Omit<ComponentProps<typeof Stage>, "onSelect">;
 
-export function BaseRasterRenderer({
+export function BaseRenderer({
   map,
   transform,
   isNode = byPoint,
@@ -42,8 +42,8 @@ export function BaseRasterRenderer({
   const [{ specimen }] = useSpecimen();
   const [{ step = 0, code }] = useUIState();
 
-  const [active, setActive] = useState<Point | undefined>(undefined);
-  const [hover, setHover] = useState<Point | undefined>(undefined);
+  const [active, setActive] = useState<Point>();
+  const [hover, setHover] = useState<Point>();
 
   const { from, scale } = transform;
   const { snap, nodeAt } = map;

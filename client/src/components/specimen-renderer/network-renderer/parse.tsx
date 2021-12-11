@@ -31,7 +31,7 @@ export type Nodes = {
   edges: "x1" | "x2" | "y1" | "y2";
 };
 
-export const parser = makeMapParser<Options, Nodes>(
+export const parse = makeMapParser<Options, Nodes>(
   (m, { vert = "v", edge = "e" }: Options) => {
     const lines = m.split("\n");
 

@@ -9,10 +9,11 @@ export type MapParser<T extends {} = {}, M extends Dictionary<string> = {}> = (
   map?: string,
   options?: Partial<T>
 ) => MapInfo<M>;
+
 export type MapParserOptions<T extends {}, M extends Dictionary<string>> = {
-  parser: MapParser<T, M>;
+  parse: MapParser<T, M>;
   options?: Partial<T>;
-  transformer: (m: MapInfo<M>, specimen?: Trace) => Transform<Point>;
+  normalize: (m: MapInfo<M>, specimen?: Trace) => Transform<Point>;
 };
 
 export function makeMapParser<T, M extends Dictionary<string>>(

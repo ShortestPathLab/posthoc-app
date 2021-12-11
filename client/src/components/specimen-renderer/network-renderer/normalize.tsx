@@ -3,7 +3,7 @@ import { Trace } from "protocol/Trace";
 import { MapInfo } from "../map-parser/MapInfo";
 import { Point } from "../Renderer";
 import { Transform } from "../Transform";
-import { Nodes } from "./parser";
+import { Nodes } from "./parse";
 
 const { max, log10 } = Math;
 
@@ -11,7 +11,7 @@ const mag = (n: number) => 10 ** ~~log10(n);
 
 const keys = ["x", "y"] as const;
 
-export function transformer(m: MapInfo<Nodes>, specimen?: Trace) {
+export function normalize(m: MapInfo<Nodes>, specimen?: Trace) {
   const verts = map(
     [...m.nodes.verts, ...(specimen?.eventList ?? [])],
     "variables"
