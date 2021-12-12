@@ -64,7 +64,7 @@ export const solve = [
                   throw new Error("Solution is too large.");
                 }
                 return JSON.parse(trim(output));
-              } else return {};
+              } else throw new Error("Nothing to solve.");
             }
           } else return JSON.parse(content);
         } else throw new Error("Select an algorithm.");

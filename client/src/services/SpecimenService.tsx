@@ -9,7 +9,7 @@ import { PathfindingTask } from "protocol/SolveTask";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
-import { useSpecimen } from "slices/specimen";
+import { Specimen, useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { hashAsync as hash } from "workers/async";
 
@@ -17,21 +17,25 @@ async function solve(
   map: string,
   { format, ...params }: Omit<ParamsOf<PathfindingTask>, "mapURI">,
   call: Transport["call"]
-) {
+): Promise<Specimen | undefined> {
   if (map) {
     for (const mapURI of [
       `hash:${await hash(map)}`,
       `map:${encodeURIComponent(map)}`,
     ] as const) {
       const p = { ...params, format, mapURI };
-      const specimen = await call("solve/pathfinding", p);
-      if (specimen)
-        return {
-          ...p,
-          specimen,
-          map,
-          format: specimen.format ?? format,
-        };
+      try {
+        const specimen = await call("solve/pathfinding", p);
+        if (specimen)
+          return {
+            ...p,
+            specimen,
+            map,
+            format: specimen?.format ?? format,
+          };
+      } catch (e: any) {
+        return { ...p, specimen: {}, map, format, error: e.message };
+      }
     }
   }
 }
@@ -54,33 +58,28 @@ export function SpecimenService() {
           if (entry) {
             const connection = resolve({ url: entry.source });
             if (connection) {
-              try {
-                const solution = await solve(
-                  map.content,
-                  {
-                    algorithm,
-                    format: map.format,
-                    instances: [{ end, start }],
-                  },
-                  connection.call
-                );
-                if (solution && !signal.aborted) {
-                  setSpecimen(solution);
-                  setUIState({ step: 0, playback: "paused", breakpoints: [] });
-                  notify(
-                    !isEmpty(solution.specimen) ? (
+              const solution = await solve(
+                map.content,
+                {
+                  algorithm,
+                  format: map.format,
+                  instances: [{ end, start }],
+                },
+                connection.call
+              );
+              if (solution && !signal.aborted) {
+                setSpecimen(solution);
+                setUIState({ step: 0, playback: "paused", breakpoints: [] });
+                notify(
+                  solution.error ??
+                    (!isEmpty(solution.specimen) ? (
                       <Label
                         primary="Solution generated."
-                        secondary={`${solution.specimen.eventList?.length} steps`}
+                        secondary={`${solution.specimen?.eventList?.length} steps`}
                       />
                     ) : (
                       "Ready."
-                    )
-                  );
-                }
-              } catch (e: any) {
-                notify(
-                  <Label primary={`${e.message}`} secondary={connection.name} />
+                    ))
                 );
               }
             } else
