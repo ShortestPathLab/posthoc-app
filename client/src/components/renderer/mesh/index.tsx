@@ -6,7 +6,7 @@ import { tri } from "../raster/Draw";
 import { LazyNodeList as LazyNodes } from "../raster/NodeList";
 import { RendererProps } from "../Renderer";
 import { normalize } from "./normalize";
-import { progressOptions, shadowOptions } from "./options";
+import { progressOptions, shadowOptions, options } from "./options";
 import { parse } from "./parse";
 import { Path } from "./Path";
 
@@ -22,14 +22,15 @@ export function MeshRenderer(props: RendererProps) {
       {...props}
       ShadowProps={{ variant: tri, options: shadowOptions }}
       ProgressProps={{ variant: tri, options: progressOptions }}
-    >
-      <LazyNodes
-        {...info}
-        nodes={specimen?.eventList}
-        step={step}
-        options={progressOptions}
-      />
-      <Path {...info} nodes={specimen?.eventList} step={step} />
-    </PlanarRenderer>
+      overlay={[
+        <LazyNodes
+          {...info}
+          nodes={specimen?.eventList}
+          step={step}
+          options={options}
+        />,
+        <Path {...info} nodes={specimen?.eventList} step={step} />,
+      ]}
+    />
   );
 }

@@ -35,3 +35,12 @@ export const progressOptions: Options<Structure["edges"]> = (
   fill: color,
   fillAlpha: 0.08,
 });
+
+export const options: Options<Structure["edges"]> = (
+  { type, variables: { cx = 0, cy = 0, ...v } = {} } = {},
+  s
+) => ({
+  ...v,
+  a: s?.to?.({ x: cx, y: cy }),
+  color: getColor(type),
+});
