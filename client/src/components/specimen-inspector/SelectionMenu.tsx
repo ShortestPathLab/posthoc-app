@@ -15,7 +15,7 @@ import { Label } from "components/generic/Label";
 import { Overline } from "components/generic/Overline";
 import { Property } from "components/generic/Property";
 import { useSnackbar } from "components/generic/Snackbar";
-import { SelectEvent as RendererSelectEvent } from "components/specimen-renderer/Renderer";
+import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { map } from "lodash";
 import { useUIState } from "slices/UIState";
 import { EventLabel } from "./EventLabel";

@@ -54,7 +54,7 @@ export const solve = [
               const instances = validateInstances(inst);
               // Check if there are any instances to solve
               if (instances) {
-                const scenario = create(m, { instances: instances });
+                const scenario = create(m, { instances });
                 await Promise.all([
                   write(scenarioPath, scenario(mapPath), "utf-8"),
                   write(mapPath, m, "utf-8"),

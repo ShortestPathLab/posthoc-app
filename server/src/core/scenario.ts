@@ -1,9 +1,16 @@
-import { Dictionary, filter, isUndefined } from "lodash";
-import { constant, floor, join, last, map, split, first } from "lodash";
+import {
+  constant,
+  Dictionary,
+  first,
+  floor,
+  join,
+  last,
+  map,
+  split,
+} from "lodash";
 import { roadhog, warthog } from "pathfinding-binaries";
 import { ParamsOf } from "protocol/Message";
-import { PathfindingTask, PathfindingTaskInstance } from "protocol/SolveTask";
-import { Trace } from "protocol/Trace";
+import { PathfindingTask } from "protocol/SolveTask";
 import { exec } from "../helpers/exec";
 
 type Params = Omit<
@@ -49,21 +56,16 @@ export const handlers = {
     create: (_, { instances }) => {
       const instance = first(instances);
       if (instance) {
-        const { start, end } = instance;
-        return constant(`p aux sp p2p 1\nq ${start} ${end}\n`);
-      } else throw new Error("No problem instance was specified.");
+        const { start = 0, end = 0 } = instance;
+        return constant(`p aux sp p2p 1\nq ${start + 1} ${end + 1}\n`);
+      }
     },
-    invoke: async () =>
-      JSON.stringify({
-        eventList: [{ info: "The format (xy) is temporarily unsupported." }],
-        nodeStructure: [],
-      } as Trace),
-    // invoke: (alg, scen, m) =>
-    //   exec(
-    //     roadhog,
-    //     { args: { alg, problem: scen, input: m }, flags: ["verbose"] },
-    //     true
-    //   ),
+    invoke: (alg, scen, m) =>
+      exec(
+        roadhog,
+        { args: { alg, problem: scen, input: m }, flags: ["verbose"] },
+        true
+      ),
   },
 } as Dictionary<Handler>;
 

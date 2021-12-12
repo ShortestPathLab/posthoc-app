@@ -1,6 +1,6 @@
 import { HideSourceOutlined as HiddenIcon } from "@material-ui/icons";
 import { Overline, OverlineDot as Dot } from "components/generic/Overline";
-import { getColorHex } from "components/specimen-renderer/colors";
+import { getColorHex } from "components/renderer/colors";
 import { TraceEvent } from "protocol/Trace";
 
 export function EventLabel({
