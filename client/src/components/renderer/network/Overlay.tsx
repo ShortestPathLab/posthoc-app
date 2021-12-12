@@ -1,13 +1,12 @@
 import { getColor } from "../colors";
 import { MapInfo } from "../Parser";
-import { scale } from "../planar/config";
-import { Square } from "../planar/Draw";
-import { Point } from "../Renderer";
-import { Scale } from "../Scale";
+import { scale } from "../raster/config";
+import { Square } from "../raster/Draw";
+import { Scale } from "../Size";
 
 type OverlayProps = {
   map?: MapInfo;
-  scale?: Scale<Point>;
+  scale?: Scale;
   start?: number;
   end?: number;
 };

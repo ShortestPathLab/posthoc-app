@@ -1,9 +1,8 @@
 import { ceil, floor, forEach, range } from "lodash";
 import { MapInfo } from "../Parser";
-import { scale } from "../planar/config";
-import { makeGraphic } from "../planar/makeGraphic";
-import { Point } from "../Renderer";
-import { Scale } from "../Scale";
+import { scale } from "../raster/config";
+import { makeGraphic } from "../raster/makeGraphic";
+import { Scale } from "../Size";
 
 const WEIGHT = 1 / scale;
 
@@ -29,7 +28,7 @@ export function Guides({
   scale: { minX, minY, maxX, maxY, to },
   grid = 5,
   alpha,
-}: Props & { map: MapInfo; scale: Scale<Point> }) {
+}: Props & { map: MapInfo; scale: Scale }) {
   const a = to({ x: minX, y: minY });
   const b = to({ x: maxX, y: maxY });
   return (

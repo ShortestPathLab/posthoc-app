@@ -13,7 +13,7 @@ import { SelectionMenu } from "./SelectionMenu";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
-export function SpecimenInspector(props: SpecimenInspectorProps) {
+export function Inspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
   const [{ specimen, format, map }] = useSpecimen();
   const renderer = getRenderer(format);

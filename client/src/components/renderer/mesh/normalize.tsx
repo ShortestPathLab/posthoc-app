@@ -1,8 +1,8 @@
 import { maxBy, minBy } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { MapInfo } from "../Parser";
-import { Point } from "../Renderer";
-import { Scale } from "../Scale";
+import { Point } from "../Size";
+import { Scale } from "../Size";
 import { Structure } from "./Structure";
 
 const { max, log10 } = Math;
@@ -53,5 +53,5 @@ export function normalize(m: MapInfo<Structure>, steps?: TraceEvent[]) {
     maxX,
     minY,
     maxY,
-  } as Scale<Point>;
+  } as Scale;
 }

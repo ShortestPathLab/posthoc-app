@@ -4,10 +4,9 @@ import { isNull, isUndefined, keyBy } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useMemo } from "react";
 import { getColor } from "../colors";
-import { scale } from "../planar/config";
-import { Square } from "../planar/Draw";
-import { Point } from "../Renderer";
-import { Scale } from "../Scale";
+import { scale } from "../raster/config";
+import { Square } from "../raster/Draw";
+import { Scale } from "../Size";
 
 const WEIGHT = 1 / scale;
 
@@ -18,7 +17,7 @@ function defined<T>(obj: T): obj is Exclude<T, undefined | null> {
 type PathProps = {
   nodes?: TraceEvent<"x" | "y">[];
   step?: number;
-  scale: Scale<Point>;
+  scale: Scale;
 };
 
 export function Path({ nodes = [], step = 0, scale: { to } }: PathProps) {

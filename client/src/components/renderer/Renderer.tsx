@@ -1,5 +1,6 @@
 import { TraceEvent } from "protocol/Trace";
 import { FunctionComponent } from "react";
+import { Point } from "./Size";
 
 type Step = {
   index: number;
@@ -15,11 +16,6 @@ export type SelectionInfo = {
   entry?: Step;
   node?: Node;
   point?: Point;
-};
-
-export type Point = {
-  x: number;
-  y: number;
 };
 
 export type SelectEvent = {

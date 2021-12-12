@@ -1,6 +1,6 @@
 import { blueGrey } from "@material-ui/core/colors";
 import { hex } from "../colors";
-import { NodeOptionsMapper } from "../planar/Draw";
+import { NodeOptionsMapper } from "../raster/Draw";
 
 const wallColor = hex(blueGrey["500"]);
 

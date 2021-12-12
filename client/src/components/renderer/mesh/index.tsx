@@ -1,9 +1,9 @@
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { BaseRenderer } from "../base";
+import { PlanarRenderer } from "../planar";
 import { useMap } from "../../../hooks/useMap";
-import { tri } from "../planar/Draw";
-import { LazyNodeList as LazyNodes } from "../planar/NodeList";
+import { tri } from "../raster/Draw";
+import { LazyNodeList as LazyNodes } from "../raster/NodeList";
 import { RendererProps } from "../Renderer";
 import { normalize } from "./normalize";
 import { progressOptions, shadowOptions } from "./options";
@@ -17,7 +17,7 @@ export function MeshRenderer(props: RendererProps) {
   const info = useMap({ parse, normalize });
 
   return (
-    <BaseRenderer
+    <PlanarRenderer
       {...info}
       {...props}
       ShadowProps={{ variant: tri, options: shadowOptions }}
@@ -30,6 +30,6 @@ export function MeshRenderer(props: RendererProps) {
         options={progressOptions}
       />
       <Path {...info} nodes={specimen?.eventList} step={step} />
-    </BaseRenderer>
+    </PlanarRenderer>
   );
 }

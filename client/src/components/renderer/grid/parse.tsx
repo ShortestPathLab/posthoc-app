@@ -1,6 +1,7 @@
 import { filter, flatMap as flat, last, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { makeMapParser } from "../Parser";
+import { byPoint } from "../NodeMatcher";
 import { Structure } from "./Structure";
 
 const { floor } = Math;
@@ -44,6 +45,7 @@ export const parse = makeMapParser<Options, Structure>(
         return y * width + x;
       },
       pointOf: (node) => ({ x: node % width, y: ~~(node / width) }),
+      matchNode: byPoint,
     };
   }
 );

@@ -1,4 +1,5 @@
 import { makeMapParser } from "../Parser";
+import { byPoint } from "../NodeMatcher";
 import { Structure } from "./Structure";
 
 type Options = {};
@@ -11,4 +12,5 @@ export const parse = makeMapParser<Options, Structure>(() => ({
   snap: () => undefined,
   nodeAt: () => undefined,
   pointOf: () => undefined,
+  matchNode: byPoint,
 }));

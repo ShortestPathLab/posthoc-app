@@ -1,6 +1,7 @@
 import { Dictionary, maxBy, minBy, findIndex } from "lodash";
 import { makeMapParser } from "../Parser";
-import { Point } from "../Renderer";
+import { byPoint } from "../NodeMatcher";
+import { Point } from "../Size";
 import { Structure } from "./Structure";
 
 const { sqrt } = Math;
@@ -69,6 +70,7 @@ export const parse = makeMapParser<Options, Structure>(
         return i !== -1 ? i : undefined;
       },
       pointOf: (node) => verts[node],
+      matchNode: byPoint,
     };
   }
 );

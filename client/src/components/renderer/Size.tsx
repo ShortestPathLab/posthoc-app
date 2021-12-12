@@ -1,5 +1,16 @@
-import { Bounds } from "./Bounds";
-import { Point } from "./Renderer";
+export type Point = {
+  x: number;
+  y: number;
+};
+
+export type Bounds = {
+  width: number;
+  height: number;
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
 
 export type Scale<T = Point> = Bounds & {
   scale: number;

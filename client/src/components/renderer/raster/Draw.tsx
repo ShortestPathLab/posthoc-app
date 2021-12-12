@@ -1,8 +1,8 @@
 import { Graphics } from "@pixi/graphics";
 import { map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
-import { Point } from "../Renderer";
-import { Scale } from "../Scale";
+import { Point } from "../Size";
+import { Scale } from "../Size";
 import { scale } from "./config";
 import { makeGraphic } from "./makeGraphic";
 

@@ -1,7 +1,7 @@
 import { blueGrey } from "@material-ui/core/colors";
 import { getColor, hex } from "../colors";
-import { scale } from "../planar/config";
-import { NodeOptionsMapper as Options } from "../planar/Draw";
+import { scale } from "../raster/config";
+import { NodeOptionsMapper as Options } from "../raster/Draw";
 import { Structure } from "./Structure";
 
 export const edgeColor = hex(blueGrey["100"]);

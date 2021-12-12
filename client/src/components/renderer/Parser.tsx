@@ -1,9 +1,9 @@
 import { Dictionary } from "lodash";
 import memo from "memoizee";
 import { TraceEvent } from "protocol/Trace";
-import { Bounds } from "./Bounds";
-import { Point } from "./Renderer";
-import { Scale } from "./Scale";
+import { NodeMatcher } from "./NodeMatcher";
+import { Point } from "./Size";
+import { Bounds, Scale } from "./Size";
 
 export type MapParser<T extends {} = {}, M extends Dictionary<string> = {}> = (
   map?: string,
@@ -17,7 +17,7 @@ export type MapParserOptions<
 > = {
   parse: MapParser<T, M>;
   options?: Partial<T>;
-  normalize: (m: MapInfo<M>, steps?: TraceEvent<K>[]) => Scale<Point>;
+  normalize: (m: MapInfo<M>, steps?: TraceEvent<K>[]) => Scale;
 };
 
 export function makeMapParser<T, M extends Dictionary<string>>(
@@ -36,4 +36,5 @@ export type MapInfo<M extends Dictionary<string> = {}> = {
   snap: (point: Point, scale?: number) => Point | undefined;
   nodeAt: (point: Point) => number | undefined;
   pointOf: (node: number) => Point | undefined;
+  matchNode: NodeMatcher;
 };

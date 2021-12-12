@@ -1,6 +1,6 @@
 import { blueGrey } from "@material-ui/core/colors";
 import { getColor, hex } from "../colors";
-import { NodeOptionsMapper as Options } from "../planar/Draw";
+import { NodeOptionsMapper as Options } from "../raster/Draw";
 import { Structure } from "./Structure";
 
 export const shadowColor = hex(blueGrey["100"]);

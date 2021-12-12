@@ -1,6 +1,5 @@
-import { Scale } from "../Scale";
 import { MapInfo } from "../Parser";
-import { Point } from "../Renderer";
+import { Point, Scale } from "../Size";
 
 export function normalize(m: MapInfo) {
   return {
@@ -8,5 +7,5 @@ export function normalize(m: MapInfo) {
     from: ({ x, y }: Point) => ({ x: x - 0.5, y: y - 0.5 }),
     scale: 1,
     ...m.bounds,
-  } as Scale<Point>;
+  } as Scale;
 }

@@ -1,11 +1,11 @@
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { BaseRenderer } from "../base";
+import { PlanarRenderer } from "../planar";
 import { Path } from "./Path";
 import { Overlay } from "./Overlay";
 import { useMap } from "../../../hooks/useMap";
-import { line, square } from "../planar/Draw";
-import { NodeList as Nodes } from "../planar/NodeList";
+import { line, square } from "../raster/Draw";
+import { NodeList as Nodes } from "../raster/NodeList";
 import { RendererProps } from "../Renderer";
 import { normalize } from "./normalize";
 import {
@@ -28,7 +28,7 @@ export function NetworkRenderer(props: RendererProps) {
   } = info;
 
   return (
-    <BaseRenderer
+    <PlanarRenderer
       {...info}
       {...props}
       ShadowProps={{ options: shadowOptions }}
@@ -40,6 +40,6 @@ export function NetworkRenderer(props: RendererProps) {
     >
       <Nodes nodes={edges} options={edgeOptions} variant={line} />
       <Nodes nodes={verts} options={vertOptions} variant={square} />
-    </BaseRenderer>
+    </PlanarRenderer>
   );
 }

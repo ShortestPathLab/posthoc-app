@@ -1,9 +1,9 @@
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { BaseRenderer } from "../base";
+import { PlanarRenderer } from "../planar";
 import { Path } from "./Path";
 import { useMap } from "../../../hooks/useMap";
-import { NodeList as Nodes } from "../planar/NodeList";
+import { NodeList as Nodes } from "../raster/NodeList";
 import { RendererProps } from "../Renderer";
 import { normalize } from "./normalize";
 import { wallOptions } from "./options";
@@ -23,7 +23,7 @@ export function GridRenderer(props: RendererProps) {
   } = info;
 
   return (
-    <BaseRenderer
+    <PlanarRenderer
       {...info}
       {...props}
       overlay={[
@@ -32,6 +32,6 @@ export function GridRenderer(props: RendererProps) {
       ]}
     >
       <Nodes nodes={walls} options={wallOptions} />
-    </BaseRenderer>
+    </PlanarRenderer>
   );
 }

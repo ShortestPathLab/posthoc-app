@@ -1,12 +1,11 @@
-import { Point } from "components/renderer/Renderer";
 import { map } from "lodash";
-import { Scale } from "../Scale";
+import { Scale, Point } from "../Size";
 import { Selected } from "./Selected";
 
 type Props = {
   hover?: Point;
   highlight?: Point;
-  scale: Scale<Point>;
+  scale: Scale;
 };
 
 export function Selection({ scale: { to }, hover, highlight }: Props) {

@@ -3,15 +3,14 @@ import { constant, filter, floor, identity, memoize, slice } from "lodash";
 import * as PIXI from "pixi.js";
 import { Trace } from "protocol/Trace";
 import { useCallback, useMemo } from "react";
-import { Point } from "../Renderer";
-import { Scale } from "../Scale";
+import { Scale } from "../Size";
 import { box, NodeOptions, NodeOptionsMapper } from "./Draw";
 
 export type Props<T extends string> = {
   nodes?: Trace<T>["eventList"];
   variant?: (g: PIXI.Graphics, options: NodeOptions) => PIXI.Graphics;
   condition?: (step: number) => boolean;
-  scale?: Scale<Point>;
+  scale?: Scale;
   options?: NodeOptionsMapper<T>;
 };
 
