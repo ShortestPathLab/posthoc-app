@@ -6,7 +6,7 @@ name: Deploy to Docker Registry
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [master]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -31,8 +31,10 @@ jobs:
           # Tags override for Docker image
           tags: latest
           # Target Docker registry
-          registry: registry.rachmaninoff.duckdns.org
+          registry: ghcr.io/path-visualiser/server
           # Location of Dockerfile, if not Dockerfile in root directory
           dockerfile: server/Dockerfile
           # Directory to run `docker build` from, if not project root
           directory: server
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
