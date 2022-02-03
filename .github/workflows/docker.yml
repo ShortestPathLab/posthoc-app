@@ -36,5 +36,5 @@ jobs:
           dockerfile: server/Dockerfile
           # Directory to run `docker build` from, if not project root
           directory: server
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
