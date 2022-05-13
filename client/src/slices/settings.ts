@@ -27,9 +27,9 @@ export const defaultRemotes = [
     key: "default-development-server",
   },
   {
-    url: `https://rachmaninoff.duckdns.org/`,
+    url: `https://warthog.spaaaacccee.io/`,
     transport: "socketio",
-    key: "legacy-production-server",
+    key: "production-server",
   },
 ];
 
