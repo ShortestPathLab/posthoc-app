@@ -21,7 +21,7 @@ export function InfoPanel(props: BoxProps) {
           pointerEvents: "none",
           transition: ({ transitions }) => transitions.create("background"),
           bgcolor: ({ palette }) =>
-            tab ? alpha(palette.background.default, 0.72) : "transparent",
+            tab ? alpha(palette.background.default, 0.94) : "transparent",
         }}
         alignItems="center"
         {...props}
