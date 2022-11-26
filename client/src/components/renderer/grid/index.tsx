@@ -2,7 +2,7 @@ import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { PlanarRenderer } from "../planar";
 import { Path } from "./Path";
-import { useMap } from "../../../hooks/useMap";
+import { useMap } from "hooks/useMap";
 import { NodeList as Nodes } from "../raster/NodeList";
 import { RendererProps } from "../Renderer";
 import { normalize } from "./normalize";

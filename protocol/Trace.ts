@@ -23,8 +23,17 @@ export type NodeStructure<V extends string = string> = {
   drawPath?: boolean;
 };
 
+export type ComponentDefinition = Component[];
+
+export type Component = {
+  $: string;
+} & { [K in string]?: any };
+
 export type Trace<V extends string = string> = {
   format?: string;
-  nodeStructure?: NodeStructure<V>[];
+  render?: {
+    components: { [K in string]: ComponentDefinition };
+    views: { [K in string]: Component };
+  };
   eventList?: TraceEvent<V>[];
 };

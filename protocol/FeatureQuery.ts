@@ -26,6 +26,10 @@ export type MapFeatureQuery = FeatureQuery<"map", { id: string }>;
 
 export type MapsFeatureQuery = FeatureQuery<"maps">;
 
+export type RendererFeatureQuery = FeatureQuery<"renderer", { id: string }>;
+
+export type RenderersFeatureQuery = FeatureQuery<"renderers">;
+
 export type AlgorithmFeatureQuery = FeatureQuery<"algorithms">;
 
 //
@@ -37,6 +41,8 @@ export type FeatureDescriptorListResult = Response<FeatureDescriptor[]>;
 export type MapListResult = Response<
   (FeatureDescriptor & { format: string })[]
 >;
+
+export type FeatureResult = Response<Feature>;
 
 export type MapResult = Response<(Feature & { format: string }) | undefined>;
 
@@ -52,6 +58,15 @@ export type MapTypeFeatureQueryMethod = Method<
 export type MapFeatureQueryMethod = Method<MapFeatureQuery, MapResult>;
 
 export type MapsFeatureQueryMethod = Method<MapsFeatureQuery, MapListResult>;
+
+export type RenderersFeatureQueryMethod = Method<
+  RenderersFeatureQuery,
+  FeatureDescriptorListResult
+>;
+export type RendererFeatureQueryMethod = Method<
+  RendererFeatureQuery,
+  FeatureResult
+>;
 
 export type AlgorithmFeatureQueryMethod = Method<
   AlgorithmFeatureQuery,

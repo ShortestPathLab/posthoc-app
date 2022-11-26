@@ -1,4 +1,4 @@
-import { createMethod } from "./createMethod";
+import { createMethod } from "adapter/src/createMethod";
 
 export const general = [
   /**

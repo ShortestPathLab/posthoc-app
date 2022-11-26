@@ -1,11 +1,11 @@
 import { writeFile as write } from "fs/promises";
-import { filter, indexOf, isUndefined, lastIndexOf } from "lodash";
+import { filter, indexOf, lastIndexOf } from "lodash";
 import { PathfindingTaskInstance } from "protocol/SolveTask";
 import tempy from "tempy";
 import { getMap, parseURI } from "../core/map";
 import { MapTypeKey } from "../core/maps";
 import { handlers } from "../core/scenario";
-import { createMethod } from "./createMethod";
+import { createMethod } from "adapter/src/createMethod";
 
 const { task: temp } = tempy.file;
 

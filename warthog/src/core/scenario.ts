@@ -11,7 +11,7 @@ import {
 import { roadhog, warthog } from "pathfinding-binaries";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
-import { exec } from "../helpers/exec";
+import { exec } from "adapter/src/exec";
 
 type Params = Omit<
   ParamsOf<PathfindingTask>,

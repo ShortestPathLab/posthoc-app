@@ -4,6 +4,9 @@ import {
   MapFeatureQueryMethod,
   MapsFeatureQueryMethod,
   MapTypeFeatureQueryMethod,
+  RendererFeatureQuery,
+  RendererFeatureQueryMethod,
+  RenderersFeatureQueryMethod,
 } from "./FeatureQuery";
 import { Method } from "./Message";
 import { PathfindingTaskMethod } from "./SolveTask";
@@ -15,4 +18,8 @@ export type NameMethodMap = Entry<CheckConnectionMethod> &
   Entry<MapTypeFeatureQueryMethod> &
   Entry<MapFeatureQueryMethod> &
   Entry<MapsFeatureQueryMethod> &
+  Entry<RendererFeatureQueryMethod> &
+  Entry<RenderersFeatureQueryMethod> &
   Entry<PathfindingTaskMethod>;
+
+export * from "./Renderer";

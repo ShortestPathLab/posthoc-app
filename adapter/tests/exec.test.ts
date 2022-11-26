@@ -1,5 +1,5 @@
 import { warthog } from "pathfinding-binaries";
-import { exec } from "../src/helpers/exec";
+import { exec } from "../src/exec";
 
 describe("exec", () => {
   it("returns hello", async () => {

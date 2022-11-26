@@ -13,7 +13,7 @@ import { resolve } from "path";
 import { algorithms } from "../core/algorithms";
 import { getMapDescriptor, mapIsSupported, mapsPath } from "../core/maps";
 import { handlers } from "../core/scenario";
-import { createMethod } from "./createMethod";
+import { createMethod } from "adapter/src/createMethod";
 
 async function getFiles(path: string) {
   return await glob(`${resolve(path)}/**/*`);
@@ -73,5 +73,9 @@ export const features = [
       },
       ({ id }) => id
     )
+  ),
+  createMethod(
+    "features/renderers",
+    memo(async () => [])
   ),
 ];
