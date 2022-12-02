@@ -6,7 +6,13 @@ type FeatureDescriptorWithSource = FeatureDescriptor & {
 };
 
 export type Features = {
+  /**
+   * A list of currently supported algorithms.
+   */
   algorithms: FeatureDescriptorWithSource[];
+  /**
+   * A list of currently supported maps.
+   */
   maps: (FeatureDescriptorWithSource & { type: string })[];
   formats: FeatureDescriptorWithSource[];
 };
