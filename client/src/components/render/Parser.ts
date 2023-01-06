@@ -15,20 +15,37 @@ export function parseComp() {
  * TC2: "{{x}} + {{y}}", return (context) => `${context["x"]} + ${context["y"]}`
  * TC3: "{{x}} {{y}}", return (context) => `${context["x"]} ${context["y"]}`
  * TC4: "{{`${x}`}}", return (context) => `${context["x"]}`
- * TC6: "{{`${x}${y}`}}", return  context["x"] + context["y"]
- * TC6: "[[x]]", return (context) => context[context["x"]]
- * TC7: "[[`${x}${y}`]]", return (context) => context[context["x"]+context["y"]]
+ * TC5: "{{`${x} ${y}`}}", return `${context["x"]} ${context["y"]}`
+ * TC6: "{{x + y}}", return context["x"] + context["y"]
+ * TC7: "[[x]]", return (context) => context[context["x"]]
+ * TC8: "[[`${x}${y}`]]", return (context) => 
+ *                                context[`${context["x"]}${context["y"]}`]
  */
 
+// TC1: "{{xy}}", return (context) => context["xy"]
 // "{{x}} + {{y}}" -> "context.x + context.y" -> eval("context.x + context.y") -> 1+2 -> 3
 export function parseCompProp(val: string, injectedContext: object) {
-  // const re = /{{(.*?)}}/g;
-  // const arr = [...val.matchAll(re)];
-  // // replace
-  // val.replace(re, arg2)
-  // return (context: object) => {
-    
-  // }
+
+  const variableReg = /[a-zA-Z_0-9]+/g;
+  const bracketsReg = /{{(.*?)}}|\[\[(.*?)\]\]/g;
+  let isPotNumProp = potNumCompProp(val);
+
+  function parseBracketed(str:string, p1:string) {
+      return p1.replace(variableReg, parseVariable)
+  }
+
+  function parseVariable(str:string, p1:string) {
+    if (isPotNumProp) {
+      return `\$\{context["${str}"]\}`;
+    }
+    return `"" + \$\{context["${str}"]\}`;
+  }
+  // "{{x}} + {{y}}"
+  // "{{`${x} + ${y}`}}"
+
+  val = val.replace(bracketsReg, parseBracketed);
+  console.log(val);
+  return (context: object) => Function("context", `return \`${val}\``)(context)
 }
 
 

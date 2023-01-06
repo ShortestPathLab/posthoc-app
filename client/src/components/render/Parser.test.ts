@@ -1,4 +1,4 @@
-import { parseView, isCompProp, potNumCompProp } from "./Parser";
+import { parseView, isCompProp, potNumCompProp, parseCompProp } from "./Parser";
 import trace from "./grid-astar.trace.json"
 /**
  * {{}} (double bracers) means everything inside will be executed as JavaScript in context with variables refering to the properties in the current component
@@ -78,6 +78,7 @@ test('isComputedProperty TC10', () => {
  * TC3: "{{x+y}}", return True
  * TC4: "{{x}}+{{y}}", return False
  * TC5: "{{x}}+{{y}}", return False
+ * TC6: "{{`${x}${y}`}}", return True
  */
 
 test('potNumCompProp TC1', () => {
@@ -106,19 +107,49 @@ test('potNumCompProp TC5', () => {
 /**
  * Tests for parseCompProp function
  * 
- * TC1: "{{x}}", return (context) => context.x
- * TC2: "{{x}} + {{y}}", return (context) => `${context.x} + ${context.y}`
- * TC3: "{{x}} {{y}}", return (context) => `${context.x} ${context.y}`
- * TC4: "{{`${x}`}}", return (context) => context.`${x}`
- * TC5: "{{x+y}}", return (context) => context.x + context.y
+ * TC1: "{{x}}", return (context) => context["x"]
+ * TC2: "{{x}} + {{y}}", return (context) => `${context["x"]} + ${context["y"]}`
+ * TC3: "{{x}} {{y}}", return (context) => `${context["x"]} ${context["y"]}`
+ * TC4: "{{`${x}`}}", return (context) => `${context["x"]}`
+ * TC5: "{{`${x} ${y}`}}", return `${context["x"]} ${context["y"]}`
+ * TC6: "{{x + y}}", return context["x"] + context["y"]
+ * TC7: "[[x]]", return (context) => context[context["x"]]
+ * TC8: "[[`${x}${y}`]]", return (context) => 
+ *                                context[`${context["x"]}${context["y"]}`]
+ * TC9: "Test {{y}}", return (context) => `Test ${context["y"]}`
  */
 
 test('parseCompProp TC1', () => {
-  expect(parseCompProp("{{x}}")).toBe((context:GenericContext) => context.x);
+  expect(parseCompProp("{{x}}", {})({"x":1,"y":2})).toBe(1);
 });
 
 test('parseCompProp TC2', () => {
-  expect(parseCompProp("{{x}} + {{y}}")).toBe((context:GenericContext) => `${context.x} + ${context.y}`);
+  expect(parseCompProp("{{x}} + {{y}}", {})({"x":1,"y":2})).toBe("1 + 2");
+});
+
+
+test('parseCompProp TC3', () => {
+  expect(parseCompProp("{{x}} {{y}}", {})({"x":1,"y":2})).toBe("1 2");
+});
+
+test('parseCompProp TC4', () => {
+  expect(parseCompProp("{{`${x}`}}", {})({"x":1,"y":2})).toBe("1");
+});
+
+test('parseCompProp TC5', () => {
+  expect(parseCompProp("{{`${x} ${y}`}}", {})({"x":1,"y":2})).toBe("1 2");
+});
+
+test('parseCompProp TC6', () => {
+  expect(parseCompProp("{{x + y}}", {})({"x":1,"y":2})).toBe(3);
+});
+
+test('parseCompProp TC7', () => {
+  expect(parseCompProp("[[x]]", {})({"x":"y","y":2})).toBe(2);
+});
+
+test('parseCompProp TC9', () => {
+  expect(parseCompProp("Test {{x}}", {})({"x":1,"y":2})).toBe("Test 1");
 });
 
 
