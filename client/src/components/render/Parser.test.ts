@@ -1,4 +1,4 @@
-import { parseView, isCompProp, potNumCompProp, parseCompProp } from "./Parser";
+import { parseComps, isCompProp, potNumCompProp, parseCompProp } from "./Parser";
 import trace from "./grid-astar.trace.json"
 /**
  * {{}} (double bracers) means everything inside will be executed as JavaScript in context with variables refering to the properties in the current component
@@ -120,42 +120,48 @@ test('potNumCompProp TC5', () => {
  */
 
 test('parseCompProp TC1', () => {
-  expect(parseCompProp("{{x}}", {})({"x":1,"y":2})).toBe(1);
+  expect(parseCompProp("{{x}}", {})({ "x": 1, "y": 2 })).toBe(1);
 });
 
 test('parseCompProp TC2', () => {
-  expect(parseCompProp("{{x}} + {{y}}", {})({"x":1,"y":2})).toBe("1 + 2");
+  expect(parseCompProp("{{x}} + {{y}}", {})({ "x": 1, "y": 2 })).toBe("1 + 2");
 });
 
 test('parseCompProp TC3', () => {
-  expect(parseCompProp("{{x}} {{y}}", {})({"x":1,"y":2})).toBe("1 2");
+  expect(parseCompProp("{{x}} {{y}}", {})({ "x": 1, "y": 2 })).toBe("1 2");
 });
 
 test('parseCompProp TC4', () => {
-  expect(parseCompProp("{{`${x}`}}", {})({"x":1,"y":2})).toBe("1");
+  expect(parseCompProp("{{`${x}`}}", {})({ "x": 1, "y": 2 })).toBe("1");
 });
 
 test('parseCompProp TC5', () => {
-  expect(parseCompProp("{{`${x} ${y}`}}", {})({"x":1,"y":2})).toBe("1 2");
+  expect(parseCompProp("{{`${x} ${y}`}}", {})({ "x": 1, "y": 2 })).toBe("1 2");
 });
 
 test('parseCompProp TC6', () => {
-  expect(parseCompProp("{{x + y}}", {})({"x":1,"y":2})).toBe(3);
+  expect(parseCompProp("{{x + y}}", {})({ "x": 1, "y": 2 })).toBe(3);
 });
 
 test('parseCompProp TC7', () => {
-  expect(parseCompProp("[[x]]", {})({"x":"y","y":2})).toBe(2);
+  expect(parseCompProp("[[x]]", {})({ "x": "y", "y": 2 })).toBe(2);
 });
 
 test('parseCompProp TC8', () => {
-  expect(parseCompProp("[[`${x}${y}`]]", {})({"x":2,"y":2, "22":1})).toBe(1);
+  expect(parseCompProp("[[`${x}${y}`]]", {})({ "x": 2, "y": 2, "22": 1 })).toBe(1);
 });
-
 
 test('parseCompProp TC9', () => {
-  expect(parseCompProp("Test {{x}}", {})({"x":1,"y":2})).toBe("Test 1");
+  expect(parseCompProp("Test {{x}}", {})({ "x": 1, "y": 2 })).toBe("Test 1");
 });
 
+test('parseCompProp TC10', () => {
+  expect(parseCompProp("Test {{x}}", { "x": 5 })({})).toBe("Test 5");
+});
+
+test('parseCompProp TC11', () => {
+  expect(parseCompProp("Test {{x}}", { "x": 5 })({ "x": 1 })).toBe("Test 1");
+});
 
 /**
  * Tests for parseComp function
@@ -227,9 +233,17 @@ test('parseCompProp TC9', () => {
  *
  */
 
-// test('parseComp TC1', () => {
-//   expect(parseComp()).toBe()
-// })
+test('parseComp TC1', () => {
+  expect(parseComps([
+      {
+        "$": "rect",
+        "width": 1,
+        "height": 1,
+        "text": "[[`${x}${y}`]]"
+      }
+    ]
+  , {})[0]["text"]({"x":1, "y":2, "12":3})).toBe(3)
+})
 
 
 /**
