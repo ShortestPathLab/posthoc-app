@@ -127,7 +127,6 @@ test('parseCompProp TC2', () => {
   expect(parseCompProp("{{x}} + {{y}}", {})({"x":1,"y":2})).toBe("1 + 2");
 });
 
-
 test('parseCompProp TC3', () => {
   expect(parseCompProp("{{x}} {{y}}", {})({"x":1,"y":2})).toBe("1 2");
 });
@@ -147,6 +146,11 @@ test('parseCompProp TC6', () => {
 test('parseCompProp TC7', () => {
   expect(parseCompProp("[[x]]", {})({"x":"y","y":2})).toBe(2);
 });
+
+test('parseCompProp TC8', () => {
+  expect(parseCompProp("[[`${x}${y}`]]", {})({"x":2,"y":2, "22":1})).toBe(1);
+});
+
 
 test('parseCompProp TC9', () => {
   expect(parseCompProp("Test {{x}}", {})({"x":1,"y":2})).toBe("Test 1");

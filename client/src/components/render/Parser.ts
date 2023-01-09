@@ -1,5 +1,4 @@
 
-
 export function parseView() {
 
 }
@@ -27,25 +26,33 @@ export function parseComp() {
 export function parseCompProp(val: string, injectedContext: object) {
 
   const variableReg = /[a-zA-Z_0-9]+/g;
-  const bracketsReg = /{{(.*?)}}|\[\[(.*?)\]\]/g;
+  const bracketsReg = /{{(.*?)}}/g;
+  const squareBrackReg = /\[\[(.*?)\]\]/g  
   let isPotNumProp = potNumCompProp(val);
 
-  function parseBracketed(str:string, p1:string) {
-      return p1.replace(variableReg, parseVariable)
+  function parseBracers(str:string, p1:string) {
+      return isPotNumProp ? p1.replace(variableReg, parseVariable)
+                          : "${" + p1.replace(variableReg, parseVariable) + "}"
   }
 
-  function parseVariable(str:string, p1:string) {
-    if (isPotNumProp) {
-      return `\$\{context["${str}"]\}`;
-    }
-    return `"" + \$\{context["${str}"]\}`;
+  function parseSquareBrackets(str:string, p1:string) {
+    return isPotNumProp ? `context[${p1.replace(variableReg, parseVariable)}]` : "context[`${" + p1.replace(variableReg, parseVariable) + "}`]"
   }
-  // "{{x}} + {{y}}"
-  // "{{`${x} + ${y}`}}"
 
-  val = val.replace(bracketsReg, parseBracketed);
+  function parseVariable(str:string) {
+    return `context["${str}"]` 
+  }
+
+
+  val = val.replace(bracketsReg, parseBracers);
+  val = val.replace(squareBrackReg, parseSquareBrackets)
+  if (!isPotNumProp){
+    val = `\`${val}\``
+  }
+
   console.log(val);
-  return (context: object) => Function("context", `return \`${val}\``)(context)
+
+  return (context: object) => Function("context", `return ${val}`)(context)
 }
 
 
