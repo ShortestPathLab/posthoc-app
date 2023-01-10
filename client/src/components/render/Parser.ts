@@ -52,18 +52,20 @@ type Component = {
 }
 
 
-export function parseComps(components: Component[], injectedContext: any) {
+export function parseComps(components: Component[], injectedContext: any) : Component[] {
 
-  function parseComp(component: Component) {
+  function parseComp(component: Component) : Component[] {
 
     if (component["$"] in primtives) {
+      const newComp : Component = {...component}
 
       for (let prop in component){
         if (isCompProp(component[prop as keyof Component])){
-          component[prop as keyof Component] = parseCompProp(component[prop as keyof Component], injectedContext)
+          newComp[prop as keyof Component] = parseCompProp(component[prop as keyof Component], injectedContext)
         }
       }
-      return component
+
+      return [newComp]
     }
 
     else if (component["$"] in tempComponents){
@@ -74,16 +76,12 @@ export function parseComps(components: Component[], injectedContext: any) {
     else {
       // ERROR TODO
       console.log("Component by the name of " + component['$'] + " does not exist")
+
+      return []
     }
   }
 
-  components.forEach(parseComp);
-
-  components.forEach(console.log);
-
-  
-
-  return components;
+  return components.map(parseComp).flat();
 }
 
 /**

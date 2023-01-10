@@ -1,5 +1,5 @@
 import { parseComps, isCompProp, potNumCompProp, parseCompProp } from "./Parser";
-import trace from "./grid-astar.trace.json"
+
 /**
  * {{}} (double bracers) means everything inside will be executed as JavaScript in context with variables refering to the properties in the current component
  * 
@@ -245,6 +245,33 @@ test('parseComp TC1', () => {
   , {})[0]["text"]({"x":1, "y":2, "12":3})).toBe(3)
 })
 
+test('parseComp TC2', () => {
+  expect(parseComps([
+          {
+            "$": "tilerow",
+            "y": 1
+          }
+        ]
+  , {}).map((ele)=>ele["text"]({}))).toStrictEqual(["11", "21", "31"])
+})
+
+test('parseComp TC3', () => {
+  expect(parseComps([
+          {
+            "$": "tilerow",
+            "y": 1
+          },
+          {
+            "$": "tilerow",
+            "y": 2
+          },
+          {
+            "$": "tilerow",
+            "y": 3
+          }
+        ]
+  , {}).map((ele)=>ele["text"]({}))).toStrictEqual(["11", "21", "31", "12", "22", "32", "13", "23", "33"])
+})
 
 /**
  * Tests for compToDraw function
