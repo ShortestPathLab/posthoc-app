@@ -3,14 +3,18 @@ import { parseComps, isCompProp, potNumCompProp, parseCompProp } from "./Parser"
 /**
  * {{}} (double bracers) means everything inside will be executed as JavaScript in context with variables refering to the properties in the current component
  * 
+ * {{context[`${x}${y}`]}} => context[context[x]]
+ * 
  * [[]] (double brackets) means everything inside will be executed as JavaScript (same as {{}}) but will then be used to access properties from the current context (this includes properties like current event)
  * 
+ * 
+ * [[x]] => context[context[x]]
  * For Example,
  * "[[`${x}${y}`]]" where x = 1 and y = 2
  * would become
  * context["12"]
  * 
-
+   {{[[`${x}${y}`]] + 1}} => context[`${x}${y}`] + 1
  * "{{x}}"" means that it will be of whatever type x is (number, string, etc)
  * "{{`${x}`}}" means it will be a string
 
@@ -270,7 +274,7 @@ test('parseComp TC3', () => {
             "y": 3
           }
         ]
-  , {}).map((ele)=>ele["text"]({}))).toStrictEqual(["11", "21", "31", "12", "22", "32", "13", "23", "33"])
+  , {})).toStrictEqual(["11", "21", "31", "12", "22", "32", "13", "23", "33"])
 })
 
 /**

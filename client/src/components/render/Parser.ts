@@ -1,8 +1,8 @@
+import { Render, Component } from "../renderer/types"
 
+const primtivesComponents = { "rect": {} }
 
-const primtives = { "rect": {} }
-
-const tempComponents = {
+const userComponents = {
   "tile": [
     {
       "$": "rect",
@@ -41,26 +41,22 @@ const tempComponents = {
   ]
 }
 
+// parseView -> parseComps -> parseComp -> parseCompProp -> ....
 
-export function parseView() {
-
-}
-
-type Component = {
-  "$": string
-  [K: string]: any
+export function parseView(renderDef: Render) {
+  //parseComps();
 }
 
 
-export function parseComps(components: Component[], injectedContext: any) : Component[] {
+export function parseComps(components: Component[], injectedContext: any): Component[] {
 
-  function parseComp(component: Component) : Component[] {
+  function parseComp(component: Component): Component[] {
 
-    if (component["$"] in primtives) {
-      const newComp : Component = {...component}
+    if (component["$"] in primtivesComponents) {
+      const newComp: Component = { ...component }
 
-      for (let prop in component){
-        if (isCompProp(component[prop as keyof Component])){
+      for (const prop in component) {
+        if (isCompProp(component[prop as keyof Component])) {
           newComp[prop as keyof Component] = parseCompProp(component[prop as keyof Component], injectedContext)
         }
       }
@@ -68,12 +64,14 @@ export function parseComps(components: Component[], injectedContext: any) : Comp
       return [newComp]
     }
 
-    else if (component["$"] in tempComponents){
+    else if (component["$"] in userComponents) {
 
-      return parseComps(tempComponents[component["$"] as keyof object], {...injectedContext, ...component})
+      return parseComps(userComponents[component["$"] as keyof object],
+        { ...injectedContext, ...component })
     }
 
     else {
+
       // ERROR TODO
       console.log("Component by the name of " + component['$'] + " does not exist")
 
@@ -84,22 +82,7 @@ export function parseComps(components: Component[], injectedContext: any) : Comp
   return components.map(parseComp).flat();
 }
 
-/**
- * Tests for parseCompProp function
- * 
- * TC1: "{{x}}", return (context) => context["x"]
- * TC2: "{{x}} + {{y}}", return (context) => `${context["x"]} + ${context["y"]}`
- * TC3: "{{x}} {{y}}", return (context) => `${context["x"]} ${context["y"]}`
- * TC4: "{{`${x}`}}", return (context) => `${context["x"]}`
- * TC5: "{{`${x} ${y}`}}", return `${context["x"]} ${context["y"]}`
- * TC6: "{{x + y}}", return context["x"] + context["y"]
- * TC7: "[[x]]", return (context) => context[context["x"]]
- * TC8: "[[`${x}${y}`]]", return (context) => 
- *                                context[`${context["x"]}${context["y"]}`]
- */
 
-// TC1: "{{xy}}", return (context) => context["xy"]
-// "{{x}} + {{y}}" -> "context.x + context.y" -> eval("context.x + context.y") -> 1+2 -> 3
 export function parseCompProp(val: string, injectedContext: object) {
 
   const variableReg = /[a-zA-Z_0-9]+/g;
