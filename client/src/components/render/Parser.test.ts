@@ -1,4 +1,4 @@
-import { parseComps, isComputedProp, potRawCompProp, parseComputedProp, parseView } from "./Parser";
+import { parseComps, isComputedProp, potRawCompProp, parseComputedProp, parseViews } from "./Parser";
 /**
  * {{}} (double bracers) means everything inside will be executed as JavaScript in context with variables refering to the properties in the current component
  * 
@@ -58,16 +58,9 @@ test('isComputedProperty TC7', () => {
 });
 
 test('isComputedProperty TC8', () => {
-  expect(isComputedProp("[[x]]")).toBe(true);
+  expect(isComputedProp("[[x]]")).toBe(false);
 });
 
-test('isComputedProperty TC9', () => {
-  expect(isComputedProp("[[x]")).toBe(false);
-});
-
-test('isComputedProperty TC10', () => {
-  expect(isComputedProp("[x]")).toBe(false);
-});
 /**
  * Tests for notStrComputedProp function
  * 
@@ -142,11 +135,7 @@ test('parseCompProp TC6', () => {
 });
 
 test('parseCompProp TC7', () => {
-  expect(parseComputedProp("[[x]]", {})({ "x": "y", "y": 2 })).toBe(2);
-});
-
-test('parseCompProp TC8', () => {
-  expect(parseComputedProp("[[`${x}${y}`]]", {})({ "x": 2, "y": 2, "22": 1 })).toBe(1);
+  expect(parseComputedProp("context[`${x}${y}`]", {})({ "x": 1, "y": 2, "12":3 })).toBe(3);
 });
 
 test('parseCompProp TC9', () => {
@@ -230,6 +219,44 @@ test('parseCompProp TC11', () => {
  *  ]
  *
  */
+const userComponents = {
+  "tile": [
+    {
+      "$": "rect",
+      "width": 1,
+      "height": 1,
+      "text": "{{`${x}${y}`}}"
+    }
+  ],
+  "tilerow": [
+    {
+      "$": "tile",
+      "x": 1
+    },
+    {
+      "$": "tile",
+      "x": 2
+    },
+    {
+      "$": "tile",
+      "x": 3
+    }
+  ],
+  "tileboard": [
+    {
+      "$": "tilerow",
+      "y": 1
+    },
+    {
+      "$": "tilerow",
+      "y": 2
+    },
+    {
+      "$": "tilerow",
+      "y": 3
+    }
+  ]
+}
 
 test('parseComp TC1', () => {
   expect(parseComps([
@@ -237,10 +264,10 @@ test('parseComp TC1', () => {
       "$": "rect",
       "width": 1,
       "height": 1,
-      "text": "[[`${x}${y}`]]"
+      "text": "{{context[`${x}${y}`]}}"
     }
   ]
-    , {}).map((ele) => { return { ...ele, "text": ele["text"](({ "x": 1, "y": 2, "12": 3 })) } }))
+    , {}, userComponents).map((ele) => { return { ...ele, "text": ele["text"](({ "x": 1, "y": 2, '12': 3 })) } }))
     .toStrictEqual([{
       "$": "rect",
       "width": 1,
@@ -256,7 +283,7 @@ test('parseComp TC2', () => {
       "y": 1
     }
   ]
-    , {}).map((ele) => { return { ...ele, "text": ele["text"]({}) } }))
+    , {}, userComponents).map((ele) => { return { ...ele, "text": ele["text"]({}) } }))
     .toStrictEqual([{ "$": "rect", "height": 1, "text": "11", "width": 1 },
     { "$": "rect", "height": 1, "text": "21", "width": 1 },
     { "$": "rect", "height": 1, "text": "31", "width": 1 }])
@@ -277,7 +304,7 @@ test('parseComp TC3', () => {
       "y": 3
     }
   ]
-    , {}).map((ele) => { return { ...ele, "text": ele["text"]({}) } }))
+    , {}, userComponents).map((ele) => { return { ...ele, "text": ele["text"]({}) } }))
     .toStrictEqual([{ "$": "rect", "height": 1, "text": "11", "width": 1 },
     { "$": "rect", "height": 1, "text": "21", "width": 1 },
     { "$": "rect", "height": 1, "text": "31", "width": 1 },
@@ -317,20 +344,20 @@ test('parseComp TC3', () => {
  */
 
 /**
- * Tests for parseView function
+ * Tests for parseViews function
  * 
  * 
  */
 
-test("parseView TC1", () => {
-  expect(parseView({
+test("parseView TC1 - Tile View", () => {
+  const views = parseViews({
     "components": {
       "tile": [
         {
           "$": "rect",
           "width": 1,
           "height": 1,
-          "text": "{{`${x}${y}`}}"
+          "text": "{{${x}${y}}}"
         }
       ],
       "tilerow": [
@@ -366,5 +393,15 @@ test("parseView TC1", () => {
       "tiles": [{ "$":"tileboard" }],
       "main": [{ "$": "tree" }]
     }
-  })).toBe(1)
+  });
+  const arr = [];
+  for (const comp of views.tiles) {
+    expect(comp["$"]).toBe("rect");
+    expect(comp.height).toBe(1);
+    expect(comp.width).toBe(1);
+    arr.push(comp.text({}));
+  }
+  expect(arr).toEqual(
+    expect.arrayContaining(["11", "12", "13", "21", "22", "23", "31", "32", "33"])
+  );
 })

@@ -1,56 +1,30 @@
-import { Render, Components, Component, Views, Context, UserContext } from "./types"
+import { Render, Components, Component, Views, Context } from "./types"
 
-const primtivesComponents = { "rect": {} }
-
-const userComponents: Components = {
-  "tile": [
-    {
-      "$": "rect",
-      "width": 1,
-      "height": 1,
-      "text": "{{`${x}${y}`}}"
-    }
-  ],
-  "tilerow": [
-    {
-      "$": "tile",
-      "x": 1
-    },
-    {
-      "$": "tile",
-      "x": 2
-    },
-    {
-      "$": "tile",
-      "x": 3
-    }
-  ],
-  "tileboard": [
-    {
-      "$": "tilerow",
-      "y": 1
-    },
-    {
-      "$": "tilerow",
-      "y": 2
-    },
-    {
-      "$": "tilerow",
-      "y": 3
-    }
-  ]
-}
+const primtivesComponents = { "rect": {}}
 
 /**
- * 
- * @param renderDef 
- * @returns 
+ * Clean Parser.ts
+ * Fix the context[] parsing
+ * Add more/clean up tests
+ * Clean up more of the old formats
+ * Parse view error
+ * Documentation on how to format your render section of the Search Trace
  */
-export function parseView(renderDef: Render): Views {
+
+/**
+ * Parses all reviews in a Render
+ * @param renderDef the render which contains the views to be parsed
+ * @returns the parsed Views
+ */
+export function parseViews(renderDef: Render): Views {
   const views = renderDef.views;
+  const userComp = renderDef.components ? renderDef.components : {}
+  const userContext = renderDef.context ? renderDef.context : {}
+
   for (const viewName in views) {
-    views[viewName] = parseComps(views[viewName], {})
+    views[viewName] = parseComps(views[viewName], userContext, userComp)
   }
+  console.dir(views);
   return views;
 }
 
@@ -61,7 +35,7 @@ export function parseView(renderDef: Render): Views {
  * @returns a list of parsed Components
  * @todo fix the error handling
  */
-export function parseComps(components: Component[], injectedContext: UserContext): Component[] {
+export function parseComps(components: Component[], injectedContext: Context, userComponents : Components): Component[] {
 
   /**
    * Parses a single Component
@@ -90,7 +64,7 @@ export function parseComps(components: Component[], injectedContext: UserContext
 
       // When an user component need to recurse down and parse that user defined component
       return parseComps(userComponents[component["$"] as keyof object],
-        { ...injectedContext, ...component })
+        { ...injectedContext, ...component }, userComponents)
     }
 
     // Error Handling
@@ -112,7 +86,7 @@ export function parseComps(components: Component[], injectedContext: UserContext
  * @param injectedContext any addtional context provided
  * @returns a Function that takes more in more Context and returns a value
  */
-export function parseComputedProp(val: string, injectedContext: UserContext): Function {
+export function parseComputedProp(val: string, injectedContext: Context): Function {
 
   const variableReg = /[a-zA-Z_0-9]+/g;
   const bracketsReg = /{{(.*?)}}/g;
@@ -160,8 +134,6 @@ export function isComputedProp(val: any): boolean {
   }
   let re = /{{(.*?)}}/g;
   const arr = [...val.matchAll(re)];
-  re = /\[\[(.*?)\]\]/g;
-  arr.push(...[...val.matchAll(re)]);
   return arr.length !== 0;
 }
 
@@ -179,11 +151,5 @@ export function potRawCompProp(val: any): boolean {
   }
   let re = /{{(.*?)}}/g;
   const arr = [...val.matchAll(re)];
-  re = /\[\[(.*?)\]\]/g;
-  arr.push(...[...val.matchAll(re)]);
   return (arr.length === 1) && (arr[0][0] === arr[0].input);
-}
-
-export function GenericContext() {
-
 }
