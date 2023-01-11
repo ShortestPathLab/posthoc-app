@@ -1,4 +1,4 @@
-import { parseComps, isCompProp, potNumCompProp, parseCompProp } from "./Parser";
+import { parseComps, isComputedProp, potRawCompProp, parseComputedProp, parseView } from "./Parser";
 
 /**
  * {{}} (double bracers) means everything inside will be executed as JavaScript in context with variables refering to the properties in the current component
@@ -36,43 +36,43 @@ import { parseComps, isCompProp, potNumCompProp, parseCompProp } from "./Parser"
  */
 
 test('isComputedProperty TC1', () => {
-  expect(isCompProp("{{x}}")).toBe(true);
+  expect(isComputedProp("{{x}}")).toBe(true);
 });
 
 test('isComputedProperty TC2', () => {
-  expect(isCompProp("Test {{`${x}`}}")).toBe(true);
+  expect(isComputedProp("Test {{`${x}`}}")).toBe(true);
 });
 
 test('isComputedProperty TC3', () => {
-  expect(isCompProp("Test")).toBe(false);
+  expect(isComputedProp("Test")).toBe(false);
 });
 
 test('isComputedProperty TC4', () => {
-  expect(isCompProp("{{`${x}`}")).toBe(false);
+  expect(isComputedProp("{{`${x}`}")).toBe(false);
 });
 
 test('isComputedProperty TC5', () => {
-  expect(isCompProp("{`${x}`}}")).toBe(false);
+  expect(isComputedProp("{`${x}`}}")).toBe(false);
 });
 
 test('isComputedProperty TC6', () => {
-  expect(isCompProp("{`${x}`}")).toBe(false);
+  expect(isComputedProp("{`${x}`}")).toBe(false);
 });
 
 test('isComputedProperty TC7', () => {
-  expect(isCompProp(1)).toBe(false);
+  expect(isComputedProp(1)).toBe(false);
 });
 
 test('isComputedProperty TC8', () => {
-  expect(isCompProp("[[x]]")).toBe(true);
+  expect(isComputedProp("[[x]]")).toBe(true);
 });
 
 test('isComputedProperty TC9', () => {
-  expect(isCompProp("[[x]")).toBe(false);
+  expect(isComputedProp("[[x]")).toBe(false);
 });
 
 test('isComputedProperty TC10', () => {
-  expect(isCompProp("[x]")).toBe(false);
+  expect(isComputedProp("[x]")).toBe(false);
 });
 /**
  * Tests for potNumCompProp function
@@ -85,24 +85,24 @@ test('isComputedProperty TC10', () => {
  * TC6: "{{`${x}${y}`}}", return True
  */
 
-test('potNumCompProp TC1', () => {
-  expect(potNumCompProp("{{x}}")).toBe(true);
+test('potRawCompProp TC1', () => {
+  expect(potRawCompProp("{{x}}")).toBe(true);
 });
 
-test('potNumCompProp TC2', () => {
-  expect(potNumCompProp("{{`${x}`}}")).toBe(true);
+test('potRawCompProp TC2', () => {
+  expect(potRawCompProp("{{`${x}`}}")).toBe(true);
 });
 
-test('potNumCompProp TC3', () => {
-  expect(potNumCompProp("{{x+y}}")).toBe(true);
+test('potRawCompProp TC3', () => {
+  expect(potRawCompProp("{{x+y}}")).toBe(true);
 });
 
-test('potNumCompProp TC4', () => {
-  expect(potNumCompProp("{{x}}+{{y}}")).toBe(false);
+test('potRawCompProp TC4', () => {
+  expect(potRawCompProp("{{x}}+{{y}}")).toBe(false);
 });
 
-test('potNumCompProp TC5', () => {
-  expect(potNumCompProp("{{x}}+{{y}}")).toBe(false);
+test('potRawCompProp TC5', () => {
+  expect(potRawCompProp("{{x}}+{{y}}")).toBe(false);
 });
 
 
@@ -124,47 +124,47 @@ test('potNumCompProp TC5', () => {
  */
 
 test('parseCompProp TC1', () => {
-  expect(parseCompProp("{{x}}", {})({ "x": 1, "y": 2 })).toBe(1);
+  expect(parseComputedProp("{{x}}", {})({ "x": 1, "y": 2 })).toBe(1);
 });
 
 test('parseCompProp TC2', () => {
-  expect(parseCompProp("{{x}} + {{y}}", {})({ "x": 1, "y": 2 })).toBe("1 + 2");
+  expect(parseComputedProp("{{x}} + {{y}}", {})({ "x": 1, "y": 2 })).toBe("1 + 2");
 });
 
 test('parseCompProp TC3', () => {
-  expect(parseCompProp("{{x}} {{y}}", {})({ "x": 1, "y": 2 })).toBe("1 2");
+  expect(parseComputedProp("{{x}} {{y}}", {})({ "x": 1, "y": 2 })).toBe("1 2");
 });
 
 test('parseCompProp TC4', () => {
-  expect(parseCompProp("{{`${x}`}}", {})({ "x": 1, "y": 2 })).toBe("1");
+  expect(parseComputedProp("{{`${x}`}}", {})({ "x": 1, "y": 2 })).toBe("1");
 });
 
 test('parseCompProp TC5', () => {
-  expect(parseCompProp("{{`${x} ${y}`}}", {})({ "x": 1, "y": 2 })).toBe("1 2");
+  expect(parseComputedProp("{{`${x} ${y}`}}", {})({ "x": 1, "y": 2 })).toBe("1 2");
 });
 
 test('parseCompProp TC6', () => {
-  expect(parseCompProp("{{x + y}}", {})({ "x": 1, "y": 2 })).toBe(3);
+  expect(parseComputedProp("{{x + y}}", {})({ "x": 1, "y": 2 })).toBe(3);
 });
 
 test('parseCompProp TC7', () => {
-  expect(parseCompProp("[[x]]", {})({ "x": "y", "y": 2 })).toBe(2);
+  expect(parseComputedProp("[[x]]", {})({ "x": "y", "y": 2 })).toBe(2);
 });
 
 test('parseCompProp TC8', () => {
-  expect(parseCompProp("[[`${x}${y}`]]", {})({ "x": 2, "y": 2, "22": 1 })).toBe(1);
+  expect(parseComputedProp("[[`${x}${y}`]]", {})({ "x": 2, "y": 2, "22": 1 })).toBe(1);
 });
 
 test('parseCompProp TC9', () => {
-  expect(parseCompProp("Test {{x}}", {})({ "x": 1, "y": 2 })).toBe("Test 1");
+  expect(parseComputedProp("Test {{x}}", {})({ "x": 1, "y": 2 })).toBe("Test 1");
 });
 
 test('parseCompProp TC10', () => {
-  expect(parseCompProp("Test {{x}}", { "x": 5 })({})).toBe("Test 5");
+  expect(parseComputedProp("Test {{x}}", { "x": 5 })({})).toBe("Test 5");
 });
 
 test('parseCompProp TC11', () => {
-  expect(parseCompProp("Test {{x}}", { "x": 5 })({ "x": 1 })).toBe("Test 1");
+  expect(parseComputedProp("Test {{x}}", { "x": 5 })({ "x": 1 })).toBe("Test 1");
 });
 
 /**
@@ -275,37 +275,57 @@ test('parseComp TC3', () => {
           }
         ]
   , {})).toStrictEqual(["11", "21", "31", "12", "22", "32", "13", "23", "33"])
-})
-
-/**
- * Tests for compToDraw function
- * 
- * 
- * TC1: {        
- *      "$": "rect",
- *      "width": 1,
- *      "height": 1,
- *      "text": (context) => `${context.x}${context.y}`,
- *      "x": 1,
- *      "y": 1,
- *  }
- * 
- * returns
- * 
- * TODO
- * 
- * Similar to this
- * const drawRect = (g:GraphicsType, data: any) => {
- *   g
- *     .drawRect(
- *       data.x, data.y, data.width??1, data.height??1
- *     )
- * }
- * 
- */
+});
 
 /**
  * Tests for parseView function
  * 
  * 
  */
+
+test("parseView TC1", () => {
+  expect(parseView({
+    "components": {
+      "tile": [
+        {
+          "$": "rect",
+          "width": 1,
+          "height": 1,
+          "text": "{{`${x}${y}`}}"
+        }
+      ],
+      "tilerow": [
+        {
+          "$": "tile",
+          "x": 1
+        },
+        {
+          "$": "tile",
+          "x": 2
+        },
+        {
+          "$": "tile",
+          "x": 3
+        }
+      ],
+      "tileboard":[
+        {
+          "$": "tilerow",
+          "y": 1
+        },
+        {
+          "$": "tilerow",
+          "y": 2
+        },
+        {
+          "$": "tilerow",
+          "y": 3
+        }
+      ]
+    },
+    "views": {
+      "tiles": [{ "$":"tileboard" }],
+      "main": [{ "$": "tree" }]
+    }
+  })).toBe()
+})

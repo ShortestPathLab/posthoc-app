@@ -18,10 +18,10 @@ export type Colours = {
 }
 
 export type Context = {
-  current: Event | null;
-  parent: Event | null;
-  events: Event[] | null;
-  colour: Colours;
+  current?: Event | null;
+  parent?: Event | null;
+  events?: Event[] | null;
+  colour?: Colours;
   [key: string]: any;
 }
 
@@ -47,15 +47,19 @@ export type Component = {
   [key:string]: any;
 }
 
+export type Components = { 
+  [K: string]: Component[]
+}
+
+export type Views = {
+  main: Component[];
+  [K: string]: Component[]
+}
+
 export type Render = {
   context?: Context;
-  components?: { 
-    [K: string]: Component 
-  };
-  views: { 
-    main: Component[]; 
-    [K: string]: Component[] 
-  };
+  components?: Components;
+  views: Views;
 }
 
 export type SearchTrace = {

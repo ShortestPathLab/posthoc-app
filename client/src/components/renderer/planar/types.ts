@@ -1,5 +1,5 @@
-import { Event } from "../types";
-import { Component } from "../types";
+import { Event } from "../../render/types";
+import { Component } from "../../render/types";
 
 type HexColor = `#${string}` | `0x${string}` | number;
 
