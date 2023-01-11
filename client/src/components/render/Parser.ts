@@ -1,81 +1,73 @@
 import { Render, Components, Component, Views, Context } from "./types"
 
-const primtivesComponents = { "rect": {} }
-
-const userComponents: Components = {
-  "tile": [
-    {
-      "$": "rect",
-      "width": 1,
-      "height": 1,
-      "text": "{{`${x}${y}`}}"
-    }
-  ],
-  "tilerow": [
-    {
-      "$": "tile",
-      "x": 1
-    },
-    {
-      "$": "tile",
-      "x": 2
-    },
-    {
-      "$": "tile",
-      "x": 3
-    }
-  ],
-  "tileboard": [
-    {
-      "$": "tilerow",
-      "y": 1
-    },
-    {
-      "$": "tilerow",
-      "y": 2
-    },
-    {
-      "$": "tilerow",
-      "y": 3
-    }
-  ]
-}
+const primtivesComponents = { "rect": {}}
 
 /**
- * 
- * @param renderDef 
- * @returns 
+ * Clean Parser.ts
+ * Add more/clean up tests
+ * Clean up more of the old formats
+ * Documentation on how to format your render section of the Search Trace
  */
-export function parseView(renderDef: Render): Views {
+
+/**
+ * Parses all reviews in a Render
+ * @param renderDef the render which contains the views to be parsed
+ * @returns the parsed Views
+ */
+export function parseViews(renderDef: Render): Views {
   const views = renderDef.views;
+  const userComp = renderDef.components ? renderDef.components : {}
+  const userContext = renderDef.context ? renderDef.context : {}
+
   for (const viewName in views) {
-    views[viewName] = parseComps(views[viewName], {})
+    views[viewName] = parseComps(views[viewName], userContext, userComp)
   }
+  console.dir(views);
   return views;
 }
 
 /**
- * parse components definition and return a medium language representation
- * for the renderers
- * @param components List of component
- * @param injectedContext Context params provided by the upper layer of component
- * @returns A list of parsed components
+ * A parser for a list of Components
+ * @param components a list of Components
+ * @param injectedContext user injected context (from parent Components)
+ * @returns a list of parsed Components
+ * @todo fix the error handling
  */
-export function parseComps(components: Component[], injectedContext: object): Component[] {
+export function parseComps(components: Component[], injectedContext: Context, userComponents : Components): Component[] {
 
+  /**
+   * Parses a single Component
+   * @param component a individual component
+   * @returns a list of parsed Components
+   * @todo fix the primitvesComponents and userComponents
+   */
   function parseComp(component: Component): Component[] {
+
+    // Checks to see if the name of the component matches a primitive
     if (component["$"] in primtivesComponents) {
+      // creates a copy of the component
       const newComp: Component = { ...component }
+
+      // goes through all the properties of the component and parses them when necessary
       for (const prop in component) {
         if (isComputedProp(component[prop as keyof Component])) {
           newComp[prop as keyof Component] = parseComputedProp(component[prop as keyof Component], injectedContext)
         }
       }
       return [newComp]
-    } else if (component["$"] in userComponents) {
+    }
+
+    // Checks to see if the name of the component matches a user defined component
+    else if (component["$"] in userComponents) {
+
+      // When an user component need to recurse down and parse that user defined component
       return parseComps(userComponents[component["$"] as keyof object],
-        { ...injectedContext, ...component })
-    } else {
+        { ...injectedContext, ...component }, userComponents)
+    }
+
+    // Error Handling
+    else {
+
       // ERROR TODO
       console.log("Component by the name of " + component['$'] + " does not exist")
       return []
@@ -88,14 +80,12 @@ export function parseComps(components: Component[], injectedContext: object): Co
 
 
 /**
- * Parse computed properties into run-time executable callbacks with the 
- * context parameters provided both in search trace and run-time
- * @param val a computed prop value
- * @param injectedContext context provided by upper layer component definition
- * @returns a callback that can receive run-time context and return result of 
- *          computed value
+ * Parses a computed property into JavaScript code.
+ * @param val the computed property to be parsed.
+ * @param injectedContext any addtional context provided
+ * @returns a Function that takes more in more Context and returns a value
  */
-export function parseComputedProp(val: string, injectedContext: object) {
+export function parseComputedProp(val: string, injectedContext: Context): Function {
 
   const variableReg = /[a-zA-Z_0-9]+/g;
   const bracketsReg = /{{(.*?)}}/g;
@@ -112,7 +102,7 @@ export function parseComputedProp(val: string, injectedContext: object) {
   }
 
   function parseVariable(str: string) {
-    return `context["${str}"]`
+    return str === "context" ? str : `context["${str}"]`
   }
 
   // first replaces the bracers
@@ -125,6 +115,7 @@ export function parseComputedProp(val: string, injectedContext: object) {
   if (!isPotNumProp) {
     val = `\`${val}\``
   }
+  console.log(val)
 
   return (context: Context) =>
     Function("context", `return ${val}`)
@@ -132,24 +123,33 @@ export function parseComputedProp(val: string, injectedContext: object) {
 }
 
 
-export function isComputedProp(val: any) {
+/**
+ * Checks to see is a property is a computed property.
+ * @param val the value of the property to be parsed
+ * @returns True if the computed property includes "{{}}", False otherwise
+ */
+export function isComputedProp(val: any): boolean {
   if (typeof val !== "string") {
     val = JSON.stringify(val);
   }
   let re = /{{(.*?)}}/g;
   const arr = [...val.matchAll(re)];
-  re = /\[\[(.*?)\]\]/g;
-  arr.push(...[...val.matchAll(re)]);
   return arr.length !== 0;
 }
 
-export function potRawCompProp(val: any) {
+
+/**
+ * Checks to see what type the computed property should be parsed to.
+ * If True this means the type will be whatever the type of the property is.
+ * If False this means it will be converted into a string.
+ * @param val the value of the property to be parsed
+ * @returns False if to be parsed to string, True otherwise
+ */
+export function potRawCompProp(val: any): boolean {
   if (typeof val !== "string") {
     val = JSON.stringify(val);
   }
   let re = /{{(.*?)}}/g;
   const arr = [...val.matchAll(re)];
-  re = /\[\[(.*?)\]\]/g;
-  arr.push(...[...val.matchAll(re)]);
   return (arr.length === 1) && (arr[0][0] === arr[0].input);
 }
