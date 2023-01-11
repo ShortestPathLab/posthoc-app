@@ -82,7 +82,8 @@ export function parseComps(components: Component[], injectedContext: object): Co
     }
   }
 
-  return components.map(parseComp).flat();
+  const result = components.map(parseComp).flat();
+  return result;
 }
 
 
@@ -151,8 +152,4 @@ export function potRawCompProp(val: any) {
   re = /\[\[(.*?)\]\]/g;
   arr.push(...[...val.matchAll(re)]);
   return (arr.length === 1) && (arr[0][0] === arr[0].input);
-}
-
-export function GenericContext() {
-
 }

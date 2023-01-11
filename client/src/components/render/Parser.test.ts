@@ -1,3 +1,4 @@
+import { height, letterSpacing } from "@material-ui/system";
 import { parseComps, isComputedProp, potRawCompProp, parseComputedProp, parseView } from "./Parser";
 
 /**
@@ -259,23 +260,23 @@ test('parseComp TC2', () => {
   , {}).map((ele)=>ele["text"]({}))).toStrictEqual(["11", "21", "31"])
 })
 
-test('parseComp TC3', () => {
-  expect(parseComps([
-          {
-            "$": "tilerow",
-            "y": 1
-          },
-          {
-            "$": "tilerow",
-            "y": 2
-          },
-          {
-            "$": "tilerow",
-            "y": 3
-          }
-        ]
-  , {})).toStrictEqual(["11", "21", "31", "12", "22", "32", "13", "23", "33"])
-});
+// test('parseComp TC3', () => {
+//   expect(parseComps([
+//           {
+//             "$": "tilerow",
+//             "y": 1
+//           },
+//           {
+//             "$": "tilerow",
+//             "y": 2
+//           },
+//           {
+//             "$": "tilerow",
+//             "y": 3
+//           }
+//         ]
+//   , {})).toBe()
+// });
 
 /**
  * Tests for parseView function
@@ -284,7 +285,7 @@ test('parseComp TC3', () => {
  */
 
 test("parseView TC1", () => {
-  expect(parseView({
+  const views = parseView({
     "components": {
       "tile": [
         {
@@ -327,5 +328,15 @@ test("parseView TC1", () => {
       "tiles": [{ "$":"tileboard" }],
       "main": [{ "$": "tree" }]
     }
-  })).toBe()
+  });
+  const arr = [];
+  for (const comp of views.tiles) {
+    expect(comp["$"]).toBe("rect");
+    expect(comp.height).toBe(1);
+    expect(comp.width).toBe(1);
+    arr.push(comp.text({}));
+  }
+  expect(arr).toEqual(
+    expect.arrayContaining(["11", "12", "13", "21", "22", "23", "31", "32", "33"])
+  );
 })
