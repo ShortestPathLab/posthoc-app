@@ -25,6 +25,10 @@ export type Context = {
   [key: string]: any;
 }
 
+export type UserContext = {
+  [key: string]: any;
+}
+
 export const Default2DRendererContext: Context = {
   current: null,
   parent: null,

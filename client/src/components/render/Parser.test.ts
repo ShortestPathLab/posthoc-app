@@ -1,20 +1,14 @@
 import { parseComps, isComputedProp, potRawCompProp, parseComputedProp, parseView } from "./Parser";
-
 /**
  * {{}} (double bracers) means everything inside will be executed as JavaScript in context with variables refering to the properties in the current component
  * 
- * {{context[`${x}${y}`]}} => context[context[x]]
+ * Additionally, there is a variable called context, which contains the current event information, parent component information and etc which the user can write to access this information 
+ * {{context[x]}} => context[context[x]]
  * 
- * [[]] (double brackets) means everything inside will be executed as JavaScript (same as {{}}) but will then be used to access properties from the current context (this includes properties like current event)
  * 
  * 
- * [[x]] => context[context[x]]
- * For Example,
- * "[[`${x}${y}`]]" where x = 1 and y = 2
- * would become
- * context["12"]
  * 
-   {{[[`${x}${y}`]] + 1}} => context[`${x}${y}`] + 1
+   {{context[`${x}${y}`]] + 1}} => context[`${x}${y}`] + 1
  * "{{x}}"" means that it will be of whatever type x is (number, string, etc)
  * "{{`${x}`}}" means it will be a string
 
@@ -75,7 +69,7 @@ test('isComputedProperty TC10', () => {
   expect(isComputedProp("[x]")).toBe(false);
 });
 /**
- * Tests for potNumCompProp function
+ * Tests for notStrComputedProp function
  * 
  * TC1: "{{x}}", return True
  * TC2: "{{`${x}`}}", return True
@@ -109,7 +103,7 @@ test('potRawCompProp TC5', () => {
 
 
 /**
- * Tests for parseCompProp function
+ * Tests for parseComputedProp function
  * 
  * TC1: "{{x}}", return (context) => context["x"]
  * TC2: "{{x}} + {{y}}", return (context) => `${context["x"]} + ${context["y"]}`
@@ -239,43 +233,88 @@ test('parseCompProp TC11', () => {
 
 test('parseComp TC1', () => {
   expect(parseComps([
-      {
-        "$": "rect",
-        "width": 1,
-        "height": 1,
-        "text": "[[`${x}${y}`]]"
-      }
-    ]
-  , {})[0]["text"]({"x":1, "y":2, "12":3})).toBe(3)
+    {
+      "$": "rect",
+      "width": 1,
+      "height": 1,
+      "text": "[[`${x}${y}`]]"
+    }
+  ]
+    , {}).map((ele) => { return { ...ele, "text": ele["text"](({ "x": 1, "y": 2, "12": 3 })) } }))
+    .toStrictEqual([{
+      "$": "rect",
+      "width": 1,
+      "height": 1,
+      "text": 3
+    }])
 })
 
 test('parseComp TC2', () => {
   expect(parseComps([
-          {
-            "$": "tilerow",
-            "y": 1
-          }
-        ]
-  , {}).map((ele)=>ele["text"]({}))).toStrictEqual(["11", "21", "31"])
+    {
+      "$": "tilerow",
+      "y": 1
+    }
+  ]
+    , {}).map((ele) => { return { ...ele, "text": ele["text"]({}) } }))
+    .toStrictEqual([{ "$": "rect", "height": 1, "text": "11", "width": 1 },
+    { "$": "rect", "height": 1, "text": "21", "width": 1 },
+    { "$": "rect", "height": 1, "text": "31", "width": 1 }])
 })
 
 test('parseComp TC3', () => {
   expect(parseComps([
-          {
-            "$": "tilerow",
-            "y": 1
-          },
-          {
-            "$": "tilerow",
-            "y": 2
-          },
-          {
-            "$": "tilerow",
-            "y": 3
-          }
-        ]
-  , {})).toStrictEqual(["11", "21", "31", "12", "22", "32", "13", "23", "33"])
-});
+    {
+      "$": "tilerow",
+      "y": 1
+    },
+    {
+      "$": "tilerow",
+      "y": 2
+    },
+    {
+      "$": "tilerow",
+      "y": 3
+    }
+  ]
+    , {}).map((ele) => { return { ...ele, "text": ele["text"]({}) } }))
+    .toStrictEqual([{ "$": "rect", "height": 1, "text": "11", "width": 1 },
+    { "$": "rect", "height": 1, "text": "21", "width": 1 },
+    { "$": "rect", "height": 1, "text": "31", "width": 1 },
+    { "$": "rect", "height": 1, "text": "12", "width": 1 },
+    { "$": "rect", "height": 1, "text": "22", "width": 1 },
+    { "$": "rect", "height": 1, "text": "32", "width": 1 },
+    { "$": "rect", "height": 1, "text": "13", "width": 1 },
+    { "$": "rect", "height": 1, "text": "23", "width": 1 },
+    { "$": "rect", "height": 1, "text": "33", "width": 1 }])
+})
+
+/**
+ * Tests for compToDraw function
+ * 
+ * 
+ * TC1: {        
+ *      "$": "rect",
+ *      "width": 1,
+ *      "height": 1,
+ *      "text": (context) => `${context.x}${context.y}`,
+ *      "x": 1,
+ *      "y": 1,
+ *  }
+ * 
+ * returns
+ * 
+ * TODO
+ * 
+ * Similar to this
+ * const drawRect = (g:GraphicsType, data: any) => {
+ *   g
+ *     .drawRect(
+ *       data.x, data.y, data.width??1, data.height??1
+ *     )
+ * }
+ * 
+ */
 
 /**
  * Tests for parseView function
@@ -327,5 +366,5 @@ test("parseView TC1", () => {
       "tiles": [{ "$":"tileboard" }],
       "main": [{ "$": "tree" }]
     }
-  })).toBe()
+  })).toBe(1)
 })
