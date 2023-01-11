@@ -135,7 +135,7 @@ test('parseCompProp TC6', () => {
 });
 
 test('parseCompProp TC7', () => {
-  expect(parseComputedProp("context[`${x}${y}`]", {})({ "x": 1, "y": 2, "12":3 })).toBe(3);
+  expect(parseComputedProp("{{context[`${x}${y}`]}}", {})({ "x": 1, "y": 2, "12":3 })).toBe(3);
 });
 
 test('parseCompProp TC9', () => {
@@ -357,7 +357,7 @@ test("parseView TC1 - Tile View", () => {
           "$": "rect",
           "width": 1,
           "height": 1,
-          "text": "{{${x}${y}}}"
+          "text": "{{context[`${x}${y}`]}}"
         }
       ],
       "tilerow": [
@@ -399,9 +399,9 @@ test("parseView TC1 - Tile View", () => {
     expect(comp["$"]).toBe("rect");
     expect(comp.height).toBe(1);
     expect(comp.width).toBe(1);
-    arr.push(comp.text({}));
+    arr.push(comp.text({"11":1, "12":2, "13":3, "21":4, "22":5, "23":6, "31":7, "32":8, "33":null}));
   }
   expect(arr).toEqual(
-    expect.arrayContaining(["11", "12", "13", "21", "22", "23", "31", "32", "33"])
+    expect.arrayContaining([1,2,3,4,5,6,7,8,null])
   );
 })

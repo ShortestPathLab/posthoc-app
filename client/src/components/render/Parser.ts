@@ -4,10 +4,8 @@ const primtivesComponents = { "rect": {}}
 
 /**
  * Clean Parser.ts
- * Fix the context[] parsing
  * Add more/clean up tests
  * Clean up more of the old formats
- * Parse view error
  * Documentation on how to format your render section of the Search Trace
  */
 
@@ -103,7 +101,7 @@ export function parseComputedProp(val: string, injectedContext: Context): Functi
   }
 
   function parseVariable(str: string) {
-    return `context["${str}"]`
+    return str === "context" ? str : `context["${str}"]`
   }
 
   // first replaces the bracers
@@ -116,6 +114,7 @@ export function parseComputedProp(val: string, injectedContext: Context): Functi
   if (!isPotNumProp) {
     val = `\`${val}\``
   }
+  console.log(val)
 
   return (context: Context) =>
     Function("context", `return ${val}`)
