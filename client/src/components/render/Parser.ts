@@ -22,7 +22,6 @@ export function parseViews(renderDef: Render): Views {
   for (const viewName in views) {
     views[viewName] = parseComps(views[viewName], userContext, userComp)
   }
-  console.dir(views);
   return views;
 }
 
@@ -89,16 +88,11 @@ export function parseComputedProp(val: string, injectedContext: Context): Functi
 
   const variableReg = /[a-zA-Z_0-9]+/g;
   const bracketsReg = /{{(.*?)}}/g;
-  const squareBrackReg = /\[\[(.*?)\]\]/g
   let isPotNumProp = potRawCompProp(val);
 
   function parseBracers(str: string, p1: string) {
     return isPotNumProp ? p1.replace(variableReg, parseVariable)
       : "${" + p1.replace(variableReg, parseVariable) + "}"
-  }
-
-  function parseSquareBrackets(str: string, p1: string) {
-    return isPotNumProp ? `context[${p1.replace(variableReg, parseVariable)}]` : "context[`${" + p1.replace(variableReg, parseVariable) + "}`]"
   }
 
   function parseVariable(str: string) {
@@ -108,14 +102,10 @@ export function parseComputedProp(val: string, injectedContext: Context): Functi
   // first replaces the bracers
   val = val.replace(bracketsReg, parseBracers);
 
-  // then replaces the square brackets
-  val = val.replace(squareBrackReg, parseSquareBrackets)
-
   // if it isnt a number (thus a string) then additional quotations are added
   if (!isPotNumProp) {
     val = `\`${val}\``
   }
-  console.log(val)
 
   return (context: Context) =>
     Function("context", `return ${val}`)
