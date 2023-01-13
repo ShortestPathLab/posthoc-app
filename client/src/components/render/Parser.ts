@@ -1,13 +1,13 @@
 import { Render, Components, Component, Views, Context } from "./types"
 
-const primtivesComponents = { "rect": {}}
-
 /**
- * Clean Parser.ts
- * Add more/clean up tests
- * Clean up more of the old formats
- * Documentation on how to format your render section of the Search Trace
+ * @todo Error handling for missing required fields
+ * Convert more of the old formats
+ * Documentation on how to format your render section of the Search Trace\
+ * Comments/Docs on the individuals tests (like 1 line/sentence)
  */
+
+const primtivesComponents = { "rect": {}}
 
 /**
  * Parses all reviews in a Render
@@ -30,7 +30,7 @@ export function parseViews(renderDef: Render): Views {
  * @param components a list of Components
  * @param injectedContext user injected context (from parent Components)
  * @returns a list of parsed Components
- * @todo fix the error handling
+ * @todo fix the error handling for required fields
  */
 export function parseComps(components: Component[], injectedContext: Context, userComponents : Components): Component[] {
 
@@ -67,7 +67,7 @@ export function parseComps(components: Component[], injectedContext: Context, us
     // Error Handling
     else {
 
-      // ERROR TODO
+      // TODO
       console.log("Component by the name of " + component['$'] + " does not exist")
       return []
     }
@@ -86,21 +86,33 @@ export function parseComps(components: Component[], injectedContext: Context, us
  */
 export function parseComputedProp(val: string, injectedContext: Context): Function {
 
-  const variableReg = /[a-zA-Z_0-9]+/g;
+  const variableReg = /[a-zA-Z_][a-zA-Z_0-9]*/g;
   const bracketsReg = /{{(.*?)}}/g;
+  const contextStr = "context";
   let isPotNumProp = potRawCompProp(val);
 
-  function parseBracers(str: string, p1: string) {
+  /**
+   * Parses bracketed sections
+   * @param str string that was matched
+   * @param p1 the contents of the bracketed section
+   * @returns the parsed contents
+   */
+  function parseBrackets(str: string, p1: string) {
     return isPotNumProp ? p1.replace(variableReg, parseVariable)
       : "${" + p1.replace(variableReg, parseVariable) + "}"
   }
 
+  /**
+   * Parses the isolated variables ('x') into context['x']
+   * @param str string that was matched
+   * @returns the parsed string
+   */
   function parseVariable(str: string) {
-    return str === "context" ? str : `context["${str}"]`
+    return str === contextStr ? str : `context["${str}"]`
   }
 
-  // first replaces the bracers
-  val = val.replace(bracketsReg, parseBracers);
+  // first replaces the brackets
+  val = val.replace(bracketsReg, parseBrackets);
 
   // if it isnt a number (thus a string) then additional quotations are added
   if (!isPotNumProp) {
@@ -119,12 +131,15 @@ export function parseComputedProp(val: string, injectedContext: Context): Functi
  * @returns True if the computed property includes "{{}}", False otherwise
  */
 export function isComputedProp(val: any): boolean {
-  if (typeof val !== "string") {
-    val = JSON.stringify(val);
+  if (val){
+    if (typeof val !== "string") {
+      val = JSON.stringify(val);
+    }
+    let re = /{{(.*?)}}/g;
+    const arr = [...val.matchAll(re)];
+    return arr.length !== 0;
   }
-  let re = /{{(.*?)}}/g;
-  const arr = [...val.matchAll(re)];
-  return arr.length !== 0;
+  return false;
 }
 
 
