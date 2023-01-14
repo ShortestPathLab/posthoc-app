@@ -213,9 +213,10 @@ test('parseComp TC2', () => {
     }
   ]
     , {}, userComponents).map((ele) => { return { ...ele, "text": ele["text"]({}) } }))
-    .toStrictEqual([{ "$": "rect", "height": 1, "text": "11", "width": 1 },
-    { "$": "rect", "height": 1, "text": "21", "width": 1 },
-    { "$": "rect", "height": 1, "text": "31", "width": 1 }])
+    .toStrictEqual(
+      [{ "$": "rect", "height": 1, "text": "11", "width": 1, "x":1, "y":1 },
+       { "$": "rect", "height": 1, "text": "21", "width": 1, "x":2, "y":1 },
+       { "$": "rect", "height": 1, "text": "31", "width": 1, "x":3, "y":1 }])
 })
 
 test('parseComp TC3', () => {
@@ -234,15 +235,16 @@ test('parseComp TC3', () => {
     }
   ]
     , {}, userComponents).map((ele) => { return { ...ele, "text": ele["text"]({}) } }))
-    .toStrictEqual([{ "$": "rect", "height": 1, "text": "11", "width": 1 },
-    { "$": "rect", "height": 1, "text": "21", "width": 1 },
-    { "$": "rect", "height": 1, "text": "31", "width": 1 },
-    { "$": "rect", "height": 1, "text": "12", "width": 1 },
-    { "$": "rect", "height": 1, "text": "22", "width": 1 },
-    { "$": "rect", "height": 1, "text": "32", "width": 1 },
-    { "$": "rect", "height": 1, "text": "13", "width": 1 },
-    { "$": "rect", "height": 1, "text": "23", "width": 1 },
-    { "$": "rect", "height": 1, "text": "33", "width": 1 }])
+    .toStrictEqual(
+      [{ "$": "rect", "height": 1, "text": "11", "width": 1, "x":1, "y":1 },
+       { "$": "rect", "height": 1, "text": "21", "width": 1, "x":2, "y":1 },
+       { "$": "rect", "height": 1, "text": "31", "width": 1, "x":3, "y":1 },
+       { "$": "rect", "height": 1, "text": "12", "width": 1, "x":1, "y":2 },
+       { "$": "rect", "height": 1, "text": "22", "width": 1, "x":2, "y":2 },
+       { "$": "rect", "height": 1, "text": "32", "width": 1, "x":3, "y":2 },
+       { "$": "rect", "height": 1, "text": "13", "width": 1, "x":1, "y":3 },
+       { "$": "rect", "height": 1, "text": "23", "width": 1, "x":2, "y":3 },
+       { "$": "rect", "height": 1, "text": "33", "width": 1, "x":3, "y":3 }])
 })
 
 test('parseComp TC4', () => {

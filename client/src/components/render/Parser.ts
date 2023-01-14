@@ -45,7 +45,7 @@ export function parseComps(components: Component[], injectedContext: Context, us
     // Checks to see if the name of the component matches a primitive
     if (component["$"] in primtivesComponents) {
       // creates a copy of the component
-      const newComp: Component = { ...component }
+      const newComp: Component = { ...injectedContext, ...component }
 
       // goes through all the properties of the component and parses them when necessary
       for (const prop in component) {
