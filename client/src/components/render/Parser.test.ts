@@ -19,6 +19,7 @@ import { parseComps, isComputedProp, potRawCompProp, parseComputedProp, parseVie
  * Tests for isCompProp function
  */
 
+// True tests
 test('isComputedProp TC1', () => {
   expect(isComputedProp("{{x}}")).toBe(true);
 });
@@ -27,28 +28,30 @@ test('isComputedProp TC2', () => {
   expect(isComputedProp("Test {{`${x}`}}")).toBe(true);
 });
 
+// Invalid Syntax tests
 test('isComputedProp TC3', () => {
-  expect(isComputedProp("Test")).toBe(false);
-});
-
-test('isComputedProp TC4', () => {
   expect(isComputedProp("{{`${x}`}")).toBe(false);
 });
 
-test('isComputedProp TC5', () => {
+test('isComputedProp TC4', () => {
   expect(isComputedProp("{`${x}`}}")).toBe(false);
 });
 
-test('isComputedProp TC6', () => {
+test('isComputedProp TC5', () => {
   expect(isComputedProp("{`${x}`}")).toBe(false);
 });
 
+test('isComputedProp TC6', () => {
+  expect(isComputedProp("[[x]]")).toBe(false);
+});
+
+// Other Basic False Tests
 test('isComputedProp TC7', () => {
-  expect(isComputedProp(1)).toBe(false);
+  expect(isComputedProp("Test")).toBe(false);
 });
 
 test('isComputedProp TC8', () => {
-  expect(isComputedProp("[[x]]")).toBe(false);
+  expect(isComputedProp(1)).toBe(false);
 });
 
 test('isComputedProp TC9', () => {
@@ -67,6 +70,7 @@ test('isComputedProp TC11', () => {
  * Tests for potRawCompProp function
  */
 
+// True Tests
 test('potRawCompProp TC1', () => {
   expect(potRawCompProp("{{x}}")).toBe(true);
 });
@@ -80,66 +84,82 @@ test('potRawCompProp TC3', () => {
 });
 
 test('potRawCompProp TC4', () => {
+  expect(potRawCompProp("{{context[x]}}")).toBe(true);
+});
+
+
+// False Tests
+test('potRawCompProp TC5', () => {
   expect(potRawCompProp("{{x}}+{{y}}")).toBe(false);
 });
 
-test('potRawCompProp TC5', () => {
+test('potRawCompProp TC6', () => {
   expect(potRawCompProp("Tile {{y}}")).toBe(false);
 });
 
-test('potRawCompProp TC6', () => {
-  expect(potRawCompProp("{{context[x]}}")).toBe(true);
-});
+
 
 
 /**
  * Tests for parseComputedProp function
  */
 
+// Tests basic parsing of simpliest computed property which accesses value from the context
 test('parseComputedProp TC1', () => {
   expect(parseComputedProp("{{x}}", {})({ "x": 1, "y": 2 })).toBe(1);
 });
 
+// Tests basic parsing of where it is not a raw computed property
 test('parseComputedProp TC2', () => {
   expect(parseComputedProp("{{x}} + {{y}}", {})({ "x": 1, "y": 2 })).toBe("1 + 2");
 });
 
+// Tests basic parsing where it is a raw computed property but uses `${}
 test('parseComputedProp TC3', () => {
   expect(parseComputedProp("{{`${x}`}}", {})({ "x": 1, "y": 2 })).toBe("1");
 });
 
+// Test Case 2 but as a raw computed property
 test('parseComputedProp TC4', () => {
   expect(parseComputedProp("{{`${x} + ${y}`}}", {})({ "x": 1, "y": 2 })).toBe("1 + 2");
 });
 
+// Tests parsing of slightly more complex raw computed properties
 test('parseComputedProp TC5', () => {
   expect(parseComputedProp("{{x + y}}", {})({ "x": 1, "y": 2 })).toBe(3);
 });
 
+// Tests parsing of the "context" string
 test('parseComputedProp TC6', () => {
   expect(parseComputedProp("{{context[`${x}${y}`]}}", {})({ "x": 1, "y": 2, "12":3 })).toBe(3);
 });
 
+// Tests parsing of a string and computed part (accessing from context)
 test('parseComputedProp TC7', () => {
   expect(parseComputedProp("Test {{x}}", {})({ "x": 1, "y": 2 })).toBe("Test 1");
 });
 
+// Tests parsing of a string and computed part (accessing from injectedContext)
 test('parseComputedProp TC8', () => {
   expect(parseComputedProp("Test {{x}}", { "x": 5 })({})).toBe("Test 5");
 });
 
+// Tests parsing of a string and computed part (with both context and injectContext should take from the context)
 test('parseComputedProp TC9', () => {
   expect(parseComputedProp("Test {{x}}", { "x": 5 })({ "x": 1 })).toBe("Test 1");
 });
 
+// Tests parsing of a simple number within the computed property
 test('parseComputedProp TC10', () => {
   expect(parseComputedProp("{{100}}", {})({ "x": 1 })).toBe(100);
 });
 
+// Tests parsing of simple arithmetics with computed property
 test('parseComputedProp TC11', () => {
   expect(parseComputedProp("{{x + 1}}", {})({ "x": 1 })).toBe(2);
 });
 
+// Tests parsing of variable containing all the different valid characters of a variable name
 test('parseComputedProp TC12', () => {
   expect(parseComputedProp("{{_aA01}}", {})({ "_aA01": 1 })).toBe(1);
 });
@@ -187,6 +207,7 @@ const userComponents = {
   ]
 }
 
+// Tests the parsing of a single Component which will parse directly to a primitive component.
 test('parseComp TC1', () => {
   expect(parseComps([
     {
@@ -205,6 +226,7 @@ test('parseComp TC1', () => {
     }])
 })
 
+// Tests parsing a group of components (3 tiles) which will each be parsed into a primitive component
 test('parseComp TC2', () => {
   expect(parseComps([
     {
@@ -219,6 +241,7 @@ test('parseComp TC2', () => {
        { "$": "rect", "height": 1, "text": "31", "width": 1, "x":3, "y":1 }])
 })
 
+// Tests parsing a large group of components (3 tile rows, 9 tiles)
 test('parseComp TC3', () => {
   expect(parseComps([
     {
@@ -247,6 +270,7 @@ test('parseComp TC3', () => {
        { "$": "rect", "height": 1, "text": "33", "width": 1, "x":3, "y":3 }])
 })
 
+// Tests parsing a component with an invalid name (will need to fix later)
 test('parseComp TC4', () => {
   expect(parseComps([
     {
@@ -263,6 +287,7 @@ test('parseComp TC4', () => {
  * Tests for parseViews function
  */
 
+// Tests parsing a relative complex group of components (taken from the tile puzzle render)
 test("parseViews TC1 - Tile View", () => {
   const views = parseViews({
     "components": {
