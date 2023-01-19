@@ -50,7 +50,7 @@
     "worker-loader": "^3.0.8"
   },
   "scripts": {
-    "start": "craco --openssl-legacy-provider start",
+    "start": "craco start",
     "build": "craco build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
