@@ -16,28 +16,34 @@ export type TraceEvent = {
   pId?: number;
   f?: number;
   g?: number;
+  h?: number;
   [key: string] : any;
 }
 
 export type TraceComponent = {
   "$": string;
   [key: string]: any;
-}[]
+}
 
 export type TraceComponents = {
-  [key: string]: TraceComponent;
+  [key: string]: TraceComponent[];
 }
 
 export type TraceContext = {
   [key: string]: any;
 }
 
-export type TraceViews = {
-  main: TraceComponent | string;
-  [key: string]: TraceComponent | string;
+export type TraceView = {
+  renderer: string,
+  components: TraceComponent[]
 }
 
-export type TraceRendererDefination = {
+export type TraceViews = {
+  main: TraceView
+  [key: string]: TraceView
+}
+
+export type TraceRender = {
   context?: TraceContext;
   components: TraceComponents;
   views: TraceViews;
@@ -45,6 +51,6 @@ export type TraceRendererDefination = {
 
 export type Trace = {
   version: string;
-  render: TraceRendererDefination;
+  render: TraceRender;
   eventList: TraceEvent[];
 }
