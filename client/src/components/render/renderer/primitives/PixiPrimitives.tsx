@@ -50,7 +50,7 @@ function rectDrawingCoverter(component: Component) {
 
     let color;
 
-    if (event.type in context.colour) {
+    if (event?.type??"" in context.colour) {
       color = context.colour[event.type as keyof typeof context.colour];
     }
     if (!color) {

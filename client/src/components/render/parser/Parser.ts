@@ -1,23 +1,24 @@
 import { Component, Components, Render, Views } from "../types/render"
 import { Context } from "../types/context"
 import { primitiveComponents } from "../renderer/primitives"
-import { isArray } from "lodash";
+import { isArray, set } from "lodash";
+import { Interlang } from "slices/interlang";
 
-let renderName: string;
+let renderName: string | undefined;
 /**
  * Parses all reviews in a Render
  * @param renderDef the render which contains the views to be parsed
  * @returns the parsed Views
  */
-export function parseViews(renderDef: Render): Views {
+export function parseViews(renderDef: Render): Interlang | undefined {
   const views = renderDef.views;
   const userComp = renderDef.components ? renderDef.components : {}
   const userContext = renderDef.context ? renderDef.context : {}
 
 
   for (const viewName in views) {
-    renderName = views[viewName]["renderer"];
-    views[viewName]["components"] = parseComps(views[viewName]["components"], userContext, userComp)
+    renderName = views?.[viewName]?.["renderer"];
+    set(views, `${viewName}.components`,parseComps(views?.[viewName]?.["components"], userContext, userComp))
   }
 
   return views;
@@ -30,7 +31,7 @@ export function parseViews(renderDef: Render): Views {
  * @returns a list of parsed Components
  * @todo fix the error handling for required fields
  */
-export function parseComps(components: Component[], injectedContext: Context, userComponents: Components): Component[] {
+export function parseComps(components: Component[] | undefined, injectedContext: Context, userComponents: Components): Component[] {
 
   /**
    * Parses a single Component
@@ -75,6 +76,9 @@ export function parseComps(components: Component[], injectedContext: Context, us
     }
   }
 
+  if (components === undefined) {
+    throw new Error("Parse Error. Search trace components result in undefined.");
+  }
   const result = components.map(parseComp).flat();
   return result;
 }

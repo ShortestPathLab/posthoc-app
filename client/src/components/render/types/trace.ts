@@ -8,14 +8,16 @@ export type TraceEventType =
   | "generating" 
   | "closing" 
   | "expanding" 
-  | "end";
+  | "end"
+  | string;
 
 export type TraceViewType =
   "state"
-  | "history";
+  | "history"
+  | string;
 
 export type TraceEvent = {
-  type: TraceEventType;
+  type?: TraceEventType;
   id?: number;
   pId?: number;
   f?: number;
@@ -38,24 +40,24 @@ export type TraceContext = {
 }
 
 export type TraceView = {
-  renderer: string;
-  components: TraceComponent[];
+  renderer?: string;
+  components?: TraceComponent[];
   type?: TraceViewType;
 }
 
 export type TraceViews = {
-  main: TraceView;
-  [key: string]: TraceView;
+  main?: TraceView;
+  [key: string]: TraceView | undefined;
 }
 
 export type TraceRender = {
   context?: TraceContext;
-  components: TraceComponents;
-  views: TraceViews;
+  components?: TraceComponents;
+  views?: TraceViews;
 }
 
 export type Trace = {
-  version: string;
-  render: TraceRender;
-  eventList: TraceEvent[];
+  version?: string;
+  render?: TraceRender;
+  eventList?: TraceEvent[];
 }
