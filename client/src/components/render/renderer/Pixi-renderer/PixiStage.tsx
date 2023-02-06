@@ -1,6 +1,6 @@
 import { Stage } from "@inlet/react-pixi";
 import { LazyNodeList } from "components/renderer/raster/NodeList";
-import { Viewport } from "./Viewport";
+import { Viewport } from "../Viewport";
 
 export type PixiStageProps = {
   width?: number;
@@ -16,8 +16,13 @@ export type PixiStageProps = {
  * @returns 
  */
 export function PixiStage(
-  {children, width, height}:PixiStageProps
+  { children, width, height }: PixiStageProps
 ) {
+
+  // process all the parsed components into drawing instructions 
+
+  // create an add function that adds the graphic to a canvas and then returns a remove function
+
 
   return <>
     <Stage
