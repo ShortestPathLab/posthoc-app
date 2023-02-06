@@ -61,6 +61,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
       {map(
         [
           {
+            id: 1,
             label: "Set Origin",
             icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
             action: () => {
@@ -70,6 +71,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
             disabled: !node,
           },
           {
+            id: 2,
             label: "Set Destination",
             icon: <DestinationIcon />,
             action: () => {
@@ -79,6 +81,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
             disabled: !node,
           },
           {
+            id: 3,
             label: (
               <Label primary="Go to Expansion Step" secondary={entry?.index} />
             ),
@@ -87,6 +90,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
             disabled: !entry,
           },
           {
+            id: 4,
             label: (
               <Label primary="Rewind to This Step" secondary={current?.index} />
             ),
@@ -95,8 +99,9 @@ export function SelectionMenu({ selection, onClose }: Props) {
             disabled: !current,
           },
         ],
-        ({ label, icon, action, disabled }) => (
+        ({id, label, icon, action, disabled }) => (
           <MenuItem
+            key={`${id}`}
             disabled={disabled}
             onClick={() => {
               action();

@@ -17,6 +17,8 @@ import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { SpecimenProvider } from "slices/specimen";
 import { UIStateProvider } from "slices/UIState";
 import { theme } from "theme";
+import { InterlangProvider } from "slices/interlang";
+import { InterlangService } from "services/InterlangService";
 
 const slices = [
   SettingsProvider,
@@ -25,6 +27,7 @@ const slices = [
   UIStateProvider,
   SpecimenProvider,
   LoadingProvider,
+  InterlangProvider
 ];
 
 const services = [
@@ -32,6 +35,7 @@ const services = [
   PlaybackService,
   SpecimenService,
   FeaturesService,
+  InterlangService,
 ];
 
 render(
