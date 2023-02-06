@@ -1,0 +1,29 @@
+Current Work Todo
+
+[ ] Create a stage for the PIXI renderer - renderer
+- takes in the intermediate language
+- provide add/delete function for each child nodelist
+
+[ ] Nodelist and LazyNodelist
+- generic for stages/renderers
+- caching the nodes
+- use the add/delete function to 
+
+[ ] An Context system for intermediate language - parser
+- something like a speciman context
+- takes in the search trace
+- provide intermediate language for the renderer
+
+[ ] Window system for multiple views - side by side
+- As a parent component relative to xxxStage
+- Manage the window system
+- Choose which Stage to use in each of the view
+
+[ ] Work on drawing text onto them in memory efficent ways
+
+[ ] Performance optimize
+- create algorithm reduce the graphics objects in lazynodelist
+
+[ ] Convert more Search Traces into current format
+
+[ ] Create merger of eventList information so that delta eventLists will work

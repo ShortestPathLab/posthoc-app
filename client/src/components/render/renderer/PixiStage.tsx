@@ -1,4 +1,5 @@
 import { Stage } from "@inlet/react-pixi";
+import { LazyNodeList } from "components/renderer/raster/NodeList";
 import { Viewport } from "./Viewport";
 
 export type PixiStageProps = {
@@ -17,6 +18,7 @@ export type PixiStageProps = {
 export function PixiStage(
   {children, width, height}:PixiStageProps
 ) {
+
   return <>
     <Stage
       options={{

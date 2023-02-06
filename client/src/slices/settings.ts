@@ -11,6 +11,7 @@ type Settings = {
   remote?: Remote[];
   playbackRate?: number;
   acrylic?: boolean;
+  convert?: boolean;
 };
 
 const DEV_PORT = 8001;
