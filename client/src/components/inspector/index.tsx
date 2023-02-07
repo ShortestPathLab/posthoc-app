@@ -17,6 +17,7 @@ export function Inspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
   const [{ specimen, format, map }] = useSpecimen();
   const renderer = getRenderer(format);
+  const [showInfo, setShowInfo] = useState(true);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
@@ -45,10 +46,12 @@ export function Inspector(props: SpecimenInspectorProps) {
             </AutoSize>
             <InfoPanel
               position="absolute"
-              right={0}
+              right={showInfo?0:'min(-25vw,-480px)'}
               height="100%"
               width="25vw"
               minWidth={480}
+              show={showInfo}
+              setShow={setShowInfo}
             />
           </Flex>
         ) : (

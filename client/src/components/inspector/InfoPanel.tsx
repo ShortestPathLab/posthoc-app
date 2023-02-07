@@ -1,4 +1,4 @@
-import { BoxProps, Button, Fade, Tooltip } from "@material-ui/core";
+import { BoxProps, Button, Fade, Tooltip, ToggleButton, Card } from "@material-ui/core";
 import { SortTwoTone as StepsIcon } from "@material-ui/icons";
 import { TabContext, TabPanel } from "@material-ui/lab";
 import { alpha, Box } from "@material-ui/system";
@@ -9,8 +9,11 @@ import { startCase } from "lodash";
 import { useState } from "react";
 import { useUIState } from "slices/UIState";
 import { EventListInspector } from "./EventListInspector";
+import RightArrowIcon from "@material-ui/icons/ChevronRight";
+import LeftArrowIcon from "@material-ui/icons/ChevronLeft";
 
-export function InfoPanel(props: BoxProps) {
+export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatch<React.SetStateAction<boolean>>}) {
+  const {show, setShow} = props;
   const [{ playback }] = useUIState();
   const [tab, setTab] = useState("steps");
   return (
@@ -19,13 +22,30 @@ export function InfoPanel(props: BoxProps) {
         vertical
         sx={{
           pointerEvents: "none",
-          transition: ({ transitions }) => transitions.create("background"),
+          transition: ({ transitions }) => transitions.create(["background", "right"]),
           bgcolor: ({ palette }) =>
             tab ? alpha(palette.background.default, 0.94) : "transparent",
         }}
         alignItems="center"
         {...props}
       >
+        <ToggleButton
+            value="show"
+            selected={!show}
+            sx={{
+              position:"absolute",
+              left: -40,
+              top: '50%',
+              pointerEvents: 'auto',
+              zIndex: 10,
+              border: 0,
+            }}
+            onChange={() => {
+              setShow(!show);
+            }}
+          >
+            {show?<RightArrowIcon />:<LeftArrowIcon/>}
+          </ToggleButton>
         <Toolbar>
           {[
             { icon: <StepsIcon />, key: "steps" },
