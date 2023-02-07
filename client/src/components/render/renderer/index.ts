@@ -1,4 +1,6 @@
-export {PixiStage} from "./Pixi-renderer/PixiStage";
+import { useInterlang } from "slices/interlang";
+
+export {PixiStage} from "./Pixi/PixiStage";
 
 
 /**
@@ -7,10 +9,14 @@ export {PixiStage} from "./Pixi-renderer/PixiStage";
 export function viewsManager(){
 
   // get the parsed views by context grabber
+  const [interlang] = useInterlang()
 
   // determine how the views should be placed (dimensions)
 
   // loop through the views sending them to the respective renderers
+  for (const view in interlang){
+
+  }
 
   // return the results from the respective renderers.
 
