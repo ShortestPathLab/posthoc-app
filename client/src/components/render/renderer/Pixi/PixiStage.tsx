@@ -1,12 +1,12 @@
 import { Stage } from "@inlet/react-pixi";
-import { Event, Views } from "components/render/types/render";
+import { Event } from "components/render/types/render";
 import { LazyNodeList } from "components/renderer/raster/NodeList";
-import memoizee from "memoizee";
 import {d2InstrinsicComponents, DrawingInstruction} from "./NewPixiPrimitives"
 import { Viewport } from "../Viewport";
 import { TraceView } from "components/render/types/trace";
 import { useCallback } from "react";
-
+import memoizee from "memoizee";
+import * as PIXI from 'pixi.js';
 
 export type PixiStageProps = {
   width?: number;
@@ -14,20 +14,14 @@ export type PixiStageProps = {
   children?: React.ReactNode;
 }
 
-
-
-
-
 /**
- * 
  * @param props Stage properties
- * @param props.children
  * @param props.width
  * @param props.height
  * @returns 
  */
 export function PixiStage(
-  { children, width, height }: PixiStageProps, view:TraceView
+  { width, height }: PixiStageProps, view:TraceView
 ) {
 
   // process all the parsed components into drawing instructions 
@@ -38,14 +32,34 @@ export function PixiStage(
     drawingInstructions[compName] = d2InstrinsicComponents[component.$].converter(component)
   }
 
-  // primitive mode of memoizee should work for memoizing of drawing instructions (this will be done in the NewPixiPrimitives.tsx file I believe)
+  // a function which takes in an Event List creates a graphic for them
+  const makeGraphic = memoizee((events:Event[])=>{
+    const graphic = new PIXI.Graphics();
+
+    // loops through all the events and the drawing instructions
+    // adding them all to the PIXI graphic
+    for (const event of events){
+      for (const drawIntr in drawingInstructions){
+        drawingInstructions[drawIntr](event)(graphic)
+      }
+    }
+    return graphic
+  })
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
+  const canvasRef = new PIXI.Graphics();
 
   const reference = useCallback(
     ()=>({
-      add:()=>{}
-    }), []
+      add:(events:Event[])=>{
+        const graphic = makeGraphic(events);
+        canvasRef.addChild(graphic)
+
+        return () => {
+          canvasRef.removeChild(graphic)
+        }
+      }
+    }), [canvasRef]
   )
 
 
@@ -60,7 +74,7 @@ export function PixiStage(
       }}
     >
       <Viewport width={width} height={height}>
-        {children}
+        <LazyNodeList draw={reference}></LazyNodeList>
       </Viewport>
     </Stage>
   </>

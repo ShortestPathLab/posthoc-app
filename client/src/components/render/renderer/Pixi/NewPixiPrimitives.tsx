@@ -3,11 +3,13 @@ import memoizee from "memoizee";
 import { Component, Event } from "../../types/render";
 import * as PIXI from 'pixi.js';
 
-export type DrawingInstruction = (event:Event) => (graphic:GraphicsType) => void;
+export type DrawingInstruction = (event: Event) => (graphic: GraphicsType) => void;
 
 export type InstrinsicComponents = {
-  [key:string]: {"converter" : (comp:Component)=>DrawingInstruction,
-                 "renderer": string}
+  [key: string]: {
+    "converter": (comp: Component) => DrawingInstruction,
+    "renderer": string
+  }
 }
 
 // default context
@@ -50,7 +52,7 @@ function rectDrawingCoverter(component: Component) {
       }
     }
 
-    let color;
+    let color: number | undefined = undefined;
 
     if (event.type !== undefined && event.type in context.colour) {
       color = context.colour[event.type as keyof typeof context.colour];
@@ -61,37 +63,38 @@ function rectDrawingCoverter(component: Component) {
     }
 
     const [x, y, w, h] = [
-      scale(component.x), 
+      scale(component.x),
       scale(component.y),
       scale(component.width ?? 1),
       scale(component.height ?? 1)
     ];
 
-    const rect = new PIXI.Graphics();
-    rect
-      .beginFill(component.fill ?? color ?? 0xff5722,
-        component.alpha ?? context.alpha)
-      .drawRect(
-        scale(component.x),
-        scale(component.y),
-        scale(component.width ?? 1),
-        scale(component.height ?? 1)
-      )
-      .endFill();
-
+    let text: PIXI.Text;
     if (component.text) {
-      const buttonText = new PIXI.Text(component.text,
+      text = new PIXI.Text(component.text,
         {
           fontFamily: 'Arial',
           fontSize: 10,
           fill: "black",
         });
-      buttonText.y = scale(component.y)
-      buttonText.x = scale(component.x);
-      rect.addChild(buttonText);
+      text.y = scale(component.y)
+      text.x = scale(component.x);
     }
-    
-    
-    return (g: GraphicsType) => {g.addChild(rect)};
-  }, {primitive:true})
+
+    return (g: GraphicsType) => {
+      g.beginFill(component.fill ?? color ?? 0xff5722,
+        component.alpha ?? context.alpha)
+        .drawRect(
+          scale(component.x),
+          scale(component.y),
+          scale(component.width ?? 1),
+          scale(component.height ?? 1)
+        )
+        .endFill();
+      if (text !== undefined){
+        g.addChild(text)
+      }
+    }
+
+  }, { primitive: true })
 }
