@@ -10,6 +10,7 @@ import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";
+import { SplitView } from "./SplitView";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
@@ -30,20 +31,40 @@ export function Inspector(props: SpecimenInspectorProps) {
       <Flex {...props}>
         {specimen ? (
           <Flex>
-            <AutoSize>
-              {(size) => (
-                <Fade appear in>
-                  <Box>
-                    {createElement(renderer, {
-                      ...size,
-                      key: map,
-                      onSelect: setSelection,
-                      selection: selection?.world,
-                    })}
-                  </Box>
-                </Fade>
-              )}
-            </AutoSize>
+            <SplitView
+              resizable={true}
+              left={
+                <AutoSize>
+                  {(size) => (
+                    <Fade appear in>
+                      <Box>
+                        {createElement(renderer, {
+                          ...size,
+                          key: map,
+                          onSelect: setSelection,
+                          selection: selection?.world,
+                        })}
+                      </Box>
+                    </Fade>
+                  )}
+                </AutoSize>
+              }
+              right={
+                <AutoSize>
+                  {(size) => (
+                    <Fade appear in>
+                      <Box>
+                        {createElement(renderer, {
+                          ...size,
+                          key: map,
+                          onSelect: setSelection,
+                          selection: selection?.world,
+                        })}
+                      </Box>
+                    </Fade>
+                  )}
+                </AutoSize>
+              } />
             <InfoPanel
               position="absolute"
               right={showInfo?0:'min(-25vw,-480px)'}
