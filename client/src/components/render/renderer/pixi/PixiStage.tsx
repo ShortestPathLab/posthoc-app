@@ -38,12 +38,13 @@ export type DrawInstructions = {
 export function PixiStage(
   { width, height, view, children }: PixiStageProps
 ) {
+  // get the PIXI.Application instance which holds the Stage object
   const app = useApp();
 
   // process all the parsed components into drawing instructions 
   const drawInstructs:DrawInstructions = React.useMemo(():DrawInstructions => {
     if (!view) {
-      throw new Error("")
+      throw new Error("No view is present in PixiStageProps");
     }
     const viewComps = view.components;
     const drawInstructions:DrawInstructions = {};
@@ -78,7 +79,7 @@ export function PixiStage(
           app.stage.removeChild(graphic);
         }
       }
-    }), [app]
+    }), [app, makeGraphic]
   )
 
 
@@ -94,6 +95,15 @@ export function PixiStage(
     >
       <Viewport width={width} height={height}>
         {
+          /**
+           * Children will be a callback that returns child components 
+           * wrapped in Fragment and binded with useCanvas prop
+           * (useCanvas) => (
+           *  <React.Fragment>
+           *    <LazyNodeList useCanvas={useCanvas} />
+           *  </React.Fragment>
+           * )
+           */
           children?.(useCanvas)
         }
       </Viewport>
