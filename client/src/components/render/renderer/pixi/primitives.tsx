@@ -1,5 +1,4 @@
 import { Graphics as GraphicsType, } from "@pixi/graphics";
-import memoizee from "memoizee";
 import { Component, Event } from "../../types/render";
 
 export type DrawingInstruction = (g:GraphicsType, event:Event) => void;
