@@ -1,15 +1,19 @@
 import * as PIXI from 'pixi.js';
-import { useCallback, useMemo, useRef } from "react";
-import { Stage } from "@inlet/react-pixi";
+import * as React from "react";
+import { Stage, useApp } from "@inlet/react-pixi";
 
 import { Event, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
 import { d2InstrinsicComponents, DrawInstruction} from "./NewPixiPrimitives"
 
+export type UseCanvasType = () => {
+  add: (events: Event[]) => () => void;
+}
+
 export type PixiStageProps = {
   width?: number;
   height?: number;
-  children?: React.ReactNode;
+  children?: (useCanvas:UseCanvasType) => React.ReactFragment;
   view?: View;
 }
 
@@ -32,12 +36,12 @@ export type DrawInstructions = {
  * @returns Pixi Stage element that renders current view
  */
 export function PixiStage(
-  { width, height, view }: PixiStageProps
+  { width, height, view, children }: PixiStageProps
 ) {
-  const stageRef = useRef<Stage>(null);
+  const app = useApp();
 
   // process all the parsed components into drawing instructions 
-  const drawInstructs:DrawInstructions = useMemo(():DrawInstructions => {
+  const drawInstructs:DrawInstructions = React.useMemo(():DrawInstructions => {
     if (!view) {
       throw new Error("")
     }
@@ -51,7 +55,7 @@ export function PixiStage(
   }, [view])
 
   // a function which takes in an Event List creates a graphic for them
-  const makeGraphic = useCallback((events:Event[])=>{
+  const makeGraphic = React.useCallback((events:Event[])=>{
     const g = new PIXI.Graphics();
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
@@ -64,26 +68,22 @@ export function PixiStage(
   }, [drawInstructs]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
-  const reference = useCallback(
+  const useCanvas = React.useCallback(
     ()=>({
       add:(events:Event[])=>{
         const graphic = makeGraphic(events);
-        stageRef.current.addChild(graphic)
+        app.stage.addChild(graphic)
 
         return () => {
-          if (stageRef.current) {
-            // FIXME may cause memory leak by holding the graphic reference?
-            stageRef.current.removeChild(graphic);
-          }
+          app.stage.removeChild(graphic);
         }
       }
-    }), [stageRef]
+    }), [app]
   )
 
 
   return <>
     <Stage
-      ref={stageRef}
       options={{
         backgroundColor: 0xffffff,
         autoDensity: true,
@@ -93,6 +93,9 @@ export function PixiStage(
       }}
     >
       <Viewport width={width} height={height}>
+        {
+          children?.(useCanvas)
+        }
       </Viewport>
     </Stage>
   </>
