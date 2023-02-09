@@ -3,11 +3,11 @@ import memoizee from "memoizee";
 import { Component, Event } from "../../types/render";
 import * as PIXI from 'pixi.js';
 
-export type DrawingInstruction = (event: Event) => (graphic: GraphicsType) => void;
+export type DrawInstruction = (event: Event) => (graphic: GraphicsType) => void;
 
 export type InstrinsicComponents = {
   [key: string]: {
-    "converter": (comp: Component) => DrawingInstruction,
+    "converter": (comp: Component) => DrawInstruction,
     "renderer": string
   }
 }
@@ -77,19 +77,14 @@ function rectDrawingCoverter(component: Component) {
           fontSize: 10,
           fill: "black",
         });
-      text.y = scale(component.y)
-      text.x = scale(component.x);
+      text.y = y
+      text.x = x;
     }
 
     return (g: GraphicsType) => {
       g.beginFill(component.fill ?? color ?? 0xff5722,
         component.alpha ?? context.alpha)
-        .drawRect(
-          scale(component.x),
-          scale(component.y),
-          scale(component.width ?? 1),
-          scale(component.height ?? 1)
-        )
+        .drawRect(x, y, w, h)
         .endFill();
       if (text !== undefined){
         g.addChild(text)

@@ -1,69 +1,89 @@
-import { Stage } from "@inlet/react-pixi";
-import { Event } from "components/render/types/render";
-import {d2InstrinsicComponents, DrawingInstruction} from "./NewPixiPrimitives"
-import { Viewport } from "./Viewport";
-import { TraceView } from "components/render/types/trace";
-import { useCallback } from "react";
-import memoizee from "memoizee";
 import * as PIXI from 'pixi.js';
+import { useCallback, useMemo, useRef } from "react";
+import { Stage } from "@inlet/react-pixi";
+
+import { Event, View } from "components/render/types/render";
+import { Viewport } from "./Viewport";
+import { d2InstrinsicComponents, DrawInstruction} from "./NewPixiPrimitives"
 
 export type PixiStageProps = {
   width?: number;
   height?: number;
   children?: React.ReactNode;
+  view?: View;
 }
 
+export type DrawInstructions = {
+  [key:string]:DrawInstruction
+}
+
+
 /**
+ * PIXI Stage component for rendering view and search trace,
+ * view must be composed of following supported primitives
+ * - rect (Rectangle)
+ * - circle
+ * - path
+ * - polygon
  * @param props Stage properties
- * @param props.width
- * @param props.height
- * @returns 
+ * @param props.width Width of the allocated view space
+ * @param props.height Height of the allocated view space
+ * @param props.view {View} View definition from Intermediate Language
+ * @returns Pixi Stage element that renders current view
  */
 export function PixiStage(
-  { width, height }: PixiStageProps, view:TraceView
+  { width, height, view }: PixiStageProps
 ) {
+  const stageRef = useRef<Stage>(null);
 
   // process all the parsed components into drawing instructions 
-  const viewComps = view.components
-  const drawingInstructions:{[key:string]:DrawingInstruction} = {};
-  for (const compName in viewComps){
-    const component = viewComps[compName as keyof object]
-    drawingInstructions[compName] = d2InstrinsicComponents[component.$].converter(component)
-  }
+  const drawInstructs:DrawInstructions = useMemo(():DrawInstructions => {
+    if (!view) {
+      throw new Error("")
+    }
+    const viewComps = view.components;
+    const drawInstructions:DrawInstructions = {};
+    for (const compName in viewComps){
+      const component = viewComps[compName as keyof object]
+      drawInstructions[compName] = d2InstrinsicComponents[component.$].converter(component)
+    }
+    return drawInstructions
+  }, [view])
 
   // a function which takes in an Event List creates a graphic for them
-  const makeGraphic = memoizee((events:Event[])=>{
-    const graphic = new PIXI.Graphics();
-
+  const makeGraphic = useCallback((events:Event[])=>{
+    const g = new PIXI.Graphics();
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
     for (const event of events){
-      for (const drawIntr in drawingInstructions){
-        drawingInstructions[drawIntr](event)(graphic)
+      for (const compName in drawInstructs){
+        drawInstructs[compName](event)(g);
       }
     }
-    return graphic
-  })
+    return g;
+  }, [drawInstructs]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
-  const canvasRef = new PIXI.Graphics();
-
   const reference = useCallback(
     ()=>({
       add:(events:Event[])=>{
         const graphic = makeGraphic(events);
-        canvasRef.addChild(graphic)
+        stageRef.current.addChild(graphic)
 
         return () => {
-          canvasRef.removeChild(graphic)
+          if (stageRef.current) {
+            // FIXME may cause memory leak by holding the graphic reference?
+            stageRef.current.removeChild(graphic);
+          }
         }
       }
-    }), [canvasRef]
+    }), [stageRef]
   )
 
 
   return <>
     <Stage
+      ref={stageRef}
       options={{
         backgroundColor: 0xffffff,
         autoDensity: true,
