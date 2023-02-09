@@ -105,7 +105,8 @@ export function ModalAppBar({
           <ArrowBack />
         </IconButton>
 
-        {children && (
+        {children 
+        && (
           <div
             style={{
               gridColumn: 1,
