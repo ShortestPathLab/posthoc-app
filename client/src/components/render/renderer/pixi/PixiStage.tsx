@@ -1,8 +1,7 @@
 import { Stage } from "@inlet/react-pixi";
 import { Event } from "components/render/types/render";
-import { LazyNodeList } from "components/renderer/raster/NodeList";
 import {d2InstrinsicComponents, DrawingInstruction} from "./NewPixiPrimitives"
-import { Viewport } from "../Viewport";
+import { Viewport } from "./Viewport";
 import { TraceView } from "components/render/types/trace";
 import { useCallback } from "react";
 import memoizee from "memoizee";
@@ -74,7 +73,6 @@ export function PixiStage(
       }}
     >
       <Viewport width={width} height={height}>
-        <LazyNodeList draw={reference}></LazyNodeList>
       </Viewport>
     </Stage>
   </>

@@ -12,7 +12,7 @@ import {
   PixiViewport,
   events,
   ViewportEventHandler,
-} from "./Pixi/PixiViewport";
+} from "./PixiViewport";
 
 const scale = 25;
 
