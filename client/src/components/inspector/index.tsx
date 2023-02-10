@@ -1,16 +1,24 @@
 import { Box, Fade, LinearProgress } from "@material-ui/core";
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
+import { LazyNodeList } from "components/render/renderer/generic/NodeList";
+import { PixiStage } from "components/render/renderer/pixi/PixiStage";
 import { getRenderer } from "components/renderer";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { some, values } from "lodash";
 import { createElement, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
+import { useInterlang } from "slices/interlang";
 import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";
 import { SplitView } from "./SplitView";
+
+import traceJson from "../render/data/grid-astar.trace.json";
+import { PixiApplication } from "components/render/renderer/pixi/PixiApplicatioon";
+// import traceJson from "../render/data/tile.trace.json";
+// import traceJson from ".../render/road-astar.trace.json";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
@@ -23,13 +31,47 @@ export function Inspector(props: SpecimenInspectorProps) {
     undefined
   );
 
+  const [interlang,] = useInterlang();
+
   return (
     <>
       <Fade in={some(values(loading))}>
         <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
       </Fade>
       <Flex {...props}>
-        {specimen ? (
+        <Flex>
+          <SplitView
+            resizable={true}
+            left={
+              <AutoSize>
+                {
+                  (size) => (
+                    <Fade appear in>
+                      <Box>
+                        <PixiApplication>
+                          {createElement(PixiStage, {
+                            ...size,
+                            view: interlang.main,
+                            children: (useCanvas) => (
+                              <>
+                                <LazyNodeList 
+                                  useCanvas={useCanvas}
+                                  events={traceJson.eventList}
+                                  step={50}
+                                />
+                              </>
+                            )
+                          })}
+                        </PixiApplication>
+                      </Box>
+                    </Fade>
+                  )
+                }
+              </AutoSize>
+            }
+          />
+        </Flex>
+        {/* {specimen ? (
           <Flex>
             <SplitView
               resizable={true}
@@ -85,7 +127,7 @@ export function Inspector(props: SpecimenInspectorProps) {
             <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
             Select a map to get started.
           </Flex>
-        )}
+        )} */}
       </Flex>
       <SelectionMenu
         selection={selection}

@@ -5,7 +5,7 @@ import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useInterlang } from "slices/interlang";
 import { useLoadingState } from "slices/loading";
 
-import traceJson from "../data/grid-astar.trace.json";
+import traceJson from "../components/render/data/grid-astar.trace.json";
 
 export function InterlangService() {
   const usingLoadingState = useLoadingState("interlang");

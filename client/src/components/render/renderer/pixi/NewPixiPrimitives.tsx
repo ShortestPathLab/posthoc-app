@@ -44,8 +44,7 @@ export const d2InstrinsicComponents: InstrinsicComponents = {
 
 function rectDrawingCoverter(component: Component) {
 
-  return memoizee((event: Event) => {
-
+  return (event: Event) => {
     for (const prop in component) {
       if (typeof component[prop] === "function") {
         component[prop] = component[prop](event);
@@ -91,5 +90,5 @@ function rectDrawingCoverter(component: Component) {
       }
     }
 
-  }, { primitive: true })
+  }
 }

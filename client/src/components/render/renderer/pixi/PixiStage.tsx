@@ -1,10 +1,11 @@
 import * as PIXI from 'pixi.js';
 import * as React from "react";
-import { Stage, useApp } from "@inlet/react-pixi";
+import { AppProvider, Stage, useApp } from "@inlet/react-pixi";
 
 import { Event, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
 import { d2InstrinsicComponents, DrawInstruction} from "./NewPixiPrimitives"
+import { log } from 'console';
 
 export type UseCanvasType = () => {
   add: (events: Event[]) => () => void;
@@ -35,6 +36,8 @@ export type DrawInstructions = {
  * @param props.view {View} View definition from Intermediate Language
  * @returns Pixi Stage element that renders current view
  */
+
+
 export function PixiStage(
   { width, height, view, children }: PixiStageProps
 ) {
@@ -52,7 +55,7 @@ export function PixiStage(
       const component = viewComps[compName as keyof object]
       drawInstructions[compName] = d2InstrinsicComponents[component.$].converter(component)
     }
-    return drawInstructions
+    return drawInstructions;
   }, [view])
 
   // a function which takes in an Event List creates a graphic for them
@@ -73,7 +76,7 @@ export function PixiStage(
     ()=>({
       add:(events:Event[])=>{
         const graphic = makeGraphic(events);
-        app.stage.addChild(graphic)
+        app.stage.addChild(graphic);
 
         return () => {
           app.stage.removeChild(graphic);
@@ -83,8 +86,9 @@ export function PixiStage(
   )
 
 
-  return <>
+  return (<>
     <Stage
+      width={width} height={height}
       options={{
         backgroundColor: 0xffffff,
         autoDensity: true,
@@ -108,5 +112,5 @@ export function PixiStage(
         }
       </Viewport>
     </Stage>
-  </>
+  </>)
 }
