@@ -39,7 +39,7 @@ export function Inspector(props: SpecimenInspectorProps) {
         <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
       </Fade>
       <Flex {...props}>
-        <Flex>
+        {/* <Flex>
           <SplitView
             resizable={true}
             left={
@@ -70,8 +70,8 @@ export function Inspector(props: SpecimenInspectorProps) {
               </AutoSize>
             }
           />
-        </Flex>
-        {/* {specimen ? (
+        </Flex> */}
+        {specimen ? (
           <Flex>
             <SplitView
               resizable={true}
@@ -127,7 +127,7 @@ export function Inspector(props: SpecimenInspectorProps) {
             <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
             Select a map to get started.
           </Flex>
-        )} */}
+        )}
       </Flex>
       <SelectionMenu
         selection={selection}
