@@ -15,7 +15,7 @@
       ]
     },
     "views": {
-      "main": { "renderer": "2d-pixi", "components" :[{"$": "tile"} ], "type": "history" }
+      "main": { "renderer": "2d-pixi", "components" :[{"$": "tile"} ], "type": "search" }
     }
   },
   "eventList": [

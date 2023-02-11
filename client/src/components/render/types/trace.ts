@@ -13,7 +13,7 @@ export type TraceEventType =
 
 export type TraceViewType =
   "state"
-  | "history"
+  | "search"
   | string;
 
 export type TraceEvent = {

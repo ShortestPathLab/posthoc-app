@@ -5,16 +5,12 @@ import { AppProvider, Stage, useApp } from "@inlet/react-pixi";
 import { Event, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
 import { d2InstrinsicComponents, DrawInstruction} from "./NewPixiPrimitives"
-import { log } from 'console';
-
-export type UseCanvasType = () => {
-  add: (events: Event[]) => () => void;
-}
+import { StageChild } from '../types';
 
 export type PixiStageProps = {
   width?: number;
   height?: number;
-  children?: (useCanvas:UseCanvasType) => React.ReactFragment;
+  children?: StageChild;
   view?: View;
 }
 

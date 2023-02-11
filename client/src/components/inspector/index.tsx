@@ -39,7 +39,7 @@ export function Inspector(props: SpecimenInspectorProps) {
         <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
       </Fade>
       <Flex {...props}>
-        {/* <Flex>
+        <Flex>
           <SplitView
             resizable={true}
             left={
@@ -70,8 +70,9 @@ export function Inspector(props: SpecimenInspectorProps) {
               </AutoSize>
             }
           />
-        </Flex> */}
-        {specimen ? (
+        </Flex>
+        
+        {/* {specimen ? (
           <Flex>
             <SplitView
               resizable={true}
@@ -91,22 +92,23 @@ export function Inspector(props: SpecimenInspectorProps) {
                   )}
                 </AutoSize>
               }
-              right={
-                <AutoSize>
-                  {(size) => (
-                    <Fade appear in>
-                      <Box>
-                        {createElement(renderer, {
-                          ...size,
-                          key: map,
-                          onSelect: setSelection,
-                          selection: selection?.world,
-                        })}
-                      </Box>
-                    </Fade>
-                  )}
-                </AutoSize>
-              } />
+              // right={
+              //   <AutoSize>
+              //     {(size) => (
+              //       <Fade appear in>
+              //         <Box>
+              //           {createElement(renderer, {
+              //             ...size,
+              //             key: map,
+              //             onSelect: setSelection,
+              //             selection: selection?.world,
+              //           })}
+              //         </Box>
+              //       </Fade>
+              //     )}
+              //   </AutoSize>
+              // } 
+              />
             <InfoPanel
               position="absolute"
               right={showInfo?0:'min(-25vw,-480px)'}
@@ -127,7 +129,8 @@ export function Inspector(props: SpecimenInspectorProps) {
             <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
             Select a map to get started.
           </Flex>
-        )}
+        )} */}
+
       </Flex>
       <SelectionMenu
         selection={selection}

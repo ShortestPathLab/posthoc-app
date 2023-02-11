@@ -1,5 +1,5 @@
 import { Event } from "components/render/types/render";
-import { UseCanvasType } from "../pixi/PixiStage";
+import { UseCanvas } from "../types";
 import { floor, memoize, slice } from "lodash";
 import { useMemo } from "react";
 
@@ -14,12 +14,12 @@ const cacheSize: number = 500;
 const isPersisted: boolean = true;
 
 export type NodeListProps = {
-  useCanvas?: UseCanvasType;
+  useCanvas?: UseCanvas;
   events?: Event[];
 }
 
 export type LazyNodeListProps = {
-  useCanvas?: UseCanvasType;
+  useCanvas?: UseCanvas;
   events?: Event[];
   step?: number;
 }
