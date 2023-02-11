@@ -6,7 +6,7 @@ import { PixiStage } from "components/render/renderer/pixi/PixiStage";
 import { getRenderer } from "components/renderer";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { some, values } from "lodash";
-import { createElement, useState } from "react";
+import { createElement, useCallback, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { useInterlang } from "slices/interlang";
 import { useLoading } from "slices/loading";
@@ -14,6 +14,7 @@ import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";
 import { SplitView } from "./SplitView";
+import { UseCanvas } from "components/render/renderer/types";
 
 import traceJson from "../render/data/grid-astar.trace.json";
 import { PixiApplication } from "components/render/renderer/pixi/PixiApplicatioon";
@@ -31,7 +32,7 @@ export function Inspector(props: SpecimenInspectorProps) {
     undefined
   );
 
-  const [interlang,] = useInterlang();
+  const [interlang] = useInterlang();
 
   return (
     <>
@@ -44,34 +45,32 @@ export function Inspector(props: SpecimenInspectorProps) {
             resizable={true}
             left={
               <AutoSize>
-                {
-                  (size) => (
-                    <Fade appear in>
-                      <Box>
-                        <PixiApplication>
-                          {createElement(PixiStage, {
-                            ...size,
-                            view: interlang.main,
-                            children: (useCanvas) => (
-                              <>
-                                <LazyNodeList 
-                                  useCanvas={useCanvas}
-                                  events={traceJson.eventList}
-                                  step={50}
-                                />
-                              </>
-                            )
-                          })}
-                        </PixiApplication>
-                      </Box>
-                    </Fade>
-                  )
-                }
+                {(size) => (
+                  <Fade appear in>
+                    <Box>
+                      <PixiApplication>
+                        {createElement(PixiStage, {
+                          ...size,
+                          view: interlang.main,
+                          children: (useCanvas: UseCanvas) => (
+                            <>
+                              <LazyNodeList
+                                useCanvas={useCanvas}
+                                events={traceJson.eventList}
+                                step={50}
+                              />
+                            </>
+                          ),
+                        })}
+                      </PixiApplication>
+                    </Box>
+                  </Fade>
+                )}
               </AutoSize>
             }
           />
         </Flex>
-        
+
         {/* {specimen ? (
           <Flex>
             <SplitView
@@ -130,7 +129,6 @@ export function Inspector(props: SpecimenInspectorProps) {
             Select a map to get started.
           </Flex>
         )} */}
-
       </Flex>
       <SelectionMenu
         selection={selection}

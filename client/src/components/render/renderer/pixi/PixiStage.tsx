@@ -1,11 +1,15 @@
 import * as PIXI from 'pixi.js';
 import * as React from "react";
-import { AppProvider, Stage, useApp } from "@inlet/react-pixi";
+import { AppProvider, Stage, useApp, Graphics } from "@inlet/react-pixi";
 
 import { Event, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
 import { d2InstrinsicComponents, DrawInstruction} from "./NewPixiPrimitives"
 import { StageChild } from '../types';
+import { PixiViewport } from './PixiViewport';
+
+import memoizee from 'memoizee';
+import { useMemo } from 'react';
 
 export type PixiStageProps = {
   width?: number;
@@ -17,7 +21,6 @@ export type PixiStageProps = {
 export type DrawInstructions = {
   [key:string]:DrawInstruction
 }
-
 
 /**
  * PIXI Stage component for rendering view and search trace,
@@ -34,14 +37,14 @@ export type DrawInstructions = {
  */
 
 
+
 export function PixiStage(
   { width, height, view, children }: PixiStageProps
 ) {
-  // get the PIXI.Application instance which holds the Stage object
-  const app = useApp();
+  const viewport = React.useRef<PixiViewport>(null);
 
   // process all the parsed components into drawing instructions 
-  const drawInstructs:DrawInstructions = React.useMemo(():DrawInstructions => {
+  const drawInstructs:DrawInstructions = useMemo(() => {
     if (!view) {
       throw new Error("No view is present in PixiStageProps");
     }
@@ -49,22 +52,26 @@ export function PixiStage(
     const drawInstructions:DrawInstructions = {};
     for (const compName in viewComps){
       const component = viewComps[compName as keyof object]
-      drawInstructions[compName] = d2InstrinsicComponents[component.$].converter(component)
+      drawInstructions[compName] = memoizee(d2InstrinsicComponents[component.$].converter(component), {
+        normalizer: JSON.stringify
+      })
     }
     return drawInstructions;
   }, [view])
 
   // a function which takes in an Event List creates a graphic for them
   const makeGraphic = React.useCallback((events:Event[])=>{
-    const g = new PIXI.Graphics();
+    
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
-    for (const event of events){
-      for (const compName in drawInstructs){
-        drawInstructs[compName](event)(g);
+    const g = new PIXI.Graphics();
+      for (const event of events){
+        for (const compName in drawInstructs){
+          drawInstructs[compName](event)(g);
+        }
       }
-    }
     return g;
+  
   }, [drawInstructs]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
@@ -72,16 +79,13 @@ export function PixiStage(
     ()=>({
       add:(events:Event[])=>{
         const graphic = makeGraphic(events);
-        app.stage.addChild(graphic);
-
+        viewport.current?.addChild?.(graphic);
         return () => {
-          app.stage.removeChild(graphic);
+          viewport.current?.removeChild?.(graphic);
         }
       }
-    }), [app, makeGraphic]
+    }), [makeGraphic]
   )
-
-
   return (<>
     <Stage
       width={width} height={height}
@@ -93,8 +97,8 @@ export function PixiStage(
         antialias: true,
       }}
     >
-      <Viewport width={width} height={height}>
-        {
+      <Viewport ref={viewport} width={width} height={height}/>
+      {
           /**
            * Children will be a callback that returns child components 
            * wrapped in Fragment and binded with useCanvas prop
@@ -106,7 +110,6 @@ export function PixiStage(
            */
           children?.(useCanvas)
         }
-      </Viewport>
     </Stage>
   </>)
 }

@@ -1,5 +1,7 @@
 Current Work Todo
 
+[ ] change useCanvas pass as a context
+
 [ ] Finish off the primitives
 - Rectangle, Circle, Polygon, Path
 

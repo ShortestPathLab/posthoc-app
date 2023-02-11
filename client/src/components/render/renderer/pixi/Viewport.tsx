@@ -6,7 +6,7 @@
 import { PixiComponent, useApp } from "@inlet/react-pixi";
 import { map } from "lodash";
 import * as PIXI from "pixi.js";
-import React from "react";
+import React, { ComponentProps, forwardRef } from "react";
 import {
   PointerEvent,
   PixiViewport,
@@ -71,7 +71,10 @@ const Component = PixiComponent<Props, PixiViewport>("Viewport", {
   applyProps,
 });
 
-export const Viewport = (props: ViewportProps) => {
+
+type PixiViewportProps = ViewportProps & Partial<ComponentProps<typeof Component>>;
+
+export const Viewport = forwardRef<PixiViewport, PixiViewportProps>((props,ref) => {
   const app = useApp();
-  return <Component app={app} {...props} />;
-};
+  return <Component app={app} {...props} ref={ref} />;
+});
