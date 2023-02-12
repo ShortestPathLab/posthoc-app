@@ -17,7 +17,6 @@ import { SplitView } from "./SplitView";
 import { UseCanvas } from "components/render/renderer/types";
 
 import traceJson from "../render/data/grid-astar.trace.json";
-import { PixiApplication } from "components/render/renderer/pixi/PixiApplicatioon";
 // import traceJson from "../render/data/tile.trace.json";
 // import traceJson from ".../render/road-astar.trace.json";
 
@@ -48,21 +47,19 @@ export function Inspector(props: SpecimenInspectorProps) {
                 {(size) => (
                   <Fade appear in>
                     <Box>
-                      <PixiApplication>
-                        {createElement(PixiStage, {
-                          ...size,
-                          view: interlang.main,
-                          children: (useCanvas: UseCanvas) => (
-                            <>
-                              <LazyNodeList
-                                useCanvas={useCanvas}
-                                events={traceJson.eventList}
-                                step={50}
-                              />
-                            </>
-                          ),
-                        })}
-                      </PixiApplication>
+                    {createElement(PixiStage, {
+                      ...size,
+                      view: interlang.main,
+                      children: (useCanvas: UseCanvas) => (
+                        <>
+                          <LazyNodeList
+                            useCanvas={useCanvas}
+                            events={traceJson.eventList}
+                            step={100}
+                          />
+                        </>
+                      ),
+                    })}
                     </Box>
                   </Fade>
                 )}

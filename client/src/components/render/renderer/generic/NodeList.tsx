@@ -46,7 +46,7 @@ export function LazyNodeList({
   const chunk = useMemo(
     () => memoize((n: number) => slice(events, 0, n)),
     [events]
-  );
+  );  
 
   if(isPersisted) {
     return (

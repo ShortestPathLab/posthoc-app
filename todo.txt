@@ -1,5 +1,7 @@
 Current Work Todo
 
+[ ] Add context to converter, computed props
+
 [ ] change useCanvas pass as a context
 
 [ ] Finish off the primitives

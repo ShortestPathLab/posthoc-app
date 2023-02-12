@@ -1,4 +1,4 @@
-import { Component, Components, Render, Views } from "../types/render"
+import { Component, Components, Render } from "../types/render"
 import { Context } from "../types/context"
 import { primitiveComponents } from "../renderer/primitives"
 import { isArray, set } from "lodash";
@@ -149,7 +149,7 @@ export function parseProperty(val: any, injectedContext: Context): Function {
 
   return (context: Context) =>
     // eslint-disable-next-line no-new-func
-    Function("context", `return ${val}`)
+    Function("context", `console.log(context);return ${val}`)
       ({ ...injectedContext, ...context }) // This combines the two contexts and overridees the injectedContext if duplicate properties
 }
 

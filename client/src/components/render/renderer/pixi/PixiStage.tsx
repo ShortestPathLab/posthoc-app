@@ -4,7 +4,7 @@ import { AppProvider, Stage, useApp, Graphics } from "@inlet/react-pixi";
 
 import { Event, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
-import { d2InstrinsicComponents, DrawInstruction} from "./NewPixiPrimitives"
+import { d2InstrinsicComponents, DrawInstruction} from "./PixiPrimitives"
 import { StageChild } from '../types';
 import { PixiViewport } from './PixiViewport';
 
@@ -75,7 +75,7 @@ export function PixiStage(
   }, [drawInstructs]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
-  const useCanvas = React.useCallback(
+  const drawEvents = React.useCallback(
     ()=>({
       add:(events:Event[])=>{
         const graphic = makeGraphic(events);
@@ -108,7 +108,7 @@ export function PixiStage(
            *  </React.Fragment>
            * )
            */
-          children?.(useCanvas)
+          children?.(drawEvents)
         }
     </Stage>
   </>)
