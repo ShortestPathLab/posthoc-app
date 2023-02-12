@@ -2,6 +2,8 @@ Current Work Todo
 
 [ ] Add context to converter, computed props
 
+[ ] Nodelist config the cacheSize & type to setting slice
+
 [ ] change useCanvas pass as a context
 
 [ ] Finish off the primitives

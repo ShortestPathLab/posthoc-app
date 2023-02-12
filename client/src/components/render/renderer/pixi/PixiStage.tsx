@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as React from "react";
-import { AppProvider, Stage, useApp, Graphics } from "@inlet/react-pixi";
+import { Stage } from "@inlet/react-pixi";
 
 import { Event, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
@@ -75,7 +75,7 @@ export function PixiStage(
   }, [drawInstructs]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
-  const drawEvents = React.useCallback(
+  const useCanvas = React.useCallback(
     ()=>({
       add:(events:Event[])=>{
         const graphic = makeGraphic(events);
@@ -86,6 +86,7 @@ export function PixiStage(
       }
     }), [makeGraphic]
   )
+  
   return (<>
     <Stage
       width={width} height={height}
@@ -108,7 +109,7 @@ export function PixiStage(
            *  </React.Fragment>
            * )
            */
-          children?.(drawEvents)
+          children?.(useCanvas)
         }
     </Stage>
   </>)
