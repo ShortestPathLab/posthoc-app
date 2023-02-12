@@ -7,7 +7,6 @@ import { PixiStage } from "components/render/renderer/pixi/PixiStage";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { get, some, values } from "lodash";
 import { createElement, useCallback, useState } from "react";
-import { useInterlang } from "slices/interlang";
 import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
@@ -17,7 +16,7 @@ import { SplitView } from "./SplitView";
 import AutoSize from "react-virtualized-auto-sizer";
 import { UseCanvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";
-import { Interlang } from "slices/interlang";
+import { Interlang } from "slices/specimen";
 
 import traceJson from "../render/data/grid-astar.trace.json";
 
@@ -35,6 +34,8 @@ const getRenderer = (name: string | undefined) => {
   }
 }
 
+// FIXME I want to make it a dedicate render/renderer/index.ts but fail
+// it doesn't show anything when did so
 export function createViews(interlang: Interlang) {
   
   const views = Object.keys(interlang).map((viewName) => {
@@ -72,14 +73,12 @@ type SpecimenInspectorProps = {} & FlexProps;
 
 export function Inspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
-  const [{ specimen, format, map }] = useSpecimen();
+  const [{ specimen, format, map, interlang, eventList }] = useSpecimen();
   const renderer = getRenderer(format);
   const [showInfo, setShowInfo] = useState(true);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
-
-  const [interlang] = useInterlang();
 
   return (
     <>
@@ -87,58 +86,11 @@ export function Inspector(props: SpecimenInspectorProps) {
         <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
       </Fade>
       <Flex {...props}>
-        <Flex>
-          <SplitView
-            resizable={true}
-            views={createViews(interlang)}
-          />
-        </Flex>
-
-        {/* {specimen ? (
+        {interlang ? (
           <Flex>
             <SplitView
               resizable={true}
-              left={
-                <AutoSize>
-                  {(size) => (
-                    <Fade appear in>
-                      <Box>
-                        {createElement(renderer, {
-                          ...size,
-                          key: map,
-                          onSelect: setSelection,
-                          selection: selection?.world,
-                        })}
-                      </Box>
-                    </Fade>
-                  )}
-                </AutoSize>
-              }
-              // right={
-              //   <AutoSize>
-              //     {(size) => (
-              //       <Fade appear in>
-              //         <Box>
-              //           {createElement(renderer, {
-              //             ...size,
-              //             key: map,
-              //             onSelect: setSelection,
-              //             selection: selection?.world,
-              //           })}
-              //         </Box>
-              //       </Fade>
-              //     )}
-              //   </AutoSize>
-              // } 
-              />
-            <InfoPanel
-              position="absolute"
-              right={showInfo?0:'min(-25vw,-480px)'}
-              height="100%"
-              width="25vw"
-              minWidth={480}
-              show={showInfo}
-              setShow={setShowInfo}
+              views={createViews(interlang)}
             />
           </Flex>
         ) : (
@@ -151,7 +103,18 @@ export function Inspector(props: SpecimenInspectorProps) {
             <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
             Select a map to get started.
           </Flex>
-        )} */}
+        )}
+        {eventList?(
+          <InfoPanel
+            position="absolute"
+            right={showInfo?0:'min(-25vw,-480px)'}
+            height="100%"
+            width="25vw"
+            minWidth={480}
+            show={showInfo}
+            setShow={setShowInfo}
+          />
+        ):<></>}
       </Flex>
       <SelectionMenu
         selection={selection}

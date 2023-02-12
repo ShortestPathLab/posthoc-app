@@ -2,7 +2,7 @@ import { Component, Components, Render } from "../types/render"
 import { Context } from "../types/context"
 import { primitiveComponents } from "../renderer/primitives"
 import { isArray, set } from "lodash";
-import { Interlang } from "slices/interlang";
+import { Interlang } from "slices/specimen";
 
 let renderName: string | undefined;
 /**

@@ -3,7 +3,7 @@ import { Box, Fade, LinearProgress } from "@material-ui/core";
 import AutoSize from "react-virtualized-auto-sizer";
 import { UseCanvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";
-import { Interlang } from "slices/interlang";
+import { Interlang } from "slices/specimen";
 
 import traceJson from "../data/tile.trace.json";
 // import traceJson from "../render/data/tile.trace.json";

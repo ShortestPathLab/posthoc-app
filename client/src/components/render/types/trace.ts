@@ -58,6 +58,7 @@ export type TraceRender = {
 
 export type Trace = {
   version?: string;
+  context?: object;
   render?: TraceRender;
   eventList?: TraceEvent[];
 }

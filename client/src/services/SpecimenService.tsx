@@ -12,6 +12,9 @@ import { useLoadingState } from "slices/loading";
 import { Specimen, useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { hashAsync as hash } from "workers/async";
+import { parseViews } from "components/render/parser/Parser";
+
+import traceJson from "../components/render/data/grid-astar.trace.json";
 
 async function solve(
   map: string,
@@ -46,9 +49,28 @@ export function SpecimenService() {
   const [{ formats: format }] = useFeatures();
   const [{ algorithm, start, end }, setUIState] = useUIState();
   const resolve = useConnectionResolver();
-  const [, setSpecimen] = useSpecimen();
+  const [specimen, setSpecimen] = useSpecimen();
 
   const { result: map } = useMapContent();
+
+  useAsync(
+    (signal) => 
+      usingLoadingState(async() => {
+        const views = parseViews(traceJson.render);
+        if (views !== undefined && !signal.aborted) {
+          setSpecimen({
+            ...specimen,
+            interlang: views,
+          })
+        }
+        notify((
+          <Label
+            primary="Interlang generated."
+            secondary={`${views?.main?.components?.length} components`} />
+        ))
+      }),
+    [traceJson, setSpecimen]
+  )
 
   useAsync(
     (signal) =>
