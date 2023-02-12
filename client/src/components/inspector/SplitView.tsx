@@ -3,8 +3,7 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useTheme } from "@material-ui/core/styles";
 
 export type SplitViewProps = {
-  left?: React.ReactNode;
-  right?: React.ReactNode;
+  views?: React.ReactNode[];
   resizable?: boolean;
 }
 
@@ -18,7 +17,7 @@ export type SplitViewProps = {
  * @param props.resizable boolean value if true then the split view will be resizable
  * @returns ReactElement of the split view
  */
-export function SplitView({left, right, resizable=false}:SplitViewProps):React.ReactElement {
+export function SplitView({views, resizable=false}:SplitViewProps):React.ReactElement {
   const resizerRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
@@ -72,14 +71,14 @@ export function SplitView({left, right, resizable=false}:SplitViewProps):React.R
     }
   };
 
-  if (left && right) {
+  if (views?.length === 2) {
     return (
       <div style={{ height: "100%", display: "flex", width:"100%" }}>
         <div
           ref={leftRef}
           style={{ height: "100%", minWidth: "20%", width: "50%" }}
         >
-          {left}
+          {views[0]}
         </div>
         <div
           ref={resizerRef}
@@ -92,13 +91,13 @@ export function SplitView({left, right, resizable=false}:SplitViewProps):React.R
           ref={rightRef}
           style={{ flex: "1 1 0%", minWidth: "20%", height: "100%" }}
         >
-          {right}
+          {views[1]}
         </div>
       </div>
     )
-  } else if (left) {
-    return <>{left}</>
+  } else if (views?.length === 1) {
+    return <>{views[0]}</>
   } else {
-    return <></>
+    return <>No Views Present</>
   }
 }
