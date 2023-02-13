@@ -71,7 +71,6 @@ export function parseComps(components: Component[] | undefined, injectedContext:
 
     else {
       throw new Error("Component by the name of " + component['$'] + " does not exist");
-      return []
     }
   }
 

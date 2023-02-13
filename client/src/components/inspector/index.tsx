@@ -64,6 +64,7 @@ export function createViews(interlang: Interlang, eventList: Event[], step: numb
       </AutoSize>
     )
   });
+  views.push(views[0]);
   return views;
 }
 
@@ -72,7 +73,7 @@ type SpecimenInspectorProps = {} & FlexProps;
 
 export function Inspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
-  const [{ map, interlang, eventList }] = useSpecimen();
+  const [{ interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
