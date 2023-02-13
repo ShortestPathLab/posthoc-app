@@ -64,6 +64,7 @@ export function createViews(interlang: Interlang, eventList: Event[], step: numb
       </AutoSize>
     )
   });
+  // 
   views.push(views[0]);
   return views;
 }

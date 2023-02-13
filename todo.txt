@@ -3,6 +3,7 @@ Current Work Todo
 OPEN
 
 [ ] Playback component for animation support - render/renderer/generic/Playback.tsx
+- layered system for tiles
 
 [ ] Add eventlist.context to converter, computed props
 
@@ -37,14 +38,14 @@ required here, not sure it's better or not.
 
 FINISHED
 
-[*] A function that create Renderer component according to views definiation
+[x] A function that create Renderer component according to views definiation
 - pass down the view definition to the canvas
 
-[*] Create a stage for the PIXI renderer - renderer
+[x] Create a stage for the PIXI renderer - renderer
 - takes in the intermediate language
 - provide add/delete function for each child nodelist
 
-[*] Nodelist and LazyNodelist
+[x] Nodelist and LazyNodelist
 - generic for stages/renderers
 - caching the nodes
 - use the add/delete function to 
