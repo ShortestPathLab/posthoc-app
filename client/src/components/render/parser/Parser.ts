@@ -46,7 +46,7 @@ export function parseComps(components: Component[] | undefined, injectedContext:
 
       //TODO Make this raise some popup error
       if (renderName !== undefined && primitiveComponents[component["$"]]["renderer"] !== renderName) {
-        console.log("Bad")
+        throw new Error("Component renderer definition is not match to supported renderer");
       }
 
       // creates a copy of the component
@@ -70,8 +70,7 @@ export function parseComps(components: Component[] | undefined, injectedContext:
     }
 
     else {
-      // TODO Error Handling
-      console.log("Component by the name of " + component['$'] + " does not exist")
+      throw new Error("Component by the name of " + component['$'] + " does not exist");
       return []
     }
   }

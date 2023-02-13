@@ -36,8 +36,6 @@ export type DrawInstructions = {
  * @returns Pixi Stage element that renders current view
  */
 
-
-
 export function PixiStage(
   { width, height, view, children }: PixiStageProps
 ) {

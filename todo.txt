@@ -1,16 +1,19 @@
 Current Work Todo
 
-[ ] Add context to converter, computed props
+OPEN
+
+[ ] Playback component for animation support - render/renderer/generic/Playback.tsx
+
+[ ] Add eventlist.context to converter, computed props
 
 [ ] Nodelist config the cacheSize & type to setting slice
 
-[ ] change useCanvas pass as a context
+[ ] Change useCanvas pass as a context
+- PROBLEM: multiple context required for each of the stage, many to many dependency
+required here, not sure it's better or not.
 
 [ ] Finish off the primitives
 - Rectangle, Circle, Polygon, Path
-
-[ ] A function that create Renderer component according to views definiation
-- pass down the view definition to the canvas
 
 [ ] An Context system for intermediate language - parser
 - something like a speciman context
@@ -30,6 +33,12 @@ Current Work Todo
 [ ] Create merger of eventList information so that delta eventLists will work
 
 [ ] Documentation
+
+
+FINISHED
+
+[*] A function that create Renderer component according to views definiation
+- pass down the view definition to the canvas
 
 [*] Create a stage for the PIXI renderer - renderer
 - takes in the intermediate language
