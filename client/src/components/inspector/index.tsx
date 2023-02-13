@@ -71,7 +71,7 @@ type SpecimenInspectorProps = {} & FlexProps;
 
 export function Inspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
-  const [{ format, map, interlang, eventList }] = useSpecimen();
+  const [{ map, interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
