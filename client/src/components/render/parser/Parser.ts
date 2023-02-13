@@ -44,7 +44,6 @@ export function parseComps(components: Component[] | undefined, injectedContext:
     // Checks to see if the name of the component matches a primitive
     if (component["$"] in primitiveComponents) {
 
-      //TODO Make this raise some popup error
       if (renderName !== undefined && primitiveComponents[component["$"]]["renderer"] !== renderName) {
         throw new Error("Component renderer definition is not match to supported renderer");
       }
