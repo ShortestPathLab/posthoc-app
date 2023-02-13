@@ -76,7 +76,6 @@ export function PixiStage(
       add:(events:Event[])=>{
         const graphic = makeGraphic(events);
         viewport.current?.addChild?.(graphic);
-        console.log(viewport.current);
         return () => {
           viewport.current?.removeChild?.(graphic);
         }

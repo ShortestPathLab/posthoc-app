@@ -16,7 +16,8 @@ import { UseCanvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";
 import { Interlang } from "slices/specimen";
 
-import traceJson from "../render/data/grid-astar.trace.json";
+import { Playback } from "components/render/renderer/generic/Playback";
+import { Event } from "components/render/types/render";
 
 export const Stages = {
   "2d-pixi": PixiStage
@@ -34,7 +35,7 @@ const getRenderer = (name: string | undefined) => {
 
 // FIXME I want to make it a dedicate render/renderer/index.ts but fail
 // it doesn't show anything when did so
-export function createViews(interlang: Interlang) {
+export function createViews(interlang: Interlang, eventList: Event[], step: number) {
   
   const views = Object.keys(interlang).map((viewName) => {
     const Stage = getRenderer(interlang?.[viewName]?.renderer);
@@ -51,8 +52,8 @@ export function createViews(interlang: Interlang) {
                   <>
                     <LazyNodeList
                       useCanvas={useCanvas}
-                      events={traceJson.eventList}
-                      step={100}
+                      events={eventList}
+                      step={step}
                     />
                   </>
                 ),
@@ -85,10 +86,14 @@ export function Inspector(props: SpecimenInspectorProps) {
       <Flex {...props}>
         {interlang ? (
           <Flex>
-            <SplitView
-              resizable={true}
-              views={createViews(interlang)}
-            />
+            <Playback>
+              {(eventList, step) => (
+                <SplitView
+                  resizable={true}
+                  views={createViews(interlang, eventList, step)}
+                />
+              )}
+            </Playback>
           </Flex>
         ) : (
           <Flex
