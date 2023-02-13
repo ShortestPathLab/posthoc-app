@@ -1,12 +1,10 @@
 import { Box, Fade, LinearProgress } from "@material-ui/core";
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
-// import { createViews } from "components/render/renderer";
 import { PixiStage } from "components/render/renderer/pixi/PixiStage";
-// import { getRenderer } from "components/renderer";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { get, some, values } from "lodash";
-import { createElement, useCallback, useState } from "react";
+import { createElement, useState } from "react";
 import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
@@ -73,8 +71,7 @@ type SpecimenInspectorProps = {} & FlexProps;
 
 export function Inspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
-  const [{ specimen, format, map, interlang, eventList }] = useSpecimen();
-  const renderer = getRenderer(format);
+  const [{ format, map, interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined

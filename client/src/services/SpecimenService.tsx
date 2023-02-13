@@ -61,6 +61,7 @@ export function SpecimenService() {
           setSpecimen({
             ...specimen,
             interlang: views,
+            eventList: traceJson.eventList,
           })
         }
         notify((

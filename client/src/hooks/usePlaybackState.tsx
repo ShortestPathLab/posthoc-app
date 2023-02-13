@@ -4,12 +4,12 @@ import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 
 export function usePlaybackState() {
-  const [{ specimen }] = useSpecimen();
+  const [{ eventList }] = useSpecimen();
   const [{ playback, step = 0 }, setUIState] = useUIState();
 
-  const ready = !!specimen;
+  const ready = !!eventList;
   const playing = playback === "playing";
-  const [start, end] = [0, (specimen?.eventList?.length ?? 1) - 1];
+  const [start, end] = [0, (eventList?.length ?? 1) - 1];
 
   return useMemo(() => {
     const state = {
