@@ -30,6 +30,13 @@ required here, not sure it's better or not.
 - Choose which Stage to use in each of the view
 
 [ ] Convert more Search Traces into current format
+ - [*] Grid Trace
+ - [*] Road Network Trace
+ - [*] Mesh Trace
+ - [ ] Tree Trace
+ - [*] 9 Tile Puzzle Trace
+ - [ ] Multi Agent Path Finder
+ - [*] Bidirectional (Grid/Road versions) Trace
 
 [ ] Create merger of eventList information so that delta eventLists will work
 
