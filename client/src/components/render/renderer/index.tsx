@@ -1,7 +1,7 @@
 import { createElement } from "react"; 
 import { Box, Fade } from "@material-ui/core";
 import AutoSize from "react-virtualized-auto-sizer";
-import { UseCanvas } from "components/render/renderer/types";
+import { Canvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";
 import { Interlang } from "slices/specimen";
 import { Event } from "../types/render";
@@ -37,10 +37,10 @@ export const createViews = (interlang: Interlang, eventList: Event[], step: numb
               {createElement(Stage, {
                 ...size,
                 view: interlang.main,
-                children: (useCanvas: UseCanvas) => (
+                children: (canvas: Canvas) => (
                   <>
                     <LazyNodeList
-                      useCanvas={useCanvas}
+                      canvas={canvas}
                       events={eventList}
                       step={step}
                     />
@@ -53,7 +53,6 @@ export const createViews = (interlang: Interlang, eventList: Event[], step: numb
       </AutoSize>
     )
   });
-  // HACK remove after finish splitview
-  views.push(views[0]);
+
   return views;
 }

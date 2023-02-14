@@ -8,7 +8,6 @@ import { d2InstrinsicComponents, DrawInstruction} from "./PixiPrimitives"
 import { StageChild } from '../types';
 import { PixiViewport } from './PixiViewport';
 
-import memoizee from 'memoizee';
 import { useMemo } from 'react';
 
 export type PixiStageProps = {
@@ -50,9 +49,7 @@ export function PixiStage(
     const drawInstructions:DrawInstructions = {};
     for (const compName in viewComps){
       const component = viewComps[compName as keyof object]
-      drawInstructions[compName] = memoizee(d2InstrinsicComponents[component.$].converter(component), {
-        normalizer: JSON.stringify
-      })
+      drawInstructions[compName] = d2InstrinsicComponents[component.$].converter(component);
     }
     return drawInstructions;
   }, [view])
@@ -64,8 +61,7 @@ export function PixiStage(
     const g = new PIXI.Graphics();
     for (const compName in drawInstructs){
       const drawInstruction = drawInstructs[compName];
-      console.log(`length: ${events.length}, hasCurrent: ${hasCurrent}`)
-      if (drawInstruction.persisted) {
+      if (drawInstruction.persisted === true) {
         for (const event of events){
           drawInstruction(event)(g);
         }
@@ -77,7 +73,7 @@ export function PixiStage(
   }, [drawInstructs]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
-  const useCanvas = React.useCallback(
+  const canvas = React.useCallback(
     ()=>({
       add:(events:Event[], hasCurrent:boolean)=>{
         const graphic = makeGraphic(events, hasCurrent);
@@ -111,7 +107,7 @@ export function PixiStage(
            *  </React.Fragment>
            * )
            */
-          children?.(useCanvas)
+          children?.(canvas)
         }
     </Stage>
   </>)

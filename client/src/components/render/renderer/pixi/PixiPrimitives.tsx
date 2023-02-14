@@ -197,7 +197,7 @@ function circleDrawingCoverter(component: Component){
 }
 
 function rectDrawingCoverter(component: Component) {
-  const drawInstruction = (event: Event) => {
+  function drawInstruction(event: Event) {
     // executes all the computed properties
     const element:Component = executeComponent(component, event)
 
@@ -236,5 +236,5 @@ function rectDrawingCoverter(component: Component) {
 
   drawInstruction.persisted = component.persisted ? component.persisted : true;
 
-  return memoizee(drawInstruction);
+  return drawInstruction;
 }

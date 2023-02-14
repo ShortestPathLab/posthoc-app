@@ -1,7 +1,7 @@
 import { Event } from "components/render/types/render";
-import { UseCanvas } from "../types";
+import { Canvas } from "../types";
 import { floor, memoize, slice } from "lodash";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 // TODO config the cacheSize & type to setting slice
 const cacheSize: number = 500;
@@ -14,47 +14,54 @@ const cacheSize: number = 500;
 const isPersisted: boolean = true;
 
 export type NodeListProps = {
-  useCanvas?: UseCanvas;
+  canvas?: Canvas;
   events?: Event[];
   hasCurrent?: boolean;
 }
 
 export type LazyNodeListProps = {
-  useCanvas?: UseCanvas;
+  canvas?: Canvas;
   events?: Event[];
   step?: number;
 }
 
 export function NodeList({
-  useCanvas, events, hasCurrent=false
+  canvas, events, hasCurrent=false
 }: NodeListProps) {
-  if (!useCanvas || !events) {
+  if (!canvas || !events) {
     throw new Error("Prop is missing on NodeList");
   }
-  useCanvas().add(events, hasCurrent);
+  useEffect(() => {
+    const remove = canvas().add(events, hasCurrent);
+    return () => {
+      remove();
+    }
+  }, [canvas, events, hasCurrent]);
   return <></>
 }
 
 export function LazyNodeList({
-  useCanvas, events, step
+  canvas, events, step
 }: LazyNodeListProps) {
-  if (!events || step === undefined || !useCanvas) {
+  if (!events || step === undefined || !canvas) {
     throw new Error("Prop is missing on LazyNodeList");
   }
 
-  const threshold = floor(step / cacheSize) * cacheSize;
+  const threshold = useMemo(() => {
+    return floor(step / cacheSize) * cacheSize
+  }, [step]);
 
   const chunk = useMemo(
     () => memoize((n: number) => slice(events, 0, n))(threshold),
     [events, threshold]
-  );  
+  );
 
   // Configue state/search at view level
   if(isPersisted) {
     return (
       <>
-        {threshold!==0?<NodeList events={chunk} useCanvas={useCanvas} hasCurrent={chunk.length === step} />:<></>}
-        <NodeList events={slice(events, threshold, step + 1)} useCanvas={useCanvas} hasCurrent={chunk.length !== step} />
+        {threshold!==0?<NodeList events={chunk} canvas={canvas} hasCurrent={chunk.length === step} />:<></>}
+        <NodeList events={slice(events, threshold, step + 1)} canvas={canvas} hasCurrent={chunk.length !== step} />
       </>
     )
   } else {
@@ -63,7 +70,7 @@ export function LazyNodeList({
         <NodeList events={
           events.length !== 0?
             [events[-1]]: []
-        } useCanvas={useCanvas} />
+        } canvas={canvas} />
       </>
     )
   }

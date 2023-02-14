@@ -16,7 +16,7 @@ export type AddToCanvasCb = (events: Event[], hasCurrent: boolean) => RemoveFrom
  * A medium providing "add" and "remove" event from canvas function 
  * to child components
  */
-export type UseCanvas = () => {
+export type Canvas = () => {
   add: AddToCanvasCb;
 }
 
@@ -24,4 +24,4 @@ export type UseCanvas = () => {
  * 
  */
 export type StageChild = 
-  (useCanvas:UseCanvas) => React.ReactFragment;
+  (canvas:Canvas) => React.ReactFragment;
