@@ -1,6 +1,16 @@
 Current Work Todo
 
+QUESTION
+
+[ ] Current playback system won't support unpersisted component.
+
+[ ] Current playback system
+- Currently it works by adding x steps every tick (where x is determined by playbackRate) (this way allows for faster drawing)
+- Should we change it so its reversed, 1 step every x ticks (x is playbackRate) (this way allows for slower drawing)
+
 OPEN
+
+[ ] Draw the map
 
 [ ] Playback component for animation support - render/renderer/generic/Playback.tsx
 - layered system for tiles
@@ -13,21 +23,21 @@ OPEN
 - PROBLEM: multiple context required for each of the stage, many to many dependency
 required here, not sure it's better or not.
 
-[ ] Finish off the primitives
-- Rectangle, Circle, Polygon, Path
-
 [ ] An Context system for intermediate language - parser
 - something like a speciman context
 - takes in the search trace
 - provide intermediate language for the renderer
 
-[ ] Provide a set of pre-defined components/views for user to choose from
-- user could display the search trace without defining views and components
-
 [ ] Window system for multiple views - side by side
 - As a parent component relative to xxxStage
 - Manage the window system
 - Choose which Stage to use in each of the view
+
+[ ] Finish off the primitives
+- Rectangle, Circle, Polygon, Path
+
+[ ] Provide a set of pre-defined components/views for user to choose from
+- user could display the search trace without defining views and components
 
 [ ] Convert more Search Traces into current format
  - [*] Grid Trace

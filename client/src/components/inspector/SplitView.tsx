@@ -1,10 +1,12 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useCallback, Dispatch, SetStateAction } from "react";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useTheme } from "@material-ui/core/styles";
 
 export type SplitViewProps = {
   views?: React.ReactNode[];
   resizable?: boolean;
+  resizing: boolean;
+  setResizing: Dispatch<SetStateAction<boolean>>;
 }
 
 /**
@@ -17,17 +19,17 @@ export type SplitViewProps = {
  * @param props.resizable boolean value if true then the split view will be resizable
  * @returns ReactElement of the split view
  */
-export function SplitView({views, resizable=false}:SplitViewProps):React.ReactElement {
+export function SplitView({views, resizable=false, resizing, setResizing}:SplitViewProps):React.ReactElement {
   const resizerRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
 
   const theme = useTheme();
 
-  let x = 0;
-  let leftWidth = 0;
+  let [x, setX] = useState(0);
+  let [leftWidth, setLeftWidth] = useState(0);
 
-  const resizeMoveHandler = (e: MouseEvent) => {
+  const resizeMoveHandler = useCallback((e: MouseEvent) => {
     if (
       resizerRef.current &&
       leftRef.current &&
@@ -45,9 +47,9 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
       rightRef.current.style.userSelect = "none";
       rightRef.current.style.pointerEvents = "none";
     }
-  };
+  }, [resizerRef, leftRef, rightRef, leftWidth, x]);
 
-  const resizeUpHandler = () => {
+  const resizeUpHandler = useCallback(() => {
     if (resizerRef.current && leftRef.current && rightRef.current) {
       resizerRef.current.style.removeProperty("cursor");
       document.body.style.removeProperty("cursor");
@@ -55,22 +57,47 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
       leftRef.current.style.removeProperty("pointer-events");
       rightRef.current.style.removeProperty("user-select");
       rightRef.current.style.removeProperty("pointer-events");
+      setResizing(false);
       document.removeEventListener("mousemove", resizeMoveHandler);
       document.removeEventListener("mouseup", resizeUpHandler);
     }
-  };
+  }, [resizeMoveHandler, setResizing]);
 
-  const resizeHandler = (e: React.MouseEvent) => {
+  const resizeHandler = useCallback((e: React.MouseEvent) => {
     if (leftRef.current && resizerRef.current) {
       resizerRef.current.style.cursor = "e-resize";
       document.body.style.cursor = "e-resize";
-      x = e.clientX;
-      leftWidth = leftRef.current.getBoundingClientRect().width;
+      setX(e.clientX);
+      setLeftWidth(leftRef.current.getBoundingClientRect().width);
       document.addEventListener("mousemove", resizeMoveHandler);
       document.addEventListener("mouseup", resizeUpHandler);
+      setResizing(true);
     }
-  };
+  }, [setX, setLeftWidth, resizeMoveHandler, resizeUpHandler, setResizing]);
 
+  if (resizing) {
+    return (
+      <div style={{ height: "100%", display: "flex", width:"100%" }}>
+        <div
+          ref={leftRef}
+          style={{ height: "100%", minWidth: "20%", width: "50%", background: theme.palette.divider}}
+        >
+        </div>
+        <div
+          ref={resizerRef}
+          onMouseDown={resizable?resizeHandler:undefined}
+          style={{ width: "15px", backgroundColor: theme.palette.primary.main, height: "100%", display:'flex', justifyContent:'center', alignItems:'center' }}
+        >
+          <MoreVertIcon color="action" />
+        </div>
+        <div
+          ref={rightRef}
+          style={{ flex: "1 1 0%", minWidth: "20%", height: "100%", background: theme.palette.divider }}
+        >
+        </div>
+      </div>
+    )
+  }
   if (views?.length === 2) {
     return (
       <div style={{ height: "100%", display: "flex", width:"100%" }}>
@@ -98,6 +125,6 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
   } else if (views?.length === 1) {
     return <>{views[0]}</>
   } else {
-    return <>No Views Present</>
+    return <></>
   }
 }

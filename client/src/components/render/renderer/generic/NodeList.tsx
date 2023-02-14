@@ -16,6 +16,7 @@ const isPersisted: boolean = true;
 export type NodeListProps = {
   useCanvas?: UseCanvas;
   events?: Event[];
+  hasCurrent?: boolean;
 }
 
 export type LazyNodeListProps = {
@@ -25,12 +26,12 @@ export type LazyNodeListProps = {
 }
 
 export function NodeList({
-  useCanvas, events
+  useCanvas, events, hasCurrent=false
 }: NodeListProps) {
   if (!useCanvas || !events) {
     throw new Error("Prop is missing on NodeList");
   }
-  useCanvas().add(events);
+  useCanvas().add(events, hasCurrent);
   return <></>
 }
 
@@ -44,15 +45,16 @@ export function LazyNodeList({
   const threshold = floor(step / cacheSize) * cacheSize;
 
   const chunk = useMemo(
-    () => memoize((n: number) => slice(events, 0, n)),
-    [events]
+    () => memoize((n: number) => slice(events, 0, n))(threshold),
+    [events, threshold]
   );  
 
+  // Configue state/search at view level
   if(isPersisted) {
     return (
       <>
-        {threshold!==0?<NodeList events={chunk(threshold)} useCanvas={useCanvas} />:<></>}
-        <NodeList events={slice(events, threshold, step + 1)} useCanvas={useCanvas} />
+        {threshold!==0?<NodeList events={chunk} useCanvas={useCanvas} hasCurrent={chunk.length === step} />:<></>}
+        <NodeList events={slice(events, threshold, step + 1)} useCanvas={useCanvas} hasCurrent={chunk.length !== step} />
       </>
     )
   } else {

@@ -20,7 +20,7 @@ export function parseViews(renderDef: Render): Interlang | undefined {
     renderName = views?.[viewName]?.["renderer"];
     set(views, `${viewName}.components`,parseComps(views?.[viewName]?.["components"], userContext, userComp))
   }
-
+  console.log(views);
   return views;
 }
 
@@ -53,7 +53,7 @@ export function parseComps(components: Component[] | undefined, injectedContext:
 
       // goes through all the properties of the component and parses them when necessary
       for (const prop in component) {
-        if (prop !== "$") {
+        if (prop !== "$" && prop !== "persisted") {
           newComp[prop as keyof Component] = parseProperty(component[prop as keyof Component], injectedContext)
         }
       }

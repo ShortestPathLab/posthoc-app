@@ -58,13 +58,19 @@ export function PixiStage(
   }, [view])
 
   // a function which takes in an Event List creates a graphic for them
-  const makeGraphic = React.useCallback((events:Event[])=>{
+  const makeGraphic = React.useCallback((events:Event[], hasCurrent:boolean)=>{
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
     const g = new PIXI.Graphics();
-    for (const event of events){
-      for (const compName in drawInstructs){
-        drawInstructs[compName](event)(g);
+    for (const compName in drawInstructs){
+      const drawInstruction = drawInstructs[compName];
+      console.log(`length: ${events.length}, hasCurrent: ${hasCurrent}`)
+      if (drawInstruction.persisted) {
+        for (const event of events){
+          drawInstruction(event)(g);
+        }
+      } else if (events[events.length - 1 ] && hasCurrent) {
+        drawInstruction(events[events.length - 1 ])(g);
       }
     }
     return g;
@@ -73,8 +79,8 @@ export function PixiStage(
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const useCanvas = React.useCallback(
     ()=>({
-      add:(events:Event[])=>{
-        const graphic = makeGraphic(events);
+      add:(events:Event[], hasCurrent:boolean)=>{
+        const graphic = makeGraphic(events, hasCurrent);
         viewport.current?.addChild?.(graphic);
         return () => {
           viewport.current?.removeChild?.(graphic);

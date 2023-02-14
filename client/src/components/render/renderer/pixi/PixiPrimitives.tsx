@@ -3,7 +3,7 @@ import { Component, Event } from "../../types/render";
 import * as PIXI from 'pixi.js';
 import memoizee from "memoizee";
 
-export type DrawInstruction = (event: Event) => (graphic: GraphicsType) => void;
+export type DrawInstruction = ((event: Event) => (graphic: GraphicsType) => void) & {persisted?: boolean};
 
 export type InstrinsicComponents = {
   [key: string]: {
@@ -197,9 +197,7 @@ function circleDrawingCoverter(component: Component){
 }
 
 function rectDrawingCoverter(component: Component) {
-
-  return memoizee((event: Event) => {
-    
+  const drawInstruction = (event: Event) => {
     // executes all the computed properties
     const element:Component = executeComponent(component, event)
 
@@ -234,5 +232,9 @@ function rectDrawingCoverter(component: Component) {
         g.addChild(textObj)
       }
     }
-  })
+  }
+
+  drawInstruction.persisted = component.persisted ? component.persisted : true;
+
+  return memoizee(drawInstruction);
 }

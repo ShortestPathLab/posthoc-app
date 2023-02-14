@@ -10,7 +10,7 @@ export type RemoveFromCanvasCb = () => void;
  * Add events to canvas, return a callback that can remove
  * those events from the canvas
  */
-export type AddToCanvasCb = (events: Event[]) => RemoveFromCanvasCb;
+export type AddToCanvasCb = (events: Event[], hasCurrent: boolean) => RemoveFromCanvasCb;
 
 /**
  * A medium providing "add" and "remove" event from canvas function 

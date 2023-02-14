@@ -1,14 +1,10 @@
 import { createElement } from "react"; 
-import { Box, Fade, LinearProgress } from "@material-ui/core";
+import { Box, Fade } from "@material-ui/core";
 import AutoSize from "react-virtualized-auto-sizer";
 import { UseCanvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";
 import { Interlang } from "slices/specimen";
-
-import traceJson from "../data/tile.trace.json";
-// import traceJson from "../render/data/tile.trace.json";
-// import traceJson from ".../render/road-astar.trace.json";
-
+import { Event } from "../types/render";
 
 import { PixiStage } from "./pixi/PixiStage"
 import { get } from "lodash";
@@ -28,7 +24,7 @@ const getRenderer = (name: string | undefined) => {
   }
 }
 
-export function createViews(interlang: Interlang) {
+export const createViews = (interlang: Interlang, eventList: Event[], step: number) => {
   
   const views = Object.keys(interlang).map((viewName) => {
     const Stage = getRenderer(interlang?.[viewName]?.renderer);
@@ -45,8 +41,8 @@ export function createViews(interlang: Interlang) {
                   <>
                     <LazyNodeList
                       useCanvas={useCanvas}
-                      events={traceJson.eventList}
-                      step={100}
+                      events={eventList}
+                      step={step}
                     />
                   </>
                 ),
@@ -57,5 +53,7 @@ export function createViews(interlang: Interlang) {
       </AutoSize>
     )
   });
+  // HACK remove after finish splitview
+  views.push(views[0]);
   return views;
 }
