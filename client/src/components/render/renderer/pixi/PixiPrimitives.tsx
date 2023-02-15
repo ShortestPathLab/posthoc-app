@@ -26,7 +26,7 @@ const defaultContext = {
     closing: 0xb0bec5,
     end: 0xec407a,
   },
-  scale: 0.75,
+  scale: 1,
   fill: 0x000000,
   alpha: 1,
 }
@@ -73,11 +73,12 @@ function textElement(text:string|undefined, x:number, y:number){
     if (text) {
       textObj = new PIXI.Text(text, {
         fontFamily: 'Arial',
-        fontSize: 10,
+        fontSize: 1,
         fill: "black",
       });
-      textObj.y = y
-      textObj.x = x;
+      textObj.y = scale(y)
+      textObj.x = scale(x);
+      textObj.resolution = 100
     }
     return textObj
 
@@ -219,7 +220,7 @@ function rectDrawingCoverter(component: Component) {
     ];
 
     // creates text object (undefined if no text)
-    const textObj = textElement(element.text, x, y)
+    const textObj = textElement(element.text, x+w/6, y-h/4)
 
     // draw instructions on PIXI graphics
     return (g: GraphicsType) => {
@@ -234,7 +235,7 @@ function rectDrawingCoverter(component: Component) {
     }
   }
 
-  drawInstruction.persisted = component.persisted ? component.persisted : true;
+  drawInstruction.persisted = component.persisted !== undefined ? component.persisted : true;
 
   return drawInstruction;
 }

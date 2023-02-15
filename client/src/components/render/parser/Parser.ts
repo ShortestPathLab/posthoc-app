@@ -4,6 +4,7 @@ import { primitiveComponents } from "../renderer/primitives"
 import { isArray, set } from "lodash";
 import { Interlang } from "slices/specimen";
 
+
 let renderName: string | undefined;
 /**
  * Parses all reviews in a Render
@@ -18,9 +19,9 @@ export function parseViews(renderDef: Render): Interlang | undefined {
 
   for (const viewName in views) {
     renderName = views?.[viewName]?.["renderer"];
-    set(views, `${viewName}.components`,parseComps(views?.[viewName]?.["components"], userContext, userComp))
+    set(views, `${viewName}.components`, parseComps(views?.[viewName]?.["components"], userContext, userComp))
   }
-  console.log(views);
+
   return views;
 }
 
@@ -97,7 +98,7 @@ function arrayOfFunctions(array: Function[], injectedContext: Context) {
  * @param injectedContext dditional context provided to the functions
  * @returns a single Function which contains all the other Functions
  */
-function objectOfFunctions(object: {[K:string]:Function}, injectedContext: Context) {
+function objectOfFunctions(object: { [K: string]: Function }, injectedContext: Context) {
 
   return (context: Context) => {
     for (const prop in object) {
@@ -155,21 +156,24 @@ export function parseProperty(val: any, injectedContext: Context): Function {
  * @param val the computed property to be parsed.
  * @returns a string which can be executed as JavaScript
  */
-export function parseComputedProp(val: string): string {
 
+
+export function parseComputedProp(val: string): string {
   // regex code
   const bracketsReg = /{{(.*?)}}/g;
   const contextStr = "context";
 
-  const varReg = "[a-zA-Z_][a-zA-Z_0-9]*"
-  const dotAccReg = `(\\.${varReg})`
-  const brackStrReg = `(\\['${varReg}'\\])`
-  const brackVarReg = `(\\[${varReg}\\])`
-  const brackDollarReg = `(\\[\`(\\\${${varReg}})+\`\\])`
+  const charReg = "[a-zA-Z_0-9]+"
+
+  const dotAccReg = `(\\.${charReg})`
+  const brackStrReg = `(\\['${charReg}'\\])`
+  const brackVarReg = `(\\[${charReg}\\])`
+  const brackDollarReg = `(\\[\`(\\\${${charReg}})+\`\\])`
   const remainReg = "(" + dotAccReg + "|" + brackStrReg + "|" + brackVarReg + "|" + brackDollarReg + ")*"
 
+
   const dollarReg = /\${[a-zA-Z_][a-zA-Z_0-9]*}/g
-  const actualReg = new RegExp(varReg + remainReg, "g")
+  const actualReg = new RegExp(charReg + remainReg, "g")
 
   let isPotNumProp = potRawCompProp(val);
 
@@ -179,13 +183,13 @@ export function parseComputedProp(val: string): string {
    * @returns the parsed variable section
    */
   function parseVariable(str: string) {
-    const firstVarReg = /^(.*?)[a-zA-Z_][a-zA-Z_0-9]*/
+    const firstVarReg = /^[a-zA-Z_][a-zA-Z_0-9]*/
 
     // this section of code will replace all the bracketed variable sections first (for example [x] with [context[x]]), then will replace all the dot accessors (for example .x with [x]), then will replace all the dollar symbols (for example ${x} with ${context[x]}) and then replace the first variable (for example parent with context[parent])
     return str.replace(new RegExp(brackVarReg, "g"), replaceBrackVar)
-      .replace(new RegExp(dotAccReg, "g"), replaceDotAcc)
-      .replace(new RegExp(brackDollarReg, "g"), replacDollarVar)
-      .replace(firstVarReg, replaceFirstVar)
+              .replace(new RegExp(dotAccReg, "g"), replaceDotAcc)
+              .replace(dollarReg, dollarReplace)
+              .replace(firstVarReg, replaceFirstVar)
   }
 
   /**
@@ -220,12 +224,8 @@ export function parseComputedProp(val: string): string {
    * @param str the string to replace
    * @returns the replacement string
    */
-  function replacDollarVar(str: string) {
-
-    function dollarReplace(str: string) {
-      return "${context['" + str.slice(2, -1) + "']}"
-    }
-    return str.replace(dollarReg, dollarReplace)
+  function dollarReplace(str: string) {
+    return "${context['" + str.slice(2, -1) + "']}"
   }
 
   /**
