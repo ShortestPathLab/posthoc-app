@@ -36,13 +36,14 @@ export const createViews = (interlang: Interlang, eventList: Event[], step: numb
             <Box>
               {createElement(Stage, {
                 ...size,
-                view: interlang.main,
+                view: interlang[viewName],
                 children: (canvas: Canvas) => (
                   <>
                     <LazyNodeList
                       canvas={canvas}
                       events={eventList}
                       step={step}
+                      persist={interlang[viewName]?.persist}
                     />
                   </>
                 ),
@@ -53,6 +54,5 @@ export const createViews = (interlang: Interlang, eventList: Event[], step: numb
       </AutoSize>
     )
   });
-
   return views;
 }

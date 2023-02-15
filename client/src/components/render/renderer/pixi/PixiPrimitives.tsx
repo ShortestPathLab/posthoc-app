@@ -199,39 +199,43 @@ function circleDrawingCoverter(component: Component){
 
 function rectDrawingCoverter(component: Component) {
   function drawInstruction(event: Event) {
-    // executes all the computed properties
-    const element:Component = executeComponent(component, event)
+    if (event) {
+        // executes all the computed properties
+      const element:Component = executeComponent(component, event)
 
-    // Determine color by event type
-    let color: number | undefined = undefined;
-    if (event.type !== undefined && event.type in defaultContext.colour) {
-      color = defaultContext.colour[event.type as keyof typeof defaultContext.colour];
-    }
-    if (!color) {
-      console.error(`No color defined for event type ${event.type} on context`);
-    }
-
-    // calculate shape variables based on result of computed props
-    const [x, y, w, h] = [
-      scale(element.x),
-      scale(element.y),
-      scale(element.width ?? 1),
-      scale(element.height ?? 1)
-    ];
-
-    // creates text object (undefined if no text)
-    const textObj = textElement(element.text, x+w/6, y-h/4)
-
-    // draw instructions on PIXI graphics
-    return (g: GraphicsType) => {
-      g.beginFill(
-          element.fill ?? color ?? 0xff5722,
-          element.alpha ?? defaultContext.alpha)
-        .drawRect(x, y, w, h)
-        .endFill();
-      if (textObj !== undefined){
-        g.addChild(textObj)
+      // Determine color by event type
+      let color: number | undefined = undefined;
+      if (event.type !== undefined && event.type in defaultContext.colour) {
+        color = defaultContext.colour[event.type as keyof typeof defaultContext.colour];
       }
+      if (!color) {
+        console.error(`No color defined for event type ${event.type} on context`);
+      }
+
+
+      // calculate shape variables based on result of computed props
+      const [x, y, w, h] = [
+        scale(element.x),
+        scale(element.y),
+        scale(element.width ?? 1),
+        scale(element.height ?? 1)
+      ];
+
+      const textObj = textElement(element.text, x+w/6, y-h/4)
+
+      // draw instructions on PIXI graphics
+      return (g: GraphicsType) => {
+        g.beginFill(
+            element.fill ?? color ?? 0xff5722,
+            element.alpha ?? defaultContext.alpha)
+          .drawRect(x, y, w, h)
+          .endFill();
+        if (textObj !== undefined){
+          g.addChild(textObj)
+        }
+      }
+    } else {
+      return (g: GraphicsType) => {}
     }
   }
 

@@ -10,6 +10,7 @@ export type Remote = {
 type Settings = {
   remote?: Remote[];
   playbackRate?: number;
+  cacheSize?: number;
   acrylic?: boolean;
   convert?: boolean;
 };
@@ -40,6 +41,7 @@ export const [useSettings, SettingsProvider] = createSlice<Settings>(
   {
     remote: defaultRemotes,
     playbackRate: defaultPlaybackRate,
+    cacheSize: 500,
   },
   withLocalStorage("settings")
 );

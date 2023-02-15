@@ -2,17 +2,14 @@ import { Event } from "components/render/types/render";
 import { Canvas } from "../types";
 import { floor, memoize, slice } from "lodash";
 import { useEffect, useMemo } from "react";
+import { useSettings } from "slices/settings";
 
-// TODO config the cacheSize & type to setting slice
-const cacheSize: number = 500;
 /**
  * For distinguish between persisted views like grid, mesh, tree, map
  * and non-persisted views like tile and multiagent
  * if true, then use split nodelists and draw every history event
  * if false, use a single nodelist and draw current event
  */
-const isPersisted: boolean = true;
-
 export type NodeListProps = {
   canvas?: Canvas;
   events?: Event[];
@@ -23,6 +20,7 @@ export type LazyNodeListProps = {
   canvas?: Canvas;
   events?: Event[];
   step?: number;
+  persist?: boolean;
 }
 
 export function NodeList({
@@ -41,11 +39,14 @@ export function NodeList({
 }
 
 export function LazyNodeList({
-  canvas, events, step
+  canvas, events, step, persist
 }: LazyNodeListProps) {
+
   if (!events || step === undefined || !canvas) {
     throw new Error("Prop is missing on LazyNodeList");
   }
+
+  const [{cacheSize=500}] = useSettings();
 
   const threshold = useMemo(() => {
     return floor(step / cacheSize) * cacheSize
@@ -57,7 +58,7 @@ export function LazyNodeList({
   );
 
   // Configue state/search at view level
-  if(isPersisted) {
+  if(persist) {
     return (
       <>
         {threshold!==0?<NodeList events={chunk} canvas={canvas} hasCurrent={chunk.length === step} />:<></>}

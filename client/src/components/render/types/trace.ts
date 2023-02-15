@@ -43,6 +43,7 @@ export type TraceView = {
   renderer?: string;
   components?: TraceComponent[];
   type?: TraceViewType;
+  persist?: boolean;
 }
 
 export type TraceViews = {
