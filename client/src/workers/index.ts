@@ -1,3 +1,2 @@
-/* eslint import/no-webpack-loader-syntax: off */
-export { default as HashWorker } from "worker-loader!./hash.worker.ts";
-export { default as IPCWorker } from "worker-loader!./hash.worker.ts";
+export const HashWorker = new Worker(new URL("./hash.worker", import.meta.url));
+export const IPCWorker = new Worker(new URL("./hash.worker", import.meta.url))
