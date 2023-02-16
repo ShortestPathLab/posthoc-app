@@ -1,5 +1,11 @@
 Current Work Todo
 
+ISSUES/BUGS
+
+[ ] Drawing Instructions do not have access to things like parent or allEvents (this means that road traces will not work)
+
+[ ] The complexity of computed properties is relatively small (currently no special strings besides 'context' can be used, as they will be interpreted as variables eg. undefined would be converted to context[undefined])
+
 QUESTION
 
 [ ] Current playback system won't support unpersisted component.

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "render": {
     "components": {
       "node": [
@@ -15,7 +15,7 @@
           "$": "path",
           "points": [
             {
-              "x": "{{parent.x}}",
+              "x": "{{x}}",
               "y": "{{parent.y}}"
             },
             {
@@ -24,20 +24,23 @@
             }
           ]
         }
-      ]
-    },
-    "views": {
-      "main": {
-        "renderer": "2d-pixi",
-        "components": [
-          {
+      ],
+      "road-event":[
+        {
             "$": "node"
           },
           {
             "$": "line"
           }
-        ],
-        "type": "history"
+      ]
+      
+    },
+    "views": {
+      "main": {
+        "renderer": "2d-pixi",
+        "components": [{"$":"road-event"}
+          
+        ]
       }
     }
   },

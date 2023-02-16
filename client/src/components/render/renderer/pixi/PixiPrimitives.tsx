@@ -76,8 +76,8 @@ function textElement(text:string|undefined, x:number, y:number){
         fontSize: 1,
         fill: "black",
       });
-      textObj.y = scale(y)
-      textObj.x = scale(x);
+      textObj.y = y
+      textObj.x = x;
       textObj.resolution = 100
     }
     return textObj
@@ -159,6 +159,7 @@ function polygonDrawingCoverter(component: Component){
 }
 
 function circleDrawingCoverter(component: Component){
+
   return memoizee((event: Event) => {
     
     // executes all the computed properties
