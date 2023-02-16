@@ -64,6 +64,9 @@ export function PixiStage(
 
       if (drawInstruction.persisted === true) {
         for (const event of events){
+          // create the context here
+          // spread the current event and get the parent event aswell
+
           drawInstruction(event)(g);
         }
       } else if (events[events.length - 1 ] && hasCurrent) {
