@@ -101,10 +101,11 @@ function arrayOfFunctions(array: Function[], injectedContext: Context) {
 function objectOfFunctions(object: { [K: string]: Function }, injectedContext: Context) {
 
   return (context: Context) => {
+    const newObject:{[K: string]: Function} = {};
     for (const prop in object) {
-      object[prop] = object[prop](context)
+      newObject[prop] = object[prop](context)
     }
-    return object
+    return newObject
   }
 }
 

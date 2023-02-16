@@ -2733,9 +2733,9 @@ function meshConverter(){
   for (const eventName in mesh_events){
     let currentEvent = mesh_events[eventName]
 
-    newEventList.push({"id":String(currentEvent["id"]), "type":currentEvent["type"], "pId":currentEvent["pId"], "f":Number(currentEvent["f"]), "g":Number(currentEvent["g"]), 'x1':currentEvent["variables"]["cx"], 'y1':currentEvent["variables"]["cy"], 'x2':currentEvent["variables"]["x1"], 'y2':currentEvent["variables"]["y1"], 'x3':currentEvent["variables"]["x2"], 'y3':currentEvent["variables"]["y2"]})
+    newEventList.push({"id":Number(currentEvent["id"]), "type":currentEvent["type"], "pId":Number(currentEvent["pId"]), "f":Number(currentEvent["f"]), "g":Number(currentEvent["g"]), 'x1':currentEvent["variables"]["cx"], 'y1':currentEvent["variables"]["cy"], 'x2':currentEvent["variables"]["x1"], 'y2':currentEvent["variables"]["y1"], 'x3':currentEvent["variables"]["x2"], 'y3':currentEvent["variables"]["y2"]})
   }
   console.log(newEventList)
 }
 
-//meshConverter()
+meshConverter()

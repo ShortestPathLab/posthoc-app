@@ -6,6 +6,10 @@ ISSUES/BUGS
 
 [ ] The complexity of computed properties is relatively small (currently no special strings besides 'context' can be used, as they will be interpreted as variables eg. undefined would be converted to context[undefined])
 
+[ ] id and pId should be able to be Strings
+
+[ ] think we sometimes skip drwaing the first event or something
+
 QUESTION
 
 [ ] Current playback system won't support unpersisted component.
