@@ -2,13 +2,10 @@ Current Work Todo
 
 ISSUES/BUGS
 
-[ ] Drawing Instructions do not have access to things like parent or allEvents (this means that road traces will not work)
-
 [ ] The complexity of computed properties is relatively small (currently no special strings besides 'context' can be used, as they will be interpreted as variables eg. undefined would be converted to context[undefined])
 
 [ ] id and pId should be able to be Strings
 
-[ ] Persisted functionalities not completing working
 
 QUESTION
 
@@ -43,9 +40,6 @@ required here, not sure it's better or not.
 - Manage the window system
 - Choose which Stage to use in each of the view
 
-[ ] Finish off the primitives
-- Rectangle, Circle, Polygon, Path
-
 [ ] Provide a set of pre-defined components/views for user to choose from
 - user could display the search trace without defining views and components
 
@@ -57,6 +51,10 @@ required here, not sure it's better or not.
  - [*] 9 Tile Puzzle Trace
  - [ ] Multi Agent Path Finder
  - [*] Bidirectional (Grid/Road versions) Trace
+
+[ ] Improve the process in which the currentEventContexts are created (maybe memoizee them)
+
+[ ] Fix issue where if the parent undefined (starting event or something) the application wont error (if they used something like parent.x)
 
 [ ] Create merger of eventList information so that delta eventLists will work
 
