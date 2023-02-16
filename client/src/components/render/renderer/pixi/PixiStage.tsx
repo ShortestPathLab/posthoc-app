@@ -8,6 +8,7 @@ import { d2InstrinsicComponents, DrawInstruction} from "./PixiPrimitives"
 import { StageChild } from '../types';
 import { PixiViewport } from './PixiViewport';
 
+import { useMap } from 'hooks/useMap';
 import { useMemo } from 'react';
 
 export type PixiStageProps = {

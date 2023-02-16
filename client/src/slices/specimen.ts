@@ -5,6 +5,7 @@ import { ParamsOf } from "protocol/Message";
 import { TraceViews } from "components/render/types/trace";
 import { Event } from "components/render/types/render";
 import { Context } from "components/render/types/context";
+import { Map, GridNode } from "components/render/renderer/generic/MapParser";
 
 export type Interlang = TraceViews;
 
@@ -13,7 +14,7 @@ export type Specimen = {
   interlang?: Interlang;
   eventList?: Event[];
   context?: Context;
-  map?: string;
+  map?: Map<GridNode>;
   error?: string;
 } & Partial<ParamsOf<PathfindingTask>>;
 
