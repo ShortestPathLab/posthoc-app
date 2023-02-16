@@ -61,6 +61,7 @@ export function PixiStage(
     const g = new PIXI.Graphics();
     for (const compName in drawInstructs){
       const drawInstruction = drawInstructs[compName];
+
       if (drawInstruction.persisted === true) {
         for (const event of events){
           drawInstruction(event)(g);

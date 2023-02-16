@@ -14,7 +14,7 @@ import { useUIState } from "slices/UIState";
 import { hashAsync as hash } from "workers/async";
 import { parseViews } from "components/render/parser/Parser";
 
-import traceJson from "../components/render/data/grid-astar.trace.json";
+import traceJson from "../components/render/data/mesh-polyanya.trace.json";
 
 async function solve(
   map: string,

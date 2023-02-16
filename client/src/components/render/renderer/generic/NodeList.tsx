@@ -59,10 +59,11 @@ export function LazyNodeList({
 
   // Configue state/search at view level
   if(persist) {
+    const dynamicEvents = slice(events, threshold, step + 1);
     return (
       <>
         {threshold!==0?<NodeList events={chunk} canvas={canvas} hasCurrent={chunk.length === step} />:<></>}
-        <NodeList events={slice(events, threshold, step + 1)} canvas={canvas} hasCurrent={chunk.length !== step} />
+        <NodeList events={dynamicEvents} canvas={canvas} hasCurrent={true} />
       </>
     )
   } else {

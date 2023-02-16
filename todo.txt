@@ -8,7 +8,7 @@ ISSUES/BUGS
 
 [ ] id and pId should be able to be Strings
 
-[ ] think we sometimes skip drwaing the first event or something
+[ ] Persisted functionalities not completing working
 
 QUESTION
 

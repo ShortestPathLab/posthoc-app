@@ -15,7 +15,7 @@
           "$": "path",
           "points": [
             {
-              "x": "{{x}}",
+              "x": "{{parent.x}}",
               "y": "{{parent.y}}"
             },
             {

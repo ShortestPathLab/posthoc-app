@@ -20,7 +20,7 @@ export function parseViews(renderDef: Render): Interlang | undefined {
   for (const viewName in views) {
     renderName = views?.[viewName]?.["renderer"];
     set(views, `${viewName}.components`, parseComps(views?.[viewName]?.["components"], userContext, userComp));
-    set(views, `${viewName}.persist`, views?.[viewName]?.persist === undefined?true:false);
+    set(views, `${viewName}.persist`, views?.[viewName]?.persist??true ? true : false);
   }
   return views;
 }

@@ -8,8 +8,8 @@
             "width": 0.9,
             "height": 0.9,
             "text": "{{context[`${x}${y}`]}}",
-            "persisted": false,
-            "fill": "{{context[`${x}${y}`] ? 0x808080 : 0xFFFFFFF}}"
+            "fill": "{{context[`${x}${y}`] ? 0x808080 : 0xFFFFFFF}}",
+            "persisted":false
           }
         ],
         "tilerow": [
