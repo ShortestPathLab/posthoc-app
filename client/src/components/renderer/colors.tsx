@@ -7,7 +7,7 @@ import {
   yellow,
 } from "@material-ui/core/colors";
 import { mapValues } from "lodash";
-import { TraceEventType } from "protocol/Trace";
+import { TraceEventType } from "components/render/types/trace";
 
 const tint = "500";
 
@@ -34,5 +34,5 @@ export function getColor(key?: TraceEventType) {
 }
 
 export function getColorHex(key?: TraceEventType) {
-  return (key && colorsHex[key]) ?? orange[tint];
+  return (key && colorsHex[key as keyof typeof colorsHex]) ?? orange[tint];
 }

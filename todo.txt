@@ -17,6 +17,8 @@ QUESTION
 
 OPEN
 
+[ ] Hover over
+
 [ ] Playback component for animation support - render/renderer/generic/Playback.tsx
 - layered system for tiles
 

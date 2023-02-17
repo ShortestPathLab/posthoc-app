@@ -16,7 +16,7 @@ import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
 
 type EventInspectorProps = {
-  event?: TraceEvent;
+  event?: Event;
   index?: number;
   selected?: boolean;
 } & CardProps;

@@ -1,13 +1,13 @@
 import { HideSourceOutlined as HiddenIcon } from "@material-ui/icons";
 import { Overline, OverlineDot as Dot } from "components/generic/Overline";
 import { getColorHex } from "components/renderer/colors";
-import { TraceEvent } from "protocol/Trace";
-
+import { Event } from "components/render/types/render";
+ 
 export function EventLabel({
   event,
   hidden,
 }: {
-  event?: TraceEvent;
+  event?: Event;
   hidden?: boolean;
 }) {
   return (

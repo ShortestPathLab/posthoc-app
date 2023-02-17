@@ -53,7 +53,6 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
       );
     }
   }, [step, playback]);
-
   return (
     <Flex vertical alignItems="center">
       {loading.map ? (
