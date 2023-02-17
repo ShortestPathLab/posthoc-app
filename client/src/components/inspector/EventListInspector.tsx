@@ -36,7 +36,7 @@ function Placeholder() {
 export function EventListInspector(props: ListProps<TraceEvent>) {
   const [loading] = useLoading();
   const [{ step = 0, playback }] = useUIState();
-  const [{ specimen }] = useSpecimen();
+  const [{ eventList }] = useSpecimen();
   const ref = useRef<ListHandle | null>(null);
 
   useEffect(() => {
@@ -56,12 +56,12 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
 
   return (
     <Flex vertical alignItems="center">
-      {loading.map || loading.specimen ? (
+      {loading.map ? (
         <CircularProgress />
-      ) : specimen?.eventList?.length ? (
+      ) : eventList?.length ? (
         <List
           {...props}
-          items={specimen?.eventList}
+          items={eventList}
           listOptions={{ ref }}
           renderItem={(item, i) => (
             <Flex p={2} pt={i ? 0 : 2}>
