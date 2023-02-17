@@ -18,8 +18,8 @@ export type TraceViewType =
 
 export type TraceEvent = {
   type?: TraceEventType;
-  id?: number;
-  pId?: number | null;
+  id?: number | string;
+  pId?: number | string | null;
   f?: number;
   g?: number;
   h?: number;

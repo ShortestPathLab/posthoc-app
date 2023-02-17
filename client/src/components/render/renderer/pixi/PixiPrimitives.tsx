@@ -112,8 +112,8 @@ function pixiInterlangConventer(component: Component) {
       // draw instructions on PIXI graphics
       return (g: GraphicsType) => {
 
-
-        g.beginFill(element.fill ?? color ?? 0xff5722,
+        const fillColour = element.fill ?? color ?? 0xff5722
+        g.beginFill(fillColour,
             element.alpha ?? defaultContext.alpha)
 
         switch (component.$) {
@@ -140,7 +140,8 @@ function pixiInterlangConventer(component: Component) {
             break;
           case "path":
             // fallthrough is wanted, as polygons and paths are drawn the same way
-            g.lineStyle({ width: 0.2 })
+            g.lineStyle({ width: 0.2 , color:fillColour})
+
           case "polygon":
             const points = element.points.map((point: { x: number, y: number }) => { return { x: scale(point.x), y: scale(point.y) } })
 

@@ -6,6 +6,8 @@ ISSUES/BUGS
 
 [ ] id and pId should be able to be Strings
 
+[ ] The currentEventContext will break for search traces requiring information from parents every time it hits one of the LazyNodeList thresholds, as the allEvents property is actually only the events that are draw by the Nodelist. This needs to be fixed, maybe by using a global context or something. If stored once in a global context this may also reduce the memory usage.
+
 
 QUESTION
 
@@ -47,6 +49,8 @@ required here, not sure it's better or not.
 [ ] Improve the process in which the currentEventContexts are created (maybe memoizee them)
 
 [ ] Fix issue where if the parent undefined (starting event or something) the application wont error (if they used something like parent.x)
+
+[ ] Maybe make the text property in the search traces an Object with properties like displayText, Colour, position (relative to parent Object) etc. Also maybe add some more properties to existing primitives like a lineWidth to the path primitive. 
 
 [ ] Create merger of eventList information so that delta eventLists will work
 
