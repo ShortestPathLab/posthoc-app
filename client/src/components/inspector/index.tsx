@@ -18,8 +18,7 @@ type SpecimenInspectorProps = {} & FlexProps;
 
 export function Inspector(props: SpecimenInspectorProps) {
   const [loading] = useLoading();
-  const [{ interlang, eventList, map }] = useSpecimen();
-  console.log(map);
+  const [{ interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
   const [resizing, setResizing] = useState(false);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
@@ -27,7 +26,6 @@ export function Inspector(props: SpecimenInspectorProps) {
   );
 
   const createViews = useCallback(cv, []);
-
   return (
     <>
       <Fade in={some(values(loading))}>
@@ -43,7 +41,6 @@ export function Inspector(props: SpecimenInspectorProps) {
                   views={createViews(interlang, eventList, step)}
                   resizing={resizing}
                   setResizing={setResizing}
-                  map={map}
                 />
               )}
             </Playback>

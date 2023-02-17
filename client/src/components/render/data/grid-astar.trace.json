@@ -18,6 +18,7 @@
       "main": { "renderer": "2d-pixi", "components" :[{"$": "tile"} ], "type": "search" }
     }
   },
+  
   "eventList": [
     {
       "type": "source",
@@ -23225,4 +23226,5 @@
       "y": 43
     }
   ]
+
 }

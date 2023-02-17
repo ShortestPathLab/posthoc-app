@@ -9,7 +9,9 @@ export type Map<T> = {
     width?: number;
     height?: number;
   };
-  nodes?: T[];
+  nodes?: {
+    walls?: T[]
+  };
 }
 
 export function parseGridMap(data: string) {
@@ -19,7 +21,9 @@ export function parseGridMap(data: string) {
       width: 0,
       height: 0,
     },
-    nodes: []
+    nodes: {
+      walls: []
+    }
   }
   const lines = data.split("\n");
   lines.map((line, lineNum) => {
@@ -43,7 +47,7 @@ export function parseGridMap(data: string) {
     const chars = line.split("");
     chars.map((ch, charNum) => {
       if (ch === "@") {
-        mapObj.nodes!.push({
+        mapObj.nodes!.walls!.push({
           x: charNum,
           y: lineNum,
         })

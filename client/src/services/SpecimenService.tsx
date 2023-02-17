@@ -15,10 +15,8 @@ import { hashAsync as hash } from "workers/async";
 import { parseViews } from "components/render/parser/Parser";
 
 import traceJson from "../components/render/data/grid-astar.trace.json";
-import mapData from "../components/render/data/maps/grids/CSC2F.grid?raw";
+import mapData from "../components/render/data/maps/grids/Small Maze.grid?raw";
 import { parseGridMap } from "components/render/renderer/generic/MapParser";
-
-const map = parseGridMap(mapData);
 
 // async function solve(
 //   map: string,
@@ -66,7 +64,7 @@ export function SpecimenService() {
             ...specimen,
             interlang: views,
             eventList: traceJson.eventList,
-            map: map
+            map: parseGridMap(mapData)
           })
         }
         notify((

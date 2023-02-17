@@ -8,8 +8,8 @@ import { d2InstrinsicComponents, DrawInstruction } from "./PixiPrimitives"
 import { StageChild } from '../types';
 import { PixiViewport } from './PixiViewport';
 
-import { useMap } from 'hooks/useMap';
 import { useMemo } from 'react';
+import { useSpecimen } from 'slices/specimen';
 
 export type PixiStageProps = {
   width?: number;
@@ -50,6 +50,19 @@ export function PixiStage(
   { width, height, view, children }: PixiStageProps
 ) {
   const viewport = React.useRef<PixiViewport>(null);
+  const [{map}] = useSpecimen();
+
+  const renderMap = React.useCallback(() => {
+    const g = new PIXI.Graphics();
+    if (map?.nodes?.walls) {
+      for (const block of map?.nodes?.walls) {
+        g.beginFill(0x202124, 1)
+          .drawRect(block.x??1, (block.y??1) - 4, 1, 1)
+          .endFill();
+      }
+    }
+    viewport.current?.addChild(g);
+  }, [map])
 
   // process all the parsed components into drawing instructions 
   const drawInstructs: DrawInstructions = useMemo(() => {
@@ -69,7 +82,7 @@ export function PixiStage(
   const makeGraphic = React.useCallback((events: Event[], hasCurrent: boolean) => {
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
-
+    renderMap();
     const eventContext = {
       allEvents:events,
       colour: {
@@ -85,25 +98,17 @@ export function PixiStage(
     const g = new PIXI.Graphics();
     for (const compName in drawInstructs) {
       const drawInstruction = drawInstructs[compName];
-
-
-
       if (drawInstruction.persisted === true) {
         for (const event of events) {
           // create the context here
           // spread the current event and get the parent event aswell
-
           let parentEvent = findRecentParentEvent(event?.pId, events)
-          
           // TODO fix this parent section 
           if (parentEvent === undefined){
             parentEvent = event
           }
-
           // TODO fix how the currentEventContext is created
           const currentEventContext = { ...eventContext, parent:parentEvent, ...event}
-
-
           drawInstruction(currentEventContext)(g);
         }
       } else if (events[events.length - 1] && hasCurrent) {
@@ -133,7 +138,7 @@ export function PixiStage(
           viewport.current?.removeChild?.(graphic);
         }
       }
-    }), [makeGraphic]
+    }), []
   )
 
   return (<>

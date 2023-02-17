@@ -8,7 +8,6 @@ export type SplitViewProps = {
   resizable?: boolean;
   resizing: boolean;
   setResizing: Dispatch<SetStateAction<boolean>>;
-  map?: Map<GridNode>;
 }
 
 /**
@@ -21,7 +20,7 @@ export type SplitViewProps = {
  * @param props.resizable boolean value if true then the split view will be resizable
  * @returns ReactElement of the split view
  */
-export function SplitView({views, resizable=false, resizing, setResizing, map}:SplitViewProps):React.ReactElement {
+export function SplitView({views, resizable=false, resizing, setResizing}:SplitViewProps):React.ReactElement {
   const resizerRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);

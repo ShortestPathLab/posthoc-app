@@ -9,28 +9,20 @@ ISSUES/BUGS
 
 QUESTION
 
-[ ] Current playback system won't support unpersisted component.
-
 [ ] Current playback system
 - Currently it works by adding x steps every tick (where x is determined by playbackRate) (this way allows for faster drawing)
 - Should we change it so its reversed, 1 step every x ticks (x is playbackRate) (this way allows for slower drawing)
 
 OPEN
 
-[ ] Draw the map
-
 [ ] Playback component for animation support - render/renderer/generic/Playback.tsx
 - layered system for tiles
-
-[ ] Add eventlist.context to converter, computed props
-
-[ ] Nodelist config the cacheSize & type to setting slice
 
 [ ] Change useCanvas pass as a context
 - PROBLEM: multiple context required for each of the stage, many to many dependency
 required here, not sure it's better or not.
 
-[ ] An Context system for intermediate language - parser
+[x] An Context system for intermediate language - parser
 - something like a speciman context
 - takes in the search trace
 - provide intermediate language for the renderer
@@ -74,3 +66,11 @@ FINISHED
 - generic for stages/renderers
 - caching the nodes
 - use the add/delete function to 
+
+[x] Draw the map
+
+[x] Add eventlist.context to converter, computed props
+
+[x] Nodelist config the cacheSize & type to setting slice
+
+[x] Current playback system won't support unpersisted component.
