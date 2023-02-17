@@ -82,7 +82,6 @@ export function PixiStage(
   const makeGraphic = React.useCallback((events: Event[], hasCurrent: boolean) => {
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
-    renderMap();
     const eventContext = {
       allEvents:events,
       colour: {

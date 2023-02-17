@@ -3,7 +3,7 @@ export type GridNode = {
   y?: number;
 }
 
-export type Map<T> = {
+export type TraceMap<T> = {
   type?: string;
   bounds?: {
     width?: number;
@@ -15,7 +15,7 @@ export type Map<T> = {
 }
 
 export function parseGridMap(data: string) {
-  const mapObj: Map<GridNode> = {
+  const mapObj: TraceMap<GridNode> = {
     type: "",
     bounds: {
       width: 0,

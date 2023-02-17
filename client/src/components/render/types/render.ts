@@ -16,3 +16,7 @@ export type Point = {
   x: number;
   y: number;
 }
+
+export type NodeEvents = {
+  [id: number | string]: Event[] 
+}

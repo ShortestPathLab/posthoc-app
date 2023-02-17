@@ -17,6 +17,7 @@ import { parseViews } from "components/render/parser/Parser";
 import traceJson from "../components/render/data/grid-astar.trace.json";
 import mapData from "../components/render/data/maps/grids/Small Maze.grid?raw";
 import { parseGridMap } from "components/render/renderer/generic/MapParser";
+import { createNodeEvents } from "components/render/renderer/generic/NodeEvent";
 
 // async function solve(
 //   map: string,
@@ -64,7 +65,8 @@ export function SpecimenService() {
             ...specimen,
             interlang: views,
             eventList: traceJson.eventList,
-            map: parseGridMap(mapData)
+            map: parseGridMap(mapData),
+            nodeEvents: createNodeEvents(traceJson.eventList),
           })
         }
         notify((
