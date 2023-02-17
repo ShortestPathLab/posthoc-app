@@ -52,17 +52,19 @@ export function PixiStage(
   const viewport = React.useRef<PixiViewport>(null);
   const [{map}] = useSpecimen();
 
-  const renderMap = React.useCallback(() => {
-    const g = new PIXI.Graphics();
-    if (map?.nodes?.walls) {
-      for (const block of map?.nodes?.walls) {
-        g.beginFill(0x202124, 1)
+  React.useEffect(() => {
+    if (viewport.current) {
+      const g = new PIXI.Graphics();
+      if (map?.nodes?.walls) {
+        for (const block of map?.nodes?.walls) {
+          g.beginFill(0x202124, 1)
           .drawRect(block.x??1, (block.y??1) - 4, 1, 1)
           .endFill();
+        }
       }
+      viewport.current?.addChild(g);
     }
-    viewport.current?.addChild(g);
-  }, [map])
+  }, [viewport.current === null])
 
   // process all the parsed components into drawing instructions 
   const drawInstructs: DrawInstructions = useMemo(() => {

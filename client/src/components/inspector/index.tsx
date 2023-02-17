@@ -1,10 +1,7 @@
-import { Fade, LinearProgress } from "@material-ui/core";
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { some, values } from "lodash";
 import { useState, useCallback } from "react";
-import { useLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";
@@ -13,11 +10,12 @@ import { SplitView } from "./SplitView";
 import { createViews as cv } from "components/render/renderer";
 
 import { Playback } from "components/render/renderer/generic/Playback";
+import React from "react";
+import { LoadIndicator } from "./LoadIndicator";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
-export function Inspector(props: SpecimenInspectorProps) {
-  const [loading] = useLoading();
+export const Inspector = React.memo( function Inspector(props: SpecimenInspectorProps) {
   const [{ interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
   const [resizing, setResizing] = useState(false);
@@ -28,9 +26,7 @@ export function Inspector(props: SpecimenInspectorProps) {
   const createViews = useCallback(cv, []);
   return (
     <>
-      <Fade in={some(values(loading))}>
-        <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
-      </Fade>
+      <LoadIndicator />
       <Flex {...props}>
         {interlang ? (
           <Flex>
@@ -74,4 +70,4 @@ export function Inspector(props: SpecimenInspectorProps) {
       />
     </>
   );
-}
+});

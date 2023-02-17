@@ -40,7 +40,7 @@ render(
       <ThemeProvider theme={theme}>
         <SnackbarProvider>
           <EnvironmentProvider slices={slices} services={services}>
-            <App />
+           <App />
           </EnvironmentProvider>
         </SnackbarProvider>
       </ThemeProvider>
