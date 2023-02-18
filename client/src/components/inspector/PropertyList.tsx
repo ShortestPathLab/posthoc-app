@@ -26,7 +26,7 @@ export function PropertyList({
           ([, v]) => v !== undefined
         ),
         ([k, v]) => (
-          <Property label={k} value={v} type={{ variant }} />
+          <Property key={k} label={k} value={v} type={{ variant }} />
         )
       )}
     </Flex>

@@ -52,7 +52,9 @@ export function PixiStage(
   const viewport = React.useRef<PixiViewport>(null);
   const [{map}] = useSpecimen();
 
+  // MAP: draw map background
   React.useEffect(() => {
+    console.log("Map Drawn");
     if (viewport.current) {
       const g = new PIXI.Graphics();
       if (map?.nodes?.walls) {
@@ -66,7 +68,7 @@ export function PixiStage(
     }
   }, [viewport.current === null])
 
-  // process all the parsed components into drawing instructions 
+  // create draw instructions for each of the search trace components
   const drawInstructs: DrawInstructions = useMemo(() => {
     if (!view) {
       throw new Error("No view is present in PixiStageProps");
@@ -80,7 +82,11 @@ export function PixiStage(
     return drawInstructions;
   }, [view])
 
-  // a function which takes in an Event List creates a graphic for them
+  /**
+   * Create Grapphic object for events
+   * @param events list of events need to be rendered using drawInstructs
+   * @param hasCurrent indicates if the graphic holds the current step
+   */
   const makeGraphic = React.useCallback((events: Event[], hasCurrent: boolean) => {
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
@@ -104,10 +110,6 @@ export function PixiStage(
           // create the context here
           // spread the current event and get the parent event aswell
           let parentEvent = findRecentParentEvent(event?.pId, events)
-          // TODO fix this parent section 
-          if (parentEvent === undefined){
-            parentEvent = event
-          }
           // TODO fix how the currentEventContext is created
           const currentEventContext = { ...eventContext, parent:parentEvent, ...event}
           drawInstruction(currentEventContext)(g);
