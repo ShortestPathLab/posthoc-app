@@ -13,7 +13,6 @@ export type Specimen = {
   specimen?: Trace;
   interlang?: Interlang;
   eventList?: Event[];
-  nodeEvents?: Map<string|number, Event[]>;
   context?: Context;
   map?: TraceMap<GridNode>;
   error?: string;

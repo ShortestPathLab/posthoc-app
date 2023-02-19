@@ -4,7 +4,7 @@ import AutoSize from "react-virtualized-auto-sizer";
 import { Canvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";
 import { Interlang } from "slices/specimen";
-import { Event } from "../types/render";
+import { Event, Nodes } from "../types/render";
 
 import { PixiStage } from "./pixi/PixiStage"
 import { get } from "lodash";
@@ -24,7 +24,7 @@ const getRenderer = (name: string | undefined) => {
   }
 }
 
-export const createViews = (interlang: Interlang, eventList: Event[], step: number) => {
+export const createViews = (interlang: Interlang, nodes: Nodes, step: number) => {
   // interlang["other"] = {...interlang.main}
   const views:{[key: string]: React.ReactNode} = {};
    Object.keys(interlang).forEach((viewName) => {
@@ -42,9 +42,8 @@ export const createViews = (interlang: Interlang, eventList: Event[], step: numb
                   <>
                     <LazyNodeList
                       canvas={canvas}
-                      events={eventList}
+                      nodes={nodes}
                       step={step}
-                      persist={interlang[viewName]?.persist}
                     />
                   </>
                 ),

@@ -1,5 +1,5 @@
 import { Graphics as GraphicsType, } from "@pixi/graphics";
-import { Component, Event } from "../../types/render";
+import { Component, Event, Nodes } from "../../types/render";
 import * as PIXI from 'pixi.js';
 import memoizee from "memoizee";
 
@@ -14,7 +14,7 @@ export type InstrinsicComponents = {
 
 export type EventContext = {
   parent: Event | undefined,
-  allEvents: Event[],
+  nodes?: Nodes,
   colour: {
     [key: string]: number
   }

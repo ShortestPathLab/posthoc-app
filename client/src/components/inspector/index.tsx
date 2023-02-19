@@ -30,10 +30,10 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
         {interlang ? (
           <Flex>
             <Playback>
-              {(eventList, step) => (
+              {(nodes, step) => (
                 <SplitView
                   resizable={true}
-                  views={createViews(interlang, eventList, step)}
+                  views={createViews(interlang, nodes, step)}
                 />
               )}
             </Playback>

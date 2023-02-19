@@ -1,4 +1,4 @@
-import { Event } from "components/render/types/render";
+import { Event, Nodes } from "components/render/types/render";
 import { Canvas } from "../types";
 import { floor, memoize, slice } from "lodash";
 import { useEffect, useMemo } from "react";
@@ -12,68 +12,59 @@ import { useSettings } from "slices/settings";
  */
 export type NodeListProps = {
   canvas?: Canvas;
-  events?: Event[];
+  nodes?: Nodes;
   hasCurrent?: boolean;
 }
 
 export type LazyNodeListProps = {
   canvas?: Canvas;
-  events?: Event[];
+  nodes?: Nodes;
   step?: number;
-  persist?: boolean;
 }
 
 export function NodeList({
-  canvas, events, hasCurrent=false
+  canvas, nodes, hasCurrent=false
 }: NodeListProps) {
-  if (!canvas || !events) {
+  if (!canvas || !nodes) {
     throw new Error("Prop is missing on NodeList");
   }
   useEffect(() => {
-    const remove = canvas().add(events, hasCurrent);
+    const remove = canvas().add(nodes, hasCurrent);
     return () => {
       remove();
     }
-  }, [canvas, events, hasCurrent]);
+  }, [canvas, nodes, hasCurrent]);
   return <></>
 }
 
 export function LazyNodeList({
-  canvas, events, step, persist
+  canvas, nodes, step
 }: LazyNodeListProps) {
-
-  if (!events || step === undefined || !canvas) {
+  if (!nodes || step === undefined || !canvas) {
     throw new Error("Prop is missing on LazyNodeList");
   }
 
   const [{cacheSize=500}] = useSettings();
 
+  // number of nodes needed to be cached
   const threshold = useMemo(() => {
     return floor(step / cacheSize) * cacheSize
   }, [step]);
 
-  const chunk = useMemo(
-    () => memoize((n: number) => slice(events, 0, n))(threshold),
-    [events, threshold]
-  );
+  const [cachedNodes, dynamicNodes] = useMemo(() => {
+    const cached = new Map<string|number, Event[]>(), dynamic = new Map<string|number, Event[]>();
+    let i = 0;
+    nodes.forEach((events, id) => {
+      i < threshold ? cached.set(id, events) : dynamic.set(id, events);
+      i++;
+    })
+    return [cached, dynamic];
+  }, [nodes, threshold, step]);
 
-  // Configue state/search at view level
-  if(persist) {
-    const dynamicEvents = slice(events, threshold, step + 1);
-    return (
-      <>
-        {threshold!==0?<NodeList events={chunk} canvas={canvas} hasCurrent={chunk.length === step} />:<></>}
-        <NodeList events={dynamicEvents} canvas={canvas} hasCurrent={true} />
-      </>
-    )
-  } else {
-    return (
-      <>
-        <NodeList events={
-          events.length !== 0?
-            [events[-1]]: []
-        } canvas={canvas} />
-      </>
-    )
-  }
+  return (
+    <>
+      {threshold!==0?<NodeList nodes={cachedNodes} canvas={canvas} hasCurrent={cachedNodes.size === step} />:<></>}
+      <NodeList nodes={dynamicNodes} canvas={canvas} hasCurrent={true} />
+    </>
+  )
 }

@@ -17,6 +17,4 @@ export type Point = {
   y: number;
 }
 
-export type NodeEvents = {
-  [id: number | string]: Event[] 
-}
+export type Nodes = Map<string|number, Event[]>

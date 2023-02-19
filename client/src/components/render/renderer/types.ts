@@ -1,4 +1,4 @@
-import { Event } from "../types/render"
+import { Event, Nodes } from "../types/render"
 
 /**
  * Remove events that previously added by AddToCanvasCb from the
@@ -10,7 +10,7 @@ export type RemoveFromCanvasCb = () => void;
  * Add events to canvas, return a callback that can remove
  * those events from the canvas
  */
-export type AddToCanvasCb = (events: Event[], hasCurrent: boolean) => RemoveFromCanvasCb;
+export type AddToCanvasCb = (nodes: Nodes, hasCurrent: boolean) => RemoveFromCanvasCb;
 
 /**
  * A medium providing "add" and "remove" event from canvas function 

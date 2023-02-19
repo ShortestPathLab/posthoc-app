@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import * as React from "react";
 import { Stage } from "@inlet/react-pixi";
 
-import { Event, View } from "components/render/types/render";
+import { Event, Nodes, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
 import { d2InstrinsicComponents, DrawInstruction, scale } from "./PixiPrimitives"
 import { StageChild } from '../types';
@@ -23,16 +23,6 @@ export type PixiStageProps = {
 export type DrawInstructions = {
   [key: string]: DrawInstruction
 }
-
-function findRecentParentEvent(pId:number|string|undefined|null, allEvents:Event[]):Event|undefined{
-
-  for (let i = allEvents.length - 1; i >= 0; i--){
-    if (allEvents[i]?.id === pId){
-      return allEvents[i]
-    }
-  }
-}
-
 /**
  * PIXI Stage component for rendering view and search trace,
  * view must be composed of following supported primitives
@@ -89,13 +79,12 @@ export function PixiStage(
   }, []);
 
   const onViewportDestroy = React.useCallback((e) => {
-    const data:ViewportData = {
-      x: e.x,
-      y: e.y,
-      scale: e.scaleX
-    }
     updateSvData?.(viewName, {
-      viewport: data
+      viewport: {
+        x: e.x,
+        y: e.y,
+        scale: e.scaleX
+      }
     });
   }, [])
 
@@ -118,11 +107,11 @@ export function PixiStage(
    * @param events list of events need to be rendered using drawInstructs
    * @param hasCurrent indicates if the graphic holds the current step
    */
-  const makeGraphic = React.useCallback((events: Event[], hasCurrent: boolean) => {
+  const makeGraphic = React.useCallback((nodes: Nodes, hasCurrent: boolean) => {
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
     const eventContext = {
-      allEvents:events,
+      nodes,
       colour: {
         source: 0x26a69a,
         destination: 0xf06292,
@@ -136,25 +125,20 @@ export function PixiStage(
     const g = new PIXI.Graphics();
     for (const compName in drawInstructs) {
       const drawInstruction = drawInstructs[compName];
-      if (drawInstruction.persisted === true) {
-        for (const event of events) {
-          // create the context here
-          // spread the current event and get the parent event aswell
-          let parentEvent = findRecentParentEvent(event?.pId, events)
-          // TODO fix how the currentEventContext is created
-          const currentEventContext = { ...eventContext, parent:parentEvent, ...event}
-          drawInstruction(currentEventContext)(g);
+      let i = -1;
+      for (const [, events] of nodes) {
+        i++;
+        if (!drawInstruction.persisted && i !== (nodes.size - 1)) {
+          continue;
         }
-      } else if (events[events.length - 1] && hasCurrent) {
-        const curEvent = events[events.length - 1]
-          // TODO fix this parent section 
-        let parentEvent = findRecentParentEvent(curEvent?.pId, events)
-
-        if (parentEvent === undefined){
-          parentEvent = curEvent
+        // create the context here
+        // spread the current event and get the parent event aswell
+        const current = events[events.length - 1];
+        let parent;
+        if (current.pid) {
+          parent = nodes.get(current?.pid)?.[0];
         }
-
-        const currentEventContext = { ...eventContext, parent:parentEvent, ...curEvent}
+        const currentEventContext = { ...eventContext, parent, ...current}
         drawInstruction(currentEventContext)(g);
       }
     }
@@ -164,8 +148,8 @@ export function PixiStage(
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const canvas = React.useCallback(
     () => ({
-      add: (events: Event[], hasCurrent: boolean) => {
-        const graphic = makeGraphic(events, hasCurrent);
+      add: (nodes: Nodes, hasCurrent: boolean) => {
+        const graphic = makeGraphic(nodes, hasCurrent);
         viewport.current?.addChild?.(graphic);
         return () => {
           viewport.current?.removeChild?.(graphic);
