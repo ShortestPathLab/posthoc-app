@@ -2,19 +2,36 @@ import React, { useRef, useState, useCallback, useEffect } from "react";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useTheme } from "@material-ui/core/styles";
 import { debounce } from "lodash";
-
-export type SplitViewType = (data:ViewData, setData:(data:ViewData)=>void) => React.ReactNode;
+import { useImmer } from "use-immer";
 
 export type SplitViewProps = {
-  views?:  SplitViewType[];
+  views?:  React.ReactNode[];
   resizable?: boolean;
 }
 
-export type ViewData = {
+export type ViewportData = {
   x: number;
   y: number;
   scale: number;
 }
+
+export type ViewContext = {
+  viewport: ViewportData;
+}
+
+// key: viewname
+export type SplitViewDataType = {
+  [key: string]: ViewContext
+}
+
+export type SplitViewDataSetterType = ((viewName: string, newData: ViewContext) => void);
+
+export type SplitViewContextType = [
+  SplitViewDataType?,
+  SplitViewDataSetterType?
+]
+
+export const SplitViewContext = React.createContext<SplitViewContextType>([]);
 
 /**
  * Resizable split view component for displaying views side by side
@@ -31,11 +48,18 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
 
-  const defaultData = {x: 0, y: 0, scale:1}
-  const [leftData, setLeftData] = useState<ViewData>(defaultData);
-  const [rightData, setRightData] = useState<ViewData>(defaultData);
-
   const [resizing, setResizing] = useState(false);
+
+  const [splitViewData, updateSplitViewData] = useImmer<SplitViewDataType>({});
+
+  const updateViewData = useCallback((viewName: string, newData: ViewContext) => {
+    updateSplitViewData(draft => {
+      draft[viewName]= {
+        ...draft[viewName],
+        ...newData
+      }
+    })
+  }, [updateSplitViewData, splitViewData]); 
 
   useEffect(() => {
     const resizeEnd = debounce(() => {
@@ -107,27 +131,29 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
 
   if (views?.length === 2) {
     return (
-      <div style={{ height: "100%", display: "flex", width:"100%" }}>
-        <div
-          ref={leftRef}
-          style={{ height: "100%", minWidth: "20%", width: "50%", background: resizing? theme.palette.divider: undefined }}
-        >
-          {!resizing && views[0](leftData, setLeftData)}
+      <SplitViewContext.Provider value={[splitViewData, updateViewData]}>
+        <div style={{ height: "100%", display: "flex", width:"100%" }}>
+          <div
+            ref={leftRef}
+            style={{ height: "100%", minWidth: "20%", width: "50%", background: resizing? theme.palette.divider: undefined }}
+          >
+            {!resizing && views[0]}
+          </div>
+          <div
+            ref={resizerRef}
+            onMouseDown={resizable?resizeHandler:undefined}
+            style={{ width: "15px", backgroundColor: theme.palette.primary.main, height: "100%", display:'flex', justifyContent:'center', alignItems:'center' }}
+          >
+            <MoreVertIcon color="action" />
+          </div>
+          <div
+            ref={rightRef}
+            style={{ flex: "1 1 0%", minWidth: "20%", height: "100%", background: resizing? theme.palette.divider: undefined }}
+          >
+            {!resizing && views[1]}
+          </div>
         </div>
-        <div
-          ref={resizerRef}
-          onMouseDown={resizable?resizeHandler:undefined}
-          style={{ width: "15px", backgroundColor: theme.palette.primary.main, height: "100%", display:'flex', justifyContent:'center', alignItems:'center' }}
-        >
-          <MoreVertIcon color="action" />
-        </div>
-        <div
-          ref={rightRef}
-          style={{ flex: "1 1 0%", minWidth: "20%", height: "100%", background: resizing? theme.palette.divider: undefined }}
-        >
-          {!resizing && views[1](rightData, setRightData)}
-        </div>
-      </div>
+      </SplitViewContext.Provider>
     )
   } else if (views?.length === 1) {
     return <>{

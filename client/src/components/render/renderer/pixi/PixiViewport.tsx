@@ -1,4 +1,3 @@
-import { ViewData } from "components/inspector/SplitView";
 import { find } from "lodash";
 import { Viewport as PixiViewportBase } from "pixi-viewport";
 import * as PIXI from "pixi.js";

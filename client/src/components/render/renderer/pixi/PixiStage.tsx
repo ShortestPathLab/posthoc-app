@@ -10,15 +10,14 @@ import { PixiViewport } from './PixiViewport';
 
 import { useMemo } from 'react';
 import { useSpecimen } from 'slices/specimen';
-import { ViewData } from 'components/inspector/SplitView';
+import { SplitViewContext, ViewportData } from 'components/inspector/SplitView';
 
 export type PixiStageProps = {
   width?: number;
   height?: number;
   children?: StageChild;
-  view?: View;
-  viewData?: ViewData;
-  setViewData?: (data:ViewData) => void;
+  view: View;
+  viewName: string;
 }
 
 export type DrawInstructions = {
@@ -49,14 +48,23 @@ function findRecentParentEvent(pId:number|string|undefined|null, allEvents:Event
  */
 
 export function PixiStage(
-  { width, height, view, children, viewData, setViewData }: PixiStageProps
+  { width, height, view, viewName, children }: PixiStageProps
 ) {
   const viewport = React.useRef<PixiViewport>(null);
   const [{map}] = useSpecimen();
 
-  // MAP: draw map background
+  const [svData, updateSvData] = React.useContext(SplitViewContext);
+
   React.useEffect(() => {
     if (viewport.current) {
+      // restore viewport state
+      if (svData?.[viewName]?.viewport) {
+        console.log(svData);
+        const vpData = svData?.[viewName]?.viewport;
+        viewport.current.moveCorner(vpData.x, vpData.y);
+        viewport.current.setZoom(vpData.scale);
+      }
+      // MAP: draw map background
       const g = new PIXI.Graphics();
       if (map?.nodes?.walls) {
         for (const block of map?.nodes?.walls) {
@@ -67,25 +75,17 @@ export function PixiStage(
       }
       viewport.current?.addChild(g);
     }
-  }, [viewport.current === null])
-
-  React.useEffect(() => {
-    if (viewData && viewport.current) {
-      viewport.current.moveCorner(viewData.x, viewData.y);
-      viewport.current.setZoom(viewData.scale);
-    }
-  },[]);
+  }, []);
 
   const onViewportDestroy = React.useCallback((e) => {
-    console.log(e);
-    if (setViewData) {
-      const data:ViewData = {
-        x: e.x,
-        y: e.y,
-        scale: e.scaleX
-      }
-      setViewData(data);
+    const data:ViewportData = {
+      x: e.x,
+      y: e.y,
+      scale: e.scaleX
     }
+    updateSvData?.(viewName, {
+      viewport: data
+    });
   }, [])
 
   // create draw instructions for each of the search trace components

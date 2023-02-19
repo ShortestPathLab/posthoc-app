@@ -8,7 +8,6 @@ import { Event } from "../types/render";
 
 import { PixiStage } from "./pixi/PixiStage"
 import { get } from "lodash";
-import { ViewData } from "components/inspector/SplitView";
 
 export const Stages = {
   "2d-pixi": PixiStage
@@ -26,11 +25,11 @@ const getRenderer = (name: string | undefined) => {
 }
 
 export const createViews = (interlang: Interlang, eventList: Event[], step: number) => {
-  
+  interlang["other"] = {...interlang.main}
   const views = Object.keys(interlang).map((viewName) => {
     const Stage = getRenderer(interlang?.[viewName]?.renderer);
     
-    return (viewData:ViewData, setViewData:(data:ViewData)=>void) => (
+    return (
       <AutoSize>
         {(size) => (
           <Fade appear in>
@@ -38,8 +37,7 @@ export const createViews = (interlang: Interlang, eventList: Event[], step: numb
               {createElement(Stage, {
                 ...size,
                 view: interlang[viewName],
-                viewData,
-                setViewData,
+                viewName,
                 children: (canvas: Canvas) => (
                   <>
                     <LazyNodeList
@@ -57,6 +55,5 @@ export const createViews = (interlang: Interlang, eventList: Event[], step: numb
       </AutoSize>
     )
   });
-  views.push(views[0])
   return views;
 }
