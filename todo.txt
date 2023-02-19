@@ -4,37 +4,30 @@ ISSUES/BUGS
 
 [ ] The complexity of computed properties is relatively small (currently no special strings besides 'context' can be used, as they will be interpreted as variables eg. undefined would be converted to context[undefined])
 
-[ ] id and pId should be able to be Strings
+[x] id and pId should be able to be Strings
 
-[ ] The currentEventContext will break for search traces requiring information from parents every time it hits one of the LazyNodeList thresholds, as the allEvents property is actually only the events that are draw by the Nodelist. This needs to be fixed, maybe by using a global context or something. If stored once in a global context this may also reduce the memory usage.
+[x] The currentEventContext will break for search traces requiring information from parents every time it hits one of the LazyNodeList thresholds, as the allEvents property is actually only the events that are draw by the Nodelist. This needs to be fixed, maybe by using a global context or something. If stored once in a global context this may also reduce the memory usage.
 
 
 QUESTION
 
-[ ] Current playback system
+[x] Current playback system
 - Currently it works by adding x steps every tick (where x is determined by playbackRate) (this way allows for faster drawing)
 - Should we change it so its reversed, 1 step every x ticks (x is playbackRate) (this way allows for slower drawing)
++ combine both
 
 OPEN
 
 [ ] Hover over
 
-[ ] Playback component for animation support - render/renderer/generic/Playback.tsx
-- layered system for tiles
-
 [ ] Change useCanvas pass as a context
 - PROBLEM: multiple context required for each of the stage, many to many dependency
 required here, not sure it's better or not.
 
-[x] An Context system for intermediate language - parser
-- something like a speciman context
-- takes in the search trace
-- provide intermediate language for the renderer
-
 [ ] Window system for multiple views - side by side
-- As a parent component relative to xxxStage
-- Manage the window system
-- Choose which Stage to use in each of the view
+- [x] As a parent component relative to xxxStage
+- [x] Manage the window system
+- [ ] Choose which Stage to use in each of the view
 
 [ ] Provide a set of pre-defined components/views for user to choose from
 - user could display the search trace without defining views and components
@@ -80,3 +73,15 @@ FINISHED
 [x] Nodelist config the cacheSize & type to setting slice
 
 [x] Current playback system won't support unpersisted component.
+
+[x] Playback component for animation support - render/renderer/generic/Playback.tsx
+- layered system for tiles
+
+[x] Dark mode
+
+[x] Refactor render data strucure to node based instead of event based
+
+[x] An Context system for intermediate language - parser
+- something like a speciman context
+- takes in the search trace
+- provide intermediate language for the renderer
