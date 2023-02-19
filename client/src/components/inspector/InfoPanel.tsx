@@ -1,7 +1,7 @@
-import { BoxProps, Button, Fade, Tooltip, ToggleButton } from "@material-ui/core";
+import { BoxProps, Button, Fade, Tooltip, ToggleButton, Paper } from "@material-ui/core";
 import { SortTwoTone as StepsIcon } from "@material-ui/icons";
 import { TabContext, TabPanel } from "@material-ui/lab";
-import { alpha, Box } from "@material-ui/system";
+import { alpha, Box, darken } from "@material-ui/system";
 import { Flex } from "components/generic/Flex";
 import { PlaceholderCard } from "components/generic/PlaceholderCard";
 import { Toolbar } from "components/generic/Toolbar";
@@ -11,10 +11,14 @@ import { useUIState } from "slices/UIState";
 import { EventListInspector } from "./EventListInspector";
 import RightArrowIcon from "@material-ui/icons/ChevronRight";
 import LeftArrowIcon from "@material-ui/icons/ChevronLeft";
+import ViewSidebarRounded  from "@material-ui/icons/ViewSidebarRounded";
+import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
+import { ToggleButtonWithTooltip } from "components/generic/ToggleButtonWithTooltip";
 
 export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatch<React.SetStateAction<boolean>>}) {
   const {show, setShow} = props;
-  const [{ playback }] = useUIState();
+  const [uiState, setUIState] = useUIState();
+  const { playback, fixed=false } = uiState;
   const [tab, setTab] = useState("steps");
   return (
     <TabContext value={tab}>
@@ -24,12 +28,20 @@ export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatc
           pointerEvents: "none",
           transition: ({ transitions }) => transitions.create(["background", "right"]),
           bgcolor: ({ palette }) =>
-            tab ? alpha(palette.background.default, 0.94) : "transparent",
+            fixed?darken(palette.background.default, 0.06):(tab ? alpha(palette.background.default, 0.94) : "transparent"),
         }}
         alignItems="center"
+        position="relative"
         {...props}
       >
-        <ToggleButton
+        <Paper sx={{position:"absolute", right:0, bottom: 0, m:3, zIndex:'appBar'}}>
+          <ToggleButtonWithTooltip
+            label="fix-info-panel"
+            icon={<ViewSidebarRounded />}
+            size="small" value="fixed" sx={{pointerEvents:"auto"}} selected={fixed} onChange={() => {setUIState({...uiState, fixed:!fixed})}} />
+        </Paper>
+        {!fixed?
+          <ToggleButton
             value="show"
             selected={!show}
             sx={{
@@ -46,6 +58,8 @@ export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatc
           >
             {show?<RightArrowIcon />:<LeftArrowIcon/>}
           </ToggleButton>
+          :<></>
+        }
         <Toolbar>
           {[
             { icon: <StepsIcon />, key: "steps" },

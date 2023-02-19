@@ -12,12 +12,14 @@ import { createViews as cv } from "components/render/renderer";
 import { Playback } from "components/render/renderer/generic/Playback";
 import React from "react";
 import { LoadIndicator } from "./LoadIndicator";
+import { useUIState } from "slices/UIState";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
 export const Inspector = React.memo( function Inspector(props: SpecimenInspectorProps) {
   const [{ interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
+  const [{fixed=false}] = useUIState();
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
@@ -51,8 +53,8 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
         )}
         {eventList?(
           <InfoPanel
-            position="absolute"
-            right={showInfo?0:'min(-25vw,-480px)'}
+            position={fixed?undefined:"absolute"}
+            right={fixed?undefined:(showInfo?0:'min(-25vw,-480px)')}
             height="100%"
             width="25vw"
             minWidth={480}

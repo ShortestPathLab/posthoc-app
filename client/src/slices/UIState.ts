@@ -47,10 +47,15 @@ type SpecimenState = {
   end?: number;
 };
 
+type InfoPanelState = {
+  fixed?: boolean;
+};
+
 export type UIState = InputState &
   PlaybackState &
   DebugOptionsState &
-  SpecimenState;
+  SpecimenState &
+  InfoPanelState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,

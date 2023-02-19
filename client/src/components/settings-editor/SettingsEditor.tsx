@@ -1,6 +1,9 @@
 import {
   Box,
   Divider,
+  FormControl,
+  MenuItem,
+  Select,
   Slider,
   Switch,
   Tab,
@@ -9,7 +12,7 @@ import {
 import { TabContext, TabList, TabPanel } from "@material-ui/lab";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
-import { ReactNode, useState } from "react";
+import { ReactNode, useCallback, useState, useMemo } from "react";
 import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
 import { ServerListEditor } from "./ServerListEditor";
 
@@ -26,9 +29,28 @@ export function SettingsEditor() {
       </Type>
     );
   }
+
   function renderLabel(label: ReactNode) {
     return <Type variant="body1">{label}</Type>;
   }
+
+  const themeName = useMemo(() => {
+    const name = followSystemDark?"Follow System":(dark?"Dark":"Light");
+    console.log(name);
+    
+    return name;
+  }, [dark, followSystemDark])
+
+  const handleTheme = useCallback(e => {
+    switch(e.target.value) {
+      case "Follow System":
+        setSettings({ ...settings, followSystemDark: true }); break;
+      case "Dark": 
+        setSettings({ ...settings, followSystemDark: false, dark: true }); break;
+      case "Light":
+        setSettings({ ...settings, followSystemDark: false, dark: false }); break;
+    }
+  }, [setSettings])
   return (
     <TabContext value={tab}>
       <TabList onChange={(_, v) => setTab(v)}>
@@ -69,21 +91,19 @@ export function SettingsEditor() {
             />
           </Flex>
           <Flex alignItems="center">
-            {renderLabel("Dark Mode")}
+            {renderLabel("Theme")}
             <Space flex={1} />
-            <Switch
-              defaultChecked={!!dark}
-              onChange={(_, v) => setSettings({ ...settings, dark: v })}
-              disabled={followSystemDark}
-            />
-          </Flex>
-          <Flex alignItems="center">
-            {renderLabel("Follow System Dark Settings")}
-            <Space flex={1} />
-            <Switch
-              defaultChecked={!!followSystemDark}
-              onChange={(_, v) => setSettings({ ...settings, followSystemDark: v })}
-            />
+            <FormControl sx={{minWidth:120, my:2}} size="small">
+              <Select
+                id="theme-select"
+                value={themeName}
+                onChange={handleTheme}
+              >
+                <MenuItem value="Dark">Dark</MenuItem>
+                <MenuItem value="Light">Light</MenuItem>
+                <MenuItem value="Follow System">Follow System</MenuItem>
+              </Select>
+            </FormControl>
           </Flex>
         </Box>
       </TabPanel>

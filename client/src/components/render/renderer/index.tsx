@@ -25,6 +25,7 @@ const getRenderer = (name: string | undefined) => {
 }
 
 export const createViews = (interlang: Interlang, nodes: Nodes, step: number) => {
+  // uncomment to show two views
   // interlang["other"] = {...interlang.main}
   const views:{[key: string]: React.ReactNode} = {};
    Object.keys(interlang).forEach((viewName) => {
