@@ -1,7 +1,7 @@
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";
@@ -18,7 +18,6 @@ type SpecimenInspectorProps = {} & FlexProps;
 export const Inspector = React.memo( function Inspector(props: SpecimenInspectorProps) {
   const [{ interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
-  const [resizing, setResizing] = useState(false);
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
@@ -35,8 +34,6 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
                 <SplitView
                   resizable={true}
                   views={createViews(interlang, eventList, step)}
-                  resizing={resizing}
-                  setResizing={setResizing}
                 />
               )}
             </Playback>

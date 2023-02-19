@@ -14,7 +14,7 @@ import {
   ViewportEventHandler,
 } from "./PixiViewport";
 
-const scale = 25;
+const scale = 1;
 
 export type ViewportProps = {
   width?: number;
@@ -38,11 +38,18 @@ function create(props: Props) {
     .pinch()
     .wheel()
     .decelerate({ friction: 0.98 })
-    .clampZoom({ maxScale: 10 * scale, minScale: 0.02 * scale })
-    .zoomPercent(scale);
+    .clampZoom({ maxScale: 30, minScale: 0.05})
   return viewport as PixiViewport;
 }
 
+/**
+ * Hanle props updates
+ * re-subscribe all event listeners
+ * resize based on width and height
+ * @param v current viewport instance
+ * @param prev previous props
+ * @param param2 new props
+ */
 function applyProps(
   v: PixiViewport,
   prev: Props,
@@ -62,6 +69,7 @@ function applyProps(
   }
 }
 
+// define a custom pixi react class component, create is a lifecycle method
 const Component = PixiComponent<Props, PixiViewport>("Viewport", {
   create: (props) => {
     const viewport = create(props);
@@ -74,6 +82,7 @@ const Component = PixiComponent<Props, PixiViewport>("Viewport", {
 
 type PixiViewportProps = ViewportProps & Partial<ComponentProps<typeof Component>>;
 
+// provide app instance to View port
 export const Viewport = forwardRef<PixiViewport, PixiViewportProps>((props,ref) => {
   const app = useApp();
   return <Component app={app} {...props} ref={ref} />;

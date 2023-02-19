@@ -35,12 +35,12 @@ const defaultContext = {
     closing: 0xb0bec5,
     end: 0xec407a,
   },
-  scale: 1,
+  scale: 10,
   fill: 0x000000,
   alpha: 1,
 }
 
-const scale = (length: number): number => {
+export const scale = (length: number): number => {
   return length * defaultContext.scale;
 }
 

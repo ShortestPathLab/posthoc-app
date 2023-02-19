@@ -1,13 +1,19 @@
-import React, { useRef, useState, useCallback, Dispatch, SetStateAction } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useTheme } from "@material-ui/core/styles";
-import { GridNode, Map } from "components/render/renderer/generic/MapParser";
+import { debounce } from "lodash";
+
+export type SplitViewType = (data:ViewData, setData:(data:ViewData)=>void) => React.ReactNode;
 
 export type SplitViewProps = {
-  views?: React.ReactNode[];
+  views?:  SplitViewType[];
   resizable?: boolean;
-  resizing: boolean;
-  setResizing: Dispatch<SetStateAction<boolean>>;
+}
+
+export type ViewData = {
+  x: number;
+  y: number;
+  scale: number;
 }
 
 /**
@@ -20,10 +26,33 @@ export type SplitViewProps = {
  * @param props.resizable boolean value if true then the split view will be resizable
  * @returns ReactElement of the split view
  */
-export function SplitView({views, resizable=false, resizing, setResizing}:SplitViewProps):React.ReactElement {
+export function SplitView({views, resizable=false}:SplitViewProps):React.ReactElement {
   const resizerRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
+
+  const defaultData = {x: 0, y: 0, scale:1}
+  const [leftData, setLeftData] = useState<ViewData>(defaultData);
+  const [rightData, setRightData] = useState<ViewData>(defaultData);
+
+  const [resizing, setResizing] = useState(false);
+
+  useEffect(() => {
+    const resizeEnd = debounce(() => {
+      setResizing(false);
+    }, 500);
+
+    const handleResize = () => {
+      setResizing(true);
+      resizeEnd();
+    } 
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const theme = useTheme();
 
@@ -76,37 +105,14 @@ export function SplitView({views, resizable=false, resizing, setResizing}:SplitV
     }
   }, [setX, setLeftWidth, resizeMoveHandler, resizeUpHandler, setResizing]);
 
-  if (resizing) {
-    return (
-      <div style={{ height: "100%", display: "flex", width:"100%" }}>
-        <div
-          ref={leftRef}
-          style={{ height: "100%", minWidth: "20%", width: "50%", background: theme.palette.divider}}
-        >
-        </div>
-        <div
-          ref={resizerRef}
-          onMouseDown={resizable?resizeHandler:undefined}
-          style={{ width: "15px", backgroundColor: theme.palette.primary.main, height: "100%", display:'flex', justifyContent:'center', alignItems:'center' }}
-        >
-          <MoreVertIcon color="action" />
-        </div>
-        <div
-          ref={rightRef}
-          style={{ flex: "1 1 0%", minWidth: "20%", height: "100%", background: theme.palette.divider }}
-        >
-        </div>
-      </div>
-    )
-  }
   if (views?.length === 2) {
     return (
       <div style={{ height: "100%", display: "flex", width:"100%" }}>
         <div
           ref={leftRef}
-          style={{ height: "100%", minWidth: "20%", width: "50%" }}
+          style={{ height: "100%", minWidth: "20%", width: "50%", background: resizing? theme.palette.divider: undefined }}
         >
-          {views[0]}
+          {!resizing && views[0](leftData, setLeftData)}
         </div>
         <div
           ref={resizerRef}
@@ -117,14 +123,17 @@ export function SplitView({views, resizable=false, resizing, setResizing}:SplitV
         </div>
         <div
           ref={rightRef}
-          style={{ flex: "1 1 0%", minWidth: "20%", height: "100%" }}
+          style={{ flex: "1 1 0%", minWidth: "20%", height: "100%", background: resizing? theme.palette.divider: undefined }}
         >
-          {views[1]}
+          {!resizing && views[1](rightData, setRightData)}
         </div>
       </div>
     )
   } else if (views?.length === 1) {
-    return <>{views[0]}</>
+    return <>{
+      resizing ? (
+        <div style={{ height: "100%", display: "flex", width:"100%", background: theme.palette.divider}}></div>
+      ) : views[0]}</>
   } else {
     return <></>
   }

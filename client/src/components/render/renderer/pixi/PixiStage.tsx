@@ -4,18 +4,21 @@ import { Stage } from "@inlet/react-pixi";
 
 import { Event, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
-import { d2InstrinsicComponents, DrawInstruction } from "./PixiPrimitives"
+import { d2InstrinsicComponents, DrawInstruction, scale } from "./PixiPrimitives"
 import { StageChild } from '../types';
 import { PixiViewport } from './PixiViewport';
 
 import { useMemo } from 'react';
 import { useSpecimen } from 'slices/specimen';
+import { ViewData } from 'components/inspector/SplitView';
 
 export type PixiStageProps = {
   width?: number;
   height?: number;
   children?: StageChild;
   view?: View;
+  viewData?: ViewData;
+  setViewData?: (data:ViewData) => void;
 }
 
 export type DrawInstructions = {
@@ -29,7 +32,6 @@ function findRecentParentEvent(pId:number|string|undefined|null, allEvents:Event
       return allEvents[i]
     }
   }
-  return undefined
 }
 
 /**
@@ -47,26 +49,44 @@ function findRecentParentEvent(pId:number|string|undefined|null, allEvents:Event
  */
 
 export function PixiStage(
-  { width, height, view, children }: PixiStageProps
+  { width, height, view, children, viewData, setViewData }: PixiStageProps
 ) {
   const viewport = React.useRef<PixiViewport>(null);
   const [{map}] = useSpecimen();
 
   // MAP: draw map background
   React.useEffect(() => {
-    console.log("Map Drawn");
     if (viewport.current) {
       const g = new PIXI.Graphics();
       if (map?.nodes?.walls) {
         for (const block of map?.nodes?.walls) {
           g.beginFill(0x202124, 1)
-          .drawRect(block.x??1, (block.y??1) - 4, 1, 1)
+          .drawRect(scale(block.x??1), scale((block.y??1) - 4), scale(1), scale(1))
           .endFill();
         }
       }
       viewport.current?.addChild(g);
     }
   }, [viewport.current === null])
+
+  React.useEffect(() => {
+    if (viewData && viewport.current) {
+      viewport.current.moveCorner(viewData.x, viewData.y);
+      viewport.current.setZoom(viewData.scale);
+    }
+  },[]);
+
+  const onViewportDestroy = React.useCallback((e) => {
+    console.log(e);
+    if (setViewData) {
+      const data:ViewData = {
+        x: e.x,
+        y: e.y,
+        scale: e.scaleX
+      }
+      setViewData(data);
+    }
+  }, [])
 
   // create draw instructions for each of the search trace components
   const drawInstructs: DrawInstructions = useMemo(() => {
@@ -155,7 +175,7 @@ export function PixiStage(
         antialias: true,
       }}
     >
-      <Viewport ref={viewport} width={width} height={height} />
+      <Viewport ref={viewport} width={width} height={height} onDestroy={onViewportDestroy} />
       {
         /**
          * Children will be a callback that returns child components 
