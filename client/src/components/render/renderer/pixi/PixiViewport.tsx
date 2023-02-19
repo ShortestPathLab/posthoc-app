@@ -74,7 +74,13 @@ export class PixiViewport extends PixiViewportBase {
     super.destroy(options);
   }
   fitMap(width: number, height: number) {
-    this.setZoom(this.findFit(width, height) - 0.1)
-    this.moveCenter(width / 2, height / 2 );
+    this.animate({
+      time: 500,
+      position: new PIXI.Point(width / 2, height / 2),
+      scale: this.findFit(width, height) - 0.1,
+      ease: 'easeOutQuint'
+    })
+    // this.setZoom(this.findFit(width, height) - 0.1)
+    // this.moveCenter(width / 2, height / 2 );
   }
 }
