@@ -57,12 +57,13 @@ export function PixiStage(
 
   React.useEffect(() => {
     if (viewport.current) {
-      // restore viewport state
+      // ZOOM: restore viewport state
       if (svData?.[viewName]?.viewport) {
-        console.log(svData);
         const vpData = svData?.[viewName]?.viewport;
-        viewport.current.moveCorner(vpData.x, vpData.y);
-        viewport.current.setZoom(vpData.scale);
+        if (vpData) {
+          viewport.current.moveCorner(vpData.x, vpData.y);
+          viewport.current.setZoom(vpData.scale);
+        }
       }
       // MAP: draw map background
       const g = new PIXI.Graphics();
@@ -74,6 +75,16 @@ export function PixiStage(
         }
       }
       viewport.current?.addChild(g);
+      // MAP: provide fitmap callback to splitview
+      updateSvData?.(viewName, {
+        map: {
+          fitMap: () => {
+            if (map?.bounds?.width && map.bounds.height) {
+              viewport.current?.fitMap(scale(map?.bounds?.width), scale(map?.bounds?.height));
+            }
+          }
+        }
+      });
     }
   }, []);
 
@@ -142,7 +153,6 @@ export function PixiStage(
         if (parentEvent === undefined){
           parentEvent = curEvent
         }
-
 
         const currentEventContext = { ...eventContext, parent:parentEvent, ...curEvent}
         drawInstruction(currentEventContext)(g);

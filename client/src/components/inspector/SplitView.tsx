@@ -3,9 +3,10 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useTheme } from "@material-ui/core/styles";
 import { debounce } from "lodash";
 import { useImmer } from "use-immer";
+import { ResizeMenu } from "./ResizeMenu";
 
 export type SplitViewProps = {
-  views?:  React.ReactNode[];
+  views:  {[key: string]:React.ReactNode};
   resizable?: boolean;
 }
 
@@ -15,8 +16,13 @@ export type ViewportData = {
   scale: number;
 }
 
+export type MapData = {
+  fitMap: () => void
+}
+
 export type ViewContext = {
-  viewport: ViewportData;
+  viewport?: ViewportData;
+  map?: MapData;
 }
 
 // key: viewname
@@ -44,12 +50,21 @@ export const SplitViewContext = React.createContext<SplitViewContextType>([]);
  * @returns ReactElement of the split view
  */
 export function SplitView({views, resizable=false}:SplitViewProps):React.ReactElement {
+  const theme = useTheme();
+
+  const [x, setX] = useState(0);
+  const [leftWidth, setLeftWidth] = useState(0);
+  const [resizing, setResizing] = useState(false);
+
   const resizerRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
 
-  const [resizing, setResizing] = useState(false);
 
+  /**
+   * Used for memorize view data such as viewport x & y, scale and pass
+   * view controls like fitmap, fitscreen to splitview
+   */
   const [splitViewData, updateSplitViewData] = useImmer<SplitViewDataType>({});
 
   const updateViewData = useCallback((viewName: string, newData: ViewContext) => {
@@ -61,27 +76,20 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
     })
   }, [updateSplitViewData, splitViewData]); 
 
+  // add resize handler
   useEffect(() => {
     const resizeEnd = debounce(() => {
       setResizing(false);
     }, 500);
-
     const handleResize = () => {
       setResizing(true);
       resizeEnd();
     } 
-
     window.addEventListener('resize', handleResize);
-
     return () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-  const theme = useTheme();
-
-  let [x, setX] = useState(0);
-  let [leftWidth, setLeftWidth] = useState(0);
 
   const resizeMoveHandler = useCallback((e: MouseEvent) => {
     if (
@@ -129,7 +137,9 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
     }
   }, [setX, setLeftWidth, resizeMoveHandler, resizeUpHandler, setResizing]);
 
-  if (views?.length === 2) {
+  const viewNames = Object.keys(views);
+
+  if (viewNames.length === 2) {
     return (
       <SplitViewContext.Provider value={[splitViewData, updateViewData]}>
         <div style={{ height: "100%", display: "flex", width:"100%" }}>
@@ -137,7 +147,8 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
             ref={leftRef}
             style={{ height: "100%", minWidth: "20%", width: "50%", background: resizing? theme.palette.divider: undefined }}
           >
-            {!resizing && views[0]}
+            <ResizeMenu fitMap={splitViewData[viewNames[0]]?.map?.fitMap}/>
+            {!resizing && views[viewNames[0]]}
           </div>
           <div
             ref={resizerRef}
@@ -150,16 +161,19 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
             ref={rightRef}
             style={{ flex: "1 1 0%", minWidth: "20%", height: "100%", background: resizing? theme.palette.divider: undefined }}
           >
-            {!resizing && views[1]}
+            <ResizeMenu fitMap={splitViewData[viewNames[1]]?.map?.fitMap}/>
+            {!resizing && views[viewNames[1]]}
           </div>
         </div>
       </SplitViewContext.Provider>
     )
-  } else if (views?.length === 1) {
-    return <>{
-      resizing ? (
-        <div style={{ height: "100%", display: "flex", width:"100%", background: theme.palette.divider}}></div>
-      ) : views[0]}</>
+  } else if (viewNames.length === 1) {
+    return (
+      <SplitViewContext.Provider value={[splitViewData, updateViewData]}>
+        <ResizeMenu fitMap={splitViewData[viewNames[0]]?.map?.fitMap}/>
+        {views[viewNames[0]]}
+      </SplitViewContext.Provider>
+    )
   } else {
     return <></>
   }

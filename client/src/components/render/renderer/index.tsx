@@ -25,11 +25,11 @@ const getRenderer = (name: string | undefined) => {
 }
 
 export const createViews = (interlang: Interlang, eventList: Event[], step: number) => {
-  interlang["other"] = {...interlang.main}
-  const views = Object.keys(interlang).map((viewName) => {
+  // interlang["other"] = {...interlang.main}
+  const views:{[key: string]: React.ReactNode} = {};
+   Object.keys(interlang).forEach((viewName) => {
     const Stage = getRenderer(interlang?.[viewName]?.renderer);
-    
-    return (
+    views[viewName] = (
       <AutoSize>
         {(size) => (
           <Fade appear in>

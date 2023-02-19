@@ -66,10 +66,15 @@ export class PixiViewport extends PixiViewportBase {
       this.events[event] = () => this.off(event, f);
     }
   }
+  // emit destory event for storing viewport exit data using onDestroy prop
   destroy(options?: PIXI.IDestroyOptions | undefined): void {
     const {scaleX, scaleY} = this.lastViewport??{scaleX:1, scaleY:1};
     this.setZoom(1);
     this.emit('destroy', { x: this.left, y: this.top, scaleX, scaleY})
     super.destroy(options);
+  }
+  fitMap(width: number, height: number) {
+    this.setZoom(this.findFit(width, height) - 0.1)
+    this.moveCenter(width / 2, height / 2 );
   }
 }
