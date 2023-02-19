@@ -55,8 +55,9 @@ export function PixiStage(
   const [svData, updateSvData] = React.useContext(SplitViewContext);
 
   const colours = useMemo(() => {
+    console.log(theme.event)
     return coloursToHex(theme.event);
-  }, [theme.event]);
+  }, [theme]);
 
   React.useEffect(() => {
     if (viewport.current) {
@@ -89,7 +90,7 @@ export function PixiStage(
         }
       });
     }
-  }, []);
+  }, [theme.palette.mode]);
 
   const onViewportDestroy = React.useCallback((e) => {
     updateSvData?.(viewName, {
@@ -150,7 +151,7 @@ export function PixiStage(
       }
     }
     return g;
-  }, [drawInstructs]);
+  }, [drawInstructs, colours]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const canvas = React.useCallback(

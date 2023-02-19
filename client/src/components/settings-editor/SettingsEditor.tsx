@@ -16,7 +16,8 @@ import { ServerListEditor } from "./ServerListEditor";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsEditor() {
-  const [{ playbackRate = 1, acrylic }, setSettings] = useSettings();
+  const [settings, setSettings] = useSettings();
+  const { playbackRate = 1, acrylic, dark, followSystemDark } = settings;
   const [tab, setTab] = useState("general");
   function renderHeading(label: ReactNode) {
     return (
@@ -54,7 +55,7 @@ export function SettingsEditor() {
               valueLabelDisplay="auto"
               defaultValue={playbackRate}
               onChangeCommitted={(_, v) =>
-                setSettings({ playbackRate: v as number })
+                setSettings({...settings, playbackRate: v as number })
               }
             />
           </Flex>
@@ -64,7 +65,24 @@ export function SettingsEditor() {
             <Space flex={1} />
             <Switch
               defaultChecked={!!acrylic}
-              onChange={(_, v) => setSettings({ acrylic: v })}
+              onChange={(_, v) => setSettings({ ...settings, acrylic: v })}
+            />
+          </Flex>
+          <Flex alignItems="center">
+            {renderLabel("Dark Mode")}
+            <Space flex={1} />
+            <Switch
+              defaultChecked={!!dark}
+              onChange={(_, v) => setSettings({ ...settings, dark: v })}
+              disabled={followSystemDark}
+            />
+          </Flex>
+          <Flex alignItems="center">
+            {renderLabel("Follow System Dark Settings")}
+            <Space flex={1} />
+            <Switch
+              defaultChecked={!!followSystemDark}
+              onChange={(_, v) => setSettings({ ...settings, followSystemDark: v })}
             />
           </Flex>
         </Box>

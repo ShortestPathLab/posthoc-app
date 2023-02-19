@@ -5,10 +5,12 @@ import { Inspector } from "components/inspector";
 import { useMedia } from "react-use";
 import { getTheme } from "theme";
 import { useMemo } from "react";
+import { useSettings } from "slices/settings";
 
 function App() {
   const prefersDark = useMedia('(prefers-color-scheme: dark)');
-  const theme = useMemo(() => getTheme(prefersDark), [prefersDark]);
+  const [{dark, followSystemDark}] = useSettings();
+  const theme = useMemo(() => getTheme(followSystemDark?prefersDark:dark), [prefersDark, dark, followSystemDark]);
   return (
     <CssBaseline>
     <ThemeProvider theme={theme}>

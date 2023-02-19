@@ -13,6 +13,8 @@ type Settings = {
   cacheSize?: number;
   acrylic?: boolean;
   convert?: boolean;
+  dark: boolean;
+  followSystemDark: boolean;
 };
 
 const DEV_PORT = 8001;
@@ -42,6 +44,8 @@ export const [useSettings, SettingsProvider] = createSlice<Settings>(
     remote: defaultRemotes,
     playbackRate: defaultPlaybackRate,
     cacheSize: 500,
+    dark: false,
+    followSystemDark: true,
   },
   withLocalStorage("settings")
 );
