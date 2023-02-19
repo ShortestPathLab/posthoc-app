@@ -6,10 +6,10 @@ export type TraceEventType =
     "source" 
   | "destination" 
   | "generating" 
+  | "updating"
   | "closing" 
   | "expanding" 
-  | "end"
-  | string;
+  | "end";
 
 export type TraceViewType =
   "state"

@@ -7,7 +7,7 @@ import {
   yellow,
 } from "@material-ui/core/colors";
 import { mapValues } from "lodash";
-import { TraceEventType } from "components/render/types/trace";
+import { TraceEventType } from "protocol/Trace";
 
 const tint = "500";
 

@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider } from "@material-ui/core";
+import { CssBaseline } from "@material-ui/core";
 import App from "App";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import "index.css";
@@ -16,7 +16,6 @@ import { SettingsProvider } from "slices/settings";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { SpecimenProvider } from "slices/specimen";
 import { UIStateProvider } from "slices/UIState";
-import { theme } from "theme";
 
 const slices = [
   SettingsProvider,
@@ -36,15 +35,11 @@ const services = [
 
 render(
   <StrictMode>
-    <CssBaseline>
-      <ThemeProvider theme={theme}>
-        <SnackbarProvider>
-          <EnvironmentProvider slices={slices} services={services}>
-           <App />
-          </EnvironmentProvider>
-        </SnackbarProvider>
-      </ThemeProvider>
-    </CssBaseline>
+    <SnackbarProvider>
+      <EnvironmentProvider slices={slices} services={services}>
+        <App />
+      </EnvironmentProvider>
+    </SnackbarProvider>
   </StrictMode>,
   document.getElementById("root")
 );

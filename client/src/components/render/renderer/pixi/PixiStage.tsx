@@ -11,6 +11,10 @@ import { PixiViewport } from './PixiViewport';
 import { useMemo } from 'react';
 import { useSpecimen } from 'slices/specimen';
 import { SplitViewContext, ViewportData } from 'components/inspector/SplitView';
+import { useTheme } from '@material-ui/core';
+import { hex } from 'components/renderer/colors';
+import { TraceEventType } from 'protocol/Trace';
+import { coloursToHex } from '../generic/colours';
 
 export type PixiStageProps = {
   width?: number;
@@ -22,6 +26,10 @@ export type PixiStageProps = {
 
 export type DrawInstructions = {
   [key: string]: DrawInstruction
+}
+
+export type EventTypeColoursTypeHex = {
+  [k in TraceEventType]: number 
 }
 /**
  * PIXI Stage component for rendering view and search trace,
@@ -42,8 +50,13 @@ export function PixiStage(
 ) {
   const viewport = React.useRef<PixiViewport>(null);
   const [{map}] = useSpecimen();
+  const theme = useTheme();
 
   const [svData, updateSvData] = React.useContext(SplitViewContext);
+
+  const colours = useMemo(() => {
+    return coloursToHex(theme.event);
+  }, [theme.event]);
 
   React.useEffect(() => {
     if (viewport.current) {
@@ -59,7 +72,7 @@ export function PixiStage(
       const g = new PIXI.Graphics();
       if (map?.nodes?.walls) {
         for (const block of map?.nodes?.walls) {
-          g.beginFill(0x202124, 1)
+          g.beginFill(hex(theme.map.walls), 1)
           .drawRect(scale(block.x??1), scale((block.y??1) - 4), scale(1), scale(1))
           .endFill();
         }
@@ -113,14 +126,8 @@ export function PixiStage(
     const eventContext = {
       nodes,
       colour: {
-        source: 0x26a69a,
-        destination: 0xf06292,
-        expanding: 0xff5722,
-        updating: 0xff5722,
-        generating: 0xffeb3b,
-        closing: 0xb0bec5,
-        end: 0xec407a,
-      },
+        ...colours
+      } 
     }
     const g = new PIXI.Graphics();
     for (const compName in drawInstructs) {

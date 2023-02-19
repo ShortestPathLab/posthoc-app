@@ -100,10 +100,7 @@ function pixiInterlangConventer(component: Component) {
       const element: Component = executeComponent(component, eventContext)
 
       // Determine color by event type
-      let color: number | undefined = undefined;
-      if (eventContext.type !== undefined && eventContext.type in defaultContext.colour) {
-        color = defaultContext.colour[eventContext.type as keyof typeof defaultContext.colour];
-      }
+      let color: number | undefined = eventContext.type && eventContext.type in eventContext.colour? eventContext.colour[eventContext.type]:undefined;
       if (!color) {
         console.error(`No color defined for event type ${eventContext.type} on context`);
       }

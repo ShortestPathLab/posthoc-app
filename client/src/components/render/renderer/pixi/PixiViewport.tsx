@@ -80,7 +80,5 @@ export class PixiViewport extends PixiViewportBase {
       scale: this.findFit(width, height) - 0.1,
       ease: 'easeOutQuint'
     })
-    // this.setZoom(this.findFit(width, height) - 0.1)
-    // this.moveCenter(width / 2, height / 2 );
   }
 }
