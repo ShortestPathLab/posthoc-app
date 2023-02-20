@@ -146,7 +146,7 @@ function pixiInterlangConventer(component: Component) {
           //@ts-ignore
           case "path":
             // fallthrough is wanted, as polygons and paths are drawn the same way
-            g.lineStyle({ width: 0.2 , color:fillColour})
+            g.lineStyle({ width: element.lineWidth , color:fillColour})
 
           case "polygon":
             const points = element.points.map((point: { x: number, y: number }) => { return { x: scale(point.x), y: scale(point.y) } })
@@ -155,7 +155,6 @@ function pixiInterlangConventer(component: Component) {
             break;
 
           default:
-            console.log(element.$)
             throw Error("Invalid primitive for the PIXI renderer")
         }
 
