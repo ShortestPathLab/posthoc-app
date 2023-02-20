@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import * as React from "react";
 import { Stage } from "@inlet/react-pixi";
 
-import { Event, Nodes, View } from "components/render/types/render";
+import { Nodes, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
 import { d2InstrinsicComponents, DrawInstruction, scale } from "./PixiPrimitives"
 import { StageChild } from '../types';
@@ -10,7 +10,7 @@ import { PixiViewport } from './PixiViewport';
 
 import { useMemo } from 'react';
 import { useSpecimen } from 'slices/specimen';
-import { SplitViewContext, ViewportData } from 'components/inspector/SplitView';
+import { SplitViewContext } from 'components/inspector/SplitView';
 import { useTheme } from '@material-ui/core';
 import { hex } from 'components/renderer/colors';
 import { TraceEventType } from 'protocol/Trace';
@@ -55,7 +55,6 @@ export function PixiStage(
   const [svData, updateSvData] = React.useContext(SplitViewContext);
 
   const colours = useMemo(() => {
-    console.log(theme.event)
     return coloursToHex(theme.event);
   }, [theme]);
 
@@ -121,9 +120,12 @@ export function PixiStage(
    * @param events list of events need to be rendered using drawInstructs
    * @param hasCurrent indicates if the graphic holds the current step
    */
+  // FIXME has current not working
   const makeGraphic = React.useCallback((nodes: Nodes, hasCurrent: boolean) => {
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
+    // FIXME nodes is not all nodes but only part of the node rendered by current
+    // node list 
     const eventContext = {
       nodes,
       colour: {
@@ -143,9 +145,10 @@ export function PixiStage(
         // spread the current event and get the parent event aswell
         const current = events[events.length - 1];
         let parent;
-        if (current.pid) {
-          parent = nodes.get(current?.pid)?.[0];
+        if (current.pId) {
+          parent = nodes.get(current?.pId)?.[0];
         }
+        console.log(parent);
         const currentEventContext = { ...eventContext, parent, ...current}
         drawInstruction(currentEventContext)(g);
       }

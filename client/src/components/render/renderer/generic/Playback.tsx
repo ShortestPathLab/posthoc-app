@@ -1,7 +1,7 @@
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { Event, Nodes } from "components/render/types/render";
-import { createNodes, createStepNodes } from "./Nodes";
+import { createStepNodes } from "./Nodes";
 import { useMemo } from "react";
 
 /**

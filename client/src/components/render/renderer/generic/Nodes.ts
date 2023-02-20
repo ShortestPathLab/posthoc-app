@@ -5,6 +5,7 @@ export function isTopEvent(event: Event) {
   return event.type && ["source", "destination", "end"].includes(event.type);
 }
 
+// 
 export function createNodes(eventList: Event[]):Nodes {
   const result:Nodes = new Map();
   for (const event of eventList) {
@@ -22,13 +23,14 @@ export function createStepNodes(eventList: Event[], step: number):Nodes {
   const topNodes:[[number|string, TraceEvent[]]?] = [];
   let i = 0;
   for (const event of eventList) {
-    
     if (i <= step && event.id) {
       if (isTopEvent(event)) {
         topNodes.push([event.id,[event]]);
       } else {
         result.set(event.id, [event]);
       }
+    } else {
+      break;
     }
     i++;
   }

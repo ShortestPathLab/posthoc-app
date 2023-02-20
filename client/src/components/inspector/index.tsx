@@ -1,7 +1,7 @@
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";

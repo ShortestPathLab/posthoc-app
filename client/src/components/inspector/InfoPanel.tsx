@@ -12,7 +12,6 @@ import { EventListInspector } from "./EventListInspector";
 import RightArrowIcon from "@material-ui/icons/ChevronRight";
 import LeftArrowIcon from "@material-ui/icons/ChevronLeft";
 import ViewSidebarRounded  from "@material-ui/icons/ViewSidebarRounded";
-import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
 import { ToggleButtonWithTooltip } from "components/generic/ToggleButtonWithTooltip";
 
 export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatch<React.SetStateAction<boolean>>}) {

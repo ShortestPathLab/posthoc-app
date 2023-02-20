@@ -4,7 +4,7 @@ import AutoSize from "react-virtualized-auto-sizer";
 import { Canvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";
 import { Interlang } from "slices/specimen";
-import { Event, Nodes } from "../types/render";
+import { Nodes } from "../types/render";
 
 import { PixiStage } from "./pixi/PixiStage"
 import { get } from "lodash";
