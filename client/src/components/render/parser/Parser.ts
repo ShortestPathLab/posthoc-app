@@ -52,10 +52,11 @@ export function parseComps(components: Component[] | undefined, injectedContext:
       // creates a copy of the component
       const newComp: Component = { ...injectedContext, ...component }
 
+
       // goes through all the properties of the component and parses them when necessary
       for (const prop in component) {
         if (prop !== "$" && prop !== "persisted") {
-          newComp[prop as keyof Component] = parseProperty(component[prop as keyof Component], injectedContext)
+          newComp[prop as keyof Component] = parseProperty(component[prop as keyof Component], { ...injectedContext, ...component })
         }
       }
       return [newComp]
@@ -101,10 +102,12 @@ function arrayOfFunctions(array: Function[], injectedContext: Context) {
 function objectOfFunctions(object: { [K: string]: Function }, injectedContext: Context) {
 
   return (context: Context) => {
-    const newObject:{[K: string]: Function} = {};
+    const newObject:{[K: string]: any} = {};
     for (const prop in object) {
-      newObject[prop] = object[prop](context)
+      newObject[prop] = object[prop]({ ...injectedContext, ...context })
+      console.log(typeof newObject[prop])
     }
+    console.log(newObject, 1)
     return newObject
   }
 }
@@ -137,11 +140,13 @@ export function parseProperty(val: any, injectedContext: Context): Function {
       }
       else {
         // for objects we parse each of the properties
+        const newVal:any = {}
         for (const prop in val) {
-          val[prop] = parseProperty(val[prop], injectedContext)
+          newVal[prop] = parseProperty(val[prop], injectedContext)
         }
+
         // then call a function which groups all the individual functions under one function call
-        return objectOfFunctions(val, injectedContext)
+        return objectOfFunctions(newVal, injectedContext)
       }
 
   }
