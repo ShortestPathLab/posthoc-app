@@ -135,6 +135,7 @@ function pixiInterlangConventer(component: Component) {
             ];
             g.drawCircle(circX, circY, circR)
             break;
+          //@ts-ignore
           case "path":
             // fallthrough is wanted, as polygons and paths are drawn the same way
             g.lineStyle({ width: 0.2 , color:fillColour})
