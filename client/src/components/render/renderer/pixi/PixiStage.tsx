@@ -147,9 +147,11 @@ export function PixiStage(
         let parent;
         if (current.pId) {
           parent = nodes.get(current?.pId)?.[0];
+        } else {
+          parent = current;
         }
-        console.log(parent);
         const currentEventContext = { ...eventContext, parent, ...current}
+        console.log(currentEventContext);
         drawInstruction(currentEventContext)(g);
       }
     }

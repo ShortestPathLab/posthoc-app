@@ -96,7 +96,7 @@ function pixiInterlangConventer(component: Component) {
   function drawInstruction(eventContext: EventContext) {
     if (eventContext) {
       // executes all the computed properties
-      const element: Component = executeComponent(component, eventContext)
+      const element: Component = executeComponent(component, eventContext);
 
       // Determine color by event type
       let color: number | undefined = eventContext.type && eventContext.type in eventContext.colour? eventContext.colour[eventContext.type]:undefined;
@@ -104,7 +104,7 @@ function pixiInterlangConventer(component: Component) {
         console.error(`No color defined for event type ${eventContext.type} on context`);
       }
 
-      let textObj: PIXI.Text | undefined = undefined;;
+      let textObj: PIXI.Text | undefined = undefined;
       // draw instructions on PIXI graphics
       return (g: GraphicsType) => {
 
