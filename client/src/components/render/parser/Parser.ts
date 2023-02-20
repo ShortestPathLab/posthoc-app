@@ -105,9 +105,7 @@ function objectOfFunctions(object: { [K: string]: Function }, injectedContext: C
     const newObject:{[K: string]: any} = {};
     for (const prop in object) {
       newObject[prop] = object[prop]({ ...injectedContext, ...context })
-      console.log(typeof newObject[prop])
     }
-    console.log(newObject, 1)
     return newObject
   }
 }

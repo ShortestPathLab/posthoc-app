@@ -151,7 +151,7 @@ export function PixiStage(
           parent = current;
         }
         const currentEventContext = { ...eventContext, parent, ...current}
-        console.log(currentEventContext);
+
         drawInstruction(currentEventContext)(g);
       }
     }
