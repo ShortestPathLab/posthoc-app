@@ -1,52 +1,64 @@
 {
     "version": "1.0.3",
     "render": {
-      "components": {
-        "tile": [
-          {
-            "$": "rect",
-            "width": 0.9,
-            "height": 0.9,
-            "text": "{{context[`${x}${y}`]}}",
-            "fill": "{{context[`${x}${y}`] ? 0x808080 : 0xFFFFFFF}}",
-            "persisted":false
-          }
-        ],
-        "tilerow": [
-          {
-            "$": "tile",
-            "x": 1
-          },
-          {
-            "$": "tile",
-            "x": 2
-          },
-          {
-            "$": "tile",
-            "x": 3
-          }
-        ],
-        "tileboard":[
-          {
-            "$": "tilerow",
-            "y": 1
-          },
-          {
-            "$": "tilerow",
-            "y": 2
-          },
-          {
-            "$": "tilerow",
-            "y": 3
-          }
-        ]
-      },
-      "views": {
-        "main": {"renderer": "2d-pixi", "components":[{ "$":"tileboard" }]}
-      }
+        "components": {
+            "tile": [
+                {
+                    "$": "rect",
+                    "width": 0.9,
+                    "height": 0.9,
+                    "text": {
+                        "displayText": "{{context[`${x}${y}`] === 0 ? '' : context[`${x}${y}`]}}",
+                        "fontSize" : 10,
+                        "fill": "0x000000",
+                        "x" : "{{x+width/6}}",
+                        "y" : "{{y-height/4}}"
+                    },
+                    "fill": "{{context[`${x}${y}`] ? 0x808080 : 0xFFFFFFF}}",
+                    "persisted": false
+                }
+            ],
+            "tilerow": [
+                {
+                    "$": "tile",
+                    "x": 1
+                },
+                {
+                    "$": "tile",
+                    "x": 2
+                },
+                {
+                    "$": "tile",
+                    "x": 3
+                }
+            ],
+            "tileboard": [
+                {
+                    "$": "tilerow",
+                    "y": 1
+                },
+                {
+                    "$": "tilerow",
+                    "y": 2
+                },
+                {
+                    "$": "tilerow",
+                    "y": 3
+                }
+            ]
+        },
+        "views": {
+            "main": {
+                "renderer": "2d-pixi",
+                "components": [
+                    {
+                        "$": "tileboard"
+                    }
+                ]
+            }
+        }
     },
-    "eventList": 
-    [
+    "eventList": [
         {
             "11": 1,
             "12": 4,
@@ -970,4 +982,4 @@
             "g": 0.93117
         }
     ]
-  }
+}

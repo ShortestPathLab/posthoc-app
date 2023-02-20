@@ -20,6 +20,14 @@ export type EventContext = {
   scale?: number
 } & Event
 
+export type TextObject = {
+  displayText: string,
+  fontSize: number,
+  fill: string, 
+  x: number, 
+  y: number
+}
+
 // default context
 const defaultContext = {
   current: null,
@@ -62,7 +70,7 @@ export const d2InstrinsicComponents: InstrinsicComponents = {
   }
 }
 
-function executeComponent(component: Component, event: Event) {
+function executeComponent(component: Component, event: EventContext) {
 
   const element: Component = { ...component };
   // Execute the computed props from the event
@@ -75,17 +83,18 @@ function executeComponent(component: Component, event: Event) {
   return element
 }
 
-function textElement(text: string | undefined, x: number, y: number) {
+function textElement(text: TextObject | undefined) {
   // if text defined, provide text object
   let textObj: PIXI.Text | undefined = undefined;
+
   if (text) {
-    textObj = new PIXI.Text(text, {
+    textObj = new PIXI.Text(text.displayText, {
       fontFamily: 'Arial',
-      fontSize: 1,
-      fill: "black",
+      fontSize: text.fontSize,
+      fill: text.fill,
     });
-    textObj.y = y
-    textObj.x = x;
+    textObj.y = scale(text.y)
+    textObj.x = scale(text.x)
     textObj.resolution = 100
   }
   return textObj
@@ -122,7 +131,7 @@ function pixiInterlangConventer(component: Component) {
             ];
 
 
-            textObj = textElement(element.text, rectX+rectW/6, rectY-rectH/4)
+            textObj = textElement(element.text)
             g.drawRect(rectX, rectY, rectW, rectH)
             break;
 
