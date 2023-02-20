@@ -38,9 +38,7 @@ required here, not sure it's better or not.
 
 [ ] Improve the process in which the currentEventContexts are created (maybe memoizee them)
 
-[ ] Fix issue where if the parent undefined (starting event or something) the application wont error (if they used something like parent.x) (this is techincally fixed but probs a better way todo it)
 
-[ ] Maybe make the text property in the search traces an Object with properties like displayText, Colour, position (relative to parent Object) etc. Also maybe add some more properties to existing primitives like a lineWidth to the path primitive. 
 
 [ ] Create merger of eventList information so that delta eventLists will work
 
@@ -82,3 +80,7 @@ FINISHED
 - something like a speciman context
 - takes in the search trace
 - provide intermediate language for the renderer
+
+[x] Fix issue where if the parent undefined (starting event or something) the application wont error (if they used something like parent.x) (this is techincally fixed but probs a better way todo it)
+
+[x] Maybe make the text property in the search traces an Object with properties like displayText, Colour, position (relative to parent Object) etc. Also maybe add some more properties to existing primitives like a lineWidth to the path primitive. 
