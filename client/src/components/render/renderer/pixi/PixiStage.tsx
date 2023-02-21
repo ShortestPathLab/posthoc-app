@@ -92,6 +92,9 @@ export function PixiStage(
         }
       }
     });
+    return () => {
+      viewport.current?.removeChild(g);
+    }
   }, [map, theme.palette.mode]);
 
   // remember viewport resize information

@@ -48,7 +48,7 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
             vertical
           >
             <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
-            Select a map to get started.
+            Select a trace to get started.
           </Flex>
         )}
         {eventList?(
