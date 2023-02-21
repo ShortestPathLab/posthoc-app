@@ -93,9 +93,9 @@ function textElement(text: TextObject | undefined) {
       fontSize: text.fontSize,
       fill: text.fill,
     });
-    textObj.y = scale(text.y)
-    textObj.x = scale(text.x)
-    textObj.resolution = 100
+    textObj.y = scale(text.y);
+    textObj.x = scale(text.x);
+    textObj.resolution = 100;
   }
   return textObj
 
@@ -113,7 +113,7 @@ function pixiInterlangConventer(component: Component) {
         console.error(`No color defined for event type ${eventContext.type} on context`);
       }
 
-      let textObj: PIXI.Text | undefined = undefined;
+      let textObj: PIXI.Text | undefined;
       // draw instructions on PIXI graphics
       return (g: GraphicsType) => {
 
@@ -157,7 +157,6 @@ function pixiInterlangConventer(component: Component) {
           default:
             throw Error("Invalid primitive for the PIXI renderer")
         }
-
         g.endFill()
         if (textObj !== undefined) {
           g.addChild(textObj)
@@ -172,5 +171,3 @@ function pixiInterlangConventer(component: Component) {
 
   return drawInstruction;
 }
-
-

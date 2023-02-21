@@ -94,6 +94,7 @@ export function PixiStage(
     });
   }, [map, theme.palette.mode]);
 
+  // remember viewport resize information
   const onViewportDestroy = React.useCallback((e) => {
     updateSvData?.(viewName, {
       viewport: {
@@ -116,7 +117,7 @@ export function PixiStage(
       drawInstructions[compName] = d2InstrinsicComponents[component.$].converter(component);
     }
     return drawInstructions;
-  }, [view])
+  }, [view.components])
 
   /**
    * Create Grapphic object for events
@@ -136,6 +137,7 @@ export function PixiStage(
       } 
     }
     const g = new PIXI.Graphics();
+    
     for (const compName in drawInstructs) {
       const drawInstruction = drawInstructs[compName];
       let i = -1;
@@ -170,7 +172,7 @@ export function PixiStage(
           viewport.current?.removeChild?.(graphic);
         }
       }
-    }),[])
+    }),[makeGraphic])
 
   return (<>
     <Stage
