@@ -66,14 +66,16 @@ export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatc
             { key: "parameters" },
           ].map(({ key, icon }) => (
             <Tooltip key={key} title={startCase(key)}>
-              <Button
-                onClick={() => setTab(key === tab ? "" : key)}
-                color="primary"
-                variant={key === tab ? "contained" : "text"}
-                startIcon={icon}
-              >
-                {startCase(key)}
-              </Button>
+              <span>
+                <Button
+                  onClick={() => setTab(key === tab ? "" : key)}
+                  color="primary"
+                  variant={key === tab ? "contained" : "text"}
+                  startIcon={icon}
+                >
+                  {startCase(key)}
+                </Button>
+              </span>
             </Tooltip>
           ))}
         </Toolbar>

@@ -1,2 +1,4 @@
-export const HashWorker = new Worker(new URL("./hash.worker", import.meta.url));
-export const IPCWorker = new Worker(new URL("./hash.worker", import.meta.url))
+import Worker from './hash.worker?worker'
+
+export const HashWorker = new Worker();
+export const IPCWorker = new Worker();

@@ -15,13 +15,15 @@ export function Utility() {
       <Dialog
         trigger={(onClick) => (
           <Tooltip title="Debug Options">
-            <Button
-              {...{ onClick }}
-              disabled={!specimen}
-              startIcon={<BugIcon />}
-            >
-              Debug
-            </Button>
+            <span>
+              <Button
+                {...{ onClick }}
+                disabled={!specimen}
+                startIcon={<BugIcon />}
+              >
+                Debug
+              </Button>
+            </span>
           </Tooltip>
         )}
         options={{ width: 960, scrollable: false }}

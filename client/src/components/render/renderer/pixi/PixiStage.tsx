@@ -154,10 +154,6 @@ export function PixiStage(
           parent = current;
         }
         const currentEventContext = { ...eventContext, parent, ...current}
-<<<<<<< HEAD
-
-=======
->>>>>>> map and search trace loader
         drawInstruction(currentEventContext)(g);
       }
     }
@@ -174,8 +170,7 @@ export function PixiStage(
           viewport.current?.removeChild?.(graphic);
         }
       }
-    }), []
-  )
+    }),[])
 
   return (<>
     <Stage

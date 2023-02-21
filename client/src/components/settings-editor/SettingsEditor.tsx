@@ -72,6 +72,7 @@ export function SettingsEditor() {
               step={0.25 * baseRate}
               min={0.25 * baseRate}
               max={5 * baseRate}
+              key={`slider-${playbackRate}`}
               valueLabelFormat={(v) => formatLabel(v / baseRate)}
               valueLabelDisplay="auto"
               defaultValue={playbackRate}
