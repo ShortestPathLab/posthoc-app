@@ -68,28 +68,31 @@ export function PixiStage(
           viewport.current.setZoom(vpData.scale);
         }
       }
-      // MAP: draw map background
-      const g = new PIXI.Graphics();
-      if (map?.nodes?.walls) {
-        for (const block of map?.nodes?.walls) {
-          g.beginFill(hex(theme.map.walls), 1)
-          .drawRect(scale(block.x??1), scale((block.y??1) - 4), scale(1), scale(1))
-          .endFill();
-        }
-      }
-      viewport.current?.addChild(g);
-      // MAP: provide fitmap callback to splitview
-      updateSvData?.(viewName, {
-        map: {
-          fitMap: () => {
-            if (map?.bounds?.width && map.bounds.height) {
-              viewport.current?.fitMap(scale(map?.bounds?.width), scale(map?.bounds?.height));
-            }
-          }
-        }
-      });
     }
   }, [theme.palette.mode]);
+
+  React.useEffect(() => {
+    // MAP: draw map background
+    const g = new PIXI.Graphics();
+    if (map?.nodes?.walls) {
+      for (const block of map?.nodes?.walls) {
+        g.beginFill(hex(theme.map.walls), 1)
+        .drawRect(scale(block.x??1), scale((block.y??1) - 4), scale(1), scale(1))
+        .endFill();
+      }
+    }
+    viewport.current?.addChild(g);
+    // MAP: provide fitmap callback to splitview
+    updateSvData?.(viewName, {
+      map: {
+        fitMap: () => {
+          if (map?.bounds?.width && map.bounds.height) {
+            viewport.current?.fitMap(scale(map?.bounds?.width), scale(map?.bounds?.height));
+          }
+        }
+      }
+    });
+  }, [map, theme.palette.mode]);
 
   const onViewportDestroy = React.useCallback((e) => {
     updateSvData?.(viewName, {
@@ -151,7 +154,10 @@ export function PixiStage(
           parent = current;
         }
         const currentEventContext = { ...eventContext, parent, ...current}
+<<<<<<< HEAD
 
+=======
+>>>>>>> map and search trace loader
         drawInstruction(currentEventContext)(g);
       }
     }

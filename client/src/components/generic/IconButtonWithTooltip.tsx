@@ -3,19 +3,21 @@ import { startCase } from "lodash";
 import { ReactNode } from "react";
 
 type IconButtonWithTooltipProps = {
-  label: string;
-  icon: ReactNode;
+  label?: string;
+  icon?: ReactNode;
 } & IconButtonProps;
 
 export function IconButtonWithTooltip({
-  label,
+  label="default",
   icon,
   ...rest
 }: IconButtonWithTooltipProps) {
   return (
     <Tooltip title={startCase(label)} key={label}>
       <span>
-        <IconButton {...rest}>{icon}</IconButton>
+        <IconButton {...rest}>
+          {icon}
+        </IconButton>
       </span>
     </Tooltip>
   );

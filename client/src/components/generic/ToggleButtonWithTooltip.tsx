@@ -1,4 +1,4 @@
-import { IconButton, ToggleButtonProps, ToggleButton, Tooltip } from "@material-ui/core";
+import { ToggleButtonProps, ToggleButton, Tooltip } from "@material-ui/core";
 import { startCase } from "lodash";
 import { ReactNode } from "react";
 

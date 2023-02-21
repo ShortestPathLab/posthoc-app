@@ -1,61 +1,84 @@
-import { Code as CodeIcon, MapTwoTone as MapIcon } from "@material-ui/icons";
-import { useSnackbar } from "components/generic/Snackbar";
+import { ButtonWithTooltip as Button } from "components/generic/ButtonWithTooltip";
+import { fileDialog as file } from "file-select-dialog";
+import { useSpecimen } from "slices/specimen";
 import { Space } from "components/generic/Space";
-import { find } from "lodash";
-import { useConnections } from "slices/connections";
-import { useFeatures } from "slices/features";
-import { useUIState } from "slices/UIState";
-import { FeaturePicker } from "./FeaturePicker";
-import { custom, upload } from "./upload";
-
-export const mapDefaults = { start: undefined, end: undefined };
+import { MapRounded as MapIcon, TravelExploreRounded as TraceIcon } from "@material-ui/icons";
+import { useCallback } from "react";
+import { parseGridMap } from "components/render/renderer/generic/MapParser";
+import { parseViews } from "components/render/parser/Parser";
+import { useSnackbar } from "components/generic/Snackbar";
 
 export function Input() {
+  const [specimen,setSpecimen] = useSpecimen();
   const notify = useSnackbar();
-  const [connections] = useConnections();
-  const [{ algorithms, maps, formats }] = useFeatures();
-  const [{ algorithm, map }, setUIState] = useUIState();
+  
+  const handleMapInput = useCallback(async () => {
+    const reader = new FileReader();
+    const f = await file({
+      strict: true,
+    });
+    reader.readAsText(f, "UTF-8");
+    reader.onload = e => {
+      try {
+        setSpecimen({
+          ...specimen,
+          map: parseGridMap(e.target?.result as string)
+        });
+        notify(
+          `Map load successfully`
+        );
+      } catch(e) {
+        notify(
+          `Map load fail`
+        );
+        throw e;
+      }
+    }
+  }, []);
+
+  const handleTraceInput = useCallback(async () => {
+    const reader = new FileReader();
+    const f = await file({
+      strict: true,
+    });
+    reader.readAsText(f, "UTF-8");
+    reader.onload = e => {
+      try {
+        const trace = JSON.parse(e.target?.result as string);
+        setSpecimen({
+          ...specimen,
+          interlang: parseViews(trace.render),
+          eventList: trace.eventList,
+        });
+        notify(
+          `Search Trace load successfully`
+        );
+      } catch(e) {
+        notify(
+          `Search Trace load fail`
+        );
+        throw e;
+      }
+    }
+  }, []);
 
   return (
     <>
-      <FeaturePicker
-        icon={<MapIcon />}
-        label="map"
-        value={map?.id}
-        items={[
-          custom(map),
-          ...maps.map((c) => ({
-            ...c,
-            description: find(connections, { url: c.source })?.name,
-          })),
-        ]}
-        onChange={async (v) => {
-          switch (v) {
-            case custom().id:
-              try {
-                const f = await upload(formats);
-                if (f) setUIState({ ...mapDefaults, map: f });
-              } catch (e) {
-                notify(`${e}`);
-              }
-              break;
-            default:
-              setUIState({ ...mapDefaults, map: find(maps, { id: v }) });
-              break;
-          }
-        }}
-      />
+      <Button
+        label="trace"
+        startIcon={<TraceIcon />}
+        onClick={handleTraceInput}
+      >
+        TRACE
+      </Button>
       <Space />
-      <FeaturePicker
-        icon={<CodeIcon />}
-        label="algorithm"
-        value={algorithm}
-        items={algorithms.map((c) => ({
-          ...c,
-          description: find(connections, { url: c.source })?.name,
-        }))}
-        onChange={(v) => setUIState({ algorithm: v })}
-      />
+      <Button
+        label="domain"
+        startIcon={<MapIcon />}
+        onClick={handleMapInput}
+      >
+        DOMAIN
+      </Button>
     </>
-  );
+  )
 }

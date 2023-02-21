@@ -16,7 +16,7 @@ export type Map = Partial<
   }
 >;
 
-type InputState = {
+type SelectState = {
   algorithm?: string;
   map?: Map;
 };
@@ -51,7 +51,7 @@ type InfoPanelState = {
   fixed?: boolean;
 };
 
-export type UIState = InputState &
+export type UIState = SelectState &
   PlaybackState &
   DebugOptionsState &
   SpecimenState &

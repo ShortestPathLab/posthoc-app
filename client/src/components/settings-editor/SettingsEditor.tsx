@@ -36,7 +36,6 @@ export function SettingsEditor() {
 
   const themeName = useMemo(() => {
     const name = followSystemDark?"Follow System":(dark?"Dark":"Light");
-    console.log(name);
     
     return name;
   }, [dark, followSystemDark])

@@ -52,30 +52,7 @@ export function SpecimenService() {
   // const [{ algorithm, start, end }, setUIState] = useUIState();
   // const resolve = useConnectionResolver();
   const [specimen, setSpecimen] = useSpecimen();
-
   // const { result: map } = useMapContent();
-
-  useAsync(
-    (signal) => 
-      usingLoadingState(async() => {
-        const views = parseViews(traceJson.render);
-        if (views !== undefined && !signal.aborted) {
-          setSpecimen({
-            ...specimen,
-            interlang: views,
-            eventList: traceJson.eventList,
-            map: parseGridMap(mapData)
-          })
-        }
-        notify((
-          <Label
-            primary="Interlang generated."
-            secondary={`${views?.main?.components?.length} components`} />
-        ))
-      }),
-    [traceJson, setSpecimen]
-  )
-
   // useAsync(
   //   (signal) =>
   //     usingLoadingState(async () => {

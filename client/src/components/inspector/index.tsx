@@ -24,7 +24,7 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
     undefined
   );
 
-  const createViews = useCallback(cv, []);
+  const createViews = useCallback(cv, [interlang]);
   return (
     <>
       <LoadIndicator />

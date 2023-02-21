@@ -38,6 +38,9 @@ export const getTheme = (preferDark:boolean = false) => createTheme(preferDark?{
   palette: {
     mode: 'dark',
     primary: colors["teal"],
+    background: {
+      paper: colors["grey"][900]
+    }
   },
   map: {
     walls: colors["grey"][300]
