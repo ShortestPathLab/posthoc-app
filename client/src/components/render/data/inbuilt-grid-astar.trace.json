@@ -1,8 +1,9 @@
 {
   "version": "1.0.4",
   "render": {
+    
     "views": {
-      "main": { "renderer": "2d-pixi", "components" : [{"$":"grid-sf"}], "type": "search" }
+      "main": { "renderer": "2d-pixi", "components" : [{"$":"grid-sf"}],  "type": "search" }
     }
   },
   

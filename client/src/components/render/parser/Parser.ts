@@ -1,6 +1,6 @@
 import { Component, Components, Render } from "../types/render"
 import { Context } from "../types/context"
-import { primitiveComponents } from "../renderer/primitives"
+import { primitiveComponents, inbuiltSearchFormats } from "../renderer/primitives"
 import { isArray, set } from "lodash";
 import { Interlang } from "slices/specimen";
 
@@ -15,13 +15,27 @@ export function parseViews(renderDef: Render): Interlang | undefined {
   const views = renderDef.views;
   const userComp = renderDef.components ? renderDef.components : {}
   const userContext = renderDef.context ? renderDef.context : {}
-
+  let inbuiltComps = {};
 
   for (const viewName in views) {
     renderName = views?.[viewName]?.["renderer"];
-    set(views, `${viewName}.components`, parseComps(views?.[viewName]?.["components"], userContext, userComp));
-    set(views, `${viewName}.persist`, views?.[viewName]?.persist??true ? true : false);
+
+    // TODO fix the typing so that components is only a single object
+    if (renderName && views?.[viewName]?.components?.[0]?.$) {
+      const compName = views?.[viewName]?.components?.[0]?.$
+      if (compName && inbuiltSearchFormats[renderName][compName]) {
+        inbuiltComps = inbuiltSearchFormats[renderName][compName]
+        console.log(inbuiltComps)
+      }
+      else {
+        inbuiltComps = {}
+      }
+    }
+
+    set(views, `${viewName}.components`, parseComps(views?.[viewName]?.["components"], userContext, userComp, inbuiltComps));
+    set(views, `${viewName}.persist`, views?.[viewName]?.persist ?? true ? true : false);
   }
+
   return views;
 }
 
@@ -32,7 +46,7 @@ export function parseViews(renderDef: Render): Interlang | undefined {
  * @returns a list of parsed Components
  * @todo fix the error handling for required fields
  */
-export function parseComps(components: Component[] | undefined, injectedContext: Context, userComponents: Components): Component[] {
+export function parseComps(components: Component[] | undefined, injectedContext: Context, userComponents: Components, inbuiltComps:Components): Component[] {
 
   /**
    * Parses a single Component
@@ -62,12 +76,19 @@ export function parseComps(components: Component[] | undefined, injectedContext:
       return [newComp]
     }
 
+    else if (component["$"] in inbuiltComps){
+        // When an inbuiltComps need to recurse down and parse that inbuiltComps
+        return parseComps(inbuiltComps[component["$"] as keyof Object],
+        { ...injectedContext, ...component }, userComponents, inbuiltComps)
+    
+    }
+
     // Checks to see if the name of the component matches a user defined component
     else if (component["$"] in userComponents) {
 
       // When an user component need to recurse down and parse that user defined component
       return parseComps(userComponents[component["$"] as keyof Object],
-        { ...injectedContext, ...component }, userComponents)
+        { ...injectedContext, ...component }, userComponents, inbuiltComps)
     }
 
     else {
@@ -102,7 +123,7 @@ function arrayOfFunctions(array: Function[], injectedContext: Context) {
 function objectOfFunctions(object: { [K: string]: Function }, injectedContext: Context) {
 
   return (context: Context) => {
-    const newObject:{[K: string]: any} = {};
+    const newObject: { [K: string]: any } = {};
     for (const prop in object) {
       newObject[prop] = object[prop]({ ...injectedContext, ...context })
     }
@@ -138,7 +159,7 @@ export function parseProperty(val: any, injectedContext: Context): Function {
       }
       else {
         // for objects we parse each of the properties
-        const newVal:any = {}
+        const newVal: any = {}
         for (const prop in val) {
           newVal[prop] = parseProperty(val[prop], injectedContext)
         }
@@ -191,9 +212,9 @@ export function parseComputedProp(val: string): string {
 
     // this section of code will replace all the bracketed variable sections first (for example [x] with [context[x]]), then will replace all the dot accessors (for example .x with [x]), then will replace all the dollar symbols (for example ${x} with ${context[x]}) and then replace the first variable (for example parent with context[parent])
     return str.replace(new RegExp(brackVarReg, "g"), replaceBrackVar)
-              .replace(new RegExp(dotAccReg, "g"), replaceDotAcc)
-              .replace(dollarReg, dollarReplace)
-              .replace(firstVarReg, replaceFirstVar)
+      .replace(new RegExp(dotAccReg, "g"), replaceDotAcc)
+      .replace(dollarReg, dollarReplace)
+      .replace(firstVarReg, replaceFirstVar)
   }
 
   /**
