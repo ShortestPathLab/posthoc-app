@@ -1,6 +1,7 @@
 import { Graphics as GraphicsType, } from "@pixi/graphics";
 import { Component, Event, Nodes } from "../../types/render";
 import * as PIXI from 'pixi.js';
+import memoizee from "memoizee";
 
 export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persisted?: boolean };
 
@@ -71,7 +72,6 @@ export const d2InstrinsicComponents: InstrinsicComponents = {
 }
 
 function executeComponent(component: Component, event: EventContext) {
-
   const element: Component = { ...component };
   // Execute the computed props from the event
   for (const prop in component) {
@@ -123,20 +123,19 @@ function pixiInterlangConventer(component: Component) {
 
         switch (component.$) {
           case "rect":
-            let [rectX, rectY, rectW, rectH] = [
+            const [rectX, rectY, rectW, rectH] = [
               scale(element.x),
               scale(element.y),
               scale(element.width ?? 1),
               scale(element.height ?? 1)
             ];
 
-
-            textObj = textElement(element.text)
+            element.text&&(textObj = textElement(element.text));
             g.drawRect(rectX, rectY, rectW, rectH)
             break;
 
           case "circle":
-            let [circX, circY, circR] = [
+            const [circX, circY, circR] = [
               scale(element.x),
               scale(element.y),
               scale(element.radius ?? 1)
@@ -157,7 +156,7 @@ function pixiInterlangConventer(component: Component) {
           default:
             throw Error("Invalid primitive for the PIXI renderer")
         }
-        g.endFill()
+        g.endFill();
         if (textObj !== undefined) {
           g.addChild(textObj)
         }

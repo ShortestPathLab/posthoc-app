@@ -60,7 +60,6 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
 
-
   /**
    * Used for memorize view data such as viewport x & y, scale and pass
    * view controls like fitmap, fitscreen to splitview
@@ -171,7 +170,7 @@ export function SplitView({views, resizable=false}:SplitViewProps):React.ReactEl
     return (
       <SplitViewContext.Provider value={[splitViewData, updateViewData]}>
         <ResizeMenu fitMap={splitViewData[viewNames[0]]?.map?.fitMap}/>
-        {views[viewNames[0]]}
+        {!resizing && views[viewNames[0]]}
       </SplitViewContext.Provider>
     )
   } else {

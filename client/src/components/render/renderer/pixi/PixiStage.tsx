@@ -15,11 +15,12 @@ import { useTheme } from '@material-ui/core';
 import { hex } from 'components/renderer/colors';
 import { TraceEventType } from 'protocol/Trace';
 import { coloursToHex } from '../generic/colours';
+import { useUIState } from 'slices/UIState';
 
 export type PixiStageProps = {
   width?: number;
   height?: number;
-  children?: StageChild;
+  children: StageChild;
   view: View;
   viewName: string;
 }
@@ -31,6 +32,7 @@ export type DrawInstructions = {
 export type EventTypeColoursTypeHex = {
   [k in TraceEventType]: number 
 }
+
 /**
  * PIXI Stage component for rendering view and search trace,
  * view must be composed of following supported primitives
@@ -51,6 +53,8 @@ export function PixiStage(
   const viewport = React.useRef<PixiViewport>(null);
   const [{map}] = useSpecimen();
   const theme = useTheme();
+  const [{step}] = useUIState();
+
 
   const [svData, updateSvData] = React.useContext(SplitViewContext);
 
@@ -122,13 +126,24 @@ export function PixiStage(
     return drawInstructions;
   }, [view.components])
 
+  const graph = useMemo(() => {
+    return new PIXI.Graphics();
+  }, []);
+
+  React.useEffect(() => {
+    viewport.current?.addChild?.(graph);
+    return () => {
+      viewport.current?.removeChild?.(graph);
+    }
+  }, [graph])
+
   /**
    * Create Grapphic object for events
    * @param events list of events need to be rendered using drawInstructs
    * @param hasCurrent indicates if the graphic holds the current step
    */
   // FIXME has current not working
-  const makeGraphic = React.useCallback((nodes: Nodes, hasCurrent: boolean) => {
+  const makeGraphic = React.useCallback((nodes: Nodes) => {
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
     // FIXME nodes is not all nodes but only part of the node rendered by current
@@ -139,7 +154,6 @@ export function PixiStage(
         ...colours
       } 
     }
-    const g = new PIXI.Graphics();
     
     for (const compName in drawInstructs) {
       const drawInstruction = drawInstructs[compName];
@@ -159,20 +173,20 @@ export function PixiStage(
           parent = current;
         }
         const currentEventContext = { ...eventContext, parent, ...current}
-        drawInstruction(currentEventContext)(g);
+        drawInstruction(currentEventContext)(graph);
       }
     }
-    return g;
   }, [drawInstructs, colours]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const canvas = React.useCallback(
     () => ({
-      add: (nodes: Nodes, hasCurrent: boolean) => {
-        const graphic = makeGraphic(nodes, hasCurrent);
-        viewport.current?.addChild?.(graphic);
+      add: (nodes: Nodes) => {
+        makeGraphic(nodes);
         return () => {
-          viewport.current?.removeChild?.(graphic);
+          try {
+            graph.clear();
+          } catch {}
         }
       }
     }),[makeGraphic])
@@ -189,7 +203,8 @@ export function PixiStage(
       }}
     >
       <Viewport ref={viewport} width={width} height={height} onDestroy={onViewportDestroy} />
-      {
+    </Stage>
+    {
         /**
          * Children will be a callback that returns child components 
          * wrapped in Fragment and binded with useCanvas prop
@@ -199,8 +214,8 @@ export function PixiStage(
          *  </React.Fragment>
          * )
          */
-        children?.(canvas)
+        children(canvas)
+        
       }
-    </Stage>
   </>)
 }
