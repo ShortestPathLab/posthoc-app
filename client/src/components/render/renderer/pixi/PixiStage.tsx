@@ -16,6 +16,7 @@ import { hex } from 'components/renderer/colors';
 import { TraceEventType } from 'protocol/Trace';
 import { coloursToHex } from '../generic/colours';
 import { useUIState } from 'slices/UIState';
+import { useNodesMap } from '../generic/NodesMap';
 
 export type PixiStageProps = {
   width?: number;
@@ -53,8 +54,7 @@ export function PixiStage(
   const viewport = React.useRef<PixiViewport>(null);
   const [{map}] = useSpecimen();
   const theme = useTheme();
-  const [{step}] = useUIState();
-
+  const globalNodes = useNodesMap();
 
   const [svData, updateSvData] = React.useContext(SplitViewContext);
 
@@ -157,26 +157,32 @@ export function PixiStage(
     
     for (const compName in drawInstructs) {
       const drawInstruction = drawInstructs[compName];
-      let i = -1;
-      for (const [, events] of nodes) {
-        i++;
-        if (!drawInstruction.persisted && i !== (nodes.size - 1)) {
-          continue;
-        }
-        // create the context here
-        // spread the current event and get the parent event aswell
-        const current = events[events.length - 1];
+      if (!drawInstruction.persist && globalNodes?.current?.id) {
         let parent;
-        if (current.pId) {
-          parent = nodes.get(current?.pId)?.[0];
+        if (globalNodes?.current?.pId) {
+          parent = globalNodes?.nodes?.get(globalNodes.current?.pId)?.[0];
         } else {
-          parent = current;
+          parent = globalNodes.current;
         }
-        const currentEventContext = { ...eventContext, parent, ...current}
+        const currentEventContext = { ...eventContext, parent, ...globalNodes.current};
         drawInstruction(currentEventContext)(graph);
+      } else {
+        for (const [, events] of nodes) {
+          // create the context here
+          // spread the current event and get the parent event aswell
+          const current = events[events.length - 1];
+          let parent;
+          if (current.pId) {
+            parent = globalNodes?.nodes?.get(current?.pId)?.[0];
+          } else {
+            parent = current;
+          }
+          const currentEventContext = { ...eventContext, parent, ...current}
+          drawInstruction(currentEventContext)(graph);
+        }
       }
     }
-  }, [drawInstructs, colours]);
+  }, [drawInstructs, colours, globalNodes.nodes,globalNodes.current]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const canvas = React.useCallback(

@@ -71,7 +71,7 @@ export function parseComps(components: Component[] | undefined, injectedContext:
 
       // goes through all the properties of the component and parses them when necessary
       for (const prop in component) {
-        if (prop !== "$" && prop !== "persisted") {
+        if (prop !== "$" && prop !== "persist") {
           newComp[prop as keyof Component] = parseProperty(component[prop as keyof Component], { ...injectedContext, ...component })
         }
       }

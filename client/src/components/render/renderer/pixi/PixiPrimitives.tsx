@@ -1,9 +1,8 @@
 import { Graphics as GraphicsType, } from "@pixi/graphics";
 import { Component, Event, Nodes } from "../../types/render";
 import * as PIXI from 'pixi.js';
-import memoizee from "memoizee";
 
-export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persisted?: boolean };
+export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persist?: boolean };
 
 export type InstrinsicComponents = {
   [key: string]: {
@@ -166,7 +165,7 @@ function pixiInterlangConventer(component: Component) {
     }
   }
 
-  drawInstruction.persisted = component.persisted !== undefined ? component.persisted : true;
+  drawInstruction.persist = component.persist !== undefined ? component.persist : true;
 
   return drawInstruction;
 }

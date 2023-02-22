@@ -1,15 +1,15 @@
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";
 import { SplitView } from "./SplitView";
 
-import { createViews as cv } from "components/render/renderer";
+import { TraceView } from "components/render/renderer";
 
-import { Playback } from "components/render/renderer/generic/Playback";
+import { NodesMap } from "components/render/renderer/generic/NodesMap";
 import React from "react";
 import { LoadIndicator } from "./LoadIndicator";
 import { useUIState } from "slices/UIState";
@@ -24,21 +24,28 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
     undefined
   );
 
-  const createViews = useCallback(cv, [interlang]);
+  const views = useMemo(() => {
+    const result:{[key: string]:React.ReactNode} = {};
+    if (interlang) {
+      Object.keys(interlang).forEach(viewName => {
+        result[viewName] = <TraceView view={interlang?.[viewName]} viewName={viewName} />;
+      })
+    }
+    return result;
+  }, [interlang]);
+  
   return (
     <>
       <LoadIndicator />
       <Flex {...props}>
         {interlang ? (
           <Flex>
-            <Playback>
-              {(nodes, step) => (
-                <SplitView
-                  resizable={true}
-                  views={createViews(interlang, nodes, step)}
-                />
-              )}
-            </Playback>
+            <NodesMap>
+              <SplitView
+                resizable={true}
+                views ={ views }
+              />
+            </NodesMap>
           </Flex>
         ) : (
           <Flex

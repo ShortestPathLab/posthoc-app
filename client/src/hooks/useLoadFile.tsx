@@ -25,7 +25,6 @@ export function useLoadFile() {
     switch (type){
       case "map": {
         reader.onload = e => {
-          stop();
           try {
             setSpecimen({
               ...specimen,
