@@ -1,6 +1,6 @@
 import { Component, Components, Render } from "../types/render"
 import { Context } from "../types/context"
-import { primitiveComponents, inbuiltSearchFormats } from "../renderer/primitives"
+import { primitiveComponents, inbuiltViews } from "../renderer/primitives"
 import { isArray, set } from "lodash";
 import { Interlang } from "slices/specimen";
 
@@ -12,6 +12,8 @@ let renderName: string | undefined;
  * @returns the parsed Views
  */
 export function parseViews(renderDef: Render): Interlang | undefined {
+
+
   const views = renderDef.views;
   const userComp = renderDef.components ? renderDef.components : {}
   const userContext = renderDef.context ? renderDef.context : {}
@@ -23,8 +25,8 @@ export function parseViews(renderDef: Render): Interlang | undefined {
     // TODO fix the typing so that components is only a single object
     if (renderName && views?.[viewName]?.components?.[0]?.$) {
       const compName = views?.[viewName]?.components?.[0]?.$
-      if (compName && inbuiltSearchFormats[renderName][compName]) {
-        inbuiltComps = inbuiltSearchFormats[renderName][compName]
+      if (compName && inbuiltViews[renderName][compName]) {
+        inbuiltComps = inbuiltViews[renderName][compName]
         console.log(inbuiltComps)
       }
       else {

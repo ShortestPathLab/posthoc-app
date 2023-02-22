@@ -1,16 +1,16 @@
 import { d2InstrinsicComponents } from "./pixi/PixiPrimitives";
 
-import { d2SearchFormats } from "./pixi/PixiSearchFormats";
-import { TraceComponent } from "../types/trace";
+import { d2InbuiltViews } from "./pixi/PixiInbuiltViews";
+import { TraceComponents } from "../types/trace";
 
 export const primitiveComponents = {
   ...d2InstrinsicComponents
 }
 
-export type RendererSearchFormats = {
-  [key: string]: { [key: string]: TraceComponent[] }
+export type RendererInbuiltViews = {
+  [key: string]: {[key: string]:TraceComponents}
 }
 
-export const inbuiltSearchFormats = {
-  ...d2SearchFormats
+export const inbuiltViews = {
+  ...d2InbuiltViews
 }

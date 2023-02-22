@@ -3,7 +3,7 @@
   "render": {
     
     "views": {
-      "main": { "renderer": "2d-pixi", "components" : [{"$":"grid-sf"}],  "type": "search" }
+      "main": { "renderer": "2d-pixi", "components" : [{"$":"grid-view"}],  "type": "search" }
     }
   },
   
