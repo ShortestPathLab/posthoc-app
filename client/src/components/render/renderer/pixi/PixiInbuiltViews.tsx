@@ -147,8 +147,40 @@ const PixiRoadSF: TraceComponents = {
 }
 
 const PixiTreeSF = {
-
+  "node": [
+    {
+      "$": "circle",
+      "radius": 0.3,
+      "x": "{{x}}",
+      "y": "{{y}}"
+    }
+  ],
+  "line": [
+    {
+      "$": "path",
+      "points": [
+        {
+          "x": "{{parent.x}}",
+          "y": "{{parent.y}}"
+        },
+        {
+          "x": "{{x}}",
+          "y": "{{y}}"
+        }
+      ],
+      "lineWidth" : 1
+    }
+  ],
+  "tree-view":[
+    {
+        "$": "node"
+      },
+      {
+        "$": "line"
+      }
+  ]
+  
 }
 
-export const d2InbuiltViews: RendererInbuiltViews = { "2d-pixi": { "grid-view": PixiGridSF, "mesh-view": PixiMeshSF, "road-view": PixiRoadSF } }
+export const d2InbuiltViews: RendererInbuiltViews = { "2d-pixi": { "grid-view": PixiGridSF, "mesh-view": PixiMeshSF, "road-view": PixiRoadSF, "tree-view":PixiTreeSF } }
 

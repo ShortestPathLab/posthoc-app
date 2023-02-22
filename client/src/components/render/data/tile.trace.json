@@ -1,63 +1,73 @@
 {
     "version": "1.0.3",
-    "render": {
-        "components": {
-            "tile": [
+  "render": {
+      "components": {
+          "tile": [
+              {
+                  "$": "rect",
+                  "width": 0.9,
+                  "height": 0.9,
+                  "text": {
+                      "displayText": "{{context[`${tile_x}${tile_y}`] === 0 ? '' : context[`${tile_x}${tile_y}`]}}",
+                      "fontSize" : 10,
+                      "fill": "0x000000",
+                      "x" : "{{tile_x+width/6}}",
+                      "y" : "{{tile_y-height/4}}"
+                  },
+                  "fill": "{{context[`${tile_x}${tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
+                  "persisted": false,
+                  "x":"{{tile_x}}",
+                  "y":"{{tile_y}}"
+              }
+          ],
+          "tilerow": [
+              {
+                  "$": "tile",
+                  "tile_x": 1
+              },
+              {
+                  "$": "tile",
+                  "tile_x": 2
+              },
+              {
+                  "$": "tile",
+                  "tile_x": 3
+              }
+          ],
+          "tileboard": [
+              {
+                  "$": "tilerow",
+                  "tile_y": 1
+              },
+              {
+                  "$": "tilerow",
+                  "tile_y": 2
+              },
+              {
+                  "$": "tilerow",
+                  "tile_y": 3
+              }
+          ]
+      },
+      "views": {
+          "main": {
+              "renderer": "2d-pixi",
+              "components": [
+                  {
+                      "$": "tileboard"
+                  }
+              ]
+          },
+          "secondary":{
+            "renderer": "2d-pixi",
+            "components": [
                 {
-                    "$": "rect",
-                    "width": 0.9,
-                    "height": 0.9,
-                    "text": {
-                        "displayText": "{{context[`${x}${y}`] === 0 ? '' : context[`${x}${y}`]}}",
-                        "fontSize" : 10,
-                        "fill": "0x000000",
-                        "x" : "{{x+width/6}}",
-                        "y" : "{{y-height/4}}"
-                    },
-                    "fill": "{{context[`${x}${y}`] ? 0x808080 : 0xFFFFFFF}}",
-                    "persisted": false
-                }
-            ],
-            "tilerow": [
-                {
-                    "$": "tile",
-                    "x": 1
-                },
-                {
-                    "$": "tile",
-                    "x": 2
-                },
-                {
-                    "$": "tile",
-                    "x": 3
-                }
-            ],
-            "tileboard": [
-                {
-                    "$": "tilerow",
-                    "y": 1
-                },
-                {
-                    "$": "tilerow",
-                    "y": 2
-                },
-                {
-                    "$": "tilerow",
-                    "y": 3
+                    "$": "tree-view"
                 }
             ]
-        },
-        "views": {
-            "main": {
-                "renderer": "2d-pixi",
-                "components": [
-                    {
-                        "$": "tileboard"
-                    }
-                ]
-            }
-        }
-    },
+          }
+      }
+  },
     "eventList": [
         {
             "11": 1,

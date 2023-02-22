@@ -4,6 +4,8 @@ import { Specimen, useSpecimen } from "slices/specimen";
 import { useSnackbar } from "components/generic/Snackbar";
 import { usePlaybackState } from "./usePlaybackState";
 import { useCallback, useMemo } from "react";
+import { processTree } from "components/render/processer/TreeFormatter"
+
 
 type FileTypes = "map" | "trace";
 

@@ -4,12 +4,8 @@ ISSUES/BUGS
 
 [ ] The complexity of computed properties is relatively small (currently no special strings besides 'context' can be used, as they will be interpreted as variables eg. undefined would be converted to context[undefined])
 
-QUESTION
-
-[x] Current playback system
-- Currently it works by adding x steps every tick (where x is determined by playbackRate) (this way allows for faster drawing)
-- Should we change it so its reversed, 1 step every x ticks (x is playbackRate) (this way allows for slower drawing)
-+ combine both
+[ ] Search Traces which are currently bugged
+- All search traces with persisted properties (polyanya, tiles)
 
 OPEN
 
@@ -23,9 +19,6 @@ required here, not sure it's better or not.
 - [x] As a parent component relative to xxxStage
 - [x] Manage the window system
 - [ ] Choose which Stage to use in each of the view
-
-[ ] Provide a set of pre-defined components/views for user to choose from
-- user could display the search trace without defining views and components
 
 [ ] Convert more Search Traces into current format
  - [*] Grid Trace
@@ -46,6 +39,14 @@ required here, not sure it's better or not.
 
 [ ] Create the functions which generate x and y coordinates for the tree view.
 
+
+
+QUESTION
+
+[x] Current playback system
+- Currently it works by adding x steps every tick (where x is determined by playbackRate) (this way allows for faster drawing)
+- Should we change it so its reversed, 1 step every x ticks (x is playbackRate) (this way allows for slower drawing)
++ combine both
 
 FINISHED
 
@@ -84,3 +85,6 @@ FINISHED
 [x] Fix issue where if the parent undefined (starting event or something) the application wont error (if they used something like parent.x) (this is techincally fixed but probs a better way todo it)
 
 [x] Maybe make the text property in the search traces an Object with properties like displayText, Colour, position (relative to parent Object) etc. Also maybe add some more properties to existing primitives like a lineWidth to the path primitive. 
+
+[*] Provide a set of pre-defined components/views for user to choose from
+- user could display the search trace without defining views and components

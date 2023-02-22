@@ -27,23 +27,19 @@ export function processTree(eventList:TraceEvent[]){
            (root);
 
     root.descendants().forEach((node) => {
-        
+        // TODO optimize this code, which basically adds the x and y coordinates to the eventList information
         eventList =  eventList.map((event)=> {
 
             if (event.id === node.data.id){
                 console.log
-                return {...event, x:node.x, y:node.y}
+                return {...event, 'x':node.x, 'y':node.y}
             }
             else{
 
                 return event
             }
-
         })
-        
     });
-    console.log(root.descendants().length)
-  console.log(eventList)
 
   return eventList
 }
