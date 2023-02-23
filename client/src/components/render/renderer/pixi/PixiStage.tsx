@@ -153,7 +153,7 @@ export function PixiStage(
         ...colours
       } 
     }
-    
+    graph.removeChildren();
     for (const compName in drawInstructs) {
       const drawInstruction = drawInstructs[compName];
       if (!drawInstruction.persist && globalNodes?.current?.id) {
