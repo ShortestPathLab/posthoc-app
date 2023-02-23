@@ -45,7 +45,8 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "forcebuild": "vite build"
   },
   "eslintConfig": {
     "extends": [

@@ -116,9 +116,9 @@ function pixiInterlangConventer(component: Component) {
       // draw instructions on PIXI graphics
       return (g: GraphicsType) => {
 
-        const fillColour = element.fill ?? color ?? 0xff5722
+        const fillColour = element.fill ?? color;
         g.beginFill(fillColour,
-            element.alpha ?? defaultContext.alpha)
+          element.alpha ?? defaultContext.alpha);
 
         switch (component.$) {
           case "rect":
