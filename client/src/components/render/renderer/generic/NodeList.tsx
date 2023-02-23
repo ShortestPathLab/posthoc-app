@@ -1,6 +1,6 @@
 import { Event, Nodes } from "components/render/types/render";
 import { Canvas } from "../types";
-import { floor, memoize, slice } from "lodash";
+import { floor } from "lodash";
 import { useEffect, useMemo } from "react";
 import { useSettings } from "slices/settings";
 import { useNodesMap } from "./NodesMap";
@@ -47,7 +47,7 @@ export function LazyNodeList({
 
   // number of nodes needed to be cached
   const threshold = useMemo(() => {
-    return floor(step??0 / cacheSize) * cacheSize
+    return floor((step??0) / cacheSize) * cacheSize
   }, [step]);
 
   const [cachedNodes, dynamicNodes] = useMemo(() => {

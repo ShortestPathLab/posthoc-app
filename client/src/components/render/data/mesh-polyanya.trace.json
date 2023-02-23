@@ -73,7 +73,7 @@
               "y": "{{y3}}"
             }
           ],
-          "persisted": false
+          "persist": false
         }
       ],
       "mesh-event": [

@@ -15,6 +15,7 @@
                       "y" : "{{tile_y-height/4}}"
                   },
                   "fill": "{{context[`${tile_x}${tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
+                  "persist": false,
                   "x":"{{tile_x}}",
                   "y":"{{tile_y}}"
               }

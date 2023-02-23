@@ -15,7 +15,6 @@ import { useTheme } from '@material-ui/core';
 import { hex } from 'components/renderer/colors';
 import { TraceEventType } from 'protocol/Trace';
 import { coloursToHex } from '../generic/colours';
-import { useUIState } from 'slices/UIState';
 import { useNodesMap } from '../generic/NodesMap';
 
 export type PixiStageProps = {
@@ -182,7 +181,7 @@ export function PixiStage(
         }
       }
     }
-  }, [drawInstructs, colours, globalNodes.nodes,globalNodes.current]);
+  }, [drawInstructs, colours, globalNodes.nodes, globalNodes.current]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const canvas = React.useCallback(

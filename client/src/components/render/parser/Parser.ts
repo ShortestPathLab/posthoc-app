@@ -27,7 +27,6 @@ export function parseViews(renderDef: Render): Interlang | undefined {
       const compName = views?.[viewName]?.components?.[0]?.$
       if (compName && inbuiltViews[renderName][compName]) {
         inbuiltComps = inbuiltViews[renderName][compName]
-        console.log(inbuiltComps)
       }
       else {
         inbuiltComps = {}
