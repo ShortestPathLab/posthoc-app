@@ -6,7 +6,7 @@
         "renderer": "2d-pixi",
         "components": [
           {
-            "$": "mesh-view"
+            "$": "polyanya-view"
           }
         ]
       }

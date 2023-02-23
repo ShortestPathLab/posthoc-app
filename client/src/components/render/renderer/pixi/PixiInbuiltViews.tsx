@@ -1,7 +1,7 @@
 import { TraceComponents } from "components/render/types/trace"
 import { RendererInbuiltViews } from "../primitives"
 
-const PixiGridSF: TraceComponents = {
+const PixiGridView: TraceComponents = {
   "grid-view": [
     {
       "$": "rect",
@@ -13,7 +13,7 @@ const PixiGridSF: TraceComponents = {
   ]
 }
 
-const PixiMeshSF: TraceComponents = {
+const PixiPolyanyaView: TraceComponents = {
   "node": [
     {
       "$": "circle",
@@ -87,30 +87,33 @@ const PixiMeshSF: TraceComponents = {
           "x": "{{x3}}",
           "y": "{{y3}}"
         }
-      ],
-      "persisted": false
+      ]
     }
   ],
-  "mesh-view": [
+  "polyanya-view": [
     {
       "$": "node"
     },
     {
-      "$": "line1"
+      "$": "line1",
+      "persist": false
     },
     {
-      "$": "line2"
+      "$": "line2",
+      "persist": false
     },
     {
-      "$": "line3"
+      "$": "line3",
+      "persist": false
     },
     {
-      "$": "triangle"
+      "$": "triangle",
+      "persist": false
     }
   ]
 }
 
-const PixiRoadSF: TraceComponents = {
+const PixiRoadView: TraceComponents = {
   "node": [
     {
       "$": "circle",
@@ -146,7 +149,7 @@ const PixiRoadSF: TraceComponents = {
   
 }
 
-const PixiTreeSF = {
+const PixiTreeView = {
   "node": [
     {
       "$": "circle",
@@ -182,5 +185,5 @@ const PixiTreeSF = {
   
 }
 
-export const d2InbuiltViews: RendererInbuiltViews = { "2d-pixi": { "grid-view": PixiGridSF, "mesh-view": PixiMeshSF, "road-view": PixiRoadSF, "tree-view":PixiTreeSF } }
+export const d2InbuiltViews: RendererInbuiltViews = { "2d-pixi": { "grid-view": PixiGridView, "polyanya-view": PixiPolyanyaView, "road-view": PixiRoadView, "tree-view":PixiTreeView } }
 

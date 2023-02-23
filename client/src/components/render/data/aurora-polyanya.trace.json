@@ -25,7 +25,7 @@
             }
           ],
           "lineWidth" : 0.5,
-          "persisted": false
+          "persist": false
         }
       ],
       "line2": [
@@ -42,7 +42,7 @@
             }
           ],
           "lineWidth" : 0.5,
-          "persisted": false
+          "persist": false
         }
       ],
       "line3": [
@@ -59,7 +59,7 @@
             }
           ],
           "lineWidth" : 0.5,
-          "persisted": false
+          "persist": false
           
         }
       ],
@@ -80,7 +80,7 @@
               "y": "{{y3}}"
             }
           ],
-          "persisted": false
+          "persist": false
         }
       ],
       "mesh-event": [

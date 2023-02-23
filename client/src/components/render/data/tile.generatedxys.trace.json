@@ -15,7 +15,6 @@
                       "y" : "{{tile_y-height/4}}"
                   },
                   "fill": "{{context[`${tile_x}${tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
-                  "persisted": false,
                   "x":"{{tile_x}}",
                   "y":"{{tile_y}}"
               }
@@ -54,7 +53,8 @@
               "renderer": "2d-pixi",
               "components": [
                   {
-                      "$": "tileboard"
+                      "$": "tileboard",
+                      "persist":false
                   }
               ]
           },
