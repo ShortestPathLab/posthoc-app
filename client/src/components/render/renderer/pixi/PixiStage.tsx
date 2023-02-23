@@ -125,16 +125,11 @@ export function PixiStage(
     return drawInstructions;
   }, [view.components])
 
-  const graph = useMemo(() => {
-    return new PIXI.Graphics();
-  }, []);
-
   React.useEffect(() => {
-    viewport.current?.addChild?.(graph);
     return () => {
-      viewport.current?.removeChild?.(graph);
+      viewport.current?.removeChildren();
     }
-  }, [graph])
+  }, [])
 
   /**
    * Create Grapphic object for events
@@ -147,13 +142,13 @@ export function PixiStage(
     // adding them all to the PIXI graphic
     // FIXME nodes is not all nodes but only part of the node rendered by current
     // node list 
+    const graph = new PIXI.Graphics();
     const eventContext = {
       nodes,
       colour: {
         ...colours
       } 
     }
-    graph.removeChildren();
     for (const compName in drawInstructs) {
       const drawInstruction = drawInstructs[compName];
       if (!drawInstruction.persist && globalNodes?.current?.id) {
@@ -180,6 +175,7 @@ export function PixiStage(
           drawInstruction(currentEventContext)(graph);
         }
       }
+      viewport.current?.addChild(graph);
     }
   }, [drawInstructs, colours, globalNodes.nodes, globalNodes.current]);
 
