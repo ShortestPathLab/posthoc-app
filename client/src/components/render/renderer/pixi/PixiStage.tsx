@@ -177,17 +177,16 @@ export function PixiStage(
       }
       viewport.current?.addChild(graph);
     }
+    return graph;
   }, [drawInstructs, colours, globalNodes.nodes, globalNodes.current]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const canvas = React.useCallback(
     () => ({
       add: (nodes: Nodes) => {
-        makeGraphic(nodes);
+        const graph = makeGraphic(nodes);
         return () => {
-          try {
-            graph.clear();
-          } catch {}
+          viewport.current?.removeChild(graph);
         }
       }
     }),[makeGraphic])
