@@ -4,7 +4,7 @@ import { Stage } from "@inlet/react-pixi";
 
 import { Nodes, View } from "components/render/types/render";
 import { Viewport } from "./Viewport";
-import { d2InstrinsicComponents, DrawInstruction, scale } from "./PixiPrimitives"
+import { d2InstrinsicComponents, DrawInstruction, EventContext, scale } from "./PixiPrimitives"
 import { StageChild } from '../types';
 import { PixiViewport } from './PixiViewport';
 
@@ -131,24 +131,37 @@ export function PixiStage(
     }
   }, [])
 
+
+  const makeAndAttachComp = React.useCallback((
+    drawInstruct: DrawInstruction,
+    container: PIXI.Container, 
+    context: EventContext) => {
+    const graph = new PIXI.Graphics();
+    drawInstruct(context)(graph);
+    graph.interactive = true;
+    graph.buttonMode = true;
+    graph.on("click", e => {
+      console.log(e);
+    })
+    container.addChild(graph);
+  }, [])
   /**
    * Create Grapphic object for events
    * @param events list of events need to be rendered using drawInstructs
    * @param hasCurrent indicates if the graphic holds the current step
    */
-  // FIXME has current not working
   const makeGraphic = React.useCallback((nodes: Nodes) => {
     // loops through all the events and the drawing instructions
     // adding them all to the PIXI graphic
     // FIXME nodes is not all nodes but only part of the node rendered by current
     // node list 
-    const graph = new PIXI.Graphics();
     const eventContext = {
       nodes,
       colour: {
         ...colours
       } 
     }
+    const container = new PIXI.Container();
     for (const compName in drawInstructs) {
       const drawInstruction = drawInstructs[compName];
       if (!drawInstruction.persist && globalNodes?.current?.id) {
@@ -158,38 +171,34 @@ export function PixiStage(
         } else {
           parent = globalNodes.current;
         }
-        const currentEventContext = { ...eventContext, parent, ...globalNodes.current};
-        drawInstruction(currentEventContext)(graph);
+        makeAndAttachComp(drawInstruction, container, 
+          { ...eventContext, parent, ...globalNodes.current})
       } else {
         for (const [, events] of nodes) {
           // create the context here
           // spread the current event and get the parent event aswell
           const current = events[events.length - 1];
-          let parent;
-          if (current.pId) {
-            parent = globalNodes?.nodes?.get(current?.pId)?.[0];
-          } else {
-            parent = current;
-          }
-          const currentEventContext = { ...eventContext, parent, ...current}
-          drawInstruction(currentEventContext)(graph);
+          let parent= current.pId? globalNodes?.nodes?.get(current?.pId)?.[0]:current;
+          makeAndAttachComp(drawInstruction, container, 
+            { ...eventContext, parent, ...current});
         }
       }
-      viewport.current?.addChild(graph);
+      viewport.current?.addChild(container);
     }
-    return graph;
+    return container;
   }, [drawInstructs, colours, globalNodes.nodes, globalNodes.current]);
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const canvas = React.useCallback(
     () => ({
       add: (nodes: Nodes) => {
-        const graph = makeGraphic(nodes);
+        const container = makeGraphic(nodes);
         return () => {
-          viewport.current?.removeChild(graph);
+          viewport.current?.removeChild(container);
         }
       }
-    }),[makeGraphic])
+    })
+  ,[makeGraphic])
 
   return (<>
     <Stage
