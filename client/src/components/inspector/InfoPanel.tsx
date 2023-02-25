@@ -14,8 +14,7 @@ import LeftArrowIcon from "@material-ui/icons/ChevronLeft";
 import ViewSidebarRounded  from "@material-ui/icons/ViewSidebarRounded";
 import { ToggleButtonWithTooltip } from "components/generic/ToggleButtonWithTooltip";
 
-export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatch<React.SetStateAction<boolean>>}) {
-  const {show, setShow} = props;
+export function InfoPanel(props: BoxProps) {
   const [uiState, setUIState] = useUIState();
   const { playback, fixed=false } = uiState;
   const [tab, setTab] = useState("steps");
@@ -25,7 +24,7 @@ export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatc
         vertical
         sx={{
           pointerEvents: "none",
-          transition: ({ transitions }) => transitions.create(["background", "right"]),
+          transition: ({ transitions }) => transitions.create(["background"]),
           bgcolor: ({ palette }) =>
             fixed?darken(palette.background.default, 0.06):(tab ? alpha(palette.background.default, 0.94) : "transparent"),
         }}
@@ -33,16 +32,9 @@ export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatc
         position="relative"
         {...props}
       >
-        <Paper sx={{position:"absolute", right:0, bottom: 0, m:3, zIndex:'appBar'}}>
-          <ToggleButtonWithTooltip
-            label="fix-info-panel"
-            icon={<ViewSidebarRounded />}
-            size="small" value="fixed" sx={{pointerEvents:"auto"}} selected={fixed} onChange={() => {setUIState({...uiState, fixed:!fixed})}} />
-        </Paper>
-        {!fixed?
-          <ToggleButton
-            value="show"
-            selected={!show}
+        <ToggleButton
+            value="fixed"
+            selected={!fixed}
             sx={{
               position:"absolute",
               left: -40,
@@ -51,14 +43,10 @@ export function InfoPanel(props: BoxProps & {show:boolean; setShow:React.Dispatc
               zIndex: 10,
               border: 0,
             }}
-            onChange={() => {
-              setShow(!show);
-            }}
+            onChange={() => {setUIState({...uiState, fixed:!fixed})}}
           >
-            {show?<RightArrowIcon />:<LeftArrowIcon/>}
-          </ToggleButton>
-          :<></>
-        }
+            {fixed?<RightArrowIcon />:<LeftArrowIcon/>}
+        </ToggleButton>
         <Toolbar>
           {[
             { icon: <StepsIcon />, key: "steps" },

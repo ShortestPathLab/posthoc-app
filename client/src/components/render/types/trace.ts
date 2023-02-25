@@ -11,11 +11,6 @@ export type TraceEventType =
   | "expanding" 
   | "end";
 
-export type TraceViewType =
-  "state"
-  | "search"
-  | string;
-
 export type TraceEvent = {
   type?: TraceEventType;
   id: number | string;
@@ -42,7 +37,6 @@ export type TraceContext = {
 export type TraceView = {
   renderer?: string;
   components?: TraceComponent[];
-  type?: TraceViewType;
   persist?: boolean;
 }
 

@@ -60,13 +60,11 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
         )}
         {eventList?(
           <InfoPanel
-            position={fixed?undefined:"absolute"}
-            right={fixed?undefined:(showInfo?0:'min(-25vw,-480px)')}
+            position={fixed?"relative":"absolute"}
+            right={fixed?undefined:'min(-25vw,-480px)'}
             height="100%"
             width="25vw"
             minWidth={480}
-            show={showInfo}
-            setShow={setShowInfo}
           />
         ):<></>}
       </Flex>

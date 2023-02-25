@@ -16,6 +16,7 @@ import { hex } from 'components/renderer/colors';
 import { TraceEventType } from 'protocol/Trace';
 import { coloursToHex } from '../generic/colours';
 import { useNodesMap } from '../generic/NodesMap';
+import { get, set } from 'lodash';
 
 export type PixiStageProps = {
   width?: number;
@@ -54,8 +55,11 @@ export function PixiStage(
   const [{map}] = useSpecimen();
   const theme = useTheme();
   const globalNodes = useNodesMap();
+  const {click, setClick} = globalNodes;
 
   const [svData, updateSvData] = React.useContext(SplitViewContext);
+
+  // Map<number|stirng, {x:number, y:number}>();
 
   const colours = useMemo(() => {
     return coloursToHex(theme.event);
@@ -140,9 +144,26 @@ export function PixiStage(
     drawInstruct(context)(graph);
     graph.interactive = true;
     graph.buttonMode = true;
-    graph.on("click", e => {
-      console.log(e);
-    })
+    set(graph, "id", context.id);
+    const onClickHandler = (e:PIXI.InteractionEvent) => {
+      if (!click) {
+        console.log(get(e.target, "id"));
+        console.log(e);
+        const origin = e.currentTarget as PIXI.Graphics;
+        const overlay = origin.clone();
+        overlay.tint = (overlay.fill.color - 0x333333 > 0)?overlay.fill.color - 0x333333:0x000000;
+        viewport.current?.addChild(overlay);
+        const offClickHandler = () => {
+          viewport.current?.removeChild(overlay);
+          graph.on('click', onClickHandler);
+          graph.off('click', offClickHandler);
+        };
+        graph.off('click', onClickHandler);
+        graph.on("click", offClickHandler);
+      }
+      
+    }
+    graph.on("click", onClickHandler);
     container.addChild(graph);
   }, [])
   /**
@@ -198,6 +219,7 @@ export function PixiStage(
         }
       }
     })
+  
   ,[makeGraphic])
 
   return (<>
