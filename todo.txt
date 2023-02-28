@@ -4,16 +4,9 @@ ISSUES/BUGS
 
 [ ] The complexity of computed properties is relatively small (currently no special strings besides 'context' can be used, as they will be interpreted as variables eg. undefined would be converted to context[undefined])
 
-[ ] Search Traces which are currently bugged
-- All search traces with persisted properties (polyanya, tiles)
-
 OPEN
 
 [ ] Hover over
-
-[ ] Change useCanvas pass as a context
-- PROBLEM: multiple context required for each of the stage, many to many dependency
-required here, not sure it's better or not.
 
 [ ] Window system for multiple views - side by side
 - [x] As a parent component relative to xxxStage
@@ -24,14 +17,10 @@ required here, not sure it's better or not.
  - [*] Grid Trace
  - [*] Road Network Trace
  - [*] Mesh Trace
- - [ ] Tree Trace
+ - [*] Tree Trace
  - [*] 9 Tile Puzzle Trace
  - [ ] Multi Agent Path Finder
- - [*] Bidirectional (Grid/Road versions) Trace
-
-[ ] Improve the process in which the currentEventContexts are created (maybe memoizee them)
-
-[ ] Allow for the two different view types to be drawn (search and state views)
+ - [ ] Bidirectional (Grid/Road versions) Trace
 
 [ ] Create merger of eventList information so that delta eventLists will work
 
@@ -39,6 +28,11 @@ required here, not sure it's better or not.
 
 [ ] Create the functions which generate x and y coordinates for the tree view.
 
+[ ] Tree Renderer - independent of the PIXI renderer
+
+[ ] Trace zoom 
+
+[ ] Line back to source from current
 
 
 QUESTION
@@ -73,6 +67,9 @@ FINISHED
 [x] Playback component for animation support - render/renderer/generic/Playback.tsx
 - layered system for tiles
 
+
+
+
 [x] Dark mode
 
 [x] Refactor render data strucure to node based instead of event based
@@ -88,3 +85,5 @@ FINISHED
 
 [*] Provide a set of pre-defined components/views for user to choose from
 - user could display the search trace without defining views and components
+
+[*] Allow for the two different view types to be drawn (search and state views)
