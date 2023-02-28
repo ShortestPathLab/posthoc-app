@@ -1,5 +1,11 @@
 Current Work Todo
 
+DISCUSSION TOPICS
+
+[ ] Parser Implementation
+- Current we treat individuals strings in expressions are accessors to the execution context, however this has flaws (show the flaws).
+- Could just make it so we treat the entire string as JavaScript code and leave it to the users to write everything (would slightly increase the complexity of the component definiations)
+
 ISSUES/BUGS
 
 [ ] The complexity of computed properties is relatively small (currently no special strings besides 'context' can be used, as they will be interpreted as variables eg. undefined would be converted to context[undefined])
