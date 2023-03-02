@@ -32,6 +32,7 @@ export function AppBarTitle({ children }: { children?: ReactNode }) {
 export type Props = {
   children?: ReactNode;
   actions?: ReactNode;
+  open?: boolean;
   width?: number;
   height?: string | number;
   onTarget?: (target: HTMLDivElement | null) => void;

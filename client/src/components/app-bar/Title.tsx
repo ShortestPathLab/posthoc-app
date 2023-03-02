@@ -3,6 +3,7 @@ import {
   AppBarTitle,
   ManagedModal as Dialog,
 } from "components/generic/Modal";
+import { Welcome } from "components/welcome/Welcome"
 
 export function Title(props: BoxProps) {
   return (
@@ -26,7 +27,7 @@ export function Title(props: BoxProps) {
         options={{width:960, scrollable: false}}
         appBar={{children: <AppBarTitle>Welcome</AppBarTitle> }}
       >
-        ABCDE
+        <Welcome />
       </Dialog>
     </>
   );
