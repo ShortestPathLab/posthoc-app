@@ -1,7 +1,6 @@
-import { Typography, Box, Card, CardActionArea, CardContent } from "@material-ui/core";
+import { Typography, Box, Card, CardActionArea, CardContent, CardMedia } from "@material-ui/core";
 import { Flex } from "components/generic/Flex";
-import { useLoadFile } from "hooks/useLoadFile";
-import { useCallback } from "react";
+import { Fragment, useCallback } from "react";
 import axios from 'axios';
 import { useSpecimen } from "slices/specimen";
 import { usePlaybackState } from "hooks/usePlaybackState";
@@ -10,14 +9,23 @@ import { parseGridMap } from "components/render/renderer/generic/MapParser";
 import { parseViews } from "components/render/parser/Parser";
 
 const traceMaps = {
-  "grid-astar": {
-    title: "Grid Search Astar Algroithm",
-    trace: "grid-astar.trace.json",
-    map: "Small Maze.grid",
+  "grid": {
+    "grid-astar": {
+      title: "Grid Search Astar",
+      trace: "grid-astar.trace.json",
+      map: "Small Maze.grid",
+      preview: "snip_grid_astar.png",
+      color: "#3d5afe",
+    },
   },
-  "tile-generate-xyz": {
-    trace: "tile.generatedxys.trace.json",
-  },
+  "tile": {
+    "tile-generate-xyz": {
+      title: "Tile Tree With XYZ",
+      trace: "tile.generatedxys.trace.json",
+      preview: "snip_tile_tree.png",
+      color: "#ffab00"
+    },
+  }
 };
 
 export function Welcome() {
@@ -28,26 +36,11 @@ export function Welcome() {
     stop,
   } = usePlaybackState();
 
-  const loadDemo = useCallback(async () => {
-    setSpecimen({...specimen, map: undefined, interlang: undefined, eventList: undefined});
+  const loadDemo = useCallback(async function (demo) {
     stop();
+    setSpecimen({...specimen, map: undefined, interlang: undefined, eventList: undefined});
     try {
-      const traceRes = await axios.get('/traces/grid-astar.trace.json');
-      const mapRes = await axios.get('/maps/Small Maze.grid');
-      try {
-        setSpecimen({
-          ...specimen,
-          map: parseGridMap(mapRes.data)
-        });
-        notify(
-          `Map load successfully`
-        );
-      } catch(e) {
-        notify(
-          `Map load fail`
-        );
-        throw e;
-      }
+      const traceRes = await axios.get(`/traces/${demo.trace}`);
       try {
         setSpecimen({
           ...specimen,
@@ -63,7 +56,23 @@ export function Welcome() {
         );
         throw e;
       }
-      
+      if (demo.map) {
+        const mapRes = await axios.get(`/maps/${demo.map}`);
+        try {
+          setSpecimen({
+            ...specimen,
+            map: parseGridMap(mapRes.data)
+          });
+          notify(
+            `Map load successfully`
+          );
+        } catch(e) {
+          notify(
+            `Map load fail`
+          );
+          throw e;
+        }
+      }
     } catch (err) {
       console.error(err);
     }
@@ -75,23 +84,36 @@ export function Welcome() {
         <Typography variant="h4" gutterBottom>
           Demos
         </Typography>
-        <Typography pt={3} variant="h5" gutterBottom>
-          Grid
-        </Typography>
-        <Flex p={2}>
-          <Card sx={{maxWidth: 300, backgroundColor: "#1de9b6"}} elevation={8}>
-            <CardActionArea onClick={loadDemo}>
-              <CardContent>
-                <Typography gutterBottom variant="h6">
-                  Grid Search
+        {
+          Object.entries(traceMaps).map(([section, demos]) => {
+            return (
+              <Fragment key={section}>
+                <Typography variant="h5" pt={2} gutterBottom>
+                  {section.toUpperCase()}
                 </Typography>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Flex>
-        <Typography pt={3} variant="h5" gutterBottom>
-          Tile
-        </Typography>
+                <Flex py={2}>
+                {
+                  Object.entries(demos).map(([demoName, demo]) => {
+                    return (
+                      <Fragment key={demoName}>
+                        <Card sx={{maxWidth: 300, backgroundColor: demo.color, color:"#fff"}}>
+                          <CardActionArea onClick={() => loadDemo(demo)}>
+                            <CardContent>
+                              <Typography variant="h6">
+                                {demo.title}
+                              </Typography>
+                            </CardContent>
+                          </CardActionArea>
+                        </Card>
+                      </Fragment>
+                    )
+                  })
+                }
+                </Flex>
+              </Fragment>
+            )
+          })
+        }
       </Box>
     </>
   );

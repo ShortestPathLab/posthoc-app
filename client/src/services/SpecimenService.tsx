@@ -14,7 +14,6 @@ import { useUIState } from "slices/UIState";
 import { hashAsync as hash } from "workers/async";
 import { parseViews } from "components/render/parser/Parser";
 
-import traceJson from "../components/render/data/road-test.trace.json";
 import mapData from "../components/render/data/maps/grids/Small Maze.grid?raw";
 import { parseGridMap } from "components/render/renderer/generic/MapParser";
 
