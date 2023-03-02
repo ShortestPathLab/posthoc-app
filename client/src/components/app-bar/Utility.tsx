@@ -1,6 +1,5 @@
 import { Button, Tooltip } from "@material-ui/core";
 import { BugReportTwoTone as BugIcon } from "@material-ui/icons";
-import { DebugOptionsEditor } from "components/debug-options-editor/DebugOptionsEditor";
 import {
   AppBarTitle as Title,
   ManagedModal as Dialog,
@@ -29,7 +28,6 @@ export function Utility() {
         options={{ width: 960, scrollable: false }}
         appBar={{ children: <Title>Debug Options</Title> }}
       >
-        <DebugOptionsEditor />
       </Dialog>
     </>
   );

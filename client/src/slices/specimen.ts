@@ -2,9 +2,8 @@ import { createSlice } from "./createSlice";
 import { Trace } from "protocol/Trace";
 import { PathfindingTask } from "protocol/SolveTask";
 import { ParamsOf } from "protocol/Message";
-import { TraceViews } from "components/render/types/trace";
-import { Event } from "components/render/types/render";
-import { Context } from "components/render/types/context";
+import { TraceViews } from "protocol/Trace";
+import { Context, Event } from "protocol/Render";
 import { TraceMap, GridNode } from "components/render/renderer/generic/MapParser";
 
 export type Interlang = TraceViews;

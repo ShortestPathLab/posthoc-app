@@ -19,6 +19,7 @@ export const colorsHex = {
   source: teal["A400"],
   destination: pink["A400"],
   expanding: deepOrange[tint],
+  updating: deepOrange[tint],
   generating: yellow[tint],
   closing: blueGrey["200"],
   end: pink["A400"],

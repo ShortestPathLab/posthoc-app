@@ -14,6 +14,7 @@ export type ViewportData = {
   x: number;
   y: number;
   scale: number;
+  
 }
 
 export type MapData = {

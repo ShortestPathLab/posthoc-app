@@ -1,5 +1,5 @@
-import { Event, Nodes } from "components/render/types/render";
-import { TraceEvent } from "components/render/types/trace";
+import { Event, Nodes } from "protocol/Render";
+import { TraceEvent } from "protocol/Trace";
 
 export function isTopEvent(event: Event) {
   return event.type && ["source", "destination", "end"].includes(event.type);

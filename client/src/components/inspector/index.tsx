@@ -1,10 +1,8 @@
 import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
 import { Flex, FlexProps } from "components/generic/Flex";
-import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { useState, useCallback, useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
-import { SelectionMenu } from "./SelectionMenu";
 import { SplitView } from "./SplitView";
 
 import { TraceView } from "components/render/renderer";
@@ -20,9 +18,6 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
   const [{ interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
   const [{fixed=false}] = useUIState();
-  const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
-    undefined
-  );
 
   const views = useMemo(() => {
     const result:{[key: string]:React.ReactNode} = {};
@@ -68,10 +63,6 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
           />
         ):<></>}
       </Flex>
-      <SelectionMenu
-        selection={selection}
-        onClose={() => setSelection(undefined)}
-      />
     </>
   );
 });

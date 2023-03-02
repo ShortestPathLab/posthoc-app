@@ -3,7 +3,7 @@ import { Box, Fade } from "@material-ui/core";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Canvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";
-import { View } from "../types/render";
+import { View } from "protocol/Render";
 
 import { PixiStage } from "./pixi/PixiStage"
 import { get } from "lodash";

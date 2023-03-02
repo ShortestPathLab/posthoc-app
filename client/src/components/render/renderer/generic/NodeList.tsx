@@ -1,4 +1,4 @@
-import { Event, Nodes } from "components/render/types/render";
+import { Event, Nodes } from "protocol/Render";
 import { Canvas } from "../types";
 import { floor } from "lodash";
 import { useEffect, useMemo } from "react";

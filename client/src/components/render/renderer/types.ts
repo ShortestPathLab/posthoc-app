@@ -1,4 +1,4 @@
-import { Event, Nodes } from "../types/render"
+import { Nodes } from "protocol/Render"
 
 /**
  * Remove events that previously added by AddToCanvasCb from the

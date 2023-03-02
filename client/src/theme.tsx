@@ -1,6 +1,6 @@
 import { colors, createTheme } from "@material-ui/core";
 import { alpha, SxProps, Theme } from "@material-ui/system";
-import { TraceEventType } from "components/render/types/trace";
+import { TraceEventType } from "protocol/Trace";
 import { constant, times } from "lodash";
 import { useSettings } from "slices/settings";
 

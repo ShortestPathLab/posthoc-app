@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import * as React from "react";
 import { Stage } from "@inlet/react-pixi";
 
-import { Nodes, View } from "components/render/types/render";
+import { Nodes, View } from "protocol/Render";
 import { Viewport } from "./Viewport";
 import { d2InstrinsicComponents, DrawInstruction, EventContext, scale } from "./PixiPrimitives"
 import { StageChild } from '../types';

@@ -1,5 +1,5 @@
-import { Component, Components, Render } from "../types/render"
-import { Context } from "../types/context"
+import { Component, Components, Render } from "protocol/Render"
+import { Context } from "protocol/Render"
 import { primitiveComponents, inbuiltViews } from "../renderer/primitives"
 import { isArray, set } from "lodash";
 import { Interlang } from "slices/specimen";

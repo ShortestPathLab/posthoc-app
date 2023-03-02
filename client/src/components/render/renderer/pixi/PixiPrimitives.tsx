@@ -1,5 +1,5 @@
 import { Graphics as GraphicsType, } from "@pixi/graphics";
-import { Component, Event, Nodes } from "../../types/render";
+import { Component, Event, Nodes } from "protocol/Render";
 import * as PIXI from 'pixi.js';
 
 export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persist?: boolean };

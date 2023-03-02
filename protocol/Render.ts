@@ -1,4 +1,4 @@
-import { TraceComponent, TraceComponents, TraceEvent, TraceRender, TraceView, TraceViews } from "./trace";
+import { TraceComponent, TraceComponents, TraceEvent, TraceRender, TraceView, TraceViews, TraceEventType } from "./Trace";
 
 /**
  * Type Definition used by renderers and interlang, to differenciate from
@@ -28,3 +28,15 @@ export type Point = {
  * stage at a given time, and a node can "experience" different stages.
  */
 export type Nodes = Map<string|number, Event[]>
+
+export type EventTypeColours = {
+  [key in TraceEventType]: string;
+}
+
+export type Context = {
+  current?: TraceEvent | null;
+  parent?: TraceEvent | null;
+  events?: TraceEvent[] | null;
+  colour?: EventTypeColours;
+  [key: string]: any;
+}

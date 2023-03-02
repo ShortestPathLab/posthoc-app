@@ -1,20 +1,49 @@
-export type TraceEventType =
-  | "end"
-  | "source"
-  | "destination"
-  | "expanding"
-  | "generating"
-  | "closing";
+/**
+ * Search Trace format definition
+ */
 
-export type TraceEvent<V extends string = string> = {
+export type TraceEventType =  
+    "source" 
+  | "destination" 
+  | "generating" 
+  | "updating"
+  | "closing" 
+  | "expanding" 
+  | "end";
+
+export type TraceEvent = {
   type?: TraceEventType;
-  id?: number;
-  variables?: { [K in V]: number };
+  id: number | string;
+  pId?: number | string | null;
   f?: number;
   g?: number;
-  info?: string;
-  pId?: number | null;
-};
+  h?: number;
+  [key: string] : any;
+}
+
+export type TraceComponent = {
+  "$": string;
+  [key: string]: any;
+}
+
+export type TraceComponents = {
+  [key: string]: TraceComponent[];
+}
+
+export type TraceContext = {
+  [key: string]: any;
+}
+
+export type TraceView = {
+  renderer?: string;
+  components?: TraceComponent[];
+  persist?: boolean;
+}
+
+export type TraceViews = {
+  main?: TraceView;
+  [key: string]: TraceView | undefined;
+}
 
 export type NodeStructure<V extends string = string> = {
   type?: string;
@@ -23,8 +52,15 @@ export type NodeStructure<V extends string = string> = {
   drawPath?: boolean;
 };
 
-export type Trace<V extends string = string> = {
-  format?: string;
-  nodeStructure?: NodeStructure<V>[];
-  eventList?: TraceEvent<V>[];
+export type TraceRender = {
+  context?: TraceContext;
+  components?: TraceComponents;
+  views?: TraceViews;
+};
+
+export type Trace = {
+  version?: string;
+  context?: object;
+  render?: TraceRender;
+  eventList?: TraceEvent[];
 };

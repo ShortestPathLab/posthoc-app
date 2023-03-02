@@ -1,4 +1,3 @@
-import { TraceEventType } from "components/render/types/trace";
 import { mapValues } from "lodash";
 import { EventTypeColoursTypeHex } from "../pixi/PixiStage";
 import { EventTypeColoursType } from "theme";

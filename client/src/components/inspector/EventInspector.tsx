@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core";
 import { Flex } from "components/generic/Flex";
 import { call } from "components/script-editor/call";
-import { Event } from "components/render/types/render";
+import { Event } from "protocol/Render";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { useAcrylic } from "theme";

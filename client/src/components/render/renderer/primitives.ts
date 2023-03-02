@@ -1,7 +1,7 @@
 import { d2InstrinsicComponents } from "./pixi/PixiPrimitives";
 
 import { d2InbuiltViews } from "./pixi/PixiInbuiltViews";
-import { TraceComponents } from "../types/trace";
+import { TraceComponents } from "protocol/Trace";
 
 export const primitiveComponents = {
   ...d2InstrinsicComponents

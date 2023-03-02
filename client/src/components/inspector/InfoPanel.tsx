@@ -11,8 +11,6 @@ import { useUIState } from "slices/UIState";
 import { EventListInspector } from "./EventListInspector";
 import RightArrowIcon from "@material-ui/icons/ChevronRight";
 import LeftArrowIcon from "@material-ui/icons/ChevronLeft";
-import ViewSidebarRounded  from "@material-ui/icons/ViewSidebarRounded";
-import { ToggleButtonWithTooltip } from "components/generic/ToggleButtonWithTooltip";
 
 export function InfoPanel(props: BoxProps) {
   const [uiState, setUIState] = useUIState();
@@ -25,8 +23,7 @@ export function InfoPanel(props: BoxProps) {
         sx={{
           pointerEvents: "none",
           transition: ({ transitions }) => transitions.create(["background"]),
-          bgcolor: ({ palette }) =>
-            fixed?darken(palette.background.default, 0.06):(tab ? alpha(palette.background.default, 0.94) : "transparent"),
+          bgcolor: ({ palette }) => darken(palette.background.default, 0.06),
         }}
         alignItems="center"
         position="relative"

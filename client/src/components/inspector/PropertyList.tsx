@@ -1,7 +1,7 @@
 import { TypographyVariant } from "@material-ui/core";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { Property } from "components/generic/Property";
-import { Event } from "components/render/types/render";
+import { Event } from "protocol/Render";
 import { entries, filter, map } from "lodash";
 
 export function PropertyList({
