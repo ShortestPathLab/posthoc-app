@@ -38,35 +38,21 @@ export function Welcome() {
 
   const loadDemo = useCallback(async function (demo) {
     stop();
-    setSpecimen({...specimen, interlang: undefined, eventList: undefined, map: undefined}); 
     try {
       const traceRes = await axios.get(`/traces/${demo.trace}`, {timeout:2000});
-      try {
-        setSpecimen({
-          ...specimen,
-          interlang: parseViews(traceRes.data.render),
-          eventList: traceRes.data.eventList,
-        });
-        notify(
-          `Search Trace load successfully`
-        );
-      } catch(e) {
-        throw e;
-      }
+      let mapRes;
       if (demo.map) {
-        const mapRes = await axios.get(`/maps/${demo.map}`, {timeout:2000});
-        try {
-          setSpecimen({
-            ...specimen,
-            map: parseGridMap(mapRes.data)
-          });
-          notify(
-            `Map load successfully`
-          );
-        } catch(e) {
-          throw e;
-        }
+        mapRes = await axios.get(`/maps/${demo.map}`, {timeout:2000});
       }
+      setSpecimen({
+        ...specimen,
+        interlang: parseViews(traceRes.data.render),
+        eventList: traceRes.data.eventList,
+        map: mapRes?parseGridMap(mapRes.data):undefined
+      });
+      notify(
+        `Search Trace load successfully`
+      );
     } catch (err) {
       notify(
         `Search Trace and Map load fail`
