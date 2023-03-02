@@ -15,7 +15,7 @@ const traceMaps = {
       trace: "grid-astar.trace.json",
       map: "Small Maze.grid",
       preview: "snip_grid_astar.png",
-      color: "#3d5afe",
+      color: "#0057b7",
     },
   },
   "tile": {
@@ -23,7 +23,7 @@ const traceMaps = {
       title: "Tile Tree With XYZ",
       trace: "tile.generatedxys.trace.json",
       preview: "snip_tile_tree.png",
-      color: "#ffab00"
+      color: "#4caf50"
     },
   }
 };
@@ -38,9 +38,9 @@ export function Welcome() {
 
   const loadDemo = useCallback(async function (demo) {
     stop();
-    setSpecimen({...specimen, map: undefined, interlang: undefined, eventList: undefined});
+    setSpecimen({...specimen, interlang: undefined, eventList: undefined, map: undefined}); 
     try {
-      const traceRes = await axios.get(`/traces/${demo.trace}`);
+      const traceRes = await axios.get(`/traces/${demo.trace}`, {timeout:2000});
       try {
         setSpecimen({
           ...specimen,
@@ -51,13 +51,10 @@ export function Welcome() {
           `Search Trace load successfully`
         );
       } catch(e) {
-        notify(
-          `Search Trace load fail`
-        );
         throw e;
       }
       if (demo.map) {
-        const mapRes = await axios.get(`/maps/${demo.map}`);
+        const mapRes = await axios.get(`/maps/${demo.map}`, {timeout:2000});
         try {
           setSpecimen({
             ...specimen,
@@ -67,14 +64,13 @@ export function Welcome() {
             `Map load successfully`
           );
         } catch(e) {
-          notify(
-            `Map load fail`
-          );
           throw e;
         }
       }
     } catch (err) {
-      console.error(err);
+      notify(
+        `Search Trace and Map load fail`
+      );
     }
   }, []);
 
@@ -96,8 +92,26 @@ export function Welcome() {
                   Object.entries(demos).map(([demoName, demo]) => {
                     return (
                       <Fragment key={demoName}>
-                        <Card sx={{maxWidth: 300, backgroundColor: demo.color, color:"#fff"}}>
-                          <CardActionArea onClick={() => loadDemo(demo)}>
+                        <Card sx={{
+                          width: 200,
+                          height: 140,
+                          color: "#fff",
+                          backgroundImage: `url('/previews/${demo.preview}')`, 
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          position: "relative",
+                          "::before": {
+                            content: '""',
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: demo.color,
+                            opacity: 0.8
+                          }
+                        }}>
+                          <CardActionArea onClick={() => loadDemo(demo)} sx={{width:"100%", height: "100%"}}>
                             <CardContent>
                               <Typography variant="h6">
                                 {demo.title}
