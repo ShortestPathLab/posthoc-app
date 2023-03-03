@@ -178,7 +178,7 @@ export function PixiStage(
       graph.on("click", onClickHandler);
     }
     container.addChild(graph);
-  }, [])
+  }, [globalNodes.nodes])
   /**
    * Create Grapphic object for events
    * @param events list of events need to be rendered using drawInstructs
