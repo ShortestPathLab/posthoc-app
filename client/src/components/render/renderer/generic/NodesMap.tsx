@@ -2,7 +2,7 @@ import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { Event, Nodes } from "protocol/Render";
 import { createNodes, createStepNodes } from "./Nodes";
-import { useMemo, createContext, useContext, ReactNode, useState } from "react";
+import { useMemo, createContext, useContext, ReactNode, useState, useCallback } from "react";
 import { NodePopup } from "components/generic/NodePopup";
 
 export type ClickInfo = {
@@ -33,7 +33,14 @@ export function NodesMap({children}:{children: ReactNode}) {
   const [{eventList}] = useSpecimen();
   const [{step}] = useUIState();
 
-  const [click, setClick] = useState<ClickInfo>();
+  const [click, setClickRaw] = useState<ClickInfo>();
+
+  const setClick = useCallback((c: ClickInfo|undefined) => {
+    if (!c) {
+      click?.remove?.();
+    }
+    setClickRaw(c);
+  }, [click]);
 
   const nodesAll = useMemo(() => {
     if (eventList) {

@@ -137,8 +137,8 @@ export function PixiStage(
 
   React.useEffect(() => {
     const vpClickHandler = () => {
-      if (click && click.remove) {
-        click?.remove();
+      if (click) {
+        setClick?.(undefined)
       }
     };
     viewport.current?.on("click", vpClickHandler);
@@ -170,7 +170,6 @@ export function PixiStage(
           point: {...e.data.global},
           remove: () => {
             viewport.current?.removeChild(overlay);
-            setClick?.(undefined);
           },
         };
         setClick?.(cl);
