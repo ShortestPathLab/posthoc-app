@@ -3,14 +3,16 @@ import { useUIState } from "slices/UIState";
 import { Event, Nodes } from "protocol/Render";
 import { createNodes, createStepNodes } from "./Nodes";
 import { useMemo, createContext, useContext, ReactNode, useState } from "react";
+import { NodePopup } from "components/generic/NodePopup";
 
-type ClickInfo = {
+export type ClickInfo = {
   node?: Event[];
+  nodes?: Event[];
   point?: {
     x: number;
     y: number;
   };
-  remove?: (e: any) => void;
+  remove?: () => void;
   overlay?: any;
 }
 
@@ -20,7 +22,7 @@ type NodesMapContextType = {
   eventsAll?: Event[];  // original eventList
   current?: Event;      // current event
   click?: ClickInfo | undefined;
-  setClick?: (info: ClickInfo) => void;
+  setClick?: (info: ClickInfo | undefined) => void;
 }
 
 const NodesMapContext = createContext<NodesMapContextType>({});
@@ -52,6 +54,7 @@ export function NodesMap({children}:{children: ReactNode}) {
       click,
       setClick,
     }}>
+      <NodePopup {...click} />
       {children}
     </NodesMapContext.Provider>
   )

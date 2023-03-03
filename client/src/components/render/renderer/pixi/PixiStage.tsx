@@ -136,9 +136,9 @@ export function PixiStage(
   }, [])
 
   React.useEffect(() => {
-    const vpClickHandler = (e: PIXI.InteractionEvent) => {
+    const vpClickHandler = () => {
       if (click && click.remove) {
-        click?.remove(e.currentTarget);
+        click?.remove();
       }
     };
     viewport.current?.on("click", vpClickHandler);
@@ -158,20 +158,20 @@ export function PixiStage(
     graph.buttonMode = true;
     set(graph, "id", context.id);
     const onClickHandler = (e:PIXI.InteractionEvent) => {
+      setClick?.(undefined);
       const origin = e.currentTarget as PIXI.Graphics;
       const overlay = origin.clone();
       overlay.tint = (overlay.fill.color - 0x333333 > 0)?overlay.fill.color - 0x333333:0x000000;
       viewport.current?.addChild(overlay);
       const cl = {
         node: globalNodes.nodes?.get(get(e.target, "id")),
+        nodes: globalNodes.nodesAll?.get(get(e.target, "id")),
         point: {...e.data.global},
-        remove: (target: any) => {
-          if (target !== origin) {
-            viewport.current?.removeChild(overlay)
-          }
+        remove: () => {
+          viewport.current?.removeChild(overlay);
+          setClick?.(undefined);
         },
       };
-      console.log(cl);
       setClick?.(cl);
     }
     graph.on("click", onClickHandler);
