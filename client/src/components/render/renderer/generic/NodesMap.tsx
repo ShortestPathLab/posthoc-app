@@ -5,12 +5,13 @@ import { createNodes, createStepNodes } from "./Nodes";
 import { useMemo, createContext, useContext, ReactNode, useState } from "react";
 
 type ClickInfo = {
-  node: Node;
-  point: {
+  node?: Event[];
+  point?: {
     x: number;
     y: number;
-  },
-  handler?: (e:any) => {}
+  };
+  remove?: (e: any) => void;
+  overlay?: any;
 }
 
 type NodesMapContextType = {
@@ -19,7 +20,7 @@ type NodesMapContextType = {
   eventsAll?: Event[];  // original eventList
   current?: Event;      // current event
   click?: ClickInfo | undefined;
-  setClick?: (info: ClickInfo | undefined) => void;
+  setClick?: (info: ClickInfo) => void;
 }
 
 const NodesMapContext = createContext<NodesMapContextType>({});
@@ -30,7 +31,7 @@ export function NodesMap({children}:{children: ReactNode}) {
   const [{eventList}] = useSpecimen();
   const [{step}] = useUIState();
 
-  const [click, setClick] = useState<ClickInfo | undefined>(undefined);
+  const [click, setClick] = useState<ClickInfo>();
 
   const nodesAll = useMemo(() => {
     if (eventList) {

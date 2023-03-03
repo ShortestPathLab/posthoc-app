@@ -135,6 +135,18 @@ export function PixiStage(
     }
   }, [])
 
+  React.useEffect(() => {
+    const vpClickHandler = (e: PIXI.InteractionEvent) => {
+      if (click && click.remove) {
+        click?.remove(e.currentTarget);
+      }
+    };
+    viewport.current?.on("click", vpClickHandler);
+    return () => {
+      viewport.current?.off("click", vpClickHandler);
+    }
+  }, [click])
+
 
   const makeAndAttachComp = React.useCallback((
     drawInstruct: DrawInstruction,
@@ -146,22 +158,21 @@ export function PixiStage(
     graph.buttonMode = true;
     set(graph, "id", context.id);
     const onClickHandler = (e:PIXI.InteractionEvent) => {
-      if (!click) {
-        console.log(get(e.target, "id"));
-        console.log(e);
-        const origin = e.currentTarget as PIXI.Graphics;
-        const overlay = origin.clone();
-        overlay.tint = (overlay.fill.color - 0x333333 > 0)?overlay.fill.color - 0x333333:0x000000;
-        viewport.current?.addChild(overlay);
-        const offClickHandler = () => {
-          viewport.current?.removeChild(overlay);
-          graph.on('click', onClickHandler);
-          graph.off('click', offClickHandler);
-        };
-        graph.off('click', onClickHandler);
-        graph.on("click", offClickHandler);
-      }
-      
+      const origin = e.currentTarget as PIXI.Graphics;
+      const overlay = origin.clone();
+      overlay.tint = (overlay.fill.color - 0x333333 > 0)?overlay.fill.color - 0x333333:0x000000;
+      viewport.current?.addChild(overlay);
+      const cl = {
+        node: globalNodes.nodes?.get(get(e.target, "id")),
+        point: {...e.data.global},
+        remove: (target: any) => {
+          if (target !== origin) {
+            viewport.current?.removeChild(overlay)
+          }
+        },
+      };
+      console.log(cl);
+      setClick?.(cl);
     }
     graph.on("click", onClickHandler);
     container.addChild(graph);
