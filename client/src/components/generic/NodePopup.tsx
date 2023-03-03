@@ -7,7 +7,7 @@ export function NodePopup(props: NodePopupProps) {
   return (
     props.point ? (
       <>
-        <Paper sx={{ width: 200, maxWidth: '100%', position: "absolute", top: props.point?.y??0, left: props.point?.x }}>
+        <Paper sx={{ width: 200, maxWidth: '100%', position: "absolute", zIndex: 'tooltip', top: props.point?.y??0, left: props.point?.x }}>
           <List
             subheader={
               <ListSubheader component="div" id="nested-list-subheader">
