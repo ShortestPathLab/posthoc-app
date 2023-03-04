@@ -172,23 +172,39 @@ function pixiInterlangConventer(component: Component) {
 
 
 
-export function pixiPathDrawer(component:Component, curNode:Event, parentNode:Event):PIXI.Graphics{
-
+export function pixiPathDrawer(component:Component, curNode:Event|undefined, nodes:Nodes):PIXI.Graphics{
 
   const pathGraphic = new PIXI.Graphics();
+  let parentEvent:Event|undefined;
+
   pathGraphic.beginFill();
-  pathGraphic.lineStyle({ width: 1 , color:0x964B00})
-  switch (component.$) {
-    case "rect":
 
-    pathGraphic.drawPolygon(scale(component.x(curNode)+0.5), scale(component.y(curNode)+0.5), scale(component.x(parentNode)+0.5), scale(component.y(parentNode)+0.5))
+  while (component && curNode?.pId){
+    pathGraphic.lineStyle({ width: 1 , color:0x964B00})
+    parentEvent = nodes?.get(curNode.pId)?.[0]
+    if (parentEvent){
 
-      break;
+      switch (component.$) {
+        case "rect":
+    
+          pathGraphic.drawPolygon(scale(component.x(curNode)+0.5), scale(component.y(curNode)+0.5), scale(component.x(parentEvent)+0.5), scale(component.y(parentEvent)+0.5))
+    
+          break;
+    
+        case "circle":
+          pathGraphic.drawPolygon(scale(component.x(curNode)), scale(component.y(curNode)), scale(component.x(parentEvent)), scale(component.y(parentEvent)))
+          pathGraphic.lineStyle({ width: 0 , color:0x964B00})
+          pathGraphic.drawCircle(scale(component.x(curNode)), scale(component.y(curNode)), scale(component.radius(curNode)) )
+          
+          break;
+      }
 
-    case "circle":
-      
-      break;
+    
+    }
+    curNode = nodes?.get(curNode.pId)?.[0]
   }
+
+  pathGraphic.endFill()
 
   return pathGraphic;
 

@@ -138,20 +138,11 @@ export function PixiStage(
 
   React.useEffect(()=>{
     let curNode = globalNodes.current
-    let parentNode;
-    let pathPart:PIXI.Graphics;
 
-    while (pathComponent && curNode && curNode?.pId){
-      parentNode = globalNodes.nodes?.get(curNode.pId)?.[0]
-      if (parentNode){
-        pathPart = pixiPathDrawer(pathComponent, curNode, parentNode)
-        viewport.current?.addChild(pathPart)
-      }
-      curNode = globalNodes.nodes?.get(curNode.pId)?.[0]
+    if (pathComponent && curNode && globalNodes.nodes){
+      const pathGraphic:PIXI.Graphics = pixiPathDrawer(pathComponent, curNode, globalNodes.nodes)
+      viewport.current?.addChild(pathGraphic)
     }
-
-
-
 
   }, [globalNodes.nodes])
 
