@@ -69,8 +69,10 @@ export function parseComps(components: Component[] | undefined, injectedContext:
 
 
       // goes through all the properties of the component and parses them when necessary
+
       for (const prop in component) {
-        if (prop !== "$" && prop !== "persist") {
+        // FIXME probs make it doesnt have to have these &&s 
+        if (prop !== "$" && prop !== "persist" && prop !== "drawPath") {
           newComp[prop as keyof Component] = parseProperty(component[prop as keyof Component], { ...injectedContext, ...component })
         }
       }

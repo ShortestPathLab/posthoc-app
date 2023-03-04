@@ -10,7 +10,8 @@
           "width": 1,
           "height": 1,
           "x": "{{x}}",
-          "y": "{{y}}"
+          "y": "{{y}}",
+          "drawPath": true
         }
       ]
     },

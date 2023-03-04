@@ -4,7 +4,7 @@ import { Stage } from "@inlet/react-pixi";
 
 import { Nodes, View } from "protocol/Render";
 import { Viewport } from "./Viewport";
-import { d2InstrinsicComponents, DrawInstruction, EventContext, scale } from "./PixiPrimitives"
+import { d2InstrinsicComponents, DrawInstruction, EventContext, pixiPathDrawer, scale } from "./PixiPrimitives"
 import { StageChild } from '../types';
 import { PixiViewport } from './PixiViewport';
 
@@ -13,7 +13,7 @@ import { useSpecimen } from 'slices/specimen';
 import { SplitViewContext } from 'components/inspector/SplitView';
 import { useTheme } from '@material-ui/core';
 import { hex } from 'components/renderer/colors';
-import { TraceEventType } from 'protocol/Trace';
+import { TraceComponent, TraceEventType } from 'protocol/Trace';
 import { coloursToHex } from '../generic/colours';
 import { useNodesMap } from '../generic/NodesMap';
 import { get, set } from 'lodash';
@@ -116,18 +116,44 @@ export function PixiStage(
   }, [])
 
   // create draw instructions for each of the search trace components
-  const drawInstructs: DrawInstructions = useMemo(() => {
+  const [drawInstructs, pathComponent]: [DrawInstructions, TraceComponent|undefined] = useMemo(() => {
     if (!view) {
       throw new Error("No view is present in PixiStageProps");
     }
     const viewComps = view.components;
     const drawInstructions: DrawInstructions = {};
+    let pathComponent:TraceComponent|undefined = undefined;
     for (const compName in viewComps) {
       const component = viewComps[compName as keyof object]
       drawInstructions[compName] = d2InstrinsicComponents[component.$].converter(component);
+
+      // checks if the component is the pathComponent
+      if (pathComponent === undefined && component?.drawPath){
+        pathComponent = component;
+      }
     }
-    return drawInstructions;
+    return [drawInstructions, pathComponent];
   }, [view.components])
+
+
+  React.useEffect(()=>{
+    let curNode = globalNodes.current
+    let parentNode;
+    let pathPart:PIXI.Graphics;
+
+    while (pathComponent && curNode && curNode?.pId){
+      parentNode = globalNodes.nodes?.get(curNode.pId)?.[0]
+      if (parentNode){
+        pathPart = pixiPathDrawer(pathComponent, curNode, parentNode)
+        viewport.current?.addChild(pathPart)
+      }
+      curNode = globalNodes.nodes?.get(curNode.pId)?.[0]
+    }
+
+
+
+
+  }, [globalNodes.nodes])
 
   React.useEffect(() => {
     return () => {

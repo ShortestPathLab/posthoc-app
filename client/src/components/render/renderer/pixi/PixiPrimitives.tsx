@@ -2,7 +2,7 @@ import { Graphics as GraphicsType, } from "@pixi/graphics";
 import { Component, Event, Nodes } from "protocol/Render";
 import * as PIXI from 'pixi.js';
 
-export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persist?: boolean };
+export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persist?: boolean};
 
 export type InstrinsicComponents = {
   [key: string]: {
@@ -168,4 +168,28 @@ function pixiInterlangConventer(component: Component) {
   drawInstruction.persist = component.persist !== undefined ? component.persist : true;
 
   return drawInstruction;
+}
+
+
+
+export function pixiPathDrawer(component:Component, curNode:Event, parentNode:Event):PIXI.Graphics{
+
+
+  const pathGraphic = new PIXI.Graphics();
+  pathGraphic.beginFill();
+  pathGraphic.lineStyle({ width: 1 , color:0x964B00})
+  switch (component.$) {
+    case "rect":
+
+    pathGraphic.drawPolygon(scale(component.x(curNode)+0.5), scale(component.y(curNode)+0.5), scale(component.x(parentNode)+0.5), scale(component.y(parentNode)+0.5))
+
+      break;
+
+    case "circle":
+      
+      break;
+  }
+
+  return pathGraphic;
+
 }
