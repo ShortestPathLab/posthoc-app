@@ -100,6 +100,32 @@ function textElement(text: TextObject | undefined) {
 
 }
 
+function pixiDrawRect(element:Component, g:GraphicsType){
+  const [rectX, rectY, rectW, rectH] = [
+    scale(element.x),
+    scale(element.y),
+    scale(element.width ?? 1),
+    scale(element.height ?? 1)
+  ];
+
+  g.drawRect(rectX, rectY, rectW, rectH)
+}
+
+function pixiDrawCircle(element:Component, g:GraphicsType){
+  const [circX, circY, circR] = [
+    scale(element.x),
+    scale(element.y),
+    scale(element.radius ?? 1)
+  ];
+  g.drawCircle(circX, circY, circR)
+}
+
+function pixiDrawPolygon(element:Component, g:GraphicsType){
+  const points = element.points.map((point: { x: number, y: number }) => { return { x: scale(point.x), y: scale(point.y) } })
+
+  g.drawPolygon(points)
+}
+
 function pixiInterlangConventer(component: Component) {
   function drawInstruction(eventContext: EventContext) {
     if (eventContext) {
@@ -122,24 +148,16 @@ function pixiInterlangConventer(component: Component) {
 
         switch (component.$) {
           case "rect":
-            const [rectX, rectY, rectW, rectH] = [
-              scale(element.x),
-              scale(element.y),
-              scale(element.width ?? 1),
-              scale(element.height ?? 1)
-            ];
 
+            pixiDrawRect(component, g)
             element.text&&(textObj = textElement(element.text));
-            g.drawRect(rectX, rectY, rectW, rectH)
+
             break;
 
           case "circle":
-            const [circX, circY, circR] = [
-              scale(element.x),
-              scale(element.y),
-              scale(element.radius ?? 1)
-            ];
-            g.drawCircle(circX, circY, circR)
+            pixiDrawCircle(component, g)
+            element.text&&(textObj = textElement(element.text));
+
             break;
           //@ts-ignore
           case "path":
@@ -147,9 +165,10 @@ function pixiInterlangConventer(component: Component) {
             g.lineStyle({ width: element.lineWidth , color:fillColour})
 
           case "polygon":
-            const points = element.points.map((point: { x: number, y: number }) => { return { x: scale(point.x), y: scale(point.y) } })
 
-            g.drawPolygon(points)
+            pixiDrawPolygon(element, g)
+            element.text&&(textObj = textElement(element.text));
+            
             break;
 
           default:

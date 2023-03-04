@@ -135,7 +135,7 @@ export function PixiStage(
     return [drawInstructions, pathComponent];
   }, [view.components])
 
-
+  // draws the path from current to source
   React.useEffect(()=>{
     let curNode = globalNodes.current
 
