@@ -139,6 +139,13 @@ export function PixiStage(
   React.useEffect(()=>{
     let curNode = globalNodes.current
 
+    const eventContext = {
+      globalNodes,
+      colour: {
+        ...colours
+      } 
+    }
+
     if (pathComponent && curNode && globalNodes.nodes){
       const pathGraphic:PIXI.Graphics = pixiPathDrawer(pathComponent, curNode, globalNodes.nodes)
       viewport.current?.addChild(pathGraphic)

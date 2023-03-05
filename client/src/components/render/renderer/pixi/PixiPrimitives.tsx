@@ -1,6 +1,7 @@
 import { Graphics as GraphicsType, } from "@pixi/graphics";
 import { Component, Event, Nodes } from "protocol/Render";
 import * as PIXI from 'pixi.js';
+import { EventTypeColoursTypeHex } from "./PixiStage";
 
 export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persist?: boolean};
 
@@ -109,6 +110,7 @@ function pixiDrawRect(element:Component, g:GraphicsType){
   ];
 
   g.drawRect(rectX, rectY, rectW, rectH)
+
 }
 
 function pixiDrawCircle(element:Component, g:GraphicsType){
@@ -149,13 +151,13 @@ function pixiInterlangConventer(component: Component) {
         switch (component.$) {
           case "rect":
 
-            pixiDrawRect(component, g)
+            pixiDrawRect(element, g)
             element.text&&(textObj = textElement(element.text));
 
             break;
 
           case "circle":
-            pixiDrawCircle(component, g)
+            pixiDrawCircle(element, g)
             element.text&&(textObj = textElement(element.text));
 
             break;
@@ -196,24 +198,33 @@ export function pixiPathDrawer(component:Component, curNode:Event|undefined, nod
   const pathGraphic = new PIXI.Graphics();
   let parentEvent:Event|undefined;
 
+  let compParent:Component;
+  let compCurrent:Component
+
   pathGraphic.beginFill();
 
   while (component && curNode?.pId){
     pathGraphic.lineStyle({ width: 1 , color:0x964B00})
     parentEvent = nodes?.get(curNode.pId)?.[0]
+
+
     if (parentEvent){
+      compParent = executeComponent(component, {colour:{}, nodes, ...parentEvent, parent: parentEvent.pId ? nodes?.get(parentEvent.pId)?.[0] : parentEvent} )
+
+      compCurrent = executeComponent(component, {colour:{}, nodes, ...curNode, parent:parentEvent, })
 
       switch (component.$) {
         case "rect":
     
-          pathGraphic.drawPolygon(scale(component.x(curNode)+0.5), scale(component.y(curNode)+0.5), scale(component.x(parentEvent)+0.5), scale(component.y(parentEvent)+0.5))
-    
+          pathGraphic.drawPolygon(scale(compCurrent.x+0.5), scale(compCurrent.y+0.5), scale(compParent.x+0.5), scale(compParent.y+0.5))
+          pathGraphic.lineStyle({ width: 0 , color:0x964B00})
+          pixiDrawRect(compCurrent, pathGraphic)
           break;
     
         case "circle":
-          pathGraphic.drawPolygon(scale(component.x(curNode)), scale(component.y(curNode)), scale(component.x(parentEvent)), scale(component.y(parentEvent)))
+          pathGraphic.drawPolygon(scale(compCurrent.x), scale(compCurrent.y), scale(compParent.x), scale(compParent.y))
           pathGraphic.lineStyle({ width: 0 , color:0x964B00})
-          pathGraphic.drawCircle(scale(component.x(curNode)), scale(component.y(curNode)), scale(component.radius(curNode)) )
+          pathGraphic.drawCircle(scale(compCurrent.x), scale(compCurrent.y), scale(compCurrent.radius) )
           
           break;
       }
