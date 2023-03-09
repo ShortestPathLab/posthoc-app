@@ -12,12 +12,16 @@ declare module '@material-ui/core/styles' {
   interface Theme {
     map: {
       walls: string;
+      path?: string;
+      guide?: string;
     };
     event: EventTypeColoursType
   }
   interface ThemeOptions {
     map?: {
       walls?: string;
+      path?: string;
+      guide?: string;
     };
     event?: EventTypeColoursType;
   }
@@ -43,7 +47,9 @@ export const getTheme = (preferDark:boolean = false) => createTheme(preferDark?{
     }
   },
   map: {
-    walls: colors["grey"][300]
+    walls: colors["grey"][300],
+    path: colors["lightGreen"]["A700"],
+    guide: colors["red"]["600"]
   },
   event: {
     source: colors["teal"]["A700"],
@@ -61,7 +67,9 @@ export const getTheme = (preferDark:boolean = false) => createTheme(preferDark?{
     primary: colors["blueGrey"],
   },
   map: {
-    walls: colors["blueGrey"][800]
+    walls: colors["blueGrey"][800],
+    path: colors["lightGreen"]["A400"],
+    guide: colors["red"]["500"],
   },
   event: {
     source: colors["teal"]["A400"],

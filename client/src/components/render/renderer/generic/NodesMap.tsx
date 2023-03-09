@@ -33,14 +33,7 @@ export function NodesMap({children}:{children: ReactNode}) {
   const [{eventList}] = useSpecimen();
   const [{step}] = useUIState();
 
-  const [click, setClickRaw] = useState<ClickInfo>();
-
-  const setClick = useCallback((c: ClickInfo|undefined) => {
-    if (!c) {
-      click?.remove?.();
-    }
-    setClickRaw(c);
-  }, [click]);
+  const [click, setClick] = useState<ClickInfo>();
 
   const nodesAll = useMemo(() => {
     if (eventList) {

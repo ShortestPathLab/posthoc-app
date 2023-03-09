@@ -44,7 +44,7 @@
     "worker-loader": "^3.0.8"
   },
   "scripts": {
-    "start": "vite",
+    "start": "vite --host",
     "build": "tsc && vite build",
     "forcebuild": "vite build"
   },

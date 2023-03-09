@@ -193,48 +193,42 @@ function pixiInterlangConventer(component: Component) {
 
 
 
-export function pixiPathDrawer(component:Component, curNode:Event|undefined, nodes:Nodes):PIXI.Graphics{
+export function pixiPathDrawer(component:Component, curNode:Event|undefined, nodes:Nodes, color:number):PIXI.Graphics{
 
   const pathGraphic = new PIXI.Graphics();
   let parentEvent:Event|undefined;
 
   let compParent:Component;
-  let compCurrent:Component
+  let compCurrent:Component;
 
   pathGraphic.beginFill();
 
   while (component && curNode?.pId){
-    pathGraphic.lineStyle({ width: 1 , color:0x964B00})
-    parentEvent = nodes?.get(curNode.pId)?.[0]
-
+    pathGraphic.lineStyle({ width: scale(0.2) , color});
+    parentEvent = nodes?.get(curNode.pId)?.[0];
 
     if (parentEvent){
-      compParent = executeComponent(component, {colour:{}, nodes, ...parentEvent, parent: parentEvent.pId ? nodes?.get(parentEvent.pId)?.[0] : parentEvent} )
-
-      compCurrent = executeComponent(component, {colour:{}, nodes, ...curNode, parent:parentEvent, })
+      compParent = executeComponent(component, {colour:{}, nodes, ...parentEvent, parent: parentEvent.pId ? nodes?.get(parentEvent.pId)?.[0] : parentEvent} );
+      compCurrent = executeComponent(component, {colour:{}, nodes, ...curNode, parent:parentEvent});
 
       switch (component.$) {
         case "rect":
-    
-          pathGraphic.drawPolygon(scale(compCurrent.x+0.5), scale(compCurrent.y+0.5), scale(compParent.x+0.5), scale(compParent.y+0.5))
-          pathGraphic.lineStyle({ width: 0 , color:0x964B00})
-          pixiDrawRect(compCurrent, pathGraphic)
+          pathGraphic.moveTo(scale(compCurrent.x+0.5), scale(compCurrent.y+0.5));
+          pathGraphic.lineTo(scale(compParent.x+0.5), scale(compParent.y+0.5));
           break;
-    
         case "circle":
-          pathGraphic.drawPolygon(scale(compCurrent.x), scale(compCurrent.y), scale(compParent.x), scale(compParent.y))
-          pathGraphic.lineStyle({ width: 0 , color:0x964B00})
-          pathGraphic.drawCircle(scale(compCurrent.x), scale(compCurrent.y), scale(compCurrent.radius) )
-          
+          pathGraphic.moveTo(scale(compCurrent.x+0.5), scale(compCurrent.y+0.5));
+          pathGraphic.lineTo(scale(compParent.x+0.5), scale(compParent.y+0.5));
+          pathGraphic.drawCircle(scale(compCurrent.x), scale(compCurrent.y), scale(compCurrent.radius))
           break;
       }
-
-    
+    } else {
+      break;
     }
-    curNode = nodes?.get(curNode.pId)?.[0]
+    curNode = nodes?.get(curNode.pId)?.[0];
   }
 
-  pathGraphic.endFill()
+  pathGraphic.endFill();
 
   return pathGraphic;
 

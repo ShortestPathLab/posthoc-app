@@ -1,22 +1,29 @@
-import * as PIXI from 'pixi.js';
+import * as PIXI from "pixi.js";
 import * as React from "react";
 import { Stage } from "@inlet/react-pixi";
 
 import { Nodes, View } from "protocol/Render";
 import { Viewport } from "./Viewport";
-import { d2InstrinsicComponents, DrawInstruction, EventContext, pixiPathDrawer, scale } from "./PixiPrimitives"
-import { StageChild } from '../types';
-import { PixiViewport } from './PixiViewport';
+import {
+  d2InstrinsicComponents,
+  DrawInstruction,
+  EventContext,
+  pixiPathDrawer,
+  scale,
+} from "./PixiPrimitives";
+import { StageChild } from "../types";
+import { PixiViewport } from "./PixiViewport";
 
-import { useMemo } from 'react';
-import { useSpecimen } from 'slices/specimen';
-import { SplitViewContext } from 'components/inspector/SplitView';
-import { useTheme } from '@material-ui/core';
-import { hex } from 'components/renderer/colors';
-import { TraceComponent, TraceEventType } from 'protocol/Trace';
-import { coloursToHex } from '../generic/colours';
-import { useNodesMap } from '../generic/NodesMap';
-import { get, set } from 'lodash';
+import { useMemo } from "react";
+import { useSpecimen } from "slices/specimen";
+import { SplitViewContext } from "components/inspector/SplitView";
+import { useTheme } from "@material-ui/core";
+import { hex } from "components/renderer/colors";
+import { TraceComponent, TraceEventType } from "protocol/Trace";
+import { coloursToHex } from "../generic/colours";
+import { useNodesMap } from "../generic/NodesMap";
+import { get, set } from "lodash";
+import { CompressOutlined } from "@material-ui/icons";
 
 export type PixiStageProps = {
   width?: number;
@@ -24,15 +31,15 @@ export type PixiStageProps = {
   children: StageChild;
   view: View;
   viewName: string;
-}
+};
 
 export type DrawInstructions = {
-  [key: string]: DrawInstruction
-}
+  [key: string]: DrawInstruction;
+};
 
 export type EventTypeColoursTypeHex = {
-  [k in TraceEventType]: number 
-}
+  [k in TraceEventType]: number;
+};
 
 /**
  * PIXI Stage component for rendering view and search trace,
@@ -48,14 +55,18 @@ export type EventTypeColoursTypeHex = {
  * @returns Pixi Stage element that renders current view
  */
 
-export function PixiStage(
-  { width, height, view, viewName, children }: PixiStageProps
-) {
+export function PixiStage({
+  width,
+  height,
+  view,
+  viewName,
+  children,
+}: PixiStageProps) {
   const viewport = React.useRef<PixiViewport>(null);
-  const [{map}] = useSpecimen();
+  const [{ map }] = useSpecimen();
   const theme = useTheme();
   const globalNodes = useNodesMap();
-  const {click, setClick} = globalNodes;
+  const { click, setClick } = globalNodes;
 
   const [svData, updateSvData] = React.useContext(SplitViewContext);
 
@@ -84,8 +95,13 @@ export function PixiStage(
     if (map?.nodes?.walls) {
       for (const block of map?.nodes?.walls) {
         g.beginFill(hex(theme.map.walls), 1)
-        .drawRect(scale(block.x??1), scale((block.y??1) - 4), scale(1), scale(1))
-        .endFill();
+          .drawRect(
+            scale(block.x ?? 1),
+            scale((block.y ?? 1) - 4),
+            scale(1),
+            scale(1)
+          )
+          .endFill();
       }
     }
     viewport.current?.addChild(g);
@@ -94,14 +110,17 @@ export function PixiStage(
       map: {
         fitMap: () => {
           if (map?.bounds?.width && map.bounds.height) {
-            viewport.current?.fitMap(scale(map?.bounds?.width), scale(map?.bounds?.height));
+            viewport.current?.fitMap(
+              scale(map?.bounds?.width),
+              scale(map?.bounds?.height)
+            );
           }
-        }
-      }
+        },
+      },
     });
     return () => {
       viewport.current?.removeChild(g);
-    }
+    };
   }, [map, theme.palette.mode]);
 
   // remember viewport resize information
@@ -110,144 +129,177 @@ export function PixiStage(
       viewport: {
         x: e.x,
         y: e.y,
-        scale: e.scaleX
-      }
+        scale: e.scaleX,
+      },
     });
-  }, [])
+  }, []);
 
   // create draw instructions for each of the search trace components
-  const [drawInstructs, pathComponent]: [DrawInstructions, TraceComponent|undefined] = useMemo(() => {
+  const [drawInstructs, pathComponent]: [
+    DrawInstructions,
+    TraceComponent | undefined
+  ] = useMemo(() => {
     if (!view) {
       throw new Error("No view is present in PixiStageProps");
     }
     const viewComps = view.components;
     const drawInstructions: DrawInstructions = {};
-    let pathComponent:TraceComponent|undefined = undefined;
+    let pathComponent: TraceComponent | undefined = undefined;
     for (const compName in viewComps) {
-      const component = viewComps[compName as keyof object]
-      drawInstructions[compName] = d2InstrinsicComponents[component.$].converter(component);
+      const component = viewComps[compName as keyof object];
+      drawInstructions[compName] =
+        d2InstrinsicComponents[component.$].converter(component);
 
       // checks if the component is the pathComponent
-      if (pathComponent === undefined && component?.drawPath){
+      if (pathComponent === undefined && component?.drawPath) {
         pathComponent = component;
       }
     }
     return [drawInstructions, pathComponent];
-  }, [view.components])
+  }, [view.components]);
 
   // draws the path from current to source
-  React.useEffect(()=>{
-    let curNode = globalNodes.current
+  React.useEffect(() => {
+    let curNode = globalNodes.current;
 
-    const eventContext = {
-      globalNodes,
-      colour: {
-        ...colours
-      } 
+    if (pathComponent && curNode && globalNodes.nodes) {
+      const pathGraphic: PIXI.Graphics = pixiPathDrawer(
+        pathComponent,
+        curNode,
+        globalNodes.nodes,
+        hex(theme.map.path ?? "#66bb6a")
+      );
+      viewport.current?.addChild(pathGraphic);
+      return () => viewport.current?.removeChild(pathGraphic);
     }
 
-    if (pathComponent && curNode && globalNodes.nodes){
-      const pathGraphic:PIXI.Graphics = pixiPathDrawer(pathComponent, curNode, globalNodes.nodes)
-      viewport.current?.addChild(pathGraphic)
-      return () => viewport.current?.removeChild(pathGraphic)
-    }
+    return () => {};
+  }, [globalNodes.nodes, theme.palette.mode]);
 
-
-    return () => {}
-    
-  }, [globalNodes.nodes])
-
+  // clean the canvas after view distroyed
   React.useEffect(() => {
     return () => {
       viewport.current?.removeChildren();
-    }
-  }, [])
+    };
+  }, []);
 
   React.useEffect(() => {
-    const vpClickHandler = () => {
+    const vpClickHandler = (e:any) => {
+      if (e.target instanceof PixiViewport) {
+        setClick?.(undefined);
+      }
       if (click) {
-        setClick?.(undefined)
+        click?.remove?.();
       }
     };
     viewport.current?.on("click", vpClickHandler);
     return () => {
       viewport.current?.off("click", vpClickHandler);
-    }
-  }, [click])
+    };
+  }, [click]);
 
+  const onGraphicClickHandler = React.useCallback((e: PIXI.InteractionEvent) => {
+      const origin = e.currentTarget as PIXI.Graphics;
+      const overlay = origin.clone();
+      let tempPath: PIXI.Graphics;
+      overlay.tint = 0x000000;
+      overlay.alpha = 0.3;
+      viewport.current?.addChild(overlay);
 
-  const makeAndAttachComp = React.useCallback((
-    drawInstruct: DrawInstruction,
-    container: PIXI.Container, 
-    context: EventContext) => {
-    const graph = new PIXI.Graphics();
-    drawInstruct(context)(graph);
-    graph.interactive = true;
-    graph.buttonMode = true;
-    set(graph, "id", context.id);
-    if (drawInstruct.persist) {
-      const onClickHandler = (e:PIXI.InteractionEvent) => {
-        setClick?.(undefined);
-        const origin = e.currentTarget as PIXI.Graphics;
-        const overlay = origin.clone();
-        overlay.tint = (overlay.fill.color - 0x333333 > 0)?overlay.fill.color - 0x333333:0x000000;
-        viewport.current?.addChild(overlay);
-        const cl = {
-          node: globalNodes.nodes?.get(get(e.target, "id")),
-          nodes: globalNodes.nodesAll?.get(get(e.target, "id")),
-          point: {...e.data.global},
-          remove: () => {
-            viewport.current?.removeChild(overlay);
-          },
-        };
-        setClick?.(cl);
+      const event = globalNodes.nodes?.get(get(e.target, "id"))?.[0];
+      if (pathComponent && event && globalNodes.nodes) {
+          tempPath = pixiPathDrawer(
+          pathComponent,
+          event,
+          globalNodes.nodes,
+          hex(theme.map.guide ?? "#e53935")
+        );
+        viewport.current?.addChild(tempPath);
       }
-      graph.on("click", onClickHandler);
-    }
-    container.addChild(graph);
-  }, [globalNodes.nodes])
+      const cl = {
+        node: globalNodes.nodes?.get(get(e.target, "id")),
+        nodes: globalNodes.nodesAll?.get(get(e.target, "id")),
+        point: { ...e.data.global },
+        remove: () => {
+          viewport.current?.removeChild(overlay);
+          viewport.current?.removeChild(tempPath);
+        },
+      };
+      setClick?.(cl);
+  }, [viewport, globalNodes, setClick]);
+
+  // draw single graphics and add click event handler
+  const makeAndAttachComp = React.useCallback(
+    (
+      drawInstruct: DrawInstruction,
+      container: PIXI.Container,
+      context: EventContext
+    ) => {
+      const graph = new PIXI.Graphics();
+      drawInstruct(context)(graph);
+      graph.interactive = true;
+      graph.buttonMode = true;
+      set(graph, "id", context.id);
+      if (drawInstruct.persist) {
+        graph.on("click", onGraphicClickHandler);
+      }
+      container.addChild(graph);
+    },
+    [globalNodes.nodes]
+  );
   /**
    * Create Grapphic object for events
    * @param events list of events need to be rendered using drawInstructs
    * @param hasCurrent indicates if the graphic holds the current step
    */
-  const makeGraphic = React.useCallback((nodes: Nodes) => {
-    // loops through all the events and the drawing instructions
-    // adding them all to the PIXI graphic
-    // FIXME nodes is not all nodes but only part of the node rendered by current
-    // node list 
-    const eventContext = {
-      nodes,
-      colour: {
-        ...colours
-      } 
-    }
-    const container = new PIXI.Container();
-    for (const compName in drawInstructs) {
-      const drawInstruction = drawInstructs[compName];
-      if (!drawInstruction.persist && globalNodes?.current?.id) {
-        let parent;
-        if (globalNodes?.current?.pId) {
-          parent = globalNodes?.nodes?.get(globalNodes.current?.pId)?.[0];
+  const makeGraphic = React.useCallback(
+    (nodes: Nodes) => {
+      // loops through all the events and the drawing instructions
+      // adding them all to the PIXI graphic
+      // FIXME nodes is not all nodes but only part of the node rendered by current
+      // node list
+      const eventContext = {
+        nodes,
+        colour: {
+          ...colours,
+        },
+      };
+      const container = new PIXI.Container();
+      for (const compName in drawInstructs) {
+        const drawInstruction = drawInstructs[compName];
+        if (!drawInstruction.persist && globalNodes?.current?.id) {
+          let parent;
+          if (globalNodes?.current?.pId) {
+            parent = globalNodes?.nodes?.get(globalNodes.current?.pId)?.[0];
+          } else {
+            parent = globalNodes.current;
+          }
+          makeAndAttachComp(drawInstruction, container, {
+            ...eventContext,
+            parent,
+            ...globalNodes.current,
+          });
         } else {
-          parent = globalNodes.current;
+          for (const [, events] of nodes) {
+            // create the context here
+            // spread the current event and get the parent event aswell
+            const current = events[events.length - 1];
+            let parent = current.pId
+              ? globalNodes?.nodes?.get(current?.pId)?.[0]
+              : current;
+            makeAndAttachComp(drawInstruction, container, {
+              ...eventContext,
+              parent,
+              ...current,
+            });
+          }
         }
-        makeAndAttachComp(drawInstruction, container, 
-          { ...eventContext, parent, ...globalNodes.current})
-      } else {
-        for (const [, events] of nodes) {
-          // create the context here
-          // spread the current event and get the parent event aswell
-          const current = events[events.length - 1];
-          let parent= current.pId? globalNodes?.nodes?.get(current?.pId)?.[0]:current;
-          makeAndAttachComp(drawInstruction, container, 
-            { ...eventContext, parent, ...current});
-        }
+        viewport.current?.addChild(container);
       }
-      viewport.current?.addChild(container);
-    }
-    return container;
-  }, [drawInstructs, colours, globalNodes.nodes, globalNodes.current]);
+      return container;
+    },
+    [drawInstructs, colours, globalNodes.nodes, globalNodes.current]
+  );
 
   // create an add function that adds the graphic to a canvas and then returns a remove function
   const canvas = React.useCallback(
@@ -256,28 +308,36 @@ export function PixiStage(
         const container = makeGraphic(nodes);
         return () => {
           viewport.current?.removeChild(container);
-        }
-      }
-    })
-  
-  ,[makeGraphic])
+        };
+      },
+    }),
 
-  return (<>
-    <Stage
-      width={width} height={height}
-      options={{
-        backgroundColor: 0xffffff,
-        autoDensity: true,
-        clearBeforeRender: false,
-        resolution: 1,
-        antialias: true,
-      }}
-    >
-      <Viewport ref={viewport} width={width} height={height} onDestroy={onViewportDestroy} />
-    </Stage>
-    {
+    [makeGraphic]
+  );
+
+  return (
+    <>
+      <Stage
+        width={width}
+        height={height}
+        options={{
+          backgroundColor: 0xffffff,
+          autoDensity: true,
+          clearBeforeRender: false,
+          resolution: 1,
+          antialias: true,
+        }}
+      >
+        <Viewport
+          ref={viewport}
+          width={width}
+          height={height}
+          onDestroy={onViewportDestroy}
+        />
+      </Stage>
+      {
         /**
-         * Children will be a callback that returns child components 
+         * Children will be a callback that returns child components
          * wrapped in Fragment and binded with useCanvas prop
          * (useCanvas) => (
          *  <React.Fragment>
@@ -286,7 +346,7 @@ export function PixiStage(
          * )
          */
         children(canvas)
-        
       }
-  </>)
+    </>
+  );
 }
