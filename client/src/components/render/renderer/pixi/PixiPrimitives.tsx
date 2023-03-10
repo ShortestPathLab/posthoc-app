@@ -201,11 +201,12 @@ export function pixiPathDrawer(component:Component, curNode:Event|undefined, nod
   let compParent:Component;
   let compCurrent:Component;
 
-  pathGraphic.beginFill();
+  pathGraphic.beginFill(color, 1);
 
   while (component && curNode?.pId){
-    pathGraphic.lineStyle({ width: scale(0.2) , color});
+    
     parentEvent = nodes?.get(curNode.pId)?.[0];
+    pathGraphic.lineStyle({ width: scale(0.2) , color});
 
     if (parentEvent){
       compParent = executeComponent(component, {colour:{}, nodes, ...parentEvent, parent: parentEvent.pId ? nodes?.get(parentEvent.pId)?.[0] : parentEvent} );
@@ -213,13 +214,15 @@ export function pixiPathDrawer(component:Component, curNode:Event|undefined, nod
 
       switch (component.$) {
         case "rect":
-          pathGraphic.moveTo(scale(compCurrent.x+0.5), scale(compCurrent.y+0.5));
-          pathGraphic.lineTo(scale(compParent.x+0.5), scale(compParent.y+0.5));
+          pathGraphic.moveTo(scale(compCurrent.x + 0.5 * compCurrent.width), scale(compCurrent.y + 0.5 * compCurrent.height));
+          pathGraphic.lineTo(scale(compParent.x + 0.5 * compCurrent.width), scale(compParent.y + 0.5 * compCurrent.height));
           break;
         case "circle":
-          pathGraphic.moveTo(scale(compCurrent.x+0.5), scale(compCurrent.y+0.5));
-          pathGraphic.lineTo(scale(compParent.x+0.5), scale(compParent.y+0.5));
-          pathGraphic.drawCircle(scale(compCurrent.x), scale(compCurrent.y), scale(compCurrent.radius))
+          pathGraphic.lineStyle({ width: scale(0.1) , color});
+          pathGraphic.moveTo(scale(compCurrent.x), scale(compCurrent.y));
+          pathGraphic.lineTo(scale(compParent.x), scale(compParent.y));
+          pathGraphic.lineStyle({ width: scale(0) , color});
+          pathGraphic.drawCircle(scale(compCurrent.x), scale(compCurrent.y), scale(compCurrent.radius));
           break;
       }
     } else {

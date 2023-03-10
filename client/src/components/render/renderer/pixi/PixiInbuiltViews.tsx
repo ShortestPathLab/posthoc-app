@@ -8,7 +8,8 @@ const PixiGridView: TraceComponents = {
       "width": 1,
       "height": 1,
       "x": "{{x}}",
-      "y": "{{y}}"
+      "y": "{{y}}",
+      "drawPath": true,
     }
   ]
 }
@@ -19,7 +20,8 @@ const PixiPolyanyaView: TraceComponents = {
       "$": "circle",
       "radius": 1,
       "x": "{{x1}}",
-      "y": "{{y1}}"
+      "y": "{{y1}}",
+      "drawPath": true,
     }
   ],
   "line1": [
@@ -119,7 +121,8 @@ const PixiRoadView: TraceComponents = {
       "$": "circle",
       "radius": 0.3,
       "x": "{{x}}",
-      "y": "{{y}}"
+      "y": "{{y}}",
+      "drawPath": true,
     }
   ],
   "line": [
@@ -155,7 +158,8 @@ const PixiTreeView = {
       "$": "circle",
       "radius": 0.3,
       "x": "{{x}}",
-      "y": "{{y}}"
+      "y": "{{y}}",
+      "drawPath": true,
     }
   ],
   "line": [

@@ -1,13 +1,20 @@
 Current Work Todo
 
+DONE
+
+[x] Hover over
+
+[x] Line back to source from current
+
+
 OPEN
 
-[ ] Hover over
+[ ] Settings for line back to source, whether it generates path/node or both
 
 [ ] Window system for multiple views - side by side
 - [x] As a parent component relative to xxxStage
 - [x] Manage the window system
-- [ ] Choose which Stage to use in each of the view
+- [ ] Choose which Stage to use in each of the view and toggle tree view when user doesn't define one
 
 [ ] Convert more Search Traces into current format
  - [*] Grid Trace
@@ -28,7 +35,6 @@ OPEN
 
 [ ] Trace zoom 
 
-[ ] Line back to source from current
 
 
 QUESTION
