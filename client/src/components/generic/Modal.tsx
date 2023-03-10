@@ -250,16 +250,16 @@ export function ManagedModal({
   children,
 }: {
   options?: Props;
-  trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void) => ReactElement;
+  trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void, setOpen?:(open:boolean) => void) => ReactElement;
   appBar?: ModalAppBarProps;
   children?: ReactNode;
 }) {
   return (
     <PopupState variant="popover">
-      {({ open, close, isOpen }) => {
+      {({ open, close, isOpen, setOpen }) => {
         return (
           <>
-            {cloneElement(trigger(open))}
+            {cloneElement(trigger(open, setOpen))}
             <Modal open={isOpen} onClose={close} {...ModalProps}>
               <ModalAppBar onClose={close} {...ModalAppBarProps} />
               {children ?? ModalProps?.children}

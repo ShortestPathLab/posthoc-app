@@ -39,10 +39,10 @@ export function Welcome() {
   const loadDemo = useCallback(async function (demo) {
     stop();
     try {
-      const traceRes = await axios.get(`/traces/${demo.trace}`, {timeout:2000});
+      const traceRes = await axios.get(`traces/${demo.trace}`, {timeout:2000});
       let mapRes;
       if (demo.map) {
-        mapRes = await axios.get(`/maps/${demo.map}`, {timeout:2000});
+        mapRes = await axios.get(`maps/${demo.map}`, {timeout:2000});
       }
       setSpecimen({
         ...specimen,
@@ -82,7 +82,7 @@ export function Welcome() {
                           width: 200,
                           height: 140,
                           color: "#fff",
-                          backgroundImage: `url('/previews/${demo.preview}')`, 
+                          backgroundImage: `url('previews/${demo.preview}')`, 
                           backgroundSize: "cover",
                           backgroundPosition: "center",
                           position: "relative",
