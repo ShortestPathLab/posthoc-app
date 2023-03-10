@@ -20,10 +20,10 @@ export function NodePopup(props: NodePopupProps) {
                 return (
                   <ListItem sx={{paddingTop: 0, paddingBottom: 0}} key={eventProp[0]}>
                     <ListItemText sx={{fontWeight:'medium'}}>
-                      {eventProp[0]}
+                      { eventProp[0] }
                     </ListItemText>
                     <Typography>
-                      {eventProp[1]}
+                      { eventProp[1] }
                     </Typography>
                   </ListItem>
                 )
@@ -35,7 +35,7 @@ export function NodePopup(props: NodePopupProps) {
               props.nodes?.map(event => {
                 return (
                   <ListItem component="div" disablePadding key={`${event.type}${event.pId}${event.id}`}>
-                    <ListItemButton sx={{paddingTop: 0, paddingBottom: 0}}>
+                    <ListItemButton sx={{ paddingTop: 0, paddingBottom: 0 }} onClick={() => {}}>
                       <ListItemText primary={`${event.type}`} secondary={`${event.id}`}/>
                     </ListItemButton>
                   </ListItem>
