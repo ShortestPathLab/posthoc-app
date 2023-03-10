@@ -9,7 +9,17 @@ DONE
 
 OPEN
 
+[ ] More work on the map
+
+[ ] Connect the warthog, update the search trace protocol
+
+[ ] Create merger of eventList information so that delta eventLists will work
+
 [ ] Settings for line back to source, whether it generates path/node or both
+
+[ ] only shows path back to source when right click
+
+[ ] show the continuations of the node when click
 
 [ ] Window system for multiple views - side by side
 - [x] As a parent component relative to xxxStage
@@ -25,15 +35,12 @@ OPEN
  - [ ] Multi Agent Path Finder
  - [ ] Bidirectional (Grid/Road versions) Trace
 
-[ ] Create merger of eventList information so that delta eventLists will work
-
 [ ] Documentation
 
 [ ] Create the functions which generate x and y coordinates for the tree view.
 
-[ ] Tree Renderer - independent of the PIXI renderer
-
 [ ] Trace zoom 
+
 
 
 
