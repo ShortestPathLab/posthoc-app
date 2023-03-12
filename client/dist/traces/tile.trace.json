@@ -8,16 +8,16 @@
                     "width": 0.9,
                     "height": 0.9,
                     "text": {
-                        "displayText": "{{context[`${tile_x}${tile_y}`] === 0 ? '' : context[`${tile_x}${tile_y}`]}}",
+                        "displayText": "{{execon[`${execon.tile_x}${execon.tile_y}`] === 0 ? '' : execon[`${execon.tile_x}${execon.tile_y}`]}}",
                         "fontSize": 10,
                         "fill": "0x000000",
-                        "x": "{{tile_x+width/6}}",
-                        "y": "{{tile_y-height/4}}"
+                        "x": "{{execon.tile_x+execon.width/6}}",
+                        "y": "{{execon.tile_y-execon.height/4}}"
                     },
-                    "fill": "{{context[`${tile_x}${tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
+                    "fill": "{{execon[`${execon.tile_x}${execon.tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
                     "persist": false,
-                    "x": "{{tile_x}}}",
-                    "y": "{{tile_y}}"
+                    "x": "{{execon.tile_x}}",
+                    "y": "{{execon.tile_y}}"
                 }
             ],
             "tilerow": [
@@ -57,73 +57,6 @@
                         "$": "tileboard"
                     }
                 ]
-            },
-            "secondary": {
-                "renderer": "2d-pixi",
-                "components": [
-                    {
-                        "$": "rect",
-                        "width": 0.9,
-                        "height": 0.9,
-                        "text": {
-                            "displayText": "{{context[`${tile_x}${tile_y}`] === 0 ? '' : context[`${tile_x}${tile_y}`]}}",
-                            "fontSize": 10,
-                            "fill": "0x000000",
-                            "x": "{{tile_x+width/6}}",
-                            "y": "{{tile_y-height/4}}"
-                        },
-                        "fill": "{{context[`${tile_x}${tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
-                        "x": "{{tile_x}}",
-                        "y": "{{tile_y}}"
-                    }
-                ],
-                "tilerow": [
-                    {
-                        "$": "tile",
-                        "tile_x": 1
-                    },
-                    {
-                        "$": "tile",
-                        "tile_x": 2
-                    },
-                    {
-                        "$": "tile",
-                        "tile_x": 3
-                    }
-                ],
-                "tileboard": [
-                    {
-                        "$": "tilerow",
-                        "tile_y": 1
-                    },
-                    {
-                        "$": "tilerow",
-                        "tile_y": 2
-                    },
-                    {
-                        "$": "tilerow",
-                        "tile_y": 3
-                    }
-                ]
-            },
-            "views": {
-                "main": {
-                    "renderer": "2d-pixi",
-                    "components": [
-                        {
-                            "$": "tileboard",
-                            "persist": false
-                        }
-                    ]
-                },
-                "secondary": {
-                    "renderer": "2d-pixi",
-                    "components": [
-                        {
-                            "$": "tree-view"
-                        }
-                    ]
-                }
             }
         },
         "eventList": [

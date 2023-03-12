@@ -147,6 +147,8 @@ export function parseProperty(val: any, injectedContext: Context): Function {
       if (isComputedProp(val)) {
         val = parseComputedProp(val)
       }
+
+      console.log(val)
       break;
 
     case ("object"):
@@ -172,10 +174,10 @@ export function parseProperty(val: any, injectedContext: Context): Function {
       }
 
   }
-
+  console.log(val)
   return (context: Context) =>
     // eslint-disable-next-line no-new-func
-    Function("context", `return ${val}`)
+    Function("execon", `return ${val}`)
       ({ ...injectedContext, ...context }) // This combines the two contexts and overridees the injectedContext if duplicate properties
 }
 
@@ -184,89 +186,21 @@ export function parseProperty(val: any, injectedContext: Context): Function {
  * @param val the computed property to be parsed.
  * @returns a string which can be executed as JavaScript
  */
-
-
 export function parseComputedProp(val: string): string {
   // regex code
   const bracketsReg = /{{(.*?)}}/g;
-  const contextStr = "context";
-
-  const charReg = "[a-zA-Z_0-9]+"
-
-  const dotAccReg = `(\\.${charReg})`
-  const brackStrReg = `(\\['${charReg}'\\])`
-  const brackVarReg = `(\\[${charReg}\\])`
-  const brackDollarReg = `(\\[\`(\\\${${charReg}})+\`\\])`
-  const remainReg = "(" + dotAccReg + "|" + brackStrReg + "|" + brackVarReg + "|" + brackDollarReg + ")*"
-
-
-  const dollarReg = /\${[a-zA-Z_][a-zA-Z_0-9]*}/g
-  const actualReg = new RegExp(charReg + remainReg, "g")
 
   let isPotNumProp = potRawCompProp(val);
-
-  /**
-   * Parses an individual variable section
-   * @param str the string that was matched
-   * @returns the parsed variable section
-   */
-  function parseVariable(str: string) {
-    const firstVarReg = /^[a-zA-Z_][a-zA-Z_0-9]*/
-
-    // this section of code will replace all the bracketed variable sections first (for example [x] with [context[x]]), then will replace all the dot accessors (for example .x with [x]), then will replace all the dollar symbols (for example ${x} with ${context[x]}) and then replace the first variable (for example parent with context[parent])
-    return str.replace(new RegExp(brackVarReg, "g"), replaceBrackVar)
-      .replace(new RegExp(dotAccReg, "g"), replaceDotAcc)
-      .replace(dollarReg, dollarReplace)
-      .replace(firstVarReg, replaceFirstVar)
-  }
-
-  /**
-   * Replaces the first variable if the str is not "context"
-   * @param str the string to replace
-   * @returns the replacement string
-   */
-  function replaceFirstVar(str: string) {
-    return str === contextStr ? contextStr : "context['" + str + "']"
-  }
-
-  /**
-   * Replaces the dot accessors
-   * @param str the string to replace
-   * @returns the replacement string
-   */
-  function replaceDotAcc(str: string) {
-    return "['" + str.slice(1) + "']"
-  }
-
-  /**
-   * Replaces bracketed variables
-   * @param str the string to replace
-   * @returns the replacement string
-   */
-  function replaceBrackVar(str: string) {
-    return "[context['" + str.slice(1, -1) + "']]"
-  }
-
-  /**
-   * Replaces dollar variables
-   * @param str the string to replace
-   * @returns the replacement string
-   */
-  function dollarReplace(str: string) {
-    return "${context['" + str.slice(2, -1) + "']}"
-  }
 
   /**
    * Parses double bracketed sections ({{...}})
    * @param str 
    * @param p1 
-   * @returns 
+   * @returns the contents of the contents within the {{}}
    */
   function parseBrackets(str: string, p1: string) {
-    return isPotNumProp ? p1.replace(actualReg, parseVariable)
-      : "${" + p1.replace(actualReg, parseVariable) + "}"
+    return p1
   }
-
 
   val = val.replace(bracketsReg, parseBrackets);
 

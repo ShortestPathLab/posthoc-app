@@ -7,8 +7,8 @@ const PixiGridView: TraceComponents = {
       "$": "rect",
       "width": 1,
       "height": 1,
-      "x": "{{x}}",
-      "y": "{{y}}",
+      "x": "{{execon.x}}",
+      "y": "{{execon.y}}",
       "drawPath": true,
     }
   ]
@@ -19,8 +19,8 @@ const PixiPolyanyaView: TraceComponents = {
     {
       "$": "circle",
       "radius": 1,
-      "x": "{{x1}}",
-      "y": "{{y1}}",
+      "x": "{{execon.x1}}",
+      "y": "{{execon.y1}}",
       "drawPath": true,
     }
   ],
@@ -29,12 +29,12 @@ const PixiPolyanyaView: TraceComponents = {
       "$": "path",
       "points": [
         {
-          "x": "{{x2}}",
-          "y": "{{y2}}"
+          "x": "{{execon.x2}}",
+          "y": "{{execon.y2}}"
         },
         {
-          "x": "{{x3}}",
-          "y": "{{y3}}"
+          "x": "{{execon.x3}}",
+          "y": "{{execon.y3}}"
         }
       ],
       "lineWidth" : 0.5
@@ -45,12 +45,12 @@ const PixiPolyanyaView: TraceComponents = {
       "$": "path",
       "points": [
         {
-          "x": "{{x1}}",
-          "y": "{{y1}}"
+          "x": "{{execon.x1}}",
+          "y": "{{execon.y1}}"
         },
         {
-          "x": "{{x2}}",
-          "y": "{{y2}}"
+          "x": "{{execon.x2}}",
+          "y": "{{execon.y2}}"
         }
       ],
       "lineWidth" : 0.5
@@ -61,12 +61,12 @@ const PixiPolyanyaView: TraceComponents = {
       "$": "path",
       "points": [
         {
-          "x": "{{x1}}",
-          "y": "{{y1}}"
+          "x": "{{execon.x1}}",
+          "y": "{{execon.y1}}"
         },
         {
-          "x": "{{x3}}",
-          "y": "{{y3}}"
+          "x": "{{execon.x3}}",
+          "y": "{{execon.y3}}"
         }
       ],
       "lineWidth" : 0.5
@@ -78,16 +78,16 @@ const PixiPolyanyaView: TraceComponents = {
       "$": "polygon",
       "points": [
         {
-          "x": "{{x1}}",
-          "y": "{{y1}}"
+          "x": "{{execon.x1}}",
+          "y": "{{execon.y1}}"
         },
         {
-          "x": "{{x2}}",
-          "y": "{{y2}}"
+          "x": "{{execon.x2}}",
+          "y": "{{execon.y2}}"
         },
         {
-          "x": "{{x3}}",
-          "y": "{{y3}}"
+          "x": "{{execon.x3}}",
+          "y": "{{execon.y3}}"
         }
       ]
     }
@@ -120,8 +120,8 @@ const PixiRoadView: TraceComponents = {
     {
       "$": "circle",
       "radius": 0.3,
-      "x": "{{x}}",
-      "y": "{{y}}",
+      "x": "{{execon.x}}",
+      "y": "{{execon.y}}",
       "drawPath": true,
     }
   ],
@@ -130,12 +130,12 @@ const PixiRoadView: TraceComponents = {
       "$": "path",
       "points": [
         {
-          "x": "{{parent.x}}",
-          "y": "{{parent.y}}"
+          "x": "{{execon.parent.x}}",
+          "y": "{{execon.parent.y}}"
         },
         {
-          "x": "{{x}}",
-          "y": "{{y}}"
+          "x": "{{execon.x}}",
+          "y": "{{execon.y}}"
         }
       ],
       "lineWidth" : 1
@@ -157,8 +157,8 @@ const PixiTreeView = {
     {
       "$": "circle",
       "radius": 0.3,
-      "x": "{{x}}",
-      "y": "{{y}}",
+      "x": "{{execon.x}}",
+      "y": "{{execon.y}}",
       "drawPath": true,
     }
   ],
@@ -167,12 +167,12 @@ const PixiTreeView = {
       "$": "path",
       "points": [
         {
-          "x": "{{parent.x}}",
-          "y": "{{parent.y}}"
+          "x": "{{execon.parent.x}}",
+          "y": "{{execon.parent.y}}"
         },
         {
-          "x": "{{x}}",
-          "y": "{{y}}"
+          "x": "{{execon.x}}",
+          "y": "{{execon.y}}"
         }
       ],
       "lineWidth" : 1
