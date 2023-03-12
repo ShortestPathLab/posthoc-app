@@ -2,9 +2,7 @@ Current Work Todo
 
 DONE
 
-[x] Hover over
-
-[x] Line back to source from current
+[x] Updated Computed properties to be pure JS.
 
 
 OPEN
@@ -20,6 +18,8 @@ OPEN
 [ ] only shows path back to source when right click
 
 [ ] show the continuations of the node when click
+
+[ ] fix bug where welcome link dont work
 
 [ ] Window system for multiple views - side by side
 - [x] As a parent component relative to xxxStage
@@ -96,3 +96,7 @@ FINISHED
 - user could display the search trace without defining views and components
 
 [*] Allow for the two different view types to be drawn (search and state views)
+
+[x] Hover over
+
+[x] Line back to source from current
