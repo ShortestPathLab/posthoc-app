@@ -9,8 +9,8 @@
           "$": "rect",
           "width": 1,
           "height": 1,
-          "x": "{{execon.x}}",
-          "y": "{{execon.y}}",
+          "x": "{{ctx.x}}",
+          "y": "{{ctx.y}}",
           "drawPath": true
         }
       ]

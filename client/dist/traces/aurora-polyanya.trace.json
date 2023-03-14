@@ -7,8 +7,8 @@
         {
           "$": "circle",
           "radius": 1,
-          "x": "{{execon.x1}}",
-          "y": "{{execon.y1}}",
+          "x": "{{ctx.x1}}",
+          "y": "{{ctx.y1}}",
           "drawPath":true
         }
       ],
@@ -17,12 +17,12 @@
           "$": "path",
           "points": [
             {
-              "x": "{{execon.x2}}",
-              "y": "{{execon.y2}}"
+              "x": "{{ctx.x2}}",
+              "y": "{{ctx.y2}}"
             },
             {
-              "x": "{{execon.x3}}",
-              "y": "{{execon.y3}}"
+              "x": "{{ctx.x3}}",
+              "y": "{{ctx.y3}}"
             }
           ],
           "lineWidth" : 0.5,
@@ -34,12 +34,12 @@
           "$": "path",
           "points": [
             {
-              "x": "{{execon.x1}}",
-              "y": "{{execon.y1}}"
+              "x": "{{ctx.x1}}",
+              "y": "{{ctx.y1}}"
             },
             {
-              "x": "{{execon.x2}}",
-              "y": "{{execon.y2}}"
+              "x": "{{ctx.x2}}",
+              "y": "{{ctx.y2}}"
             }
           ],
           "lineWidth" : 0.5,
@@ -51,12 +51,12 @@
           "$": "path",
           "points": [
             {
-              "x": "{{execon.x1}}",
-              "y": "{{execon.y1}}"
+              "x": "{{ctx.x1}}",
+              "y": "{{ctx.y1}}"
             },
             {
-              "x": "{{execon.x3}}",
-              "y": "{{execon.y3}}"
+              "x": "{{ctx.x3}}",
+              "y": "{{ctx.y3}}"
             }
           ],
           "lineWidth" : 0.5,
@@ -69,16 +69,16 @@
           "$": "polygon",
           "points": [
             {
-              "x": "{{execon.x1}}",
-              "y": "{{execon.y1}}"
+              "x": "{{ctx.x1}}",
+              "y": "{{ctx.y1}}"
             },
             {
-              "x": "{{execon.x2}}",
-              "y": "{{execon.y2}}"
+              "x": "{{ctx.x2}}",
+              "y": "{{ctx.y2}}"
             },
             {
-              "x": "{{execon.x3}}",
-              "y": "{{execon.y3}}"
+              "x": "{{ctx.x3}}",
+              "y": "{{ctx.y3}}"
             }
           ],
           "persist": false

@@ -6,8 +6,8 @@
         {
           "$": "circle",
           "radius": 1,
-          "x": "{{execon.x}}",
-          "y": "{{execon.y}}"
+          "x": "{{ctx.x}}",
+          "y": "{{ctx.y}}"
         }
       ],
       "line": [
@@ -15,12 +15,12 @@
           "$": "path",
           "points": [
             {
-              "x": "{{execon.parent.x}}",
-              "y": "{{parent.y}}"
+              "x": "{{ctx.parent.x}}",
+              "y": "{{ctx.parent.y}}"
             },
             {
-              "x": "{{execon.x}}",
-              "y": "{{execon.y}}"
+              "x": "{{ctx.x}}",
+              "y": "{{ctx.y}}"
             }
           ]
         }

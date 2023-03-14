@@ -8,16 +8,16 @@
                     "width": 0.9,
                     "height": 0.9,
                     "text": {
-                        "displayText": "{{execon[`${execon.tile_x}${execon.tile_y}`] === 0 ? '' : execon[`${execon.tile_x}${execon.tile_y}`]}}",
+                        "displayText": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] === 0 ? '' : ctx[`${ctx.tile_x}${ctx.tile_y}`]}}",
                         "fontSize": 10,
                         "fill": "0x000000",
-                        "x": "{{execon.tile_x+execon.width/6}}",
-                        "y": "{{execon.tile_y-execon.height/4}}"
+                        "x": "{{ctx.tile_x+ctx.width/6}}",
+                        "y": "{{ctx.tile_y-ctx.height/4}}"
                     },
-                    "fill": "{{execon[`${execon.tile_x}${execon.tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
+                    "fill": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
                     "persist": false,
-                    "x": "{{execon.tile_x}}",
-                    "y": "{{execon.tile_y}}"
+                    "x": "{{ctx.tile_x}}",
+                    "y": "{{ctx.tile_y}}"
                 }
             ],
             "tilerow": [

@@ -147,8 +147,6 @@ export function parseProperty(val: any, injectedContext: Context): Function {
       if (isComputedProp(val)) {
         val = parseComputedProp(val)
       }
-
-      console.log(val)
       break;
 
     case ("object"):
@@ -174,10 +172,10 @@ export function parseProperty(val: any, injectedContext: Context): Function {
       }
 
   }
-  console.log(val)
+
   return (context: Context) =>
     // eslint-disable-next-line no-new-func
-    Function("execon", `return ${val}`)
+    Function("ctx", `return ${val}`)
       ({ ...injectedContext, ...context }) // This combines the two contexts and overridees the injectedContext if duplicate properties
 }
 
