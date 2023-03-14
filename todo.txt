@@ -19,8 +19,6 @@ OPEN
 
 [ ] show the continuations of the node when click
 
-[ ] fix bug where welcome link dont work
-
 [ ] Window system for multiple views - side by side
 - [x] As a parent component relative to xxxStage
 - [x] Manage the window system
