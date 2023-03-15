@@ -1,7 +1,6 @@
 import { Graphics as GraphicsType, } from "@pixi/graphics";
 import { Component, Event, Nodes } from "protocol/Render";
 import * as PIXI from 'pixi.js';
-import { EventTypeColoursTypeHex } from "./PixiStage";
 
 export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persist?: boolean};
 
@@ -108,9 +107,7 @@ function pixiDrawRect(element:Component, g:GraphicsType){
     scale(element.width ?? 1),
     scale(element.height ?? 1)
   ];
-
   g.drawRect(rectX, rectY, rectW, rectH)
-
 }
 
 function pixiDrawCircle(element:Component, g:GraphicsType){
@@ -182,12 +179,11 @@ function pixiInterlangConventer(component: Component) {
         }
       }
     } else {
-      return (g: GraphicsType) => { }
+      throw new Error("Component context is not defined");
     }
   }
 
   drawInstruction.persist = component.persist !== undefined ? component.persist : true;
-
   return drawInstruction;
 }
 
