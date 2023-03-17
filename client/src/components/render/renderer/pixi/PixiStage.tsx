@@ -66,7 +66,7 @@ export function PixiStage({
   const [{ map }] = useSpecimen();
   const theme = useTheme();
   const globalNodes = useNodesMap();
-  const { click, setClick } = globalNodes;
+  const { click, setClick, successors } = globalNodes;
 
   const [svData, updateSvData] = React.useContext(SplitViewContext);
 
@@ -87,7 +87,7 @@ export function PixiStage({
         }
       }
     }
-  }, [theme.palette.mode]);
+  }, [theme.palette.mode, viewport]);
 
   React.useEffect(() => {
     // MAP: draw map background
@@ -121,7 +121,7 @@ export function PixiStage({
     return () => {
       viewport.current?.removeChild(g);
     };
-  }, [map, theme.palette.mode]);
+  }, [map, theme.palette.mode, viewport]);
 
   // remember viewport resize information
   const onViewportDestroy = React.useCallback((e) => {
@@ -174,14 +174,14 @@ export function PixiStage({
     }
 
     return () => {};
-  }, [globalNodes.nodes, theme.palette.mode]);
+  }, [globalNodes.current, globalNodes.nodes, viewport, theme.palette.mode]);
 
   // clean the canvas after view distroyed
   React.useEffect(() => {
     return () => {
       viewport.current?.removeChildren();
     };
-  }, []);
+  }, [viewport]);
 
   React.useEffect(() => {
     const vpClickHandler = (e:any) => {
@@ -201,21 +201,24 @@ export function PixiStage({
   const onGraphicClickHandler = React.useCallback((e: PIXI.InteractionEvent) => {
       const origin = e.currentTarget as PIXI.Graphics;
       const overlay = origin.clone();
-      let tempPath: PIXI.Graphics;
       overlay.tint = 0x000000;
       overlay.alpha = 0.3;
       viewport.current?.addChild(overlay);
-
+      
+      let tempPath: PIXI.Graphics;
       const event = globalNodes.nodes?.get(get(e.target, "id"))?.[0];
       if (pathComponent && event && globalNodes.nodes) {
+        console.log("PIXI path drawer called")
           tempPath = pixiPathDrawer(
           pathComponent,
           event,
           globalNodes.nodes,
-          hex(theme.map.guide ?? "#e53935")
+          hex(theme.map.guide ?? "#e53935"),
+          successors
         );
         viewport.current?.addChild(tempPath);
       }
+
       const cl = {
         node: globalNodes.nodes?.get(get(e.target, "id")),
         nodes: globalNodes.nodesAll?.get(get(e.target, "id")),
@@ -226,7 +229,8 @@ export function PixiStage({
         },
       };
       setClick?.(cl);
-  }, [viewport, globalNodes, setClick]);
+
+  }, [viewport, globalNodes, setClick, pathComponent, successors]);
 
   // draw single graphics and add click event handler
   const makeAndAttachComp = React.useCallback(
@@ -245,7 +249,7 @@ export function PixiStage({
       }
       container.addChild(graph);
     },
-    [globalNodes.nodes]
+    [onGraphicClickHandler, drawInstructs]
   );
   /**
    * Create Grapphic object for events
@@ -298,7 +302,7 @@ export function PixiStage({
       }
       return container;
     },
-    [drawInstructs, colours, globalNodes.nodes, globalNodes.current]
+    [drawInstructs, colours, makeAndAttachComp]
   );
 
   // create an add function that adds the graphic to a canvas and then returns a remove function

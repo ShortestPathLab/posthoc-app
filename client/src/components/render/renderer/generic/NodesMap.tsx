@@ -4,6 +4,7 @@ import { Event, Nodes } from "protocol/Render";
 import { createNodes, createStepNodes } from "./Nodes";
 import { useMemo, createContext, useContext, ReactNode, useState, useCallback } from "react";
 import { NodePopup } from "components/generic/NodePopup";
+import { Successors } from "../types";
 
 export type ClickInfo = {
   node?: Event[];
@@ -21,6 +22,7 @@ type NodesMapContextType = {
   nodesAll?: Nodes;     // all nodes converted from eventlist
   eventsAll?: Event[];  // original eventList
   current?: Event;      // current event
+  successors?:Successors;
   click?: ClickInfo | undefined;
   setClick?: (info: ClickInfo | undefined) => void;
 }
@@ -31,7 +33,7 @@ export const useNodesMap = () => useContext(NodesMapContext);
 
 export function NodesMap({children}:{children: ReactNode}) {
   const [{eventList}] = useSpecimen();
-  const [{step}] = useUIState();
+  const [{step, playback}] = useUIState();
 
   const [click, setClick] = useState<ClickInfo>();
 
@@ -45,6 +47,30 @@ export function NodesMap({children}:{children: ReactNode}) {
       return createStepNodes(eventList, step??0);
     }
   }, [eventList, step])
+
+  const successors = useMemo(() => {
+    let successors : Successors = {};
+    let i = 0;
+    if (eventList){
+      for (const event of eventList){
+        if (step && i <= step  && event.id){
+          if (event.pId){
+             
+             if (successors[event.pId]){
+                successors[event.pId].add(event.id)
+             }
+             else{
+                successors[event.pId] = new Set([event.pId])
+             }
+           }
+           i++;
+        }
+      }
+    }
+    console.log(successors)
+    return successors;
+  }, [playback, eventList])
+
   return (
     <NodesMapContext.Provider value={{
       nodes, 
@@ -52,6 +78,7 @@ export function NodesMap({children}:{children: ReactNode}) {
       eventsAll:eventList, 
       current: eventList?.[step??0],
       click,
+      successors,
       setClick,
     }}>
       <NodePopup {...click} />

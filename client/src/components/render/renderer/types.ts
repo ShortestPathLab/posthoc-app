@@ -50,3 +50,5 @@ export type Scale<T = Point> = Bounds & {
    */
   from: (point: T) => T;
 };
+
+export type Successors = {[key:number|string]:Set<string|number>}

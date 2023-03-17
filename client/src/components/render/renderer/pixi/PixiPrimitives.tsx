@@ -1,6 +1,8 @@
 import { Graphics as GraphicsType, } from "@pixi/graphics";
 import { Component, Event, Nodes } from "protocol/Render";
 import * as PIXI from 'pixi.js';
+import { EventTypeColoursTypeHex } from "./PixiStage";
+import { Successors } from "../types";
 
 export type DrawInstruction = ((eventContext: EventContext) => (graphic: GraphicsType) => void) & { persist?: boolean};
 
@@ -189,8 +191,8 @@ function pixiInterlangConventer(component: Component) {
 
 
 
-export function pixiPathDrawer(component:Component, curNode:Event|undefined, nodes:Nodes, color:number):PIXI.Graphics{
-
+export function pixiPathDrawer(component:Component, curNode:Event|undefined, nodes:Nodes, color:number, succesors?:Successors):PIXI.Graphics{
+  console.log(succesors)
   const pathGraphic = new PIXI.Graphics();
   let parentEvent:Event|undefined;
 
