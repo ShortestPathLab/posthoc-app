@@ -208,7 +208,7 @@ export function PixiStage({
       let tempPath: PIXI.Graphics;
       const event = globalNodes.nodes?.get(get(e.target, "id"))?.[0];
       if (pathComponent && event && globalNodes.nodes) {
-        console.log("click and draw");
+
         tempPath = pixiPathDrawer(
           pathComponent,
           event,

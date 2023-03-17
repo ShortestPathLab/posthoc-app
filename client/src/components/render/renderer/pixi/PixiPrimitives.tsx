@@ -200,9 +200,10 @@ export function pixiPathDrawer(component:Component, curNode:Event|undefined, nod
   let compCurrent:Component;
   let compSuccessor:Component;
 
-  pathGraphic.beginFill(color, 1);
+
 
   if (succesors && curNode?.pId){
+    pathGraphic.beginFill(0xFFC0CB)
     pathGraphic.lineStyle({ width: scale(0.2) ,color: 0xFFC0CB });
     parentEvent = nodes?.get(curNode.pId)?.[0];
 
@@ -226,10 +227,10 @@ export function pixiPathDrawer(component:Component, curNode:Event|undefined, nod
                 pathGraphic.lineTo(scale(compSuccessor.x + 0.5 * compCurrent.width), scale(compSuccessor.y + 0.5 * compCurrent.height));
                 break;
               case "circle":
-                pathGraphic.lineStyle({ width: scale(0.1) , color});
+                pathGraphic.lineStyle({ width: scale(0.1) , color: 0xFFC0CB});
                 pathGraphic.moveTo(scale(compCurrent.x), scale(compCurrent.y));
                 pathGraphic.lineTo(scale(compSuccessor.x), scale(compSuccessor.y));
-                pathGraphic.lineStyle({ width: scale(0) , color});
+                pathGraphic.lineStyle({ width: scale(0) , color: 0xFFC0CB});
                 pathGraphic.drawCircle(scale(compSuccessor.x), scale(compSuccessor.y), scale(compSuccessor.radius));
                 break;
             }
@@ -238,7 +239,7 @@ export function pixiPathDrawer(component:Component, curNode:Event|undefined, nod
       }
     }
   }
-  
+  pathGraphic.beginFill(color, 1);
   while (component && curNode?.pId){
     
     parentEvent = nodes?.get(curNode.pId)?.[0];
