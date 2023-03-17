@@ -60,7 +60,7 @@ export function NodesMap({children}:{children: ReactNode}) {
                 successors[event.pId].add(event.id)
              }
              else{
-                successors[event.pId] = new Set([event.pId])
+                successors[event.pId] = new Set([event.id])
              }
            }
            i++;

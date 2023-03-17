@@ -192,15 +192,53 @@ function pixiInterlangConventer(component: Component) {
 
 
 export function pixiPathDrawer(component:Component, curNode:Event|undefined, nodes:Nodes, color:number, succesors?:Successors):PIXI.Graphics{
-  console.log(succesors)
+
   const pathGraphic = new PIXI.Graphics();
   let parentEvent:Event|undefined;
 
   let compParent:Component;
   let compCurrent:Component;
+  let compSuccessor:Component;
 
   pathGraphic.beginFill(color, 1);
 
+  if (succesors && curNode?.pId){
+    pathGraphic.lineStyle({ width: scale(0.2) ,color: 0xFFC0CB });
+    parentEvent = nodes?.get(curNode.pId)?.[0];
+
+    const succesorsToDraw = succesors[curNode?.id]
+    if (succesorsToDraw){
+      for (const succesor of succesorsToDraw){
+
+        if (curNode.pId){
+
+          const succesorEvent = nodes.get(succesor)?.[0]
+
+          if (parentEvent && succesorEvent){
+    
+            compSuccessor = executeComponent(component, {colour:{}, nodes, ...succesorEvent, parent: curNode} );
+            compCurrent = executeComponent(component, {colour:{}, nodes, ...curNode, parent:parentEvent.pId ? nodes?.get(parentEvent.pId)?.[0] : parentEvent});
+
+    
+            switch (component.$) {
+              case "rect":
+                pathGraphic.moveTo(scale(compCurrent.x + 0.5 * compCurrent.width), scale(compCurrent.y + 0.5 * compCurrent.height));
+                pathGraphic.lineTo(scale(compSuccessor.x + 0.5 * compCurrent.width), scale(compSuccessor.y + 0.5 * compCurrent.height));
+                break;
+              case "circle":
+                pathGraphic.lineStyle({ width: scale(0.1) , color});
+                pathGraphic.moveTo(scale(compCurrent.x), scale(compCurrent.y));
+                pathGraphic.lineTo(scale(compSuccessor.x), scale(compSuccessor.y));
+                pathGraphic.lineStyle({ width: scale(0) , color});
+                pathGraphic.drawCircle(scale(compSuccessor.x), scale(compSuccessor.y), scale(compSuccessor.radius));
+                break;
+            }
+          }
+        }
+      }
+    }
+  }
+  
   while (component && curNode?.pId){
     
     parentEvent = nodes?.get(curNode.pId)?.[0];
@@ -228,6 +266,8 @@ export function pixiPathDrawer(component:Component, curNode:Event|undefined, nod
     }
     curNode = nodes?.get(curNode.pId)?.[0];
   }
+
+
 
   pathGraphic.endFill();
 
