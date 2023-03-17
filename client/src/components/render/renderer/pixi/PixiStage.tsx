@@ -66,7 +66,7 @@ export function PixiStage({
   const [{ map }] = useSpecimen();
   const theme = useTheme();
   const globalNodes = useNodesMap();
-  const { click, setClick, successors } = globalNodes;
+  const { click, setClick } = globalNodes;
 
   const [svData, updateSvData] = React.useContext(SplitViewContext);
 
@@ -76,9 +76,9 @@ export function PixiStage({
     return coloursToHex(theme.event);
   }, [theme]);
 
+  // ZOOM: restore viewport state
   React.useEffect(() => {
     if (viewport.current) {
-      // ZOOM: restore viewport state
       if (svData?.[viewName]?.viewport) {
         const vpData = svData?.[viewName]?.viewport;
         if (vpData) {
@@ -174,7 +174,7 @@ export function PixiStage({
     }
 
     return () => {};
-  }, [globalNodes.current, globalNodes.nodes, viewport, theme.palette.mode]);
+  }, [globalNodes.nodes, globalNodes.current, globalNodes.successors, viewport, theme.palette.mode]);
 
   // clean the canvas after view distroyed
   React.useEffect(() => {
@@ -208,13 +208,13 @@ export function PixiStage({
       let tempPath: PIXI.Graphics;
       const event = globalNodes.nodes?.get(get(e.target, "id"))?.[0];
       if (pathComponent && event && globalNodes.nodes) {
-        console.log("PIXI path drawer called")
-          tempPath = pixiPathDrawer(
+        console.log("click and draw");
+        tempPath = pixiPathDrawer(
           pathComponent,
           event,
           globalNodes.nodes,
           hex(theme.map.guide ?? "#e53935"),
-          successors
+          globalNodes.successors
         );
         viewport.current?.addChild(tempPath);
       }
@@ -230,7 +230,7 @@ export function PixiStage({
       };
       setClick?.(cl);
 
-  }, [viewport, globalNodes, setClick, pathComponent, successors]);
+  }, [viewport, globalNodes.nodes, setClick, pathComponent, globalNodes.successors]);
 
   // draw single graphics and add click event handler
   const makeAndAttachComp = React.useCallback(
@@ -302,7 +302,7 @@ export function PixiStage({
       }
       return container;
     },
-    [drawInstructs, colours, makeAndAttachComp]
+    [colours, makeAndAttachComp]
   );
 
   // create an add function that adds the graphic to a canvas and then returns a remove function

@@ -67,7 +67,6 @@ export function NodesMap({children}:{children: ReactNode}) {
         }
       }
     }
-    console.log(successors)
     return successors;
   }, [playback, eventList])
 
