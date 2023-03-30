@@ -4,6 +4,7 @@ import {
 } from "protocol/CheckConnection";
 import { createMethod } from "../src/methods/createMethod";
 import { usingE2E } from "./e2e";
+import { test, expect } from "vitest";
 
 test("RPC server responds to ping", async () => {
   let response: CheckConnectionResponse | undefined;

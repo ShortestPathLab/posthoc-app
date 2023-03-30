@@ -1,7 +1,16 @@
-import { BoxProps, Button, Fade, Tooltip, ToggleButton, Paper } from "@material-ui/core";
+import {
+  BoxProps,
+  Button,
+  Fade,
+  Tooltip,
+  ToggleButton,
+  Paper,
+  alpha,
+  Box,
+  darken,
+} from "@material-ui/core";
 import { SortTwoTone as StepsIcon } from "@material-ui/icons";
 import { TabContext, TabPanel } from "@material-ui/lab";
-import { alpha, Box, darken } from "@material-ui/system";
 import { Flex } from "components/generic/Flex";
 import { PlaceholderCard } from "components/generic/PlaceholderCard";
 import { Toolbar } from "components/generic/Toolbar";
@@ -14,7 +23,7 @@ import LeftArrowIcon from "@material-ui/icons/ChevronLeft";
 
 export function InfoPanel(props: BoxProps) {
   const [uiState, setUIState] = useUIState();
-  const { playback, fixed=false } = uiState;
+  const { playback, fixed = false } = uiState;
   const [tab, setTab] = useState("steps");
   return (
     <TabContext value={tab}>
@@ -30,19 +39,21 @@ export function InfoPanel(props: BoxProps) {
         {...props}
       >
         <ToggleButton
-            value="fixed"
-            selected={!fixed}
-            sx={{
-              position:"absolute",
-              left: -40,
-              top: '50%',
-              pointerEvents: 'auto',
-              zIndex: 10,
-              border: 0,
-            }}
-            onChange={() => {setUIState({...uiState, fixed:!fixed})}}
-          >
-            {fixed?<RightArrowIcon />:<LeftArrowIcon/>}
+          value="fixed"
+          selected={!fixed}
+          sx={{
+            position: "absolute",
+            left: -40,
+            top: "50%",
+            pointerEvents: "auto",
+            zIndex: 10,
+            border: 0,
+          }}
+          onChange={() => {
+            setUIState({ ...uiState, fixed: !fixed });
+          }}
+        >
+          {fixed ? <RightArrowIcon /> : <LeftArrowIcon />}
         </ToggleButton>
         <Toolbar>
           {[

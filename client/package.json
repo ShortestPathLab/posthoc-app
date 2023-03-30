@@ -10,6 +10,7 @@
     "@material-ui/core": "^5.0.0-beta.5",
     "@material-ui/icons": "^5.0.0-beta.5",
     "@material-ui/lab": "^5.0.0-alpha.44",
+    "@material-ui/system": "^4.12.2",
     "@monaco-editor/react": "^4.2.2",
     "@types/node": "^18.13.0",
     "@types/react": "^17.0.19",
@@ -30,9 +31,9 @@
     "pixi-viewport": "^4.32.0",
     "pixi.js": "^6.1.2",
     "protocol": "file:../protocol",
-    "react": "^17.0.2",
+    "react": "^18.2.0",
     "react-async-hook": "^3.6.2",
-    "react-dom": "^17.0.2",
+    "react-dom": "^18.2.0",
     "react-use": "^17.3.1",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-virtuoso": "^2.2.1",
@@ -45,6 +46,7 @@
   },
   "scripts": {
     "start": "vite --host",
+    "test": "vitest run",
     "build": "tsc && vite build",
     "forcebuild": "vite build"
   },
@@ -66,6 +68,7 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/react": "^14.0.0",
     "@types/d3-hierarchy": "^3.1.2",
     "@types/downloadjs": "^1.4.2",
     "@types/lodash": "^4.14.172",
@@ -74,10 +77,13 @@
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/url-parse": "^1.4.5",
     "@vitejs/plugin-react": "^3.1.0",
+    "jsdom": "^21.1.1",
     "vite": "^4.1.1",
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-svgr": "^2.4.0",
-    "vite-tsconfig-paths": "^4.0.5"
+    "vite-tsconfig-paths": "^4.0.7",
+    "vitest": "^0.29.8",
+    "vitest-canvas-mock": "^0.2.2"
   },
   "homepage": "."
 }

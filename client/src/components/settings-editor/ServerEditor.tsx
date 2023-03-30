@@ -3,9 +3,9 @@ import {
   TextField,
   Tooltip,
   Typography as Type,
+  Box,
 } from "@material-ui/core";
 import { EditTwoTone as EditIcon } from "@material-ui/icons";
-import { Box } from "@material-ui/system";
 import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
 import {

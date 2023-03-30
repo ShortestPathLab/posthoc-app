@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "path": "adapter"
+    },
+    {
+      "path": "protocol"
+    },
+    {
+      "path": "client"
+    },
+    {
+      "path": "server"
+    }
+  ],
+  "settings": {
+    "testing.automaticallyOpenPeekView": "never"
+  }
+}

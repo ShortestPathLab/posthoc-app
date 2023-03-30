@@ -8,17 +8,20 @@ import { useMemo } from "react";
 import { useSettings } from "slices/settings";
 
 function App() {
-  const prefersDark = useMedia('(prefers-color-scheme: dark)');
-  const [{dark, followSystemDark}] = useSettings();
-  const theme = useMemo(() => getTheme(followSystemDark?prefersDark:dark), [prefersDark, dark, followSystemDark]);
+  const prefersDark = useMedia("(prefers-color-scheme: dark)");
+  const [{ dark, followSystemDark }] = useSettings();
+  const theme = useMemo(
+    () => getTheme(followSystemDark ? prefersDark : dark),
+    [prefersDark, dark, followSystemDark]
+  );
   return (
     <CssBaseline>
-    <ThemeProvider theme={theme}>
-      <Flex vertical sx={{ bgcolor: "background.default" }}>
-        <Controls />
-        <Inspector flex={1} />
-      </Flex>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <Flex vertical sx={{ bgcolor: "background.default" }}>
+          <Controls />
+          <Inspector flex={1} />
+        </Flex>
+      </ThemeProvider>
     </CssBaseline>
   );
 }

@@ -1,5 +1,6 @@
 import { warthog } from "pathfinding-binaries";
 import { exec } from "../src/exec";
+import { describe, it, expect } from "vitest";
 
 describe("exec", () => {
   it("returns hello", async () => {
