@@ -16,7 +16,10 @@ import { PixiViewport } from "./PixiViewport";
 
 import { useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
-import { SplitViewContext } from "components/inspector/SplitView";
+import {
+  SplitViewContext,
+  useViewContext,
+} from "components/inspector/SplitPanes";
 import { useTheme } from "@material-ui/core";
 import { hex } from "components/renderer/colors";
 import { TraceComponent, TraceEventType } from "protocol/Trace";
@@ -68,7 +71,7 @@ export function PixiStage({
   const globalNodes = useNodesMap();
   const { click, setClick } = globalNodes;
 
-  const [svData, updateSvData] = React.useContext(SplitViewContext);
+  const [svData, updateSvData] = useViewContext();
 
   // Map<number|stirng, {x:number, y:number}>();
 
@@ -106,15 +109,18 @@ export function PixiStage({
     }
     viewport.current?.addChild(g);
     // MAP: provide fitmap callback to splitview
-    updateSvData?.(viewName, {
-      map: {
-        fitMap: () => {
-          if (map?.bounds?.width && map.bounds.height) {
-            viewport.current?.fitMap(
-              scale(map?.bounds?.width),
-              scale(map?.bounds?.height)
-            );
-          }
+    updateSvData({
+      view: viewName,
+      payload: {
+        map: {
+          fitMap: () => {
+            if (map?.bounds?.width && map.bounds.height) {
+              viewport.current?.fitMap(
+                scale(map?.bounds?.width),
+                scale(map?.bounds?.height)
+              );
+            }
+          },
         },
       },
     });
@@ -125,11 +131,14 @@ export function PixiStage({
 
   // remember viewport resize information
   const onViewportDestroy = React.useCallback((e) => {
-    updateSvData?.(viewName, {
-      viewport: {
-        x: e.x,
-        y: e.y,
-        scale: e.scaleX,
+    updateSvData({
+      view: viewName,
+      payload: {
+        viewport: {
+          x: e.x,
+          y: e.y,
+          scale: e.scaleX,
+        },
       },
     });
   }, []);
@@ -174,7 +183,13 @@ export function PixiStage({
     }
 
     return () => {};
-  }, [globalNodes.nodes, globalNodes.current, globalNodes.successors, viewport, theme.palette.mode]);
+  }, [
+    globalNodes.nodes,
+    globalNodes.current,
+    globalNodes.successors,
+    viewport,
+    theme.palette.mode,
+  ]);
 
   // clean the canvas after view distroyed
   React.useEffect(() => {
@@ -184,7 +199,7 @@ export function PixiStage({
   }, [viewport]);
 
   React.useEffect(() => {
-    const vpClickHandler = (e:any) => {
+    const vpClickHandler = (e: any) => {
       if (e.target instanceof PixiViewport) {
         setClick?.(undefined);
       }
@@ -198,17 +213,17 @@ export function PixiStage({
     };
   }, [click]);
 
-  const onGraphicClickHandler = React.useCallback((e: PIXI.InteractionEvent) => {
+  const onGraphicClickHandler = React.useCallback(
+    (e: PIXI.InteractionEvent) => {
       const origin = e.currentTarget as PIXI.Graphics;
       const overlay = origin.clone();
       overlay.tint = 0x000000;
       overlay.alpha = 0.3;
       viewport.current?.addChild(overlay);
-      
+
       let tempPath: PIXI.Graphics;
       const event = globalNodes.nodes?.get(get(e.target, "id"))?.[0];
       if (pathComponent && event && globalNodes.nodes) {
-
         tempPath = pixiPathDrawer(
           pathComponent,
           event,
@@ -229,8 +244,15 @@ export function PixiStage({
         },
       };
       setClick?.(cl);
-
-  }, [viewport, globalNodes.nodes, setClick, pathComponent, globalNodes.successors]);
+    },
+    [
+      viewport,
+      globalNodes.nodes,
+      setClick,
+      pathComponent,
+      globalNodes.successors,
+    ]
+  );
 
   // draw single graphics and add click event handler
   const makeAndAttachComp = React.useCallback(

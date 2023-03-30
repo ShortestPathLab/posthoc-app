@@ -4,7 +4,6 @@
   "description": "",
   "scripts": {
     "start": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
-    "test": "concurrently \"cd client && npm test\" \"cd server && npm test\" \"cd adapter && npm test\"",
     "build:all": "cd client && npm run build",
     "postinstall": "concurrently \"cd client && npm i\" \"cd server && npm i\""
   },
@@ -19,8 +18,7 @@
   },
   "homepage": "https://path-visualiser.github.io/app",
   "devDependencies": {
-    "concurrently": "^6.2.1",
-    "vitest": "^0.29.8"
+    "concurrently": "^6.2.1"
   },
   "dependencies": {
     "axios": "^1.3.4",

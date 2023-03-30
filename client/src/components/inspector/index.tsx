@@ -3,7 +3,7 @@ import { Flex, FlexProps } from "components/generic/Flex";
 import { useState, useCallback, useMemo } from "react";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
-import { SplitView } from "./SplitView";
+import { SplitView } from "./SplitPanes";
 
 import { TraceView } from "components/render/renderer";
 
@@ -14,21 +14,25 @@ import { useUIState } from "slices/UIState";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
-export const Inspector = React.memo( function Inspector(props: SpecimenInspectorProps) {
+export const Inspector = React.memo(function Inspector(
+  props: SpecimenInspectorProps
+) {
   const [{ interlang, eventList }] = useSpecimen();
   const [showInfo, setShowInfo] = useState(true);
-  const [{fixed=false}] = useUIState();
+  const [{ fixed = false }] = useUIState();
 
   const views = useMemo(() => {
-    const result:{[key: string]:React.ReactNode} = {};
+    const result: { [key: string]: React.ReactNode } = {};
     if (interlang) {
-      Object.keys(interlang).forEach(viewName => {
-        result[viewName] = <TraceView view={interlang?.[viewName]} viewName={viewName} />;
-      })
+      Object.keys(interlang).forEach((viewName) => {
+        result[viewName] = (
+          <TraceView view={interlang?.[viewName]} viewName={viewName} />
+        );
+      });
     }
     return result;
   }, [interlang]);
-  
+
   return (
     <>
       <LoadIndicator />
@@ -36,10 +40,7 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
         {interlang ? (
           <Flex>
             <NodesMap>
-              <SplitView
-                resizable={true}
-                views ={ views }
-              />
+              <SplitView resizable={true} views={views} />
             </NodesMap>
           </Flex>
         ) : (
@@ -53,15 +54,17 @@ export const Inspector = React.memo( function Inspector(props: SpecimenInspector
             Select a trace to get started.
           </Flex>
         )}
-        {eventList?(
+        {eventList ? (
           <InfoPanel
-            position={fixed?"relative":"absolute"}
-            right={fixed?undefined:'min(-25vw,-480px)'}
+            position={fixed ? "relative" : "absolute"}
+            right={fixed ? undefined : "min(-25vw,-480px)"}
             height="100%"
             width="25vw"
             minWidth={480}
           />
-        ):<></>}
+        ) : (
+          <></>
+        )}
       </Flex>
     </>
   );

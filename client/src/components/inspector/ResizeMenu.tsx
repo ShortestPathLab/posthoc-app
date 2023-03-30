@@ -1,13 +1,13 @@
-import { Card, Box } from "@material-ui/core";
+import { Box, Card } from "@material-ui/core";
+import { MapOutlined as MapIcon } from "@material-ui/icons";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
 import { useAcrylic } from "theme";
-import { MapOutlined as MapIcon } from '@material-ui/icons';
 
 export type ResizeMenuProps = {
   fitMap?: () => void;
-}
+};
 
-export function ResizeMenu({fitMap}: ResizeMenuProps) {
+export function ResizeMenu({ fitMap }: ResizeMenuProps) {
   const acrylic = useAcrylic();
   return (
     <Card
@@ -21,16 +21,17 @@ export function ResizeMenu({fitMap}: ResizeMenuProps) {
       }}
     >
       <Box display="flex">
-        {
-          fitMap? (
-            <Button
-              label="fit-map"
-              icon={<MapIcon />}
-              onClick={fitMap}
-              color="primary"
-            />):<></>
-        }
+        {fitMap ? (
+          <Button
+            label="fit-map"
+            icon={<MapIcon />}
+            onClick={fitMap}
+            color="primary"
+          />
+        ) : (
+          <></>
+        )}
       </Box>
     </Card>
-  )
+  );
 }
