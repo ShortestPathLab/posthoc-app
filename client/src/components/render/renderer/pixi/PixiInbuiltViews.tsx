@@ -1,5 +1,5 @@
 import { TraceComponents } from "protocol/Trace";
-import { RendererInbuiltViews } from "../primitives";
+import { RendererInbuiltViews } from "../RendererInbuiltViews";
 
 const PixiGridView: TraceComponents = {
   "grid-view": [

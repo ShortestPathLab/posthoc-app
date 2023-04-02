@@ -4,7 +4,10 @@ import { PathfindingTask } from "protocol/SolveTask";
 import { ParamsOf } from "protocol/Message";
 import { TraceViews } from "protocol/Trace";
 import { Context, Event } from "protocol/Render";
-import { TraceMap, GridNode } from "components/render/renderer/generic/MapParser";
+import {
+  TraceMap,
+  GridNode,
+} from "components/render/renderer/generic/MapParser";
 
 export type Interlang = TraceViews;
 

@@ -29,8 +29,8 @@ export function usePlaybackState() {
       play: () => setUIState({ playback: "playing", step: stepBy(1) }),
       pause: (n = 0) => setUIState({ playback: "paused", step: stepBy(n) }),
       stop: () => setUIState({ step: start, playback: "paused" }),
-      stepForward: () => setUIState({ playback: "paused",step: stepBy(1) }),
-      stepBackward: () => setUIState({ playback: "paused",step: stepBy(-1) }),
+      stepForward: () => setUIState({ playback: "paused", step: stepBy(1) }),
+      stepBackward: () => setUIState({ playback: "paused", step: stepBy(-1) }),
       tick: (n = 1) => setUIState({ playback: "playing", step: stepBy(n) }),
     };
 

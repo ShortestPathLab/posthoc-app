@@ -17,12 +17,18 @@ export type ViewportStateEvent = {
     x: number;
     y: number;
     [key: string]: any;
-  }
-}
+  };
+};
 
-export type ViewportEventHandler = (e: ViewportEvent | ViewportStateEvent) => void;
+export type ViewportEventHandler = (
+  e: ViewportEvent | ViewportStateEvent
+) => void;
 
-export type PointerEvent = "onMouseOver" | "onClick" | "onMouseDown" | "onDestroy";
+export type PointerEvent =
+  | "onMouseOver"
+  | "onClick"
+  | "onMouseDown"
+  | "onDestroy";
 
 export type PropEventPair = {
   prop: PointerEvent;
@@ -34,7 +40,7 @@ export const events = [
   { prop: "onClick", event: "pointerup", filter: true },
   { prop: "onMouseOver", event: "mousemove" },
   { prop: "onMouseDown", event: "pointerdown", filter: true },
-  { prop: "onDestroy", event: "destroy"}
+  { prop: "onDestroy", event: "destroy" },
 ] as PropEventPair[];
 
 // additional property events for keep event destroy callbacks
@@ -44,7 +50,7 @@ export class PixiViewport extends PixiViewportBase {
     [K in string]?: () => void;
   } = {};
   register(prop: PointerEvent, handler?: ViewportEventHandler) {
-    // 
+    //
     const { event, filter } = find(events, (c) => c.prop === prop)!;
     this.events?.[event]?.();
     if (handler) {
@@ -68,9 +74,9 @@ export class PixiViewport extends PixiViewportBase {
   }
   // emit destory event for storing viewport exit data using onDestroy prop
   destroy(options?: PIXI.IDestroyOptions | undefined): void {
-    const {scaleX, scaleY} = this.lastViewport??{scaleX:1, scaleY:1};
+    const { scaleX, scaleY } = this.lastViewport ?? { scaleX: 1, scaleY: 1 };
     this.setZoom(1);
-    this.emit('destroy', { x: this.left, y: this.top, scaleX, scaleY})
+    this.emit("destroy", { x: this.left, y: this.top, scaleX, scaleY });
     super.destroy(options);
   }
   fitMap(width: number, height: number) {
@@ -78,7 +84,7 @@ export class PixiViewport extends PixiViewportBase {
       time: 500,
       position: new PIXI.Point(width / 2, height / 2),
       scale: this.findFit(width, height) - 0.1,
-      ease: 'easeOutQuint'
-    })
+      ease: "easeOutQuint",
+    });
   }
 }

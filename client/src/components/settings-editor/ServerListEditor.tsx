@@ -15,7 +15,7 @@ export function ServerListEditor() {
         editor={(v) => <ServerEditor value={v} />}
         icon={null}
         value={remote}
-        onChange={debounce((v) => setSettings({...settings, remote: v }), 300)}
+        onChange={debounce((v) => setSettings({ ...settings, remote: v }), 300)}
         addItemLabel="Add Solver"
         create={() => ({
           transport: defaultTransport,
@@ -26,7 +26,7 @@ export function ServerListEditor() {
           <Button
             startIcon={<ResetIcon />}
             sx={{ ml: 2 }}
-            onClick={() => setSettings({...settings, remote: defaultRemotes })}
+            onClick={() => setSettings({ ...settings, remote: defaultRemotes })}
           >
             Reset to Defaults
           </Button>

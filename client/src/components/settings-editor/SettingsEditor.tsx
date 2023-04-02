@@ -35,21 +35,27 @@ export function SettingsEditor() {
   }
 
   const themeName = useMemo(() => {
-    const name = followSystemDark?"Follow System":(dark?"Dark":"Light");
-    
-    return name;
-  }, [dark, followSystemDark])
+    const name = followSystemDark ? "Follow System" : dark ? "Dark" : "Light";
 
-  const handleTheme = useCallback(e => {
-    switch(e.target.value) {
-      case "Follow System":
-        setSettings({ ...settings, followSystemDark: true }); break;
-      case "Dark": 
-        setSettings({ ...settings, followSystemDark: false, dark: true }); break;
-      case "Light":
-        setSettings({ ...settings, followSystemDark: false, dark: false }); break;
-    }
-  }, [setSettings])
+    return name;
+  }, [dark, followSystemDark]);
+
+  const handleTheme = useCallback(
+    (e) => {
+      switch (e.target.value) {
+        case "Follow System":
+          setSettings({ ...settings, followSystemDark: true });
+          break;
+        case "Dark":
+          setSettings({ ...settings, followSystemDark: false, dark: true });
+          break;
+        case "Light":
+          setSettings({ ...settings, followSystemDark: false, dark: false });
+          break;
+      }
+    },
+    [setSettings]
+  );
   return (
     <TabContext value={tab}>
       <TabList onChange={(_, v) => setTab(v)}>
@@ -77,7 +83,7 @@ export function SettingsEditor() {
               valueLabelDisplay="auto"
               defaultValue={playbackRate}
               onChangeCommitted={(_, v) =>
-                setSettings({...settings, playbackRate: v as number })
+                setSettings({ ...settings, playbackRate: v as number })
               }
             />
           </Flex>
@@ -93,7 +99,7 @@ export function SettingsEditor() {
           <Flex alignItems="center">
             {renderLabel("Theme")}
             <Space flex={1} />
-            <FormControl sx={{minWidth:120, my:2}} size="small">
+            <FormControl sx={{ minWidth: 120, my: 2 }} size="small">
               <Select
                 id="theme-select"
                 value={themeName}

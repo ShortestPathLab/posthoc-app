@@ -13,14 +13,11 @@ export function ButtonWithTooltip({
 }: ButtonWithTooltipProps) {
   return (
     <>
-      <Tooltip
-        title={startCase(label)} key={label}>
-          <span>
-            <Button {...rest}>
-              {children}
-            </Button>
-          </span>
+      <Tooltip title={startCase(label)} key={label}>
+        <span>
+          <Button {...rest}>{children}</Button>
+        </span>
       </Tooltip>
     </>
-  )
+  );
 }

@@ -1,7 +1,7 @@
 export type GridNode = {
   x?: number;
   y?: number;
-}
+};
 
 export type TraceMap<T> = {
   type?: string;
@@ -10,9 +10,9 @@ export type TraceMap<T> = {
     height?: number;
   };
   nodes?: {
-    walls?: T[]
+    walls?: T[];
   };
-}
+};
 
 export function parseGridMap(data: string) {
   const mapObj: TraceMap<GridNode> = {
@@ -22,13 +22,13 @@ export function parseGridMap(data: string) {
       height: 0,
     },
     nodes: {
-      walls: []
-    }
-  }
+      walls: [],
+    },
+  };
   const lines = data.split("\n");
   lines.map((line, lineNum) => {
     if (line.length < 20) {
-      switch(line.split(" ")[0]) {
+      switch (line.split(" ")[0]) {
         case "type": {
           mapObj.type = line.split(" ")[1];
           return;
@@ -41,7 +41,9 @@ export function parseGridMap(data: string) {
           mapObj.bounds!.width = Number.parseInt(line.split(" ")[1]);
           return;
         }
-        case "map": {return;}
+        case "map": {
+          return;
+        }
       }
     }
     const chars = line.split("");
@@ -50,7 +52,7 @@ export function parseGridMap(data: string) {
         mapObj.nodes!.walls!.push({
           x: charNum,
           y: lineNum,
-        })
+        });
       }
     });
   });

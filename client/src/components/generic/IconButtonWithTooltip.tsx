@@ -8,16 +8,14 @@ type IconButtonWithTooltipProps = {
 } & IconButtonProps;
 
 export function IconButtonWithTooltip({
-  label="default",
+  label = "default",
   icon,
   ...rest
 }: IconButtonWithTooltipProps) {
   return (
     <Tooltip title={startCase(label)} key={label}>
       <span>
-        <IconButton {...rest}>
-          {icon}
-        </IconButton>
+        <IconButton {...rest}>{icon}</IconButton>
       </span>
     </Tooltip>
   );

@@ -106,8 +106,7 @@ export function ModalAppBar({
           <ArrowBack />
         </IconButton>
 
-        {children 
-        && (
+        {children && (
           <div
             style={{
               gridColumn: 1,
@@ -250,7 +249,10 @@ export function ManagedModal({
   children,
 }: {
   options?: Props;
-  trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void, setOpen?:(open:boolean) => void) => ReactElement;
+  trigger?: (
+    onClick: (e: SyntheticEvent<any, Event>) => void,
+    setOpen?: (open: boolean) => void
+  ) => ReactElement;
   appBar?: ModalAppBarProps;
   children?: ReactNode;
 }) {

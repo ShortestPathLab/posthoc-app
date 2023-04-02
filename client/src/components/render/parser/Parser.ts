@@ -1,9 +1,8 @@
-import { Component, Components, Render } from "protocol/Render"
-import { Context } from "protocol/Render"
-import { primitiveComponents, inbuiltViews } from "../renderer/primitives"
+import { Component, Components, Render } from "protocol/Render";
+import { Context } from "protocol/Render";
+import { primitiveComponents, inbuiltViews } from "../renderer/primitives";
 import { isArray, set } from "lodash";
 import { Interlang } from "slices/specimen";
-
 
 let renderName: string | undefined;
 /**
@@ -12,11 +11,9 @@ let renderName: string | undefined;
  * @returns the parsed Views
  */
 export function parseViews(renderDef: Render): Interlang | undefined {
-
-
   const views = renderDef.views;
-  const userComp = renderDef.components ? renderDef.components : {}
-  const userContext = renderDef.context ? renderDef.context : {}
+  const userComp = renderDef.components ? renderDef.components : {};
+  const userContext = renderDef.context ? renderDef.context : {};
   let inbuiltComps = {};
 
   for (const viewName in views) {
@@ -24,17 +21,29 @@ export function parseViews(renderDef: Render): Interlang | undefined {
 
     // TODO fix the typing so that components is only a single object
     if (renderName && views?.[viewName]?.components?.[0]?.$) {
-      const compName = views?.[viewName]?.components?.[0]?.$
+      const compName = views?.[viewName]?.components?.[0]?.$;
       if (compName && inbuiltViews[renderName][compName]) {
-        inbuiltComps = inbuiltViews[renderName][compName]
-      }
-      else {
-        inbuiltComps = {}
+        inbuiltComps = inbuiltViews[renderName][compName];
+      } else {
+        inbuiltComps = {};
       }
     }
 
-    set(views, `${viewName}.components`, parseComps(views?.[viewName]?.["components"], userContext, userComp, inbuiltComps));
-    set(views, `${viewName}.persist`, views?.[viewName]?.persist ?? true ? true : false);
+    set(
+      views,
+      `${viewName}.components`,
+      parseComps(
+        views?.[viewName]?.["components"],
+        userContext,
+        userComp,
+        inbuiltComps
+      )
+    );
+    set(
+      views,
+      `${viewName}.persist`,
+      views?.[viewName]?.persist ?? true ? true : false
+    );
   }
 
   return views;
@@ -47,8 +56,12 @@ export function parseViews(renderDef: Render): Interlang | undefined {
  * @returns a list of parsed Components
  * @todo fix the error handling for required fields
  */
-export function parseComps(components: Component[] | undefined, injectedContext: Context, userComponents: Components, inbuiltComps:Components): Component[] {
-
+export function parseComps(
+  components: Component[] | undefined,
+  injectedContext: Context,
+  userComponents: Components,
+  inbuiltComps: Components
+): Component[] {
   /**
    * Parses a single Component
    * @param component a individual component
@@ -56,51 +69,62 @@ export function parseComps(components: Component[] | undefined, injectedContext:
    * @todo fix the primitvesComponents and userComponents
    */
   function parseComp(component: Component): Component[] {
-
     // Checks to see if the name of the component matches a primitive
     if (component["$"] in primitiveComponents) {
-
-      if (renderName !== undefined && primitiveComponents[component["$"]]["renderer"] !== renderName) {
-        throw new Error("Component renderer definition is not match to supported renderer");
+      if (
+        renderName !== undefined &&
+        primitiveComponents[component["$"]]["renderer"] !== renderName
+      ) {
+        throw new Error(
+          "Component renderer definition is not match to supported renderer"
+        );
       }
 
       // creates a copy of the component
-      const newComp: Component = { ...injectedContext, ...component }
-
+      const newComp: Component = { ...injectedContext, ...component };
 
       // goes through all the properties of the component and parses them when necessary
 
       for (const prop in component) {
-        // FIXME probs make it doesnt have to have these &&s 
+        // FIXME probs make it doesnt have to have these &&s
         if (prop !== "$" && prop !== "persist" && prop !== "drawPath") {
-          newComp[prop as keyof Component] = parseProperty(component[prop as keyof Component], { ...injectedContext, ...component })
+          newComp[prop as keyof Component] = parseProperty(
+            component[prop as keyof Component],
+            { ...injectedContext, ...component }
+          );
         }
       }
-      return [newComp]
-    }
-
-    else if (component["$"] in inbuiltComps){
-        // When an inbuiltComps need to recurse down and parse that inbuiltComps
-        return parseComps(inbuiltComps[component["$"] as keyof Object],
-        { ...injectedContext, ...component }, userComponents, inbuiltComps)
-    
+      return [newComp];
+    } else if (component["$"] in inbuiltComps) {
+      // When an inbuiltComps need to recurse down and parse that inbuiltComps
+      return parseComps(
+        inbuiltComps[component["$"] as keyof Object],
+        { ...injectedContext, ...component },
+        userComponents,
+        inbuiltComps
+      );
     }
 
     // Checks to see if the name of the component matches a user defined component
     else if (component["$"] in userComponents) {
-
       // When an user component need to recurse down and parse that user defined component
-      return parseComps(userComponents[component["$"] as keyof Object],
-        { ...injectedContext, ...component }, userComponents, inbuiltComps)
-    }
-
-    else {
-      throw new Error("Component by the name of " + component['$'] + " does not exist");
+      return parseComps(
+        userComponents[component["$"] as keyof Object],
+        { ...injectedContext, ...component },
+        userComponents,
+        inbuiltComps
+      );
+    } else {
+      throw new Error(
+        "Component by the name of " + component["$"] + " does not exist"
+      );
     }
   }
 
   if (components === undefined) {
-    throw new Error("Parse Error. Search trace components result in undefined.");
+    throw new Error(
+      "Parse Error. Search trace components result in undefined."
+    );
   }
   const result = components.map(parseComp).flat();
   return result;
@@ -113,8 +137,8 @@ export function parseComps(components: Component[] | undefined, injectedContext:
  * @returns a single Function which contains all the other Functions
  */
 function arrayOfFunctions(array: Function[], injectedContext: Context) {
-
-  return (context: Context) => array.map((ele: Function) => ele({ ...injectedContext, ...context }))
+  return (context: Context) =>
+    array.map((ele: Function) => ele({ ...injectedContext, ...context }));
 }
 
 /**
@@ -123,15 +147,17 @@ function arrayOfFunctions(array: Function[], injectedContext: Context) {
  * @param injectedContext dditional context provided to the functions
  * @returns a single Function which contains all the other Functions
  */
-function objectOfFunctions(object: { [K: string]: Function }, injectedContext: Context) {
-
+function objectOfFunctions(
+  object: { [K: string]: Function },
+  injectedContext: Context
+) {
   return (context: Context) => {
     const newObject: { [K: string]: any } = {};
     for (const prop in object) {
-      newObject[prop] = object[prop]({ ...injectedContext, ...context })
+      newObject[prop] = object[prop]({ ...injectedContext, ...context });
     }
-    return newObject
-  }
+    return newObject;
+  };
 }
 
 /**
@@ -142,41 +168,38 @@ function objectOfFunctions(object: { [K: string]: Function }, injectedContext: C
  */
 export function parseProperty(val: any, injectedContext: Context): Function {
   switch (typeof val) {
-    case ("string"):
+    case "string":
       // when a string, we check to see if it is a computed property and then parse it when true (do nothing when not)
       if (isComputedProp(val)) {
-        val = parseComputedProp(val)
+        val = parseComputedProp(val);
       }
       break;
 
-    case ("object"):
+    case "object":
       // when an object we sort them into arrays and other objects
       if (isArray(val)) {
         // for an array we parse each of the elements in the array
-        const newArray = []
+        const newArray = [];
         for (const ele of val) {
-          newArray.push(parseProperty(ele, injectedContext))
+          newArray.push(parseProperty(ele, injectedContext));
         }
         // then call a function which groups all the individual functions under one function call
-        return arrayOfFunctions(newArray, injectedContext)
-      }
-      else {
+        return arrayOfFunctions(newArray, injectedContext);
+      } else {
         // for objects we parse each of the properties
-        const newVal: any = {}
+        const newVal: any = {};
         for (const prop in val) {
-          newVal[prop] = parseProperty(val[prop], injectedContext)
+          newVal[prop] = parseProperty(val[prop], injectedContext);
         }
 
         // then call a function which groups all the individual functions under one function call
-        return objectOfFunctions(newVal, injectedContext)
+        return objectOfFunctions(newVal, injectedContext);
       }
-
   }
 
   return (context: Context) =>
     // eslint-disable-next-line no-new-func
-    Function("ctx", `return ${val}`)
-      ({ ...injectedContext, ...context }) // This combines the two contexts and overridees the injectedContext if duplicate properties
+    Function("ctx", `return ${val}`)({ ...injectedContext, ...context }); // This combines the two contexts and overridees the injectedContext if duplicate properties
 }
 
 /**
@@ -192,24 +215,23 @@ export function parseComputedProp(val: string): string {
 
   /**
    * Parses double bracketed sections ({{...}})
-   * @param str 
-   * @param p1 
+   * @param str
+   * @param p1
    * @returns the contents of the contents within the {{}}
    */
   function parseBrackets(str: string, p1: string) {
-    return p1
+    return p1;
   }
 
   val = val.replace(bracketsReg, parseBrackets);
 
   // if it isnt a number (thus a string) then additional quotations are added
   if (!isPotNumProp) {
-    val = `\`${val}\``
+    val = `\`${val}\``;
   }
 
-  return val
+  return val;
 }
-
 
 /**
  * Checks to see is a property is a computed property.
@@ -228,7 +250,6 @@ export function isComputedProp(val: any): boolean {
   return false;
 }
 
-
 /**
  * Checks to see what type the computed property should be parsed to.
  * If True this means the type will be whatever the type of the property is.
@@ -242,5 +263,5 @@ export function potRawCompProp(val: any): boolean {
   }
   let re = /{{(.*?)}}/g;
   const arr = [...val.matchAll(re)];
-  return (arr.length === 1) && (arr[0][0] === arr[0].input);
+  return arr.length === 1 && arr[0][0] === arr[0].input;
 }

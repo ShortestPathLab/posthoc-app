@@ -1,4 +1,4 @@
-import { Nodes } from "protocol/Render"
+import { Nodes } from "protocol/Render";
 
 /**
  * Remove events that previously added by AddToCanvasCb from the
@@ -10,20 +10,23 @@ export type RemoveFromCanvasCb = () => void;
  * Add events to canvas, return a callback that can remove
  * those events from the canvas
  */
-export type AddToCanvasCb = (nodes: Nodes, hasCurrent: boolean) => RemoveFromCanvasCb;
+export type AddToCanvasCb = (
+  nodes: Nodes,
+  hasCurrent: boolean
+) => RemoveFromCanvasCb;
 
 /**
- * A medium providing "add" and "remove" event from canvas function 
+ * A medium providing "add" and "remove" event from canvas function
  * to child components
  */
 export type Canvas = () => {
   add: AddToCanvasCb;
-}
+};
 
 /**
- * 
+ *
  */
-export type StageChild = (canvas:Canvas) => React.ReactFragment;
+export type StageChild = (canvas: Canvas) => React.ReactFragment;
 
 export type Point = {
   x: number;
@@ -51,4 +54,4 @@ export type Scale<T = Point> = Bounds & {
   from: (point: T) => T;
 };
 
-export type Successors = {[key:number|string]:Set<string|number>}
+export type Successors = { [key: number | string]: Set<string | number> };

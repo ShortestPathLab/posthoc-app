@@ -38,7 +38,7 @@ function create(props: Props) {
     .pinch()
     .wheel()
     .decelerate({ friction: 0.98 })
-    .clampZoom({ maxScale: 30, minScale: 0.05})
+    .clampZoom({ maxScale: 30, minScale: 0.05 });
   return viewport as PixiViewport;
 }
 
@@ -79,11 +79,13 @@ const Component = PixiComponent<Props, PixiViewport>("Viewport", {
   applyProps,
 });
 
-
-type PixiViewportProps = ViewportProps & Partial<ComponentProps<typeof Component>>;
+type PixiViewportProps = ViewportProps &
+  Partial<ComponentProps<typeof Component>>;
 
 // provide app instance to View port
-export const Viewport = forwardRef<PixiViewport, PixiViewportProps>((props,ref) => {
-  const app = useApp();
-  return <Component app={app} {...props} ref={ref} />;
-});
+export const Viewport = forwardRef<PixiViewport, PixiViewportProps>(
+  (props, ref) => {
+    const app = useApp();
+    return <Component app={app} {...props} ref={ref} />;
+  }
+);

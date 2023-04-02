@@ -27,8 +27,7 @@ export function Utility() {
         )}
         options={{ width: 960, scrollable: false }}
         appBar={{ children: <Title>Debug Options</Title> }}
-      >
-      </Dialog>
+      ></Dialog>
     </>
   );
 }
