@@ -6,7 +6,7 @@
     "start": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
     "build:all": "cd client && npm run build",
     "test": "(cd client && npm run test -- --watchAll=false) && (cd server && npm run test)",
-    "postinstall": "concurrently \"cd client && npm i\" \"cd server && npm i\""
+    "postinstall": "concurrently \"cd client && npm i --legacy-peer-deps\" \"cd server && npm i --legacy-peer-deps\""
   },
   "repository": {
     "type": "git",

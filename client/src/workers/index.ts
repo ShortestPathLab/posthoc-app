@@ -1,13 +1,13 @@
-import "./hash.worker";
-import "./ipc.worker";
+import hashWorkerUrl from "./hash.worker.ts?worker&url";
+import ipcWorkerUrl from "./ipc.worker.ts?worker&url";
 
 export class HashWorker extends Worker {
   constructor() {
-    super(new URL("./hash.worker.ts", import.meta.url), { type: "module" });
+    super(hashWorkerUrl, { type: "module" });
   }
 }
 export class IPCWorker extends Worker {
   constructor() {
-    super(new URL("./ipc.worker.ts", import.meta.url), { type: "module" });
+    super(ipcWorkerUrl, { type: "module" });
   }
 }
