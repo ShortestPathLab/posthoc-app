@@ -6,6 +6,7 @@ export class HashWorker extends Worker {
     super(hashWorkerUrl, { type: "module" });
   }
 }
+
 export class IPCWorker extends Worker {
   constructor() {
     super(ipcWorkerUrl, { type: "module" });
