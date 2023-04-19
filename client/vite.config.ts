@@ -7,6 +7,7 @@ export default defineConfig({
   worker: {
     plugins: [react()],
   },
+  base: "/app",
   build: {
     outDir: path.join(process.cwd(), "./build"),
   },
