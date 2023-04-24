@@ -1,6 +1,6 @@
 import { Graphics } from "@inlet/react-pixi";
 import { Graphics as PixiGraphics } from "@pixi/graphics";
-import { isNull, isUndefined, keyBy } from "lodash";
+import { isNull, isUndefined, keyBy, range } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { useMemo } from "react";
 import { getColor } from "../colors";
@@ -22,13 +22,13 @@ type PathProps = {
 
 export function Path({ nodes = [], step = 0, scale }: PathProps) {
   const path = useMemo(() => {
-    const memo = keyBy(nodes, "id");
+    const memo = range(nodes.length).map((i) => keyBy(nodes.slice(0, i), "id"));
     return (s: number) => {
       const out = [];
       let next: TraceEvent | undefined = nodes[s];
       while (next) {
         out.push(next);
-        next = defined(next.pId) ? memo[`${next.pId}`] : undefined;
+        next = defined(next.pId) ? memo[s][`${next.pId}`] : undefined;
       }
       return out;
     };
