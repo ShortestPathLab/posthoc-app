@@ -74,7 +74,11 @@ export function Input() {
               }
               break;
             default:
-              setUIState({ ...mapDefaults, map: find(maps, { id: v }) });
+              setUIState({
+                ...mapDefaults,
+                map: find(maps, { id: v }),
+                parameters: {},
+              });
               notify("Solution was cleared because the map changed.");
               break;
           }

@@ -45,7 +45,7 @@ async function solve(
 export function SpecimenService() {
   const usingLoadingState = useLoadingState("specimen");
   const notify = useSnackbar();
-  const [{ formats, algorithms }] = useFeatures();
+  const [{ formats }] = useFeatures();
   const [{ algorithm, start, end, parameters }, setUIState] = useUIState();
   const resolve = useConnectionResolver();
   const [connections] = useConnections();
