@@ -4,6 +4,7 @@ export interface FeatureDescriptor {
   id: string;
   name?: string;
   description?: string;
+  hidden?: boolean;
 }
 
 export interface Feature extends FeatureDescriptor {

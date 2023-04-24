@@ -4,6 +4,7 @@ import { values } from "lodash";
 import { Feature } from "protocol/FeatureQuery";
 import { TraceEventType } from "protocol/Trace";
 import { createSlice } from "./createSlice";
+import { Parameters } from "protocol/SolveTask";
 
 export type PlaybackStateType = "playing" | "paused" | undefined;
 
@@ -19,6 +20,7 @@ export type Map = Partial<
 type InputState = {
   algorithm?: string;
   map?: Map;
+  parameters?: Parameters;
 };
 
 export type Comparator = {

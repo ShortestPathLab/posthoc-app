@@ -24,14 +24,22 @@ export type PathfindingTaskInstance = {
   end?: number;
 };
 
-type PathfindingTaskParams = {
+export type Parameters = {
+  [K in string]: any;
+};
+
+type PathfindingTaskParams<T extends Parameters = {}> = {
   mapURI: MapURI;
   format: string;
   algorithm?: string;
+  parameters?: T;
   instances: PathfindingTaskInstance[];
 };
 
-export type PathfindingTask = SolveTask<"pathfinding", PathfindingTaskParams>;
+export type PathfindingTask<T extends Parameters = {}> = SolveTask<
+  "pathfinding",
+  PathfindingTaskParams<T>
+>;
 
 export type SearchTraceResult = Response<Trace | undefined>;
 

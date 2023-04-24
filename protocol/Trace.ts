@@ -25,6 +25,7 @@ export type NodeStructure<V extends string = string> = {
 
 export type Trace<V extends string = string> = {
   format?: string;
+  map?: string;
   nodeStructure?: NodeStructure<V>[];
   eventList?: TraceEvent<V>[];
 };

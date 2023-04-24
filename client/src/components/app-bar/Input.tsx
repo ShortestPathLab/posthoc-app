@@ -1,12 +1,17 @@
 import { Code as CodeIcon, MapTwoTone as MapIcon } from "@material-ui/icons";
 import { useSnackbar } from "components/generic/Snackbar";
 import { Space } from "components/generic/Space";
-import { find } from "lodash";
+import { find, merge } from "lodash";
+import { useUIState } from "slices/UIState";
 import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
-import { useUIState } from "slices/UIState";
 import { FeaturePicker } from "./FeaturePicker";
-import { custom, upload } from "./upload";
+import {
+  custom as customMap,
+  customTrace,
+  uploadMap,
+  uploadTrace,
+} from "./upload";
 
 export const mapDefaults = { start: undefined, end: undefined };
 
@@ -14,7 +19,7 @@ export function Input() {
   const notify = useSnackbar();
   const [connections] = useConnections();
   const [{ algorithms, maps, formats }] = useFeatures();
-  const [{ algorithm, map }, setUIState] = useUIState();
+  const [{ algorithm, map, parameters }, setUIState] = useUIState();
 
   return (
     <>
@@ -23,7 +28,8 @@ export function Input() {
         label="map"
         value={map?.id}
         items={[
-          custom(map),
+          customTrace(parameters),
+          customMap(map),
           ...maps.map((c) => ({
             ...c,
             description: find(connections, { url: c.source })?.name,
@@ -31,16 +37,45 @@ export function Input() {
         ]}
         onChange={async (v) => {
           switch (v) {
-            case custom().id:
+            case customMap().id:
               try {
-                const f = await upload(formats);
-                if (f) setUIState({ ...mapDefaults, map: f });
+                const f = await uploadMap(formats);
+                if (f) {
+                  setUIState({
+                    ...mapDefaults,
+                    map: f,
+                    algorithm: algorithm ?? "identity",
+                    parameters: {},
+                  });
+                  notify("Solution was cleared because the map changed.");
+                }
+              } catch (e) {
+                notify(`${e}`);
+              }
+              break;
+            case customTrace().id:
+              try {
+                const f2 = await uploadTrace();
+                if (f2) {
+                  setUIState({
+                    parameters: f2,
+                    algorithm: "identity",
+                    start: 0,
+                    end: 0,
+                    map: {
+                      format: f2.format,
+                      content: map?.format === f2.format ? map?.content : " ",
+                      id: "internal/upload",
+                    },
+                  });
+                }
               } catch (e) {
                 notify(`${e}`);
               }
               break;
             default:
               setUIState({ ...mapDefaults, map: find(maps, { id: v }) });
+              notify("Solution was cleared because the map changed.");
               break;
           }
         }}
@@ -54,7 +89,7 @@ export function Input() {
           ...c,
           description: find(connections, { url: c.source })?.name,
         }))}
-        onChange={(v) => setUIState({ algorithm: v })}
+        onChange={async (v) => setUIState({ algorithm: v, parameters: {} })}
       />
     </>
   );

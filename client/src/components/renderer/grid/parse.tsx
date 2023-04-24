@@ -17,7 +17,7 @@ type Options = {
 export const parse = makeMapParser<Options, Structure>(
   (m, { wall = "@" }: Options) => {
     const lines = m.split("\n");
-    const [, h, w, , ...grid] = lines;
+    const [, h = "", w = "", , ...grid] = lines;
     const [width, height] = [w, h].map((d) => +last(d.split(" "))!);
 
     return {
