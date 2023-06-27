@@ -4,13 +4,46 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@pixi/webworker": "^7.2.4",
     "adapter": "file:../adapter",
+    "combinate": "^1.1.11",
+    "eventemitter3": "^5.0.1",
+    "hilbert-curve-ts": "^0.0.14",
+    "lodash": "^4.17.21",
+    "nanoid": "^4.0.2",
+    "pixi-viewport": "^5.0.1",
+    "pixi.js": "^7.2.4",
     "protocol": "file:../protocol",
-    "react": "^18.2.0"
+    "renderer": "file:../renderer",
+    "typed-emitter": "^2.1.0",
+    "typescript-memoize": "^1.1.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.0.24",
+    "@storybook/addon-interactions": "^7.0.24",
+    "@storybook/addon-links": "^7.0.24",
+    "@storybook/blocks": "^7.0.24",
+    "@storybook/react": "^7.0.24",
+    "@storybook/react-vite": "^7.0.24",
+    "@storybook/testing-library": "^0.0.14-next.2",
+    "@types/lodash": "^4.14.195",
+    "@vitest/web-worker": "^0.32.2",
+    "canvas": "^2.11.2",
+    "jest-webgl-canvas-mock": "^2.5.0",
+    "jsdom": "^22.1.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.0.24",
+    "vite-tsconfig-paths": "^4.2.0",
+    "vitest": "^0.32.2",
+    "vitest-canvas-mock": "^0.3.1"
   }
 }
