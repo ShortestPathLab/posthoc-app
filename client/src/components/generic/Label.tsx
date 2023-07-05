@@ -1,4 +1,4 @@
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import { ReactNode } from "react";
 import { Flex } from "./Flex";
 import { Space } from "./Space";

@@ -1,47 +1,98 @@
-import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
+import { BlurOnTwoTone as DisabledIcon } from "@mui/icons-material";
+import { Box, Fade, LinearProgress } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
-import { useState, useCallback, useMemo } from "react";
+import { getParser } from "components/renderer";
+import {
+  RendererProps,
+  SelectEvent as RendererSelectEvent,
+} from "components/renderer/Renderer";
+import { DefaultRenderer } from "components/renderer/default";
+import { every, find, keyBy, some, values } from "lodash";
+import { createElement, useEffect, useRef, useState } from "react";
+import AutoSize from "react-virtualized-auto-sizer";
+import { useLoading } from "slices/loading";
+import { useRenderers } from "slices/renderers";
 import { useSpecimen } from "slices/specimen";
 import { InfoPanel } from "./InfoPanel";
-import { SplitView } from "./SplitPanes";
-
-import { TraceView } from "components/render/renderer";
-
-import { NodesMap } from "components/render/renderer/generic/NodesMap";
-import React from "react";
-import { LoadIndicator } from "./LoadIndicator";
-import { useUIState } from "slices/UIState";
+import { SelectionMenu } from "./SelectionMenu";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
-export const Inspector = React.memo(function Inspector(
-  props: SpecimenInspectorProps
-) {
-  const [{ interlang, eventList }] = useSpecimen();
-  const [showInfo, setShowInfo] = useState(true);
-  const [{ fixed = false }] = useUIState();
-
-  const views = useMemo(() => {
-    const result: { [key: string]: React.ReactNode } = {};
-    if (interlang) {
-      Object.keys(interlang).forEach((viewName) => {
-        result[viewName] = (
-          <TraceView view={interlang?.[viewName]} viewName={viewName} />
-        );
+function TraceRenderer({ renderer, width, height }: RendererProps) {
+  const [renderers] = useRenderers();
+  const { renderer: r2 } = find(renderers, { key: renderer })!;
+  const [{ format, map }] = useSpecimen();
+  const { nodes } = getParser(format)?.(map) ?? { nodes: [] };
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (ref.current) {
+      const r = new r2.constructor();
+      r.setup({
+        tileSubdivision: 0,
+        workerCount: 4,
+        tileResolution: {
+          width: 256,
+          height: 256,
+        },
+        screenSize: {
+          width,
+          height,
+        },
       });
+      const remove = r.add(nodes);
+      ref.current.append(r.getView()!);
+      return () => {
+        r.destroy();
+        ref.current?.removeChild?.(r.getView()!);
+      };
     }
-    return result;
-  }, [interlang]);
+  }, [ref.current, width, height]);
+  return <div ref={ref} />;
+}
+
+export function Inspector(props: SpecimenInspectorProps) {
+  const [loading] = useLoading();
+  const [{ specimen, format, map }] = useSpecimen();
+  const [renderers] = useRenderers();
+  const { nodes } = getParser(format)?.(map) ?? { nodes: [] };
+  const renderer = find(renderers, (r) => {
+    const components = keyBy(r.renderer.meta.components);
+    return every(nodes, (n) => n.$ in components);
+  });
+  const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
+    undefined
+  );
 
   return (
     <>
-      <LoadIndicator />
+      <Fade in={some(values(loading))}>
+        <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
+      </Fade>
       <Flex {...props}>
-        {interlang ? (
+        {specimen ? (
           <Flex>
-            <NodesMap>
-              <SplitView resizable={true} views={views} />
-            </NodesMap>
+            <AutoSize>
+              {(size) => (
+                <Fade appear in>
+                  <Box>
+                    {createElement(renderer ? TraceRenderer : DefaultRenderer, {
+                      ...size,
+                      renderer: renderer?.key,
+                      key: map,
+                      onSelect: setSelection,
+                      selection: selection?.world,
+                    })}
+                  </Box>
+                </Fade>
+              )}
+            </AutoSize>
+            <InfoPanel
+              position="absolute"
+              right={0}
+              height="100%"
+              width="25vw"
+              minWidth={480}
+            />
           </Flex>
         ) : (
           <Flex
@@ -51,21 +102,14 @@ export const Inspector = React.memo(function Inspector(
             vertical
           >
             <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
-            Select a trace to get started.
+            Select a map to get started.
           </Flex>
         )}
-        {eventList ? (
-          <InfoPanel
-            position={fixed ? "relative" : "absolute"}
-            right={fixed ? undefined : "min(-25vw,-480px)"}
-            height="100%"
-            width="25vw"
-            minWidth={480}
-          />
-        ) : (
-          <></>
-        )}
       </Flex>
+      <SelectionMenu
+        selection={selection}
+        onClose={() => setSelection(undefined)}
+      />
     </>
   );
-});
+}

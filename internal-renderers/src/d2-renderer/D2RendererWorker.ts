@@ -1,8 +1,8 @@
-import * as PIXI from "@pixi/webworker";
 import combinate from "combinate";
-import { Dictionary, ceil, floor, range, throttle } from "lodash";
+import { Body, System } from "detect-collisions";
+import { Dictionary, ceil, floor, range, sortBy, throttle } from "lodash";
+import memoizee from "memoizee";
 import type { Bounds } from "protocol";
-import { clear, Memoize as memo } from "typescript-memoize";
 import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 import {
   D2RendererEvents,
@@ -10,18 +10,13 @@ import {
   defaultD2RendererOptions,
 } from "./D2RendererOptions";
 import { EventEmitter } from "./EventEmitter";
-import { draw } from "./compile";
+import { draw } from "./draw";
 import { pointToIndex } from "./pointToIndex";
+import { primitives } from "./primitives";
 
 const { log2, max } = Math;
 
 const z = (x: number) => floor(log2(x));
-
-const memoOptions: Parameters<typeof memo>[0] = {
-  expiring: 1000 * 60,
-  hashFunction: JSON.stringify,
-  tags: ["d2-renderer-cache"],
-};
 
 export type D2WorkerRequest<
   T extends keyof D2RendererWorker = keyof D2RendererWorker
@@ -44,66 +39,65 @@ export type D2WorkerEvent<
   payload: D2WorkerEvents[T];
 };
 
+type BodyWithComponent = Body & {
+  component: CompiledD2IntrinsicComponent;
+  index: number;
+};
+
 export class D2RendererWorker extends EventEmitter<
   D2RendererEvents & {
     message: (event: D2WorkerEvent, transfer: Transferable[]) => void;
   }
 > {
-  #app: PIXI.Application<OffscreenCanvas> = new PIXI.Application({
-    autoStart: false,
-  });
-  #world: PIXI.Container = new PIXI.Container();
   #options: D2RendererOptions = defaultD2RendererOptions;
   #frustum: Bounds = { bottom: 256, top: 0, left: 0, right: 256 };
-  #children: Dictionary<PIXI.Graphics> = {};
+  #system = new System<BodyWithComponent>();
+  #children: Dictionary<BodyWithComponent[]> = {};
 
   getView() {
-    return { app: this.#app, world: this.#world };
+    return { system: this.#system };
   }
 
   setFrustum(frustum: Bounds) {
     this.#frustum = frustum;
-    this.#queueRender();
+    this.#enqueueRender();
+  }
+
+  #count: number = 0;
+
+  #next() {
+    return this.#count++;
   }
 
   add(component: CompiledD2IntrinsicComponent[], id: string) {
-    const g = new PIXI.Graphics();
-    g.name = id;
-    draw(component, g);
-    this.#world.addChild(g);
-    this.#children[id] = g;
+    this.#children[id] = [];
+    for (const c of component) {
+      const body = Object.assign(primitives[c.$].test(c), {
+        component: c,
+        index: this.#next(),
+      });
+      this.#system.insert(body);
+      this.#children[id].push(body);
+    }
     this.#invalidate();
   }
 
   remove(id: string) {
-    this.#children[id].removeFromParent();
+    for (const c of this.#children[id]) {
+      this.#system.remove(c);
+    }
     delete this.#children[id];
     this.#invalidate();
   }
 
   setup(options: D2RendererOptions) {
     this.#options = options;
-    this.#setupPixi(options);
     this.#invalidate();
   }
 
-  #setupPixi(options: D2RendererOptions) {
-    this.#app = new PIXI.Application({
-      autoStart: false,
-      antialias: false,
-      background: ["#03045e", "#023e8a", "#0077b6", "#0096c7"][
-        options.workerIndex
-      ],
-      width: options.tileResolution.width,
-      height: options.tileResolution.height,
-    });
-    this.#world = new PIXI.Container();
-    this.#app.stage.addChild(this.#world);
-  }
-
   #invalidate() {
-    clear(["d2-renderer-cache"]);
-    this.#queueRender();
+    this.renderTile.clear();
+    this.#enqueueRender();
   }
 
   getZoom({ top, left, bottom, right }: Bounds) {
@@ -111,7 +105,7 @@ export class D2RendererWorker extends EventEmitter<
     return max(z(right - left), z(bottom - top)) - tileSubdivision;
   }
 
-  render() {
+  async render() {
     const zoom = this.getZoom(this.#frustum);
     const order = 2 ** zoom;
     const tiles = {
@@ -126,7 +120,7 @@ export class D2RendererWorker extends EventEmitter<
     })) {
       if (this.#shouldRender(x, y)) {
         const bounds = this.getTileBounds(x, y, zoom);
-        const bitmap = this.renderTile(bounds);
+        const bitmap = await createImageBitmap(this.renderTile(bounds));
         this.emit(
           "message",
           {
@@ -142,10 +136,14 @@ export class D2RendererWorker extends EventEmitter<
     }
   }
 
-  #queueRender = throttle(() => this.render(), this.#options.refreshInterval, {
-    leading: false,
-    trailing: true,
-  });
+  #enqueueRender = throttle(
+    () => this.render(),
+    this.#options.refreshInterval,
+    {
+      leading: false,
+      trailing: true,
+    }
+  );
 
   #shouldRender(x: number, y: number) {
     const { workerCount, workerIndex } = this.#options;
@@ -164,21 +162,38 @@ export class D2RendererWorker extends EventEmitter<
     } as Bounds;
   }
 
-  // @memo(memoOptions)
-  renderTile(bounds: Bounds) {
+  renderTile = memoizee((b: Bounds) => this.#renderTile(b), {
+    normalizer: JSON.stringify,
+    max: 50,
+  });
+
+  #renderTile(bounds: Bounds) {
     const { top, right, bottom, left } = bounds;
     const { tileResolution: tile } = this.#options;
     const scale = {
       x: tile.width / (right - left),
       y: tile.height / (bottom - top),
     };
-    this.#world?.setTransform?.(
-      -left * scale.x,
-      -top * scale.y,
-      scale.x,
-      scale.y
-    );
-    this.#app.render();
-    return this.#app.view.transferToImageBitmap();
+    const g = new OffscreenCanvas(tile.width, tile.height);
+    const ctx = g.getContext("2d", { alpha: false })!;
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = this.#options.backgroundColor;
+    ctx.fillRect(0, 0, tile.width, tile.height);
+    for (const { component } of sortBy(
+      this.#system.search({
+        minX: left,
+        maxX: right,
+        maxY: bottom,
+        minY: top,
+      }),
+      "index"
+    )) {
+      draw(component, ctx, {
+        scale,
+        x: -left * scale.x,
+        y: -top * scale.y,
+      });
+    }
+    return g.transferToImageBitmap();
   }
 }

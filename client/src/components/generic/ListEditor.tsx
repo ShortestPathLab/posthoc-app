@@ -10,13 +10,13 @@ import {
   Switch,
   Typography,
   useTheme,
-} from "@material-ui/core";
+} from "@mui/material";
 import {
   Add,
   DeleteOutlined as DeleteIcon,
   EditOutlined as EditIcon,
   LabelOutlined as LabelIcon,
-} from "@material-ui/icons";
+} from "@mui/icons-material";
 import { filter, map, sortBy, uniqBy } from "lodash";
 import { nanoid as id } from "nanoid";
 import {

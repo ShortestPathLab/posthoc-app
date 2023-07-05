@@ -1,5 +1,6 @@
-import { Button, Tooltip } from "@material-ui/core";
-import { BugReportTwoTone as BugIcon } from "@material-ui/icons";
+import { Button, Tooltip } from "@mui/material";
+import { BugReportTwoTone as BugIcon } from "@mui/icons-material";
+import { DebugOptionsEditor } from "components/debug-options-editor/DebugOptionsEditor";
 import {
   AppBarTitle as Title,
   ManagedModal as Dialog,
@@ -14,20 +15,20 @@ export function Utility() {
       <Dialog
         trigger={(onClick) => (
           <Tooltip title="Debug Options">
-            <span>
-              <Button
-                {...{ onClick }}
-                disabled={!specimen}
-                startIcon={<BugIcon />}
-              >
-                Debug
-              </Button>
-            </span>
+            <Button
+              {...{ onClick }}
+              disabled={!specimen}
+              startIcon={<BugIcon />}
+            >
+              Debug
+            </Button>
           </Tooltip>
         )}
         options={{ width: 960, scrollable: false }}
         appBar={{ children: <Title>Debug Options</Title> }}
-      ></Dialog>
+      >
+        <DebugOptionsEditor />
+      </Dialog>
     </>
   );
 }

@@ -4,7 +4,7 @@ import {
   TextField,
   TextFieldProps,
   Tooltip,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { findIndex, map, max } from "lodash";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
@@ -14,7 +14,7 @@ type Key = string | number;
 
 export type SelectProps<T extends Key> = {
   trigger?: (props: ReturnType<typeof bindTrigger>) => ReactElement;
-  items?: { value: T; label?: ReactNode }[];
+  items?: { value: T; label?: ReactNode; disabled?: boolean }[];
   value?: T;
   onChange?: (value: T) => void;
   placeholder?: string;
@@ -50,8 +50,9 @@ export function Select<T extends string>({
               horizontal: "center",
             }}
           >
-            {map(items, ({ value: v, label }) => (
+            {map(items, ({ value: v, label, disabled }) => (
               <MenuItem
+                disabled={disabled}
                 key={v}
                 value={v}
                 selected={v === value}

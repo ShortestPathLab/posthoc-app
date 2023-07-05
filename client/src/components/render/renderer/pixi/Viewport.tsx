@@ -3,7 +3,7 @@
  * @author roxgarage
  */
 
-import { PixiComponent, useApp } from "@inlet/react-pixi";
+import { PixiComponent, useApp } from "@pixi/react";
 import { map } from "lodash";
 import * as PIXI from "pixi.js";
 import React, { ComponentProps, forwardRef } from "react";

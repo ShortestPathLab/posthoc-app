@@ -2,13 +2,15 @@
  * Search Trace format definition
  */
 
-export type TraceEventType =  
-    "source" 
-  | "destination" 
-  | "generating" 
+export type Properties = { [K in string]: any };
+
+export type TraceEventType =
+  | "source"
+  | "destination"
+  | "generating"
   | "updating"
-  | "closing" 
-  | "expanding" 
+  | "closing"
+  | "expanding"
   | "end";
 
 export type TraceEvent = {
@@ -18,32 +20,37 @@ export type TraceEvent = {
   f?: number;
   g?: number;
   h?: number;
-  [key: string] : any;
-}
-
-export type TraceComponent = {
-  "$": string;
   [key: string]: any;
-}
+};
 
-export type TraceComponents = {
-  [key: string]: TraceComponent[];
-}
+export type TraceComponent<
+  T extends string = string,
+  U extends Properties = Properties
+> = U & {
+  $: T;
+};
+
+export type TraceComponents<
+  T extends string = string,
+  U extends Properties = Properties
+> = {
+  [K in string]: TraceComponent<T, U>[];
+};
 
 export type TraceContext = {
   [key: string]: any;
-}
+};
 
 export type TraceView = {
   renderer?: string;
   components?: TraceComponent[];
   persist?: boolean;
-}
+};
 
 export type TraceViews = {
   main?: TraceView;
   [key: string]: TraceView | undefined;
-}
+};
 
 export type NodeStructure<V extends string = string> = {
   type?: string;

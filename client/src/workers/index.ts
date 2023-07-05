@@ -1,4 +1,14 @@
-import Worker from "./hash.worker?worker";
+import hashWorkerUrl from "./hash.worker.ts?worker&url";
+import ipcWorkerUrl from "./ipc.worker.ts?worker&url";
 
-export const HashWorker = new Worker();
-export const IPCWorker = new Worker();
+export class HashWorker extends Worker {
+  constructor() {
+    super(hashWorkerUrl, { type: "module" });
+  }
+}
+
+export class IPCWorker extends Worker {
+  constructor() {
+    super(ipcWorkerUrl, { type: "module" });
+  }
+}

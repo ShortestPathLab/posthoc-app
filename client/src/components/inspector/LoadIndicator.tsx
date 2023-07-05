@@ -1,5 +1,5 @@
 import { useLoading } from "slices/loading";
-import { Fade, LinearProgress } from "@material-ui/core";
+import { Fade, LinearProgress } from "@mui/material";
 import { some, values } from "lodash";
 
 export function LoadIndicator() {

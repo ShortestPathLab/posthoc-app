@@ -2,7 +2,7 @@ import { Flex } from "./Flex";
 import {
   Typography as Type,
   TypographyProps as TypeProps,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Space } from "./Space";
 import { ReactNode } from "react";
 

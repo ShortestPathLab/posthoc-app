@@ -4,7 +4,7 @@ import {
   SkipNextOutlined as ForwardIcon,
   SkipPreviousOutlined as PreviousIcon,
   StopOutlined as StopIcon,
-} from "@material-ui/icons";
+} from "@mui/icons-material";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
 

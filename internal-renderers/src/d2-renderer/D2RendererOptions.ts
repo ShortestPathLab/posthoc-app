@@ -20,6 +20,7 @@ export type D2RendererOptions = RendererOptions & {
   workerCount: number;
   workerIndex: number;
   refreshInterval: number;
+  backgroundColor: string;
 };
 
 export const defaultD2RendererOptions: D2RendererOptions = {
@@ -33,6 +34,7 @@ export const defaultD2RendererOptions: D2RendererOptions = {
   },
   tileSubdivision: 0,
   refreshInterval: 1000 / 48,
+  backgroundColor: "#ffffff",
 };
 
 export type D2RendererEvents = RendererEvents & {};

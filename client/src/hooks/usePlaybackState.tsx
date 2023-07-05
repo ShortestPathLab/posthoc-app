@@ -4,12 +4,12 @@ import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 
 export function usePlaybackState() {
-  const [{ eventList }] = useSpecimen();
+  const [{ specimen }] = useSpecimen();
   const [{ playback, step = 0 }, setUIState] = useUIState();
 
-  const ready = !!eventList;
+  const ready = !!specimen;
   const playing = playback === "playing";
-  const [start, end] = [0, (eventList?.length ?? 1) - 1];
+  const [start, end] = [0, (specimen?.eventList?.length ?? 1) - 1];
 
   return useMemo(() => {
     const state = {
@@ -29,8 +29,8 @@ export function usePlaybackState() {
       play: () => setUIState({ playback: "playing", step: stepBy(1) }),
       pause: (n = 0) => setUIState({ playback: "paused", step: stepBy(n) }),
       stop: () => setUIState({ step: start, playback: "paused" }),
-      stepForward: () => setUIState({ playback: "paused", step: stepBy(1) }),
-      stepBackward: () => setUIState({ playback: "paused", step: stepBy(-1) }),
+      stepForward: () => setUIState({ step: stepBy(1) }),
+      stepBackward: () => setUIState({ step: stepBy(-1) }),
       tick: (n = 1) => setUIState({ playback: "playing", step: stepBy(n) }),
     };
 

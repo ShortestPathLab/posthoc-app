@@ -1,5 +1,5 @@
 import { createElement, useMemo } from "react";
-import { Box, Fade } from "@material-ui/core";
+import { Box, Fade } from "@mui/material";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Canvas } from "components/render/renderer/types";
 import { LazyNodeList } from "components/render/renderer/generic/NodeList";

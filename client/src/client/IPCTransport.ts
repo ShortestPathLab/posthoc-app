@@ -5,11 +5,11 @@ import { IPCWorker } from "workers";
 import { Transport, TransportOptions } from "./Transport";
 
 export class IPCTransport implements Transport {
-  worker: typeof IPCWorker;
+  worker: IPCWorker;
   rpc: JSONRPCClient;
 
   constructor(readonly options: TransportOptions) {
-    this.worker = IPCWorker;
+    this.worker = new IPCWorker();
     this.rpc = new JSONRPCClient(async (request: Request) => {
       const listener = ({ data }: MessageEvent<Response>) => {
         if (data.id === request.id) {

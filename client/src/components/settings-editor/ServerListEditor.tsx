@@ -1,5 +1,5 @@
-import { Button } from "@material-ui/core";
-import { ReplayOutlined as ResetIcon } from "@material-ui/icons";
+import { Button } from "@mui/material";
+import { ReplayOutlined as ResetIcon } from "@mui/icons-material";
 import { defaultTransport } from "client";
 import { ListEditor } from "components/generic/ListEditor";
 import { debounce } from "lodash";
@@ -7,15 +7,14 @@ import { defaultRemotes, Remote, useSettings } from "slices/settings";
 import { ServerEditor } from "./ServerEditor";
 
 export function ServerListEditor() {
-  const [settings, setSettings] = useSettings();
-  const { remote } = settings;
+  const [{ remote }, setSettings] = useSettings();
   return (
     <>
       <ListEditor<Remote>
         editor={(v) => <ServerEditor value={v} />}
         icon={null}
         value={remote}
-        onChange={debounce((v) => setSettings({ ...settings, remote: v }), 300)}
+        onChange={debounce((v) => setSettings({ remote: v }), 300)}
         addItemLabel="Add Solver"
         create={() => ({
           transport: defaultTransport,
@@ -26,7 +25,7 @@ export function ServerListEditor() {
           <Button
             startIcon={<ResetIcon />}
             sx={{ ml: 2 }}
-            onClick={() => setSettings({ ...settings, remote: defaultRemotes })}
+            onClick={() => setSettings({ remote: defaultRemotes })}
           >
             Reset to Defaults
           </Button>

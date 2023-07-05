@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import * as React from "react";
-import { Stage } from "@inlet/react-pixi";
+import { Stage } from "@pixi/react";
 
 import { Nodes, View } from "protocol/Render";
 import { Viewport } from "./Viewport";
@@ -20,13 +20,13 @@ import {
   SplitViewContext,
   useViewContext,
 } from "components/inspector/SplitPanes";
-import { useTheme } from "@material-ui/core";
+import { useTheme } from "@mui/material";
 import { hex } from "components/renderer/colors";
 import { TraceComponent, TraceEventType } from "protocol/Trace";
 import { coloursToHex } from "../generic/colours";
 import { useNodesMap } from "../generic/NodesMap";
 import { get, set } from "lodash";
-import { CompressOutlined } from "@material-ui/icons";
+import { CompressOutlined } from "@mui/icons-material";
 
 export type PixiStageProps = {
   width?: number;

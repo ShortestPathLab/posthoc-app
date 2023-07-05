@@ -1,16 +1,7 @@
-import {
-  BoxProps,
-  Button,
-  Fade,
-  Tooltip,
-  ToggleButton,
-  Paper,
-  alpha,
-  Box,
-  darken,
-} from "@material-ui/core";
-import { SortTwoTone as StepsIcon } from "@material-ui/icons";
-import { TabContext, TabPanel } from "@material-ui/lab";
+import { BoxProps, Button, Fade, Tooltip } from "@mui/material";
+import { SortTwoTone as StepsIcon } from "@mui/icons-material";
+import { TabContext, TabPanel } from "@mui/lab";
+import { alpha, Box } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { PlaceholderCard } from "components/generic/PlaceholderCard";
 import { Toolbar } from "components/generic/Toolbar";
@@ -18,12 +9,9 @@ import { startCase } from "lodash";
 import { useState } from "react";
 import { useUIState } from "slices/UIState";
 import { EventListInspector } from "./EventListInspector";
-import RightArrowIcon from "@material-ui/icons/ChevronRight";
-import LeftArrowIcon from "@material-ui/icons/ChevronLeft";
 
 export function InfoPanel(props: BoxProps) {
-  const [uiState, setUIState] = useUIState();
-  const { playback, fixed = false } = uiState;
+  const [{ playback }] = useUIState();
   const [tab, setTab] = useState("steps");
   return (
     <TabContext value={tab}>
@@ -31,47 +19,28 @@ export function InfoPanel(props: BoxProps) {
         vertical
         sx={{
           pointerEvents: "none",
-          transition: ({ transitions }) => transitions.create(["background"]),
-          bgcolor: ({ palette }) => darken(palette.background.default, 0.06),
+          transition: ({ transitions }) => transitions.create("background"),
+          bgcolor: ({ palette }) =>
+            tab ? alpha(palette.background.default, 0.94) : "transparent",
         }}
         alignItems="center"
-        position="relative"
         {...props}
       >
-        <ToggleButton
-          value="fixed"
-          selected={!fixed}
-          sx={{
-            position: "absolute",
-            left: -40,
-            top: "50%",
-            pointerEvents: "auto",
-            zIndex: 10,
-            border: 0,
-          }}
-          onChange={() => {
-            setUIState({ ...uiState, fixed: !fixed });
-          }}
-        >
-          {fixed ? <RightArrowIcon /> : <LeftArrowIcon />}
-        </ToggleButton>
         <Toolbar>
           {[
             { icon: <StepsIcon />, key: "steps" },
             { key: "info" },
             { key: "parameters" },
           ].map(({ key, icon }) => (
-            <Tooltip key={key} title={startCase(key)}>
-              <span>
-                <Button
-                  onClick={() => setTab(key === tab ? "" : key)}
-                  color="primary"
-                  variant={key === tab ? "contained" : "text"}
-                  startIcon={icon}
-                >
-                  {startCase(key)}
-                </Button>
-              </span>
+            <Tooltip title={startCase(key)}>
+              <Button
+                onClick={() => setTab(key === tab ? "" : key)}
+                color="primary"
+                variant={key === tab ? "contained" : "text"}
+                startIcon={icon}
+              >
+                {startCase(key)}
+              </Button>
             </Tooltip>
           ))}
         </Toolbar>
@@ -96,7 +65,6 @@ export function InfoPanel(props: BoxProps) {
           },
         ].map(({ content, key }) => (
           <TabPanel
-            key={key}
             value={key}
             sx={{ pointerEvents: "all", flex: 1, p: 0, width: "100%" }}
           >

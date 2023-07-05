@@ -1,15 +1,15 @@
-import { TypographyVariant } from "@material-ui/core";
+import { TypographyVariant } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { Property } from "components/generic/Property";
-import { Event } from "protocol/Render";
 import { entries, filter, map } from "lodash";
+import { TraceEvent } from "protocol/Trace";
 
 export function PropertyList({
   event,
   variant = "body2",
   ...props
 }: {
-  event?: Event;
+  event?: TraceEvent<string>;
   variant?: TypographyVariant;
 } & FlexProps) {
   return (
@@ -26,7 +26,7 @@ export function PropertyList({
           ([, v]) => v !== undefined
         ),
         ([k, v]) => (
-          <Property key={k} label={k} value={v} type={{ variant }} />
+          <Property label={k} value={v} type={{ variant }} />
         )
       )}
     </Flex>

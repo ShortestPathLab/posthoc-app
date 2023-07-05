@@ -1,11 +1,8 @@
-import "vitest-canvas-mock";
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render } from "@testing-library/react";
 import { Title } from "./Title";
 
 describe("Title", () => {
-  it("renders", () => {
-    render(<Title />);
-    expect(screen.getByText("PFAlgoViz")).toBeDefined();
+  it("renders correctly", () => {
+    expect(render(<Title />).getByText("PFAlgoViz")).toBeInTheDocument();
   });
 });

@@ -1,13 +1,25 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import viteTsconfigPaths from 'vite-tsconfig-paths';
-import svgrPlugin from 'vite-plugin-svgr';
+/// <reference types="vitest" />
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react(), viteTsconfigPaths(), svgrPlugin()],
-  server: {
-    open: true
+import path from "path";
+import { UserConfig } from "vite";
+import viteTsconfigPaths from "vite-tsconfig-paths";
+import react from "@vitejs/plugin-react";
+
+export default {
+  root: path.join(process.cwd(), "./src"),
+  plugins: [react(), viteTsconfigPaths()],
+  test: {
+    globals: true,
+    deps: {
+      inline: ["vitest-canvas-mock"],
+    },
+    threads: false,
+    setupFiles: "./setupTests.ts",
+    environment: "jsdom",
+    environmentOptions: {
+      jsdom: {
+        resources: "usable",
+      },
+    },
   },
-  base: ''
-});
+} as UserConfig;

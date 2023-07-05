@@ -7,8 +7,8 @@ import {
   Toolbar,
   Typography,
   useTheme,
-} from "@material-ui/core";
-import { ArrowBack } from "@material-ui/icons";
+} from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
 import { ResizeSensor } from "css-element-queries";
 import PopupState from "material-ui-popup-state";
 import {
@@ -32,7 +32,6 @@ export function AppBarTitle({ children }: { children?: ReactNode }) {
 export type Props = {
   children?: ReactNode;
   actions?: ReactNode;
-  open?: boolean;
   width?: number;
   height?: string | number;
   onTarget?: (target: HTMLDivElement | null) => void;
@@ -249,19 +248,16 @@ export function ManagedModal({
   children,
 }: {
   options?: Props;
-  trigger?: (
-    onClick: (e: SyntheticEvent<any, Event>) => void,
-    setOpen?: (open: boolean) => void
-  ) => ReactElement;
+  trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void) => ReactElement;
   appBar?: ModalAppBarProps;
   children?: ReactNode;
 }) {
   return (
     <PopupState variant="popover">
-      {({ open, close, isOpen, setOpen }) => {
+      {({ open, close, isOpen }) => {
         return (
           <>
-            {cloneElement(trigger(open, setOpen))}
+            {cloneElement(trigger(open))}
             <Modal open={isOpen} onClose={close} {...ModalProps}>
               <ModalAppBar onClose={close} {...ModalAppBarProps} />
               {children ?? ModalProps?.children}

@@ -1,4 +1,4 @@
-import { Code as CodeIcon, MapTwoTone as MapIcon } from "@material-ui/icons";
+import { Code as CodeIcon, MapTwoTone as MapIcon } from "@mui/icons-material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { Space } from "components/generic/Space";
 import { find } from "lodash";

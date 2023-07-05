@@ -1,5 +1,5 @@
-import { IconButton, Snackbar } from "@material-ui/core";
-import { CloseOutlined as CloseIcon } from "@material-ui/icons";
+import { IconButton, Snackbar } from "@mui/material";
+import { CloseOutlined as CloseIcon } from "@mui/icons-material";
 import { noop } from "lodash";
 import {
   createContext,

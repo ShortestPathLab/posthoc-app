@@ -1,4 +1,4 @@
-import { Card, CardProps, Typography } from "@material-ui/core";
+import { Card, CardProps, Typography } from "@mui/material";
 
 export function PlaceholderCard({ sx, children, ...props }: CardProps) {
   return (

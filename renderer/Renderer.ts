@@ -39,12 +39,25 @@ export interface Renderer<
 
 type RendererMetadata = FeatureDescriptor & {
   components: string[];
+  version?: string;
+};
+
+export type RendererDefinition<
+  T extends RendererOptions,
+  U extends RendererEvents,
+  V extends CompiledComponent<any, any>
+> = {
+  constructor: new () => Renderer<T, U, V>;
+  meta: RendererMetadata;
 };
 
 export function makeRenderer<
   T extends RendererOptions,
   U extends RendererEvents,
   V extends CompiledComponent<any, any>
->(Renderer: new () => Renderer<T, U, V>, options: RendererMetadata) {
-  return { Renderer: Renderer, meta: options };
+>(
+  Renderer: new () => Renderer<T, U, V>,
+  options: RendererMetadata
+): RendererDefinition<T, U, V> {
+  return { constructor: Renderer, meta: options };
 }

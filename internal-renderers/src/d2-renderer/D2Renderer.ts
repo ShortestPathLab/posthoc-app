@@ -1,4 +1,4 @@
-import { ceil, filter, get, map, set, throttle, times } from "lodash";
+import { map, throttle, times } from "lodash";
 import { nanoid } from "nanoid";
 import { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
@@ -14,15 +14,7 @@ import {
 import { D2WorkerEvent } from "./D2RendererWorker";
 import { D2RendererWorkerAdapter } from "./D2RendererWorkerAdapter";
 import { EventEmitter } from "./EventEmitter";
-
-function intersect(r1: Bounds, r2: Bounds) {
-  return !(
-    r2.left >= r1.right ||
-    r2.right <= r1.left ||
-    r2.top >= r1.bottom ||
-    r2.bottom <= r1.top
-  );
-}
+import { intersect } from "./intersect";
 
 class Tile extends PIXI.Sprite {
   constructor(texture?: PIXI.Texture, public bounds?: Bounds) {
@@ -70,8 +62,7 @@ class D2Renderer
 
   #setupPixi(options: D2RendererOptions) {
     this.#app = new PIXI.Application({
-      clearBeforeRender: false,
-      background: "#caf0f8",
+      background: "#ffffff",
       width: options.screenSize.width,
       height: options.screenSize.height,
     });
@@ -109,8 +100,11 @@ class D2Renderer
     map(this.#workers, (w) => w.terminate());
     this.#workers = times(options.workerCount, (i) => {
       const worker = new D2RendererWorkerAdapter();
-      worker.call("setup", [{ ...options, workerIndex: i }]);
       worker.on("update", (e) => this.#handleUpdate(e));
+      worker.onerror = (e) => {
+        throw e;
+      };
+      worker.call("setup", [{ ...options, workerIndex: i }]);
       return worker;
     });
   }
@@ -159,6 +153,9 @@ class D2Renderer
 export default makeRenderer(D2Renderer, {
   components: ["rect", "circle", "path", "polygon"],
   id: "d2-renderer",
+  name: "Pixi",
+  description: "Provides 2D Visualisation Support",
+  version: "1.0.0",
 });
 
 // change options like color and schema

@@ -1,14 +1,14 @@
-import { IconButton, IconButtonProps, Tooltip } from "@material-ui/core";
+import { IconButton, IconButtonProps, Tooltip } from "@mui/material";
 import { startCase } from "lodash";
 import { ReactNode } from "react";
 
 type IconButtonWithTooltipProps = {
-  label?: string;
-  icon?: ReactNode;
+  label: string;
+  icon: ReactNode;
 } & IconButtonProps;
 
 export function IconButtonWithTooltip({
-  label = "default",
+  label,
   icon,
   ...rest
 }: IconButtonWithTooltipProps) {

@@ -50,6 +50,11 @@ export type IntrinsicOnlyComponentDefinition<T extends IntrinsicComponentMap> =
 export type ParsedComponentDefinition<T extends IntrinsicComponentMap> =
   ParsedComponent<Extract<keyof T, string>, T[keyof T]>[];
 
+export type ComponentDefinition<
+  T extends string,
+  U extends Properties = Properties
+> = TraceComponent<T, U>[];
+
 export type ComponentDefinitionMap<
   T extends string = string,
   U extends Properties = Properties

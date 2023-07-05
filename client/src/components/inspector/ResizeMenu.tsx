@@ -1,5 +1,5 @@
-import { Box, Card } from "@material-ui/core";
-import { MapOutlined as MapIcon } from "@material-ui/icons";
+import { Box, Card } from "@mui/material";
+import { MapOutlined as MapIcon } from "@mui/icons-material";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
 import { useAcrylic } from "theme";
 

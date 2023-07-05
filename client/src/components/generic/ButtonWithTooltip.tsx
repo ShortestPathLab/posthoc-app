@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Tooltip } from "@material-ui/core";
+import { Button, ButtonProps, Tooltip } from "@mui/material";
 import { startCase } from "lodash";
 
 type ButtonWithTooltipProps = {

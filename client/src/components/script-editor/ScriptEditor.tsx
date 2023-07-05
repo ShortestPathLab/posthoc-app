@@ -1,4 +1,4 @@
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress } from "@mui/material";
 import Editor from "@monaco-editor/react";
 import { Flex } from "components/generic/Flex";
 import { debounce } from "lodash";

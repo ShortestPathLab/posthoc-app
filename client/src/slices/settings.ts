@@ -7,14 +7,18 @@ export type Remote = {
   disabled?: boolean;
 };
 
+export type Renderer = {
+  url: string;
+  key: string;
+  transport: string;
+  disabled?: boolean;
+};
+
 type Settings = {
   remote?: Remote[];
+  renderer?: Renderer[];
   playbackRate?: number;
-  cacheSize?: number;
   acrylic?: boolean;
-  convert?: boolean;
-  dark: boolean;
-  followSystemDark: boolean;
 };
 
 const DEV_PORT = 8001;
@@ -37,15 +41,21 @@ export const defaultRemotes = [
   },
 ];
 
+export const defaultRenderers = [
+  {
+    url: `internal://d2-renderer/`,
+    key: "d2-renderer",
+    transport: "native",
+  },
+];
+
 export const defaultPlaybackRate = 4;
 
 export const [useSettings, SettingsProvider] = createSlice<Settings>(
   {
+    renderer: defaultRenderers,
     remote: defaultRemotes,
     playbackRate: defaultPlaybackRate,
-    cacheSize: 500,
-    dark: false,
-    followSystemDark: true,
   },
   withLocalStorage("settings")
 );

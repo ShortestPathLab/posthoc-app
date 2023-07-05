@@ -1,4 +1,4 @@
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import { chain as _, entries, identity, merge } from "lodash";
 import React, { Reducer, useContext, useReducer } from "react";
 import { SplitPane } from "react-multi-split-pane";

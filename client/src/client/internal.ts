@@ -23,14 +23,35 @@ export const internal: Dictionary<Transport["call"]> = {
       case "features/formats":
         return [
           {
-            id: "json",
-            name: "Search Trace",
+            id: "grid",
+            name: "Grid",
+          },
+          {
+            id: "xy",
+            name: "Network",
+          },
+          {
+            id: "mesh",
+            name: "Mesh",
+          },
+        ];
+      case "features/algorithms":
+        return [
+          {
+            id: "identity",
+            name: "Unknown",
+            hidden: true,
           },
         ];
       case "solve/pathfinding":
-        const { mapURI } = (params as PathfindingTask["params"])!;
-        const { scheme, content } = parseURI(mapURI);
-        if (["map:", "trace:"].includes(scheme)) return JSON.parse(content);
+        const { parameters } = (params as PathfindingTask<{
+          content?: string;
+        }>["params"])!;
+        try {
+          return JSON.parse(parameters?.content ?? "");
+        } catch {
+          return {};
+        }
     }
   },
 };

@@ -9,7 +9,7 @@ import {
   MenuList,
   Paper,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { ClickInfo } from "components/render/renderer/generic/NodesMap";
 
 export type NodePopupProps = ClickInfo;

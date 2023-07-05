@@ -4,6 +4,7 @@ import { values } from "lodash";
 import { Feature } from "protocol/FeatureQuery";
 import { TraceEventType } from "protocol/Trace";
 import { createSlice } from "./createSlice";
+import { Parameters } from "protocol/SolveTask";
 
 export type PlaybackStateType = "playing" | "paused" | undefined;
 
@@ -16,9 +17,10 @@ export type Map = Partial<
   }
 >;
 
-type SelectState = {
+type InputState = {
   algorithm?: string;
   map?: Map;
+  parameters?: Parameters;
 };
 
 export type Comparator = {
@@ -47,15 +49,10 @@ type SpecimenState = {
   end?: number;
 };
 
-type InfoPanelState = {
-  fixed?: boolean;
-};
-
-export type UIState = SelectState &
+export type UIState = InputState &
   PlaybackState &
   DebugOptionsState &
-  SpecimenState &
-  InfoPanelState;
+  SpecimenState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,

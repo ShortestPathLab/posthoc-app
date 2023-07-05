@@ -6,7 +6,7 @@ export default {
   component: D2RendererComponent,
   tags: ["autodocs"],
   argTypes: {
-    resolution: { control: { type: "range", min: 1, max: 3, step: 1 } },
+    resolution: { control: { type: "range", min: 0, max: 3, step: 1 } },
     threads: { control: { type: "number", min: 1, max: 64, step: 1 } },
     tileSize: { control: { type: "number", min: 1, max: 512, step: 1 } },
   },

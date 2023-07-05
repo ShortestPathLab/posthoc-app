@@ -1,4 +1,4 @@
-import { Button, Typography as Type } from "@material-ui/core";
+import { Button, Typography as Type } from "@mui/material";
 import { Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";
 import { find, map, startCase } from "lodash";
@@ -23,7 +23,7 @@ export function FeaturePicker({ label, value, onChange, items, icon }: Props) {
           {selected?.name ?? label}
         </Button>
       )}
-      items={map(items, ({ id, name, description }) => ({
+      items={map(items, ({ id, name, description, hidden }) => ({
         value: id,
         label: (
           <>
@@ -34,6 +34,7 @@ export function FeaturePicker({ label, value, onChange, items, icon }: Props) {
             </Type>
           </>
         ),
+        disabled: hidden,
       }))}
       value={selected?.id}
       onChange={onChange}

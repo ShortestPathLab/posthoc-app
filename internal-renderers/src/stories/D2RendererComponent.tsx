@@ -2,11 +2,11 @@ import { useEffect, useRef } from "react";
 import { D2Renderer } from "d2-renderer";
 import { times } from "lodash";
 
-const { meta, Renderer } = D2Renderer;
+const { meta, constructor } = D2Renderer;
 
 export function D2RendererComponent({
   resolution = 0,
-  threads = 4,
+  threads = 1,
   tileSize = 256,
 }: {
   resolution?: number;
@@ -16,7 +16,7 @@ export function D2RendererComponent({
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (ref.current) {
-      const r = new Renderer();
+      const r = new constructor();
       r.setup({
         tileSubdivision: resolution,
         workerCount: threads,
@@ -56,8 +56,19 @@ export function D2RendererComponent({
           $: "rect",
           x: 128 - 16,
           y: 128 - 16,
-          width: 16,
-          height: 16,
+          width: 32,
+          height: 32,
+          alpha: 1,
+          fill: "#ffff00",
+          fontSize: 16,
+          text: "",
+        },
+        {
+          $: "rect",
+          x: 128 - 32,
+          y: 128 - 32,
+          width: 8,
+          height: 8,
           alpha: 1,
           fill: "#ffff00",
           fontSize: 16,
@@ -83,7 +94,7 @@ export function D2RendererComponent({
           width: 16,
           height: 16,
           alpha: 1,
-          fill: "#000000",
+          fill: "#555555",
           fontSize: 16,
           text: "",
         }))

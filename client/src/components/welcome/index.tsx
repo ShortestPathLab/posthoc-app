@@ -4,7 +4,7 @@ import {
   CardActionArea,
   CardContent,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import axios from "axios";
 import { Flex } from "components/generic/Flex";
 import { useSnackbar } from "components/generic/Snackbar";

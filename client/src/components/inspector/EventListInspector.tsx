@@ -1,5 +1,5 @@
-import { CircularProgress } from "@material-ui/core";
-import { SortOutlined as ListIcon } from "@material-ui/icons";
+import { CircularProgress } from "@mui/material";
+import { SortOutlined as ListIcon } from "@mui/icons-material";
 import { Flex } from "components/generic/Flex";
 import {
   LazyList as List,
@@ -36,7 +36,7 @@ function Placeholder() {
 export function EventListInspector(props: ListProps<TraceEvent>) {
   const [loading] = useLoading();
   const [{ step = 0, playback }] = useUIState();
-  const [{ eventList }] = useSpecimen();
+  const [{ specimen }] = useSpecimen();
   const ref = useRef<ListHandle | null>(null);
 
   useEffect(() => {
@@ -53,14 +53,15 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
       );
     }
   }, [step, playback]);
+
   return (
     <Flex vertical alignItems="center">
-      {loading.map ? (
+      {loading.map || loading.specimen ? (
         <CircularProgress />
-      ) : eventList?.length ? (
+      ) : specimen?.eventList?.length ? (
         <List
           {...props}
-          items={eventList}
+          items={specimen?.eventList}
           listOptions={{ ref }}
           renderItem={(item, i) => (
             <Flex p={2} pt={i ? 0 : 2}>

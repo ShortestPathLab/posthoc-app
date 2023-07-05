@@ -6,7 +6,6 @@ type Loading = {
   map?: boolean;
   connections?: boolean;
   features?: boolean;
-  interlang?: boolean;
 };
 
 export const [useLoading, LoadingProvider] = createSlice<Loading>({});
