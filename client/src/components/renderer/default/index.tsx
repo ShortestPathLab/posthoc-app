@@ -18,3 +18,5 @@ export function DefaultRenderer({ width, height }: RendererProps) {
     </Flex>
   );
 }
+
+export { Loader } from "./Loader";

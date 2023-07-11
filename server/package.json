@@ -17,6 +17,7 @@
     "json-rpc-2.0": "^0.2.18",
     "lodash": "^4.17.21",
     "lru-cache": "^6.0.0",
+    "lz-string": "^1.5.0",
     "md5": "^2.3.0",
     "pathfinding-binaries": "github:path-visualiser/pathfinding#binaries",
     "protocol": "file:../protocol",

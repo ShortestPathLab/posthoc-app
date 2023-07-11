@@ -5,9 +5,10 @@ import { NodeMatcher } from "./NodeMatcher";
 import { Point } from "./Size";
 import { Bounds, Scale } from "./Size";
 
-export type MapParser = (map?: string, options?: any) => MapInfo;
+export type MapParser = (map?: string, options?: any) => Promise<MapInfo>;
 
 export type MapInfo = {
+  log: string[];
   bounds: Bounds;
   nodes: TraceComponent[];
   snap: (point: Point, scale?: number) => Point | undefined;

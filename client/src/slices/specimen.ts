@@ -1,7 +1,13 @@
-import { createSlice } from "./createSlice";
-import { Trace } from "protocol/Trace";
-import { PathfindingTask } from "protocol/SolveTask";
 import { ParamsOf } from "protocol/Message";
+import { PathfindingTask } from "protocol/SolveTask";
+import { Trace } from "protocol/Trace";
+import { createSlice } from "./createSlice";
+
+export type SpecimenOld = {
+  specimen?: Trace;
+  map?: string;
+  error?: string;
+} & Partial<ParamsOf<PathfindingTask>>;
 
 export type Specimen = {
   specimen?: Trace;
@@ -9,4 +15,4 @@ export type Specimen = {
   error?: string;
 } & Partial<ParamsOf<PathfindingTask>>;
 
-export const [useSpecimen, SpecimenProvider] = createSlice<Specimen>({});
+export const [useSpecimen, SpecimenProvider] = createSlice<SpecimenOld>({});

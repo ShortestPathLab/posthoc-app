@@ -11,7 +11,36 @@ const shadow = `
 
 export const theme = createTheme({
   palette: {
-    primary: colors["blueGrey"],
+    primary: colors["teal"],
+  },
+  typography: {
+    allVariants: {
+      fontFamily: "Inter",
+    },
+    button: {
+      textTransform: "none",
+      letterSpacing: 0,
+    },
+  },
+  components: {
+    MuiTypography: {
+      styleOverrides: {
+        body1: {
+          fontWeight: 500,
+          fontSize: "0.875rem",
+        },
+        overline: {
+          fontWeight: 500,
+          textTransform: "none",
+          letterSpacing: 0,
+          fontSize: "0.875rem",
+        },
+        h6: {
+          fontWeight: 600,
+          letterSpacing: -0.4,
+        },
+      },
+    },
   },
   shadows: ["", ...times(24, constant(shadow))] as any,
 });
@@ -21,7 +50,7 @@ export function useAcrylic(): SxProps<Theme> {
   return acrylic
     ? {
         backdropFilter: "blur(5px)",
-        background: ({ palette }) => alpha(palette.background.paper, 0.84),
+        background: ({ palette }) => alpha(palette.background.paper, 0.94),
       }
     : {
         backdropFilter: "blur(0px)",

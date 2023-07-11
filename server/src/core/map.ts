@@ -3,6 +3,7 @@ import hash from "md5";
 import { env } from "process";
 import { Scheme } from "protocol/SolveTask";
 import { URL } from "url";
+import { decompressFromBase64 as decompress } from "lz-string";
 
 /**
  * Specifies the maximum amount of maps that can be cached at a given time.
@@ -26,6 +27,10 @@ export function getMap(uri: string) {
     case "map:":
       cache.set(hash(content), content);
       return content;
+    case "lz:":
+      const decompressed = decompress(content);
+      cache.set(hash(decompressed), decompressed);
+      return decompressed;
     case "hash:":
       return cache.get(content);
   }

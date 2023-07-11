@@ -1,0 +1,1 @@
+{"version":3,"file":"createAdapter.js","sourceRoot":"","sources":["../../src/createAdapter.ts"],"names":[],"mappings":";;;AAAA,iDAA8C;AAC9C,+CAA4C;AAC5C,2CAAwC;AACxC,2CAAwC;AAExC,SAAgB,aAAa,CAAC,IAAa;IACzC,OAAO,IAAI,qBAAS,CAAC;QACnB,IAAI;QACJ,OAAO,EAAE,CAAC,GAAG,iBAAO,EAAE,GAAG,mBAAQ,EAAE,GAAG,aAAK,CAAC;KAC7C,CAAC,CAAC;AACL,CAAC;AALD,sCAKC"}

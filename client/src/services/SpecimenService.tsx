@@ -12,7 +12,7 @@ import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { Specimen, useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { hashAsync as hash } from "workers/async";
+import { compressAsync as compress, hashAsync as hash } from "workers/async";
 
 async function solve(
   map: string,
@@ -22,7 +22,7 @@ async function solve(
   if (map) {
     for (const mapURI of [
       `hash:${await hash(map)}`,
-      `map:${encodeURIComponent(map)}`,
+      `lz:${encodeURIComponent(await compress(map))}`,
     ] as const) {
       const p = { ...params, format, mapURI };
       try {
@@ -52,50 +52,52 @@ export function SpecimenService() {
   const [, setSpecimen] = useSpecimen();
 
   const { result: map } = useMapContent();
+
   useAsync(
     (signal) =>
       usingLoadingState(async () => {
         if (map?.format && map?.content) {
-          let entry;
-          for (const connection of connections) {
-            const a = await connection.call("features/algorithms");
-            const f = await connection.call("features/formats");
-            if (find(a, { id: algorithm }) && find(f, { id: map?.format })) {
-              entry = connection;
-              break;
-            }
-          }
-          if (entry) {
-            const solution = await solve(
-              map?.content ?? "",
-              {
-                algorithm,
-                format: map?.format ?? "",
-                instances: [{ end, start }],
-                parameters,
-              },
-              entry.call
-            );
-            if (solution && !signal.aborted) {
-              setSpecimen(solution);
-              setUIState({ step: 0, playback: "paused", breakpoints: [] });
-              notify(
-                solution.error ??
-                  (!isEmpty(solution.specimen) ? (
+          if (algorithm) {
+            let entry = await findConnection(connections, algorithm, map);
+            if (entry) {
+              notify("Running query...");
+              const solution = await solve(
+                map?.content ?? "",
+                {
+                  algorithm,
+                  format: map?.format ?? "",
+                  instances: [{ end, start }],
+                  parameters,
+                },
+                entry.call
+              );
+              if (solution && !signal.aborted) {
+                setSpecimen(solution);
+                setUIState({ step: 0, playback: "paused", breakpoints: [] });
+                notify(
+                  solution.error ? (
+                    `${entry.name} returned an error: ${solution.error}`
+                  ) : !isEmpty(solution.specimen) ? (
                     <Label
                       primary="Solution generated."
                       secondary={`${solution.specimen?.eventList?.length} steps`}
                     />
                   ) : (
                     "Ready."
-                  ))
+                  )
+                );
+              }
+            } else {
+              notify(
+                `No solver is available for the map format (${
+                  map?.format ?? "none"
+                }) and algorithm (${algorithm ?? "none"}).`
               );
             }
-          } else
-            notify(
-              `No solver is available for the map format (${map?.format ??
-                "none"}) and algorithm (${algorithm ?? "none"}).`
-            );
+          } else {
+            setSpecimen({ format: map.format, map: map.content, specimen: {} });
+            setUIState({ step: 0, playback: "paused", breakpoints: [] });
+          }
         }
       }),
     [
@@ -113,4 +115,55 @@ export function SpecimenService() {
   );
 
   return <></>;
+}
+async function findConnection(
+  connections: ({
+    name?: string | undefined;
+    description?: string | undefined;
+    version?: string | undefined;
+  } & {
+    call: <
+      T extends
+        | "features/map"
+        | "about"
+        | "features/algorithms"
+        | "features/formats"
+        | "features/maps"
+        | "solve/pathfinding"
+    >(
+      name: T,
+      params?:
+        | import("/home/spaaaacccee/projects/path-visualiser/app/protocol/Message").RequestOf<
+            import("/home/spaaaacccee/projects/path-visualiser/app/protocol/index").NameMethodMap[T]
+          >["params"]
+        | undefined
+    ) => Promise<
+      import("/home/spaaaacccee/projects/path-visualiser/app/protocol/Message").ResponseOf<
+        import("/home/spaaaacccee/projects/path-visualiser/app/protocol/index").NameMethodMap[T]
+      >["result"]
+    >;
+    disconnect: () => Promise<void>;
+    url: string;
+    ping: number;
+  })[],
+  algorithm: string | undefined,
+  map: {
+    content: string | undefined;
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    format?: string | undefined;
+    source?: string | undefined;
+  }
+) {
+  let entry;
+  for (const connection of connections) {
+    const a = await connection.call("features/algorithms");
+    const f = await connection.call("features/formats");
+    if (find(a, { id: algorithm }) && find(f, { id: map?.format })) {
+      entry = connection;
+      break;
+    }
+  }
+  return entry;
 }

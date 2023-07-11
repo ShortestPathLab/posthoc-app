@@ -3,10 +3,11 @@ import {
   CompiledD2IntrinsicComponent as CompiledD2Component,
   D2InstrinsicComponents as D2Components,
 } from "d2-renderer/D2IntrinsicComponents";
-import { Body, Ellipse, Box as Rect } from "detect-collisions";
 import { Dictionary } from "lodash";
 import { Bounds, Point, Size } from "protocol";
 import { defaultContext } from "./EventContext";
+
+const { ceil } = Math;
 
 export type Transform = Point & {
   scale: Point;
@@ -35,7 +36,7 @@ type Primitive<T extends keyof D2Components = keyof D2Components> = {
     g: OffscreenCanvasRenderingContext2D,
     t: Transform
   ): void;
-  test(c: CompiledD2Component<T>): Body;
+  test(c: CompiledD2Component<T>): Bounds;
 };
 
 export const text: Primitive<any> = {
@@ -48,7 +49,12 @@ export const text: Primitive<any> = {
     }
   },
   test(c) {
-    return new Rect(c, c.width, c.fontSize);
+    return {
+      left: c.x,
+      right: c.x,
+      top: c.y,
+      bottom: c.y,
+    };
   },
 };
 
@@ -56,10 +62,15 @@ export const rect: Primitive<"rect"> = {
   draw(c, g, t) {
     const { x, y, width, height } = transform(c, t);
     g.fillStyle = getFillStyle(c.fill, c.alpha);
-    g.fillRect(x, y, width, height);
+    g.fillRect(ceil(x), ceil(y), ceil(width) || 1, ceil(height) || 1);
   },
   test(c) {
-    return new Rect(c, c.width, c.height);
+    return {
+      left: c.x,
+      right: c.x + c.width,
+      top: c.y,
+      bottom: c.y + c.height,
+    };
   },
 };
 
@@ -71,8 +82,12 @@ export const circle: Primitive<"circle"> = {
     g.fill();
   },
   test(c) {
-    // TODO: Write collision
-    return new Ellipse(c, c.radius);
+    return {
+      left: c.x,
+      right: c.x + c.radius,
+      top: c.y,
+      bottom: c.y + c.radius,
+    };
   },
 };
 
@@ -89,8 +104,7 @@ export const polygon: Primitive<"polygon"> = {
     g.fill();
   },
   test(c) {
-    // TODO: Write collision
-    return new Rect(c, 1, 1);
+    return { left: c.x, right: c.x, top: c.y, bottom: c.y };
   },
 };
 
@@ -107,8 +121,7 @@ export const path: Primitive<"path"> = {
     g.stroke();
   },
   test(c) {
-    // TODO: Write collision
-    return new Rect(c, 1, 1);
+    return { left: c.x, right: c.x, top: c.y, bottom: c.y };
   },
 };
 

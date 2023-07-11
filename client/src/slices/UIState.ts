@@ -2,9 +2,10 @@ import { makeTemplate } from "components/script-editor/makeTemplate";
 import { templates } from "components/script-editor/templates";
 import { values } from "lodash";
 import { Feature } from "protocol/FeatureQuery";
-import { TraceEventType } from "protocol/Trace";
-import { createSlice } from "./createSlice";
 import { Parameters } from "protocol/SolveTask";
+import { Trace, TraceEventType } from "protocol/Trace";
+import { createSlice } from "./createSlice";
+import { nanoid } from "nanoid";
 
 export type PlaybackStateType = "playing" | "paused" | undefined;
 
@@ -49,14 +50,66 @@ type SpecimenState = {
   end?: number;
 };
 
+export type Layer = { key: string } & {
+  source?:
+    | { type: "map"; map?: Map }
+    | ({ type: "query" } & InputState & SpecimenState)
+    | { type: "trace"; trace: Trace };
+};
+
+export type Branch<T> = {
+  type: "branch";
+  key: string;
+  orientation: "vertical" | "horizontal";
+  children: Root<T>[];
+};
+
+export type Leaf<T> = {
+  type: "leaf";
+  key: string;
+  content?: T;
+};
+
+export type Root<T> = Branch<T> | Leaf<T>;
+
+export type ViewTreeState = { view: Root<Stack<Layers>> };
+
+export type Layers = {
+  layers: Layer[];
+};
+
+export type StackItem<T> = {
+  key: string;
+  content: T;
+};
+
+export type Stack<T> = {
+  items: StackItem<T>[];
+};
+
 export type UIState = InputState &
   PlaybackState &
   DebugOptionsState &
-  SpecimenState;
+  SpecimenState &
+  ViewTreeState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
   Partial<UIState>
 >({
   code: makeTemplate(values(templates)),
+  view: {
+    type: "leaf",
+    key: nanoid(),
+    content: {
+      items: [
+        {
+          key: nanoid(),
+          content: {
+            layers: [],
+          },
+        },
+      ],
+    },
+  },
 });

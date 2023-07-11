@@ -1,7 +1,8 @@
-import { filter, flatMap as flat, last, map } from "lodash";
-import { TraceComponent } from "protocol/Trace";
+import { last, map } from "lodash";
 import { byPoint } from "../NodeMatcher";
 import { MapParser } from "../Parser";
+import { parseGridAsync } from "./parseGridWorker";
+import type { Options } from "./parseGrid.worker";
 
 const { floor } = Math;
 
@@ -9,42 +10,16 @@ function between(v: number, min: number, max: number) {
   return v >= min && v < max;
 }
 
-type Options = {
-  wall?: string;
-};
-
-export const parse: MapParser = (m = "", { wall = "@" }: Options = {}) => {
-  const lines = m.split("\n");
-  const [, h = "", w = "", , ...grid] = lines;
-  const [width, height] = [w, h].map((d) => +last(d.split(" "))!);
-
+export const parse: MapParser = async (m = "", options: Options) => {
+  const { width, height, ...rest } = await parseGridAsync({
+    map: m,
+    options,
+  });
   return {
-    bounds: { width, height, minX: 0, minY: 0, maxX: width, maxY: height },
-    nodes: filter(
-      flat(grid, (row, y) =>
-        map(row, (tile, x) =>
-          tile === wall
-            ? {
-                $: "rect",
-                width: 1,
-                height: 1,
-                fill: "#121923",
-                alpha: 1,
-                x,
-                y,
-              }
-            : undefined
-        )
-      )
-    ) as TraceComponent[],
+    ...rest,
     snap: ({ x: x1, y: y1 }, scale = 1) => {
       const [x, y] = [floor(x1 + scale / 2), floor(y1 + scale / 2)];
-      if (
-        between(x, 0, width) &&
-        between(y, 0, height) &&
-        grid[y]?.[x] !== wall
-      )
-        return { x, y };
+      if (between(x, 0, width) && between(y, 0, height)) return { x, y };
     },
     nodeAt: (point) => {
       const { x, y } = point;

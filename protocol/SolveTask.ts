@@ -1,7 +1,7 @@
 import { Method, Namespace, Response } from "./Message";
 import { Trace } from "./Trace";
 
-export type SchemeBase = "hash" | "trace" | "map";
+export type SchemeBase = "hash" | "trace" | "map" | "lz";
 
 export type Scheme = `${SchemeBase}:`;
 

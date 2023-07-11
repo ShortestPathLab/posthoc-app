@@ -1,8 +1,17 @@
 import combinate from "combinate";
-import { Body, System } from "detect-collisions";
-import { Dictionary, ceil, floor, range, sortBy, throttle } from "lodash";
+import {
+  Dictionary,
+  ceil,
+  floor,
+  map,
+  once,
+  range,
+  sortBy,
+  throttle,
+} from "lodash";
 import memoizee from "memoizee";
-import type { Bounds } from "protocol";
+import type { Bounds, Point } from "protocol";
+import RBush from "rbush";
 import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 import {
   D2RendererEvents,
@@ -16,7 +25,41 @@ import { primitives } from "./primitives";
 
 const { log2, max } = Math;
 
-const z = (x: number) => floor(log2(x));
+const z = (x: number) => floor(log2(x + 1));
+
+export function getTiles(
+  { right, left, bottom, top }: Bounds,
+  tileSubdivision: number
+) {
+  const zoom = max(z(right - left), z(bottom - top)) - tileSubdivision;
+  const order = 2 ** zoom;
+  const tiles = {
+    left: floor(left / order),
+    right: ceil((right + 1) / order),
+    top: floor(top / order),
+    bottom: ceil((bottom + 1) / order),
+  };
+  return {
+    zoom,
+    order,
+    tiles: combinate({
+      x: range(tiles.left, tiles.right + 1),
+      y: range(tiles.top, tiles.bottom + 1),
+    }).map((tile) => {
+      const mapX = tile.x * order;
+      const mapY = tile.y * order;
+      return {
+        tile,
+        bounds: {
+          left: mapX - order / 2,
+          right: mapX + order / 2,
+          top: mapY - order / 2,
+          bottom: mapY + order / 2,
+        },
+      };
+    }),
+  };
+}
 
 export type D2WorkerRequest<
   T extends keyof D2RendererWorker = keyof D2RendererWorker
@@ -39,10 +82,24 @@ export type D2WorkerEvent<
   payload: D2WorkerEvents[T];
 };
 
-type BodyWithComponent = Body & {
+type Body = Bounds & {
   component: CompiledD2IntrinsicComponent;
   index: number;
 };
+
+class Bush extends RBush<Body> {
+  toBBox(b: Body) {
+    return { minX: b.left, minY: b.top, maxX: b.right, maxY: b.bottom };
+  }
+  compareMinX(a: Body, b: Body) {
+    return a.left - b.left;
+  }
+  compareMinY(a: Body, b: Body) {
+    return a.top - b.top;
+  }
+}
+
+const TILE_CACHE_SIZE = 200;
 
 export class D2RendererWorker extends EventEmitter<
   D2RendererEvents & {
@@ -51,8 +108,8 @@ export class D2RendererWorker extends EventEmitter<
 > {
   #options: D2RendererOptions = defaultD2RendererOptions;
   #frustum: Bounds = { bottom: 256, top: 0, left: 0, right: 256 };
-  #system = new System<BodyWithComponent>();
-  #children: Dictionary<BodyWithComponent[]> = {};
+  #system: Bush = new Bush(16);
+  #children: Dictionary<Body[]> = {};
 
   getView() {
     return { system: this.#system };
@@ -60,7 +117,7 @@ export class D2RendererWorker extends EventEmitter<
 
   setFrustum(frustum: Bounds) {
     this.#frustum = frustum;
-    this.#enqueueRender();
+    this.#getRenderQueue()();
   }
 
   #count: number = 0;
@@ -70,15 +127,13 @@ export class D2RendererWorker extends EventEmitter<
   }
 
   add(component: CompiledD2IntrinsicComponent[], id: string) {
-    this.#children[id] = [];
-    for (const c of component) {
-      const body = Object.assign(primitives[c.$].test(c), {
-        component: c,
-        index: this.#next(),
-      });
-      this.#system.insert(body);
-      this.#children[id].push(body);
-    }
+    const bodies = map(component, (c) => ({
+      ...primitives[c.$].test(c),
+      component: c,
+      index: this.#next(),
+    }));
+    this.#system.load(bodies);
+    this.#children[id] = bodies;
     this.#invalidate();
   }
 
@@ -97,29 +152,15 @@ export class D2RendererWorker extends EventEmitter<
 
   #invalidate() {
     this.renderTile.clear();
-    this.#enqueueRender();
-  }
-
-  getZoom({ top, left, bottom, right }: Bounds) {
-    const { tileSubdivision } = this.#options;
-    return max(z(right - left), z(bottom - top)) - tileSubdivision;
+    this.#getRenderQueue()();
   }
 
   async render() {
-    const zoom = this.getZoom(this.#frustum);
-    const order = 2 ** zoom;
-    const tiles = {
-      left: floor(this.#frustum.left / order),
-      right: ceil((this.#frustum.right + 1) / order),
-      top: floor(this.#frustum.top / order),
-      bottom: ceil((this.#frustum.bottom + 1) / order),
-    };
-    for (const { x, y } of combinate({
-      x: range(tiles.left, tiles.right + 1),
-      y: range(tiles.top, tiles.bottom + 1),
-    })) {
-      if (this.#shouldRender(x, y)) {
-        const bounds = this.getTileBounds(x, y, zoom);
+    for (const { tile, bounds } of getTiles(
+      this.#frustum,
+      this.#options.tileSubdivision
+    ).tiles) {
+      if (this.#shouldRender(tile)) {
         const bitmap = await createImageBitmap(this.renderTile(bounds));
         this.emit(
           "message",
@@ -136,35 +177,21 @@ export class D2RendererWorker extends EventEmitter<
     }
   }
 
-  #enqueueRender = throttle(
-    () => this.render(),
-    this.#options.refreshInterval,
-    {
+  #getRenderQueue = once(() =>
+    throttle(() => this.render(), this.#options.refreshInterval, {
       leading: false,
       trailing: true,
-    }
+    })
   );
 
-  #shouldRender(x: number, y: number) {
+  #shouldRender({ x, y }: Point) {
     const { workerCount, workerIndex } = this.#options;
     return pointToIndex({ x, y }) % workerCount === workerIndex;
   }
 
-  getTileBounds(x: number, y: number, zoom: number) {
-    const order = 2 ** zoom;
-    const mapX = x * order;
-    const mapY = y * order;
-    return {
-      left: mapX - order / 2,
-      right: mapX + order / 2,
-      top: mapY - order / 2,
-      bottom: mapY + order / 2,
-    } as Bounds;
-  }
-
   renderTile = memoizee((b: Bounds) => this.#renderTile(b), {
     normalizer: JSON.stringify,
-    max: 50,
+    max: TILE_CACHE_SIZE,
   });
 
   #renderTile(bounds: Bounds) {

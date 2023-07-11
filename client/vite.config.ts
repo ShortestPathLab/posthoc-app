@@ -7,6 +7,7 @@ import react from "@vitejs/plugin-react";
 
 export default {
   root: path.join(process.cwd(), "./src"),
+  build: { outDir: path.join(process.cwd(), "./dist") },
   plugins: [react(), viteTsconfigPaths()],
   test: {
     globals: true,

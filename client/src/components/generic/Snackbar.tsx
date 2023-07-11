@@ -10,7 +10,8 @@ import {
   useState,
 } from "react";
 
-const SnackbarContext = createContext<(message?: ReactNode) => void>(noop);
+const SnackbarContext =
+  createContext<(message?: ReactNode) => () => void>(noop);
 
 export interface SnackbarMessage {
   message?: ReactNode;
@@ -47,6 +48,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
   const handleMessage = useCallback(
     (message: ReactNode) => {
       setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
+      return () => handleClose("");
     },
     [setSnackPack]
   );

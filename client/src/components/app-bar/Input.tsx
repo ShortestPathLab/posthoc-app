@@ -25,7 +25,7 @@ export function Input() {
     <>
       <FeaturePicker
         icon={<MapIcon />}
-        label="map"
+        label="Map"
         value={map?.id}
         items={[
           customTrace(parameters),
@@ -87,7 +87,7 @@ export function Input() {
       <Space />
       <FeaturePicker
         icon={<CodeIcon />}
-        label="algorithm"
+        label="Algorithm"
         value={algorithm}
         items={algorithms.map((c) => ({
           ...c,
