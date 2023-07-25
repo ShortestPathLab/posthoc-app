@@ -1,4 +1,11 @@
 import {
+  Add,
+  DeleteOutlined as DeleteIcon,
+  DragHandleOutlined,
+  EditOutlined as EditIcon,
+  LabelOutlined as LabelIcon,
+} from "@mui/icons-material";
+import {
   Box,
   Button,
   Card,
@@ -11,25 +18,20 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { filter, map, noop, sortBy, uniqBy } from "lodash";
+import { nanoid as id, nanoid } from "nanoid";
 import {
-  Add,
-  DeleteOutlined as DeleteIcon,
-  EditOutlined as EditIcon,
-  LabelOutlined as LabelIcon,
-} from "@mui/icons-material";
-import { filter, map, sortBy, uniqBy } from "lodash";
-import { nanoid as id } from "nanoid";
-import {
-  cloneElement,
-  ComponentProps,
   CSSProperties,
-  forwardRef,
+  ComponentProps,
   ReactElement,
   ReactNode,
+  cloneElement,
+  forwardRef,
   useEffect,
   useRef,
   useState,
 } from "react";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 export const DefaultListEditorInput = forwardRef(function StyledInputBase(
   props: ComponentProps<typeof InputBase>,
@@ -55,6 +57,8 @@ type Item<T = any> = {
 };
 
 type Props<T = any> = {
+  onChange?: (value: Item<T>[]) => void;
+  sortable?: boolean;
   extras?: ReactNode;
   addItemLabel?: ReactNode;
   label?: ReactNode;
@@ -66,6 +70,7 @@ type Props<T = any> = {
   onAddItem?: () => void;
   onDeleteItem?: (key: Key) => void;
   icon?: ReactElement | null;
+  useReorder?: boolean;
   useEdit?: boolean;
   variant?: "outlined" | "default";
   extrasPlacement?: "flex-start" | "center" | "flex-end";
@@ -104,11 +109,19 @@ export function ListEditorField({
   extrasPlacement = "center",
   autoFocus,
   cardStyle: style,
+  sortable,
 }: Props & ListEditorFieldProps & Item) {
   const [field, setField] = useState<HTMLElement | null>(null);
   const theme = useTheme();
-  const content = (
+  const content = (handleProps?: ComponentProps<"div"> | null) => (
     <Box display="flex" alignItems={extrasPlacement}>
+      {sortable && (
+        <div {...handleProps}>
+          <Box color="text.secondary" sx={{ pr: 2 }}>
+            <DragHandleOutlined />
+          </Box>
+        </div>
+      )}
       {icon !== null &&
         cloneElement(icon, {
           style: {
@@ -164,32 +177,47 @@ export function ListEditorField({
     </Box>
   );
   return (
-    <Box
-      style={{
-        marginBottom: theme.spacing(1),
-        marginLeft: theme.spacing(2),
-      }}
-    >
-      {variant === "outlined" ? (
-        <Card
-          variant="outlined"
-          style={{
-            borderColor: "transparent",
-            paddingRight: theme.spacing(2),
-            transition: theme.transitions.create([
-              "box-shadow",
-              "border-color",
-            ]),
-            ...style,
-          }}
-        >
-          {content}
-        </Card>
-      ) : (
-        content
+    <Draggable index={i} draggableId={`${id}`}>
+      {(provided, snapshot) => (
+        <div ref={provided.innerRef} {...provided.draggableProps}>
+          <Box
+            sx={{
+              pb: 1,
+              ml: 2,
+            }}
+          >
+            {variant === "outlined" ? (
+              <Card
+                variant="outlined"
+                style={{
+                  borderColor: "transparent",
+                  paddingRight: theme.spacing(2),
+                  transition: theme.transitions.create([
+                    "box-shadow",
+                    "border-color",
+                  ]),
+                  ...style,
+                }}
+              >
+                {content(provided.dragHandleProps)}
+              </Card>
+            ) : (
+              content(provided.dragHandleProps)
+            )}
+          </Box>
+        </div>
       )}
-    </Box>
+    </Draggable>
   );
+}
+
+// a little function to help us with reordering the result
+function reorder<T>(list: T[], startIndex: number, endIndex: number) {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
 }
 
 export default function Editor<T>(props: Props<T>) {
@@ -204,7 +232,9 @@ export default function Editor<T>(props: Props<T>) {
     autoFocus,
     getCategory,
     getOrder,
+    onChange,
     extras,
+    sortable,
   } = props;
   const isInitialRender = useInitialRender();
   const theme = useTheme();
@@ -218,7 +248,12 @@ export default function Editor<T>(props: Props<T>) {
       clearTimeout(timeout);
     };
   }, [items, setIntermediateItems, theme.transitions.duration.standard]);
-  const children = uniqBy([...intermediateItems, ...items], (c) => c.id)
+  const children: {
+    key: Key;
+    in: boolean;
+    value?: T;
+    render: (p?: ComponentProps<typeof ListEditorField>) => ReactNode;
+  }[] = uniqBy([...intermediateItems, ...items], (c) => c.id)
     .map((c) => items.find((c2) => c.id === c2.id) ?? c)
     .map((x, i) => {
       const { enabled, element, value, id } = x ?? {};
@@ -262,99 +297,112 @@ export default function Editor<T>(props: Props<T>) {
     ),
   }));
   return (
-    <List
-      subheader={
-        label || text ? (
-          <>
-            <ListSubheader disableSticky>
-              {label && (
-                <Typography variant="body1" gutterBottom color="textPrimary">
-                  {label}
-                </Typography>
-              )}
-              {text && (
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  gutterBottom
-                  style={{ marginBottom: theme.spacing(3) }}
-                >
-                  {text}
-                </Typography>
-              )}
-            </ListSubheader>
-          </>
-        ) : undefined
-      }
+    <DragDropContext
+      onDragEnd={(result) => {
+        // dropped outside the list
+        if (!result.destination) {
+          return;
+        }
+
+        const reordered = reorder(
+          items,
+          result.source.index,
+          result.destination.index
+        );
+
+        onChange?.(reordered);
+        setIntermediateItems(reordered);
+      }}
     >
-      <Box mt={getCategory ? -1 : 0}>
-        {(() => {
-          const out: ReactNode[] = [];
-          sorted.forEach((c, i) => {
-            if (getCategory && isNewCategory(sorted, i, c)) {
-              out.push(
-                <Collapse
-                  in={items.some(
-                    (c2) => getCategory(c2.value) === getCategory(c.value)
-                  )}
-                  appear
-                  key={getCategory(c.value)}
-                >
-                  <Box pl={2} pb={2} pt={1}>
-                    <Typography variant="overline" color="textSecondary">
-                      {getCategory(c.value)}
-                    </Typography>
-                  </Box>
-                </Collapse>
-              );
-            }
-            out.push(c.render());
-          });
-          return out;
-        })()}
-      </Box>
-      <Collapse in={!items?.length}>
-        <Box ml={2} mb={1} pt={getCategory ? 1 : 0}>
-          <Typography color="textSecondary">
-            {placeholderText ?? "No items"}
-          </Typography>
+      <List
+        subheader={
+          label || text ? (
+            <>
+              <ListSubheader disableSticky>
+                {label && (
+                  <Typography variant="body1" gutterBottom color="textPrimary">
+                    {label}
+                  </Typography>
+                )}
+                {text && (
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    gutterBottom
+                    style={{ marginBottom: theme.spacing(3) }}
+                  >
+                    {text}
+                  </Typography>
+                )}
+              </ListSubheader>
+            </>
+          ) : undefined
+        }
+      >
+        <Box mt={getCategory ? -1 : 0}>
+          <Droppable droppableId="list">
+            {(provided, snapshot) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {(() => {
+                  const out: ReactNode[] = [];
+                  sorted.forEach((c, i) => {
+                    if (getCategory && isNewCategory(sorted, i, c)) {
+                      out.push(
+                        <Collapse
+                          in={items.some(
+                            (c2) =>
+                              getCategory(c2.value) === getCategory(c.value)
+                          )}
+                          appear
+                          key={getCategory(c.value)}
+                        >
+                          <Box pl={2} pb={2} pt={1}>
+                            <Typography
+                              variant="overline"
+                              color="textSecondary"
+                            >
+                              {getCategory(c.value)}
+                            </Typography>
+                          </Box>
+                        </Collapse>
+                      );
+                    }
+                    out.push(c.render());
+                  });
+                  return out;
+                })()}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         </Box>
-      </Collapse>
-      <Box p={2} mb={-3}>
-        <Button
-          disableElevation
-          variant="contained"
-          startIcon={<Add />}
-          color="primary"
-          onClick={() => {
-            onAddItem();
-            setNewIndex(items.length);
-          }}
-        >
-          {addItemLabel}
-        </Button>
-        {extras}
-      </Box>
-    </List>
+        <Collapse in={!items?.length}>
+          <Box ml={2} mb={1} pt={getCategory ? 1 : 0}>
+            <Typography color="textSecondary">
+              {placeholderText ?? "No items"}
+            </Typography>
+          </Box>
+        </Collapse>
+        <Box p={2} mb={-3}>
+          <Button
+            disableElevation
+            variant="contained"
+            startIcon={<Add />}
+            color="primary"
+            onClick={() => {
+              onAddItem();
+              setNewIndex(items.length);
+            }}
+          >
+            {addItemLabel}
+          </Button>
+          {extras}
+        </Box>
+      </List>
+    </DragDropContext>
   );
 
-  function isNewCategory(
-    arr: {
-      value: T | undefined;
-      render: (
-        p?: (Props<any> & ListEditorFieldProps & Item<any>) | undefined
-      ) => JSX.Element;
-      key: Key;
-    }[],
-    i: number,
-    c: {
-      value: T | undefined;
-      render: (
-        p?: (Props<any> & ListEditorFieldProps & Item<any>) | undefined
-      ) => JSX.Element;
-      key: Key;
-    }
-  ) {
+  function isNewCategory(arr: any, i: any, c: any) {
     return !!(
       getCategory &&
       (arr[i - 1] === undefined ||
@@ -369,7 +417,7 @@ export function ListEditor<T extends { key: string }>({
   editor,
   create,
   ...props
-}: Omit<Props<T>, "items"> & {
+}: Omit<Props<T>, "items" | "onChange"> & {
   items?: T[];
   onChange?: (value: T[]) => void;
   value?: T[];
@@ -404,6 +452,7 @@ export function ListEditor<T extends { key: string }>({
         onChangeItem={(k, v) =>
           handleChange?.(map(state, (b) => (b.key === k ? v : b)))
         }
+        onChange={(k) => handleChange?.(map(k, (a) => a.value!))}
       />
     </Box>
   );

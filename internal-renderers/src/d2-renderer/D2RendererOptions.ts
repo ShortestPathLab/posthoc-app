@@ -28,7 +28,6 @@ export type D2RendererOptions = RendererOptions & {
 
 export const defaultD2RendererOptions: D2RendererOptions = {
   screenSize: { width: 256, height: 256 },
-  definitions: {},
   workerCount: 4,
   workerIndex: 0,
   tileResolution: {

@@ -12,8 +12,58 @@ import {
   uploadMap,
   uploadTrace,
 } from "./upload";
+import { SelectField as Select } from "components/generic/Select";
 
 export const mapDefaults = { start: undefined, end: undefined };
+
+export function MapPicker() {
+  const notify = useSnackbar();
+  const [connections] = useConnections();
+  const [{ maps, formats }] = useFeatures();
+  const [{ algorithm, map, parameters }, setUIState] = useUIState();
+  return (
+    <FeaturePicker
+      showArrow
+      label="Choose Map"
+      value={map?.id}
+      items={[
+        customMap(map),
+        ...maps.map((c) => ({
+          ...c,
+          description: find(connections, { url: c.source })?.name,
+        })),
+      ]}
+      onChange={async (v) => {
+        switch (v) {
+          case customMap().id:
+            try {
+              const f = await uploadMap(formats);
+              if (f) {
+                setUIState({
+                  ...mapDefaults,
+                  map: f,
+                  algorithm: algorithm ?? "identity",
+                  parameters: {},
+                });
+                notify("Solution was cleared because the map changed.");
+              }
+            } catch (e) {
+              notify(`${e}`);
+            }
+            break;
+          default:
+            setUIState({
+              ...mapDefaults,
+              map: find(maps, { id: v }),
+              parameters: {},
+            });
+            notify("Solution was cleared because the map changed.");
+            break;
+        }
+      }}
+    />
+  );
+}
 
 export function Input() {
   const notify = useSnackbar();

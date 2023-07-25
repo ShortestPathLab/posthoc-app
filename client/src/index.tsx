@@ -2,6 +2,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import App from "App";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import "index.css";
+import "overlayscrollbars/overlayscrollbars.css";
 import { render } from "react-dom";
 import { ConnectionsService } from "services/ConnectionsService";
 import { FeaturesService } from "services/FeaturesService";
@@ -16,7 +17,6 @@ import { LoadingProvider } from "slices/loading";
 import { RendererProvider } from "slices/renderers";
 import { SettingsProvider } from "slices/settings";
 import { SpecimenProvider } from "slices/specimen";
-import { theme } from "theme";
 
 const slices = [
   SettingsProvider,
@@ -38,13 +38,11 @@ const services = [
 
 render(
   <CssBaseline>
-    <ThemeProvider theme={theme}>
-      <SnackbarProvider>
-        <EnvironmentProvider slices={slices} services={services}>
-          <App />
-        </EnvironmentProvider>
-      </SnackbarProvider>
-    </ThemeProvider>
+    <SnackbarProvider>
+      <EnvironmentProvider slices={slices} services={services}>
+        <App />
+      </EnvironmentProvider>
+    </SnackbarProvider>
   </CssBaseline>,
   document.getElementById("root")
 );

@@ -1,4 +1,3 @@
-import { last, map } from "lodash";
 import { byPoint } from "../NodeMatcher";
 import { MapParser } from "../Parser";
 import { parseGridAsync } from "./parseGridWorker";

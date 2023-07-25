@@ -44,6 +44,7 @@ class D2Renderer
     // create a pixi application
     this.#setupPixi(o);
     this.setOptions(o);
+    this.#handleWorkerChange(o);
   }
 
   destroy(): void {
@@ -57,8 +58,8 @@ class D2Renderer
     return () => map(this.#workers, (w) => w.call("remove", [id]));
   }
 
-  setOptions(options: D2RendererOptions) {
-    this.#handleWorkerChange(options);
+  setOptions(o: D2RendererOptions) {
+    const options = { ...this.#options, ...o };
     this.#handleWindowSizeChange(options);
     this.#options = options;
     this.#handleFrustumChange();
@@ -129,9 +130,7 @@ class D2Renderer
   }
 
   #handleUpdate({ bounds, bitmap }: D2WorkerEvent<"update">["payload"]) {
-    const texture = PIXI.Texture.from(bitmap, {
-      scaleMode: PIXI.SCALE_MODES.NEAREST,
-    });
+    const texture = PIXI.Texture.from(bitmap);
     this.#addToWorld(texture, bounds);
   }
 

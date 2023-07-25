@@ -1,6 +1,7 @@
 import { last, map, range } from "lodash";
 import { Point, Size } from "protocol";
 import { MapInfo } from "../Parser";
+import { Theme } from "@mui/material";
 
 const { min } = Math;
 
@@ -83,6 +84,7 @@ export function optimizeGridMap(
 
 export type Options = {
   wall?: string;
+  color?: string;
 };
 
 export type ParseGridWorkerParameters = {
@@ -97,7 +99,7 @@ export type ParseGridWorkerReturnType = Pick<
 
 function parseGrid({
   map: m,
-  options: { wall = "@" } = {},
+  options: { wall = "@", color = "#151d2f" } = {},
 }: ParseGridWorkerParameters): ParseGridWorkerReturnType {
   const lines = m.split("\n");
   const [, h = "", w = "", , ...grid] = lines;
@@ -119,7 +121,7 @@ function parseGrid({
     bounds: { width, height, minX: 0, minY: 0, maxX: width, maxY: height },
     nodes: nodes.map((node) => ({
       $: "rect",
-      fill: "#151d2f",
+      fill: color,
       alpha: 1,
       ...node,
     })),

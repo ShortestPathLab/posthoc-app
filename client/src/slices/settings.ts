@@ -19,6 +19,7 @@ type Settings = {
   renderer?: Renderer[];
   playbackRate?: number;
   acrylic?: boolean;
+  theme?: "dark" | "light";
 };
 
 const DEV_PORT = 8001;

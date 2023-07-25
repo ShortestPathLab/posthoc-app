@@ -1,3 +1,4 @@
+import { darken, lighten, useTheme } from "@mui/material";
 import { Label } from "components/generic/Label";
 import { useSnackbar } from "components/generic/Snackbar";
 import { getParser } from "components/renderer";
@@ -7,15 +8,22 @@ import { useSpecimen } from "slices/specimen";
 
 export function useParsedMap() {
   const notify = useSnackbar();
+  const theme = useTheme();
   const usingLoadingState = useLoadingState("parsedMap");
   const [{ format, map }] = useSpecimen();
 
   return useAsync(
     () =>
       usingLoadingState(async () => {
+        const fn = theme.palette.mode === "dark" ? lighten : darken;
         if (format && map) {
           notify("Processing map...");
-          const parsedMap = (await getParser(format)?.(map)) ?? { nodes: [] };
+          const parsedMap = (await getParser(format)?.(map, {
+            color: fn(
+              theme.palette.background.paper,
+              1 - theme.palette.action.hoverOpacity
+            ),
+          })) ?? { nodes: [] };
 
           notify(
             <Label
@@ -28,6 +36,6 @@ export function useParsedMap() {
           return parsedMap;
         }
       }),
-    [format, map, notify, useLoadingState]
+    [format, map, notify, useLoadingState, theme]
   );
 }

@@ -5,7 +5,8 @@ import { Feature } from "protocol/FeatureQuery";
 import { Parameters } from "protocol/SolveTask";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { createSlice } from "./createSlice";
-import { nanoid } from "nanoid";
+import { nanoid as id } from "nanoid";
+import { StackProps } from "@mui/material";
 
 export type PlaybackStateType = "playing" | "paused" | undefined;
 
@@ -50,21 +51,23 @@ type SpecimenState = {
   end?: number;
 };
 
-export type Layer = { key: string } & {
+export type Layer = { key: string; name?: string } & {
   source?:
     | { type: "map"; map?: Map }
     | ({ type: "query" } & InputState & SpecimenState)
     | { type: "trace"; trace: Trace };
 };
 
-export type Branch<T> = {
+export type Node<T> = { size?: number };
+
+export type Branch<T> = Node<T> & {
   type: "branch";
   key: string;
   orientation: "vertical" | "horizontal";
   children: Root<T>[];
 };
 
-export type Leaf<T> = {
+export type Leaf<T> = Node<T> & {
   type: "leaf";
   key: string;
   content?: T;
@@ -72,25 +75,21 @@ export type Leaf<T> = {
 
 export type Root<T> = Branch<T> | Leaf<T>;
 
-export type ViewTreeState = { view: Root<Stack<Layers>> };
+export type ViewTreeState = { view: Root<PanelState> };
 
-export type Layers = {
+export type LayerState = {
   layers: Layer[];
 };
 
-export type StackItem<T> = {
-  key: string;
-  content: T;
-};
-
-export type Stack<T> = {
-  items: StackItem<T>[];
+export type PanelState = {
+  type: string;
 };
 
 export type UIState = InputState &
   PlaybackState &
   DebugOptionsState &
   SpecimenState &
+  LayerState &
   ViewTreeState;
 
 export const [useUIState, UIStateProvider] = createSlice<
@@ -98,18 +97,33 @@ export const [useUIState, UIStateProvider] = createSlice<
   Partial<UIState>
 >({
   code: makeTemplate(values(templates)),
+  layers: [{ key: id(), name: "Scene", source: { type: "map" } }],
   view: {
-    type: "leaf",
-    key: nanoid(),
-    content: {
-      items: [
-        {
-          key: nanoid(),
-          content: {
-            layers: [],
+    type: "branch",
+    key: id(),
+    orientation: "horizontal",
+    children: [
+      {
+        size: 80,
+        type: "leaf",
+        key: id(),
+        content: { type: "viewport" },
+      },
+      {
+        size: 20,
+        type: "branch",
+        key: id(),
+        orientation: "vertical",
+        children: [
+          { type: "leaf", size: 50, key: id(), content: { type: "steps" } },
+          {
+            type: "leaf",
+            size: 50,
+            key: id(),
+            content: { type: "layers" },
           },
-        },
-      ],
-    },
+        ],
+      },
+    ],
   },
 });

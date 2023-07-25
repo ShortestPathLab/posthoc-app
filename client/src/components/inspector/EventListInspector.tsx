@@ -1,4 +1,4 @@
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Stack } from "@mui/material";
 import { SortOutlined as ListIcon } from "@mui/icons-material";
 import { Flex } from "components/generic/Flex";
 import {
@@ -17,19 +17,14 @@ import { EventInspector } from "./EventInspector";
 
 function Placeholder() {
   return (
-    <PlaceholderCard
-      sx={{
-        width: "100%",
-        height: "fit-content",
-      }}
-    >
+    <Stack alignItems="center" p={4} color="text.secondary" textAlign="center">
       <p>
         <ListIcon />
       </p>
       <p>
         Select a source & destination node on the map to see the steps here.
       </p>
-    </PlaceholderCard>
+    </Stack>
   );
 }
 

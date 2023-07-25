@@ -65,6 +65,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         {children}
       </SnackbarContext.Provider>
       <Snackbar
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         key={current?.key}
         open={open}
         autoHideDuration={6000}

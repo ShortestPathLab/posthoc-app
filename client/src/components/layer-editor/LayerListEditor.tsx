@@ -1,36 +1,32 @@
-import { ReplayOutlined as ResetIcon } from "@mui/icons-material";
-import { Button } from "@mui/material";
-import { defaultTransport } from "client";
+import { Box } from "@mui/material";
 import { ListEditor } from "components/generic/ListEditor";
-import { debounce } from "lodash";
-import { defaultRenderers, Renderer, useSettings } from "slices/settings";
+import { Layer, useUIState } from "slices/UIState";
 import { LayerEditor } from "./LayerEditor";
 
-export function RendererListEditor() {
-  const [{ renderer }, setSettings] = useSettings();
+export function LayerListEditor() {
+  const [{ layers = [] }, setUIState] = useUIState();
+  //   const [{ specimen }] = useSpecimen();
+
   return (
-    <>
-      <ListEditor<Renderer>
-        editor={(v) => <LayerEditor value={v} />}
-        icon={null}
-        value={renderer}
-        onChange={debounce((v) => setSettings({ renderer: v }), 300)}
-        addItemLabel="Add Renderer"
-        create={() => ({
-          transport: defaultTransport,
-          url: "",
-          disabled: true,
-        })}
-        extras={
-          <Button
-            startIcon={<ResetIcon />}
-            sx={{ ml: 2 }}
-            onClick={() => setSettings({ renderer: defaultRenderers })}
-          >
-            Reset to Defaults
-          </Button>
-        }
-      />
-    </>
+    <Box sx={{ overflow: "auto hidden", width: "100%" }}>
+      <Box sx={{ mb: 2 }}>
+        <ListEditor<Layer>
+          sortable
+          icon={null}
+          value={layers}
+          useDelete
+          useReorder
+          editor={(v) => <LayerEditor value={v} />}
+          create={() => ({
+            source: { type: "trace", trace: {} },
+          })}
+          onChange={(v) => setUIState({ layers: v })}
+          addItemLabel="Layer"
+          placeholderText={
+            <Box pt={2}>Click the button below to add a layer.</Box>
+          }
+        />
+      </Box>
+    </Box>
   );
 }

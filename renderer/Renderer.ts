@@ -1,15 +1,8 @@
-import {
-  CompiledComponent,
-  ParsedComponent,
-  Point,
-  Size,
-  TraceComponents,
-} from "protocol";
+import { CompiledComponent, Size } from "protocol";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import EventEmitter from "typed-emitter";
 
 export type RendererOptions = {
-  definitions: TraceComponents;
   screenSize: Size;
 };
 
@@ -26,9 +19,9 @@ export type RemoveElementCallback = () => void;
  * and steps in the search trace format and drawing them to the canvas.
  */
 export interface Renderer<
-  T extends RendererOptions,
-  U extends RendererEvents,
-  V extends CompiledComponent<any, any>
+  T extends RendererOptions = RendererOptions,
+  U extends RendererEvents = RendererEvents,
+  V extends CompiledComponent<any, any> = CompiledComponent<string, {}>
 > extends EventEmitter<U> {
   setup(options: Partial<T>): void;
   destroy(): void;
