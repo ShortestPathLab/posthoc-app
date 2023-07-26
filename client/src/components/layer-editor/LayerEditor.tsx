@@ -15,22 +15,46 @@ import {
   AppBarTitle as Title,
 } from "components/generic/Modal";
 import { Space } from "components/generic/Space";
-import { set, slice, startCase } from "lodash";
+import { debounce, noop, set, slice, startCase } from "lodash";
 import { produce } from "produce";
-import { ReactNode } from "react";
+import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
 import { Layer } from "slices/UIState";
+import { layerHandlers } from "./layers/LayerSource";
+import { useDebounce } from "react-use";
 
 type LayerEditorProps = {
   value: Layer;
   onValueChange?: (v: Layer) => void;
 };
 
+function useDraft<T>(
+  initial: T,
+  commit?: (value: T) => void,
+  ms: number = 600
+) {
+  const [state, setState] = useState(initial);
+  useEffect(() => void setState(initial), [setState, initial]);
+  const handleChange = useMemo(
+    () => debounce((v: T) => commit?.(v), ms),
+    [commit, ms]
+  );
+  return [
+    state,
+    (value: T) => {
+      setState(value);
+      handleChange(value);
+    },
+  ] as const;
+}
+
 export function LayerEditor({
   value,
   onValueChange: onChange,
 }: LayerEditorProps) {
+  const [draft, setDraft] = useDraft(value, onChange);
+
   const renderHeading = (label: ReactNode) => (
-    <Type variant="overline" color="textSecondary" sx={{pt:1}} component="p">
+    <Type variant="overline" color="textSecondary" sx={{ pt: 1 }} component="p">
       {label}
     </Type>
   );
@@ -51,7 +75,7 @@ export function LayerEditor({
       name: startCase(c),
     }));
 
-  const name = value.name || "Untitled Layer";
+  const name = draft.name || "Untitled Layer";
 
   return (
     <>
@@ -62,7 +86,7 @@ export function LayerEditor({
         <Box py={1}>
           <Type>{name}</Type>
           <Type variant="body2" color="text.secondary">
-            {startCase(value.source?.type)}
+            {startCase(draft.source?.type)}
           </Type>
         </Box>
         <Space flex={1} />
@@ -81,10 +105,10 @@ export function LayerEditor({
                   fullWidth
                   variant="filled"
                   label="Layer Name"
-                  value={value.name ?? ""}
+                  value={draft.name ?? ""}
                   onChange={(e) =>
-                    onChange?.(
-                      produce(value, (d) => set(d, "name", e.target.value))
+                    setDraft?.(
+                      produce(draft, (d) => set(d, "name", e.target.value))
                     )
                   }
                 />
@@ -113,31 +137,22 @@ export function LayerEditor({
                 "Type",
                 <FeaturePicker
                   label="Type"
-                  value={value.source?.type}
+                  value={draft.source?.type}
                   items={["map", "trace", "query"].map((s) => ({
                     id: s,
                     name: startCase(s),
                   }))}
                   onChange={(v) =>
-                    onChange?.(produce(value, (d) => set(d, "source.type", v)))
+                    setDraft?.(produce(draft, (d) => set(d, "source.type", v)))
                   }
                   showArrow
                 />
               )}
-              {value.source?.type &&
-                {
-                  map: <>{renderOption("Source", <MapPicker />)}</>,
-                  trace: (
-                    <Box color="text.secondary">
-                      {renderLabel("This source type is not implemented.")}
-                    </Box>
-                  ),
-                  query: (
-                    <Box color="text.secondary">
-                      {renderLabel("This source type is not implemented.")}
-                    </Box>
-                  ),
-                }[value.source.type]}
+              {draft.source?.type &&
+                createElement(layerHandlers[draft.source.type].editor, {
+                  onChange: setDraft,
+                  value: draft,
+                })}
             </Box>
           </Dialog>
         </Stack>

@@ -1,6 +1,6 @@
 import { Box, Fade, LinearProgress } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
-import { pages } from "components/pages";
+import { pages } from "pages";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { createElement, useState } from "react";
 import { PanelState, useUIState } from "slices/UIState";
@@ -14,7 +14,6 @@ type SpecimenInspectorProps = {} & FlexProps;
 export function Inspector(props: SpecimenInspectorProps) {
   const loading = useAnyLoading();
   const [{ view }, setUIState] = useUIState();
-  const [{ specimen }] = useSpecimen();
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );

@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import App from "App";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import "index.css";
@@ -8,7 +8,6 @@ import { ConnectionsService } from "services/ConnectionsService";
 import { FeaturesService } from "services/FeaturesService";
 import { PlaybackService } from "services/PlaybackService";
 import { RendererService } from "services/RendererService";
-import { SpecimenService } from "services/SpecimenService";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { UIStateProvider } from "slices/UIState";
 import { ConnectionsProvider } from "slices/connections";
@@ -31,18 +30,15 @@ const slices = [
 const services = [
   ConnectionsService,
   PlaybackService,
-  SpecimenService,
   FeaturesService,
   RendererService,
 ];
 
 render(
   <CssBaseline>
-    <SnackbarProvider>
-      <EnvironmentProvider slices={slices} services={services}>
-        <App />
-      </EnvironmentProvider>
-    </SnackbarProvider>
+    <EnvironmentProvider slices={slices} services={services}>
+      <App />
+    </EnvironmentProvider>
   </CssBaseline>,
   document.getElementById("root")
 );

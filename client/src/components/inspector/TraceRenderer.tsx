@@ -5,13 +5,24 @@ import {
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps } from "components/renderer/Renderer";
 import { useParsedMap } from "hooks/useParsedMap";
-import { find, uniq } from "lodash";
-import { useEffect, useRef, useState } from "react";
+import { find, map, uniq } from "lodash";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDebounce } from "react-use";
 import { Renderer } from "renderer";
 import { useRenderers } from "slices/renderers";
 import { useSpecimen } from "slices/specimen";
 import { Placeholder } from "./Placeholder";
+import { useLoading } from "slices/loading";
+import { RenderLayer } from "components/layer-editor/layers/LayerSource";
+import { useUIState } from "slices/UIState";
+import { Size } from "protocol";
 
 const rendererOptions = {
   tileSubdivision: 1,
@@ -22,17 +33,22 @@ const rendererOptions = {
   },
 };
 
-export function TraceRenderer({ width, height, renderer }: RendererProps) {
+const TraceRendererContext = createContext<{ renderer?: Renderer }>({});
+
+export function useRendererInstance() {
+  return useContext(TraceRendererContext);
+}
+
+function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
   const theme = useTheme();
-  const [{ specimen }] = useSpecimen();
   const [renderers] = useRenderers();
-  const { result: map, loading } = useParsedMap();
   const ref = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState("");
   const [instance, setInstance] = useState<Renderer>();
+
   useEffect(() => {
     setError("");
-    if (ref.current && width && height && renderer && map) {
+    if (ref.current && width && height && renderer) {
       const entry = find(renderers, (r) => r.renderer.meta.id === renderer);
       if (entry) {
         const instance = new entry.renderer.constructor();
@@ -41,7 +57,6 @@ export function TraceRenderer({ width, height, renderer }: RendererProps) {
           backgroundColor: theme.palette.background.paper,
           accentColor: theme.palette.primary.main,
         });
-        instance.add(map.nodes);
         ref.current.append(instance.getView()!);
         setInstance(instance);
         return () => {
@@ -49,12 +64,6 @@ export function TraceRenderer({ width, height, renderer }: RendererProps) {
           instance.destroy();
           setInstance(undefined);
         };
-      } else {
-        setError(
-          `No installed renderer has support for ${uniq(
-            map.nodes.map((c) => `"${c.$}"`)
-          ).join(", ")}`
-        );
       }
     }
   }, [ref.current, map, renderer, renderers, theme, setError, setInstance]);
@@ -68,10 +77,21 @@ export function TraceRenderer({ width, height, renderer }: RendererProps) {
     theme.transitions.duration.standard,
     [instance, width, height]
   );
+  return { instance, ref, error };
+}
+
+export function TraceRenderer({ width, height, renderer }: RendererProps) {
+  const theme = useTheme();
+  const [{ map: loading }] = useLoading();
+  const [{ layers }] = useUIState();
+
+  const { instance, error, ref } = useRenderer(renderer, { width, height });
+
+  const context = useMemo(() => ({ renderer: instance }), [instance]);
 
   return (
-    <>
-      {specimen ? (
+    <TraceRendererContext.Provider value={context}>
+      {layers?.length ? (
         error ? (
           <Box
             sx={{
@@ -89,18 +109,10 @@ export function TraceRenderer({ width, height, renderer }: RendererProps) {
           </Box>
         ) : (
           <>
-            <Box sx={{ display: loading ? "none" : "block" }} ref={ref} />
-            <Box
-              sx={{
-                display: loading ? "flex" : "none",
-                width,
-                height,
-                alignItems: "center",
-                justifyContent: "center",
-                color: "text.secondary",
-              }}
-            >
-              <CircularProgress sx={{ mb: 2 }} />
+            <Box ref={ref}>
+              {map(layers, (l) => (
+                <RenderLayer key={l.key} layer={l} />
+              ))}
             </Box>
           </>
         )
@@ -112,6 +124,6 @@ export function TraceRenderer({ width, height, renderer }: RendererProps) {
           height={height}
         />
       )}
-    </>
+    </TraceRendererContext.Provider>
   );
 }

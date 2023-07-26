@@ -6,13 +6,15 @@ import { useMapContent } from "hooks/useMapContent";
 import { find, isEmpty } from "lodash";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
+import { Component, FunctionComponent } from "react";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
-import { useConnections } from "slices/connections";
+import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { Specimen, useSpecimen } from "slices/specimen";
-import { useUIState } from "slices/UIState";
+import { Map, useUIState } from "slices/UIState";
 import { compressAsync as compress, hashAsync as hash } from "workers/async";
+import { Avatar, Box, IconButton, Stack, TextField } from "@mui/material";
 
 async function solve(
   map: string,
@@ -34,8 +36,7 @@ async function solve(
             map,
             format: specimen?.format ?? format,
           };
-      } catch (e) {
-        ///@ts-ignore
+      } catch (e: any) {
         return { ...p, specimen: {}, map, format, error: e.message };
       }
     }
@@ -46,7 +47,8 @@ export function SpecimenService() {
   const usingLoadingState = useLoadingState("specimen");
   const notify = useSnackbar();
   const [{ formats }] = useFeatures();
-  const [{ algorithm, start, end, parameters }, setUIState] = useUIState();
+  const [{ algorithm, start, end, parameters, layers }, setUIState] =
+    useUIState();
   const resolve = useConnectionResolver();
   const [connections] = useConnections();
   const [, setSpecimen] = useSpecimen();
@@ -116,45 +118,11 @@ export function SpecimenService() {
 
   return <></>;
 }
+
 async function findConnection(
-  connections: ({
-    name?: string | undefined;
-    description?: string | undefined;
-    version?: string | undefined;
-  } & {
-    call: <
-      T extends
-        | "features/map"
-        | "about"
-        | "features/algorithms"
-        | "features/formats"
-        | "features/maps"
-        | "solve/pathfinding"
-    >(
-      name: T,
-      params?:
-        | import("/home/spaaaacccee/projects/path-visualiser/app/protocol/Message").RequestOf<
-            import("/home/spaaaacccee/projects/path-visualiser/app/protocol/index").NameMethodMap[T]
-          >["params"]
-        | undefined
-    ) => Promise<
-      import("/home/spaaaacccee/projects/path-visualiser/app/protocol/Message").ResponseOf<
-        import("/home/spaaaacccee/projects/path-visualiser/app/protocol/index").NameMethodMap[T]
-      >["result"]
-    >;
-    disconnect: () => Promise<void>;
-    url: string;
-    ping: number;
-  })[],
-  algorithm: string | undefined,
-  map: {
-    content: string | undefined;
-    id?: string | undefined;
-    name?: string | undefined;
-    description?: string | undefined;
-    format?: string | undefined;
-    source?: string | undefined;
-  }
+  connections: Connection[],
+  algorithm?: string,
+  map?: Map
 ) {
   let entry;
   for (const connection of connections) {

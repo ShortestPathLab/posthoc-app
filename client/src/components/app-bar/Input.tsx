@@ -1,10 +1,11 @@
 import { Code as CodeIcon, MapTwoTone as MapIcon } from "@mui/icons-material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { Space } from "components/generic/Space";
-import { find, merge } from "lodash";
-import { useUIState } from "slices/UIState";
+import { find } from "lodash";
+import { Map, UploadedTrace, useUIState } from "slices/UIState";
 import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
+import { EditorProps } from "../Editor";
 import { FeaturePicker } from "./FeaturePicker";
 import {
   custom as customMap,
@@ -12,22 +13,22 @@ import {
   uploadMap,
   uploadTrace,
 } from "./upload";
-import { SelectField as Select } from "components/generic/Select";
+import { Button } from "@mui/material";
+import { Trace } from "protocol";
 
 export const mapDefaults = { start: undefined, end: undefined };
 
-export function MapPicker() {
+export function MapPicker({ onChange, value }: EditorProps<Map>) {
   const notify = useSnackbar();
   const [connections] = useConnections();
   const [{ maps, formats }] = useFeatures();
-  const [{ algorithm, map, parameters }, setUIState] = useUIState();
   return (
     <FeaturePicker
       showArrow
       label="Choose Map"
-      value={map?.id}
+      value={value?.id}
       items={[
-        customMap(map),
+        customMap(value),
         ...maps.map((c) => ({
           ...c,
           description: find(connections, { url: c.source })?.name,
@@ -39,29 +40,41 @@ export function MapPicker() {
             try {
               const f = await uploadMap(formats);
               if (f) {
-                setUIState({
-                  ...mapDefaults,
-                  map: f,
-                  algorithm: algorithm ?? "identity",
-                  parameters: {},
-                });
-                notify("Solution was cleared because the map changed.");
+                onChange?.(f);
               }
             } catch (e) {
               notify(`${e}`);
             }
             break;
           default:
-            setUIState({
-              ...mapDefaults,
-              map: find(maps, { id: v }),
-              parameters: {},
-            });
-            notify("Solution was cleared because the map changed.");
+            onChange?.(find(maps, { id: v })!);
             break;
         }
       }}
     />
+  );
+}
+
+export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
+  const notify = useSnackbar();
+  const [connections] = useConnections();
+  const [{ maps, formats }] = useFeatures();
+  return (
+    <Button
+      variant="contained"
+      onClick={async () => {
+        try {
+          const f = await uploadTrace();
+          if (f) {
+            onChange?.(f);
+          }
+        } catch (e) {
+          notify(`${e}`);
+        }
+      }}
+    >
+      Upload Search Trace
+    </Button>
   );
 }
 

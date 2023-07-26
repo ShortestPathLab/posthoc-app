@@ -1,20 +1,32 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Slider, Switch, Tab, Typography as Type } from "@mui/material";
+import {
+  Box,
+  Slider,
+  Switch,
+  Tab,
+  Typography as Type,
+  colors,
+} from "@mui/material";
+import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "components/pages/Page";
+import { Page } from "pages/Page";
 import { RendererListEditor } from "components/settings-editor/RendererListEditor";
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
+import { keys, map, startCase } from "lodash";
 import { ReactNode, useState } from "react";
 import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
+import { AccentColor, accentColors } from "theme";
 
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsPage() {
   const { controls, onChange, state } = useViewTreeContext();
-  const [{ playbackRate = 1, acrylic, theme = "light" }, setSettings] =
-    useSettings();
+  const [
+    { playbackRate = 1, acrylic, theme = "light", accentColor = "teal" },
+    setSettings,
+  ] = useSettings();
   const [tab, setTab] = useState("general");
   function renderHeading(label: ReactNode) {
     return (
@@ -78,6 +90,21 @@ export function SettingsPage() {
                       defaultChecked={theme === "dark"}
                       onChange={(_, v) =>
                         setSettings({ theme: v ? "dark" : "light" })
+                      }
+                    />
+                  </Flex>
+                  <Flex alignItems="center">
+                    {renderLabel("Accent")}
+                    <Space flex={1} />
+                    <FeaturePicker
+                      value={accentColor}
+                      items={map(keys(accentColors), (c) => ({
+                        id: c,
+                        name: startCase(c),
+                      }))}
+                      showArrow
+                      onChange={(v) =>
+                        setSettings({ accentColor: v as AccentColor })
                       }
                     />
                   </Flex>

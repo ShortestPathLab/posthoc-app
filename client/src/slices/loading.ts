@@ -1,16 +1,39 @@
 import { useCallback } from "react";
 import { createSlice } from "./createSlice";
 import { some, values } from "lodash";
+import { produce } from "produce";
 
 type Loading = {
-  specimen?: boolean;
-  map?: boolean;
-  connections?: boolean;
-  features?: boolean;
-  parsedMap?: boolean;
+  specimen: number;
+  map: number;
+  connections: number;
+  features: number;
 };
 
-export const [useLoading, LoadingProvider] = createSlice<Loading>({});
+type A = { action: "start" | "end"; key: keyof Loading };
+
+export const [useLoading, LoadingProvider] = createSlice<Loading, A>(
+  {
+    specimen: 0,
+    connections: 0,
+    features: 0,
+    map: 0,
+  },
+  {
+    reduce: (prev, { action, key }: A) => {
+      return produce(prev, (draft) => {
+        switch (action) {
+          case "start":
+            draft[key] += 1;
+            break;
+          case "end":
+            draft[key] -= 1;
+        }
+        return draft;
+      });
+    },
+  }
+);
 
 export function useAnyLoading() {
   const [loading] = useLoading();
@@ -18,15 +41,15 @@ export function useAnyLoading() {
 }
 
 export function useLoadingState(key: keyof Loading) {
-  const [, setLoading] = useLoading();
+  const [, dispatch] = useLoading();
 
   return useCallback(
     async <T>(task: () => Promise<T>) => {
-      setLoading({ [key]: true });
+      dispatch({ action: "start", key });
       const out = await task();
-      setLoading({ [key]: false });
+      dispatch({ action: "end", key });
       return out;
     },
-    [key, setLoading]
+    [key, dispatch]
   );
 }

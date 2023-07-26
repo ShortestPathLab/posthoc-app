@@ -1,9 +1,9 @@
 import { Box, Divider, Fade } from "@mui/material";
-import { Scroll } from "components/Scrollbars";
+import { Scroll } from "components/generic/Scrollbars";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
-import { pages } from "components/pages";
+import { pages } from "pages";
 import { values } from "lodash";
 import { ReactNode } from "react";
 import { withSlots } from "react-slot-component";
@@ -53,7 +53,7 @@ export const Page = withSlots<Slots, PageProps>(
               sx={{
                 width: "100%",
                 height: "100%",
-                bgcolor: "background.default",
+                bgcolor: "background.paper",
               }}
             >
               {slotProps.Content?.children}

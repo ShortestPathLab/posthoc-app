@@ -2,6 +2,7 @@ import { fileDialog as file } from "file-select-dialog";
 import { find, startCase } from "lodash";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { Parameters } from "protocol/SolveTask";
+import { Map, UploadedTrace } from "slices/UIState";
 
 function ext(s: string) {
   return s.split(".").pop();
@@ -31,7 +32,7 @@ export const customTrace = (trace?: Parameters) => ({
 
 const TRACE_FORMAT = "json";
 
-export async function uploadTrace() {
+export async function uploadTrace(): Promise<UploadedTrace | undefined> {
   const f = await file({
     accept: [`.${TRACE_FORMAT}`],
     strict: true,

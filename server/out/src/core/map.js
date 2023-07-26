@@ -8,6 +8,7 @@ const lru_cache_1 = __importDefault(require("lru-cache"));
 const md5_1 = __importDefault(require("md5"));
 const process_1 = require("process");
 const url_1 = require("url");
+const lz_string_1 = require("lz-string");
 /**
  * Specifies the maximum amount of maps that can be cached at a given time.
  * @default 500e6
@@ -28,6 +29,10 @@ function getMap(uri) {
         case "map:":
             cache.set((0, md5_1.default)(content), content);
             return content;
+        case "lz:":
+            const decompressed = (0, lz_string_1.decompressFromBase64)(content);
+            cache.set((0, md5_1.default)(decompressed), decompressed);
+            return decompressed;
         case "hash:":
             return cache.get(content);
     }

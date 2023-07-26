@@ -1,6 +1,6 @@
 import { ListTwoTone } from "@mui/icons-material";
 import { Placeholder } from "components/inspector/Placeholder";
-import { Page } from "components/pages/Page";
+import { Page } from "pages/Page";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 
 export function InfoPage() {

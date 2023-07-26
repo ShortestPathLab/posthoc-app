@@ -3,7 +3,7 @@ import { findIndex, findLastIndex, take } from "lodash";
 import { Trace, TraceEvent } from "protocol/Trace";
 
 export function info(
-  { eventList }: Trace = {},
+  { events: eventList }: Trace = {},
   playback: number = 0,
   key: number | undefined = undefined,
   getStep: (s: TraceEvent) => boolean

@@ -1,12 +1,13 @@
 import { makeTemplate } from "components/script-editor/makeTemplate";
 import { templates } from "components/script-editor/templates";
 import { values } from "lodash";
-import { Feature } from "protocol/FeatureQuery";
-import { Parameters } from "protocol/SolveTask";
+import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
+import { Parameters, PathfindingTask } from "protocol/SolveTask";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { createSlice } from "./createSlice";
 import { nanoid as id } from "nanoid";
 import { StackProps } from "@mui/material";
+import { ParamsOf } from "protocol/Message";
 
 export type PlaybackStateType = "playing" | "paused" | undefined;
 
@@ -51,11 +52,30 @@ type SpecimenState = {
   end?: number;
 };
 
-export type Layer = { key: string; name?: string } & {
-  source?:
+export type Specimen = {
+  specimen?: Trace;
+  map?: string;
+  error?: string;
+} & Partial<ParamsOf<PathfindingTask>>;
+
+export type UploadedTrace = FeatureDescriptor & {
+  content?: Trace;
+};
+
+export type Layer<T = {}> = { key: string; name?: string } & {
+  source?: (
     | { type: "map"; map?: Map }
-    | ({ type: "query" } & InputState & SpecimenState)
-    | { type: "trace"; trace: Trace };
+    | ({ type: "query" } & InputState &
+        SpecimenState & {
+          result?: {
+            specimen?: Trace;
+            map?: string;
+            error?: string;
+          } & Partial<ParamsOf<PathfindingTask>>;
+        })
+    | { type: "trace"; trace: UploadedTrace }
+  ) &
+    T;
 };
 
 export type Node<T> = { size?: number };

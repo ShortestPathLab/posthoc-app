@@ -45,6 +45,7 @@
     "react-virtuoso": "^2.2.1",
     "renderer": "file:../renderer",
     "socket.io-client": "^4.1.3",
+    "string-template-parser": "^1.2.6",
     "typescript": "^4.4.2",
     "url-parse": "^1.5.3",
     "vite": "^4.2.2",

@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { LayerListEditor } from "components/layer-editor/LayerListEditor";
-import { Page } from "components/pages/Page";
+import { Page } from "pages/Page";
 
 export function LayersPage() {
   const { controls, onChange, state } = useViewTreeContext();

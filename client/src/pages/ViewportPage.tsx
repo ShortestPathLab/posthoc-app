@@ -9,7 +9,7 @@ import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "components/pages/Page";
+import { Page } from "pages/Page";
 import { useParsedMap } from "hooks/useParsedMap";
 import { every, find, keyBy, map } from "lodash";
 import { useMemo } from "react";

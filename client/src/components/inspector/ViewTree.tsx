@@ -1,22 +1,14 @@
 import Split, { GutterTheme, SplitDirection } from "@devbookhq/splitter";
-import { ViewInArOutlined, ViewInArTwoTone } from "@mui/icons-material";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Tabs, Tab, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 
-import { countBy, every, filter, forEach, head, map, sumBy } from "lodash";
+import { filter, forEach, map, sumBy } from "lodash";
 import { nanoid } from "nanoid";
 import { produce, produce2 } from "produce";
-import {
-  Context,
-  ReactNode,
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import { Branch, Leaf, Root } from "slices/UIState";
+import { Context, ReactNode, createContext, useContext, useMemo } from "react";
+import { Leaf, Root } from "slices/UIState";
 import { ViewControls } from "./ViewControls";
+import { useCss } from "react-use";
 
 type ViewTreeContextType<T = any> = {
   controls?: ReactNode;
@@ -46,6 +38,14 @@ export function ViewTree<T>({
   depth = 0,
 }: ViewTreeProps<T>) {
   const { palette, spacing } = useTheme();
+
+  const gutterCls = useCss({
+    background: palette.background.default,
+  });
+  const dragCls = useCss({
+    background: palette.text.secondary,
+  });
+
   const getSpacing = (n: number) => Number(spacing(n).slice(0, -2));
 
   function inferSize(all: Root<T>[]) {
@@ -104,6 +104,8 @@ export function ViewTree<T>({
           gutterTheme={
             palette.mode === "dark" ? GutterTheme.Dark : GutterTheme.Light
           }
+          gutterClassName={gutterCls}
+          draggerClassName={dragCls}
           onResizeFinished={(_, sizes) =>
             onChange?.(
               produce(root, (draft) => {

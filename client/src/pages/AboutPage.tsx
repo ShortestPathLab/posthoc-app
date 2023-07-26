@@ -13,10 +13,10 @@ import {
   Typography as Type,
   Typography,
 } from "@mui/material";
-import { Scroll } from "components/Scrollbars";
+import { Scroll } from "components/generic/Scrollbars";
 import { Flex } from "components/generic/Flex";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "components/pages/Page";
+import { Page } from "pages/Page";
 import { head } from "lodash";
 import { ReactNode, useState } from "react";
 import { useSettings } from "slices/settings";
@@ -60,7 +60,7 @@ export function AboutPage() {
             <Scroll y>
               <Box sx={{ p: 2 }}>
                 <Box sx={{ pt: 6, pb: 2 }}>
-                  <img src="/public/logo512.png" width="64" />
+                  <img src="/public/logo512.png" height="64" />
                 </Box>
                 <Type variant="h6">Waypoint {version}</Type>
                 {renderSection(

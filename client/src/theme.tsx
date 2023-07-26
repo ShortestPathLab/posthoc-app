@@ -3,17 +3,25 @@ import { alpha, SxProps, Theme } from "@mui/material";
 import { constant, times } from "lodash";
 import { useSettings } from "slices/settings";
 
+export type AccentColor = Exclude<keyof typeof colors, "common" | undefined>;
+
+export const { common, ...accentColors } = colors;
+
 const shadow = `
     0px 8px 18px -1px rgb(0 0 0 / 8%), 
     0px 10px 48px 0px rgb(0 0 0 / 1%), 
     0px 20px 96px 0px rgb(0 0 0 / 0.5%)
 `;
 
-export const makeTheme = (mode: "light" | "dark") =>
+export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   createTheme({
     palette: {
-      primary: colors["teal"],
+      primary: { main: colors[theme][mode === "dark" ? "200" : "500"] },
       mode,
+      background:
+        mode === "dark"
+          ? { default: "#1f2428", paper: "#24292e" }
+          : { default: "#f6f8fa", paper: "#ffffff" },
     },
     typography: {
       allVariants: {

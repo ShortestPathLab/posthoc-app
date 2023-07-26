@@ -4,12 +4,12 @@ import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/Switch";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "components/pages/Page";
+import { Page } from "pages/Page";
 import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { ReactNode, useState } from "react";
 import { useUIState } from "slices/UIState";
 import { useSpecimen } from "slices/specimen";
-import { BreakpointListEditor } from "../breakpoint-editor/BreakpointListEditor";
+import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { saveJSON as save } from "components/debug-options-editor/saveJSON";
 
 export function DebugPage() {

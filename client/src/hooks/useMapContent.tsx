@@ -6,11 +6,10 @@ import { useLoadingState } from "slices/loading";
 import { Map, useUIState } from "slices/UIState";
 import { useConnectionResolver } from "./useConnectionResolver";
 
-export function useMapContent() {
+export function useMapContent(map?: Map) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("map");
   const resolve = useConnectionResolver();
-  const [{ map }] = useUIState();
 
   const getMap = useMemo(
     () =>
@@ -27,15 +26,17 @@ export function useMapContent() {
     [resolve, notify]
   );
 
+  const { content, source, id } = map ?? {};
+
   return useAsync(
     () =>
       usingLoadingState(async () => {
-        if (map && map.id)
+        if (id)
           return {
             ...map,
-            content: map.content ? map.content : await getMap(map),
+            content: content ? content : await getMap({ source, id }),
           };
       }),
-    [getMap, map, usingLoadingState]
+    [getMap, content, source, id, usingLoadingState]
   );
 }

@@ -1,18 +1,8 @@
-import { ParamsOf } from "protocol/Message";
-import { PathfindingTask } from "protocol/SolveTask";
-import { Trace } from "protocol/Trace";
+import { Layer } from "./UIState";
 import { createSlice } from "./createSlice";
 
-export type SpecimenOld = {
-  specimen?: Trace;
-  map?: string;
-  error?: string;
-} & Partial<ParamsOf<PathfindingTask>>;
-
 export type Specimen = {
-  specimen?: Trace;
-  map?: string;
-  error?: string;
-} & Partial<ParamsOf<PathfindingTask>>;
+  layers?: Layer[];
+};
 
-export const [useSpecimen, SpecimenProvider] = createSlice<SpecimenOld>({});
+export const [useSpecimen, SpecimenProvider] = createSlice<Specimen>({});

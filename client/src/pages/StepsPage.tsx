@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { Playback } from "components/app-bar/Playback";
 import { StepsPanel } from "components/inspector/StepsPanel";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "components/pages/Page";
+import { Page } from "pages/Page";
 
 export function StepsPage() {
   const { controls, onChange, state } = useViewTreeContext();
