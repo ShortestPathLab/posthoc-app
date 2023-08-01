@@ -20,6 +20,7 @@ import { map } from "lodash";
 import { useUIState } from "slices/UIState";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
+import { usePlayback } from "slices/playback";
 
 type Props = {
   selection?: RendererSelectEvent;
@@ -28,7 +29,7 @@ type Props = {
 
 export function SelectionMenu({ selection, onClose }: Props) {
   const notify = useSnackbar();
-  const [, setUIState] = useUIState();
+  const [, setPlayback] = usePlayback();
   const { global, info } = selection ?? {};
   const { current, entry, node } = info ?? {};
 
@@ -65,7 +66,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
             icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
             action: () => {
               notify("Origin set.");
-              setUIState({ start: node?.key });
+              setPlayback({ start: node?.key });
             },
             disabled: !node,
           },
@@ -74,7 +75,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
             icon: <DestinationIcon />,
             action: () => {
               notify("Destination set.");
-              setUIState({ end: node?.key });
+              setPlayback({ end: node?.key });
             },
             disabled: !node,
           },
@@ -83,7 +84,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
               <Label primary="Go to Expansion Step" secondary={entry?.index} />
             ),
             action: () =>
-              setUIState({ step: entry?.index ?? 0, playback: "paused" }),
+              setPlayback({ step: entry?.index ?? 0, playback: "paused" }),
             disabled: !entry,
           },
           {
@@ -91,7 +92,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
               <Label primary="Rewind to This Step" secondary={current?.index} />
             ),
             action: () =>
-              setUIState({ step: current?.index ?? 0, playback: "paused" }),
+              setPlayback({ step: current?.index ?? 0, playback: "paused" }),
             disabled: !current,
           },
         ],

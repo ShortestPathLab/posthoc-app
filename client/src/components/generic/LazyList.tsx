@@ -1,8 +1,9 @@
 import { Box, BoxProps } from "@mui/material";
-import { ReactElement } from "react";
+import { OverlayScrollbars } from "overlayscrollbars";
+import { ReactElement, useEffect, useState } from "react";
 import {
-  Virtuoso as List,
   VirtuosoHandle as Handle,
+  Virtuoso as List,
   VirtuosoProps as ListProps,
 } from "react-virtuoso";
 
@@ -20,11 +21,21 @@ export function LazyList<T>({
   listOptions: options,
   ...props
 }: LazyListProps<T>) {
+  const [ref, setRef] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    if (ref) {
+      console.log(ref);
+      ///@ts-ignore
+      window.Ov = OverlayScrollbars;
+      OverlayScrollbars({ target: ref });
+    }
+  }, [ref]);
   return (
     <Box {...props}>
       <List
         totalCount={items.length}
         itemContent={(i) => renderItem?.(items[i], i)}
+        scrollerRef={(r) => setRef(r as HTMLElement)}
         {...options}
       />
     </Box>

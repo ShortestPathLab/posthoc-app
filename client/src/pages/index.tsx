@@ -40,7 +40,7 @@ export const pages: Dictionary<PageMeta> = {
   },
   info: {
     id: "info",
-    name: "Info",
+    name: "Logs",
     icon: <ListTwoTone />,
     content: InfoPage,
   },

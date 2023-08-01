@@ -1,17 +1,20 @@
-import { IconButton, Snackbar } from "@mui/material";
 import { CloseOutlined as CloseIcon } from "@mui/icons-material";
-import { noop } from "lodash";
+import { IconButton, Snackbar } from "@mui/material";
 import {
-  createContext,
   ReactNode,
+  createContext,
   useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
+import { useLog } from "slices/log";
+import { Label } from "./Label";
+import { filter } from "lodash";
 
-const SnackbarContext =
-  createContext<(message?: ReactNode) => () => void>(noop);
+const SnackbarContext = createContext<
+  (message?: string, secondary?: string) => () => void
+>(() => {});
 
 export interface SnackbarMessage {
   message?: ReactNode;
@@ -35,6 +38,8 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
     undefined
   );
 
+  const [, appendLog] = useLog();
+
   useEffect(() => {
     if (snackPack.length && !current) {
       setCurrent({ ...snackPack[0] });
@@ -46,8 +51,18 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
   }, [snackPack, current, open]);
 
   const handleMessage = useCallback(
-    (message: ReactNode) => {
-      setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
+    (message?: string, secondary?: string) => {
+      setSnackPack((prev) => [
+        ...prev,
+        {
+          message: <Label primary={message} secondary={secondary} />,
+          key: new Date().getTime(),
+        },
+      ]);
+      appendLog({
+        content: filter([message, secondary]).join(", "),
+        timestamp: new Date().toString(),
+      });
       return () => handleClose("");
     },
     [setSnackPack]

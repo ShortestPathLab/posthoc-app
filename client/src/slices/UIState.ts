@@ -8,11 +8,6 @@ import { createSlice } from "./createSlice";
 import { nanoid as id } from "nanoid";
 import { StackProps } from "@mui/material";
 import { ParamsOf } from "protocol/Message";
-
-export type PlaybackStateType = "playing" | "paused" | undefined;
-
-type PlaybackState = { playback?: PlaybackStateType; step?: number };
-
 export type Map = Partial<
   Feature & {
     format: string;
@@ -62,20 +57,10 @@ export type UploadedTrace = FeatureDescriptor & {
   content?: Trace;
 };
 
-export type Layer<T = {}> = { key: string; name?: string } & {
-  source?: (
-    | { type: "map"; map?: Map }
-    | ({ type: "query" } & InputState &
-        SpecimenState & {
-          result?: {
-            specimen?: Trace;
-            map?: string;
-            error?: string;
-          } & Partial<ParamsOf<PathfindingTask>>;
-        })
-    | { type: "trace"; trace: UploadedTrace }
-  ) &
-    T;
+export type Layer<T = {}> = {
+  key: string;
+  name?: string;
+  source?: { type: string } & T;
 };
 
 export type Node<T> = { size?: number };
@@ -106,7 +91,6 @@ export type PanelState = {
 };
 
 export type UIState = InputState &
-  PlaybackState &
   DebugOptionsState &
   SpecimenState &
   LayerState &
@@ -117,32 +101,51 @@ export const [useUIState, UIStateProvider] = createSlice<
   Partial<UIState>
 >({
   code: makeTemplate(values(templates)),
-  layers: [{ key: id(), name: "Scene", source: { type: "map" } }],
+  layers: [],
   view: {
     type: "branch",
     key: id(),
     orientation: "horizontal",
     children: [
       {
-        size: 80,
-        type: "leaf",
-        key: id(),
-        content: { type: "viewport" },
-      },
-      {
-        size: 20,
+        size: 75,
         type: "branch",
         key: id(),
-        orientation: "vertical",
+        orientation: "horizontal",
         children: [
-          { type: "leaf", size: 50, key: id(), content: { type: "steps" } },
           {
             type: "leaf",
-            size: 50,
+            size: 25,
             key: id(),
             content: { type: "layers" },
           },
+          {
+            size: 75,
+            type: "branch",
+            key: id(),
+            orientation: "vertical",
+            children: [
+              {
+                type: "leaf",
+                size: 75,
+                key: id(),
+                content: { type: "viewport" },
+              },
+              {
+                type: "leaf",
+                size: 25,
+                key: id(),
+                content: { type: "info" },
+              },
+            ],
+          },
         ],
+      },
+      {
+        size: 25,
+        type: "leaf",
+        key: id(),
+        content: { type: "steps" },
       },
     ],
   },

@@ -28,12 +28,8 @@ export function useParsedMap(map?: Map) {
           })) ?? { nodes: [] };
 
           notify(
-            <Label
-              primary="Map loaded."
-              secondary={`${
-                parsedMap.nodes.length
-              } elements, ${parsedMap.log.join(", ")}`}
-            />
+            "Map loaded",
+            `${parsedMap.nodes.length} elements, ${parsedMap.log.join(", ")}`
           );
           return parsedMap;
         }

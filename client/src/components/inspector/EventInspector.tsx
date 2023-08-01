@@ -1,25 +1,24 @@
 import {
-  Box,
-  Card,
-  CardActionArea,
-  CardProps,
-  Divider,
+  ListItemButton,
+  ListItemButtonProps,
+  ListItemIcon,
+  ListItemText,
   Typography as Type,
+  useTheme,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
-import { call } from "components/script-editor/call";
+import { getColorHex } from "components/renderer/colors";
 import { TraceEvent } from "protocol/Trace";
-import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { useAcrylic } from "theme";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
+import { usePlayback } from "slices/playback";
 
 type EventInspectorProps = {
   event?: TraceEvent;
   index?: number;
   selected?: boolean;
-} & CardProps;
+} & ListItemButtonProps;
 
 export function EventInspector({
   event,
@@ -27,46 +26,40 @@ export function EventInspector({
   selected,
   ...props
 }: EventInspectorProps) {
-  const acrylic = useAcrylic();
-  const [{ specimen }] = useSpecimen();
-  const [{ code }, setUIState] = useUIState();
+  const { spacing } = useTheme();
+  const [, setPlayback] = usePlayback();
 
-  const cardStyles = selected
-    ? {
-        color: "primary.contrastText",
-        bgcolor: "primary.main",
-      }
-    : acrylic;
+  // const cardStyles = selected
+  //   ? {
+  //       color: "primary.contrastText",
+  //       bgcolor: "primary.main",
+  //     }
+  //   : acrylic;
 
-  const hidden = event
-    ? !call(code ?? "", "shouldRender", [
-        index ?? 0,
-        event,
-        specimen?.eventList ?? [],
-      ])
-    : false;
+  // const hidden = event
+  //   ? !call(code ?? "", "shouldRender", [
+  //       index ?? 0,
+  //       event,
+  //       specimen?.eventList ?? [],
+  //     ])
+  //   : false;
 
   return (
-    <Card
+    <ListItemButton
+      selected={selected}
       {...props}
       sx={{
-        ...cardStyles,
-        ...props.sx,
+        borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
       }}
+      onClick={() => setPlayback({ step: index })}
     >
-      <CardActionArea
-        sx={{ p: 2, height: "100%" }}
-        onClick={() => setUIState({ step: index })}
-      >
-        <Flex alignItems="center">
-          <Type>{index}</Type>
-          <Divider sx={{ mx: 2 }} flexItem orientation="vertical" />
-          <Box>
-            <EventLabel event={event} hidden={hidden} />
-            <PropertyList event={event} />
-          </Box>
-        </Flex>
-      </CardActionArea>
-    </Card>
+      <ListItemIcon>
+        <Type variant="body2">{index}</Type>
+      </ListItemIcon>
+      <ListItemText
+        primary={<EventLabel event={event} hidden={false} />}
+        secondary={<PropertyList event={event} />}
+      ></ListItemText>
+    </ListItemButton>
   );
 }

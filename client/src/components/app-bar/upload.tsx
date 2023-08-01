@@ -40,10 +40,11 @@ export async function uploadTrace(): Promise<UploadedTrace | undefined> {
   if (f) {
     if (ext(f.name) === TRACE_FORMAT) {
       const content = await f.text();
+      const parsed = JSON.parse(content);
       return {
         ...customTrace(),
-        format: JSON.parse(content)?.format,
-        content,
+        format: parsed?.format,
+        content: parsed,
         name: startCase(name(f.name)),
         type: customTraceId,
       } as Parameters;

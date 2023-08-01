@@ -1,4 +1,8 @@
-import { Code as CodeIcon, MapTwoTone as MapIcon } from "@mui/icons-material";
+import {
+  Code as CodeIcon,
+  FileOpenTwoTone,
+  MapTwoTone as MapIcon,
+} from "@mui/icons-material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { Space } from "components/generic/Space";
 import { find } from "lodash";
@@ -57,23 +61,19 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
 
 export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
   const notify = useSnackbar();
-  const [connections] = useConnections();
-  const [{ maps, formats }] = useFeatures();
   return (
     <Button
-      variant="contained"
+      startIcon={<FileOpenTwoTone />}
       onClick={async () => {
         try {
           const f = await uploadTrace();
-          if (f) {
-            onChange?.(f);
-          }
+          if (f) onChange?.(f);
         } catch (e) {
           notify(`${e}`);
         }
       }}
     >
-      Upload Search Trace
+      {value?.id ? `Uploaded Trace - ${value.name}` : "Upload Search Trace"}
     </Button>
   );
 }

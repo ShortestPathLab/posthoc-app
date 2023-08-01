@@ -24,29 +24,26 @@
               "y": "{{ctx.y}}"
             }
           ],
-          "lineWidth" : 1
+          "lineWidth": 1
         }
       ],
-      "road-event":[
+      "road-event": [
         {
-            "$": "node"
-          },
-          {
-            "$": "line"
-          }
+          "$": "node"
+        },
+        {
+          "$": "line"
+        }
       ]
-      
     },
     "views": {
       "main": {
         "renderer": "2d-pixi",
-        "components": [{"$":"road-event"}
-          
-        ]
+        "components": [{ "$": "road-event" }]
       }
     }
   },
-  "eventList": [
+  "events": [
     {
       "id": 1736,
       "type": "source",

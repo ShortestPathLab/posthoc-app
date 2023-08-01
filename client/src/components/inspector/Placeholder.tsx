@@ -12,7 +12,7 @@ export function Placeholder({
       justifyContent="center"
       alignItems="center"
       color="text.secondary"
-      bgcolor="background.default"
+      bgcolor="background.paper"
       vertical
       {...rest}
     >

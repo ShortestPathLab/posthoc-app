@@ -47,11 +47,11 @@ export function PlaybackService() {
             ({ result, offset, error }) => {
               if (!error) {
                 if (result) {
-                  notify(renderLabel(`Breakpoint hit: ${result}.`, offset));
+                  notify(`Breakpoint hit: ${result}.`, offset);
                   pause(offset);
                 } else tick(playbackRate);
               } else {
-                notify(renderLabel(`${trimEnd(error, ".")}.`, offset));
+                notify(`${trimEnd(error, ".")}.`, offset);
                 pause();
               }
             }

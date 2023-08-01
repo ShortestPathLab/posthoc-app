@@ -20,6 +20,7 @@ import { Page } from "pages/Page";
 import { head } from "lodash";
 import { ReactNode, useState } from "react";
 import { useSettings } from "slices/settings";
+import logo from "public/logo512.png";
 
 const version = "0.1.2";
 
@@ -60,7 +61,7 @@ export function AboutPage() {
             <Scroll y>
               <Box sx={{ p: 2 }}>
                 <Box sx={{ pt: 6, pb: 2 }}>
-                  <img src="/public/logo512.png" height="64" />
+                  <img src={logo} height="64" />
                 </Box>
                 <Type variant="h6">Waypoint {version}</Type>
                 {renderSection(

@@ -1,4 +1,13 @@
-import { debounce, find, isEqual, map, once, throttle, times } from "lodash";
+import {
+  debounce,
+  defer,
+  find,
+  isEqual,
+  map,
+  once,
+  throttle,
+  times,
+} from "lodash";
 import { nanoid } from "nanoid";
 import { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
@@ -19,8 +28,11 @@ import { intersect } from "./intersect";
 const { max } = Math;
 
 class Tile extends PIXI.Sprite {
+  static age: number = 0;
+  age: number;
   constructor(texture?: PIXI.Texture, public bounds?: Bounds) {
     super(texture);
+    this.age = Tile.age++;
   }
 }
 
@@ -107,7 +119,7 @@ class D2Renderer
   );
 
   #getUpdateGridQueue = once(() =>
-    debounce(() => this.#updateGrid(), this.#options.refreshInterval)
+    throttle(() => this.#updateGrid(), this.#options.refreshInterval)
   );
 
   #handleWorkerChange(options: D2RendererOptions) {
@@ -188,24 +200,29 @@ class D2Renderer
         .setTransform(bounds.left, bounds.top, scale.x, scale.y);
       this.#getUpdateGridQueue()();
       await this.#animate(tile);
-      for (const c of this.#world!.children) {
-        if (intersect(c.bounds!, bounds) && c !== tile) {
-          c.destroy({ texture: true, baseTexture: true });
+      defer(() => {
+        for (const c of this.#world!.children) {
+          if (intersect(c.bounds!, bounds) && c.age < tile.age) {
+            c.destroy({ texture: true, baseTexture: true });
+          }
         }
-      }
+      });
     }
   }
 
   #animate(tile: Tile) {
+    const ticker = this.#app!.ticker;
     return new Promise<void>((res) => {
-      const f = () => {
-        if (tile.alpha < 1) {
-          tile.alpha += 1000 / 60 / this.#options.animationDuration;
-          requestAnimationFrame(f);
-        } else res();
+      const f = (dt: number) => {
+        tile.alpha +=
+          dt / PIXI.Ticker.targetFPMS / this.#options.animationDuration;
+        if (tile.alpha > 1) {
+          ticker.remove(f);
+          res();
+        }
       };
       tile.alpha = 0;
-      requestAnimationFrame(f);
+      ticker.add(f);
     });
   }
 }

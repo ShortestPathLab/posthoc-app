@@ -12,10 +12,11 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { Page } from "pages/Page";
 import { useParsedMap } from "hooks/useParsedMap";
 import { every, find, keyBy, map } from "lodash";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
-import { PanelState } from "slices/UIState";
+import { PanelState, useUIState } from "slices/UIState";
 import { Renderer, useRenderers } from "slices/renderers";
+import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -34,6 +35,12 @@ export function ViewportPage() {
   const { controls, onChange, state } =
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();
+  const [{ layers }] = useUIState();
+
+  const [selectedLayers, setSelectedLayers] = useState<
+    Record<string, boolean | undefined>
+  >({});
+
   const { result: m } = useParsedMap();
 
   const autoRenderer = useMemo(
@@ -80,11 +87,15 @@ export function ViewportPage() {
             showArrow
           />
           {divider}
-          <FeaturePicker
+          <FeaturePickerMulti
             label="All Layers"
             icon={<LayersTwoTone />}
-            value={undefined}
-            items={[]}
+            value={selectedLayers}
+            onChange={setSelectedLayers}
+            items={map(layers, (c) => ({
+              id: c.key,
+              name: c.name ?? "Untitled Layer",
+            }))}
             showArrow
           />
           {divider}

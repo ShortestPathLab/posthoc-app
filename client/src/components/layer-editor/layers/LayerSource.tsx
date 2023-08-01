@@ -1,26 +1,30 @@
+import { useTheme } from "@mui/material";
 import { EditorProps } from "components/Editor";
 import { MapPicker, TracePicker } from "components/app-bar/Input";
-import { NodeList } from "components/render/renderer/generic/NodeList";
+import {
+  LazyNodeList,
+  NodeList,
+} from "components/render/renderer/generic/NodeList";
 import { useMapContent } from "hooks/useMapContent";
 import { useParsedMap } from "hooks/useParsedMap";
-import { Dictionary, map, set } from "lodash";
+import { Dictionary, flatMap, set } from "lodash";
 import { withProduce } from "produce";
-import { FC, createElement, useMemo } from "react";
+import { TraceEvent } from "protocol";
+import { FC, ReactNode, createElement, useMemo } from "react";
+import { useThrottle } from "react-use";
 import { Layer, Map, UploadedTrace } from "slices/UIState";
+import { usePlayback } from "slices/playback";
+import { useTraceContent } from "../../../hooks/useTraceContent";
 import { Option } from "./Option";
-import {
-  CompiledComponent,
-  ParsedComponent,
-  Trace,
-  TraceEvent,
-} from "protocol";
-import { parse } from "components/renderer/parser";
-import { mapProperties } from "components/renderer/parser/mapProperties";
 
 type LayerSource<K extends string, T> = {
   key: K;
   editor: FC<EditorProps<Layer<T>>>;
   renderer: FC<{ layer?: Layer<T> }>;
+  steps: FC<{
+    layer?: Layer<T>;
+    children?: (steps: TraceEvent[]) => ReactNode;
+  }>;
 };
 
 const mapLayerSource: LayerSource<"map", { map?: Map }> = {
@@ -50,26 +54,8 @@ const mapLayerSource: LayerSource<"map", { map?: Map }> = {
       </>
     );
   },
+  steps: ({ children }) => <>{children?.([])}</>,
 };
-
-function useTraceContent(trace?: Trace, view: "main" = "main") {
-  return useMemo(() => {
-    const parsed = parse(
-      trace?.render?.views?.[view]?.components ?? [],
-      trace?.render?.components ?? {}
-    );
-    return {
-      events: trace?.events ?? [],
-      apply: (event: TraceEvent) =>
-        map(parsed, (p) =>
-          mapProperties<
-            ParsedComponent<string, any>,
-            CompiledComponent<string, any>
-          >(p, (c) => c(event))
-        ),
-    };
-  }, [trace, view]);
-}
 
 const traceLayerSource: LayerSource<"trace", { trace?: UploadedTrace }> = {
   key: "trace",
@@ -89,8 +75,30 @@ const traceLayerSource: LayerSource<"trace", { trace?: UploadedTrace }> = {
     );
   }),
   renderer: ({ layer }) => {
-    const {} = useTraceContent(layer?.source?.trace?.content);
-    return <></>;
+    const { palette } = useTheme();
+    const [{ step = 0 }] = usePlayback();
+    const throttledStep = useThrottle(step, 300);
+    const { events, apply } = useTraceContent(layer?.source?.trace?.content);
+    const nodes = useMemo(() => flatMap(events, apply), [events, apply]);
+    const shadow = useMemo(
+      () =>
+        flatMap(events, (e) => apply(e)).map((c) => ({
+          ...c,
+          fill: palette.text.primary,
+          alpha: palette.action.hoverOpacity,
+        })),
+      [events, apply, palette]
+    );
+    return (
+      <>
+        <NodeList nodes={shadow} />
+        <LazyNodeList step={throttledStep} nodes={nodes} />
+      </>
+    );
+  },
+  steps: ({ layer, children }) => {
+    const { events } = useTraceContent(layer?.source?.trace?.content);
+    return <>{children?.(events)}</>;
   },
 };
 const queryLayerSource: LayerSource<"query", {}> = {
@@ -105,6 +113,7 @@ const queryLayerSource: LayerSource<"query", {}> = {
   renderer: ({ layer }) => {
     return <></>;
   },
+  steps: ({ children }) => <>{children?.([])}</>,
 };
 
 export const layerHandlers: Dictionary<LayerSource<string, any>> = {

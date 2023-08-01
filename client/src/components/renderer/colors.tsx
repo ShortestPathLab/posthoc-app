@@ -1,9 +1,10 @@
 import {
-  blueGrey,
-  deepOrange,
+  blue,
+  deepPurple,
+  green,
   orange,
   pink,
-  teal,
+  red,
   yellow,
 } from "@mui/material/colors";
 import { mapValues } from "lodash";
@@ -16,13 +17,13 @@ export function hex(h: string) {
 }
 
 export const colorsHex = {
-  source: teal["A400"],
-  destination: pink["A400"],
-  updating: pink["A200"],
-  expanding: deepOrange[tint],
+  source: green["A400"],
+  destination: red["A400"],
+  updating: orange[tint],
+  expanding: deepPurple[tint],
   generating: yellow[tint],
-  closing: blueGrey["200"],
-  end: pink["A400"],
+  closing: pink[tint],
+  end: blue["A400"],
 };
 
 export const colors: { [K in TraceEventType]: number } = mapValues(

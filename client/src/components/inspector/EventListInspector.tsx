@@ -1,18 +1,18 @@
-import { CircularProgress, Stack } from "@mui/material";
 import { SortOutlined as ListIcon } from "@mui/icons-material";
+import { CircularProgress, Divider, Stack } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import {
   LazyList as List,
   LazyListHandle as ListHandle,
   LazyListProps as ListProps,
 } from "components/generic/LazyList";
-import { PlaceholderCard } from "components/generic/PlaceholderCard";
-import { delay } from "lodash";
+import { layerHandlers } from "components/layer-editor/layers/LayerSource";
+import { delay, map } from "lodash";
 import { TraceEvent } from "protocol/Trace";
-import { useEffect, useRef } from "react";
-import { useLoading } from "slices/loading";
-import { useSpecimen } from "slices/specimen";
+import { cloneElement, createElement, useEffect, useRef } from "react";
 import { useUIState } from "slices/UIState";
+import { useLoading } from "slices/loading";
+import { usePlayback } from "slices/playback";
 import { EventInspector } from "./EventInspector";
 
 function Placeholder() {
@@ -30,9 +30,13 @@ function Placeholder() {
 
 export function EventListInspector(props: ListProps<TraceEvent>) {
   const [loading] = useLoading();
-  const [{ step = 0, playback }] = useUIState();
-  const [{ specimen }] = useSpecimen();
+  const [{ step = 0, playback }] = usePlayback();
+  const [{ layers }] = useUIState();
   const ref = useRef<ListHandle | null>(null);
+
+  const steps = map(layers, (l) =>
+    createElement(layerHandlers[l.source?.type ?? ""]?.steps!, { layer: l })
+  );
 
   useEffect(() => {
     if (playback === "paused") {
@@ -53,26 +57,28 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
     <Flex vertical alignItems="center">
       {loading.map || loading.specimen ? (
         <CircularProgress />
-      ) : specimen?.eventList?.length ? (
-        <List
-          {...props}
-          items={specimen?.eventList}
-          listOptions={{ ref }}
-          renderItem={(item, i) => (
-            <Flex p={2} pt={i ? 0 : 2}>
-              <EventInspector
-                sx={{ flex: 1 }}
-                event={item}
-                index={i}
-                selected={i === step}
-              />
-            </Flex>
-          )}
-        />
       ) : (
-        <Flex>
-          <Placeholder />
-        </Flex>
+        map(steps, (s) =>
+          cloneElement(s, {
+            children: (steps: TraceEvent[]) => (
+              <List
+                {...props}
+                items={steps}
+                listOptions={{ ref }}
+                renderItem={(item, i) => (
+                  <>
+                    <EventInspector
+                      event={item}
+                      index={i}
+                      selected={i === step}
+                    />
+                    <Divider variant="inset" />
+                  </>
+                )}
+              />
+            ),
+          })
+        )
       )}
     </Flex>
   );

@@ -77,16 +77,14 @@ export function SpecimenService() {
                 setSpecimen(solution);
                 setUIState({ step: 0, playback: "paused", breakpoints: [] });
                 notify(
-                  solution.error ? (
-                    `${entry.name} returned an error: ${solution.error}`
-                  ) : !isEmpty(solution.specimen) ? (
-                    <Label
-                      primary="Solution generated."
-                      secondary={`${solution.specimen?.eventList?.length} steps`}
-                    />
-                  ) : (
-                    "Ready."
-                  )
+                  ...(solution.error
+                    ? [`${entry.name} returned an error: ${solution.error}`]
+                    : !isEmpty(solution.specimen)
+                    ? [
+                        "Solution generated.",
+                        `${solution.specimen?.eventList?.length} steps`,
+                      ]
+                    : ["Ready."])
                 );
               }
             } else {

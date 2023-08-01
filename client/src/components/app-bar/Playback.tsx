@@ -1,15 +1,41 @@
 import {
+  SkipNextOutlined as ForwardIcon,
   PauseOutlined as PauseIcon,
   PlayArrowOutlined as PlayIcon,
-  SkipNextOutlined as ForwardIcon,
   SkipPreviousOutlined as PreviousIcon,
   StopOutlined as StopIcon,
 } from "@mui/icons-material";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
+import { Label } from "components/generic/Label";
+import { useSnackbar } from "components/generic/Snackbar";
+import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
+import { range, trimEnd } from "lodash";
+import { ReactNode, useCallback, useEffect } from "react";
+import { useRaf } from "react-use";
+import { Layer, UploadedTrace } from "slices/UIState";
+import { useSettings } from "slices/settings";
 
-export function Playback() {
+function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
+  let cancelled = false;
+  requestAnimationFrame(async () => {
+    const result = await f();
+    if (!cancelled) g(result);
+  });
+  return () => {
+    cancelled = true;
+  };
+}
+
+export function Playback({
+  layer,
+}: {
+  layer?: Layer<{ trace?: UploadedTrace }>;
+}) {
   const {
+    step,
+    tick,
+    end,
     playing,
     canPause,
     canPlay,
@@ -21,7 +47,56 @@ export function Playback() {
     stepBackward,
     stepForward,
     stop,
-  } = usePlaybackState();
+  } = usePlaybackState(layer);
+  useRaf();
+
+  const notify = useSnackbar();
+  const [{ playbackRate = 1 }] = useSettings();
+  const shouldBreak = useBreakpoints();
+
+  const renderLabel = useCallback(
+    (label: ReactNode, offset: number) => (
+      <Label primary={label} secondary={`Step ${step + offset}`} />
+    ),
+    [step]
+  );
+
+  useEffect(() => {
+    if (playing) {
+      return step < end
+        ? cancellable(
+            async () => {
+              for (const i of range(playbackRate)) {
+                const r = shouldBreak(step + i);
+                if (r.result || r.error) return { ...r, offset: i };
+              }
+              return { result: "", offset: 0 };
+            },
+            ({ result, offset, error }) => {
+              if (!error) {
+                if (result) {
+                  notify(`Breakpoint hit: ${result}.`, offset);
+                  pause(offset);
+                } else tick(playbackRate);
+              } else {
+                notify(`${trimEnd(error, ".")}.`, offset);
+                pause();
+              }
+            }
+          )
+        : pause();
+    }
+  }, [
+    renderLabel,
+    playing,
+    end,
+    step,
+    pause,
+    tick,
+    notify,
+    shouldBreak,
+    playbackRate,
+  ]);
   return (
     <>
       <Button

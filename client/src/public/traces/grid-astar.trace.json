@@ -1,8 +1,7 @@
 {
   "version": "1.0.4",
   "render": {
-    "context": {
-    },
+    "context": {},
     "components": {
       "tile": [
         {
@@ -11,22 +10,24 @@
           "height": 1,
           "x": "{{ctx.x}}",
           "y": "{{ctx.y}}",
+          "fill": "{{ctx.color[ctx.type]}}",
           "drawPath": true
         }
       ]
     },
     "views": {
       "main": {
-          "renderer": "2d-pixi",
-          "components": [
-              {
-                  "$": "tile"
-              }
-          ]
-      }}
+        "renderer": "2d-pixi",
+        "components": [
+          {
+            "$": "tile"
+          }
+        ]
+      }
+    }
   },
-  
-  "eventList": [
+
+  "events": [
     {
       "type": "source",
       "id": 1736,
@@ -23233,5 +23234,4 @@
       "y": 43
     }
   ]
-
 }

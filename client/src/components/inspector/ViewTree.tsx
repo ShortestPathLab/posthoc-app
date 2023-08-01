@@ -37,13 +37,17 @@ export function ViewTree<T>({
   onClose,
   depth = 0,
 }: ViewTreeProps<T>) {
-  const { palette, spacing } = useTheme();
+  const { palette, spacing, transitions } = useTheme();
+
+  const dragCls = useCss({
+    background: palette.text.secondary,
+    opacity: 1 - palette.action.activatedOpacity,
+    transition: transitions.create("opacity"),
+  });
 
   const gutterCls = useCss({
     background: palette.background.default,
-  });
-  const dragCls = useCss({
-    background: palette.text.secondary,
+    [`&:hover .${dragCls}`]: { opacity: 1 },
   });
 
   const getSpacing = (n: number) => Number(spacing(n).slice(0, -2));
@@ -101,9 +105,6 @@ export function ViewTree<T>({
         </Flex>
       ) : (
         <Split
-          gutterTheme={
-            palette.mode === "dark" ? GutterTheme.Dark : GutterTheme.Light
-          }
           gutterClassName={gutterCls}
           draggerClassName={dragCls}
           onResizeFinished={(_, sizes) =>

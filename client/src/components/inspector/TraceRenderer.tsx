@@ -26,7 +26,7 @@ import { Size } from "protocol";
 
 const rendererOptions = {
   tileSubdivision: 1,
-  workerCount: 2,
+  workerCount: 4,
   tileResolution: {
     width: 512,
     height: 512,
@@ -81,8 +81,6 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
 }
 
 export function TraceRenderer({ width, height, renderer }: RendererProps) {
-  const theme = useTheme();
-  const [{ map: loading }] = useLoading();
   const [{ layers }] = useUIState();
 
   const { instance, error, ref } = useRenderer(renderer, { width, height });

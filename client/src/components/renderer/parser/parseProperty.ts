@@ -9,7 +9,7 @@ import { parseString } from "./parseString";
  * @returns a Function which takes in context and returns the properties value
  */
 export function parseProperty(prop: any): Prop<any> {
-  switch (prop.constructor) {
+  switch (prop?.constructor) {
     case Array: {
       const parsed = map(prop, parseProperty);
       return (ctx) => map(parsed, (f) => f(ctx));
