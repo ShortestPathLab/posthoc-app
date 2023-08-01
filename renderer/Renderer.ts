@@ -28,6 +28,8 @@ export interface Renderer<
   setOptions(options: Partial<T>): void;
   add(components: V[]): RemoveElementCallback;
   getView(): HTMLElement | undefined;
+  fitCamera(): void;
+  initialCamera(): void;
 }
 
 type RendererMetadata = FeatureDescriptor & {

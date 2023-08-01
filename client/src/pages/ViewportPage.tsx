@@ -11,11 +11,12 @@ import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { Page } from "pages/Page";
 import { useParsedMap } from "hooks/useParsedMap";
-import { every, find, keyBy, map } from "lodash";
+import { Dictionary, every, filter, find, keyBy, map } from "lodash";
 import { useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { PanelState, useUIState } from "slices/UIState";
 import { Renderer, useRenderers } from "slices/renderers";
+import { Renderer as RendererInstance } from "renderer";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
@@ -35,11 +36,16 @@ export function ViewportPage() {
   const { controls, onChange, state } =
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();
-  const [{ layers }] = useUIState();
 
-  const [selectedLayers, setSelectedLayers] = useState<
-    Record<string, boolean | undefined>
-  >({});
+  const [{ layers }] = useUIState();
+  const [layerSet, setLayerSet] = useState<Dictionary<boolean | undefined>>({});
+  const selectedLayers = useMemo(
+    () => filter(layers, (l) => layerSet?.[l.key] ?? true),
+    [layerSet, layers]
+  );
+
+  const [rendererInstance, setRendererInstance] =
+    useState<RendererInstance | null>();
 
   const { result: m } = useParsedMap();
 
@@ -60,7 +66,12 @@ export function ViewportPage() {
           <AutoSize>
             {(size) => (
               <Box>
-                <TraceRenderer {...size} renderer={selectedRenderer} />
+                <TraceRenderer
+                  {...size}
+                  layers={selectedLayers}
+                  renderer={selectedRenderer}
+                  rendererRef={setRendererInstance}
+                />
               </Box>
             )}
           </AutoSize>
@@ -88,10 +99,11 @@ export function ViewportPage() {
           />
           {divider}
           <FeaturePickerMulti
+            defaultChecked
             label="All Layers"
             icon={<LayersTwoTone />}
-            value={selectedLayers}
-            onChange={setSelectedLayers}
+            value={layerSet}
+            onChange={setLayerSet}
             items={map(layers, (c) => ({
               id: c.key,
               name: c.name ?? "Untitled Layer",
@@ -99,10 +111,22 @@ export function ViewportPage() {
             showArrow
           />
           {divider}
-          <Button disabled startIcon={<CenterFocusStrongTwoTone />}>
+          <Button
+            disabled={!rendererInstance}
+            onClick={() => {
+              rendererInstance?.fitCamera();
+            }}
+            startIcon={<CenterFocusStrongTwoTone />}
+          >
             Fit
           </Button>
-          <Button disabled startIcon={<CropFreeTwoTone />}>
+          <Button
+            disabled={!rendererInstance}
+            onClick={() => {
+              rendererInstance?.initialCamera();
+            }}
+            startIcon={<CropFreeTwoTone />}
+          >
             1:1
           </Button>
         </Stack>

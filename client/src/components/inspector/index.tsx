@@ -3,17 +3,17 @@ import { Flex, FlexProps } from "components/generic/Flex";
 import { pages } from "pages";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { createElement, useState } from "react";
-import { PanelState, useUIState } from "slices/UIState";
 import { useAnyLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
 import { SelectionMenu } from "./SelectionMenu";
 import { ViewTree } from "./ViewTree";
+import { PanelState, useView } from "slices/view";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
 export function Inspector(props: SpecimenInspectorProps) {
   const loading = useAnyLoading();
-  const [{ view }, setUIState] = useUIState();
+  const [{ view }, setView] = useView();
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
@@ -23,7 +23,7 @@ export function Inspector(props: SpecimenInspectorProps) {
       <Flex {...props}>
         <ViewTree<PanelState>
           root={view}
-          onChange={(v) => setUIState({ view: v })}
+          onChange={(v) => setView({ view: v })}
           renderLeaf={({ content }) => (
             <Fade in>
               <Box sx={{ width: "100%", height: "100%" }}>

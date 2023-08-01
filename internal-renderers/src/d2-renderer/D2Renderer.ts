@@ -1,12 +1,15 @@
 import {
+  Dictionary,
   debounce,
   defer,
   find,
   isEqual,
   map,
   once,
+  reduce,
   throttle,
   times,
+  values,
 } from "lodash";
 import { nanoid } from "nanoid";
 import { Viewport } from "pixi-viewport";
@@ -24,8 +27,9 @@ import { D2WorkerEvent, getTiles } from "./D2RendererWorker";
 import { D2RendererWorkerAdapter } from "./D2RendererWorkerAdapter";
 import { EventEmitter } from "./EventEmitter";
 import { intersect } from "./intersect";
+import { primitives } from "./primitives";
 
-const { max } = Math;
+const { max, min } = Math;
 
 class Tile extends PIXI.Sprite {
   static age: number = 0;
@@ -46,6 +50,51 @@ class D2Renderer
   #grid?: PIXI.Graphics;
   #options: D2RendererOptions = defaultD2RendererOptions;
   #workers: D2RendererWorkerAdapter[] = [];
+  #bounds: Dictionary<Bounds[]> = {};
+
+  fitCamera() {
+    const bounds = values(this.#bounds).flat();
+    if (bounds.length) {
+      const out: Bounds = reduce(
+        bounds,
+        (a, b) => ({
+          top: min(a.top, b.top),
+          left: min(a.top, b.left),
+          bottom: max(a.bottom, b.bottom),
+          right: max(a.right, b.right),
+        }),
+        {
+          bottom: -Infinity,
+          top: Infinity,
+          left: Infinity,
+          right: -Infinity,
+        }
+      );
+      this.#viewport?.animate?.({
+        position: new PIXI.Point(
+          (out.left + out.right) / 2,
+          (out.top + out.bottom) / 2
+        ),
+        scale:
+          this.#viewport?.findFit?.(
+            out.right - out.left,
+            out.bottom - out.top
+          ) * 0.8,
+        ease: "easeOutExpo",
+        time: this.#options.animationDuration * 1.5,
+        callbackOnComplete: () => this.#getFrustumChangeQueue()(),
+      });
+    }
+  }
+
+  initialCamera() {
+    this.#viewport?.animate?.({
+      scale: 1,
+      ease: "easeOutExpo",
+      time: this.#options.animationDuration * 1.5,
+      callbackOnComplete: () => this.#getFrustumChangeQueue()(),
+    });
+  }
 
   getView(): HTMLElement | undefined {
     return this.#app?.view;
@@ -67,7 +116,11 @@ class D2Renderer
   add(components: CompiledD2IntrinsicComponent[]) {
     const id = nanoid();
     map(this.#workers, (w) => w.call("add", [components, id]));
-    return () => map(this.#workers, (w) => w.call("remove", [id]));
+    this.#bounds[id] = map(components, (c) => primitives[c.$].test(c));
+    return () => {
+      delete this.#bounds[id];
+      map(this.#workers, (w) => w.call("remove", [id]));
+    };
   }
 
   setOptions(o: D2RendererOptions) {

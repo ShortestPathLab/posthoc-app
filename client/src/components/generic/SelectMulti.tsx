@@ -20,6 +20,7 @@ export type SelectProps<T extends Key> = {
   value?: Record<T, boolean | undefined>;
   onChange?: (value: Record<T, boolean | undefined>) => void;
   placeholder?: string;
+  defaultChecked?: boolean;
 };
 
 const itemHeight = (sm: boolean) => (sm ? 48 : 36);
@@ -31,6 +32,7 @@ export function SelectMulti<T extends string>({
   value,
   onChange,
   placeholder = "Select Options",
+  defaultChecked,
 }: SelectProps<T>) {
   const sm = useSmallDisplay();
   const index = max([findIndex(items, ({ value: v }) => !!value?.[v]), 0]) ?? 0;
@@ -57,11 +59,17 @@ export function SelectMulti<T extends string>({
                 disabled={disabled}
                 key={v}
                 onClick={() => {
-                  onChange?.({ ...value, [v]: !value?.[v] } as any);
+                  onChange?.({
+                    ...value,
+                    [v]: !(value?.[v] ?? defaultChecked),
+                  } as any);
                 }}
               >
                 <ListItemIcon>
-                  <Checkbox sx={{ p: 0 }} checked={!!value?.[v]} />
+                  <Checkbox
+                    sx={{ p: 0 }}
+                    checked={!!(value?.[v] ?? defaultChecked)}
+                  />
                 </ListItemIcon>
                 {label}
               </MenuItem>

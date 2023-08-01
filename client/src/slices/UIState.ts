@@ -63,38 +63,14 @@ export type Layer<T = {}> = {
   source?: { type: string } & T;
 };
 
-export type Node<T> = { size?: number };
-
-export type Branch<T> = Node<T> & {
-  type: "branch";
-  key: string;
-  orientation: "vertical" | "horizontal";
-  children: Root<T>[];
-};
-
-export type Leaf<T> = Node<T> & {
-  type: "leaf";
-  key: string;
-  content?: T;
-};
-
-export type Root<T> = Branch<T> | Leaf<T>;
-
-export type ViewTreeState = { view: Root<PanelState> };
-
 export type LayerState = {
   layers: Layer[];
-};
-
-export type PanelState = {
-  type: string;
 };
 
 export type UIState = InputState &
   DebugOptionsState &
   SpecimenState &
-  LayerState &
-  ViewTreeState;
+  LayerState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
@@ -102,51 +78,4 @@ export const [useUIState, UIStateProvider] = createSlice<
 >({
   code: makeTemplate(values(templates)),
   layers: [],
-  view: {
-    type: "branch",
-    key: id(),
-    orientation: "horizontal",
-    children: [
-      {
-        size: 75,
-        type: "branch",
-        key: id(),
-        orientation: "horizontal",
-        children: [
-          {
-            type: "leaf",
-            size: 25,
-            key: id(),
-            content: { type: "layers" },
-          },
-          {
-            size: 75,
-            type: "branch",
-            key: id(),
-            orientation: "vertical",
-            children: [
-              {
-                type: "leaf",
-                size: 75,
-                key: id(),
-                content: { type: "viewport" },
-              },
-              {
-                type: "leaf",
-                size: 25,
-                key: id(),
-                content: { type: "info" },
-              },
-            ],
-          },
-        ],
-      },
-      {
-        size: 25,
-        type: "leaf",
-        key: id(),
-        content: { type: "steps" },
-      },
-    ],
-  },
 });

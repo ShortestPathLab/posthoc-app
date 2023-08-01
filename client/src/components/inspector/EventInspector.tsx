@@ -1,10 +1,13 @@
 import {
+  Divider,
+  ListItem,
   ListItemButton,
   ListItemButtonProps,
   ListItemIcon,
   ListItemText,
   Typography as Type,
   useTheme,
+  Skeleton as Placeholder,
 } from "@mui/material";
 import { getColorHex } from "components/renderer/colors";
 import { TraceEvent } from "protocol/Trace";
@@ -59,7 +62,39 @@ export function EventInspector({
       <ListItemText
         primary={<EventLabel event={event} hidden={false} />}
         secondary={<PropertyList event={event} />}
-      ></ListItemText>
+      />
     </ListItemButton>
+  );
+}
+
+export function Skeleton() {
+  const { spacing, palette } = useTheme();
+  return (
+    <>
+      <ListItem
+        sx={{
+          borderLeft: `${spacing(0.5)} solid transparent`,
+        }}
+      >
+        <ListItemIcon>
+          <Type variant="body2">
+            <Placeholder animation={false} width={spacing(4)} />
+          </Type>
+        </ListItemIcon>
+        <ListItemText
+          primary={
+            <Type variant="overline">
+              <Placeholder animation={false} width={spacing(12)} />
+            </Type>
+          }
+          secondary={
+            <Type variant="body2">
+              <Placeholder animation={false} width={spacing(24)} />
+            </Type>
+          }
+        />
+      </ListItem>
+      <Divider variant="inset" />
+    </>
   );
 }

@@ -5,7 +5,7 @@ import {
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps } from "components/renderer/Renderer";
 import { useParsedMap } from "hooks/useParsedMap";
-import { find, map, uniq } from "lodash";
+import { filter, find, map, uniq } from "lodash";
 import {
   createContext,
   useContext,
@@ -60,9 +60,13 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
         ref.current.append(instance.getView()!);
         setInstance(instance);
         return () => {
-          ref.current?.removeChild?.(instance.getView()!);
-          instance.destroy();
-          setInstance(undefined);
+          try {
+            ref.current?.removeChild?.(instance.getView()!);
+            instance.destroy();
+            setInstance(undefined);
+          } catch (e) {
+            console.warn(e);
+          }
         };
       }
     }
@@ -80,12 +84,18 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
   return { instance, ref, error };
 }
 
-export function TraceRenderer({ width, height, renderer }: RendererProps) {
-  const [{ layers }] = useUIState();
-
+export function TraceRenderer({
+  width,
+  height,
+  renderer,
+  rendererRef,
+  layers,
+}: RendererProps) {
   const { instance, error, ref } = useRenderer(renderer, { width, height });
 
   const context = useMemo(() => ({ renderer: instance }), [instance]);
+
+  useEffect(() => rendererRef?.(instance), [instance, rendererRef]);
 
   return (
     <TraceRendererContext.Provider value={context}>
@@ -108,7 +118,7 @@ export function TraceRenderer({ width, height, renderer }: RendererProps) {
         ) : (
           <>
             <Box ref={ref}>
-              {map(layers, (l) => (
+              {layers.map((l) => (
                 <RenderLayer key={l.key} layer={l} />
               ))}
             </Box>

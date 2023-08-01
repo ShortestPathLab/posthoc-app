@@ -16,6 +16,7 @@ import { PlaybackProvider } from "slices/playback";
 import { RendererProvider } from "slices/renderers";
 import { SettingsProvider } from "slices/settings";
 import { SpecimenProvider } from "slices/specimen";
+import { ViewProvider } from "slices/view";
 
 const slices = [
   SettingsProvider,
@@ -27,6 +28,7 @@ const slices = [
   RendererProvider,
   PlaybackProvider,
   LogProvider,
+  ViewProvider,
 ];
 
 const services = [ConnectionsService, FeaturesService, RendererService];

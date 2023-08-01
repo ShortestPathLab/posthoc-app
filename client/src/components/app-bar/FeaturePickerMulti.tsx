@@ -14,6 +14,7 @@ type Props = {
   items?: FeatureDescriptor[];
   icon?: ReactNode;
   showArrow?: boolean;
+  defaultChecked?: boolean;
 };
 
 export function FeaturePickerMulti({
@@ -23,8 +24,9 @@ export function FeaturePickerMulti({
   items,
   icon,
   showArrow,
+  defaultChecked,
 }: Props) {
-  const selected = filter(items, ({ id }) => !!value?.[id]);
+  const selected = filter(items, ({ id }) => !!(value?.[id] ?? defaultChecked));
 
   const buttonLabel = selected.length
     ? selected.length === 1
@@ -34,6 +36,7 @@ export function FeaturePickerMulti({
 
   return (
     <SelectMulti
+      defaultChecked
       placeholder={startCase(label)}
       trigger={(props) => (
         <Button

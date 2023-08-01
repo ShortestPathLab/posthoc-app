@@ -1,5 +1,11 @@
 import { SortOutlined as ListIcon } from "@mui/icons-material";
-import { CircularProgress, Divider, Stack } from "@mui/material";
+import {
+  CircularProgress,
+  Divider,
+  ListItem,
+  ListItemText,
+  Stack,
+} from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import {
   LazyList as List,
@@ -67,11 +73,17 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
                 listOptions={{ ref }}
                 renderItem={(item, i) => (
                   <>
-                    <EventInspector
-                      event={item}
-                      index={i}
-                      selected={i === step}
-                    />
+                    {true ? (
+                      <EventInspector
+                        event={item}
+                        index={i}
+                        selected={i === step}
+                      />
+                    ) : (
+                      <ListItem>
+                        <ListItemText primary="" secondary="" />
+                      </ListItem>
+                    )}
                     <Divider variant="inset" />
                   </>
                 )}

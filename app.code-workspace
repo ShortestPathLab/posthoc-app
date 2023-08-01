@@ -13,6 +13,9 @@
       "path": "adapter"
     },
     {
+      "path": "adapter-template-ts"
+    },
+    {
       "path": "renderer"
     },
     {

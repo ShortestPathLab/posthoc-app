@@ -7,6 +7,9 @@ import {
   Button,
   CircularProgress,
   Divider,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Typography as Type,
   useTheme,
 } from "@mui/material";
@@ -17,7 +20,7 @@ import {
   LazyList as List,
   LazyListHandle as ListHandle,
 } from "components/generic/LazyList";
-import { EventInspector } from "components/inspector/EventInspector";
+import { EventInspector, Skeleton } from "components/inspector/EventInspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { layerHandlers } from "components/layer-editor/layers/LayerSource";
@@ -84,17 +87,22 @@ export function StepsPage() {
                 children: (steps: TraceEvent[]) =>
                   steps.length ? (
                     <List
-                      sx={{ width: "100%", height: "100%" }}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        paddingTop: spacing(6),
+                      }}
                       items={steps}
                       listOptions={{ ref }}
+                      placeholder={<Skeleton />}
                       renderItem={(item, i) => (
                         <>
-                          <Box pt={i ? 0 : 6} />
                           <EventInspector
                             event={item}
                             index={i}
                             selected={i === step}
                           />
+
                           <Divider variant="inset" />
                         </>
                       )}
