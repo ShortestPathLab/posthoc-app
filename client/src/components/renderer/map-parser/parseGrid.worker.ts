@@ -83,7 +83,7 @@ export function optimizeGridMap(
 }
 
 export type Options = {
-  wall?: string;
+  floor?: string;
   color?: string;
 };
 
@@ -95,28 +95,24 @@ export type ParseGridWorkerParameters = {
 export type ParseGridWorkerReturnType = Pick<
   MapInfo,
   "log" | "bounds" | "nodes"
-> & { width: number; height: number };
+>;
 
 function parseGrid({
   map: m,
-  options: { wall = "@", color = "#151d2f" } = {},
+  options: { floor = ".", color = "#151d2f" } = {},
 }: ParseGridWorkerParameters): ParseGridWorkerReturnType {
   const lines = m.split("\n");
   const [, h = "", w = "", , ...grid] = lines;
   const [width, height] = [w, h].map((d) => +last(d.split(" "))!);
 
   const nodes = optimizeGridMap(
-    grid.map((l) => map(l, (c) => c === wall)),
+    grid.map((l) => map(l, (c) => c !== floor)),
     { width, height }
   );
 
   return {
-    width,
-    height,
     log: [
-      `${((nodes.length * 100) / (width * height)).toFixed(
-        2
-      )}% of original size`,
+      `${((nodes.length * 100) / (width * height)).toFixed(2)}% of original`,
     ],
     bounds: { width, height, minX: 0, minY: 0, maxX: width, maxY: height },
     nodes: nodes.map((node) => ({

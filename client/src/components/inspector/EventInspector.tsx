@@ -8,6 +8,7 @@ import {
   Typography as Type,
   useTheme,
   Skeleton as Placeholder,
+  Tooltip,
 } from "@mui/material";
 import { getColorHex } from "components/renderer/colors";
 import { TraceEvent } from "protocol/Trace";
@@ -53,16 +54,20 @@ export function EventInspector({
       {...props}
       sx={{
         borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
+        ...props.sx,
       }}
       onClick={() => setPlayback({ step: index })}
     >
       <ListItemIcon>
         <Type variant="body2">{index}</Type>
       </ListItemIcon>
-      <ListItemText
-        primary={<EventLabel event={event} hidden={false} />}
-        secondary={<PropertyList event={event} />}
-      />
+      <Tooltip title={<PropertyList event={event} flexDirection="column" />}>
+        <ListItemText
+          sx={{ overflow: "hidden" }}
+          primary={<EventLabel event={event} hidden={false} />}
+          secondary={<PropertyList event={event} />}
+        />
+      </Tooltip>
     </ListItemButton>
   );
 }

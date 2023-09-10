@@ -54,7 +54,7 @@ export function FeaturePickerMulti({
           <>
             <Type>{name}</Type>
             <Space />
-            <Type variant="body2" color="textSecondary">
+            <Type variant="body2" color="text.secondary">
               {description}
             </Type>
           </>

@@ -116,7 +116,7 @@ export function ViewTree<T>({
               })
             )
           }
-          minHeights={map(root.children, () => getSpacing(6))}
+          minHeights={map(root.children, () => getSpacing(6) - 11)}
           minWidths={map(root.children, () => getSpacing(32))}
           initialSizes={map(
             root.children,
@@ -126,7 +126,7 @@ export function ViewTree<T>({
             {
               vertical: SplitDirection.Vertical,
               horizontal: SplitDirection.Horizontal,
-            }[root.orientation]
+            }[root.orientation as "vertical" | "horizontal"]
           }
         >
           {map(root.children, (c, i) => (

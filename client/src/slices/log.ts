@@ -1,7 +1,5 @@
 import { createSlice } from "./createSlice";
 
-export type PlaybackStateType = "playing" | "paused" | undefined;
-
 type LogEntry = {
   content: string;
   timestamp?: string;

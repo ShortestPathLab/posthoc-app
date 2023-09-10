@@ -2,16 +2,18 @@ import combinate from "combinate";
 import {
   Dictionary,
   ceil,
+  debounce,
   floor,
+  isEqual,
   map,
   once,
   range,
   sortBy,
-  throttle,
 } from "lodash";
 import memoizee from "memoizee";
-import type { Bounds, Point } from "protocol";
-import RBush from "rbush";
+import type { Bounds, Point, Size } from "protocol";
+import { ComponentEntry } from "renderer";
+import { Bush } from "./Bush";
 import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 import {
   D2RendererEvents,
@@ -82,22 +84,10 @@ export type D2WorkerEvent<
   payload: D2WorkerEvents[T];
 };
 
-type Body = Bounds & {
-  component: CompiledD2IntrinsicComponent;
-  index: number;
-};
-
-class Bush extends RBush<Body> {
-  toBBox(b: Body) {
-    return { minX: b.left, minY: b.top, maxX: b.right, maxY: b.bottom };
-  }
-  compareMinX(a: Body, b: Body) {
-    return a.left - b.left;
-  }
-  compareMinY(a: Body, b: Body) {
-    return a.top - b.top;
-  }
-}
+export type Body<T> = Bounds &
+  ComponentEntry<T> & {
+    index: number;
+  };
 
 const TILE_CACHE_SIZE = 200;
 
@@ -108,8 +98,8 @@ export class D2RendererWorker extends EventEmitter<
 > {
   #options: D2RendererOptions = defaultD2RendererOptions;
   #frustum: Bounds = { bottom: 256, top: 0, left: 0, right: 256 };
-  #system: Bush = new Bush(16);
-  #children: Dictionary<Body[]> = {};
+  #system: Bush<CompiledD2IntrinsicComponent> = new Bush(16);
+  #children: Dictionary<Body<CompiledD2IntrinsicComponent>[]> = {};
 
   getView() {
     return { system: this.#system };
@@ -118,6 +108,13 @@ export class D2RendererWorker extends EventEmitter<
   setFrustum(frustum: Bounds) {
     this.#frustum = frustum;
     this.#getRenderQueue()();
+  }
+
+  setTileResolution(tileResolution: Size) {
+    if (!isEqual(tileResolution, this.#options.tileResolution)) {
+      Object.assign(this.#options, { tileResolution });
+      this.#invalidate();
+    }
   }
 
   #count: number = 0;
@@ -161,7 +158,7 @@ export class D2RendererWorker extends EventEmitter<
       this.#options.tileSubdivision
     ).tiles) {
       if (this.#shouldRender(tile)) {
-        const bitmap = await createImageBitmap(this.renderTile(bounds));
+        const bitmap = this.renderTile(bounds, this.#options.tileResolution);
         this.emit(
           "message",
           {
@@ -171,14 +168,14 @@ export class D2RendererWorker extends EventEmitter<
               bitmap,
             },
           },
-          [bitmap]
+          []
         );
       }
     }
   }
 
   #getRenderQueue = once(() =>
-    throttle(() => this.render(), this.#options.refreshInterval, {
+    debounce(() => this.render(), this.#options.refreshInterval, {
       leading: false,
       trailing: true,
     })
@@ -189,14 +186,13 @@ export class D2RendererWorker extends EventEmitter<
     return pointToIndex({ x, y }) % workerCount === workerIndex;
   }
 
-  renderTile = memoizee((b: Bounds) => this.#renderTile(b), {
+  renderTile = memoizee((b: Bounds, t: Size) => this.#renderTile(b, t), {
     normalizer: JSON.stringify,
     max: TILE_CACHE_SIZE,
   });
 
-  #renderTile(bounds: Bounds) {
+  #renderTile(bounds: Bounds, tile: Size) {
     const { top, right, bottom, left } = bounds;
-    const { tileResolution: tile } = this.#options;
     const scale = {
       x: tile.width / (right - left),
       y: tile.height / (bottom - top),

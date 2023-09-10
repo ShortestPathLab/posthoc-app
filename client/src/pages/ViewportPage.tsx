@@ -6,18 +6,20 @@ import {
 } from "@mui/icons-material";
 import { Box, Button, Divider, Stack } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 import { Flex } from "components/generic/Flex";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "pages/Page";
+import { inferLayerName } from "components/layer-editor/layers/LayerSource";
 import { useParsedMap } from "hooks/useParsedMap";
 import { Dictionary, every, filter, find, keyBy, map } from "lodash";
+import { Page } from "pages/Page";
 import { useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
-import { PanelState, useUIState } from "slices/UIState";
-import { Renderer, useRenderers } from "slices/renderers";
 import { Renderer as RendererInstance } from "renderer";
-import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
+import { useUIState } from "slices/UIState";
+import { Renderer, useRenderers } from "slices/renderers";
+import { PanelState } from "slices/view";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -100,13 +102,13 @@ export function ViewportPage() {
           {divider}
           <FeaturePickerMulti
             defaultChecked
-            label="All Layers"
+            label="Layers"
             icon={<LayersTwoTone />}
             value={layerSet}
             onChange={setLayerSet}
             items={map(layers, (c) => ({
               id: c.key,
-              name: c.name ?? "Untitled Layer",
+              name: inferLayerName(c),
             }))}
             showArrow
           />

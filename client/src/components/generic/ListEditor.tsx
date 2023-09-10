@@ -133,8 +133,8 @@ export function ListEditorField({
         })}
       <Box
         flexGrow={1}
-        style={{
-          marginLeft: -theme.spacing(icon === null ? 2 : 0),
+        sx={{
+          ml: icon === null ? 2 : 0,
         }}
       >
         {cloneElement(element, {
@@ -327,7 +327,7 @@ export default function Editor<T>(props: Props<T>) {
                 {text && (
                   <Typography
                     variant="body2"
-                    color="textSecondary"
+                    color="text.secondary"
                     gutterBottom
                     style={{ marginBottom: theme.spacing(3) }}
                   >
@@ -359,7 +359,7 @@ export default function Editor<T>(props: Props<T>) {
                           <Box pl={2} pb={2} pt={1}>
                             <Typography
                               variant="overline"
-                              color="textSecondary"
+                              color="text.secondary"
                             >
                               {getCategory(c.value)}
                             </Typography>
@@ -378,7 +378,7 @@ export default function Editor<T>(props: Props<T>) {
         </Box>
         <Collapse in={!items?.length}>
           <Box ml={2} mb={1} pt={getCategory ? 1 : 0}>
-            <Typography color="textSecondary">
+            <Typography component="div" color="text.secondary">
               {placeholderText ?? "No items"}
             </Typography>
           </Box>

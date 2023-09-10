@@ -33,10 +33,10 @@ export function Inspector(props: SpecimenInspectorProps) {
           )}
         />
       </Flex>
-      <SelectionMenu
+      {/* <SelectionMenu
         selection={selection}
         onClose={() => setSelection(undefined)}
-      />
+      /> */}
       <Fade in={loading}>
         <LinearProgress
           variant="indeterminate"

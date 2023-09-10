@@ -9,17 +9,19 @@ import { ReactNode } from "react";
 type Props = {
   label?: ReactNode;
   value?: ReactNode;
-  type?: TypeProps;
+  type?: TypeProps<"div">;
 };
 
 export function Property({ label, value, type }: Props) {
   return (
     <Flex width="auto" mr={3} mt={0.5} key={`${label}::${value}`}>
-      <Type sx={{ opacity: 0.54 }} {...type}>
+      <Type component="div" sx={{ opacity: 0.54 }} {...type}>
         {label}
       </Type>
       <Space />
-      <Type {...type}>{value}</Type>
+      <Type component="div" {...type}>
+        {value}
+      </Type>
     </Flex>
   );
 }

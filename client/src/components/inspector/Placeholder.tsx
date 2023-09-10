@@ -14,6 +14,7 @@ export function Placeholder({
       color="text.secondary"
       bgcolor="background.paper"
       vertical
+      pt={6}
       {...rest}
     >
       {cloneElement(icon, { sx: { mb: 2 }, fontSize: "large" })}

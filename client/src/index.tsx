@@ -2,7 +2,7 @@ import { CssBaseline } from "@mui/material";
 import App from "App";
 import "index.css";
 import "overlayscrollbars/overlayscrollbars.css";
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { ConnectionsService } from "services/ConnectionsService";
 import { FeaturesService } from "services/FeaturesService";
 import { RendererService } from "services/RendererService";
@@ -33,11 +33,12 @@ const slices = [
 
 const services = [ConnectionsService, FeaturesService, RendererService];
 
-render(
+const root = createRoot(document.getElementById("root")!);
+
+root.render(
   <CssBaseline>
     <EnvironmentProvider slices={slices} services={services}>
       <App />
     </EnvironmentProvider>
-  </CssBaseline>,
-  document.getElementById("root")
+  </CssBaseline>
 );

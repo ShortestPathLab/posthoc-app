@@ -1,8 +1,5 @@
 import { Renderer, RendererEvents, RendererOptions } from "renderer";
-import {
-  CompiledD2IntrinsicComponent,
-  ParsedD2IntrinsicComponent,
-} from "./D2IntrinsicComponents";
+import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 
 export type Size = {
   width: number;
@@ -14,6 +11,15 @@ export type Point = {
   y: number;
 };
 
+type DynamicResolutionOptions = {
+  intervalMs: number;
+  increment: number;
+  maxScale: number;
+  minScale: number;
+  dtMax: number;
+  dtMin: number;
+};
+
 export type D2RendererOptions = RendererOptions & {
   tileResolution: Size;
   tileSubdivision: number;
@@ -22,8 +28,7 @@ export type D2RendererOptions = RendererOptions & {
   refreshInterval: number;
   animationDuration: number;
   debounceInterval: number;
-  backgroundColor: string;
-  accentColor: string;
+  dynamicResolution: DynamicResolutionOptions;
 };
 
 export const defaultD2RendererOptions: D2RendererOptions = {
@@ -36,10 +41,18 @@ export const defaultD2RendererOptions: D2RendererOptions = {
   },
   tileSubdivision: 0,
   refreshInterval: 1000 / 30,
-  animationDuration: 300,
+  animationDuration: 150,
   debounceInterval: 300,
   backgroundColor: "#ffffff",
   accentColor: "#333333",
+  dynamicResolution: {
+    intervalMs: 5000,
+    increment: 0.25,
+    maxScale: 1.5,
+    minScale: 1,
+    dtMax: 1.5,
+    dtMin: 1.1,
+  },
 };
 
 export type D2RendererEvents = RendererEvents & {};

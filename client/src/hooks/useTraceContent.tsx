@@ -26,20 +26,20 @@ export function useTraceContent(trace?: Trace, view: "main" = "main") {
     return {
       events: trace?.events ?? [],
       apply: (event: TraceEvent, ctx?: EventContext) =>
-        map(parsed, (p) => ({
-          fill: theme.palette.primary.main,
-          alpha: 1,
-          ...mapProperties<
+        map(parsed, (p) =>
+          mapProperties<
             ParsedComponent<string, any>,
             CompiledComponent<string, {}>
           >(p, (c) =>
             c({
+              fill: theme.palette.primary.main,
+              alpha: 1,
               ...context,
               ...ctx,
               ...event,
             })
-          ),
-        })),
+          )
+        ),
     };
   }, [trace, view, theme]);
 }

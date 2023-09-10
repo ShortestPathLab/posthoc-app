@@ -13,6 +13,7 @@ type Props = {
   items?: FeatureDescriptor[];
   icon?: ReactNode;
   showArrow?: boolean;
+  disabled?: boolean;
 };
 
 export function FeaturePicker({
@@ -22,6 +23,7 @@ export function FeaturePicker({
   items,
   icon,
   showArrow,
+  disabled,
 }: Props) {
   const selected = find(items, { id: value });
   return (
@@ -30,7 +32,7 @@ export function FeaturePicker({
       trigger={(props) => (
         <Button
           {...props}
-          disabled={!items?.length}
+          disabled={!items?.length || disabled}
           startIcon={icon}
           endIcon={showArrow && <ArrowDropDownOutlined sx={{ ml: -0.5 }} />}
         >
@@ -43,7 +45,7 @@ export function FeaturePicker({
           <>
             <Type>{name}</Type>
             <Space />
-            <Type variant="body2" color="textSecondary">
+            <Type variant="body2" color="text.secondary">
               {description}
             </Type>
           </>

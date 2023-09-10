@@ -1,4 +1,5 @@
-import { map, uniqBy } from "lodash";
+import { mapParsers } from "components/renderer/map-parser";
+import { keys, map, uniqBy } from "lodash";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useConnections } from "slices/connections";
 import { Features, useFeatures } from "slices/features";
@@ -14,7 +15,14 @@ export function FeaturesService() {
   useAsync(
     (signal) =>
       usingLoadingState(async () => {
-        const features: Features = { algorithms: [], formats: [], maps: [] };
+        const features: Features = {
+          algorithms: [],
+          formats: keys(mapParsers).map((c) => ({
+            id: c,
+            source: "internal",
+          })),
+          maps: [],
+        };
         for (const { call, url } of connections) {
           for (const prop of ["algorithms", "formats", "maps"] as const) {
             features[prop] = uniqBy(

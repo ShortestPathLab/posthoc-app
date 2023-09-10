@@ -45,7 +45,7 @@ export function AboutPage() {
   function renderSection(label: ReactNode, content: ReactNode) {
     return (
       <Box sx={{ pt: 2 }}>
-        <Type variant="overline" color="textSecondary">
+        <Type variant="overline" color="text.secondary">
           {label}
         </Type>
         <Type variant="body2">{content}</Type>

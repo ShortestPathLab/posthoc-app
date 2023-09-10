@@ -23,7 +23,10 @@ import {
 import { EventInspector, Skeleton } from "components/inspector/EventInspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { layerHandlers } from "components/layer-editor/layers/LayerSource";
+import {
+  inferLayerName,
+  layerHandlers,
+} from "components/layer-editor/layers/LayerSource";
 import { delay, find, head, map } from "lodash";
 import { Page } from "pages/Page";
 import { TraceEvent } from "protocol";
@@ -85,28 +88,41 @@ export function StepsPage() {
             playback !== "playing" ? (
               cloneElement(steps, {
                 children: (steps: TraceEvent[]) =>
-                  steps.length ? (
-                    <List
-                      sx={{
-                        width: "100%",
-                        height: "100%",
-                        paddingTop: spacing(6),
-                      }}
-                      items={steps}
-                      listOptions={{ ref }}
-                      placeholder={<Skeleton />}
-                      renderItem={(item, i) => (
-                        <>
-                          <EventInspector
-                            event={item}
-                            index={i}
-                            selected={i === step}
-                          />
-
-                          <Divider variant="inset" />
-                        </>
-                      )}
-                    />
+                  layer ? (
+                    steps.length ? (
+                      <List
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                        items={steps}
+                        listOptions={{ ref, defaultItemHeight: 80 }}
+                        placeholder={<Skeleton />}
+                        renderItem={(item, i) => (
+                          <Box
+                            sx={{
+                              height: spacing(i ? 10 : 16),
+                              pt: i ? 0 : spacing(6),
+                            }}
+                          >
+                            <EventInspector
+                              event={item}
+                              index={i}
+                              selected={i === step}
+                              sx={{ height: "100%" }}
+                            />
+                            <Divider variant="inset" />
+                          </Box>
+                        )}
+                      />
+                    ) : (
+                      <Placeholder
+                        icon={<StepsIcon />}
+                        label={`${inferLayerName(
+                          layer
+                        )} has no steps to display`}
+                      />
+                    )
                   ) : (
                     <Placeholder icon={<StepsIcon />} label="Steps" />
                   ),
@@ -136,7 +152,7 @@ export function StepsPage() {
           value={key}
           items={map(layers, (l) => ({
             id: l.key,
-            name: l.name ?? "Untitled Layer",
+            name: inferLayerName(l),
           }))}
           onChange={setKey}
           showArrow

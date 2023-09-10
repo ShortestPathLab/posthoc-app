@@ -44,7 +44,7 @@ export type TraceContext = {
 export type TraceView = {
   renderer?: string;
   components?: TraceComponent[];
-  persist?: boolean;
+  onionSkin?: number;
 };
 
 export type TraceViews = {
@@ -63,6 +63,10 @@ export type TraceRender = {
   context?: TraceContext;
   components?: TraceComponents;
   views?: TraceViews;
+  path?: {
+    pivot?: { x?: string; y?: string; z?: string };
+    scale?: number;
+  };
 };
 
 export type Trace = {

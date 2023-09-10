@@ -1,18 +1,31 @@
-import { CompiledComponent, Size } from "protocol";
+import { CompiledComponent, Point, Size } from "protocol";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import EventEmitter from "typed-emitter";
 
 export type RendererOptions = {
   screenSize: Size;
+  backgroundColor: string;
+  accentColor: string;
 };
 
-export type RendererEvent = {};
+export type RendererEvent = {
+  world: Point;
+  components: ComponentEntry[];
+};
 
 export type RendererEvents = {
-  click: (e: MouseEvent, rendererEvent: RendererEvent) => void;
+  click: (e: Event, rendererEvent: RendererEvent) => void;
 };
 
 export type RemoveElementCallback = () => void;
+
+export type ComponentEntry<
+  V extends CompiledComponent<any, any> = CompiledComponent<string, {}>,
+  M = any
+> = {
+  component: V;
+  meta?: M;
+};
 
 /**
  * Responsible for consuming the components definition
@@ -26,10 +39,11 @@ export interface Renderer<
   setup(options: Partial<T>): void;
   destroy(): void;
   setOptions(options: Partial<T>): void;
-  add(components: V[]): RemoveElementCallback;
+  add(components: ComponentEntry<V>[]): RemoveElementCallback;
   getView(): HTMLElement | undefined;
   fitCamera(): void;
   initialCamera(): void;
+  getInstance(): any;
 }
 
 type RendererMetadata = FeatureDescriptor & {

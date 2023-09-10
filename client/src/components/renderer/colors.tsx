@@ -2,12 +2,14 @@ import {
   blue,
   deepPurple,
   green,
+  grey,
   orange,
   pink,
   red,
   yellow,
 } from "@mui/material/colors";
 import { mapValues } from "lodash";
+import { EventTypeColors } from "protocol";
 import { TraceEventType } from "protocol/Trace";
 
 const tint = "500";
@@ -16,7 +18,7 @@ export function hex(h: string) {
   return parseInt(h.replace("#", "0x"));
 }
 
-export const colorsHex = {
+export const colorsHex: EventTypeColors = {
   source: green["A400"],
   destination: red["A400"],
   updating: orange[tint],
@@ -36,5 +38,5 @@ export function getColor(key?: TraceEventType) {
 }
 
 export function getColorHex(key?: TraceEventType) {
-  return (key && colorsHex[key]) ?? orange[tint];
+  return (key && colorsHex[key]) ?? grey[tint];
 }

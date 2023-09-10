@@ -3,9 +3,10 @@ import {
   ViewInArTwoTone,
 } from "@mui/icons-material";
 import { Box, CircularProgress, useTheme } from "@mui/material";
-import { RendererProps } from "components/renderer/Renderer";
-import { useParsedMap } from "hooks/useParsedMap";
-import { filter, find, map, uniq } from "lodash";
+import { RenderLayer } from "components/layer-editor/layers/LayerSource";
+import { RendererProps, SelectEvent } from "components/renderer/Renderer";
+import { find, map } from "lodash";
+import { Size } from "protocol";
 import {
   createContext,
   useContext,
@@ -15,21 +16,18 @@ import {
   useState,
 } from "react";
 import { useDebounce } from "react-use";
-import { Renderer } from "renderer";
+import { Renderer, RendererEvent } from "renderer";
 import { useRenderers } from "slices/renderers";
-import { useSpecimen } from "slices/specimen";
 import { Placeholder } from "./Placeholder";
+import { SelectionMenu } from "./SelectionMenu";
 import { useLoading } from "slices/loading";
-import { RenderLayer } from "components/layer-editor/layers/LayerSource";
-import { useUIState } from "slices/UIState";
-import { Size } from "protocol";
 
 const rendererOptions = {
-  tileSubdivision: 1,
-  workerCount: 4,
+  tileSubdivision: 2,
+  workerCount: 2,
   tileResolution: {
-    width: 512,
-    height: 512,
+    width: 1024,
+    height: 1024,
   },
 };
 
@@ -62,10 +60,11 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
         return () => {
           try {
             ref.current?.removeChild?.(instance.getView()!);
-            instance.destroy();
             setInstance(undefined);
           } catch (e) {
             console.warn(e);
+          } finally {
+            instance.destroy();
           }
         };
       }
@@ -84,6 +83,21 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
   return { instance, ref, error };
 }
 
+function TraceRendererCircularProgress() {
+  const [{ map, specimen }] = useLoading();
+  return (
+    !!(map || specimen) && (
+      <CircularProgress
+        sx={{
+          position: "absolute",
+          top: (t) => t.spacing(6 + 2),
+          right: (t) => t.spacing(2),
+        }}
+      />
+    )
+  );
+}
+
 export function TraceRenderer({
   width,
   height,
@@ -93,45 +107,69 @@ export function TraceRenderer({
 }: RendererProps) {
   const { instance, error, ref } = useRenderer(renderer, { width, height });
 
+  const [selection, setSelection] = useState<SelectEvent>();
+
+  useEffect(() => {
+    if (instance) {
+      const handleClick = (e: Event, e1: RendererEvent): void => {
+        const e2 = e as MouseEvent;
+        setSelection({
+          client: { x: e2.clientX, y: e2.clientY },
+          world: e1.world,
+          info: { point: e1.world, components: e1.components },
+        });
+        console.log(e, e1);
+      };
+      instance.on("click", handleClick);
+      return () => void instance.off("click", handleClick);
+    }
+  }, [instance]);
   const context = useMemo(() => ({ renderer: instance }), [instance]);
 
   useEffect(() => rendererRef?.(instance), [instance, rendererRef]);
 
   return (
-    <TraceRendererContext.Provider value={context}>
-      {layers?.length ? (
-        error ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              width,
-              height,
-              alignItems: "center",
-              justifyContent: "center",
-              color: "text.secondary",
-            }}
-          >
-            <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
-            {error}
-          </Box>
-        ) : (
-          <>
-            <Box ref={ref}>
-              {layers.map((l) => (
-                <RenderLayer key={l.key} layer={l} />
-              ))}
+    <>
+      <TraceRendererCircularProgress />
+      <TraceRendererContext.Provider value={context}>
+        {layers?.length ? (
+          error ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                width,
+                height,
+                alignItems: "center",
+                justifyContent: "center",
+                color: "text.secondary",
+              }}
+            >
+              <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
+              {error}
             </Box>
-          </>
-        )
-      ) : (
-        <Placeholder
-          icon={<ViewInArTwoTone />}
-          label="No layers to render"
-          width={width}
-          height={height}
-        />
-      )}
-    </TraceRendererContext.Provider>
+          ) : (
+            <>
+              <Box ref={ref}>
+                {layers.map((l) => (
+                  <RenderLayer key={l.key} layer={l} />
+                ))}
+              </Box>
+            </>
+          )
+        ) : (
+          <Placeholder
+            icon={<ViewInArTwoTone />}
+            label="No layers to render"
+            width={width}
+            height={height}
+          />
+        )}
+      </TraceRendererContext.Provider>
+      <SelectionMenu
+        selection={selection}
+        onClose={() => setSelection(undefined)}
+      />
+    </>
   );
 }

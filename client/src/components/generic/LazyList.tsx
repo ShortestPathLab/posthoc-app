@@ -57,17 +57,17 @@ export function LazyList<T>({
 }: LazyListProps<T>) {
   const [isScrolling, setIsScrolling] = useGetSet(false);
 
-  const handleScrolling = useMemo(
-    () => debounce(setIsScrolling, 150, { leading: true, trailing: false }),
-    [setIsScrolling]
-  );
+  // const handleScrolling = useMemo(
+  //   () => debounce(setIsScrolling, 150, { leading: true, trailing: false }),
+  //   [setIsScrolling]
+  // );
 
   return (
     <Box {...props}>
       <List
         components={{ Scroller }}
         totalCount={items.length}
-        isScrolling={handleScrolling}
+        // isScrolling={handleScrolling}
         itemContent={(i) =>
           isScrolling() && placeholder ? placeholder : renderItem?.(items[i], i)
         }

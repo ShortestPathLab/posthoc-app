@@ -10,12 +10,13 @@ function between(v: number, min: number, max: number) {
 }
 
 export const parse: MapParser = async (m = "", options: Options) => {
-  const { width, height, ...rest } = await parseGridAsync({
+  const result = await parseGridAsync({
     map: m,
     options,
   });
+  const { width, height } = result.bounds;
   return {
-    ...rest,
+    ...result,
     snap: ({ x: x1, y: y1 }, scale = 1) => {
       const [x, y] = [floor(x1 + scale / 2), floor(y1 + scale / 2)];
       if (between(x, 0, width) && between(y, 0, height)) return { x, y };

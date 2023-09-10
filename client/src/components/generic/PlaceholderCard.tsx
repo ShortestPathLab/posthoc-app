@@ -11,7 +11,7 @@ export function PlaceholderCard({ sx, children, ...props }: CardProps) {
       }}
       {...props}
     >
-      <Typography color="textSecondary">{children}</Typography>
+      <Typography color="text.secondary">{children}</Typography>
     </Card>
   );
 }

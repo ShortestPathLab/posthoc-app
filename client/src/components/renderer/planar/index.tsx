@@ -72,7 +72,7 @@ export function PlanarRenderer({
         const point = snap(from(world), s);
         if (point) {
           onSelect?.({
-            global: { x: left + global.x, y: top + global.y },
+            client: { x: left + global.x, y: top + global.y },
             world: point,
             info: {
               ...selectionInfo(specimen, step, nodeAt(point), (s) =>

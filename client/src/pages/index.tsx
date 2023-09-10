@@ -1,4 +1,5 @@
 import {
+  AccountTreeTwoTone,
   BugReportTwoTone,
   InfoTwoTone,
   LayersTwoTone,
@@ -17,6 +18,7 @@ import { DebugPage } from "./DebugPage";
 import { StepsPage } from "./StepsPage";
 import { SettingsPage } from "./SettingsPage";
 import { AboutPage } from "./AboutPage";
+import { TreePage } from "./TreePage";
 
 export type PageMeta = {
   id: string;
@@ -31,6 +33,12 @@ export const pages: Dictionary<PageMeta> = {
     name: "Viewport",
     icon: <ViewInArTwoTone />,
     content: ViewportPage,
+  },
+  tree: {
+    id: "tree",
+    name: "Tree",
+    icon: <AccountTreeTwoTone />,
+    content: TreePage,
   },
   steps: {
     id: "steps",

@@ -1,8 +1,7 @@
 import { fileDialog as file } from "file-select-dialog";
 import { find, startCase } from "lodash";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
-import { Parameters } from "protocol/SolveTask";
-import { Map, UploadedTrace } from "slices/UIState";
+import { UploadedTrace } from "slices/UIState";
 
 function ext(s: string) {
   return s.split(".").pop();
@@ -21,7 +20,7 @@ export const custom = (map?: Partial<Feature>) => ({
   id: customMapId,
 });
 
-export const customTrace = (trace?: Parameters) => ({
+export const customTrace = (trace?: any) => ({
   name:
     trace?.type === customTraceId
       ? `Imported Trace - ${trace?.name}`
@@ -32,27 +31,44 @@ export const customTrace = (trace?: Parameters) => ({
 
 const TRACE_FORMAT = "json";
 
-export async function uploadTrace(): Promise<UploadedTrace | undefined> {
+export async function uploadTrace(): Promise<
+  (() => Promise<UploadedTrace | undefined>) | undefined
+> {
   const f = await file({
     accept: [`.${TRACE_FORMAT}`],
     strict: true,
   });
   if (f) {
-    if (ext(f.name) === TRACE_FORMAT) {
-      const content = await f.text();
-      const parsed = JSON.parse(content);
-      return {
-        ...customTrace(),
-        format: parsed?.format,
-        content: parsed,
-        name: startCase(name(f.name)),
-        type: customTraceId,
-      } as Parameters;
-    } else {
-      throw new Error(`The format (${ext(f.name)}) is unsupported.`);
-    }
+    return async () => {
+      if (ext(f.name) === TRACE_FORMAT) {
+        const content = await f.text();
+        const parsed = JSON.parse(content);
+        return {
+          ...customTrace(),
+          format: parsed?.format,
+          content: parsed,
+          name: startCase(name(f.name)),
+          type: customTraceId,
+        };
+      } else {
+        throw new Error(`The format (${ext(f.name)}) is unsupported.`);
+      }
+    };
   }
 }
+
+// async function readAll(f: File) {
+//   const a = f.stream().getReader();
+//   let out = "";
+//   const decoder = new TextDecoder();
+//   while (true) {
+//     const { done, value } = await a.read();
+//     out += decoder.decode(value);
+//     console.log(value);
+//     if (done) break;
+//   }
+//   return out;
+// }
 
 export async function uploadMap(accept: FeatureDescriptor[]) {
   const f = await file({
@@ -60,15 +76,17 @@ export async function uploadMap(accept: FeatureDescriptor[]) {
     strict: true,
   });
   if (f) {
-    if (find(accept, { id: ext(f.name) })) {
-      return {
-        ...custom(),
-        format: ext(f.name),
-        content: await f.text(),
-        name: startCase(name(f.name)),
-      } as Feature & { format?: string };
-    } else {
-      throw new Error(`The format (${ext(f.name)}) is unsupported.`);
-    }
+    return async () => {
+      if (find(accept, { id: ext(f.name) })) {
+        return {
+          ...custom(),
+          format: ext(f.name),
+          content: await f.text(),
+          name: startCase(name(f.name)),
+        } as Feature & { format?: string };
+      } else {
+        throw new Error(`The format (${ext(f.name)}) is unsupported.`);
+      }
+    };
   }
 }

@@ -10,11 +10,11 @@ import {
 } from "react";
 import { useLog } from "slices/log";
 import { Label } from "./Label";
-import { filter } from "lodash";
+import { filter, noop } from "lodash";
 
 const SnackbarContext = createContext<
   (message?: string, secondary?: string) => () => void
->(() => {});
+>(() => noop);
 
 export interface SnackbarMessage {
   message?: ReactNode;
@@ -61,7 +61,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
       ]);
       appendLog({
         content: filter([message, secondary]).join(", "),
-        timestamp: new Date().toString(),
+        timestamp: `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
       });
       return () => handleClose("");
     },

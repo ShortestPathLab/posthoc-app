@@ -37,11 +37,13 @@ export const defaultRemotes = [
     url: `http://localhost:${DEV_PORT}/`,
     transport: "socketio",
     key: "default-development-server",
+    disabled: true,
   },
   {
     url: `https://warthog.spaaaacccee.io/`,
     transport: "socketio",
     key: "production-server",
+    disabled: true,
   },
 ];
 

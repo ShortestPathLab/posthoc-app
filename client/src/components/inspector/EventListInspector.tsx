@@ -5,6 +5,7 @@ import {
   ListItem,
   ListItemText,
   Stack,
+  useTheme,
 } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import {
@@ -36,6 +37,7 @@ function Placeholder() {
 
 export function EventListInspector(props: ListProps<TraceEvent>) {
   const [loading] = useLoading();
+  const { spacing } = useTheme();
   const [{ step = 0, playback }] = usePlayback();
   const [{ layers }] = useUIState();
   const ref = useRef<ListHandle | null>(null);
@@ -45,7 +47,7 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
   );
 
   useEffect(() => {
-    if (playback === "paused") {
+    if ([undefined, "paused"].includes(playback)) {
       delay(
         () =>
           ref?.current?.scrollToIndex?.({
@@ -70,21 +72,17 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
               <List
                 {...props}
                 items={steps}
-                listOptions={{ ref }}
+                listOptions={{ ref, fixedItemHeight: 80 }}
                 renderItem={(item, i) => (
                   <>
-                    {true ? (
-                      <EventInspector
-                        event={item}
-                        index={i}
-                        selected={i === step}
-                      />
-                    ) : (
-                      <ListItem>
-                        <ListItemText primary="" secondary="" />
-                      </ListItem>
-                    )}
-                    <Divider variant="inset" />
+                    <EventInspector
+                      event={item}
+                      index={i}
+                      selected={i === step}
+                      sx={{ height: 80 }}
+                    >
+                      <Divider variant="inset" />
+                    </EventInspector>
                   </>
                 )}
               />

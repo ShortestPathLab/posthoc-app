@@ -3,30 +3,35 @@ import { OverlayScrollbars } from "overlayscrollbars";
 import {
   OverlayScrollbarsComponent,
   OverlayScrollbarsComponentProps,
-  OverlayScrollbarsComponentRef,
 } from "overlayscrollbars-react";
-import React, {
-  ForwardedRef,
-  MutableRefObject,
-  ReactNode,
-  Ref,
-  RefCallback,
-  forwardRef,
-  useCallback,
-} from "react";
+import { ForwardedRef, ReactNode, forwardRef, useCallback } from "react";
+import { useCss } from "react-use";
 
 type ScrollProps = {
   children?: ReactNode;
   x?: boolean;
   y?: boolean;
+  px?: number;
 };
 
 export const Scroll = forwardRef(
   (
-    { children, x, y, ...rest }: ScrollProps & OverlayScrollbarsComponentProps,
+    {
+      children,
+      x,
+      y,
+      px = 6,
+      ...rest
+    }: ScrollProps & OverlayScrollbarsComponentProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
-    const theme = useTheme();
+    const { palette, spacing } = useTheme();
+    const cls = useCss({
+      "div.os-scrollbar-vertical > div.os-scrollbar-track": {
+        height: `calc(100% - ${spacing(px)})`,
+        marginTop: spacing(px),
+      },
+    });
     const handleRef = useCallback(
       (instance: OverlayScrollbars) => {
         if (ref) {
@@ -50,13 +55,11 @@ export const Scroll = forwardRef(
           overflow: { x: x ? "scroll" : "hidden", y: y ? "scroll" : "hidden" },
           scrollbars: {
             autoHide: "move",
-            theme:
-              theme.palette.mode === "dark"
-                ? "os-theme-light"
-                : "os-theme-dark",
+            theme: palette.mode === "dark" ? "os-theme-light" : "os-theme-dark",
           },
         }}
         {...rest}
+        className={`${cls} ${rest.className}`}
         events={{ initialized: handleRef }}
       >
         {children}

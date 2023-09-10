@@ -19,7 +19,7 @@ export function DebugPage() {
   const [tab, setTab] = useState("standard");
   function renderHeading(label: ReactNode) {
     return (
-      <Type variant="overline" color="textSecondary">
+      <Type variant="overline" color="text.secondary">
         {label}
       </Type>
     );

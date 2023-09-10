@@ -8,7 +8,8 @@
           "radius": 0.3,
           "x": "{{ctx.x}}",
           "y": "{{ctx.y}}",
-          "drawPath": true
+          "drawPath": true,
+          "fill": "{{ctx.color[ctx.type]}}"
         }
       ],
       "line": [
@@ -16,23 +17,22 @@
           "$": "path",
           "points": [
             {
-              "x": "{{ctx.parent.x}}",
-              "y": "{{ctx.parent.y}}"
+              "x": "{{ctx.parent ? ctx.parent.x: ctx.x}}",
+              "y": "{{ctx.parent ? ctx.parent.y: ctx.y}}"
             },
             {
               "x": "{{ctx.x}}",
               "y": "{{ctx.y}}"
             }
           ],
-          "lineWidth": 1
+          "fill": "{{ctx.themeTextPrimary}}",
+          "lineWidth": 0.125
         }
       ],
       "road-event": [
+        { "$": "line" },
         {
           "$": "node"
-        },
-        {
-          "$": "line"
         }
       ]
     },

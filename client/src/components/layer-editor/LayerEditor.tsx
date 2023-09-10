@@ -8,19 +8,25 @@ import {
   Typography as Type,
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { MapPicker } from "components/app-bar/Input";
 import { Flex } from "components/generic/Flex";
 import {
   ManagedModal as Dialog,
   AppBarTitle as Title,
 } from "components/generic/Modal";
 import { Space } from "components/generic/Space";
-import { debounce, noop, set, slice, startCase } from "lodash";
+import { debounce, set, slice, startCase } from "lodash";
 import { produce } from "produce";
-import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
+import {
+  ForwardedRef,
+  ReactNode,
+  createElement,
+  forwardRef,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Layer } from "slices/UIState";
-import { layerHandlers } from "./layers/LayerSource";
-import { useDebounce } from "react-use";
+import { inferLayerName, layerHandlers } from "./layers/LayerSource";
 
 type LayerEditorProps = {
   value: Layer;
@@ -47,14 +53,19 @@ function useDraft<T>(
   ] as const;
 }
 
-export function LayerEditor({
-  value,
-  onValueChange: onChange,
-}: LayerEditorProps) {
+function Component(
+  { value, onValueChange: onChange }: LayerEditorProps,
+  _ref: ForwardedRef<HTMLElement>
+) {
   const [draft, setDraft] = useDraft(value, onChange);
 
   const renderHeading = (label: ReactNode) => (
-    <Type variant="overline" color="textSecondary" sx={{ pt: 1 }} component="p">
+    <Type
+      variant="overline"
+      color="text.secondary"
+      sx={{ pt: 1 }}
+      component="p"
+    >
       {label}
     </Type>
   );
@@ -75,7 +86,7 @@ export function LayerEditor({
       name: startCase(c),
     }));
 
-  const name = draft.name || "Untitled Layer";
+  const name = draft.name || inferLayerName(value);
 
   return (
     <>
@@ -160,3 +171,5 @@ export function LayerEditor({
     </>
   );
 }
+
+export const LayerEditor = forwardRef(Component);

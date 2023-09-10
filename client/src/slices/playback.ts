@@ -7,4 +7,4 @@ type PlaybackState = { playback?: PlaybackStateType; step?: number };
 export const [usePlayback, PlaybackProvider] = createSlice<
   PlaybackState,
   Partial<PlaybackState>
->({});
+>({ playback: "paused" });

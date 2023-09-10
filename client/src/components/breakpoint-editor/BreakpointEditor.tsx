@@ -46,7 +46,7 @@ export function BreakpointEditor({
               {last(c.split("."))}
               <Space />
               <Type
-                color="textSecondary"
+                color="text.secondary"
                 variant="body2"
                 component="span"
               >{`event.${c}`}</Type>

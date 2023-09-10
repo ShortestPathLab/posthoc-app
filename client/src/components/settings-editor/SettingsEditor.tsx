@@ -21,7 +21,7 @@ export function SettingsEditor() {
   const [tab, setTab] = useState("general");
   function renderHeading(label: ReactNode) {
     return (
-      <Type variant="overline" color="textSecondary">
+      <Type variant="overline" color="text.secondary">
         {label}
       </Type>
     );

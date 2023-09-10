@@ -28,7 +28,8 @@ export function ConnectionsService() {
     usingLoadingState(async () => {
       notify("Connecting...");
       for (const { transport: t, url, disabled } of remote ?? []) {
-        if (!disabled) {
+        // Truthy value includes undefined
+        if (disabled !== true) {
           const tp = new (getTransport(t))({ url });
           await tp.connect();
           const { result, delta } = await timed(() => tp.call("about"));

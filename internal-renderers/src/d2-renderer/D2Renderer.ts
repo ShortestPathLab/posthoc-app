@@ -1,8 +1,9 @@
 import {
-  Dictionary,
+  ceil,
+  clamp,
   debounce,
-  defer,
   find,
+  floor,
   isEqual,
   map,
   once,
@@ -15,8 +16,12 @@ import { nanoid } from "nanoid";
 import { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { Bounds } from "protocol";
-import { makeRenderer } from "renderer";
-import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
+import { ComponentEntry, makeRenderer } from "renderer";
+import { Bush } from "./Bush";
+import {
+  CompiledD2IntrinsicComponent,
+  D2InstrinsicComponents,
+} from "./D2IntrinsicComponents";
 import {
   D2RendererEvents,
   D2RendererInterface,
@@ -50,10 +55,21 @@ class D2Renderer
   #grid?: PIXI.Graphics;
   #options: D2RendererOptions = defaultD2RendererOptions;
   #workers: D2RendererWorkerAdapter[] = [];
-  #bounds: Dictionary<Bounds[]> = {};
+  #system: Bush<CompiledD2IntrinsicComponent> = new Bush(16);
+  #overlay?: PIXI.Graphics;
+
+  #count: number = 0;
+
+  #next() {
+    return this.#count++;
+  }
+
+  getInstance() {
+    return { app: this.#app, viewport: this.#viewport };
+  }
 
   fitCamera() {
-    const bounds = values(this.#bounds).flat();
+    const bounds = values(this.#system.all()).flat();
     if (bounds.length) {
       const out: Bounds = reduce(
         bounds,
@@ -113,12 +129,20 @@ class D2Renderer
     this.#app!.destroy();
   }
 
-  add(components: CompiledD2IntrinsicComponent[]) {
+  add(components: ComponentEntry<CompiledD2IntrinsicComponent>[]) {
     const id = nanoid();
-    map(this.#workers, (w) => w.call("add", [components, id]));
-    this.#bounds[id] = map(components, (c) => primitives[c.$].test(c));
+    const bodies = map(components, ({ component, meta }) => ({
+      ...primitives[component.$].test(component),
+      component,
+      meta,
+      index: this.#next(),
+    }));
+    this.#system.load(bodies);
+    map(this.#workers, (w) =>
+      w.call("add", [map(components, "component"), id])
+    );
     return () => {
-      delete this.#bounds[id];
+      for (const c of bodies) this.#system.remove(c);
       map(this.#workers, (w) => w.call("remove", [id]));
     };
   }
@@ -146,6 +170,20 @@ class D2Renderer
       passiveWheel: false,
     });
 
+    this.#viewport.on("clicked", (e) => {
+      const { x, y } = e.world;
+      const bodies = this.#system.search({
+        minX: x,
+        minY: y,
+        maxX: x + Number.MIN_VALUE,
+        maxY: y + Number.MIN_VALUE,
+      });
+      this.emit("click", e.event, {
+        world: e.world,
+        components: bodies,
+      });
+    });
+
     this.#app.stage.addChild(this.#viewport);
 
     this.#viewport
@@ -153,18 +191,25 @@ class D2Renderer
       .pinch()
       .wheel()
       .decelerate({ friction: 0.98 })
-      .clampZoom({ maxScale: 300, minScale: 0.01 });
+      .clampZoom({ maxScale: 300, minScale: 0.0001 });
 
     this.#viewport.on("moved", () => {
       this.#getFrustumChangeQueue()();
       this.#getUpdateGridQueue()();
     });
 
+    this.#viewport.on("mousemove", (e) => this.#getUpdateOverlayQueue()(e));
+
     this.#world = new PIXI.Container();
     this.#viewport.addChild(this.#world);
 
     this.#grid = new PIXI.Graphics();
     this.#viewport.addChild(this.#grid);
+
+    this.#overlay = new PIXI.Graphics();
+    this.#viewport.addChild(this.#overlay);
+
+    this.#startDynamicResolution();
   }
 
   #getFrustumChangeQueue = once(() =>
@@ -174,6 +219,47 @@ class D2Renderer
   #getUpdateGridQueue = once(() =>
     throttle(() => this.#updateGrid(), this.#options.refreshInterval)
   );
+  #getUpdateOverlayQueue = once(() =>
+    throttle(
+      (e: PIXI.FederatedPointerEvent) => this.#updateHover(e),
+      this.#options.refreshInterval
+    )
+  );
+
+  #startDynamicResolution() {
+    const { tileResolution, dynamicResolution } = this.#options;
+    const { dtMax, dtMin, increment, intervalMs, maxScale, minScale } =
+      dynamicResolution;
+    const targetFrames = floor(PIXI.Ticker.targetFPMS * intervalMs);
+    let frames = 0;
+    let cdt = 0;
+    let scale = 1;
+    this.#app!.ticker.add((dt) => {
+      if (!(frames % targetFrames)) {
+        const adt = cdt / targetFrames;
+        scale = clamp(
+          adt >= dtMax
+            ? scale + increment
+            : adt <= dtMin
+            ? scale - increment
+            : scale,
+          minScale,
+          maxScale
+        );
+        map(this.#workers, (w) => {
+          w.call("setTileResolution", [
+            {
+              width: ceil(tileResolution.width / scale),
+              height: ceil(tileResolution.height / scale),
+            },
+          ]);
+        });
+        cdt = 0;
+      }
+      cdt += dt;
+      frames++;
+    });
+  }
 
   #handleWorkerChange(options: D2RendererOptions) {
     map(this.#workers, (w) => w.terminate());
@@ -208,28 +294,37 @@ class D2Renderer
 
   #updateGrid() {
     const { tileSubdivision, accentColor } = this.#options;
-    const { zoom, tiles } = getTiles(this.#viewport!, tileSubdivision);
+    const { tiles } = getTiles(this.#viewport!, tileSubdivision);
     const px = this.#getPx();
     this.#grid?.clear();
-    this.#grid?.removeChildren();
     this.#grid?.lineStyle(1 * px, accentColor, 0.5);
     this.#grid?.beginFill(accentColor, 0.05);
     for (const { bounds: b, tile: t } of tiles) {
       if (!find(this.#world?.children, (c) => isEqual(c.bounds, b))) {
         this.#grid?.drawRect(b.left, b.top, b.right - b.left, b.bottom - b.top);
-        const text = new PIXI.Text(
-          `LOD ${zoom} / X=${t.x} Y=${t.y} / L=${b.left} T=${b.top} R=${b.right} B=${b.bottom}`,
-          {
-            fontFamily: "Inter",
-            fontSize: 12 * px,
-            fill: accentColor,
-          }
-        );
-        text.resolution = devicePixelRatio / px;
-        this.#grid
-          ?.addChild(text)
-          .setTransform(b.left + 12 * px, b.top + 12 * px);
       }
+    }
+  }
+
+  #updateHover(e: PIXI.FederatedPointerEvent) {
+    const { accentColor } = this.#options;
+    const px = this.#getPx();
+    const { x, y } = this.#viewport!.toWorld(e.globalX, e.globalY);
+    const bodies = this.#system.search({
+      minX: x,
+      minY: y,
+      maxX: x + Number.MIN_VALUE,
+      maxY: y + Number.MIN_VALUE,
+    });
+    this.#overlay!.clear();
+    this.#overlay!.lineStyle(2 * px, accentColor, 1);
+    for (const b of bodies) {
+      this.#overlay?.drawRect(
+        b.left,
+        b.top,
+        b.right - b.left,
+        b.bottom - b.top
+      );
     }
   }
 
@@ -240,12 +335,12 @@ class D2Renderer
   }
 
   async #addToWorld(texture: PIXI.Texture, bounds: Bounds) {
-    const { tileResolution: resolution, tileSubdivision } = this.#options;
+    const { tileSubdivision } = this.#options;
     const { tiles } = getTiles(this.#viewport!, tileSubdivision);
     if (find(tiles, (t) => isEqual(t.bounds, bounds))) {
       const scale = {
-        x: (bounds.right - bounds.left) / resolution.width,
-        y: (bounds.bottom - bounds.top) / resolution.height,
+        x: (bounds.right - bounds.left) / texture.width,
+        y: (bounds.bottom - bounds.top) / texture.height,
       };
       const tile = new Tile(texture, bounds);
       this.#world
@@ -253,13 +348,11 @@ class D2Renderer
         .setTransform(bounds.left, bounds.top, scale.x, scale.y);
       this.#getUpdateGridQueue()();
       await this.#animate(tile);
-      defer(() => {
-        for (const c of this.#world!.children) {
-          if (intersect(c.bounds!, bounds) && c.age < tile.age) {
-            c.destroy({ texture: true, baseTexture: true });
-          }
+      for (const c of this.#world!.children) {
+        if (intersect(c.bounds!, bounds) && c.age < tile.age) {
+          c.destroy({ texture: true, baseTexture: true });
         }
-      });
+      }
     }
   }
 

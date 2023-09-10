@@ -5,13 +5,17 @@
       "tile": [
         {
           "$": "rect",
-          "width": 0.9,
-          "height": 0.9,
+          "width": 0.98,
+          "height": 0.98,
           "text": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] === 0 ? '' : ctx[`${ctx.tile_x}${ctx.tile_y}`]}}",
-          "fill": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] ? 0x808080 : 0xFFFFFFF}}",
-          "persist": false,
+          "textX": 0.27,
+          "textY": 0.75,
+          "fill": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] ? ctx.themeTextPrimary : ctx.themeAccent}}",
+          "fontSize": 0.75,
+          "fontColor": "{{ctx.themeBackground}}",
           "x": "{{ctx.tile_x}}",
-          "y": "{{ctx.tile_y}}"
+          "y": "{{ctx.tile_y}}",
+          "display": "persistent"
         }
       ],
       "tilerow": [

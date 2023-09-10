@@ -3,11 +3,11 @@ import {
   CompiledD2IntrinsicComponent as CompiledD2Component,
   D2InstrinsicComponents as D2Components,
 } from "d2-renderer/D2IntrinsicComponents";
-import { Dictionary } from "lodash";
+import { Dictionary, maxBy, minBy } from "lodash";
 import { Bounds, Point, Size } from "protocol";
 import { defaultContext } from "./EventContext";
 
-const { ceil } = Math;
+const { ceil, PI } = Math;
 
 export type Transform = Point & {
   scale: Point;
@@ -16,8 +16,8 @@ export type Transform = Point & {
 export const getFillStyle = (fill: string, alpha: number) =>
   new ColorTranslator(fill).setA(alpha ?? defaultContext.alpha).RGBA;
 
-export const getStrokeStyle = (fill: string, alpha: number, width: number) =>
-  `${width}px ${getFillStyle(fill, alpha)}`;
+export const getStrokeStyle = (fill: string, alpha: number) =>
+  getFillStyle(fill, alpha);
 
 type Box = Size & Point;
 
@@ -42,9 +42,10 @@ type Primitive<T extends keyof D2Components = keyof D2Components> = {
 export const text: Primitive<any> = {
   draw(c, g, t) {
     if (c.text) {
-      const box = transform(c, t);
+      const a = transform(c, { x: c.textX, y: c.textY, scale: { x: 1, y: 1 } });
+      const box = transform(a, t);
       g.font = `${c.fontSize * t.scale.x}px Arial`;
-      g.fillStyle = getFillStyle(c.fill, 1);
+      g.fillStyle = getFillStyle(c.fontColor, c.alpha);
       g.fillText(c.text, box.x, box.y);
     }
   },
@@ -77,15 +78,24 @@ export const rect: Primitive<"rect"> = {
 export const circle: Primitive<"circle"> = {
   draw(c, g, t) {
     g.fillStyle = getFillStyle(c.fill, c.alpha);
+    g.beginPath();
     const box = transform({ ...c, width: c.radius, height: c.radius }, t);
-    g.ellipse(box.x, box.y, box.width, box.height, 0, 0, 0);
+    g.ellipse(
+      ceil(box.x),
+      ceil(box.y),
+      ceil(box.width),
+      ceil(box.height),
+      0,
+      0,
+      2 * PI
+    );
     g.fill();
   },
   test(c) {
     return {
-      left: c.x,
+      left: c.x - c.radius,
       right: c.x + c.radius,
-      top: c.y,
+      top: c.y - c.radius,
       bottom: c.y + c.radius,
     };
   },
@@ -93,35 +103,54 @@ export const circle: Primitive<"circle"> = {
 
 export const polygon: Primitive<"polygon"> = {
   draw(c, g, t) {
-    const [{ x, y }, ...rest] = c.points;
-    g.fillStyle = getFillStyle(c.fill, c.alpha);
+    const [box, ...rest] = c.points;
     g.beginPath();
-    g.moveTo(x + t.x, y + t.y);
-    for (const { x, y } of rest) {
-      g.lineTo(x + t.x, y + t.y);
+    g.fillStyle = getFillStyle(c.fill, c.alpha);
+    const { x, y } = transform({ ...box, width: 0, height: 0 }, t);
+    g.moveTo(ceil(x), ceil(y));
+    for (const box of rest) {
+      const { x, y } = transform({ ...box, width: 0, height: 0 }, t);
+      g.lineTo(ceil(x), ceil(y));
     }
     g.closePath();
     g.fill();
   },
   test(c) {
-    return { left: c.x, right: c.x, top: c.y, bottom: c.y };
+    return {
+      left: minBy(c.points, "x")?.x ?? 0,
+      right: maxBy(c.points, "x")?.x ?? 0,
+      top: minBy(c.points, "y")?.y ?? 0,
+      bottom: maxBy(c.points, "y")?.y ?? 0,
+    };
   },
 };
 
 export const path: Primitive<"path"> = {
   draw(c, g, t) {
-    const [{ x, y }, ...rest] = c.points;
+    const [box, ...rest] = c.points;
     g.beginPath();
-    g.strokeStyle = getStrokeStyle(c.fill, c.alpha, c.lineWidth);
-    g.moveTo(x + t.x, y + t.y);
-    for (const { x, y } of rest) {
-      g.lineTo(x + t.x, y + t.y);
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.strokeStyle = getStrokeStyle(c.fill, c.alpha);
+    const { x, y, width } = transform(
+      { ...box, width: c.lineWidth, height: 0 },
+      t
+    );
+    g.lineWidth = ceil(width);
+    g.moveTo(ceil(x), ceil(y));
+    for (const box of rest) {
+      const { x, y } = transform({ ...box, width: 0, height: 0 }, t);
+      g.lineTo(ceil(x), ceil(y));
     }
-    g.closePath();
     g.stroke();
   },
   test(c) {
-    return { left: c.x, right: c.x, top: c.y, bottom: c.y };
+    return {
+      left: minBy(c.points, "x")?.x ?? 0,
+      right: maxBy(c.points, "x")?.x ?? 0,
+      top: minBy(c.points, "y")?.y ?? 0,
+      bottom: maxBy(c.points, "y")?.y ?? 0,
+    };
   },
 };
 

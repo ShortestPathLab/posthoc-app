@@ -4,7 +4,7 @@ import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 
 export const Heading = ({ label }: { label?: Node }) => (
-  <Type variant="overline" color="textSecondary" sx={{ pt: 1 }} component="p">
+  <Type variant="overline" color="text.secondary" sx={{ pt: 1 }} component="p">
     {label}
   </Type>
 );

@@ -18,8 +18,8 @@ export function InfoPage() {
           {log.length ? (
             <Scroll y>
               <List sx={{ pt: 6 }}>
-                {map(log, (l) => (
-                  <>
+                {map(log, (l, i) => (
+                  <div key={i}>
                     <ListItem>
                       <ListItemText
                         primary={l.content}
@@ -27,7 +27,7 @@ export function InfoPage() {
                       />
                     </ListItem>
                     <Divider />
-                  </>
+                  </div>
                 ))}
               </List>
             </Scroll>

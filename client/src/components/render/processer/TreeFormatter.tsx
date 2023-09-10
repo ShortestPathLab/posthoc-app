@@ -28,7 +28,6 @@ export function processTree(eventList: TraceEvent[]) {
     // TODO optimize this code, which basically adds the x and y coordinates to the eventList information
     eventList = eventList.map((event) => {
       if (event.id === node.data.id) {
-        console.log;
         return { ...event, x: node.x, y: node.y };
       } else {
         return event;

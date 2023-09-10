@@ -2,6 +2,7 @@ import { useRendererInstance } from "components/inspector/TraceRenderer";
 import { floor, slice } from "lodash";
 import { CompiledComponent } from "protocol";
 import { useEffect, useMemo } from "react";
+import { ComponentEntry } from "renderer";
 
 /**
  * For distinguish between persisted views like grid, mesh, tree, map
@@ -10,18 +11,18 @@ import { useEffect, useMemo } from "react";
  * if false, use a single nodelist and draw current event
  */
 export type NodeListProps = {
-  nodes?: CompiledComponent<any, any>[];
+  nodes?: ComponentEntry[][];
 };
 
 export type LazyNodeListProps = NodeListProps & {
   step?: number;
 };
 
-export function NodeList({ nodes = [] }: NodeListProps) {
+export function NodeList({ nodes }: NodeListProps) {
   const { renderer } = useRendererInstance();
   useEffect(() => {
-    if (renderer && nodes.length) {
-      return renderer.add(nodes);
+    if (renderer && nodes?.length) {
+      return renderer.add(nodes.flat());
     }
   }, [renderer, nodes]);
 
@@ -29,14 +30,14 @@ export function NodeList({ nodes = [] }: NodeListProps) {
 }
 
 export function LazyNodeList({ nodes, step }: LazyNodeListProps) {
-  const cacheSize = 10000;
+  const cacheSize = 200;
 
   // number of nodes needed to be cached
   const threshold = floor((step ?? 0) / cacheSize) * cacheSize;
 
   const cached = useMemo(() => slice(nodes, 0, threshold), [nodes, threshold]);
   const uncached = useMemo(
-    () => slice(nodes, threshold, step),
+    () => slice(nodes, threshold, (step ?? 0) + 1),
     [nodes, threshold, step]
   );
   return (
