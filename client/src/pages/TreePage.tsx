@@ -10,6 +10,7 @@ import {
   Menu,
   MenuItem,
   MenuList,
+  Tooltip,
   alpha,
   useTheme,
 } from "@mui/material";
@@ -18,10 +19,8 @@ import { Flex } from "components/generic/Flex";
 import { Label } from "components/generic/Label";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import {
-  TraceLayer,
-  inferLayerName,
-} from "components/layer-editor/layers/LayerSource";
+import { inferLayerName } from "components/layer-editor/layers/LayerSource";
+import { TraceLayer } from "components/layer-editor/layers/traceLayerSource";
 import { getColorHex } from "components/renderer/colors";
 import {
   delay,
@@ -59,7 +58,7 @@ function isTraceLayer(e: Layer): e is TraceLayer {
   return e.source?.type === "trace";
 }
 
-export function useCache<T>(result: T, loading: boolean) {
+export function useCache<T>(result: T, loading: boolean = false) {
   const [cache, setCache] = useState<T>();
 
   useEffect(() => {
@@ -94,9 +93,13 @@ export function TreePage() {
   const throttledStep = useThrottle(step, 600);
   const { palette } = useTheme();
   const [{ layers }] = useUIState();
-  const traceLayers = filter(layers, isTraceLayer);
-  const [key, setKey] = useState(head(traceLayers)?.key);
-  const layer = find(traceLayers, { key });
+  const [key, setKey] = useState<string>();
+
+  useEffect(() => {
+    if (!key) setKey(head(layers)?.key);
+  }, [key, setKey, layers]);
+
+  const layer = find(layers, { key }) as Layer<any>;
   const { controls, onChange, state } = useViewTreeContext<TreePageContext>();
 
   const [radius, setRadius] = useState<keyof typeof radius2>("small");
@@ -124,7 +127,7 @@ export function TreePage() {
     <Page onChange={onChange} stack={state}>
       <Page.Content>
         <Flex>
-          {cache?.tree ? (
+          {layer?.source?.trace?.content && cache?.tree ? (
             <AutoSize>
               {({ width, height }) => (
                 <Box {...{ width, height }}>
@@ -163,7 +166,7 @@ export function TreePage() {
           icon={<LayersIcon />}
           label="Layer"
           value={key}
-          items={map(traceLayers, (l) => ({
+          items={map(layers, (l) => ({
             id: l.key,
             name: inferLayerName(l),
           }))}
@@ -202,92 +205,98 @@ function Node({ onClick, node }: { onClick?: () => void; node?: EventTree }) {
     <PopupState variant="popover">
       {(state) => (
         <>
-          <g
-            onClick={(e) => {
-              state.open(e);
-            }}
+          <Tooltip
+            title={`f: ${a?.data?.f ?? "unknown"}, g: ${
+              a?.data?.g ?? "unknown"
+            }`}
           >
-            <clipPath id="clipPath">
+            <g
+              onClick={(e) => {
+                state.open(e);
+              }}
+            >
+              <clipPath id="clipPath">
+                <rect
+                  y={spacing(-height / 2)}
+                  x={spacing(-0.25)}
+                  strokeWidth={0}
+                  width={spacing(width)}
+                  height={spacing(height)}
+                  rx={shape.borderRadius}
+                />
+              </clipPath>
               <rect
                 y={spacing(-height / 2)}
                 x={spacing(-0.25)}
                 strokeWidth={0}
-                width={spacing(width)}
-                height={spacing(height)}
-                rx={shape.borderRadius}
-              />
-            </clipPath>
-            <rect
-              y={spacing(-height / 2)}
-              x={spacing(-0.25)}
-              strokeWidth={0}
-              fill={palette.background.default}
-              width={spacing(width)}
-              height={spacing(height)}
-              clipPath="url(#clipPath)"
-            />
-            {isSelected && (
-              <rect
-                y={spacing(-height / 2)}
-                x={spacing(-0.25)}
-                strokeWidth={0}
-                fill={alpha(
-                  palette.primary.main,
-                  palette.action.selectedOpacity
-                )}
+                fill={palette.background.default}
                 width={spacing(width)}
                 height={spacing(height)}
                 clipPath="url(#clipPath)"
               />
-            )}
-            <rect
-              x={spacing(-0.25)}
-              y={spacing(-height / 2)}
-              height={spacing(height)}
-              width={spacing(0.5)}
-              fill={color}
-              strokeWidth={0}
-              clipPath="url(#clipPath)"
-            />
-            <text
-              strokeWidth={0}
-              height={spacing(4)}
-              fill={palette.text.primary}
-              y={0}
-              fontWeight={500}
-              fontSize="0.875rem"
-              x={spacing(2 - 0.25)}
-              alignmentBaseline="central"
-            >
-              {node?.name}
-            </text>
-            {!!node?.cumulativeChildCount && (
-              <>
-                <text
+              {isSelected && (
+                <rect
+                  y={spacing(-height / 2)}
+                  x={spacing(-0.25)}
                   strokeWidth={0}
-                  height={spacing(4)}
-                  fill={palette.text.secondary}
-                  y={0}
-                  x={spacing(width - 2.25 - 1)}
-                  textAnchor="end"
-                  fontWeight={400}
-                  fontSize="0.875rem"
-                  alignmentBaseline="central"
-                >
-                  {node?.cumulativeChildCount}
-                </text>
-                <ChevronRightOutlined
-                  width={spacing(2)}
-                  height={spacing(2)}
-                  x={spacing(width - 2 - 1)}
-                  y={spacing(-height / 2 + 1)}
-                  strokeWidth={0}
-                  fill={palette.text.primary}
-                  opacity={palette.action.disabledOpacity}
+                  fill={alpha(
+                    palette.primary.main,
+                    palette.action.selectedOpacity
+                  )}
+                  width={spacing(width)}
+                  height={spacing(height)}
+                  clipPath="url(#clipPath)"
                 />
-              </>
-            )}
-          </g>
+              )}
+              <rect
+                x={spacing(-0.25)}
+                y={spacing(-height / 2)}
+                height={spacing(height)}
+                width={spacing(0.5)}
+                fill={color}
+                strokeWidth={0}
+                clipPath="url(#clipPath)"
+              />
+              <text
+                strokeWidth={0}
+                height={spacing(4)}
+                fill={palette.text.primary}
+                y={0}
+                fontWeight={500}
+                fontSize="0.875rem"
+                x={spacing(2 - 0.25)}
+                alignmentBaseline="central"
+              >
+                {node?.name}
+              </text>
+              {!!node?.cumulativeChildCount && (
+                <>
+                  <text
+                    strokeWidth={0}
+                    height={spacing(4)}
+                    fill={palette.text.secondary}
+                    y={0}
+                    x={spacing(width - 2.25 - 1)}
+                    textAnchor="end"
+                    fontWeight={400}
+                    fontSize="0.875rem"
+                    alignmentBaseline="central"
+                  >
+                    {node?.cumulativeChildCount}
+                  </text>
+                  <ChevronRightOutlined
+                    width={spacing(2)}
+                    height={spacing(2)}
+                    x={spacing(width - 2 - 1)}
+                    y={spacing(-height / 2 + 1)}
+                    strokeWidth={0}
+                    fill={palette.text.primary}
+                    opacity={palette.action.disabledOpacity}
+                  />
+                </>
+              )}
+            </g>
+          </Tooltip>
           <Menu
             anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
             transformOrigin={{

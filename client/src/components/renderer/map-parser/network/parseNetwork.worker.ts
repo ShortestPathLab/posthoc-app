@@ -135,13 +135,17 @@ function parseNetwork({
         2
       )}% of original`,
     ],
-    nodes: optimizedEdges.map((points) => ({
-      $: "path",
-      points: points.map((i) => verts[i]),
-      fill: color,
-      alpha: 1,
-      lineWidth: clamp(mean([ab.width, ab.height]) / 200, 0.5, 80),
-    })),
+    nodes: optimizedEdges
+      .map((points) => ({
+        $: "path",
+        points: points.map((i) => verts[i]),
+        fill: color,
+        alpha: 1,
+        lineWidth: clamp(mean([ab.width, ab.height]) / 200, 0.5, 80),
+      }))
+      .map((c) => ({
+        component: c,
+      })),
   };
 }
 

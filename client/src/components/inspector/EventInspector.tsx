@@ -17,6 +17,7 @@ import { useAcrylic } from "theme";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
 import { usePlayback } from "slices/playback";
+import { pick } from "lodash";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -65,7 +66,7 @@ export function EventInspector({
         <ListItemText
           sx={{ overflow: "hidden" }}
           primary={<EventLabel event={event} hidden={false} />}
-          secondary={<PropertyList event={event} />}
+          secondary={<PropertyList event={pick(event, "f", "g", "pId")} />}
         />
       </Tooltip>
     </ListItemButton>

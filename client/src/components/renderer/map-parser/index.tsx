@@ -4,7 +4,7 @@ import { parse as parseGrid } from "./grid";
 import { parse as parseNetwork } from "./network";
 import { parse as parseMesh } from "./mesh";
 import { parse as parsePoly } from "./poly";
-import { MapParser } from "../Parser";
+import { MapParser } from "./Parser";
 
 export const mapParsers: Dictionary<MapParser> = {
   grid: memoize(parseGrid, { normalizer: JSON.stringify }),

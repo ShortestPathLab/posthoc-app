@@ -14,7 +14,7 @@ import {
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { info as selectionInfo } from "../info";
-import { MapInfo } from "../Parser";
+import { MapInfo } from "../map-parser/Parser";
 import { RasterRenderer } from "../raster";
 import {
   LazyNodeList as LazyNodes,

@@ -54,8 +54,12 @@ export function StepsPage() {
   const [{ layers }] = useUIState();
   const ref = useRef<ListHandle | null>(null);
 
-  const [key, setKey] = useState(head(layers)?.key);
+  const [key, setKey] = useState<string>();
   const layer = find(layers, { key });
+
+  useEffect(() => {
+    if (!key) setKey(head(layers)?.key);
+  }, [key, setKey, layers]);
 
   const steps = useMemo(() => {
     if (layer) {

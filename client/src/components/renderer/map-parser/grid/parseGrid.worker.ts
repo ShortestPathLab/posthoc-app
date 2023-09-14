@@ -1,7 +1,6 @@
 import { last, map, range } from "lodash";
 import { Point, Size } from "protocol";
 import { MapInfo } from "../Parser";
-import { Theme } from "@mui/material";
 
 const { min } = Math;
 
@@ -115,12 +114,16 @@ function parseGrid({
       `${((nodes.length * 100) / (width * height)).toFixed(2)}% of original`,
     ],
     bounds: { width, height, minX: 0, minY: 0, maxX: width, maxY: height },
-    nodes: nodes.map((node) => ({
-      $: "rect",
-      fill: color,
-      alpha: 1,
-      ...node,
-    })),
+    nodes: nodes
+      .map((node) => ({
+        $: "rect",
+        fill: color,
+        alpha: 1,
+        ...node,
+      }))
+      .map((c) => ({
+        component: c,
+      })),
   };
 }
 

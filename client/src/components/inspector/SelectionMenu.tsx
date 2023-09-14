@@ -1,5 +1,4 @@
 import {
-  Box,
   Divider,
   ListItem,
   ListItemIcon,
@@ -9,18 +8,15 @@ import {
   MenuList,
   Typography,
 } from "@mui/material";
-import { Overline } from "components/generic/Overline";
-import { Property } from "components/generic/Property";
 import {
   SelectionInfoProvider,
   getLayerHandler,
 } from "components/layer-editor/layers/LayerSource";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { Dictionary, chain, merge } from "lodash";
+import { Dictionary, chain, entries, merge } from "lodash";
+import { useCache } from "pages/TreePage";
 import { ComponentProps, ReactNode, useMemo } from "react";
 import { useUIState } from "slices/UIState";
-import { EventLabel } from "./EventLabel";
-import { PropertyList } from "./PropertyList";
 
 type Props = {
   selection?: RendererSelectEvent;
@@ -44,105 +40,84 @@ type SelectionMenuSection = {
 export type SelectionMenuContent = Dictionary<SelectionMenuSection>;
 
 export function SelectionMenu({ selection, onClose }: Props) {
-  const MenuContent = useSelectionContent(selection);
+  const MenuContent = useSelectionMenu();
+  const cache = useCache(selection);
 
-  const { client: global, info } = selection ?? {};
-  const { current, entry, node } = info ?? {};
+  const { client } = selection ?? {};
 
   return (
     <Menu
       open={!!selection}
       anchorReference="anchorPosition"
       anchorPosition={{
-        top: global?.y ?? 0,
-        left: global?.x ?? 0,
+        top: client?.y ?? 0,
+        left: client?.x ?? 0,
       }}
       onClose={onClose}
+      keepMounted
     >
-      <MenuList dense sx={{ py: 0, my: 0 }}>
-        <ListItem sx={{ py: 0, my: 0 }}>
-          <ListItemText>
-            <Box>
-              <Typography color="text.secondary" variant="overline">
-                Point
-              </Typography>
-              <Property label="x" value={info?.point?.x ?? "-"} />
-              <Property label="y" value={info?.point?.y ?? "-"} />
-            </Box>
-            <Divider sx={{ my: 1 }} />
-            {/* {!!info?.components?.length && (
-              <>
-                <Box>
-                  <Overline>Elements</Overline>
-                  {info.components.map((c, i) => (
-                    <Property
-                      key={i}
-                      label={c.component.$}
-                      value={JSON.stringify(c.meta)}
-                    />
-                  ))}
-                </Box>
-                <Divider sx={{ my: 1 }} />
-              </>
-            )}
-            {current?.event && (
-              <>
-                <Box>
-                  <EventLabel event={current?.event} />
-                  <PropertyList
-                    event={current?.event}
-                    variant="body1"
-                    vertical
-                  />
-                </Box>
-                <Divider sx={{ my: 1 }} />
-              </>
-            )} */}
-          </ListItemText>
-        </ListItem>
+      <MenuList dense sx={{ py: 0 }}>
         {
-          <MenuContent>
+          <MenuContent event={cache}>
             {(menu) => {
-              console.log(menu);
-              return chain(menu)
-                .entries()
-                .sortBy(([, v]) => v.index)
-                .map(([, { items, primary }], i) => (
-                  <>
-                    {!!i && <Divider />}
-                    {primary && (
-                      <ListItem>
-                        <Typography color="text.secondary" variant="overline">
-                          {primary}
-                        </Typography>
-                      </ListItem>
-                    )}
-                    {chain(items)
-                      .entries()
-                      .sortBy(([, v]) => v.index)
-                      .map(([, { action, icon, primary, secondary }]) =>
-                        action ? (
-                          <MenuItem onClick={action}>
-                            {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                            <ListItemText primary={primary} />
-                            <Typography variant="body2" color="text.secondary">
-                              {secondary}
-                            </Typography>
-                          </MenuItem>
-                        ) : (
-                          <ListItem>
-                            {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                            <ListItemText primary={primary} />
-                            <Typography variant="body2" color="text.secondary">
-                              {secondary}
-                            </Typography>
-                          </ListItem>
+              const entries2 = entries(menu);
+              return entries2.length ? (
+                chain(entries2)
+                  .sortBy(([, v]) => v.index)
+                  .map(([, { items, primary }], i) => (
+                    <>
+                      {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
+                      {primary && (
+                        <ListItem sx={{ py: 0 }}>
+                          <Typography color="text.secondary" variant="overline">
+                            {primary}
+                          </Typography>
+                        </ListItem>
+                      )}
+                      {chain(items)
+                        .entries()
+                        .sortBy(([, v]) => v.index)
+                        .map(([, { action, icon, primary, secondary }]) =>
+                          action ? (
+                            <MenuItem
+                              onClick={() => {
+                                action();
+                                onClose?.();
+                              }}
+                            >
+                              {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                              <ListItemText primary={primary} sx={{ mr: 4 }} />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {secondary}
+                              </Typography>
+                            </MenuItem>
+                          ) : (
+                            <ListItem>
+                              {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                              <ListItemText primary={primary} sx={{ mr: 4 }} />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {secondary}
+                              </Typography>
+                            </ListItem>
+                          )
                         )
-                      )
-                      .value()}
-                  </>
-                ))
-                .value();
+                        .value()}
+                    </>
+                  ))
+                  .value()
+              ) : (
+                <>
+                  <ListItem>
+                    <Typography>No info to show.</Typography>
+                  </ListItem>
+                </>
+              );
             }}
           </MenuContent>
         }
@@ -157,20 +132,20 @@ const identity = ({ children }: SelectionInfoProviderProps<any>) => (
   <>{children?.({})}</>
 );
 
-function useSelectionContent(selection?: RendererSelectEvent | undefined) {
+function useSelectionMenu() {
   const [{ layers }] = useUIState();
   return useMemo(
     () =>
       chain(layers)
         .reduce((A, l) => {
           const B = getLayerHandler(l)?.getSelectionInfo ?? identity;
-          return ({ children }: SelectionInfoProviderProps<any>) => (
-            <B layer={l} event={selection}>
-              {(a) => <A>{(b) => children?.(merge(a, b))}</A>}
+          return ({ children, event }: SelectionInfoProviderProps<any>) => (
+            <B layer={l} event={event}>
+              {(a) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}
             </B>
           );
         }, identity)
         .value(),
-    [layers, selection]
+    [layers]
   );
 }

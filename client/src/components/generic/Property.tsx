@@ -20,7 +20,7 @@ export function Property({ label, value, type }: Props) {
       </Type>
       <Space />
       <Type component="div" {...type}>
-        {value}
+        {value ?? "none"}
       </Type>
     </Flex>
   );

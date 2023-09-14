@@ -1,6 +1,6 @@
-import { byPoint } from "../NodeMatcher";
+import { byPoint } from "../../NodeMatcher";
 import { MapParser } from "../Parser";
-import { parseGridAsync } from "./parseGridWorker";
+import { parseGridAsync } from "./parseGridAsync";
 import type { Options } from "./parseGrid.worker";
 
 const { floor } = Math;

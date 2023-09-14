@@ -1,5 +1,5 @@
 import { useSnackbar } from "components/generic/Snackbar";
-import { memoize as memo } from "lodash";
+import memo from "memoizee";
 import { useMemo } from "react";
 import { useAsync } from "react-async-hook";
 import { useLoadingState } from "slices/loading";
@@ -13,16 +13,19 @@ export function useMapContent(map?: Map) {
 
   const getMap = useMemo(
     () =>
-      memo(async ({ source, id }: Map = {}) => {
-        if (source && id) {
-          const connection = resolve({ url: source });
-          if (connection) {
-            notify("Fetching map...");
-            const result = await connection.call("features/map", { id });
-            return result?.content;
+      memo(
+        async ({ source, id }: Map = {}) => {
+          if (source && id) {
+            const connection = resolve({ url: source });
+            if (connection) {
+              notify("Fetching map...");
+              const result = await connection.call("features/map", { id });
+              return result?.content;
+            }
           }
-        }
-      }, JSON.stringify),
+        },
+        { normalizer: JSON.stringify }
+      ),
     [resolve, notify]
   );
 

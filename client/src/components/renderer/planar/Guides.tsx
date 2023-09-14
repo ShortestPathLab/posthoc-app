@@ -1,5 +1,5 @@
 import { ceil, floor, forEach, range } from "lodash";
-import { MapInfo } from "../Parser";
+import { MapInfo } from "../map-parser/Parser";
 import { scale } from "../raster/config";
 import { makeGraphic } from "../raster/makeGraphic";
 import { Scale } from "../Size";

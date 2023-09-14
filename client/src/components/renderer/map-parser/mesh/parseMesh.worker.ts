@@ -60,12 +60,16 @@ function parseMesh({
   return {
     bounds: ab,
     log: [`${pluralize("face", tris.length, true)}`],
-    nodes: tris.map((points) => ({
-      $: "polygon",
-      points: points.map(([x, y]) => ({ x, y })),
-      fill: color,
-      alpha: 1,
-    })),
+    nodes: tris
+      .map((points) => ({
+        $: "polygon",
+        points: points.map(([x, y]) => ({ x, y })),
+        fill: color,
+        alpha: 1,
+      }))
+      .map((c) => ({
+        component: c,
+      })),
   };
 }
 

@@ -2,7 +2,6 @@ import { TypographyVariant } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { Property } from "components/generic/Property";
 import { Dictionary, entries, filter, map } from "lodash";
-import { TraceEvent } from "protocol/Trace";
 
 export function PropertyList({
   event,

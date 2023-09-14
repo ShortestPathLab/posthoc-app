@@ -43,8 +43,6 @@ function parsePoly({
 
   const lines2 = rest.map((line) => line.split(" ").map(parseFloat));
 
-  console.log(lines2);
-
   const polys = lines2.map((face) => chunk(face.slice(1), 2));
   const enclosures = polys.slice(0, enclosureCount);
   const obstacles = polys.slice(enclosureCount);
@@ -66,7 +64,9 @@ function parsePoly({
         fill: color,
         alpha: 1,
       })),
-    ],
+    ].map((c) => ({
+      component: c,
+    })),
   };
 }
 

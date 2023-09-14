@@ -1,8 +1,8 @@
-import { noop } from "lodash";
-import { byPoint } from "../NodeMatcher";
+import { constant, identity, noop } from "lodash";
+import { byPoint } from "../../NodeMatcher";
 import { MapParser } from "../Parser";
 import type { Options } from "./parseMesh.worker";
-import { parseMeshAsync } from "./parseMeshWorker";
+import { parseMeshAsync } from "./parseMeshAsync";
 
 export const parse: MapParser = async (m = "", options: Options) => {
   const result = await parseMeshAsync({
@@ -11,9 +11,9 @@ export const parse: MapParser = async (m = "", options: Options) => {
   });
   return {
     ...result,
-    snap: noop as any,
-    nodeAt: noop as any,
-    pointOf: noop as any,
+    snap: identity,
+    nodeAt: constant(0),
+    pointOf: constant({ x: 0, y: 0 }),
     matchNode: byPoint,
   };
 };

@@ -118,7 +118,6 @@ export function TraceRenderer({
           world: e1.world,
           info: { point: e1.world, components: e1.components },
         });
-        console.log(e, e1);
       };
       instance.on("click", handleClick);
       return () => void instance.off("click", handleClick);
