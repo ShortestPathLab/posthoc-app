@@ -1,31 +1,35 @@
 {
-  "name": "warthog",
+  "name": "warthog-websocket",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --watch . --watch src --exec \"ts-node\" src/index.ts",
-    "test": "jest",
+    "start": "vite-node src/index.ts",
+    "watch": "vite-node -w src/index.ts",
+    "build": "sh build.sh",
     "build:docker": "docker build . -t server"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "boxen": "^7.1.1",
+    "chalk": "^5.3.0",
     "exec-sh": "^0.4.0",
     "express": "^4.17.1",
-    "glob-promise": "^4.2.0",
     "json-rpc-2.0": "^0.2.18",
     "lodash": "^4.17.21",
     "lru-cache": "^6.0.0",
     "md5": "^2.3.0",
+    "node-emoji": "^2.1.0",
     "pathfinding-binaries": "github:path-visualiser/pathfinding#binaries",
     "protocol": "file:../protocol",
-    "adapter": "file:../adapter",
     "socket.io": "^4.1.3",
     "socket.io-client": "^4.1.3",
     "tempy": "^1.0.1",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.4.4"
+    "vite-node": "^0.34.4",
+    "vite-tsconfig-paths": "^4.2.1",
+    "yaml": "^2.3.2",
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
@@ -33,9 +37,6 @@
     "@types/lodash-es": "^4.17.5",
     "@types/lru-cache": "^5.1.1",
     "@types/md5": "^2.3.1",
-    "@types/socket.io-client": "^3.0.0",
-    "jest": "^27.1.0",
-    "nodemon": "^2.0.12",
-    "ts-jest": "^27.0.5"
+    "@types/socket.io-client": "^3.0.0"
   }
 }

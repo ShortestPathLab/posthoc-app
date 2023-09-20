@@ -1,12 +1,12 @@
-import { createMethod } from "adapter/src/createMethod";
+import { createMethod } from "./createMethod";
+import { getConfig } from "../config";
 
 export const general = [
   /**
    * Returns server information.
    */
-  createMethod("about", async () => ({
-    name: "Warthog",
-    version: "1.0.2",
-    description: "Solver Adapter for Warthog & Roadhog",
-  })),
+  createMethod("about", async () => {
+    const { name, version, description } = getConfig();
+    return { name, version, description };
+  }),
 ];

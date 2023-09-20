@@ -1,0 +1,4 @@
+name: Warthog (Socket.io)
+version: 1.0.4
+description: Solver Adapter for Warthog & Roadhog
+port: 8221

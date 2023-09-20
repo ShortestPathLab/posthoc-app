@@ -1,3 +1,4 @@
+import { exec } from "helpers/exec";
 import {
   constant,
   Dictionary,
@@ -9,9 +10,10 @@ import {
   split,
 } from "lodash";
 import { roadhog, warthog } from "pathfinding-binaries";
+import { Trace } from "protocol";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
-import { exec } from "adapter/src/exec";
+import { gridTemplate, xyTemplate } from "./templates";
 
 type Params = Omit<
   ParamsOf<PathfindingTask>,
@@ -48,17 +50,19 @@ export function grid(m: string, { instances }: Params) {
 
 export const handlers = {
   grid: {
+    template: gridTemplate,
     create: grid,
     invoke: (alg, scen) =>
       exec(warthog, { args: { alg, scen }, flags: ["verbose"] }, true),
   },
   xy: {
+    template: xyTemplate,
     create: (_, { instances }) => {
       const instance = first(instances);
       if (instance) {
         const { start = 0, end = 0 } = instance;
         return constant(`p aux sp p2p 1\nq ${start + 1} ${end + 1}\n`);
-      }
+      } else return constant("");
     },
     invoke: (alg, scen, m) =>
       exec(
@@ -67,9 +71,10 @@ export const handlers = {
         true
       ),
   },
-} as Dictionary<Handler>;
+} satisfies Dictionary<Handler>;
 
 type Handler = {
+  template: Partial<Trace>;
   create: (m: string, params: Params) => (path: string) => string;
   invoke: (
     alg: string,

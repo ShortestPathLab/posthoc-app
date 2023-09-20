@@ -3,7 +3,7 @@ import { nanoid as id } from "nanoid";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask, PathfindingTaskInstance } from "protocol/SolveTask";
 import { roadhog, warthog } from "warthog-bin";
-import { gridTemplate } from "./templates";
+import { gridTemplate, xyTemplate } from "./templates";
 import { Trace } from "protocol";
 
 export type MapTypeKey = keyof typeof handlers;
@@ -66,7 +66,7 @@ export const handlers = {
     },
   },
   xy: {
-    template: gridTemplate,
+    template: xyTemplate,
     invoke: async (alg, instances, m) => {
       const [a, b] = [id(), id()];
       const scen = xy(m, a, { instances });

@@ -1,23 +1,7 @@
-import { readFile as read } from "fs/promises";
-import glob from "glob-promise";
-import {
-  entries,
-  filter,
-  first,
-  keys,
-  map,
-  memoize as memo,
-  startCase,
-} from "lodash";
-import { resolve } from "path";
+import { createMethod } from "./createMethod";
+import { entries, keys, map, memoize as memo, startCase } from "lodash";
 import { algorithms } from "../core/algorithms";
-import { getMapDescriptor, mapIsSupported, mapsPath } from "../core/maps";
 import { handlers } from "../core/scenario";
-import { createMethod } from "adapter/src/createMethod";
-
-async function getFiles(path: string) {
-  return await glob(`${resolve(path)}/**/*`);
-}
 
 export const features = [
   /**
@@ -51,31 +35,6 @@ export const features = [
    */
   createMethod(
     "features/maps",
-    memo(async () => {
-      const maps = filter(await getFiles(mapsPath), mapIsSupported);
-      return map(maps, getMapDescriptor);
-    })
-  ),
-  /**
-   * Returns a particular map.
-   */
-  createMethod(
-    "features/map",
-    memo(
-      async ({ id }) => {
-        const map = first(await glob(resolve(mapsPath, id)));
-        return map
-          ? {
-              ...getMapDescriptor(map),
-              content: await read(map, "utf8"),
-            }
-          : undefined;
-      },
-      ({ id }) => id
-    )
-  ),
-  createMethod(
-    "features/renderers",
     memo(async () => [])
   ),
 ];

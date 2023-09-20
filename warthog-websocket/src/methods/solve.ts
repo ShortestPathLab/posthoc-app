@@ -1,11 +1,11 @@
 import { writeFile as write } from "fs/promises";
-import { filter, indexOf, lastIndexOf } from "lodash";
+import { filter, indexOf, lastIndexOf, trimEnd } from "lodash";
+import { Trace } from "protocol";
 import { PathfindingTaskInstance } from "protocol/SolveTask";
 import tempy from "tempy";
 import { getMap, parseURI } from "../core/map";
-import { MapTypeKey } from "../core/maps";
 import { handlers } from "../core/scenario";
-import { createMethod } from "adapter/src/createMethod";
+import { createMethod } from "./createMethod";
 
 const { task: temp } = tempy.file;
 
@@ -34,6 +34,28 @@ function validateInstances(instances: PathfindingTaskInstance[]) {
   return filtered.length ? filtered : undefined;
 }
 
+function parseBasic(output: string) {
+  const lines = output.split("\n").filter((c) => c.startsWith(`{"type"`));
+  return lines.map((l) => trimEnd(l, ",")).map((l) => JSON.parse(l));
+}
+
+function parse(output: string, template: Partial<Trace>) {
+  const lines = parseBasic(output);
+  return {
+    ...template,
+    events: lines.map((c) => {
+      return {
+        type: c.type,
+        id: c.id,
+        x: c.variables.x,
+        y: c.variables.y,
+        pId: c.pId,
+        g: c.f,
+        f: c.g,
+      };
+    }),
+  };
+}
 export const solve = [
   /**
    * Returns a pathfinding solution.
@@ -43,7 +65,8 @@ export const solve = [
     ({ algorithm, format, mapURI, instances: inst }) =>
       usingFilePair(async (scenarioPath, mapPath) => {
         if (algorithm) {
-          const { create, invoke } = handlers[format as MapTypeKey];
+          const { create, invoke, template } =
+            handlers[format as "grid" | "xy"];
           const { scheme, content } = parseURI(mapURI);
           // Check if URI scheme is trace,
           // if so, return the URI content
@@ -63,7 +86,7 @@ export const solve = [
                 if (output.length > MAX_SOLUTION_SIZE) {
                   throw new Error("Solution is too large.");
                 }
-                return JSON.parse(trim(output));
+                return parse(trim(output), template);
               } else throw new Error("Nothing to solve.");
             }
           } else return JSON.parse(content);
