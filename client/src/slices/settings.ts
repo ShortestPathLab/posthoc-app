@@ -41,6 +41,7 @@ const defaults = {
   remote: defaultRemotes,
   playbackRate: defaultPlaybackRate,
   theme: "dark",
+  acrylic: true,
   accentColor: "blue",
 } as Settings;
 
