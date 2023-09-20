@@ -3,9 +3,9 @@
   "version": "1.0.4",
   "description": "",
   "scripts": {
-    "start": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
+    "start": "cd client && npm start",
     "build:all": "cd client && npm run build",
-    "postinstall": "concurrently \"cd client && npm i\" \"cd server && npm i\""
+    "postinstall": "cd client && npm install"
   },
   "repository": {
     "type": "git",
@@ -17,9 +17,7 @@
     "url": "https://github.com/path-visualiser/app/issues"
   },
   "homepage": "https://path-visualiser.github.io/app",
-  "devDependencies": {
-    "concurrently": "^6.2.1"
-  },
+  "devDependencies": {},
   "dependencies": {},
   "type": "module"
 }
