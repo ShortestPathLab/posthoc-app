@@ -13,8 +13,8 @@ export class IPCTransport implements Transport {
     this.rpc = new JSONRPCClient(async (request: Request) => {
       const listener = ({ data }: MessageEvent<Response>) => {
         if (data.id === request.id) {
-          this.worker.removeEventListener("message", listener);
           this.rpc.receive(data);
+          this.worker.removeEventListener("message", listener);
         }
       };
       this.worker.postMessage(request);

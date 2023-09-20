@@ -1,25 +1,29 @@
 import {
-  Box,
-  Card,
-  CardActionArea,
-  CardProps,
   Divider,
+  ListItem,
+  ListItemButton,
+  ListItemButtonProps,
+  ListItemIcon,
+  ListItemText,
   Typography as Type,
-} from "@material-ui/core";
-import { Flex } from "components/generic/Flex";
-import { call } from "components/script-editor/call";
+  useTheme,
+  Skeleton as Placeholder,
+  Tooltip,
+} from "@mui/material";
+import { getColorHex } from "components/renderer/colors";
 import { TraceEvent } from "protocol/Trace";
-import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { useAcrylic } from "theme";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
+import { usePlayback } from "slices/playback";
+import { pick } from "lodash";
 
 type EventInspectorProps = {
   event?: TraceEvent;
   index?: number;
   selected?: boolean;
-} & CardProps;
+} & ListItemButtonProps;
 
 export function EventInspector({
   event,
@@ -27,46 +31,76 @@ export function EventInspector({
   selected,
   ...props
 }: EventInspectorProps) {
-  const acrylic = useAcrylic();
-  const [{ specimen }] = useSpecimen();
-  const [{ code }, setUIState] = useUIState();
+  const { spacing } = useTheme();
+  const [, setPlayback] = usePlayback();
 
-  const cardStyles = selected
-    ? {
-        color: "primary.contrastText",
-        bgcolor: "primary.main",
-      }
-    : acrylic;
+  // const cardStyles = selected
+  //   ? {
+  //       color: "primary.contrastText",
+  //       bgcolor: "primary.main",
+  //     }
+  //   : acrylic;
 
-  const hidden = event
-    ? !call(code ?? "", "shouldRender", [
-        index ?? 0,
-        event,
-        specimen?.eventList ?? [],
-      ])
-    : false;
+  // const hidden = event
+  //   ? !call(code ?? "", "shouldRender", [
+  //       index ?? 0,
+  //       event,
+  //       specimen?.eventList ?? [],
+  //     ])
+  //   : false;
 
   return (
-    <Card
+    <ListItemButton
+      selected={selected}
       {...props}
       sx={{
-        ...cardStyles,
+        borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
         ...props.sx,
       }}
+      onClick={() => setPlayback({ step: index })}
     >
-      <CardActionArea
-        sx={{ p: 2, height: "100%" }}
-        onClick={() => setUIState({ step: index })}
+      <ListItemIcon>
+        <Type variant="body2">{index}</Type>
+      </ListItemIcon>
+      <Tooltip title={<PropertyList event={event} flexDirection="column" />}>
+        <ListItemText
+          sx={{ overflow: "hidden" }}
+          primary={<EventLabel event={event} hidden={false} />}
+          secondary={<PropertyList event={pick(event, "f", "g", "pId")} />}
+        />
+      </Tooltip>
+    </ListItemButton>
+  );
+}
+
+export function Skeleton() {
+  const { spacing, palette } = useTheme();
+  return (
+    <>
+      <ListItem
+        sx={{
+          borderLeft: `${spacing(0.5)} solid transparent`,
+        }}
       >
-        <Flex alignItems="center">
-          <Type>{index}</Type>
-          <Divider sx={{ mx: 2 }} flexItem orientation="vertical" />
-          <Box>
-            <EventLabel event={event} hidden={hidden} />
-            <PropertyList event={event} />
-          </Box>
-        </Flex>
-      </CardActionArea>
-    </Card>
+        <ListItemIcon>
+          <Type variant="body2">
+            <Placeholder animation={false} width={spacing(4)} />
+          </Type>
+        </ListItemIcon>
+        <ListItemText
+          primary={
+            <Type variant="overline">
+              <Placeholder animation={false} width={spacing(12)} />
+            </Type>
+          }
+          secondary={
+            <Type variant="body2">
+              <Placeholder animation={false} width={spacing(24)} />
+            </Type>
+          }
+        />
+      </ListItem>
+      <Divider variant="inset" />
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { SettingsTwoTone as SettingsIcon } from "@material-ui/icons";
+import { SettingsTwoTone as SettingsIcon } from "@mui/icons-material";
 import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
 import {
   AppBarTitle as Title,

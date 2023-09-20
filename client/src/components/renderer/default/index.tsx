@@ -1,4 +1,4 @@
-import { BlurOffOutlined as DisabledIcon } from "@material-ui/icons";
+import { BlurOffOutlined as DisabledIcon } from "@mui/icons-material";
 import { Flex } from "components/generic/Flex";
 import { RendererProps } from "components/renderer/Renderer";
 import { useSpecimen } from "slices/specimen";
@@ -18,3 +18,5 @@ export function DefaultRenderer({ width, height }: RendererProps) {
     </Flex>
   );
 }
+
+export { Loader } from "./Loader";

@@ -1,11 +1,23 @@
 import { Transport } from "client/Transport";
-import { once } from "lodash";
+import { delay, head, now, once } from "lodash";
 import { Request, Response } from "protocol/Message";
 
+function wait(ms: number) {
+  return new Promise((res) => delay(res, ms));
+}
+
+async function timed<T>(task: () => Promise<T>, ms: number = 500) {
+  const from = now();
+  const result = (await Promise.any([task(), wait(ms)])) as T | undefined;
+  return { result, delta: now() - from };
+}
+
 const init = once(async (url: string = "") => {
-  const res = await fetch(url);
-  const fn = new Function(`${await res.text()};\nreturn call;`);
-  return fn as Transport["call"];
+  const { result } = await timed(() => import(url));
+  if (result) {
+    const fn = (...args: any[]) => result.call(...args);
+    return fn as Transport["call"];
+  }
 });
 
 const process = async ({
@@ -14,18 +26,34 @@ const process = async ({
 }: Request): Promise<Partial<Response>> => {
   try {
     const call = await init();
-    return { result: await call(method, params) };
+    if (call) {
+      return { result: await call(method, params) };
+    } else {
+      return { error: { code: 500, message: "Could not connect." } };
+    }
   } catch (e) {
     return { error: { code: 500, message: `${e}` } };
   }
 };
 
+const queue: (Request | string)[] = [];
+
 onmessage = async (msg: MessageEvent<string | Request>) => {
-  if (typeof msg.data === "string") {
-    await init(msg.data);
-    postMessage("ready");
-  } else {
-    const { id, ...req } = msg.data;
-    postMessage({ id, jsonrpc: "2.0", ...process(req) });
-  }
+  queue.push(msg.data);
 };
+
+async function consume() {
+  const data = queue.shift();
+  if (data) {
+    if (typeof data === "string") {
+      await init(data);
+      postMessage("ready");
+    } else {
+      const { id, ...req } = data;
+      postMessage({ id, jsonrpc: "2.0", ...(await process(req)) });
+    }
+  }
+  requestAnimationFrame(consume);
+}
+
+requestAnimationFrame(consume);

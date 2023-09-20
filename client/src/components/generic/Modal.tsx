@@ -7,8 +7,8 @@ import {
   Toolbar,
   Typography,
   useTheme,
-} from "@material-ui/core";
-import { ArrowBack } from "@material-ui/icons";
+} from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
 import { ResizeSensor } from "css-element-queries";
 import PopupState from "material-ui-popup-state";
 import {
@@ -205,7 +205,7 @@ export default function Modal({
           ...(useVariant && {
             borderRadius: `${theme.shape.borderRadius}px ${theme.shape.borderRadius}px 0 0`,
           }),
-          background: theme.palette.background.default,
+          background: theme.palette.background.paper,
           overflow: "hidden",
           height:
             height && !sm
@@ -247,7 +247,7 @@ export function ManagedModal({
   trigger = () => <></>,
   children,
 }: {
-  options?: Props;
+  options?: ComponentProps<typeof Modal>;
   trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void) => ReactElement;
   appBar?: ModalAppBarProps;
   children?: ReactNode;

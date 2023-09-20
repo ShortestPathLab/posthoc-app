@@ -1,12 +1,11 @@
 {
   "name": "app",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "",
   "scripts": {
     "start": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
     "build:all": "cd client && npm run build",
-    "test": "(cd client && npm run test -- --watchAll=false) && (cd server && npm run test)",
-    "postinstall": "concurrently \"cd client && npm i --legacy-peer-deps\" \"cd server && npm i --legacy-peer-deps\""
+    "postinstall": "concurrently \"cd client && npm i\" \"cd server && npm i\""
   },
   "repository": {
     "type": "git",
@@ -21,8 +20,6 @@
   "devDependencies": {
     "concurrently": "^6.2.1"
   },
-  "dependencies": {
-    "ts-node": "^10.2.1",
-    "typescript": "^4.4.2"
-  }
+  "dependencies": {},
+  "type": "module"
 }

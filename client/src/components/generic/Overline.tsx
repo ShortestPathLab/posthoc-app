@@ -1,5 +1,5 @@
-import { Typography as Type } from "@material-ui/core";
-import { FiberManualRecord as Dot } from "@material-ui/icons";
+import { Typography as Type } from "@mui/material";
+import { FiberManualRecord as Dot } from "@mui/icons-material";
 import { ComponentProps, ReactNode } from "react";
 
 export function OverlineDot(props: ComponentProps<typeof Dot>) {

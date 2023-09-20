@@ -1,0 +1,5 @@
+name: Iron Harvest Benchmark Maps
+version: 1.0.1
+description: Grid Maps from the Iron Harvest Pathfinding Benchmark
+maps: "./content/maps"
+port: 8220

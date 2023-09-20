@@ -1,4 +1,4 @@
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress, useTheme } from "@mui/material";
 import Editor from "@monaco-editor/react";
 import { Flex } from "components/generic/Flex";
 import { debounce } from "lodash";
@@ -9,11 +9,13 @@ const DELAY = 2500;
 
 export function ScriptEditor() {
   const [{ code }, setUIState] = useUIState();
+  const theme = useTheme();
   return (
-    <Flex height="70vh" overflow="hidden">
+    <Flex height="100%" overflow="hidden">
       <AutoSize>
         {({ width, height }) => (
           <Editor
+            theme={theme.palette.mode === "dark" ? "vs-dark" : "light"}
             width={width}
             loading={<CircularProgress variant="indeterminate" />}
             height={height}

@@ -1,15 +1,13 @@
 import { makeTemplate } from "components/script-editor/makeTemplate";
 import { templates } from "components/script-editor/templates";
 import { values } from "lodash";
-import { Feature } from "protocol/FeatureQuery";
-import { TraceEventType } from "protocol/Trace";
+import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
+import { Parameters, PathfindingTask } from "protocol/SolveTask";
+import { Trace, TraceEventType } from "protocol/Trace";
 import { createSlice } from "./createSlice";
-import { Parameters } from "protocol/SolveTask";
-
-export type PlaybackStateType = "playing" | "paused" | undefined;
-
-type PlaybackState = { playback?: PlaybackStateType; step?: number };
-
+import { nanoid as id } from "nanoid";
+import { StackProps } from "@mui/material";
+import { ParamsOf } from "protocol/Message";
 export type Map = Partial<
   Feature & {
     format: string;
@@ -49,14 +47,35 @@ type SpecimenState = {
   end?: number;
 };
 
+export type Specimen = {
+  specimen?: Trace;
+  map?: string;
+  error?: string;
+} & Partial<ParamsOf<PathfindingTask>>;
+
+export type UploadedTrace = FeatureDescriptor & {
+  content?: Trace;
+};
+
+export type Layer<T = {}> = {
+  key: string;
+  name?: string;
+  source?: { type: string } & T;
+};
+
+export type LayerState = {
+  layers: Layer[];
+};
+
 export type UIState = InputState &
-  PlaybackState &
   DebugOptionsState &
-  SpecimenState;
+  SpecimenState &
+  LayerState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
   Partial<UIState>
 >({
   code: makeTemplate(values(templates)),
+  layers: [],
 });

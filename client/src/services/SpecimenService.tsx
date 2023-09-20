@@ -6,13 +6,15 @@ import { useMapContent } from "hooks/useMapContent";
 import { find, isEmpty } from "lodash";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
+import { Component, FunctionComponent } from "react";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
-import { useConnections } from "slices/connections";
+import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { Specimen, useSpecimen } from "slices/specimen";
-import { useUIState } from "slices/UIState";
-import { hashAsync as hash } from "workers/async";
+import { Map, useUIState } from "slices/UIState";
+import { compressAsync as compress, hashAsync as hash } from "workers/async";
+import { Avatar, Box, IconButton, Stack, TextField } from "@mui/material";
 
 async function solve(
   map: string,
@@ -22,7 +24,7 @@ async function solve(
   if (map) {
     for (const mapURI of [
       `hash:${await hash(map)}`,
-      `map:${encodeURIComponent(map)}`,
+      `lz:${encodeURIComponent(await compress(map))}`,
     ] as const) {
       const p = { ...params, format, mapURI };
       try {
@@ -46,7 +48,8 @@ export function SpecimenService() {
   const usingLoadingState = useLoadingState("specimen");
   const notify = useSnackbar();
   const [{ formats }] = useFeatures();
-  const [{ algorithm, start, end, parameters }, setUIState] = useUIState();
+  const [{ algorithm, start, end, parameters, layers }, setUIState] =
+    useUIState();
   const resolve = useConnectionResolver();
   const [connections] = useConnections();
   const [, setSpecimen] = useSpecimen();
@@ -56,14 +59,44 @@ export function SpecimenService() {
     (signal) =>
       usingLoadingState(async () => {
         if (map?.format && map?.content) {
-          let entry;
-          for (const connection of connections) {
-            const a = await connection.call("features/algorithms");
-            const f = await connection.call("features/formats");
-            if (find(a, { id: algorithm }) && find(f, { id: map?.format })) {
-              entry = connection;
-              break;
+          if (algorithm) {
+            let entry = await findConnection(connections, algorithm, map);
+            if (entry) {
+              notify("Running query...");
+              const solution = await solve(
+                map?.content ?? "",
+                {
+                  algorithm,
+                  format: map?.format ?? "",
+                  instances: [{ end, start }],
+                  parameters,
+                },
+                entry.call
+              );
+              if (solution && !signal.aborted) {
+                setSpecimen(solution);
+                setUIState({ step: 0, playback: "paused", breakpoints: [] });
+                notify(
+                  ...(solution.error
+                    ? [`${entry.name} returned an error: ${solution.error}`]
+                    : !isEmpty(solution.specimen)
+                    ? [
+                        "Solution generated.",
+                        `${solution.specimen?.eventList?.length} steps`,
+                      ]
+                    : ["Ready."])
+                );
+              }
+            } else {
+              notify(
+                `No solver is available for the map format (${
+                  map?.format ?? "none"
+                }) and algorithm (${algorithm ?? "none"}).`
+              );
             }
+          } else {
+            setSpecimen({ format: map.format, map: map.content, specimen: {} });
+            setUIState({ step: 0, playback: "paused", breakpoints: [] });
           }
           if (entry) {
             const solution = await solve(
@@ -113,4 +146,21 @@ export function SpecimenService() {
   );
 
   return <></>;
+}
+
+async function findConnection(
+  connections: Connection[],
+  algorithm?: string,
+  map?: Map
+) {
+  let entry;
+  for (const connection of connections) {
+    const a = await connection.call("features/algorithms");
+    const f = await connection.call("features/formats");
+    if (find(a, { id: algorithm }) && find(f, { id: map?.format })) {
+      entry = connection;
+      break;
+    }
+  }
+  return entry;
 }

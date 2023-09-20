@@ -5,13 +5,14 @@ import {
   Switch,
   Tab,
   Typography as Type,
-} from "@material-ui/core";
-import { TabContext, TabList, TabPanel } from "@material-ui/lab";
+} from "@mui/material";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { ReactNode, useState } from "react";
 import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
 import { ServerListEditor } from "./ServerListEditor";
+import { RendererListEditor } from "./RendererListEditor";
 
 const formatLabel = (v: number) => `${v}x`;
 
@@ -20,7 +21,7 @@ export function SettingsEditor() {
   const [tab, setTab] = useState("general");
   function renderHeading(label: ReactNode) {
     return (
-      <Type variant="overline" color="textSecondary">
+      <Type variant="overline" color="text.secondary">
         {label}
       </Type>
     );
@@ -33,6 +34,7 @@ export function SettingsEditor() {
       <TabList onChange={(_, v) => setTab(v)}>
         <Tab label="General" value="general" />
         <Tab label="Connections" value="connections" />
+        <Tab label="Renderers" value="renderers" />
       </TabList>
       <Divider />
       <TabPanel value="general">
@@ -73,6 +75,12 @@ export function SettingsEditor() {
         <Box>
           {renderHeading("Solvers")}
           <ServerListEditor />
+        </Box>
+      </TabPanel>
+      <TabPanel value="renderers">
+        <Box>
+          {renderHeading("Renderers")}
+          <RendererListEditor />
         </Box>
       </TabPanel>
     </TabContext>

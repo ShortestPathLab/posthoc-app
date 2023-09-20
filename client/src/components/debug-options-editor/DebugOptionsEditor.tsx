@@ -1,11 +1,5 @@
-import {
-  Box,
-  Divider,
-  Tab,
-  Typography as Type,
-  Button,
-} from "@material-ui/core";
-import { TabContext, TabList, TabPanel } from "@material-ui/lab";
+import { Box, Divider, Tab, Typography as Type, Button } from "@mui/material";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/Switch";
@@ -22,7 +16,7 @@ export function DebugOptionsEditor() {
   const [tab, setTab] = useState("standard");
   function renderHeading(label: ReactNode) {
     return (
-      <Type variant="overline" color="textSecondary">
+      <Type variant="overline" color="text.secondary">
         {label}
       </Type>
     );

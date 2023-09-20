@@ -1,4 +1,4 @@
-import { Card, Stack } from "@material-ui/core";
+import { Card, Stack } from "@mui/material";
 import { ReactNode } from "react";
 import { useAcrylic } from "theme";
 

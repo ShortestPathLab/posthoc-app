@@ -5,7 +5,7 @@ import { Breakpoint, useUIState } from "slices/UIState";
 import { comparators } from "./comparators";
 import { intrinsicProperties } from "./intrinsicProperties";
 import { BreakpointEditor } from "./BreakpointEditor";
-import { Box } from "@material-ui/system";
+import { Box } from "@mui/material";
 import { propertyPaths as paths } from "./propertyPaths";
 
 export function BreakpointListEditor() {

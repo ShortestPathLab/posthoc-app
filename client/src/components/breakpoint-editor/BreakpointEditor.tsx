@@ -1,4 +1,4 @@
-import { Divider, TextField, Typography as Type } from "@material-ui/core";
+import { Divider, TextField, Typography as Type } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { SelectField as Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";
@@ -46,7 +46,7 @@ export function BreakpointEditor({
               {last(c.split("."))}
               <Space />
               <Type
-                color="textSecondary"
+                color="text.secondary"
                 variant="body2"
                 component="span"
               >{`event.${c}`}</Type>

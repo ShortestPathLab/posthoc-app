@@ -1,29 +1,39 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
+/// <reference types="vitest" />
 
-export default defineConfig({
-  plugins: [react({ fastRefresh: false })],
-  worker: {
-    plugins: [react()],
-  },
-  base: "/app",
-  build: {
-    outDir: path.join(process.cwd(), "./build"),
-  },
+import path from "path";
+import { UserConfig } from "vite";
+import viteTsconfigPaths from "vite-tsconfig-paths";
+import react from "@vitejs/plugin-react";
+export default {
+  mode: "production",
   root: path.join(process.cwd(), "./src"),
-  publicDir: path.join(process.cwd(), "./public"),
-  resolve: {
-    alias: {
-      client: "/client",
-      components: "/components",
-      hooks: "/hooks",
-      services: "/services",
-      slices: "/slices",
-      workers: "/workers",
-      theme: "/theme",
-      "index.css": "/index.css",
-      App: "/App",
+  build: { outDir: path.join(process.cwd(), "./dist") },
+  plugins: [
+    react(),
+    viteTsconfigPaths(),
+    {
+      name: "configure-response-headers",
+      configureServer: (server) => {
+        server.middlewares.use((_req, res, next) => {
+          res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+          res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+          next();
+        });
+      },
+    },
+  ],
+  test: {
+    globals: true,
+    deps: {
+      inline: ["vitest-canvas-mock"],
+    },
+    threads: false,
+    setupFiles: "./setupTests.ts",
+    environment: "jsdom",
+    environmentOptions: {
+      jsdom: {
+        resources: "usable",
+      },
     },
   },
-});
+} as UserConfig;

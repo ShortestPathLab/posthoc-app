@@ -1,30 +1,20 @@
-import { TypographyVariant } from "@material-ui/core";
+import { TypographyVariant } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { Property } from "components/generic/Property";
-import { entries, filter, map } from "lodash";
-import { TraceEvent } from "protocol/Trace";
+import { Dictionary, entries, filter, map } from "lodash";
 
 export function PropertyList({
   event,
   variant = "body2",
   ...props
 }: {
-  event?: TraceEvent<string>;
+  event?: Dictionary<any>;
   variant?: TypographyVariant;
 } & FlexProps) {
   return (
-    <Flex flexWrap="wrap" {...props}>
+    <Flex {...props}>
       {map(
-        filter(
-          [
-            ["f", event?.f],
-            ["g", event?.g],
-            ...entries(event?.variables),
-            ["pId", event?.pId],
-            ["info", event?.info],
-          ],
-          ([, v]) => v !== undefined
-        ),
+        filter(entries(event), ([, v]) => v !== undefined),
         ([k, v]) => (
           <Property label={k} value={v} type={{ variant }} />
         )

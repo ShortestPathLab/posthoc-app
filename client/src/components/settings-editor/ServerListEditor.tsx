@@ -1,5 +1,5 @@
-import { Button } from "@material-ui/core";
-import { ReplayOutlined as ResetIcon } from "@material-ui/icons";
+import { Button } from "@mui/material";
+import { ReplayOutlined as ResetIcon } from "@mui/icons-material";
 import { defaultTransport } from "client";
 import { ListEditor } from "components/generic/ListEditor";
 import { debounce } from "lodash";

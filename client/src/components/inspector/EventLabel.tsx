@@ -1,6 +1,7 @@
-import { HideSourceOutlined as HiddenIcon } from "@material-ui/icons";
+import { HideSourceOutlined as HiddenIcon } from "@mui/icons-material";
 import { Overline, OverlineDot as Dot } from "components/generic/Overline";
 import { getColorHex } from "components/renderer/colors";
+import { startCase } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 
 export function EventLabel({
@@ -12,13 +13,7 @@ export function EventLabel({
 }) {
   return (
     <Overline>
-      <Dot
-        sx={{
-          color: getColorHex(event?.type),
-          mr: 1,
-        }}
-      />
-      {`${event?.type ?? "unsupported"} #${event?.id ?? "-"}`}{" "}
+      {startCase(`${event?.type ?? "unsupported"} #${event?.id ?? "-"}`)}{" "}
       {hidden && (
         <HiddenIcon
           sx={{

@@ -1,4 +1,4 @@
-import { Card, CardProps, Typography } from "@material-ui/core";
+import { Card, CardProps, Typography } from "@mui/material";
 
 export function PlaceholderCard({ sx, children, ...props }: CardProps) {
   return (
@@ -11,7 +11,7 @@ export function PlaceholderCard({ sx, children, ...props }: CardProps) {
       }}
       {...props}
     >
-      <Typography color="textSecondary">{children}</Typography>
+      <Typography color="text.secondary">{children}</Typography>
     </Card>
   );
 }

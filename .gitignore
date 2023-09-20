@@ -5,3 +5,7 @@ node_modules
 
 # docker-compose prefabs
 /docker-compose
+
+/client/dist
+
+/dist

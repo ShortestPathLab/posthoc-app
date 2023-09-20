@@ -1,0 +1,52 @@
+{
+  "name": "internal-renderers",
+  "version": "1.0.4",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "vitest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "adapter": "file:../adapter",
+    "colortranslator": "^2.0.0",
+    "combinate": "^1.1.11",
+    "detect-collisions": "^9.1.1",
+    "eventemitter3": "^5.0.1",
+    "lodash": "^4.17.21",
+    "memoizee": "^0.4.15",
+    "nanoid": "^4.0.2",
+    "pixi-viewport": "^5.0.1",
+    "pixi.js": "^7.2.4",
+    "protocol": "file:../protocol",
+    "rbush": "^3.0.1",
+    "renderer": "file:../renderer",
+    "typed-emitter": "^2.1.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.0.26",
+    "@storybook/addon-interactions": "^7.0.24",
+    "@storybook/addon-links": "^7.0.24",
+    "@storybook/blocks": "^7.0.24",
+    "@storybook/react": "^7.0.24",
+    "@storybook/react-vite": "^7.0.24",
+    "@storybook/testing-library": "^0.0.14-next.2",
+    "@types/lodash": "^4.14.195",
+    "@types/memoizee": "^0.4.8",
+    "@types/rbush": "^3.0.0",
+    "@vitest/web-worker": "^0.32.2",
+    "canvas": "^2.11.2",
+    "jest-webgl-canvas-mock": "^2.5.0",
+    "jsdom": "^22.1.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.0.26",
+    "vite-tsconfig-paths": "^4.2.0",
+    "vitest": "^0.32.2",
+    "vitest-canvas-mock": "^0.3.1"
+  }
+}

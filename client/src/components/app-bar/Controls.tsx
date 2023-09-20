@@ -1,7 +1,6 @@
-import { Box, Card, Divider } from "@material-ui/core";
+import { Box, Card, Divider } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { useAcrylic } from "theme";
-import { Input } from "./Input";
 import { Playback } from "./Playback";
 import { Settings } from "./Settings";
 import { Title } from "./Title";
@@ -16,7 +15,7 @@ export function Controls() {
       sx={{
         m: 3,
         position: "absolute",
-        top: 0,
+        bottom: (theme) => theme.spacing(2),
         left: 0,
         zIndex: "appBar",
         ...acrylic,
@@ -25,8 +24,6 @@ export function Controls() {
       <Box display="flex">
         <Title mr={1} />
         <Flex p={1} alignItems="center">
-          <Input />
-          {divider}
           <Playback />
           {divider}
           <Utility />

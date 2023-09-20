@@ -1,11 +1,6 @@
-import {
-  Switch,
-  TextField,
-  Tooltip,
-  Typography as Type,
-} from "@material-ui/core";
-import { EditTwoTone as EditIcon } from "@material-ui/icons";
-import { Box } from "@material-ui/system";
+import { Switch, TextField, Tooltip, Typography as Type } from "@mui/material";
+import { EditTwoTone as EditIcon } from "@mui/icons-material";
+import { Box } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
 import {

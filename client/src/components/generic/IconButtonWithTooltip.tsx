@@ -1,4 +1,4 @@
-import { IconButton, IconButtonProps, Tooltip } from "@material-ui/core";
+import { IconButton, IconButtonProps, Tooltip } from "@mui/material";
 import { startCase } from "lodash";
 import { ReactNode } from "react";
 

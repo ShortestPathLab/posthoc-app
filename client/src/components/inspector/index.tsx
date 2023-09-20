@@ -1,72 +1,48 @@
-import { Box, Fade, LinearProgress } from "@material-ui/core";
-import { BlurOnTwoTone as DisabledIcon } from "@material-ui/icons";
+import { Box, Fade, LinearProgress } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
-import { getRenderer } from "components/renderer";
+import { pages } from "pages";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { some, values } from "lodash";
 import { createElement, useState } from "react";
-import AutoSize from "react-virtualized-auto-sizer";
-import { useLoading } from "slices/loading";
+import { useAnyLoading } from "slices/loading";
 import { useSpecimen } from "slices/specimen";
-import { InfoPanel } from "./InfoPanel";
 import { SelectionMenu } from "./SelectionMenu";
+import { ViewTree } from "./ViewTree";
+import { PanelState, useView } from "slices/view";
 
 type SpecimenInspectorProps = {} & FlexProps;
 
 export function Inspector(props: SpecimenInspectorProps) {
-  const [loading] = useLoading();
-  const [{ specimen, format, map }] = useSpecimen();
-  const renderer = getRenderer(format);
+  const loading = useAnyLoading();
+  const [{ view }, setView] = useView();
   const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
     undefined
   );
 
   return (
     <>
-      <Fade in={some(values(loading))}>
-        <LinearProgress variant="indeterminate" sx={{ mb: -0.5, zIndex: 1 }} />
-      </Fade>
       <Flex {...props}>
-        {specimen ? (
-          <Flex>
-            <AutoSize>
-              {(size) => (
-                <Fade appear in>
-                  <Box>
-                    {createElement(renderer, {
-                      ...size,
-                      key: map,
-                      onSelect: setSelection,
-                      selection: selection?.world,
-                    })}
-                  </Box>
-                </Fade>
-              )}
-            </AutoSize>
-            <InfoPanel
-              position="absolute"
-              right={0}
-              height="100%"
-              width="25vw"
-              minWidth={480}
-            />
-          </Flex>
-        ) : (
-          <Flex
-            justifyContent="center"
-            alignItems="center"
-            color="text.secondary"
-            vertical
-          >
-            <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
-            Select a map to get started.
-          </Flex>
-        )}
+        <ViewTree<PanelState>
+          root={view}
+          onChange={(v) => setView({ view: v })}
+          renderLeaf={({ content }) => (
+            <Fade in>
+              <Box sx={{ width: "100%", height: "100%" }}>
+                {createElement(pages[content?.type ?? ""]?.content)}
+              </Box>
+            </Fade>
+          )}
+        />
       </Flex>
-      <SelectionMenu
+      {/* <SelectionMenu
         selection={selection}
         onClose={() => setSelection(undefined)}
-      />
+      /> */}
+      <Fade in={loading}>
+        <LinearProgress
+          variant="indeterminate"
+          sx={{ position: "absolute", bottom: 0, width: "100%", zIndex: 1 }}
+        />
+      </Fade>
     </>
   );
 }

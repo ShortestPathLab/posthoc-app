@@ -1,113 +1,151 @@
 import {
-  Box,
   Divider,
   ListItem,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
-} from "@material-ui/core";
+  MenuList,
+  Typography,
+} from "@mui/material";
 import {
-  PlaceOutlined as DestinationIcon,
-  TripOriginOutlined as StartIcon,
-} from "@material-ui/icons";
-import { Label } from "components/generic/Label";
-import { Overline } from "components/generic/Overline";
-import { Property } from "components/generic/Property";
-import { useSnackbar } from "components/generic/Snackbar";
+  SelectionInfoProvider,
+  getLayerHandler,
+} from "components/layer-editor/layers/LayerSource";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { map } from "lodash";
+import { Dictionary, chain, entries, merge } from "lodash";
+import { useCache } from "pages/TreePage";
+import { ComponentProps, ReactNode, useMemo } from "react";
 import { useUIState } from "slices/UIState";
-import { EventLabel } from "./EventLabel";
-import { PropertyList } from "./PropertyList";
 
 type Props = {
   selection?: RendererSelectEvent;
   onClose?: () => void;
 };
 
+export type SelectionMenuEntry = {
+  index?: number;
+  action?: () => void;
+  primary?: ReactNode;
+  secondary?: ReactNode;
+  icon?: ReactNode;
+};
+
+type SelectionMenuSection = {
+  index?: number;
+  primary?: ReactNode;
+  items?: Dictionary<SelectionMenuEntry>;
+};
+
+export type SelectionMenuContent = Dictionary<SelectionMenuSection>;
+
 export function SelectionMenu({ selection, onClose }: Props) {
-  const notify = useSnackbar();
-  const [, setUIState] = useUIState();
-  const { global, info } = selection ?? {};
-  const { current, entry, node } = info ?? {};
+  const MenuContent = useSelectionMenu();
+  const cache = useCache(selection);
+
+  const { client } = selection ?? {};
 
   return (
     <Menu
       open={!!selection}
       anchorReference="anchorPosition"
       anchorPosition={{
-        top: global?.y ?? 0,
-        left: global?.x ?? 0,
+        top: client?.y ?? 0,
+        left: client?.x ?? 0,
       }}
       onClose={onClose}
+      keepMounted
     >
-      <ListItem>
-        <ListItemText>
-          <Box>
-            <Overline>Point</Overline>
-            <Property label="x" value={info?.point?.x ?? "-"} />
-            <Property label="y" value={info?.point?.y ?? "-"} />
-          </Box>
-          {current?.event && (
-            <Box mt={2}>
-              <EventLabel event={current?.event} />
-              <PropertyList event={current?.event} variant="body1" vertical />
-            </Box>
-          )}
-        </ListItemText>
-      </ListItem>
-      <Divider sx={{ my: 1 }} />
-      {map(
-        [
-          {
-            label: "Set Origin",
-            icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
-            action: () => {
-              notify("Origin set.");
-              setUIState({ start: node?.key });
-            },
-            disabled: !node,
-          },
-          {
-            label: "Set Destination",
-            icon: <DestinationIcon />,
-            action: () => {
-              notify("Destination set.");
-              setUIState({ end: node?.key });
-            },
-            disabled: !node,
-          },
-          {
-            label: (
-              <Label primary="Go to Expansion Step" secondary={entry?.index} />
-            ),
-            action: () =>
-              setUIState({ step: entry?.index ?? 0, playback: "paused" }),
-            disabled: !entry,
-          },
-          {
-            label: (
-              <Label primary="Rewind to This Step" secondary={current?.index} />
-            ),
-            action: () =>
-              setUIState({ step: current?.index ?? 0, playback: "paused" }),
-            disabled: !current,
-          },
-        ],
-        ({ label, icon, action, disabled }) => (
-          <MenuItem
-            disabled={disabled}
-            onClick={() => {
-              action();
-              onClose?.();
+      <MenuList dense sx={{ py: 0 }}>
+        {
+          <MenuContent event={cache}>
+            {(menu) => {
+              const entries2 = entries(menu);
+              return entries2.length ? (
+                chain(entries2)
+                  .sortBy(([, v]) => v.index)
+                  .map(([, { items, primary }], i) => (
+                    <>
+                      {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
+                      {primary && (
+                        <ListItem sx={{ py: 0 }}>
+                          <Typography color="text.secondary" variant="overline">
+                            {primary}
+                          </Typography>
+                        </ListItem>
+                      )}
+                      {chain(items)
+                        .entries()
+                        .sortBy(([, v]) => v.index)
+                        .map(([, { action, icon, primary, secondary }]) =>
+                          action ? (
+                            <MenuItem
+                              onClick={() => {
+                                action();
+                                onClose?.();
+                              }}
+                            >
+                              {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                              <ListItemText primary={primary} sx={{ mr: 4 }} />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {secondary}
+                              </Typography>
+                            </MenuItem>
+                          ) : (
+                            <ListItem>
+                              {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                              <ListItemText primary={primary} sx={{ mr: 4 }} />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {secondary}
+                              </Typography>
+                            </ListItem>
+                          )
+                        )
+                        .value()}
+                    </>
+                  ))
+                  .value()
+              ) : (
+                <>
+                  <ListItem>
+                    <Typography>No info to show.</Typography>
+                  </ListItem>
+                </>
+              );
             }}
-          >
-            <ListItemIcon>{icon}</ListItemIcon>
-            <ListItemText>{label}</ListItemText>
-          </MenuItem>
-        )
-      )}
+          </MenuContent>
+        }
+      </MenuList>
     </Menu>
+  );
+}
+
+type SelectionInfoProviderProps<T> = ComponentProps<SelectionInfoProvider<T>>;
+
+const identity = ({ children }: SelectionInfoProviderProps<any>) => (
+  <>{children?.({})}</>
+);
+
+function useSelectionMenu() {
+  const [{ layers }] = useUIState();
+  return useMemo(
+    () =>
+      chain(layers)
+        .reduce((A, l) => {
+          const B = getLayerHandler(l)?.getSelectionInfo ?? identity;
+          return ({ children, event }: SelectionInfoProviderProps<any>) => (
+            <B layer={l} event={event}>
+              {(a) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}
+            </B>
+          );
+        }, identity)
+        .value(),
+    [layers]
   );
 }

@@ -1,5 +1,5 @@
 import { ceil, floor, forEach, range } from "lodash";
-import { MapInfo } from "../Parser";
+import { MapUtils } from "../map-parser/Parser";
 import { scale } from "../raster/config";
 import { makeGraphic } from "../raster/makeGraphic";
 import { Scale } from "../Size";
@@ -28,7 +28,7 @@ export function Guides({
   scale: { minX, minY, maxX, maxY, to },
   grid = 5,
   alpha,
-}: Props & { map: MapInfo; scale: Scale }) {
+}: Props & { map: MapUtils; scale: Scale }) {
   const a = to({ x: minX, y: minY });
   const b = to({ x: maxX, y: maxY });
   return (

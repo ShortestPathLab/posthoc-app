@@ -1,21 +1,21 @@
-import { CssBaseline, ThemeProvider } from "@material-ui/core";
+import { CssBaseline } from "@mui/material";
 import App from "App";
-import { SnackbarProvider } from "components/generic/Snackbar";
 import "index.css";
-import { StrictMode } from "react";
-import { render } from "react-dom";
-import { ConnectionsService } from "services/ConnectionsService";
-import { PlaybackService } from "services/PlaybackService";
-import { FeaturesService } from "services/FeaturesService";
-import { SpecimenService } from "services/SpecimenService";
+import "overlayscrollbars/overlayscrollbars.css";
+import { createRoot } from "react-dom/client";
+import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
+import { UIStateProvider } from "slices/UIState";
 import { ConnectionsProvider } from "slices/connections";
 import { FeaturesProvider } from "slices/features";
 import { LoadingProvider } from "slices/loading";
+import { LogProvider } from "slices/log";
+import { PlaybackProvider } from "slices/playback";
+import { RendererProvider } from "slices/renderers";
 import { SettingsProvider } from "slices/settings";
-import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { SpecimenProvider } from "slices/specimen";
-import { UIStateProvider } from "slices/UIState";
-import { theme } from "theme";
+import { ViewProvider } from "slices/view";
+
+const root = createRoot(document.getElementById("root")!);
 
 const slices = [
   SettingsProvider,
@@ -24,26 +24,16 @@ const slices = [
   UIStateProvider,
   SpecimenProvider,
   LoadingProvider,
+  RendererProvider,
+  PlaybackProvider,
+  LogProvider,
+  ViewProvider,
 ];
 
-const services = [
-  ConnectionsService,
-  PlaybackService,
-  SpecimenService,
-  FeaturesService,
-];
-
-render(
-  <StrictMode>
-    <CssBaseline>
-      <ThemeProvider theme={theme}>
-        <SnackbarProvider>
-          <EnvironmentProvider slices={slices} services={services}>
-            <App />
-          </EnvironmentProvider>
-        </SnackbarProvider>
-      </ThemeProvider>
-    </CssBaseline>
-  </StrictMode>,
-  document.getElementById("root")
+root.render(
+  <CssBaseline>
+    <EnvironmentProvider slices={slices}>
+      <App />
+    </EnvironmentProvider>
+  </CssBaseline>
 );

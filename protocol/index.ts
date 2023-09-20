@@ -8,6 +8,9 @@ import {
 import { Method } from "./Message";
 import { PathfindingTaskMethod } from "./SolveTask";
 
+export * from "./Trace";
+export * from "./Renderer";
+
 type Entry<T extends Method> = { [K in T["name"]]: T };
 
 export type NameMethodMap = Entry<CheckConnectionMethod> &
