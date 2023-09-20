@@ -42,7 +42,6 @@ type Entry = { parent: Key; step: number };
 
 function getPaths(events: TraceEvent[] = []) {
   const memo: Dictionary<Entry>[] = [];
-
   const getCache = (step: number) => {
     const current = min(events.length - 1, step);
     while (events.length && memo.length <= current) {
@@ -63,7 +62,6 @@ function getPaths(events: TraceEvent[] = []) {
     }
     return memo[current];
   };
-
   return (step: number) => {
     const cache = getCache(step);
     const path: number[] = [];

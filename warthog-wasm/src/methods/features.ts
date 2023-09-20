@@ -1,7 +1,7 @@
 import { createMethod } from "./createMethod";
 import { entries, keys, map, memoize as memo, startCase } from "lodash";
-import { algorithms } from "../core/algorithms";
-import { handlers } from "../core/scenario";
+import { algorithms } from "core/algorithms";
+import { handlers } from "core/scenario";
 
 export const features = [
   /**

@@ -3,6 +3,8 @@ import { nanoid as id } from "nanoid";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask, PathfindingTaskInstance } from "protocol/SolveTask";
 import { roadhog, warthog } from "warthog-bin";
+import { gridTemplate } from "./templates";
+import { Trace } from "protocol";
 
 export type MapTypeKey = keyof typeof handlers;
 
@@ -48,6 +50,7 @@ function xy(_m: string, _path: string, { instances }: Params) {
 
 export const handlers = {
   grid: {
+    template: gridTemplate,
     invoke: async (alg, instances, m) => {
       const [a, b] = [id(), id()];
       const scen = grid(m, a, { instances });
@@ -63,6 +66,7 @@ export const handlers = {
     },
   },
   xy: {
+    template: gridTemplate,
     invoke: async (alg, instances, m) => {
       const [a, b] = [id(), id()];
       const scen = xy(m, a, { instances });
@@ -79,6 +83,7 @@ export const handlers = {
 } satisfies Dictionary<Handler>;
 
 type Handler = {
+  template: Partial<Trace>;
   invoke: (
     alg: string,
     instances: PathfindingTaskInstance[],
