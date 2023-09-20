@@ -24,7 +24,13 @@ type Settings = {
   accentColor?: AccentColor;
 };
 
-export const defaultRemotes = [];
+export const defaultRemotes = [
+  {
+    url: `https://cdn.jsdelivr.net/gh/path-visualiser/app@adapter-warthog-wasm-dist/warthog-wasm.mjs`,
+    transport: "ipc",
+    key: "default-ipc",
+  },
+];
 
 export const defaultRenderers = [
   {
