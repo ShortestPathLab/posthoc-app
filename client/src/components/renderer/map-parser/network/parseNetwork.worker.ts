@@ -11,7 +11,7 @@ import {
 } from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
-import { MapInfo } from "../Parser";
+import { MapUtils, ParsedMap } from "../Parser";
 
 export type Options = {
   color?: string;
@@ -25,7 +25,7 @@ export type ParseNetworkWorkerParameters = {
 };
 
 export type ParseNetworkWorkerReturnType = Pick<
-  MapInfo,
+  ParsedMap,
   "log" | "bounds" | "nodes"
 >;
 
@@ -95,7 +95,6 @@ function optimizeNetworkEdges(segments: number[][]) {
     }
     if (!merged.size) break;
     xs = xs.filter((s) => !merged.has(s));
-    console.log(xs.length);
   }
   return xs;
 }

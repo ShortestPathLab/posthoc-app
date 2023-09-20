@@ -20,7 +20,7 @@ export function useParsedMap(map?: Map) {
         const fn = theme.palette.mode === "dark" ? lighten : darken;
         if (format && content) {
           notify("Processing map...");
-          const parsedMap = (await getParser(format)?.(content, {
+          const parsedMap = (await getParser(format)?.parse?.(content, {
             color: fn(
               theme.palette.background.paper,
               1 - theme.palette.action.hoverOpacity
@@ -34,6 +34,6 @@ export function useParsedMap(map?: Map) {
           return parsedMap;
         }
       }),
-    [format, content, notify, useLoadingState, theme]
+    [format, content, theme]
   );
 }

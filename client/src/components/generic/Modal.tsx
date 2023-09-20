@@ -247,7 +247,7 @@ export function ManagedModal({
   trigger = () => <></>,
   children,
 }: {
-  options?: Props;
+  options?: ComponentProps<typeof Modal>;
   trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void) => ReactElement;
   appBar?: ModalAppBarProps;
   children?: ReactNode;

@@ -1,7 +1,7 @@
 import { Dictionary, identity, maxBy, minBy } from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
-import { MapInfo } from "../Parser";
+import { MapUtils, ParsedMap } from "../Parser";
 
 export type Options = {
   color?: string;
@@ -13,7 +13,7 @@ export type ParseMeshWorkerParameters = {
 };
 
 export type ParseMeshWorkerReturnType = Pick<
-  MapInfo,
+  ParsedMap,
   "log" | "bounds" | "nodes"
 >;
 
@@ -43,7 +43,6 @@ function parseMesh({
 
   const lines2 = rest.map((line) => line.split(" ").map(parseFloat));
 
-  console.log(lines2);
   // 1-indexed vertices
   const vertices = lines2.slice(0, vertexCount);
 

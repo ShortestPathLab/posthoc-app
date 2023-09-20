@@ -59,7 +59,7 @@
               "y": "{{ctx.y3}}"
             }
           ],
-          "fill": "{{ctx.themeTextPrimary}}"
+          "fill": "{{ctx.color[ctx.type]}}"
         }
       ],
       "mesh-event": [

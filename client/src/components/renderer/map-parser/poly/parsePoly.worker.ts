@@ -1,7 +1,7 @@
 import { Dictionary, chunk, flatten, identity, maxBy, minBy } from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
-import { MapInfo } from "../Parser";
+import { MapUtils, ParsedMap } from "../Parser";
 
 export type Options = {
   color?: string;
@@ -13,7 +13,7 @@ export type ParsePolyWorkerParameters = {
 };
 
 export type ParsePolyWorkerReturnType = Pick<
-  MapInfo,
+  ParsedMap,
   "log" | "bounds" | "nodes"
 >;
 

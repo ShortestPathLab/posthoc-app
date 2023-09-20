@@ -42,11 +42,13 @@ export function createSlice<T, U = T>(
   ] as const;
 }
 
-export function withLocalStorage<T>(key: string) {
+export function withLocalStorage<T>(key: string, def: T) {
   return {
     init: () => {
       const cache = localStorage.getItem(key);
-      if (cache) return JSON.parse(cache);
+      if (cache) {
+        return JSON.parse(cache);
+      } else return def;
     },
     effect: ({ next }) => localStorage.setItem(key, JSON.stringify(next)),
   } as Options<T, T>;

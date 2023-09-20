@@ -1,7 +1,8 @@
+import memo from "memoizee";
 import { byPoint } from "../../NodeMatcher";
-import { MapParser } from "../Parser";
-import { parseGridAsync } from "./parseGridAsync";
+import { MapParser, ParsedMapHydrator } from "../Parser";
 import type { Options } from "./parseGrid.worker";
+import { parseGridAsync } from "./parseGridAsync";
 
 const { floor } = Math;
 
@@ -9,11 +10,16 @@ function between(v: number, min: number, max: number) {
   return v >= min && v < max;
 }
 
-export const parse: MapParser = async (m = "", options: Options) => {
-  const result = await parseGridAsync({
-    map: m,
-    options,
-  });
+export const parse: MapParser = memo(async (m = "", options: Options) => {
+  return {
+    ...(await parseGridAsync({
+      map: m,
+      options,
+    })),
+  };
+});
+
+export const hydrate: ParsedMapHydrator = (result) => {
   const { width, height } = result.bounds;
   return {
     ...result,

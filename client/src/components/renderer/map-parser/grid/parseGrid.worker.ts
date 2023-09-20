@@ -1,6 +1,6 @@
 import { last, map, range } from "lodash";
 import { Point, Size } from "protocol";
-import { MapInfo } from "../Parser";
+import { ParsedMap } from "../Parser";
 
 const { min } = Math;
 
@@ -92,7 +92,7 @@ export type ParseGridWorkerParameters = {
 };
 
 export type ParseGridWorkerReturnType = Pick<
-  MapInfo,
+  ParsedMap,
   "log" | "bounds" | "nodes"
 >;
 

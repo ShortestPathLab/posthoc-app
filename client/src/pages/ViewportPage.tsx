@@ -11,8 +11,7 @@ import { Flex } from "components/generic/Flex";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { inferLayerName } from "components/layer-editor/layers/LayerSource";
-import { useParsedMap } from "hooks/useParsedMap";
-import { Dictionary, every, filter, find, keyBy, map } from "lodash";
+import { Dictionary, every, filter, find, head, keyBy, map } from "lodash";
 import { Page } from "pages/Page";
 import { useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
@@ -27,7 +26,10 @@ type ViewportPageContext = PanelState & {
   renderer?: string;
 };
 
-function autoSelectRenderer(renderers: Renderer[], components: string[]) {
+export function autoSelectRenderer(
+  renderers: Renderer[],
+  components: string[]
+) {
   return find(renderers, (r) => {
     const components = keyBy(r.renderer.meta.components);
     return every(components, (n) => n in components);
@@ -49,12 +51,7 @@ export function ViewportPage() {
   const [rendererInstance, setRendererInstance] =
     useState<RendererInstance | null>();
 
-  const { result: m } = useParsedMap();
-
-  const autoRenderer = useMemo(
-    () => autoSelectRenderer(renderers, map(m?.nodes, "$")),
-    [renderers, m]
-  );
+  const autoRenderer = useMemo(() => head(renderers), [renderers]);
 
   const selectedRenderer =
     state?.renderer && state.renderer !== "internal:auto"

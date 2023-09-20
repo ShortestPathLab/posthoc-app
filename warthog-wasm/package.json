@@ -1,0 +1,30 @@
+{
+  "name": "warthog-wasm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite",
+    "test": "jest",
+    "build": "vite build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "json-rpc-2.0": "^0.2.18",
+    "lodash": "^4.17.21",
+    "lru-cache": "^6.0.0",
+    "md5": "^2.3.0",
+    "nanoid": "^5.0.1",
+    "protocol": "file:../protocol",
+    "typescript": "^4.4.4",
+    "warthog-bin": "github:path-visualiser/pathfinding#wasm-bin"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.5",
+    "@types/lru-cache": "^5.1.1",
+    "@types/md5": "^2.3.1",
+    "vite": "^4.4.9",
+    "vite-tsconfig-paths": "^4.2.1"
+  }
+}

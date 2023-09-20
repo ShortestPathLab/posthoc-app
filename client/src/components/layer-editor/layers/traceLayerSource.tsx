@@ -1,9 +1,9 @@
+import { ArrowOutwardRounded } from "@mui/icons-material";
 import { useTheme } from "@mui/material";
 import { useDebounce } from "@uidotdev/usehooks";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { TracePicker } from "components/app-bar/Input";
 import { PropertyList } from "components/inspector/PropertyList";
-import { useRendererInstance } from "components/inspector/TraceRenderer";
 import {
   LazyNodeList,
   NodeList,
@@ -18,13 +18,12 @@ import {
   isUndefined,
   last,
   map,
+  merge,
   negate,
   pick,
-  reduce,
   set,
   startCase,
 } from "lodash";
-import memoize from "memoizee";
 import { withProduce } from "produce";
 import { TraceEvent } from "protocol";
 import { useMemo } from "react";
@@ -34,25 +33,37 @@ import { usePlayback } from "slices/playback";
 import { useTraceContent } from "../../../hooks/useTraceContent";
 import { LayerSource, inferLayerName } from "./LayerSource";
 import { Option } from "./Option";
-import { ArrowOutwardRounded } from "@mui/icons-material";
+
+const { min } = Math;
 
 type Key = string | number | null | undefined;
 
 type Entry = { parent: Key; step: number };
 
 function getPaths(events: TraceEvent[] = []) {
-  const getCache = memoize((step: number) => {
-    if (step) {
-      const parent: Dictionary<Entry> = getCache(step - 1);
-      const current = events[step];
+  const memo: Dictionary<Entry>[] = [];
 
-      return current
-        ? { ...parent, [current.id]: { parent: current.pId, step } }
-        : parent;
-    } else {
-      return {};
+  const getCache = (step: number) => {
+    const current = min(events.length - 1, step);
+    while (events.length && memo.length <= current) {
+      const i = memo.length;
+      if (i < events.length) {
+        if (i) {
+          const parent: Dictionary<Entry> = last(memo)!;
+          const current = events[i];
+          memo.push(
+            current
+              ? { ...parent, [current.id]: { parent: current.pId, step: i } }
+              : parent
+          );
+        } else {
+          memo.push({});
+        }
+      }
     }
-  });
+    return memo[current];
+  };
+
   return (step: number) => {
     const cache = getCache(step);
     const path: number[] = [];
@@ -129,9 +140,16 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
       [palette, layer]
     );
     const path = use2DPath(layer, throttledStep);
+    const steps = useMemo(
+      () =>
+        map(result?.steps, (c) =>
+          map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
+        ),
+      [result?.steps, layer]
+    );
     return (
       <>
-        <LazyNodeList step={throttledStep} nodes={result?.steps} />
+        <LazyNodeList step={throttledStep} nodes={steps} />
         {path}
       </>
     );
@@ -145,6 +163,7 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
     const menu = useMemo(() => {
       const events = layer?.source?.trace?.content?.events ?? [];
       const steps = chain(event?.info?.components)
+        .filter((c) => c.meta?.sourceLayer === layer?.key)
         .map((c) => c.meta?.step)
         .filter(negate(isUndefined))
         .sort((a, b) => b - a)
@@ -184,14 +203,13 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
 };
 function use2DPath(layer?: TraceLayer, step: number = 0, ms: number = 300) {
   const debouncedStep = useDebounce(step, ms);
-  const { renderer } = useRendererInstance();
   const { palette } = useTheme();
   const getPath = useMemo(
     () => getPaths(layer?.source?.trace?.content?.events),
-    [layer]
+    [layer?.source?.trace?.content?.events]
   );
   const element = useMemo(() => {
-    if (renderer && layer?.source?.trace?.content?.render?.path) {
+    if (layer?.source?.trace?.content?.render?.path) {
       const { pivot = {}, scale = 1 } = layer.source.trace.content.render.path;
 
       const { x, y } = pivot;
@@ -246,6 +264,6 @@ function use2DPath(layer?: TraceLayer, step: number = 0, ms: number = 300) {
       }
     }
     return <></>;
-  }, [layer, debouncedStep, palette, getPath, renderer]);
+  }, [layer, debouncedStep, palette, getPath]);
   return element;
 }

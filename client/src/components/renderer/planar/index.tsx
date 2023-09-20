@@ -14,7 +14,7 @@ import {
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
 import { info as selectionInfo } from "../info";
-import { MapInfo } from "../map-parser/Parser";
+import { MapUtils } from "../map-parser/Parser";
 import { RasterRenderer } from "../raster";
 import {
   LazyNodeList as LazyNodes,
@@ -33,7 +33,7 @@ import {
 const { map } = Children;
 
 export type PlanarRendererProps = {
-  map: MapInfo;
+  map: MapUtils;
   scale: Scale;
   ProgressProps?: NodesProps<string>;
   ShadowProps?: NodesProps<string>;

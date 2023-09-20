@@ -1,6 +1,5 @@
 import { AccentColor } from "theme";
 import { createSlice, withLocalStorage } from "./createSlice";
-import { colors } from "@mui/material";
 
 export type Remote = {
   url: string;
@@ -57,13 +56,15 @@ export const defaultRenderers = [
 
 export const defaultPlaybackRate = 4;
 
+const defaults = {
+  renderer: defaultRenderers,
+  remote: defaultRemotes,
+  playbackRate: defaultPlaybackRate,
+  theme: "light",
+  accentColor: "teal",
+} as Settings;
+
 export const [useSettings, SettingsProvider] = createSlice<Settings>(
-  {
-    renderer: defaultRenderers,
-    remote: defaultRemotes,
-    playbackRate: defaultPlaybackRate,
-    theme: "light",
-    accentColor: "teal",
-  },
-  withLocalStorage("settings")
+  {},
+  withLocalStorage("settings", defaults)
 );

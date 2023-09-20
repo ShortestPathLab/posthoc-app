@@ -40,6 +40,6 @@ export function useMapContent(map?: Map) {
             content: content ? content : await getMap({ source, id }),
           };
       }),
-    [getMap, content, source, id, usingLoadingState]
+    [getMap, content, source, id]
   );
 }

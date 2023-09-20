@@ -150,16 +150,16 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
 //         }}
 //       />
 //       <Space />
-//       <FeaturePicker
-//         icon={<CodeIcon />}
-//         label="Algorithm"
-//         value={algorithm}
-//         items={algorithms.map((c) => ({
-//           ...c,
-//           description: find(connections, { url: c.source })?.name,
-//         }))}
-//         onChange={async (v) => setUIState({ algorithm: v, parameters: {} })}
-//       />
+// <FeaturePicker
+//   icon={<CodeIcon />}
+//   label="Algorithm"
+//   value={algorithm}
+//   items={algorithms.map((c) => ({
+//     ...c,
+//     description: find(connections, { url: c.source })?.name,
+//   }))}
+//   onChange={async (v) => setUIState({ algorithm: v, parameters: {} })}
+// />
 //     </>
 //   );
 // }

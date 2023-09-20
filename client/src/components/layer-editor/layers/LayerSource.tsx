@@ -20,6 +20,7 @@ export type LayerSource<K extends string, T> = {
   key: K;
   editor: FC<EditorProps<Layer<T>>>;
   renderer: FC<{ layer?: Layer<T> }>;
+  service?: FC<EditorProps<Layer<T>>>;
   inferName: (layer: Layer<T>) => string;
   steps: FC<{
     layer?: Layer<T>;
