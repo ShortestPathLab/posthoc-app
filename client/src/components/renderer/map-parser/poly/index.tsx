@@ -10,7 +10,8 @@ export const parse: MapParser = memo(
     await parsePolyAsync({
       map: m,
       options,
-    })
+    }),
+  { normalizer: JSON.stringify }
 );
 
 export const hydrate: ParsedMapHydrator = (result: ParsedMap) => ({

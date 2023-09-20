@@ -10,7 +10,8 @@ export const parse: MapParser = memo(
     await parseMeshAsync({
       map: m,
       options,
-    })
+    }),
+  { normalizer: JSON.stringify }
 );
 
 export const hydrate: ParsedMapHydrator = (result) => ({

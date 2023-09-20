@@ -12,6 +12,7 @@ import { LayerSource, inferLayerName } from "./LayerSource";
 import { Option } from "./Option";
 import { MapLayerData } from "./mapLayerSource";
 import { TraceLayerData, traceLayerSource } from "./traceLayerSource";
+import { Typography as Type } from "@mui/material";
 
 async function findConnection(
   connections: Connection[],
@@ -41,32 +42,15 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
     const [{ algorithms }] = useFeatures();
     const [connections] = useConnections();
     const filteredLayers = filter(layers, (c) => c.source?.type === "map");
+    const selectedLayer = find(filteredLayers, { key: mapLayerKey });
     return (
       <>
-        <Option
-          label="Map Layer"
-          content={
-            <FeaturePicker
-              showArrow
-              label="Map Layer"
-              value={mapLayerKey}
-              items={filteredLayers.map((c) => ({
-                id: c.key,
-                name: inferLayerName(c),
-              }))}
-              onChange={async (v) =>
-                produce((p) => set(p, "source.mapLayerKey", v))
-              }
-            />
-          }
-        />
         <Option
           label="Algorithm"
           content={
             <FeaturePicker
               showArrow
-              icon={<CodeIcon />}
-              label="Algorithm"
+              label="Choose Algorithm"
               value={algorithm}
               items={algorithms.map((c) => ({
                 ...c,
@@ -78,6 +62,34 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
             />
           }
         />
+        {!algorithms?.length && (
+          <Type variant="body2" color="warning.main" sx={{ mb: 1 }}>
+            No connected solver has declared support for running algorithms
+          </Type>
+        )}
+        <Option
+          label="Map"
+          content={
+            <FeaturePicker
+              showArrow
+              label="Choose Layer"
+              value={mapLayerKey}
+              items={filteredLayers.map((c) => ({
+                id: c.key,
+                name: inferLayerName(c),
+              }))}
+              onChange={async (v) =>
+                produce((p) => set(p, "source.mapLayerKey", v))
+              }
+            />
+          }
+        />
+        {selectedLayer && (
+          <Type variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Hint: Define source and destination nodes by clicking on valid
+            regions on {inferLayerName(selectedLayer)}
+          </Type>
+        )}
       </>
     );
   }),

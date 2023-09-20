@@ -10,14 +10,17 @@ function between(v: number, min: number, max: number) {
   return v >= min && v < max;
 }
 
-export const parse: MapParser = memo(async (m = "", options: Options) => {
-  return {
-    ...(await parseGridAsync({
-      map: m,
-      options,
-    })),
-  };
-});
+export const parse: MapParser = memo(
+  async (m = "", options: Options) => {
+    return {
+      ...(await parseGridAsync({
+        map: m,
+        options,
+      })),
+    };
+  },
+  { normalizer: JSON.stringify }
+);
 
 export const hydrate: ParsedMapHydrator = (result) => {
   const { width, height } = result.bounds;
