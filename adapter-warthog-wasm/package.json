@@ -1,6 +1,6 @@
 {
-  "name": "warthog-wasm",
-  "version": "1.0.0",
+  "name": "adapter-warthog-wasm",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "scripts": {

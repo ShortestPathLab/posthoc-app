@@ -1,8 +1,8 @@
 {
-  "name": "iron-harvest-map-server",
-  "version": "1.0.0",
+  "name": "adapter-iron-harvest",
+  "version": "1.0.4",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "start": "vite-node src/index.ts",
     "test": "vitest run",
