@@ -6,7 +6,7 @@ This document outlines changes made to Waypoint (previously PFAlgoViz) over time
 
 ## September 2023
 
-This section documents changes made from early May 2023 to late September 2023 (alpha 1.0.4).
+This section documents changes made from early May 2023 to late September 2023 (v1.0.4-preview).
 
 ### Architecture Changes
 
