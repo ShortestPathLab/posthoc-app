@@ -43,9 +43,9 @@ Renderers (a.k.a. the Viewport panel) can now be added to Waypoint via extension
 
 ![renderer](./assets/22-09-2023/renderer.png)
 
-#### Layer Panel
+#### Layers Panel
 
-Manage view layers using the **Layer** panel.
+Manage view layers using the **Layers** panel.
 
 #### Viewport Panel
 
