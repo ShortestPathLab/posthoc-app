@@ -79,7 +79,7 @@ The basic 2D renderer is built to be reliable and highly performant. Internally,
 
 ![renderer](./assets/22-09-2023/renderer.gif?raw=true)
 
-[>Click here for full size](./assets/22-09-2023/renderer.mkv)
+[Click here for full size](./assets/22-09-2023/renderer.mkv)
 
 #### Grid, Network (XY), Poly, Mesh Map Support
 
