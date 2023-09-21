@@ -77,7 +77,9 @@ Waypoint will keep a record of all alerts in the **Logs** panel.
 
 The basic 2D renderer is built to be reliable and highly performant. Internally, it delegates rendering to background processes. The main process figures out which sections of the screen needs to be repainted (and what resolution) and requests those tiles from the subprocesses.
 
-[![renderer](./assets/22-09-2023/renderer.gif?raw=true)<br/>Click here for full size](./assets/22-09-2023/renderer.mkv)
+![renderer](./assets/22-09-2023/renderer.gif?raw=true)
+
+[>Click here for full size](./assets/22-09-2023/renderer.mkv)
 
 #### Grid, Network (XY), Poly, Mesh Map Support
 
@@ -91,7 +93,9 @@ There is built-in support for grid (`.grid/.map`), network (`.co/.gr/.xy`), mesh
 
 The renderer and map parser performs optimisations to handle the rendering of large maps.
 
-[![large-map-florida](./assets/22-09-2023/large-map-florida.gif?raw=true)<br/>Click here for full size](./assets/22-09-2023/large-map-florida.mkv)
+![large-map-florida](./assets/22-09-2023/large-map-florida.gif?raw=true)
+
+[Click here for full size](./assets/22-09-2023/large-map-florida.mkv)
 
 ### Use Cases <a id="use-cases"></a>
 
@@ -99,13 +103,17 @@ The renderer and map parser performs optimisations to handle the rendering of la
 
 Load a search trace and map into Waypoint.
 
-[![basic](./assets/22-09-2023/basic.gif?raw=true)<br/>Click here for full size](./assets/22-09-2023/basic.mkv)
+![basic](./assets/22-09-2023/basic.gif?raw=true)
+
+[Click here for full size](./assets/22-09-2023/basic.mkv)
 
 #### Interacting with a Search Trace (Viewport, Steps and Tree)
 
 Move around a search trace through the Viewport, Tree, and Steps panel.
 
-[![interactive](./assets/22-09-2023/interactive.gif?raw=true)<br/>Click here for full size](./assets/22-09-2023/interactive.mkv)
+![interactive](./assets/22-09-2023/interactive.gif?raw=true)
+
+[Click here for full size](./assets/22-09-2023/interactive.mkv)
 
 #### Creative Use of the Search Trace Format (Polyanya)
 
@@ -122,13 +130,18 @@ This example uses the search trace format to tell the renderer how to display th
 #### Running a Search Query
 
 This example runs a query using Warthog (WebAssembly) over a grid map.
-[![query](./assets/22-09-2023/query.gif?raw=true)<br/>Click here for full size](./assets/22-09-2023/query.mkv)
+
+![query](./assets/22-09-2023/query.gif?raw=true)
+
+[Click here for full size](./assets/22-09-2023/query.mkv)
 
 #### Comparison of Two Traces
 
 This example compares the search process of two A\* implementations, one as a Search Trace file, and another as a query. We display these side-by-side.
 
-[![comparison](./assets/22-09-2023/comparison.gif?raw=true)<br/>Click here for full size](./assets/22-09-2023/comparison.mkv)
+![comparison](./assets/22-09-2023/comparison.gif?raw=true)
+
+[Click here for full size](./assets/22-09-2023/comparison.mkv)
 
 ### Releases
 
