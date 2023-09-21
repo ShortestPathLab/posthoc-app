@@ -6,6 +6,7 @@ import { MapPicker } from "components/app-bar/Input";
 import { NodeList } from "components/render/renderer/generic/NodeList";
 import { getParser } from "components/renderer";
 import { ParsedMap } from "components/renderer/map-parser/Parser";
+import { useEffectWhen } from "hooks/useEffectWhen";
 import { useMapContent } from "hooks/useMapContent";
 import { useParsedMap } from "hooks/useParsedMap";
 import {
@@ -23,7 +24,6 @@ import { Layer, Map, useUIState } from "slices/UIState";
 import { LayerSource, inferLayerName } from "./LayerSource";
 import { Option } from "./Option";
 import { QueryLayerData } from "./queryLayerSource";
-import { useEffectWhen } from "../../../hooks/useEffectWhen";
 
 export type MapLayerData = {
   map?: Map;

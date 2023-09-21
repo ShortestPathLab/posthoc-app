@@ -58,6 +58,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "package": "sh ./package.sh",
     "test": "vitest"
   },
   "browserslist": {
@@ -89,9 +90,12 @@
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/url-parse": "^1.4.5",
     "@vitejs/plugin-react": "^3.1.0",
+    "electron": "^26.2.1",
+    "electron-packager": "^17.1.2",
     "jsdom": "^22.1.0",
     "vitest": "^0.33.0",
     "vitest-canvas-mock": "^0.3.2"
   },
-  "homepage": "."
+  "homepage": ".",
+  "main": "main.js"
 }
