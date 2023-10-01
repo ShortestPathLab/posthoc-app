@@ -1,5 +1,5 @@
+import { createElement, ReactNode } from "react";
 import { EditorProps } from "components/Editor";
-import { FC, ReactNode, createElement } from "react";
 
 export function produce<T>(obj: T, f: (obj: T) => void) {
   const b = structuredClone(obj);

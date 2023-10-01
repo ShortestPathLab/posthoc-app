@@ -1,12 +1,12 @@
 import { Box, Divider, Fade } from "@mui/material";
-import { Scroll } from "components/generic/Scrollbars";
+import { values } from "lodash";
+import { withSlots } from "react-slot-component";
+import { ReactNode } from "react";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
+import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
 import { pages } from "pages";
-import { values } from "lodash";
-import { ReactNode } from "react";
-import { withSlots } from "react-slot-component";
 import { PanelState } from "slices/UIState";
 import { useAcrylic } from "theme";
 

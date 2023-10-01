@@ -1,6 +1,6 @@
 import { isEqual } from "lodash";
-import { useEffect } from "react";
 import { useGetSet } from "react-use";
+import { useEffect } from "react";
 
 type Comparator<T> = (a: T, b: T) => boolean;
 

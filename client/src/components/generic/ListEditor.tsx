@@ -1,3 +1,6 @@
+import { filter, map, sortBy, uniqBy } from "lodash";
+import { nanoid as id } from "nanoid";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import {
   Add,
   DeleteOutlined as DeleteIcon,
@@ -18,8 +21,8 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { filter, map, noop, sortBy, uniqBy } from "lodash";
-import { nanoid as id, nanoid } from "nanoid";
+
+
 import {
   CSSProperties,
   ComponentProps,
@@ -31,7 +34,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+
 
 export const DefaultListEditorInput = forwardRef(function StyledInputBase(
   props: ComponentProps<typeof InputBase>,

@@ -1,17 +1,11 @@
-import {
-  Box,
-  Card,
-  CardActionArea,
-  CardContent,
-  Typography,
-} from "@mui/material";
+import { Box, Card, CardActionArea, CardContent, Typography } from "@mui/material";
+import { Fragment, useCallback } from "react";
 import axios from "axios";
 import { Flex } from "components/generic/Flex";
 import { useSnackbar } from "components/generic/Snackbar";
 import { parseViews } from "components/render/parser/Parser";
 import { parseGridMap } from "components/render/renderer/generic/MapParser";
 import { usePlaybackState } from "hooks/usePlaybackState";
-import { Fragment, useCallback } from "react";
 import { useSpecimen } from "slices/specimen";
 
 const traceMaps = {

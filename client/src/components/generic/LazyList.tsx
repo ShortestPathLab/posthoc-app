@@ -1,40 +1,99 @@
 import { Box, BoxProps, useTheme } from "@mui/material";
 import {
+  ComponentProps,
   ReactElement,
   ReactNode,
+  Ref,
   forwardRef,
   useCallback,
-  useMemo,
+  useEffect,
+  useRef,
   useState,
 } from "react";
-import { useCss, useDebounce, useGetSet, useThrottle } from "react-use";
+import { useCss } from "react-use";
+
+import { useOverlayScrollbars } from "overlayscrollbars-react";
 import {
   VirtuosoHandle as Handle,
   Virtuoso as List,
   VirtuosoProps as ListProps,
-  ScrollerProps,
+  VirtuosoHandle,
 } from "react-virtuoso";
-import { Scroll } from "./Scrollbars";
-import { useDebouncedReducer } from "hooks/useDebouncedReducer";
-import { replace } from "slices/reducers";
-import { debounce, noop } from "lodash";
 
-const Scroller = forwardRef<HTMLDivElement, ScrollerProps>(
-  ({ style, ...props }, ref) => {
-    const { spacing } = useTheme();
+// const Scroller = forwardRef<HTMLDivElement, ScrollerProps>(
+//   ({ style, ...props }, ref) => {
+//     const { spacing } = useTheme();
+// const cls = useCss({
+//   "> .os-scrollbar-vertical > .os-scrollbar-track > .os-scrollbar-handle": {
+//     "min-height": spacing(12),
+//   },
+// });
+//     return (
+//       <Scroll
+//         y
+//         className={cls}
+//         style={{ width: "100%", height: "100%" }}
+//         {...props}
+//         ref={ref}
+//       />
+//     );
+//   }
+// );
+
+const Scroller = forwardRef<HTMLDivElement, ComponentProps<"div">>(
+  ({ style, children, ...rest }, ref) => {
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const { palette, spacing } = useTheme();
     const cls = useCss({
-      "> .os-scrollbar-vertical > .os-scrollbar-track > .os-scrollbar-handle": {
+      ".os-scrollbar": { visibility: "visible", opacity: 1 },
+      ".os-scrollbar-vertical > .os-scrollbar-track > .os-scrollbar-handle": {
         "min-height": spacing(12),
       },
+      "div.os-scrollbar-vertical > div.os-scrollbar-track": {
+        height: `calc(100% - ${spacing(6)})`,
+        marginTop: spacing(6),
+      },
     });
+    const [initialize] = useOverlayScrollbars({
+      options: {
+        overflow: { x: "hidden", y: "scroll" },
+        scrollbars: {
+          autoHide: "move",
+          theme: palette.mode === "dark" ? "os-theme-light" : "os-theme-dark",
+        },
+      },
+    });
+
+    useEffect(() => {
+      if (typeof ref !== "function" && ref?.current && containerRef?.current) {
+        initialize({
+          target: containerRef.current,
+          elements: {
+            viewport: ref.current,
+          },
+        });
+      }
+    }, [initialize]);
+
+    const refSetter = useCallback(
+      (node: HTMLDivElement | null) => {
+        if (node && ref) {
+          if (typeof ref === "function") {
+            ref(node);
+          } else {
+            ref.current = node;
+          }
+        }
+      },
+      [ref]
+    );
+
     return (
-      <Scroll
-        y
-        className={cls}
-        style={{ width: "100%", height: "100%" }}
-        {...props}
-        ref={ref}
-      />
+      <div ref={containerRef} style={style} className={cls}>
+        <div ref={refSetter} {...rest}>
+          {children}
+        </div>
+      </div>
     );
   }
 );
@@ -44,7 +103,7 @@ export type LazyListHandle = Handle;
 export type LazyListProps<T> = {
   items?: T[];
   renderItem?: (item: T, index: number) => ReactElement;
-  listOptions?: Partial<ListProps<T>>;
+  listOptions?: Partial<ListProps<T, {}>> & { ref?: Ref<VirtuosoHandle> };
   placeholder?: ReactNode;
 } & Omit<BoxProps, "placeholder">;
 
@@ -55,22 +114,12 @@ export function LazyList<T>({
   placeholder,
   ...props
 }: LazyListProps<T>) {
-  const [isScrolling, setIsScrolling] = useGetSet(false);
-
-  // const handleScrolling = useMemo(
-  //   () => debounce(setIsScrolling, 150, { leading: true, trailing: false }),
-  //   [setIsScrolling]
-  // );
-
   return (
     <Box {...props}>
       <List
         components={{ Scroller }}
         totalCount={items.length}
-        // isScrolling={handleScrolling}
-        itemContent={(i) =>
-          isScrolling() && placeholder ? placeholder : renderItem?.(items[i], i)
-        }
+        itemContent={(i) => renderItem?.(items[i], i)}
         {...options}
       />
     </Box>

@@ -1,32 +1,20 @@
-import * as PIXI from "pixi.js";
-import * as React from "react";
-import { Stage } from "@pixi/react";
-
-import { Nodes, View } from "protocol/Render";
-import { Viewport } from "./Viewport";
-import {
-  d2InstrinsicComponents,
-  DrawInstruction,
-  EventContext,
-  pixiPathDrawer,
-  scale,
-} from "./PixiPrimitives";
-import { StageChild } from "../types";
-import { PixiViewport } from "./PixiViewport";
-
-import { useMemo } from "react";
-import { useSpecimen } from "slices/specimen";
-import {
-  SplitViewContext,
-  useViewContext,
-} from "components/inspector/SplitPanes";
 import { useTheme } from "@mui/material";
-import { hex } from "components/renderer/colors";
+import { Stage } from "@pixi/react";
+import { get, set } from "lodash";
+import * as PIXI from "pixi.js";
+import { Nodes, View } from "protocol/Render";
 import { TraceComponent, TraceEventType } from "protocol/Trace";
+import { useMemo } from "react";
+import * as React from "react";
 import { coloursToHex } from "../generic/colours";
 import { useNodesMap } from "../generic/NodesMap";
-import { get, set } from "lodash";
-import { CompressOutlined } from "@mui/icons-material";
+import { StageChild } from "../types";
+import { d2InstrinsicComponents, DrawInstruction, EventContext, pixiPathDrawer, scale } from "./PixiPrimitives";
+import { PixiViewport } from "./PixiViewport";
+import { Viewport } from "./Viewport";
+import { useViewContext } from "components/inspector/SplitPanes";
+import { hex } from "components/renderer/colors";
+import { useSpecimen } from "slices/specimen";
 
 export type PixiStageProps = {
   width?: number;

@@ -1,7 +1,7 @@
 import { createElement } from "react";
-import { useUIState } from "slices/UIState";
-import { RendererMap, RendererProps } from "./Renderer";
 import { mapParsers } from "./map-parser";
+import { RendererMap, RendererProps } from "./Renderer";
+import { useUIState } from "slices/UIState";
 
 export function JSONRenderer(props: RendererProps) {
   const [{ parameters }] = useUIState();

@@ -1,11 +1,12 @@
-import { Button, Tooltip } from "@mui/material";
 import { BugReportTwoTone as BugIcon } from "@mui/icons-material";
+import { Button, Tooltip } from "@mui/material";
 import { DebugOptionsEditor } from "components/debug-options-editor/DebugOptionsEditor";
+import { useSpecimen } from "slices/specimen";
 import {
   AppBarTitle as Title,
   ManagedModal as Dialog,
 } from "components/generic/Modal";
-import { useSpecimen } from "slices/specimen";
+
 
 export function Utility() {
   const [{ specimen }] = useSpecimen();

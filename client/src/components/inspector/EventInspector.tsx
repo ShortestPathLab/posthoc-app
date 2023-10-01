@@ -1,3 +1,9 @@
+import { pick } from "lodash";
+import { TraceEvent } from "protocol/Trace";
+import { EventLabel } from "./EventLabel";
+import { PropertyList } from "./PropertyList";
+import { getColorHex } from "components/renderer/colors";
+import { usePlayback } from "slices/playback";
 import {
   Divider,
   ListItem,
@@ -10,14 +16,6 @@ import {
   Skeleton as Placeholder,
   Tooltip,
 } from "@mui/material";
-import { getColorHex } from "components/renderer/colors";
-import { TraceEvent } from "protocol/Trace";
-import { useUIState } from "slices/UIState";
-import { useAcrylic } from "theme";
-import { EventLabel } from "./EventLabel";
-import { PropertyList } from "./PropertyList";
-import { usePlayback } from "slices/playback";
-import { pick } from "lodash";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -74,31 +72,18 @@ export function EventInspector({
 }
 
 export function Skeleton() {
-  const { spacing, palette } = useTheme();
+  const { spacing } = useTheme();
   return (
     <>
       <ListItem
         sx={{
+          height: 80,
           borderLeft: `${spacing(0.5)} solid transparent`,
         }}
       >
         <ListItemIcon>
-          <Type variant="body2">
-            <Placeholder animation={false} width={spacing(4)} />
-          </Type>
+          <Placeholder animation={false} width={spacing(4)} />
         </ListItemIcon>
-        <ListItemText
-          primary={
-            <Type variant="overline">
-              <Placeholder animation={false} width={spacing(12)} />
-            </Type>
-          }
-          secondary={
-            <Type variant="body2">
-              <Placeholder animation={false} width={spacing(24)} />
-            </Type>
-          }
-        />
       </ListItem>
       <Divider variant="inset" />
     </>

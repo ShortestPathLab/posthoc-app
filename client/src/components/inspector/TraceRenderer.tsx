@@ -1,26 +1,16 @@
-import {
-  BlurOnTwoTone as DisabledIcon,
-  ViewInArTwoTone,
-} from "@mui/icons-material";
+import { BlurOnTwoTone as DisabledIcon, ViewInArTwoTone } from "@mui/icons-material";
 import { Box, CircularProgress, useTheme } from "@mui/material";
-import { RenderLayer } from "components/layer-editor/layers/LayerSource";
-import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { find, map } from "lodash";
 import { Size } from "protocol";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
 import { useDebounce } from "react-use";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Renderer, RendererEvent } from "renderer";
-import { useRenderers } from "slices/renderers";
 import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
+import { RenderLayer } from "components/layer-editor/layers/LayerSource";
+import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { useLoading } from "slices/loading";
+import { useRenderers } from "slices/renderers";
 
 const rendererOptions = {
   tileSubdivision: 2,

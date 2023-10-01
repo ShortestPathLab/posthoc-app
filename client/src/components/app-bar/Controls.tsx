@@ -1,10 +1,10 @@
 import { Box, Card, Divider } from "@mui/material";
-import { Flex } from "components/generic/Flex";
-import { useAcrylic } from "theme";
 import { Playback } from "./Playback";
 import { Settings } from "./Settings";
 import { Title } from "./Title";
 import { Utility } from "./Utility";
+import { Flex } from "components/generic/Flex";
+import { useAcrylic } from "theme";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 

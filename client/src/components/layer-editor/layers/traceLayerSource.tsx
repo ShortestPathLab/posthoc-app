@@ -12,8 +12,10 @@ import { colorsHex, getColorHex } from "components/renderer/colors";
 import { parseString } from "components/renderer/parser/parseString";
 import { useTraceMemo } from "components/renderer/parser/parseTrace";
 import {
-  Dictionary,
   chain,
+  constant,
+  findLast,
+  forEach,
   head,
   isUndefined,
   last,
@@ -25,7 +27,7 @@ import {
   startCase,
 } from "lodash";
 import { withProduce } from "produce";
-import { TraceEvent } from "protocol";
+import { Trace, TraceEvent } from "protocol";
 import { useMemo } from "react";
 import { useThrottle } from "react-use";
 import { Layer, UploadedTrace } from "slices/UIState";
@@ -34,50 +36,60 @@ import { useTraceContent } from "../../../hooks/useTraceContent";
 import { LayerSource, inferLayerName } from "./LayerSource";
 import { Option } from "./Option";
 
-const { min } = Math;
+const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
+  x === undefined || x === null;
 
-type Key = string | number | null | undefined;
+type Key = string | number;
 
-type Entry = { parent: Key; step: number };
+type KeyRef = Key | null | undefined;
 
-function getPaths(events: TraceEvent[] = []) {
-  const memo: Dictionary<Entry>[] = [];
-  const getCache = (step: number) => {
-    const current = min(events.length - 1, step);
-    while (events.length && memo.length <= current) {
-      const i = memo.length;
-      if (i < events.length) {
-        if (i) {
-          const parent: Dictionary<Entry> = last(memo)!;
-          const current = events[i];
-          memo.push(
-            current
-              ? { ...parent, [current.id]: { parent: current.pId, step: i } }
-              : parent
-          );
-        } else {
-          memo.push({});
-        }
-      }
-    }
-    return memo[current];
+function makePathIndex(trace: Trace) {
+  type A = {
+    id: Key;
+    pId?: KeyRef;
+    step: number;
+    prev?: A;
   };
-  return (step: number) => {
-    const cache = getCache(step);
-    const path: number[] = [];
-    const e = events[step];
-    if (e) {
-      let current: Key = e.id;
-      while (current !== null && current !== undefined) {
-        const currentCache: Entry = cache[current];
-        if (currentCache) {
-          path.push(currentCache?.step);
-        }
-        current = currentCache?.parent;
-      }
+
+  const changes: A[] = [];
+  const allChanges: { [K in Key]: KeyRef } = {};
+  const stepToChange: { [K in number]?: A } = {};
+
+  const r = chain(trace?.events)
+    .map((c, i) => ({ step: i, id: c.id, pId: c.pId }))
+    .groupBy("id")
+    .value();
+
+  forEach(trace?.events, ({ id, pId }, i) => {
+    if (!isNullish(pId) && allChanges[id] !== pId) {
+      changes.push({ id, pId, step: i, prev: last(changes) });
+      allChanges[id] = pId;
+    }
+    stepToChange[i] = last(changes);
+  });
+  const getParent = (id: Key, step: number = trace?.events?.length ?? 0) => {
+    let entry = stepToChange[step];
+    while (entry) {
+      if (entry.id === id) return entry.pId;
+      entry = entry.prev;
+    }
+  };
+  const getPath = (step: number) => {
+    let path = [step];
+    let current: A | undefined = { ...(trace.events ?? [])[step], step };
+    while (current) {
+      const pId = getParent(current.id, current.step);
+      if (pId) {
+        const event = findLast(r[pId], (c) => c.step <= current!.step);
+        if (event) {
+          path.push(event.step);
+          current = event;
+        } else break;
+      } else break;
     }
     return path;
   };
+  return { getParent, getPath };
 }
 
 export type TraceLayerData = {
@@ -123,7 +135,7 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
   renderer: ({ layer }) => {
     const { palette } = useTheme();
     const [{ step = 0 }] = usePlayback();
-    const throttledStep = useThrottle(step, 1000 / 24);
+    const throttledStep = useThrottle(step, 1000 / 60);
     const { result } = useTraceMemo(
       {
         trace: layer?.source?.trace?.content,
@@ -199,12 +211,14 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
     return <>{children?.(menu)}</>;
   },
 };
-function use2DPath(layer?: TraceLayer, step: number = 0, ms: number = 300) {
-  const debouncedStep = useDebounce(step, ms);
+function use2DPath(layer?: TraceLayer, step: number = 0) {
   const { palette } = useTheme();
-  const getPath = useMemo(
-    () => getPaths(layer?.source?.trace?.content?.events),
-    [layer?.source?.trace?.content?.events]
+  const { getPath } = useMemo(
+    () =>
+      layer?.source?.trace?.content
+        ? makePathIndex(layer.source.trace.content)
+        : { getParent: constant(undefined), getPath: constant([]) },
+    [layer?.source?.trace?.content]
   );
   const element = useMemo(() => {
     if (layer?.source?.trace?.content?.render?.path) {
@@ -216,7 +230,7 @@ function use2DPath(layer?: TraceLayer, step: number = 0, ms: number = 300) {
       const pivotY = y ? parseString(y) : (c: Partial<TraceEvent>) => c.y;
 
       const events = map(
-        getPath(debouncedStep),
+        getPath(step),
         (p) => layer?.source?.trace?.content?.events?.[p]
       );
 
@@ -262,6 +276,6 @@ function use2DPath(layer?: TraceLayer, step: number = 0, ms: number = 300) {
       }
     }
     return <></>;
-  }, [layer, debouncedStep, palette, getPath]);
+  }, [layer, step, palette, getPath]);
   return element;
 }

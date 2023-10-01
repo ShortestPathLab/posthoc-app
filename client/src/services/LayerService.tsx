@@ -1,8 +1,7 @@
-import { getLayerHandler } from "components/layer-editor/layers/LayerSource";
 import { map } from "lodash";
 import { createElement, useMemo } from "react";
+import { getLayerHandler } from "components/layer-editor/layers/LayerSource";
 import { useUIState } from "slices/UIState";
-
 function useLayerServices() {
   const [{ layers }, setUIState] = useUIState();
   return useMemo(() => {

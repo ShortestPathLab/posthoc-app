@@ -1,15 +1,4 @@
-import {
-  Divider,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  ListSubheader,
-  MenuItem,
-  MenuList,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Divider, List, ListItem, ListItemButton, ListItemText, ListSubheader, Paper, Typography } from "@mui/material";
 import { ClickInfo } from "components/render/renderer/generic/NodesMap";
 
 export type NodePopupProps = ClickInfo;

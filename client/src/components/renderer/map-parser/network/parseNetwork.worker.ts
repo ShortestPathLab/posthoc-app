@@ -1,17 +1,7 @@
-import {
-  Dictionary,
-  chain,
-  clamp,
-  first,
-  last,
-  maxBy,
-  mean,
-  minBy,
-  noop,
-} from "lodash";
+import { chain, clamp, Dictionary, first, last, maxBy, mean, minBy, noop } from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
-import { MapUtils, ParsedMap } from "../Parser";
+import { ParsedMap } from "../Parser";
 
 export type Options = {
   color?: string;

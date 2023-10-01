@@ -1,11 +1,11 @@
 import { useTheme } from "@mui/material";
-import { OverlayScrollbars } from "overlayscrollbars";
 import {
   OverlayScrollbarsComponent,
   OverlayScrollbarsComponentProps,
 } from "overlayscrollbars-react";
-import { ForwardedRef, ReactNode, forwardRef, useCallback } from "react";
+import { OverlayScrollbars } from "overlayscrollbars";
 import { useCss } from "react-use";
+import { ForwardedRef, forwardRef, ReactNode, useCallback } from "react";
 
 type ScrollProps = {
   children?: ReactNode;

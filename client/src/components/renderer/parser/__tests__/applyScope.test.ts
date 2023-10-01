@@ -1,5 +1,5 @@
-import { applyScope } from "../applyScope";
 import { describe, expect, it } from "vitest";
+import { applyScope } from "../applyScope";
 
 describe("applyScope", () => {
   it("correctly propagates context", () => {

@@ -1,7 +1,9 @@
-import {
-  PlaceOutlined as DestinationIcon,
-  TripOriginOutlined as StartIcon,
-} from "@mui/icons-material";
+import { PlaceOutlined as DestinationIcon, TripOriginOutlined as StartIcon } from "@mui/icons-material";
+import { filter, isUndefined, map, reduce, round, set, startCase } from "lodash";
+import { useMemo } from "react";
+import { inferLayerName, LayerSource } from "./LayerSource";
+import { Option } from "./Option";
+import { QueryLayerData } from "./queryLayerSource";
 import { MapPicker } from "components/app-bar/Input";
 import { NodeList } from "components/render/renderer/generic/NodeList";
 import { getParser } from "components/renderer";
@@ -9,21 +11,8 @@ import { ParsedMap } from "components/renderer/map-parser/Parser";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { useMapContent } from "hooks/useMapContent";
 import { useParsedMap } from "hooks/useParsedMap";
-import {
-  filter,
-  isUndefined,
-  map,
-  reduce,
-  round,
-  set,
-  startCase,
-} from "lodash";
 import { produce, withProduce } from "produce";
-import { useMemo } from "react";
 import { Layer, Map, useUIState } from "slices/UIState";
-import { LayerSource, inferLayerName } from "./LayerSource";
-import { Option } from "./Option";
-import { QueryLayerData } from "./queryLayerSource";
 
 export type MapLayerData = {
   map?: Map;

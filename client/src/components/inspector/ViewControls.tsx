@@ -1,18 +1,5 @@
-import {
-  CloseOutlined,
-  ViewAgendaOutlined as SplitIcon,
-  MoreVertOutlined as MoreIcon,
-} from "@mui/icons-material";
-import {
-  IconButton,
-  Stack as MuiStack,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  Tooltip,
-} from "@mui/material";
+import { CloseOutlined, MoreVertOutlined as MoreIcon, ViewAgendaOutlined as SplitIcon } from "@mui/icons-material";
+import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack as MuiStack, Tooltip } from "@mui/material";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 
 export function ViewControls({

@@ -1,5 +1,4 @@
-import { Dictionary, chain, find, findLast, forEach, map, sumBy } from "lodash";
-import { arrayToTree } from "performant-array-to-tree";
+import { chain, find, findLast, forEach, last, map } from "lodash";
 import {
   CompiledComponent,
   EventContext,
@@ -7,11 +6,43 @@ import {
   Trace,
   TraceEvent,
 } from "protocol";
+import { ComponentEntry } from "renderer";
 import { mapProperties } from "./mapProperties";
 import { parse as parseComponents } from "./parse";
-import { ComponentEntry } from "renderer";
 
-type Key = string | number | null | undefined;
+const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
+  x === undefined || x === null;
+
+type Key = string | number;
+
+type KeyRef = Key | null | undefined;
+
+function makePathIndex({ trace }: Pick<ParseTraceWorkerParameters, "trace">) {
+  type A = {
+    id: Key;
+    pId: KeyRef;
+    step: number;
+    prev?: A;
+  };
+
+  const cache: A[] = [];
+  const dict: { [K in Key]: KeyRef } = {};
+  forEach(trace?.events, ({ id, pId }, i) => {
+    if (!isNullish(pId) && dict[id] !== pId) {
+      cache.push({ id, pId, step: i, prev: last(cache) });
+      dict[id] = pId;
+    }
+  });
+  return {
+    getParent: (id: Key, step: number = trace?.events?.length ?? 0) => {
+      let entry = findLast(cache, (c) => c.step <= step);
+      while (entry) {
+        if (entry.id === id) return entry.pId;
+        entry = entry.prev;
+      }
+    },
+  };
+}
 
 function parse({
   trace,
@@ -60,10 +91,9 @@ function parse({
       apply(e, {
         ...context,
         step: i,
-        parent:
-          e.pId !== null && e.pId !== undefined
-            ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
-            : undefined,
+        parent: !isNullish(e.pId)
+          ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
+          : undefined,
       })
     )
     .map((c) => c.filter(isVisible))

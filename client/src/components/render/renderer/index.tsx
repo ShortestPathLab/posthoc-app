@@ -1,12 +1,11 @@
-import { createElement, useMemo } from "react";
 import { Box, Fade } from "@mui/material";
-import AutoSize from "react-virtualized-auto-sizer";
-import { Canvas } from "components/render/renderer/types";
-import { LazyNodeList } from "components/render/renderer/generic/NodeList";
-import { View } from "protocol/Render";
-
-import { PixiStage } from "./pixi/PixiStage";
 import { get } from "lodash";
+import { View } from "protocol/Render";
+import AutoSize from "react-virtualized-auto-sizer";
+import { createElement, useMemo } from "react";
+import { PixiStage } from "./pixi/PixiStage";
+import { LazyNodeList } from "components/render/renderer/generic/NodeList";
+import { Canvas } from "components/render/renderer/types";
 
 export const Stages = {
   "2d-pixi": PixiStage,

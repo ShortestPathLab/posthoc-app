@@ -1,14 +1,14 @@
+import { Dictionary } from "lodash";
+import { TraceEvent } from "protocol";
+import { createElement, FC, ReactNode } from "react";
+import { mapLayerSource } from "./mapLayerSource";
+import { queryLayerSource } from "./queryLayerSource";
+import { traceLayerSource } from "./traceLayerSource";
 import { EditorProps } from "components/Editor";
 import { SelectionMenuContent } from "components/inspector/SelectionMenu";
 import { SelectEvent } from "components/renderer/Renderer";
-import { Dictionary } from "lodash";
-import { TraceEvent } from "protocol";
-import { FC, ReactNode, createElement } from "react";
-import { Layer } from "slices/UIState";
 import { PlaybackStateType } from "slices/playback";
-import { queryLayerSource } from "./queryLayerSource";
-import { traceLayerSource } from "./traceLayerSource";
-import { mapLayerSource } from "./mapLayerSource";
+import { Layer } from "slices/UIState";
 
 export type SelectionInfoProvider<T> = FC<{
   layer?: Layer<T>;

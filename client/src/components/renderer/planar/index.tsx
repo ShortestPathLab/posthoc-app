@@ -1,34 +1,19 @@
-import { Stage } from "@inlet/react-pixi";
-import { RendererProps } from "components/renderer/Renderer";
-import { call } from "components/script-editor/call";
 import { constant, delay, memoize, throttle } from "lodash";
-import {
-  Children,
-  cloneElement,
-  ComponentProps,
-  ReactElement,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
-import { useSpecimen } from "slices/specimen";
-import { useUIState } from "slices/UIState";
+import { Children, cloneElement, ComponentProps, ReactElement, useCallback, useMemo, useState } from "react";
 import { info as selectionInfo } from "../info";
 import { MapUtils } from "../map-parser/Parser";
 import { RasterRenderer } from "../raster";
-import {
-  LazyNodeList as LazyNodes,
-  NodeList as Nodes,
-  Props as NodesProps,
-} from "../raster/NodeList";
+import { LazyNodeList as LazyNodes, NodeList as Nodes, Props as NodesProps } from "../raster/NodeList";
 import { ViewportEvent } from "../raster/PixiViewport";
 import { Selection } from "../raster/Selection";
 import { Point, Scale } from "../Size";
 import { Guides } from "./Guides";
-import {
-  progressOptions as defaultProgressOptions,
-  shadowOptions as defaultShadowOptions,
-} from "./options";
+import { progressOptions as defaultProgressOptions, shadowOptions as defaultShadowOptions } from "./options";
+import { Stage } from "@inlet/react-pixi";
+import { RendererProps } from "components/renderer/Renderer";
+import { call } from "components/script-editor/call";
+import { useSpecimen } from "slices/specimen";
+import { useUIState } from "slices/UIState";
 
 const { map } = Children;
 

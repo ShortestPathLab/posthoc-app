@@ -1,6 +1,6 @@
-import { SelectionInfo } from "components/renderer/Renderer";
 import { findIndex, findLastIndex, take } from "lodash";
 import { Trace, TraceEvent } from "protocol/Trace";
+import { SelectionInfo } from "components/renderer/Renderer";
 
 export function info(
   { events: eventList }: Trace = {},

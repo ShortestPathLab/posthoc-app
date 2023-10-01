@@ -1,7 +1,7 @@
 import memo from "memoizee";
 import { byPoint } from "../../NodeMatcher";
 import { MapParser, ParsedMapHydrator } from "../Parser";
-import type { Options } from "./parseGrid.worker";
+import { Options } from "./parseGrid.worker";
 import { parseGridAsync } from "./parseGridAsync";
 
 const { floor } = Math;

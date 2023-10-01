@@ -1,3 +1,9 @@
+import { ArrowBack } from "@mui/icons-material";
+import { ResizeSensor } from "css-element-queries";
+import PopupState from "material-ui-popup-state";
+import { ScrollPanel, usePanel } from "./ScrollPanel";
+import { useScrollState } from "hooks/useScrollState";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
 import {
   AppBar,
   Box,
@@ -8,9 +14,9 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
-import { ResizeSensor } from "css-element-queries";
-import PopupState from "material-ui-popup-state";
+
+
+
 import {
   cloneElement,
   ComponentProps,
@@ -21,9 +27,9 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useScrollState } from "hooks/useScrollState";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
-import { ScrollPanel, usePanel } from "./ScrollPanel";
+
+
+
 
 export function AppBarTitle({ children }: { children?: ReactNode }) {
   return <Typography variant="h6">{children}</Typography>;

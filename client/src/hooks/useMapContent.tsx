@@ -1,10 +1,10 @@
-import { useSnackbar } from "components/generic/Snackbar";
 import memo from "memoizee";
-import { useMemo } from "react";
 import { useAsync } from "react-async-hook";
-import { useLoadingState } from "slices/loading";
-import { Map, useUIState } from "slices/UIState";
+import { useMemo } from "react";
 import { useConnectionResolver } from "./useConnectionResolver";
+import { useSnackbar } from "components/generic/Snackbar";
+import { useLoadingState } from "slices/loading";
+import { Map } from "slices/UIState";
 
 export function useMapContent(map?: Map) {
   const notify = useSnackbar();

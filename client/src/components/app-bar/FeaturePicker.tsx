@@ -1,10 +1,10 @@
 import { ArrowDropDownOutlined } from "@mui/icons-material";
 import { Button, Typography as Type } from "@mui/material";
-import { Select } from "components/generic/Select";
-import { Space } from "components/generic/Space";
 import { find, map, startCase } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactNode } from "react";
+import { Select } from "components/generic/Select";
+import { Space } from "components/generic/Space";
 
 type Props = {
   label?: string;

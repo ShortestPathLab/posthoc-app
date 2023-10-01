@@ -1,7 +1,6 @@
 import { constant, map, mapValues } from "lodash";
 import { Prop } from "./Context";
 import { parseString } from "./parseString";
-
 /**
  * Parses a single property (recursively calling down if required)
  * @param prop the value of the property to parse

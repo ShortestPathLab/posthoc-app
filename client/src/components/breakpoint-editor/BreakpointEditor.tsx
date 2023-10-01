@@ -1,12 +1,12 @@
 import { Divider, TextField, Typography as Type } from "@mui/material";
+import { find, last, map, startCase } from "lodash";
+import { comparators } from "./comparators";
+import { eventTypes } from "./eventTypes";
 import { Flex } from "components/generic/Flex";
 import { SelectField as Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/Switch";
-import { find, last, map, startCase } from "lodash";
 import { Breakpoint } from "slices/UIState";
-import { comparators } from "./comparators";
-import { eventTypes } from "./eventTypes";
 
 type BreakpointEditorProps = {
   value: Breakpoint;

@@ -1,8 +1,8 @@
 import { NameMethodMap } from "protocol";
 import { RequestOf, ResponseOf } from "protocol/Message";
-import { Transport, TransportOptions } from "./Transport";
 import url from "url-parse";
 import { internal } from "./internal";
+import { Transport, TransportOptions } from "./Transport";
 
 export class NativeTransport implements Transport {
   handler: Transport["call"];

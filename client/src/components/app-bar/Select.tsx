@@ -1,12 +1,12 @@
 import { Code as CodeIcon, MapTwoTone as MapIcon } from "@mui/icons-material";
+import { find } from "lodash";
+import { FeaturePicker } from "./FeaturePicker";
+import { custom, upload } from "./upload";
 import { useSnackbar } from "components/generic/Snackbar";
 import { Space } from "components/generic/Space";
-import { find } from "lodash";
 import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { useUIState } from "slices/UIState";
-import { FeaturePicker } from "./FeaturePicker";
-import { custom, upload } from "./upload";
 
 export const mapDefaults = { start: undefined, end: undefined };
 

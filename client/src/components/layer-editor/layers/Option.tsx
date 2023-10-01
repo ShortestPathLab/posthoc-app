@@ -1,5 +1,5 @@
-import { ReactNode as Node } from "react";
 import { Typography as Type } from "@mui/material";
+import { ReactNode as Node } from "react";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 

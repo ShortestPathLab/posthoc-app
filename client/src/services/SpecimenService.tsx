@@ -1,21 +1,19 @@
+import { find, isEmpty } from "lodash";
+import { ParamsOf } from "protocol/Message";
+import { PathfindingTask } from "protocol/SolveTask";
+import { useAsyncAbortable as useAsync } from "react-async-hook";
+import { Component } from "react";
 import { Transport } from "client/Transport";
 import { Label } from "components/generic/Label";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useConnectionResolver } from "hooks/useConnectionResolver";
 import { useMapContent } from "hooks/useMapContent";
-import { find, isEmpty } from "lodash";
-import { ParamsOf } from "protocol/Message";
-import { PathfindingTask } from "protocol/SolveTask";
-import { Component, FunctionComponent } from "react";
-import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { Specimen, useSpecimen } from "slices/specimen";
 import { Map, useUIState } from "slices/UIState";
 import { compressAsync as compress, hashAsync as hash } from "workers/async";
-import { Avatar, Box, IconButton, Stack, TextField } from "@mui/material";
-
 async function solve(
   map: string,
   { format, ...params }: Omit<ParamsOf<PathfindingTask>, "mapURI">,

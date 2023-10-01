@@ -1,5 +1,5 @@
-import { normalize } from "./normalize";
 import { Prop } from "./Context";
+import { normalize } from "./normalize";
 
 export function parseToken(token: string): Prop<any> {
   const f = Function("ctx", `return ${token};`);

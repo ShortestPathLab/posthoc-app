@@ -16,8 +16,8 @@
           "$": "path",
           "points": [
             {
-              "x": "{{ctx.parent ? ctx.parent.x: ctx.x}}",
-              "y": "{{ctx.parent ? ctx.parent.y: ctx.y}}"
+              "x": "{{ctx.parent ? ctx.parent.x : ctx.x}}",
+              "y": "{{ctx.parent ? ctx.parent.y : ctx.y}}"
             },
             {
               "x": "{{ctx.x}}",

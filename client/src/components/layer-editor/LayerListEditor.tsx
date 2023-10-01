@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
+import { LayerEditor } from "./LayerEditor";
 import { ListEditor } from "components/generic/ListEditor";
 import { Layer, useUIState } from "slices/UIState";
-import { LayerEditor } from "./LayerEditor";
 
 export function LayerListEditor() {
   const [{ layers = [] }, setUIState] = useUIState();

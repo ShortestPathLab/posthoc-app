@@ -1,12 +1,12 @@
-import { ListEditor } from "components/generic/ListEditor";
+import { Box } from "@mui/material";
 import { debounce, flatMap as flat, get, keys, map, uniq } from "lodash";
-import { useSpecimen } from "slices/specimen";
-import { Breakpoint, useUIState } from "slices/UIState";
+import { BreakpointEditor } from "./BreakpointEditor";
 import { comparators } from "./comparators";
 import { intrinsicProperties } from "./intrinsicProperties";
-import { BreakpointEditor } from "./BreakpointEditor";
-import { Box } from "@mui/material";
 import { propertyPaths as paths } from "./propertyPaths";
+import { ListEditor } from "components/generic/ListEditor";
+import { useSpecimen } from "slices/specimen";
+import { Breakpoint, useUIState } from "slices/UIState";
 
 export function BreakpointListEditor() {
   const [{ breakpoints = [] }, setUIState] = useUIState();

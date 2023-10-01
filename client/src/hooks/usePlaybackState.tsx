@@ -1,10 +1,9 @@
 import { clamp } from "lodash";
 import { useMemo } from "react";
-import { useSpecimen } from "slices/specimen";
-import { Layer, UploadedTrace, useUIState } from "slices/UIState";
 import { useTraceContent } from "./useTraceContent";
-import { usePlayback } from "slices/playback";
 import { useSnackbar } from "components/generic/Snackbar";
+import { usePlayback } from "slices/playback";
+import { Layer, UploadedTrace } from "slices/UIState";
 
 export function usePlaybackState(layer?: Layer<{ trace?: UploadedTrace }>) {
   const notify = useSnackbar();

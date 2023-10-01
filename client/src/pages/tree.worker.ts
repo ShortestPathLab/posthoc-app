@@ -1,4 +1,4 @@
-import { Dictionary, chain, find, forEach, sumBy, times } from "lodash";
+import { chain, Dictionary, find, forEach, sumBy, times } from "lodash";
 import { arrayToTree } from "performant-array-to-tree";
 import { Trace, TraceEvent } from "protocol";
 

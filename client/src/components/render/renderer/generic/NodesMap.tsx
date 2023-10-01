@@ -1,17 +1,10 @@
+import { Event, Nodes } from "protocol/Render";
+import { createContext, ReactNode, useContext, useMemo, useState } from "react";
+import { Successors } from "../types";
+import { createNodes, createStepNodes } from "./Nodes";
+import { NodePopup } from "components/generic/NodePopup";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { Event, Nodes } from "protocol/Render";
-import { createNodes, createStepNodes } from "./Nodes";
-import {
-  useMemo,
-  createContext,
-  useContext,
-  ReactNode,
-  useState,
-  useCallback,
-} from "react";
-import { NodePopup } from "components/generic/NodePopup";
-import { Successors } from "../types";
 
 export type ClickInfo = {
   node?: Event[];

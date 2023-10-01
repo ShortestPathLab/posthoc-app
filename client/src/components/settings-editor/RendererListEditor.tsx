@@ -1,10 +1,10 @@
 import { ReplayOutlined as ResetIcon } from "@mui/icons-material";
 import { Button } from "@mui/material";
+import { debounce } from "lodash";
+import { RendererEditor } from "./RendererEditor";
 import { defaultTransport } from "client";
 import { ListEditor } from "components/generic/ListEditor";
-import { debounce } from "lodash";
 import { defaultRenderers, Renderer, useSettings } from "slices/settings";
-import { RendererEditor } from "./RendererEditor";
 
 export function RendererListEditor() {
   const [{ renderer }, setSettings] = useSettings();

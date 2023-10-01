@@ -1,19 +1,13 @@
-import {
-  AccountTreeTwoTone,
-  ChevronRightOutlined,
-  LayersTwoTone as LayersIcon,
-  VisibilityTwoTone,
-} from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  Menu,
-  MenuItem,
-  MenuList,
-  Tooltip,
-  alpha,
-  useTheme,
-} from "@mui/material";
+import { AccountTreeTwoTone, ChevronRightOutlined, LayersTwoTone as LayersIcon, VisibilityTwoTone } from "@mui/icons-material";
+import { alpha, Box, Divider, Menu, MenuItem, MenuList, Tooltip, useTheme } from "@mui/material";
+import { delay, entries, find, findLast, head, map, startCase } from "lodash";
+import PopupState, { bindMenu } from "material-ui-popup-state";
+import { CustomNodeElementProps, Tree as _Tree, TreeProps } from "react-d3-tree";
+import { useCss, useThrottle } from "react-use";
+import AutoSize from "react-virtualized-auto-sizer";
+import { FC, useCallback, useEffect, useState } from "react";
+import { EventTree } from "./tree.worker";
+import { useTreeMemo } from "./TreeWorker";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
 import { Label } from "components/generic/Label";
@@ -22,31 +16,10 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { inferLayerName } from "components/layer-editor/layers/LayerSource";
 import { TraceLayer } from "components/layer-editor/layers/traceLayerSource";
 import { getColorHex } from "components/renderer/colors";
-import {
-  delay,
-  entries,
-  filter,
-  find,
-  findLast,
-  head,
-  map,
-  startCase,
-} from "lodash";
-import PopupState, { bindMenu } from "material-ui-popup-state";
 import { Page } from "pages/Page";
-import { FC, useCallback, useEffect, useState } from "react";
-import {
-  CustomNodeElementProps,
-  TreeProps,
-  Tree as _Tree,
-} from "react-d3-tree";
-import { useCss, useThrottle } from "react-use";
-import AutoSize from "react-virtualized-auto-sizer";
-import { Layer, useUIState } from "slices/UIState";
 import { usePlayback } from "slices/playback";
+import { Layer, useUIState } from "slices/UIState";
 import { PanelState } from "slices/view";
-import { useTreeMemo } from "./TreeWorker";
-import { EventTree } from "./tree.worker";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -88,6 +61,7 @@ const radius2 = {
     description: "Show all nodes, may impact performance",
   },
 };
+
 export function TreePage() {
   const [{ step = 0 }] = usePlayback();
   const throttledStep = useThrottle(step, 600);

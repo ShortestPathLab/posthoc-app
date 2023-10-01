@@ -1,7 +1,7 @@
-import { Dictionary, chunk, flatten, identity, maxBy, minBy } from "lodash";
+import { chunk, Dictionary, flatten, identity, maxBy, minBy } from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
-import { MapUtils, ParsedMap } from "../Parser";
+import { ParsedMap } from "../Parser";
 
 export type Options = {
   color?: string;

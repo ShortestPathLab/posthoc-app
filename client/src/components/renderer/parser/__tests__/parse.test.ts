@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parse } from "../parse";
 import { Context } from "../Context";
+import { parse } from "../parse";
 
 describe("parse", () => {
   const result = parse<{

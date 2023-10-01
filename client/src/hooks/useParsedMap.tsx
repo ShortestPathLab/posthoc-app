@@ -1,11 +1,9 @@
 import { darken, lighten, useTheme } from "@mui/material";
-import { Label } from "components/generic/Label";
+import { useAsync } from "react-async-hook";
 import { useSnackbar } from "components/generic/Snackbar";
 import { getParser } from "components/renderer";
-import { useAsync } from "react-async-hook";
-import { Map } from "slices/UIState";
 import { useLoadingState } from "slices/loading";
-import { useSpecimen } from "slices/specimen";
+import { Map } from "slices/UIState";
 
 export function useParsedMap(map?: Map) {
   const notify = useSnackbar();

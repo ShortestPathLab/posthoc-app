@@ -1,10 +1,12 @@
+import { ReactNode } from "react";
 import { Flex } from "./Flex";
+import { Space } from "./Space";
 import {
   Typography as Type,
   TypographyProps as TypeProps,
 } from "@mui/material";
-import { Space } from "./Space";
-import { ReactNode } from "react";
+
+
 
 type Props = {
   label?: ReactNode;

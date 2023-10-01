@@ -1,4 +1,13 @@
 import { SortOutlined as ListIcon } from "@mui/icons-material";
+import { delay, map } from "lodash";
+import { TraceEvent } from "protocol/Trace";
+import { cloneElement, createElement, useEffect, useRef } from "react";
+import { EventInspector } from "./EventInspector";
+import { Flex } from "components/generic/Flex";
+import { layerHandlers } from "components/layer-editor/layers/LayerSource";
+import { useLoading } from "slices/loading";
+import { usePlayback } from "slices/playback";
+import { useUIState } from "slices/UIState";
 import {
   CircularProgress,
   Divider,
@@ -7,20 +16,12 @@ import {
   Stack,
   useTheme,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+
 import {
   LazyList as List,
   LazyListHandle as ListHandle,
   LazyListProps as ListProps,
 } from "components/generic/LazyList";
-import { layerHandlers } from "components/layer-editor/layers/LayerSource";
-import { delay, map } from "lodash";
-import { TraceEvent } from "protocol/Trace";
-import { cloneElement, createElement, useEffect, useRef } from "react";
-import { useUIState } from "slices/UIState";
-import { useLoading } from "slices/loading";
-import { usePlayback } from "slices/playback";
-import { EventInspector } from "./EventInspector";
 
 function Placeholder() {
   return (
@@ -73,6 +74,16 @@ export function EventListInspector(props: ListProps<TraceEvent>) {
                 {...props}
                 items={steps}
                 listOptions={{ ref, fixedItemHeight: 80 }}
+                placeholder={
+                  <EventInspector
+                    event={{ id: 0 }}
+                    index={0}
+                    selected={false}
+                    sx={{ height: 80 }}
+                  >
+                    <Divider variant="inset" />
+                  </EventInspector>
+                }
                 renderItem={(item, i) => (
                   <>
                     <EventInspector

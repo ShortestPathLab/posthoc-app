@@ -41,8 +41,8 @@ export const defaultD2RendererOptions: D2RendererOptions = {
   },
   tileSubdivision: 0,
   refreshInterval: 1000 / 30,
-  animationDuration: 150,
-  debounceInterval: 300,
+  animationDuration: 300,
+  debounceInterval: 150,
   backgroundColor: "#ffffff",
   accentColor: "#333333",
   dynamicResolution: {

@@ -1,19 +1,12 @@
-/**
- * Adapted from https://codesandbox.io/s/react-pixi-viewport-9ngfd
- * @author roxgarage
- */
-
 import { PixiComponent, useApp } from "@pixi/react";
 import { map } from "lodash";
 import * as PIXI from "pixi.js";
 import React, { ComponentProps, forwardRef } from "react";
-import {
-  PointerEvent,
-  PixiViewport,
-  events,
-  ViewportEventHandler,
-} from "./PixiViewport";
-
+import { events, PixiViewport, PointerEvent, ViewportEventHandler } from "./PixiViewport";
+/**
+ * Adapted from https://codesandbox.io/s/react-pixi-viewport-9ngfd
+ * @author roxgarage
+ */
 const scale = 1;
 
 export type ViewportProps = {

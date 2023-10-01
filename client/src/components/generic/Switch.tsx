@@ -1,9 +1,10 @@
+import { ReactNode } from "react";
 import {
   FormControlLabel,
   Switch as MuiSwitch,
   SwitchProps as MuiSwitchProps,
 } from "@mui/material";
-import { ReactNode } from "react";
+
 
 type SwitchProps = { label?: ReactNode } & MuiSwitchProps;
 

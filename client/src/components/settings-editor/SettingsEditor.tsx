@@ -1,18 +1,11 @@
-import {
-  Box,
-  Divider,
-  Slider,
-  Switch,
-  Tab,
-  Typography as Type,
-} from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { Box, Divider, Slider, Switch, Tab, Typography as Type } from "@mui/material";
+import { ReactNode, useState } from "react";
+import { RendererListEditor } from "./RendererListEditor";
+import { ServerListEditor } from "./ServerListEditor";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
-import { ReactNode, useState } from "react";
 import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
-import { ServerListEditor } from "./ServerListEditor";
-import { RendererListEditor } from "./RendererListEditor";
 
 const formatLabel = (v: number) => `${v}x`;
 

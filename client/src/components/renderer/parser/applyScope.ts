@@ -1,7 +1,7 @@
 import { Properties as Props } from "protocol";
 import { Context, PropMap } from "./Context";
-import { normalize } from "./normalize";
 import { mapProperties } from "./mapProperties";
+import { normalize } from "./normalize";
 
 export function applyScope<T extends Props>(
   scope: PropMap<T>,

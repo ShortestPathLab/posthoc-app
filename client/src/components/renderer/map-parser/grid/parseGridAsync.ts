@@ -1,8 +1,5 @@
+import { ParseGridWorkerParameters, ParseGridWorkerReturnType } from "./parseGrid.worker";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
-import {
-  ParseGridWorkerParameters,
-  ParseGridWorkerReturnType,
-} from "./parseGrid.worker";
 import parseGridWorkerUrl from "./parseGrid.worker.ts?worker&url";
 
 export class ParseGridWorker extends Worker {

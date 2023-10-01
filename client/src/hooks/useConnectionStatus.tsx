@@ -1,7 +1,7 @@
 import { find } from "lodash";
+import { useConnectionResolver } from "./useConnectionResolver";
 import { useLoading } from "slices/loading";
 import { useSettings } from "slices/settings";
-import { useConnectionResolver } from "./useConnectionResolver";
 
 export type ConnectionStatus =
   | "connected"

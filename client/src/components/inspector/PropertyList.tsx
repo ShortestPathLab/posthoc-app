@@ -1,7 +1,7 @@
 import { TypographyVariant } from "@mui/material";
+import { Dictionary, entries, filter, map } from "lodash";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { Property } from "components/generic/Property";
-import { Dictionary, entries, filter, map } from "lodash";
 
 export function PropertyList({
   event,

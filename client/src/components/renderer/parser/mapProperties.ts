@@ -1,7 +1,6 @@
-import { ObjectIterator, mapValues } from "lodash";
+import { mapValues, ObjectIterator } from "lodash";
 import { Properties as Props } from "protocol";
 import { Context } from "./Context";
-
 /**
  * Iterates over the properties of a scope or component,
  * ignoring the component name property `$`.

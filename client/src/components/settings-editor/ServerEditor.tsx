@@ -1,21 +1,17 @@
-import { Switch, TextField, Tooltip, Typography as Type } from "@mui/material";
 import { EditTwoTone as EditIcon } from "@mui/icons-material";
-import { Box } from "@mui/material";
+import { Box, Switch, TextField, Tooltip, Typography as Type } from "@mui/material";
+import { entries, startCase } from "lodash";
+import { transports } from "client";
 import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
-import {
-  AppBarTitle as Title,
-  ManagedModal as Dialog,
-} from "components/generic/Modal";
+import { AppBarTitle as Title, ManagedModal as Dialog } from "components/generic/Modal";
 import { OverlineDot as Dot } from "components/generic/Overline";
+import { SelectField as Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";
 import { useConnection } from "hooks/useConnectionResolver";
 import { useConnectionStatus } from "hooks/useConnectionStatus";
-import { entries, startCase } from "lodash";
 import { merge } from "slices/reducers";
 import { Remote } from "slices/settings";
-import { SelectField as Select } from "components/generic/Select";
-import { transports } from "client";
 
 const statusColor = {
   connected: "success.light",

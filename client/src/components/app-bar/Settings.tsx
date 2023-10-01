@@ -1,9 +1,6 @@
 import { SettingsTwoTone as SettingsIcon } from "@mui/icons-material";
 import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
-import {
-  AppBarTitle as Title,
-  ManagedModal as Dialog,
-} from "components/generic/Modal";
+import { AppBarTitle as Title, ManagedModal as Dialog } from "components/generic/Modal";
 import { SettingsEditor } from "components/settings-editor/SettingsEditor";
 
 export function Settings() {

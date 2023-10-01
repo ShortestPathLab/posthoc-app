@@ -1,4 +1,6 @@
 import { noop } from "lodash";
+import { useAsync } from "react-use";
+import { merge, Reducer } from "./reducers";
 import {
   createContext,
   ReactNode,
@@ -6,8 +8,8 @@ import {
   useMemo,
   useReducer,
 } from "react";
-import { useAsync } from "react-use";
-import { Reducer, merge } from "./reducers";
+
+
 
 type Slice<T, U = T> = [T, (next: U) => void];
 

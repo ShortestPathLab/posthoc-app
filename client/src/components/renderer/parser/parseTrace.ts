@@ -1,13 +1,10 @@
-import { useSnackbar } from "components/generic/Snackbar";
 import pluralize from "pluralize";
-import { useMemo } from "react";
 import { useAsync } from "react-async-hook";
+import { useMemo } from "react";
+import { ParseTraceWorkerParameters, ParseTraceWorkerReturnType } from "./parseTrace.worker";
+import { useSnackbar } from "components/generic/Snackbar";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
-import {
-  ParseTraceWorkerParameters,
-  ParseTraceWorkerReturnType,
-} from "./parseTrace.worker";
 import parseGridWorkerUrl from "./parseTrace.worker.ts?worker&url";
 
 export class ParseTraceWorker extends Worker {

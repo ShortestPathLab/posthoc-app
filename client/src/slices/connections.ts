@@ -1,7 +1,7 @@
-import { Transport } from "client/Transport";
 import { CheckConnectionResponse } from "protocol/CheckConnection";
 import { createSlice } from "./createSlice";
 import { replace } from "./reducers";
+import { Transport } from "client/Transport";
 
 export type Connection = CheckConnectionResponse["result"] & {
   call: Transport["call"];

@@ -1,14 +1,14 @@
-import { Box, Divider, Tab, Typography as Type, Button } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { Box, Button, Divider, Tab, Typography as Type } from "@mui/material";
+import { ReactNode, useState } from "react";
+import { BreakpointListEditor } from "../breakpoint-editor/BreakpointListEditor";
+import { saveJSON as save } from "./saveJSON";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/Switch";
-import { ReactNode, useState } from "react";
+import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { useSpecimen } from "slices/specimen";
 import { useUIState } from "slices/UIState";
-import { BreakpointListEditor } from "../breakpoint-editor/BreakpointListEditor";
-import { ScriptEditor } from "components/script-editor/ScriptEditor";
-import { saveJSON as save } from "./saveJSON";
 
 export function DebugOptionsEditor() {
   const [{ specimen, format, algorithm }] = useSpecimen();

@@ -1,8 +1,7 @@
-import { Graphics as GraphicsType } from "@pixi/graphics";
-import { Component, Event, Nodes } from "protocol/Render";
 import * as PIXI from "pixi.js";
-import { EventTypeColoursTypeHex } from "./PixiStage";
+import { Component, Event, Nodes } from "protocol/Render";
 import { Successors } from "../types";
+import { Graphics as GraphicsType } from "@pixi/graphics";
 
 export type DrawInstruction = ((
   eventContext: EventContext

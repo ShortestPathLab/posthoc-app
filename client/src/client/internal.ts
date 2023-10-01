@@ -1,7 +1,7 @@
-import { PathfindingTask, Scheme } from "protocol/SolveTask";
-import { Transport } from "./Transport";
-import url from "url-parse";
 import { Dictionary } from "lodash";
+import { PathfindingTask, Scheme } from "protocol/SolveTask";
+import url from "url-parse";
+import { Transport } from "./Transport";
 
 export function parseURI(uri: string) {
   const { protocol, pathname } = url(uri);

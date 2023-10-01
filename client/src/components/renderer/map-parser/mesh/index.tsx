@@ -2,7 +2,7 @@ import { constant, identity } from "lodash";
 import memo from "memoizee";
 import { byPoint } from "../../NodeMatcher";
 import { MapParser, ParsedMapHydrator } from "../Parser";
-import type { Options } from "./parseMesh.worker";
+import { Options } from "./parseMesh.worker";
 import { parseMeshAsync } from "./parseMeshAsync";
 
 export const parse: MapParser = memo(

@@ -1,21 +1,12 @@
 import { GitHub } from "@mui/icons-material";
-import {
-  Avatar,
-  Box,
-  List,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography as Type,
-} from "@mui/material";
+import { Avatar, Box, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography as Type } from "@mui/material";
+import { head } from "lodash";
+import { ReactNode } from "react";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { head } from "lodash";
 import { Page } from "pages/Page";
 import logo from "public/logo512.png";
-import { ReactNode } from "react";
 
 const version = "1.0.4";
 

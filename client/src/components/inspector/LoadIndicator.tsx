@@ -1,6 +1,6 @@
-import { useLoading } from "slices/loading";
 import { Fade, LinearProgress } from "@mui/material";
 import { some, values } from "lodash";
+import { useLoading } from "slices/loading";
 
 export function LoadIndicator() {
   const [loading] = useLoading();

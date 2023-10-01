@@ -1,12 +1,11 @@
 import { Box, Fade, LinearProgress } from "@mui/material";
-import { Flex, FlexProps } from "components/generic/Flex";
-import { pages } from "pages";
-import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { createElement, useState } from "react";
-import { useAnyLoading } from "slices/loading";
-import { useSpecimen } from "slices/specimen";
 import { SelectionMenu } from "./SelectionMenu";
 import { ViewTree } from "./ViewTree";
+import { Flex, FlexProps } from "components/generic/Flex";
+import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
+import { pages } from "pages";
+import { useAnyLoading } from "slices/loading";
 import { PanelState, useView } from "slices/view";
 
 type SpecimenInspectorProps = {} & FlexProps;

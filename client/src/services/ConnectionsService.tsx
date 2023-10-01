@@ -1,11 +1,10 @@
-import { getTransport } from "client";
-import { useSnackbar } from "components/generic/Snackbar";
 import { delay, now } from "lodash";
 import { useEffect } from "react";
+import { getTransport } from "client";
+import { useSnackbar } from "components/generic/Snackbar";
 import { Connection, useConnections } from "slices/connections";
 import { useLoadingState } from "slices/loading";
 import { useSettings } from "slices/settings";
-
 function wait(ms: number) {
   return new Promise((res) => delay(res, ms));
 }

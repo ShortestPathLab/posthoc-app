@@ -1,6 +1,5 @@
-import { d2InstrinsicComponents } from "./pixi/PixiPrimitives";
-
 import { d2InbuiltViews } from "./pixi/PixiInbuiltViews";
+import { d2InstrinsicComponents } from "./pixi/PixiPrimitives";
 
 export const primitiveComponents = {
   ...d2InstrinsicComponents,

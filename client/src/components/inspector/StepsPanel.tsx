@@ -1,6 +1,4 @@
-import { Box, BoxProps, Fade } from "@mui/material";
-import { useUIState } from "slices/UIState";
-import { EventListInspector } from "./EventListInspector";
+import { Box, BoxProps } from "@mui/material";
 
 export function StepsPanel(props: BoxProps) {
   return <></>;

@@ -1,9 +1,8 @@
-/// <reference types="vitest" />
-
-import path from "path";
-import { UserConfig } from "vite";
-import viteTsconfigPaths from "vite-tsconfig-paths";
 import react from "@vitejs/plugin-react";
+import path from "path";
+import viteTsconfigPaths from "vite-tsconfig-paths";
+import { UserConfig } from "vite";
+/// <reference types="vitest" />
 export default {
   mode: "production",
   root: path.join(process.cwd(), "./src"),

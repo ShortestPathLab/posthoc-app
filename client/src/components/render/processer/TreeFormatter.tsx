@@ -1,7 +1,7 @@
 // @ts-nocheck
-import * as d3 from "d3-hierarchy";
 import { TraceEvent } from "protocol/Trace";
 import { tileEvents } from "./tileEvents";
+import * as d3 from "d3-hierarchy";
 
 export function processTree(eventList: TraceEvent[]) {
   let obj: {

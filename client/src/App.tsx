@@ -1,15 +1,15 @@
 import { ThemeProvider, useTheme } from "@mui/material";
+import { useMemo } from "react";
 import { Flex } from "components/generic/Flex";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { Inspector } from "components/inspector";
 import { useTitleBarColor } from "hooks/useTitleBarColor";
-import { useMemo } from "react";
 import { ConnectionsService } from "services/ConnectionsService";
 import { FeaturesService } from "services/FeaturesService";
 import { LayerService } from "services/LayerService";
 import { RendererService } from "services/RendererService";
-import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { useSettings } from "slices/settings";
+import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { makeTheme } from "theme";
 
 const services = [

@@ -1,8 +1,5 @@
+import { ParseMeshWorkerParameters, ParseMeshWorkerReturnType } from "./parseMesh.worker";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
-import {
-  ParseMeshWorkerParameters,
-  ParseMeshWorkerReturnType,
-} from "./parseMesh.worker";
 import parseMeshWorkerUrl from "./parseMesh.worker.ts?worker&url";
 
 export class ParseMeshWorker extends Worker {

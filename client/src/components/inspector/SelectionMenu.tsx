@@ -1,3 +1,8 @@
+import { chain, Dictionary, entries, merge } from "lodash";
+import { ComponentProps, ReactNode, useMemo } from "react";
+import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
+import { useCache } from "pages/TreePage";
+import { useUIState } from "slices/UIState";
 import {
   Divider,
   ListItem,
@@ -12,11 +17,11 @@ import {
   SelectionInfoProvider,
   getLayerHandler,
 } from "components/layer-editor/layers/LayerSource";
-import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { Dictionary, chain, entries, merge } from "lodash";
-import { useCache } from "pages/TreePage";
-import { ComponentProps, ReactNode, useMemo } from "react";
-import { useUIState } from "slices/UIState";
+
+
+
+
+
 
 type Props = {
   selection?: RendererSelectEvent;

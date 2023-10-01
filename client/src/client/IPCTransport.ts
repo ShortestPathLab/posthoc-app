@@ -1,8 +1,8 @@
 import { JSONRPCClient, JSONRPCResponse as Response } from "json-rpc-2.0";
 import { NameMethodMap } from "protocol";
 import { Request, RequestOf, ResponseOf } from "protocol/Message";
-import { IPCWorker } from "workers";
 import { Transport, TransportOptions } from "./Transport";
+import { IPCWorker } from "workers";
 
 export class IPCTransport implements Transport {
   worker: IPCWorker;

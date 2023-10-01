@@ -1,7 +1,6 @@
 import { forIn, set } from "lodash";
-import { CSSProperties, useEffect } from "react";
-import { ReactNode, useState } from "react";
 import { createPortal } from "react-dom";
+import { CSSProperties, ReactNode, useEffect, useState } from "react";
 
 type PortalProps = {
   replace?: boolean;

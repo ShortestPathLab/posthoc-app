@@ -1,8 +1,7 @@
 import { HideSourceOutlined as HiddenIcon } from "@mui/icons-material";
-import { Overline, OverlineDot as Dot } from "components/generic/Overline";
-import { getColorHex } from "components/renderer/colors";
 import { startCase } from "lodash";
 import { TraceEvent } from "protocol/Trace";
+import { Overline } from "components/generic/Overline";
 
 export function EventLabel({
   event,

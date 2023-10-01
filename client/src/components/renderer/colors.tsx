@@ -1,3 +1,6 @@
+import { mapValues } from "lodash";
+import { EventTypeColors } from "protocol";
+import { TraceEventType } from "protocol/Trace";
 import {
   blue,
   deepPurple,
@@ -8,9 +11,9 @@ import {
   red,
   yellow,
 } from "@mui/material/colors";
-import { mapValues } from "lodash";
-import { EventTypeColors } from "protocol";
-import { TraceEventType } from "protocol/Trace";
+
+
+
 
 const tint = "500";
 

@@ -1,6 +1,6 @@
+import { some, values } from "lodash";
 import { useCallback } from "react";
 import { createSlice } from "./createSlice";
-import { some, values } from "lodash";
 import { produce } from "produce";
 
 type Loading = {

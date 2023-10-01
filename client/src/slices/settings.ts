@@ -1,5 +1,5 @@
-import { AccentColor } from "theme";
 import { createSlice, withLocalStorage } from "./createSlice";
+import { AccentColor } from "theme";
 
 export type Remote = {
   url: string;

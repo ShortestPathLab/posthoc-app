@@ -1,12 +1,12 @@
 import { ListTwoTone } from "@mui/icons-material";
-import { Placeholder } from "components/inspector/Placeholder";
-import { Page } from "pages/Page";
-import { useViewTreeContext } from "components/inspector/ViewTree";
-import { useLog } from "slices/log";
+import { Divider, List, ListItem, ListItemText } from "@mui/material";
+import { map } from "lodash";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
-import { map } from "lodash";
-import { Divider, List, ListItem, ListItemText } from "@mui/material";
+import { Placeholder } from "components/inspector/Placeholder";
+import { useViewTreeContext } from "components/inspector/ViewTree";
+import { Page } from "pages/Page";
+import { useLog } from "slices/log";
 
 export function InfoPage() {
   const { controls, onChange, state } = useViewTreeContext();

@@ -1,12 +1,11 @@
-import { useSnackbar } from "components/generic/Snackbar";
-import { Label } from "components/generic/Label";
-import { usePlaybackState } from "hooks/usePlaybackState";
 import { range, trimEnd } from "lodash";
-import { ReactNode, useCallback, useEffect } from "react";
 import { useRaf } from "react-use";
+import { ReactNode, useCallback, useEffect } from "react";
 import { useBreakpoints } from "../hooks/useBreakpoints";
+import { Label } from "components/generic/Label";
+import { useSnackbar } from "components/generic/Snackbar";
+import { usePlaybackState } from "hooks/usePlaybackState";
 import { useSettings } from "slices/settings";
-
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
   requestAnimationFrame(async () => {

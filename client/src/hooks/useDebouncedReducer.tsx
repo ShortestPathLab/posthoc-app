@@ -1,6 +1,6 @@
+import { debounce, noop } from "lodash";
 import { useCallback, useMemo, useState } from "react";
 import { merge, Reducer } from "slices/reducers";
-import { debounce, noop } from "lodash";
 
 export function useDebouncedReducer<T, U = Partial<T>>(
   initialValue: T,

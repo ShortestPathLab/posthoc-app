@@ -1,28 +1,18 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemText,
-  Slider,
-  Switch,
-  Tab,
-  Typography as Type,
-  colors,
-} from "@mui/material";
-import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Flex } from "components/generic/Flex";
-import { Space } from "components/generic/Space";
-import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "pages/Page";
-import { RendererListEditor } from "components/settings-editor/RendererListEditor";
-import { ServerListEditor } from "components/settings-editor/ServerListEditor";
+import { Box, List, ListItem, ListItemText, Slider, Switch, Tab, Typography as Type } from "@mui/material";
 import { keys, map, startCase } from "lodash";
 import { ReactNode, useState } from "react";
+import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { Flex } from "components/generic/Flex";
+import { Scroll } from "components/generic/Scrollbars";
+import { Space } from "components/generic/Space";
+import { useViewTreeContext } from "components/inspector/ViewTree";
+import { mapParsers } from "components/renderer/map-parser";
+import { RendererListEditor } from "components/settings-editor/RendererListEditor";
+import { ServerListEditor } from "components/settings-editor/ServerListEditor";
+import { Page } from "pages/Page";
 import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
 import { AccentColor, accentColors } from "theme";
-import { mapParsers } from "components/renderer/map-parser";
-import { Scroll } from "components/generic/Scrollbars";
 
 const formatLabel = (v: number) => `${v}x`;
 

@@ -1,9 +1,7 @@
-import { Component, Components, Render } from "protocol/Render";
-import { Context } from "protocol/Render";
-import { primitiveComponents, inbuiltViews } from "../renderer/primitives";
 import { isArray, set } from "lodash";
+import { Component, Components, Context, Render } from "protocol/Render";
+import { inbuiltViews, primitiveComponents } from "../renderer/primitives";
 import { Interlang } from "slices/specimen";
-
 let renderName: string | undefined;
 /**
  * Parses all reviews in a Render

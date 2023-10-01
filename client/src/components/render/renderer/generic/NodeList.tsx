@@ -1,9 +1,7 @@
-import { useRendererInstance } from "components/inspector/TraceRenderer";
 import { floor, slice } from "lodash";
-import { CompiledComponent } from "protocol";
 import { useEffect, useMemo } from "react";
 import { ComponentEntry } from "renderer";
-
+import { useRendererInstance } from "components/inspector/TraceRenderer";
 /**
  * For distinguish between persisted views like grid, mesh, tree, map
  * and non-persisted views like tile and multiagent

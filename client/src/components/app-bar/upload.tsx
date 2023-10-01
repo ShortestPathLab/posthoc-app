@@ -2,7 +2,6 @@ import { fileDialog as file } from "file-select-dialog";
 import { find, startCase } from "lodash";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { UploadedTrace } from "slices/UIState";
-
 function ext(s: string) {
   return s.split(".").pop();
 }

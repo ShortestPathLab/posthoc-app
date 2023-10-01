@@ -1,15 +1,8 @@
 import { Dictionary as Dict } from "lodash";
-import {
-  ComponentDefinition,
-  ComponentDefinitionMap,
-  IntrinsicComponentMap,
-  ParsedComponent,
-  ParsedComponentDefinition,
-} from "protocol";
+import { ComponentDefinition, ComponentDefinitionMap, IntrinsicComponentMap, ParsedComponent, ParsedComponentDefinition } from "protocol";
 import { applyScope } from "./applyScope";
-import { normalize } from "./normalize";
 import { Context, Key } from "./Context";
-
+import { normalize } from "./normalize";
 /**
  * A parser for a list of Components
  * @param definition a list of Components

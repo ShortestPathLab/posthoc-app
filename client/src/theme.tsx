@@ -1,5 +1,4 @@
-import { colors, createTheme } from "@mui/material";
-import { alpha, SxProps, Theme } from "@mui/material";
+import { alpha, colors, createTheme, SxProps, Theme } from "@mui/material";
 import { constant, times } from "lodash";
 import { useSettings } from "slices/settings";
 

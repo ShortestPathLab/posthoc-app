@@ -1,6 +1,6 @@
-import { mapParsers } from "components/renderer/map-parser";
 import { keys, map, uniqBy } from "lodash";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
+import { mapParsers } from "components/renderer/map-parser";
 import { useConnections } from "slices/connections";
 import { Features, useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";

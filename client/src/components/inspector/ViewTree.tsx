@@ -1,14 +1,13 @@
-import Split, { GutterTheme, SplitDirection } from "@devbookhq/splitter";
+import Split, { SplitDirection } from "@devbookhq/splitter";
 import { useTheme } from "@mui/material";
-import { Flex } from "components/generic/Flex";
-
 import { filter, forEach, map, sumBy } from "lodash";
 import { nanoid } from "nanoid";
-import { produce, produce2 } from "produce";
-import { Context, ReactNode, createContext, useContext, useMemo } from "react";
-import { Leaf, Root } from "slices/UIState";
-import { ViewControls } from "./ViewControls";
 import { useCss } from "react-use";
+import { Context, createContext, ReactNode, useContext, useMemo } from "react";
+import { ViewControls } from "./ViewControls";
+import { Flex } from "components/generic/Flex";
+import { produce, produce2 } from "produce";
+import { Leaf, Root } from "slices/UIState";
 
 type ViewTreeContextType<T = any> = {
   controls?: ReactNode;

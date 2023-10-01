@@ -1,32 +1,14 @@
 import { EditTwoTone } from "@mui/icons-material";
-import {
-  Avatar,
-  Box,
-  IconButton,
-  Stack,
-  TextField,
-  Typography as Type,
-} from "@mui/material";
+import { Avatar, Box, IconButton, Stack, TextField, Typography as Type } from "@mui/material";
+import { debounce, set, slice, startCase } from "lodash";
+import { createElement, ForwardedRef, forwardRef, ReactNode, useEffect, useMemo, useState } from "react";
+import { inferLayerName, layerHandlers } from "./layers/LayerSource";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
-import {
-  ManagedModal as Dialog,
-  AppBarTitle as Title,
-} from "components/generic/Modal";
+import { AppBarTitle as Title, ManagedModal as Dialog } from "components/generic/Modal";
 import { Space } from "components/generic/Space";
-import { debounce, set, slice, startCase } from "lodash";
 import { produce } from "produce";
-import {
-  ForwardedRef,
-  ReactNode,
-  createElement,
-  forwardRef,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
 import { Layer } from "slices/UIState";
-import { inferLayerName, layerHandlers } from "./layers/LayerSource";
 
 type LayerEditorProps = {
   value: Layer;

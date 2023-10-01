@@ -1,24 +1,14 @@
-import {
-  AccountTreeTwoTone,
-  BugReportTwoTone,
-  InfoTwoTone,
-  LayersTwoTone,
-  ListTwoTone,
-  SettingsInputComponentTwoTone,
-  SettingsTwoTone,
-  SortTwoTone as StepsIcon,
-  ViewInArTwoTone,
-} from "@mui/icons-material";
+import { AccountTreeTwoTone, BugReportTwoTone, InfoTwoTone, LayersTwoTone, ListTwoTone, SettingsInputComponentTwoTone, SettingsTwoTone, SortTwoTone as StepsIcon, ViewInArTwoTone } from "@mui/icons-material";
 import { Dictionary } from "lodash";
 import { ReactNode } from "react";
-import { InfoPage } from "./InfoPage";
-import { ViewportPage } from "./ViewportPage";
-import { LayersPage } from "./LayersPage";
-import { DebugPage } from "./DebugPage";
-import { StepsPage } from "./StepsPage";
-import { SettingsPage } from "./SettingsPage";
 import { AboutPage } from "./AboutPage";
+import { DebugPage } from "./DebugPage";
+import { InfoPage } from "./InfoPage";
+import { LayersPage } from "./LayersPage";
+import { SettingsPage } from "./SettingsPage";
+import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
+import { ViewportPage } from "./ViewportPage";
 
 export type PageMeta = {
   id: string;

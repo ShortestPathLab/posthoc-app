@@ -1,5 +1,5 @@
-import { Layer } from "./UIState";
 import { createSlice } from "./createSlice";
+import { Layer } from "./UIState";
 
 export type Specimen = {
   layers?: Layer[];

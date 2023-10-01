@@ -1,8 +1,8 @@
-import { CircularProgress, useTheme } from "@mui/material";
 import Editor from "@monaco-editor/react";
-import { Flex } from "components/generic/Flex";
+import { CircularProgress, useTheme } from "@mui/material";
 import { debounce } from "lodash";
 import AutoSize from "react-virtualized-auto-sizer";
+import { Flex } from "components/generic/Flex";
 import { useUIState } from "slices/UIState";
 
 const DELAY = 2500;

@@ -7,12 +7,19 @@ import {
   Button,
   CircularProgress,
   Divider,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Typography as Type,
   useTheme,
 } from "@mui/material";
+import { delay, find, head, map } from "lodash";
+import { TraceEvent } from "protocol";
+import {
+  cloneElement,
+  createElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Playback } from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
@@ -27,20 +34,10 @@ import {
   inferLayerName,
   layerHandlers,
 } from "components/layer-editor/layers/LayerSource";
-import { delay, find, head, map } from "lodash";
 import { Page } from "pages/Page";
-import { TraceEvent } from "protocol";
-import {
-  cloneElement,
-  createElement,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useUIState } from "slices/UIState";
 import { useLoading } from "slices/loading";
 import { usePlayback } from "slices/playback";
+import { useUIState } from "slices/UIState";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -100,8 +97,12 @@ export function StepsPage() {
                           height: "100%",
                         }}
                         items={steps}
-                        listOptions={{ ref, defaultItemHeight: 80 }}
-                        placeholder={<Skeleton />}
+                        listOptions={{
+                          ref,
+                          defaultItemHeight: 80,
+                          overscan: 0,
+                        }}
+                        // placeholder={<Skeleton />}
                         renderItem={(item, i) => (
                           <Box
                             sx={{

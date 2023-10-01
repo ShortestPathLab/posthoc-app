@@ -2,9 +2,9 @@ import renderers from "internal-renderers";
 import { Dictionary } from "lodash";
 import { useAsync } from "react-async-hook";
 import { RendererDefinition } from "renderer";
+import url from "url-parse";
 import { Renderer, useRenderers } from "slices/renderers";
 import { useSettings } from "slices/settings";
-import url from "url-parse";
 
 type RendererTransportOptions = { url: string };
 

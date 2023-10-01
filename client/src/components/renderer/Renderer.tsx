@@ -1,10 +1,8 @@
 import { TraceEvent } from "protocol/Trace";
 import { FunctionComponent, Ref, RefCallback } from "react";
-import { Point } from "./Size";
 import { ComponentEntry, Renderer } from "renderer";
-import { Dictionary } from "lodash";
+import { Point } from "./Size";
 import { Layer } from "slices/UIState";
-import { CompiledComponent } from "protocol";
 
 type Step = {
   index: number;

@@ -1,13 +1,13 @@
-import { makeTemplate } from "components/script-editor/makeTemplate";
-import { templates } from "components/script-editor/templates";
 import { values } from "lodash";
+import { nanoid as id } from "nanoid";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
+import { ParamsOf } from "protocol/Message";
 import { Parameters, PathfindingTask } from "protocol/SolveTask";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { createSlice } from "./createSlice";
-import { nanoid as id } from "nanoid";
-import { StackProps } from "@mui/material";
-import { ParamsOf } from "protocol/Message";
+import { makeTemplate } from "components/script-editor/makeTemplate";
+import { templates } from "components/script-editor/templates";
+
 export type Map = Partial<
   Feature & {
     format: string;

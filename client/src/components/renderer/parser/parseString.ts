@@ -1,8 +1,5 @@
 import { join } from "lodash";
-import {
-  evaluateParsedString as evaluateTemplate,
-  parseStringTemplateGenerator as makeParser,
-} from "string-template-parser";
+import { evaluateParsedString as evaluateTemplate, parseStringTemplateGenerator as makeParser } from "string-template-parser";
 import { Prop } from "./Context";
 import { parseToken } from "./parseToken";
 

@@ -1,16 +1,16 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Button, Tab, Typography as Type } from "@mui/material";
+import { ReactNode, useState } from "react";
+import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
+import { saveJSON as save } from "components/debug-options-editor/saveJSON";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/Switch";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "pages/Page";
 import { ScriptEditor } from "components/script-editor/ScriptEditor";
-import { ReactNode, useState } from "react";
-import { useUIState } from "slices/UIState";
+import { Page } from "pages/Page";
 import { useSpecimen } from "slices/specimen";
-import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
-import { saveJSON as save } from "components/debug-options-editor/saveJSON";
+import { useUIState } from "slices/UIState";
 
 export function DebugPage() {
   const { controls, onChange, state } = useViewTreeContext();

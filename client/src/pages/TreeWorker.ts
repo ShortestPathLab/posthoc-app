@@ -1,7 +1,7 @@
-import { useMemo } from "react";
 import { useAsync } from "react-async-hook";
-import { usingMemoizedWorkerTask } from "workers/usingWorker";
+import { useMemo } from "react";
 import { TreeWorkerParameters, TreeWorkerReturnType } from "./tree.worker";
+import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import treeWorkerUrl from "./tree.worker.ts?worker&url";
 
 export class TreeWorkerUrl extends Worker {

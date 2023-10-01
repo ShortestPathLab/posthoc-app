@@ -1,16 +1,10 @@
+import { colors, useTheme } from "@mui/material";
 import { map } from "lodash";
+import { CompiledComponent, EventContext, ParsedComponent, Trace, TraceEvent } from "protocol";
 import { useMemo } from "react";
-import {
-  CompiledComponent,
-  EventContext,
-  ParsedComponent,
-  Trace,
-  TraceEvent,
-} from "protocol";
+import { colorsHex } from "components/renderer/colors";
 import { parse } from "components/renderer/parser";
 import { mapProperties } from "components/renderer/parser/mapProperties";
-import { colors, useTheme } from "@mui/material";
-import { colorsHex } from "components/renderer/colors";
 
 export const context: EventContext = {
   color: colorsHex,
