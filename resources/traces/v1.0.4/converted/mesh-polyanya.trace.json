@@ -1,77 +1,62 @@
 {
   "version": "1.0.4",
   "render": {
-    "components": {},
+    "context": {},
+    "components": {
+      "node": [ { "$": "circle", "radius": 1, "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" } ],
+      "line1": [
+        {
+          "$": "path",
+          "points": [
+            { "x": "{{ctx.x2}}", "y": "{{ctx.y2}}" },
+            { "x": "{{ctx.x3}}", "y": "{{ctx.y3}}" }
+          ]
+        }
+      ],
+      "line2": [
+        {
+          "$": "path",
+          "points": [
+            { "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" },
+            { "x": "{{ctx.x2}}", "y": "{{ctx.y2}}" }
+          ]
+        }
+      ],
+      "line3": [
+        {
+          "$": "path",
+          "points": [
+            { "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" },
+            { "x": "{{ctx.x3}}", "y": "{{ctx.y3}}" }
+          ]
+        }
+      ],
+      "triangle": [
+        {
+          "$": "polygon",
+          "points": [
+            { "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" },
+            { "x": "{{ctx.x2}}", "y": "{{ctx.y2}}" },
+            { "x": "{{ctx.x3}}", "y": "{{ctx.y3}}" }
+          ],
+          "persist": false
+        }
+      ],
+      "mesh-event": [
+        { "$": "node" },
+        { "$": "line1" },
+        { "$": "line2" },
+        { "$": "line3" },
+        { "$": "triangle" }
+      ]
+    },
     "views": {
-      "main": {
-        "components": [
-          {
-            "$": "rect",
-            "fill": "{{ctx.color[ctx.type]}}",
-            "width": 1,
-            "height": 1,
-            "x": "{{'x' in ctx ? ctx.x : 0}}",
-            "y": "{{'y' in ctx ? ctx.y : 0}}"
-          }
-        ]
-      }
+      "main": { "renderer": "2d-pixi", "components": [ { "$": "mesh-event" } ] }
     }
   },
   "path": {
     "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
     "scale": 1
-  },
-  "context": {},
-  "components": {
-    "node": [ { "$": "circle", "radius": 1, "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" } ],
-    "line1": [
-      {
-        "$": "path",
-        "points": [
-          { "x": "{{ctx.x2}}", "y": "{{ctx.y2}}" },
-          { "x": "{{ctx.x3}}", "y": "{{ctx.y3}}" }
-        ]
-      }
-    ],
-    "line2": [
-      {
-        "$": "path",
-        "points": [
-          { "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" },
-          { "x": "{{ctx.x2}}", "y": "{{ctx.y2}}" }
-        ]
-      }
-    ],
-    "line3": [
-      {
-        "$": "path",
-        "points": [
-          { "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" },
-          { "x": "{{ctx.x3}}", "y": "{{ctx.y3}}" }
-        ]
-      }
-    ],
-    "triangle": [
-      {
-        "$": "polygon",
-        "points": [
-          { "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" },
-          { "x": "{{ctx.x2}}", "y": "{{ctx.y2}}" },
-          { "x": "{{ctx.x3}}", "y": "{{ctx.y3}}" }
-        ],
-        "persist": false
-      }
-    ],
-    "mesh-event": [
-      { "$": "node" },
-      { "$": "line1" },
-      { "$": "line2" },
-      { "$": "line3" },
-      { "$": "triangle" }
-    ]
-  },
-  "views": {
-    "main": { "renderer": "2d-pixi", "components": [ { "$": "mesh-event" } ] }
   },
   "events": [
     {

@@ -1,32 +1,17 @@
 {
   "version": "1.0.4",
   "render": {
-    "components": {},
     "views": {
       "main": {
-        "components": [
-          {
-            "$": "rect",
-            "fill": "{{ctx.color[ctx.type]}}",
-            "width": 1,
-            "height": 1,
-            "x": "{{'x' in ctx ? ctx.x : 0}}",
-            "y": "{{'y' in ctx ? ctx.y : 0}}"
-          }
-        ]
+        "renderer": "2d-pixi",
+        "components": [ { "$": "grid-view" } ],
+        "type": "search"
       }
     }
   },
   "path": {
     "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
     "scale": 1
-  },
-  "views": {
-    "main": {
-      "renderer": "2d-pixi",
-      "components": [ { "$": "grid-view" } ],
-      "type": "search"
-    }
   },
   "events": [
     { "type": "source", "id": 1736, "x": 8, "y": 15 },

@@ -1,53 +1,42 @@
 {
   "version": "1.0.4",
   "render": {
-    "components": {},
+    "components": {
+      "node": [
+        {
+          "$": "circle",
+          "radius": 120,
+          "x": "{{ctx.x}}",
+          "y": "{{ctx.y}}",
+          "fill": "{{ctx.color[ctx.type]}}"
+        }
+      ],
+      "line": [
+        {
+          "$": "path",
+          "points": [
+            {
+              "x": "{{ctx.parent ? ctx.parent.x : ctx.x}}",
+              "y": "{{ctx.parent ? ctx.parent.y : ctx.y}}"
+            },
+            { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }
+          ],
+          "fill": "{{ctx.color[ctx.type]}}",
+          "lineWidth": 90
+        }
+      ]
+    },
     "views": {
       "main": {
-        "components": [
-          {
-            "$": "rect",
-            "fill": "{{ctx.color[ctx.type]}}",
-            "width": 1,
-            "height": 1,
-            "x": "{{'x' in ctx ? ctx.x : 0}}",
-            "y": "{{'y' in ctx ? ctx.y : 0}}"
-          }
-        ]
+        "renderer": "2d-pixi",
+        "components": [ { "$": "node" }, { "$": "line" } ]
       }
-    }
+    },
+    "path": { "pivot": { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }, "scale": 120 }
   },
-  "path": { "pivot": { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }, "scale": 120 },
-  "components": {
-    "node": [
-      {
-        "$": "circle",
-        "radius": 120,
-        "x": "{{ctx.x}}",
-        "y": "{{ctx.y}}",
-        "fill": "{{ctx.color[ctx.type]}}"
-      }
-    ],
-    "line": [
-      {
-        "$": "path",
-        "points": [
-          {
-            "x": "{{ctx.parent ? ctx.parent.x : ctx.x}}",
-            "y": "{{ctx.parent ? ctx.parent.y : ctx.y}}"
-          },
-          { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }
-        ],
-        "fill": "{{ctx.color[ctx.type]}}",
-        "lineWidth": 90
-      }
-    ]
-  },
-  "views": {
-    "main": {
-      "renderer": "2d-pixi",
-      "components": [ { "$": "node" }, { "$": "line" } ]
-    }
+  "path": {
+    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
+    "scale": 1
   },
   "events": [
     { "id": "f-42", "type": "source", "x": -73533430, "y": 41103106 },

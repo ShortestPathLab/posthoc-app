@@ -1,59 +1,42 @@
 {
   "version": "1.0.4",
   "render": {
-    "components": {},
+    "components": {
+      "tile": [
+        {
+          "$": "rect",
+          "width": 0.98,
+          "height": 0.98,
+          "text": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] === 0 ? '' : ctx[`${ctx.tile_x}${ctx.tile_y}`]}}",
+          "textX": 0.27,
+          "textY": 0.75,
+          "fill": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] ? ctx.themeTextPrimary : ctx.themeAccent}}",
+          "fontSize": 0.75,
+          "fontColor": "{{ctx.themeBackground}}",
+          "x": "{{ctx.tile_x}}",
+          "y": "{{ctx.tile_y}}",
+          "display": "persistent"
+        }
+      ],
+      "tilerow": [
+        { "$": "tile", "tile_x": 1 },
+        { "$": "tile", "tile_x": 2 },
+        { "$": "tile", "tile_x": 3 }
+      ],
+      "tileboard": [
+        { "$": "tilerow", "tile_y": 1 },
+        { "$": "tilerow", "tile_y": 2 },
+        { "$": "tilerow", "tile_y": 3 }
+      ]
+    },
     "views": {
-      "main": {
-        "components": [
-          {
-            "$": "rect",
-            "fill": "{{ctx.color[ctx.type]}}",
-            "width": 1,
-            "height": 1,
-            "x": "{{'x' in ctx ? ctx.x : 0}}",
-            "y": "{{'y' in ctx ? ctx.y : 0}}"
-          }
-        ]
-      }
+      "main": { "renderer": "2d-pixi", "components": [ { "$": "tileboard" } ] },
+      "someOtherView": { "renderer": "2d-pixi", "components": [ { "$": "tileboard" } ] }
     }
   },
   "path": {
-    "pivot": {
-      "x": "{{'x' in ctx ? ctx.x : 0}}",
-      "y": "{{'y' in ctx ? ctx.y : 0}}"
-    },
+    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
     "scale": 1
-  },
-  "components": {
-    "tile": [
-      {
-        "$": "rect",
-        "width": 0.98,
-        "height": 0.98,
-        "text": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] === 0 ? '' : ctx[`${ctx.tile_x}${ctx.tile_y}`]}}",
-        "textX": 0.27,
-        "textY": 0.75,
-        "fill": "{{ctx[`${ctx.tile_x}${ctx.tile_y}`] ? ctx.themeTextPrimary : ctx.themeAccent}}",
-        "fontSize": 0.75,
-        "fontColor": "{{ctx.themeBackground}}",
-        "x": "{{ctx.tile_x}}",
-        "y": "{{ctx.tile_y}}",
-        "display": "persistent"
-      }
-    ],
-    "tilerow": [
-      { "$": "tile", "tile_x": 1 },
-      { "$": "tile", "tile_x": 2 },
-      { "$": "tile", "tile_x": 3 }
-    ],
-    "tileboard": [
-      { "$": "tilerow", "tile_y": 1 },
-      { "$": "tilerow", "tile_y": 2 },
-      { "$": "tilerow", "tile_y": 3 }
-    ]
-  },
-  "views": {
-    "main": { "renderer": "2d-pixi", "components": [{ "$": "tileboard" }] }
   },
   "events": [
     {

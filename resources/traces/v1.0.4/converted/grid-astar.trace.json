@@ -1,40 +1,29 @@
 {
   "version": "1.0.4",
   "render": {
-    "components": {},
-    "views": {
-      "main": {
-        "components": [
-          {
-            "$": "rect",
-            "fill": "{{ctx.color[ctx.type]}}",
-            "width": 1,
-            "height": 1,
-            "x": "{{'x' in ctx ? ctx.x : 0}}",
-            "y": "{{'y' in ctx ? ctx.y : 0}}"
-          }
-        ]
-      }
+    "context": {},
+    "components": {
+      "tile": [
+        {
+          "$": "rect",
+          "width": 1,
+          "height": 1,
+          "x": "{{ctx.x}}",
+          "y": "{{ctx.y}}",
+          "fill": "{{ctx.color[ctx.type]}}"
+        }
+      ]
+    },
+    "views": { "main": { "renderer": "2d-pixi", "components": [ { "$": "tile" } ] } },
+    "path": {
+      "pivot": { "x": "{{ctx.x + 0.5}}", "y": "{{ctx.y + 0.5}}" },
+      "scale": 0.3
     }
   },
   "path": {
-    "pivot": { "x": "{{ctx.x + 0.5}}", "y": "{{ctx.y + 0.5}}" },
-    "scale": 0.3
+    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
+    "scale": 1
   },
-  "context": {},
-  "components": {
-    "tile": [
-      {
-        "$": "rect",
-        "width": 1,
-        "height": 1,
-        "x": "{{ctx.x}}",
-        "y": "{{ctx.y}}",
-        "fill": "{{ctx.color[ctx.type]}}"
-      }
-    ]
-  },
-  "views": { "main": { "renderer": "2d-pixi", "components": [ { "$": "tile" } ] } },
   "events": [
     { "type": "source", "id": 1736, "x": 8, "y": 15 },
     { "type": "destination", "id": 4419, "x": 3, "y": 43 },

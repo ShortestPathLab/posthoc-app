@@ -1,55 +1,40 @@
 {
   "version": "1.0.4",
   "render": {
-    "components": {},
+    "components": {
+      "node": [
+        {
+          "$": "circle",
+          "radius": 0.3,
+          "x": "{{ctx.x}}",
+          "y": "{{ctx.y}}",
+          "drawPath": true,
+          "fill": "{{ctx.color[ctx.type]}}"
+        }
+      ],
+      "line": [
+        {
+          "$": "path",
+          "points": [
+            {
+              "x": "{{ctx.parent ? ctx.parent.x: ctx.x}}",
+              "y": "{{ctx.parent ? ctx.parent.y: ctx.y}}"
+            },
+            { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }
+          ],
+          "fill": "{{ctx.themeTextPrimary}}",
+          "lineWidth": 0.125
+        }
+      ],
+      "road-event": [ { "$": "line" }, { "$": "node" } ]
+    },
     "views": {
-      "main": {
-        "components": [
-          {
-            "$": "rect",
-            "fill": "{{ctx.color[ctx.type]}}",
-            "width": 1,
-            "height": 1,
-            "x": "{{'x' in ctx ? ctx.x : 0}}",
-            "y": "{{'y' in ctx ? ctx.y : 0}}"
-          }
-        ]
-      }
+      "main": { "renderer": "2d-pixi", "components": [ { "$": "road-event" } ] }
     }
   },
   "path": {
     "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
     "scale": 1
-  },
-  "components": {
-    "node": [
-      {
-        "$": "circle",
-        "radius": 0.3,
-        "x": "{{ctx.x}}",
-        "y": "{{ctx.y}}",
-        "drawPath": true,
-        "fill": "{{ctx.color[ctx.type]}}"
-      }
-    ],
-    "line": [
-      {
-        "$": "path",
-        "points": [
-          {
-            "x": "{{ctx.parent ? ctx.parent.x: ctx.x}}",
-            "y": "{{ctx.parent ? ctx.parent.y: ctx.y}}"
-          },
-          { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }
-        ],
-        "fill": "{{ctx.themeTextPrimary}}",
-        "lineWidth": 0.125
-      }
-    ],
-    "road-event": [ { "$": "line" }, { "$": "node" } ]
-  },
-  "views": {
-    "main": { "renderer": "2d-pixi", "components": [ { "$": "road-event" } ] }
   },
   "events": [
     { "id": 1736, "type": "source", "x": 8, "y": 15 },

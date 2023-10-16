@@ -1,28 +1,13 @@
 {
   "version": "1.0.4",
   "render": {
-    "components": {},
     "views": {
-      "main": {
-        "components": [
-          {
-            "$": "rect",
-            "fill": "{{ctx.color[ctx.type]}}",
-            "width": 1,
-            "height": 1,
-            "x": "{{'x' in ctx ? ctx.x : 0}}",
-            "y": "{{'y' in ctx ? ctx.y : 0}}"
-          }
-        ]
-      }
+      "main": { "renderer": "2d-pixi", "components": [ { "$": "road-view" } ] }
     }
   },
   "path": {
     "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
     "scale": 1
-  },
-  "views": {
-    "main": { "renderer": "2d-pixi", "components": [ { "$": "road-view" } ] }
   },
   "events": [
     { "id": 1736, "type": "source", "x": 8, "y": 15 },
