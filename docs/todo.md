@@ -12,6 +12,8 @@
 
 - [ ] Command system
 
+- [ ] Debug features
+
 ## Enhancement
 
 - [ ] UI improvements

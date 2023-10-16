@@ -28,6 +28,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
       },
       button: {
         textTransform: "none",
+        fontWeight: 400,
         letterSpacing: 0,
       },
     },
@@ -35,17 +36,17 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
       MuiTypography: {
         styleOverrides: {
           body1: {
-            fontWeight: 500,
+            fontWeight: 400,
             fontSize: "0.875rem",
           },
           overline: {
-            fontWeight: 500,
+            fontWeight: 400,
             textTransform: "none",
             letterSpacing: 0,
             fontSize: "0.875rem",
           },
           h6: {
-            fontWeight: 600,
+            fontWeight: 500,
             letterSpacing: -0.4,
           },
         },

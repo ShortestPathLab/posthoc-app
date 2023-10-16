@@ -1,9 +1,18 @@
-import { EditTwoTone as EditIcon } from "@mui/icons-material";
-import { Box, Switch, TextField, Tooltip, Typography as Type } from "@mui/material";
+import { EditOutlined as EditIcon } from "@mui/icons-material";
+import {
+  Box,
+  Switch,
+  TextField,
+  Tooltip,
+  Typography as Type,
+} from "@mui/material";
 import { entries, find, join, startCase } from "lodash";
 import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
-import { AppBarTitle as Title, ManagedModal as Dialog } from "components/generic/Modal";
+import {
+  AppBarTitle as Title,
+  ManagedModal as Dialog,
+} from "components/generic/Modal";
 import { OverlineDot as Dot } from "components/generic/Overline";
 import { SelectField as Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";

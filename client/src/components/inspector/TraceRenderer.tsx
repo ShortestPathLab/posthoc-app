@@ -1,9 +1,19 @@
-import { BlurOnTwoTone as DisabledIcon, ViewInArTwoTone } from "@mui/icons-material";
+import {
+  BlurOnOutlined as DisabledIcon,
+  ViewInArOutlined,
+} from "@mui/icons-material";
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { find, map } from "lodash";
 import { Size } from "protocol";
 import { useDebounce } from "react-use";
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Renderer, RendererEvent } from "renderer";
 import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
@@ -148,7 +158,7 @@ export function TraceRenderer({
           )
         ) : (
           <Placeholder
-            icon={<ViewInArTwoTone />}
+            icon={<ViewInArOutlined />}
             label="No layers to render"
             width={width}
             height={height}

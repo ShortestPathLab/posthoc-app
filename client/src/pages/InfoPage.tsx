@@ -1,4 +1,4 @@
-import { ListTwoTone } from "@mui/icons-material";
+import { ListOutlined } from "@mui/icons-material";
 import { Divider, List, ListItem, ListItemText } from "@mui/material";
 import { map } from "lodash";
 import { Flex } from "components/generic/Flex";
@@ -32,7 +32,7 @@ export function InfoPage() {
               </List>
             </Scroll>
           ) : (
-            <Placeholder pt={6} label="Logs" icon={<ListTwoTone />} />
+            <Placeholder pt={6} label="Logs" icon={<ListOutlined />} />
           )}
         </Flex>
       </Page.Content>

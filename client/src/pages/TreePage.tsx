@@ -1,8 +1,8 @@
 import {
-  AccountTreeTwoTone,
+  AccountTreeOutlined,
   ChevronRightOutlined,
-  LayersTwoTone as LayersIcon,
-  VisibilityTwoTone,
+  LayersOutlined as LayersIcon,
+  VisibilityOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -144,7 +144,7 @@ export function TreePage() {
               )}
             </AutoSize>
           ) : (
-            <Placeholder icon={<AccountTreeTwoTone />} label="Tree" />
+            <Placeholder icon={<AccountTreeOutlined />} label="Tree" />
           )}
         </Flex>
       </Page.Content>{" "}
@@ -162,7 +162,7 @@ export function TreePage() {
         />
         {divider}
         <FeaturePicker
-          icon={<VisibilityTwoTone />}
+          icon={<VisibilityOutlined />}
           label="Radius"
           value={radius}
           onChange={(e) => setRadius(e as keyof typeof radius2)}

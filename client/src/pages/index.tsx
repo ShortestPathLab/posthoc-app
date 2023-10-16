@@ -1,4 +1,14 @@
-import { AccountTreeTwoTone, BugReportTwoTone, InfoTwoTone, LayersTwoTone, ListTwoTone, SettingsInputComponentTwoTone, SettingsTwoTone, SortTwoTone as StepsIcon, ViewInArTwoTone } from "@mui/icons-material";
+import {
+  AccountTreeOutlined,
+  BugReportOutlined,
+  InfoOutlined,
+  LayersOutlined,
+  ListOutlined,
+  SettingsInputComponentOutlined,
+  SettingsOutlined,
+  SortOutlined as StepsIcon,
+  ViewInArOutlined,
+} from "@mui/icons-material";
 import { Dictionary } from "lodash";
 import { ReactNode } from "react";
 import { AboutPage } from "./AboutPage";
@@ -21,13 +31,13 @@ export const pages: Dictionary<PageMeta> = {
   viewport: {
     id: "viewport",
     name: "Viewport",
-    icon: <ViewInArTwoTone />,
+    icon: <ViewInArOutlined />,
     content: ViewportPage,
   },
   tree: {
     id: "tree",
     name: "Tree",
-    icon: <AccountTreeTwoTone />,
+    icon: <AccountTreeOutlined />,
     content: TreePage,
   },
   steps: {
@@ -39,37 +49,31 @@ export const pages: Dictionary<PageMeta> = {
   info: {
     id: "info",
     name: "Logs",
-    icon: <ListTwoTone />,
+    icon: <ListOutlined />,
     content: InfoPage,
   },
   layers: {
     id: "layers",
     name: "Layers",
-    icon: <LayersTwoTone />,
+    icon: <LayersOutlined />,
     content: LayersPage,
-  },
-  parameters: {
-    id: "parameters",
-    name: "Parameters",
-    icon: <SettingsInputComponentTwoTone />,
-    content: InfoPage,
   },
   debug: {
     id: "debug",
     name: "Debugger",
-    icon: <BugReportTwoTone />,
+    icon: <BugReportOutlined />,
     content: DebugPage,
   },
   settings: {
     id: "settings",
     name: "Settings",
-    icon: <SettingsTwoTone />,
+    icon: <SettingsOutlined />,
     content: SettingsPage,
   },
   about: {
     id: "about",
     name: "About",
-    icon: <InfoTwoTone />,
+    icon: <InfoOutlined />,
     content: AboutPage,
   },
 };

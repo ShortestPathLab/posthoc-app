@@ -1,4 +1,4 @@
-import { EditTwoTone } from "@mui/icons-material";
+import { EditOutlined } from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -106,7 +106,7 @@ function Component(
             appBar={{ children: <Title>Edit Layer</Title> }}
             trigger={(onClick) => (
               <IconButton size="small" onClick={onClick}>
-                <EditTwoTone />
+                <EditOutlined />
               </IconButton>
             )}
           >

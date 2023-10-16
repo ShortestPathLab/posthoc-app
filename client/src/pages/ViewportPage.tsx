@@ -1,8 +1,8 @@
 import {
-  BlurCircularTwoTone,
-  CenterFocusStrongTwoTone,
-  CropFreeTwoTone,
-  LayersTwoTone,
+  BlurCircularOutlined,
+  CenterFocusStrongOutlined,
+  CropFreeOutlined,
+  LayersOutlined,
 } from "@mui/icons-material";
 import { Box, Button, Divider, Stack } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
@@ -81,7 +81,7 @@ export function ViewportPage() {
         <Stack direction="row">
           <FeaturePicker
             label="Renderer"
-            icon={<BlurCircularTwoTone />}
+            icon={<BlurCircularOutlined />}
             value={state?.renderer ?? "internal:auto"}
             onChange={(v) => onChange?.({ renderer: v })}
             items={[
@@ -101,7 +101,7 @@ export function ViewportPage() {
           <FeaturePickerMulti
             defaultChecked
             label="Layers"
-            icon={<LayersTwoTone />}
+            icon={<LayersOutlined />}
             value={layerSet}
             onChange={setLayerSet}
             items={map(layers, (c) => ({
@@ -116,7 +116,7 @@ export function ViewportPage() {
             onClick={() => {
               rendererInstance?.fitCamera();
             }}
-            startIcon={<CenterFocusStrongTwoTone />}
+            startIcon={<CenterFocusStrongOutlined />}
           >
             Fit
           </Button>
@@ -125,7 +125,7 @@ export function ViewportPage() {
             onClick={() => {
               rendererInstance?.initialCamera();
             }}
-            startIcon={<CropFreeTwoTone />}
+            startIcon={<CropFreeOutlined />}
           >
             1:1
           </Button>

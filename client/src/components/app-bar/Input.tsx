@@ -1,4 +1,4 @@
-import { FileOpenTwoTone } from "@mui/icons-material";
+import { FileOpenOutlined } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { find } from "lodash";
 import { EditorProps } from "../Editor";
@@ -20,7 +20,7 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
   return (
     <FeaturePicker
       showArrow
-      icon={<FileOpenTwoTone />}
+      icon={<FileOpenOutlined />}
       label="Choose Map"
       value={value?.id}
       items={[
@@ -59,7 +59,7 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
   const usingLoadingState = useLoadingState("specimen");
   return (
     <Button
-      startIcon={<FileOpenTwoTone />}
+      startIcon={<FileOpenOutlined />}
       onClick={async () => {
         try {
           const f = await uploadTrace();

@@ -1,6 +1,6 @@
 import {
-  LayersTwoTone as LayersIcon,
-  SortTwoTone as StepsIcon,
+  LayersOutlined as LayersIcon,
+  SortOutlined as StepsIcon,
 } from "@mui/icons-material";
 import {
   Box,

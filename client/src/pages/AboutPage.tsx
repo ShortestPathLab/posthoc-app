@@ -16,8 +16,7 @@ import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { Page } from "pages/Page";
 import logo from "public/logo512.png";
-
-const version = "1.0.4";
+import { version_name, name } from "manifest.json";
 
 const contacts = [
   { name: "Dr Daniel Harabor", email: "daniel.harabor@monash.edu" },
@@ -52,18 +51,22 @@ export function AboutPage() {
               <Box sx={{ pt: 6, pb: 2 }}>
                 <img src={logo} height="64" />
               </Box>
-              <Type variant="h6">Waypoint {version}</Type>
-              {renderSection("Build Info", <>{version}; late September 2023</>)}
+              <Type variant="h6">
+                {name} {version_name}
+              </Type>
+              {renderSection(
+                "Build Info",
+                <>{version_name}; late September 2023</>
+              )}
               {renderSection(
                 "About this App",
                 <>
-                  Waypoint is a visualising debugging tool for pathfinding
-                  search. It can be used to visualise progression of search and
-                  debug pathfinding algorithms. It can handle range of different
-                  types of algorithms (demos are provided in the home page).
-                  This tool is highly customizable and provide flexibility to
-                  visualise any algorithm trace that you can augment using our
-                  docs.
+                  {name} is a visualising debugging tool for pathfinding search.
+                  It can be used to visualise progression of search and debug
+                  pathfinding algorithms. It can handle range of different types
+                  of algorithms (demos are provided in the home page). This tool
+                  is highly customizable and provide flexibility to visualise
+                  any algorithm trace that you can augment using our docs.
                 </>
               )}
               {renderSection(
