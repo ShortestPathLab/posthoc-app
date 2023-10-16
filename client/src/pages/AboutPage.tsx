@@ -51,13 +51,8 @@ export function AboutPage() {
               <Box sx={{ pt: 6, pb: 2 }}>
                 <img src={logo} height="64" />
               </Box>
-              <Type variant="h6">
-                {name} {version_name}
-              </Type>
-              {renderSection(
-                "Build Info",
-                <>{version_name}; late September 2023</>
-              )}
+              <Type variant="h6">{name}</Type>
+              {renderSection("Build Info", <>{version_name}</>)}
               {renderSection(
                 "About this App",
                 <>
