@@ -10,7 +10,22 @@ import {
   Typography as Type,
   useTheme,
 } from "@mui/material";
+import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { Playback } from "components/app-bar/Playback";
+import { Flex } from "components/generic/Flex";
+import {
+  LazyList as List,
+  LazyListHandle as ListHandle,
+} from "components/generic/LazyList";
+import { EventInspector } from "components/inspector/EventInspector";
+import { Placeholder } from "components/inspector/Placeholder";
+import { useViewTreeContext } from "components/inspector/ViewTree";
+import {
+  inferLayerName,
+  layerHandlers,
+} from "components/layer-editor/layers/LayerSource";
 import { delay, find, head, map } from "lodash";
+import { Page } from "pages/Page";
 import { TraceEvent } from "protocol";
 import {
   cloneElement,
@@ -20,24 +35,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Playback } from "components/app-bar/Playback";
-import { Flex } from "components/generic/Flex";
-import {
-  LazyList as List,
-  LazyListHandle as ListHandle,
-} from "components/generic/LazyList";
-import { EventInspector, Skeleton } from "components/inspector/EventInspector";
-import { Placeholder } from "components/inspector/Placeholder";
-import { useViewTreeContext } from "components/inspector/ViewTree";
-import {
-  inferLayerName,
-  layerHandlers,
-} from "components/layer-editor/layers/LayerSource";
-import { Page } from "pages/Page";
-import { useLoading } from "slices/loading";
-import { usePlayback } from "slices/playback";
 import { useUIState } from "slices/UIState";
+import { usePlayback } from "slices/playback";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -46,7 +45,6 @@ const pxToInt = (s: string) => Number(s.replace(/px$/, ""));
 export function StepsPage() {
   const { spacing } = useTheme();
   const { controls, onChange, state } = useViewTreeContext();
-  const [loading] = useLoading();
   const [{ step = 0, playback }, setPlayback] = usePlayback();
   const [{ layers }] = useUIState();
   const ref = useRef<ListHandle | null>(null);
@@ -60,7 +58,7 @@ export function StepsPage() {
 
   const steps = useMemo(() => {
     if (layer) {
-      return createElement(layerHandlers[layer?.source?.type ?? ""]?.steps!, {
+      return createElement(layerHandlers[layer?.source?.type ?? ""]!.steps!, {
         layer,
       });
     }

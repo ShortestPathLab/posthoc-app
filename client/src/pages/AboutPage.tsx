@@ -1,5 +1,14 @@
 import { GitHub } from "@mui/icons-material";
-import { Avatar, Box, List, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography as Type } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  List,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography as Type,
+} from "@mui/material";
 import { head } from "lodash";
 import { ReactNode } from "react";
 import { Flex } from "components/generic/Flex";
@@ -63,8 +72,8 @@ export function AboutPage() {
                   Our team is made up of present/past Monash students and
                   Professors Dr Daniel Harabor:
                   <List sx={{ mx: -2 }}>
-                    {contacts.map(({ name, email }) => (
-                      <ListItemButton href={`mailto:${email}`}>
+                    {contacts.map(({ name, email }, i) => (
+                      <ListItemButton href={`mailto:${email}`} key={i}>
                         <ListItemAvatar>
                           <Avatar>{head(name)}</Avatar>
                         </ListItemAvatar>

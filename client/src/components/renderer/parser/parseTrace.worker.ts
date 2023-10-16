@@ -1,4 +1,4 @@
-import { chain, find, findLast, forEach, last, map } from "lodash";
+import { chain, findLast, map } from "lodash";
 import {
   CompiledComponent,
   EventContext,
@@ -17,33 +17,6 @@ type Key = string | number;
 
 type KeyRef = Key | null | undefined;
 
-function makePathIndex({ trace }: Pick<ParseTraceWorkerParameters, "trace">) {
-  type A = {
-    id: Key;
-    pId: KeyRef;
-    step: number;
-    prev?: A;
-  };
-
-  const cache: A[] = [];
-  const dict: { [K in Key]: KeyRef } = {};
-  forEach(trace?.events, ({ id, pId }, i) => {
-    if (!isNullish(pId) && dict[id] !== pId) {
-      cache.push({ id, pId, step: i, prev: last(cache) });
-      dict[id] = pId;
-    }
-  });
-  return {
-    getParent: (id: Key, step: number = trace?.events?.length ?? 0) => {
-      let entry = findLast(cache, (c) => c.step <= step);
-      while (entry) {
-        if (entry.id === id) return entry.pId;
-        entry = entry.prev;
-      }
-    },
-  };
-}
-
 function parse({
   trace,
   context,
@@ -57,11 +30,11 @@ function parse({
   const apply = (
     event: TraceEvent,
     ctx?: EventContext
-  ): CompiledComponent<string, {}>[] =>
+  ): CompiledComponent<string, Record<string, any>>[] =>
     map(parsed, (p) =>
       mapProperties<
         ParsedComponent<string, any>,
-        CompiledComponent<string, {}>
+        CompiledComponent<string, Record<string, any>>
       >(p, (c) =>
         c({
           alpha: 1,
@@ -73,10 +46,11 @@ function parse({
     );
 
   const isVisible = (c: CompiledComponent<string, { alpha?: number }>) =>
-    c && c.hasOwnProperty("alpha") ? c!.alpha! > 0 : true;
+    c && Object.hasOwn(c, "alpha") ? c!.alpha! > 0 : true;
 
   const makeEntryIteratee =
-    (step: number) => (component: CompiledComponent<string, {}>) => ({
+    (step: number) =>
+    (component: CompiledComponent<string, Record<string, any>>) => ({
       component,
       meta: { source: "trace", step: step },
     });

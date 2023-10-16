@@ -20,6 +20,6 @@ export function withProduce<T>(
   return (props: EditorProps<T>) =>
     createElement(component, {
       ...props,
-      produce: (f) => props?.onChange?.(produce(props?.value!, f)),
+      produce: (f) => props?.onChange?.(produce(props!.value!, f)),
     });
 }

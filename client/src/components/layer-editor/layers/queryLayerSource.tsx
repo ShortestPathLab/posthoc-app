@@ -1,20 +1,17 @@
 import { Typography as Type } from "@mui/material";
-import { filter, find, set } from "lodash";
-import { useMemo } from "react";
-import {
-  useEffectWhen,
-  useEffectWhenAsync,
-} from "../../../hooks/useEffectWhen";
-import { inferLayerName, LayerSource } from "./LayerSource";
-import { MapLayerData } from "./mapLayerSource";
-import { Option } from "./Option";
-import { TraceLayerData, traceLayerSource } from "./traceLayerSource";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useSnackbar } from "components/generic/Snackbar";
+import { filter, find, set } from "lodash";
 import { withProduce } from "produce";
+import { useMemo } from "react";
+import { Layer, useUIState } from "slices/UIState";
 import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
-import { Layer, useUIState } from "slices/UIState";
+import { useEffectWhenAsync } from "../../../hooks/useEffectWhen";
+import { LayerSource, inferLayerName } from "./LayerSource";
+import { Option } from "./Option";
+import { MapLayerData } from "./mapLayerSource";
+import { TraceLayerData, traceLayerSource } from "./traceLayerSource";
 
 async function findConnection(
   connections: Connection[],

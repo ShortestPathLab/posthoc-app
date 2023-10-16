@@ -49,6 +49,27 @@ export function degreeSeparation(tree: EventTree, radius: number) {
 }
 
 function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
+  function addParents(tree: EventTree) {
+    forEach(tree.children, (t) => {
+      t.parent = tree;
+      addParents(t);
+    });
+  }
+  function traverse(f: (t: EventTree) => void, tr: EventTree) {
+    f(tr);
+    forEach(tr.children, (tre) => traverse(f, tre));
+  }
+  function addChildCount(tree: EventTree) {
+    if (tree.children?.length) {
+      forEach(tree.children, addChildCount);
+      const sumA = sumBy(tree.children, "cumulativeChildCount");
+      tree.cumulativeChildCount = sumA + tree.children.length;
+      return tree;
+    } else {
+      tree.cumulativeChildCount = 0;
+    }
+    return tree;
+  }
   if (trace) {
     const r = chain(trace.events)
       .map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId }))
@@ -69,21 +90,9 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
       parentId: "pId",
     }) as EventTree[];
 
-    function addParents(tree: EventTree) {
-      forEach(tree.children, (t) => {
-        t.parent = tree;
-        addParents(t);
-      });
-    }
-
     forEach(tree, addParents);
 
     const idToNode: Dictionary<EventTree> = {};
-
-    function traverse(f: (t: EventTree) => void, tr: EventTree) {
-      f(tr);
-      forEach(tr.children, (tre) => traverse(f, tre));
-    }
 
     forEach(tree, (tr) =>
       traverse((t) => {
@@ -92,18 +101,6 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
         }
       }, tr)
     );
-
-    function addChildCount(tree: EventTree) {
-      if (tree.children?.length) {
-        forEach(tree.children, addChildCount);
-        const sumA = sumBy(tree.children, "cumulativeChildCount");
-        tree.cumulativeChildCount = sumA + tree.children.length;
-        return tree;
-      } else {
-        tree.cumulativeChildCount = 0;
-      }
-      return tree;
-    }
 
     forEach(tree, addChildCount);
     const id = trace?.events?.[step]?.id;

@@ -1,6 +1,6 @@
 import { WidgetsOutlined } from "@mui/icons-material";
-import { cloneElement, ReactElement, ReactNode } from "react";
 import { Flex, FlexProps } from "components/generic/Flex";
+import { cloneElement, ReactElement, ReactNode } from "react";
 
 export function Placeholder({
   label,

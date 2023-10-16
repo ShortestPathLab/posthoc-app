@@ -18,11 +18,6 @@ import {
   getLayerHandler,
 } from "components/layer-editor/layers/LayerSource";
 
-
-
-
-
-
 type Props = {
   selection?: RendererSelectEvent;
   onClose?: () => void;
@@ -82,9 +77,10 @@ export function SelectionMenu({ selection, onClose }: Props) {
                       {chain(items)
                         .entries()
                         .sortBy(([, v]) => v.index)
-                        .map(([, { action, icon, primary, secondary }]) =>
+                        .map(([k, { action, icon, primary, secondary }]) =>
                           action ? (
                             <MenuItem
+                              key={k}
                               onClick={() => {
                                 action();
                                 onClose?.();
@@ -100,7 +96,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
                               </Typography>
                             </MenuItem>
                           ) : (
-                            <ListItem>
+                            <ListItem key={k}>
                               {icon && <ListItemIcon>{icon}</ListItemIcon>}
                               <ListItemText primary={primary} sx={{ mr: 4 }} />
                               <Typography

@@ -1,21 +1,16 @@
 import { Box, Fade, LinearProgress } from "@mui/material";
-import { createElement, useState } from "react";
-import { SelectionMenu } from "./SelectionMenu";
-import { ViewTree } from "./ViewTree";
 import { Flex, FlexProps } from "components/generic/Flex";
-import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { pages } from "pages";
+import { createElement } from "react";
 import { useAnyLoading } from "slices/loading";
 import { PanelState, useView } from "slices/view";
+import { ViewTree } from "./ViewTree";
 
-type SpecimenInspectorProps = {} & FlexProps;
+type SpecimenInspectorProps = Record<string, any> & FlexProps;
 
 export function Inspector(props: SpecimenInspectorProps) {
   const loading = useAnyLoading();
   const [{ view }, setView] = useView();
-  const [selection, setSelection] = useState<RendererSelectEvent | undefined>(
-    undefined
-  );
 
   return (
     <>

@@ -1,12 +1,11 @@
+import { makeTemplate } from "components/script-editor/makeTemplate";
+import { templates } from "components/script-editor/templates";
 import { values } from "lodash";
-import { nanoid as id } from "nanoid";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { ParamsOf } from "protocol/Message";
 import { Parameters, PathfindingTask } from "protocol/SolveTask";
 import { Trace, TraceEventType } from "protocol/Trace";
 import { createSlice } from "./createSlice";
-import { makeTemplate } from "components/script-editor/makeTemplate";
-import { templates } from "components/script-editor/templates";
 
 export type Map = Partial<
   Feature & {
@@ -57,7 +56,7 @@ export type UploadedTrace = FeatureDescriptor & {
   content?: Trace;
 };
 
-export type Layer<T = {}> = {
+export type Layer<T = Record<string, any>> = {
   key: string;
   name?: string;
   source?: { type: string } & T;

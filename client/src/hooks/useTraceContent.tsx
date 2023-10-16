@@ -1,6 +1,12 @@
-import { colors, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { map } from "lodash";
-import { CompiledComponent, EventContext, ParsedComponent, Trace, TraceEvent } from "protocol";
+import {
+  CompiledComponent,
+  EventContext,
+  ParsedComponent,
+  Trace,
+  TraceEvent,
+} from "protocol";
 import { useMemo } from "react";
 import { colorsHex } from "components/renderer/colors";
 import { parse } from "components/renderer/parser";
@@ -23,7 +29,7 @@ export function useTraceContent(trace?: Trace, view: "main" = "main") {
         map(parsed, (p) =>
           mapProperties<
             ParsedComponent<string, any>,
-            CompiledComponent<string, {}>
+            CompiledComponent<string, Record<string, any>>
           >(p, (c) =>
             c({
               fill: theme.palette.primary.main,

@@ -1,18 +1,23 @@
-import { BlurCircularTwoTone, CenterFocusStrongTwoTone, CropFreeTwoTone, LayersTwoTone } from "@mui/icons-material";
+import {
+  BlurCircularTwoTone,
+  CenterFocusStrongTwoTone,
+  CropFreeTwoTone,
+  LayersTwoTone,
+} from "@mui/icons-material";
 import { Box, Button, Divider, Stack } from "@mui/material";
-import { Dictionary, every, filter, find, head, keyBy, map } from "lodash";
-import AutoSize from "react-virtualized-auto-sizer";
-import { useMemo, useState } from "react";
-import { Renderer as RendererInstance } from "renderer";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 import { Flex } from "components/generic/Flex";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { inferLayerName } from "components/layer-editor/layers/LayerSource";
+import { Dictionary, every, filter, find, head, keyBy, map } from "lodash";
 import { Page } from "pages/Page";
-import { Renderer, useRenderers } from "slices/renderers";
+import { useMemo, useState } from "react";
+import AutoSize from "react-virtualized-auto-sizer";
+import { Renderer as RendererInstance } from "renderer";
 import { useUIState } from "slices/UIState";
+import { Renderer, useRenderers } from "slices/renderers";
 import { PanelState } from "slices/view";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
@@ -23,6 +28,7 @@ type ViewportPageContext = PanelState & {
 
 export function autoSelectRenderer(
   renderers: Renderer[],
+  //TODO:
   components: string[]
 ) {
   return find(renderers, (r) => {

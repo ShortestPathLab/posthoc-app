@@ -9,7 +9,7 @@ export type ParsedMapHydrator = (result: ParsedMap) => ParsedMap & MapUtils;
 export type ParsedMap = {
   log: string[];
   bounds: Bounds;
-  nodes: ComponentEntry<CompiledComponent<string, {}>>[];
+  nodes: ComponentEntry<CompiledComponent<string, Record<string, any>>>[];
 };
 
 export type MapUtils = {

@@ -1,35 +1,48 @@
-import { AccountTreeTwoTone, ChevronRightOutlined, LayersTwoTone as LayersIcon, VisibilityTwoTone } from "@mui/icons-material";
-import { alpha, Box, Divider, Menu, MenuItem, MenuList, Tooltip, useTheme } from "@mui/material";
-import { delay, entries, find, findLast, head, map, startCase } from "lodash";
-import PopupState, { bindMenu } from "material-ui-popup-state";
-import { CustomNodeElementProps, Tree as _Tree, TreeProps } from "react-d3-tree";
-import { useCss, useThrottle } from "react-use";
-import AutoSize from "react-virtualized-auto-sizer";
-import { FC, useCallback, useEffect, useState } from "react";
-import { EventTree } from "./tree.worker";
-import { useTreeMemo } from "./TreeWorker";
+import {
+  AccountTreeTwoTone,
+  ChevronRightOutlined,
+  LayersTwoTone as LayersIcon,
+  VisibilityTwoTone,
+} from "@mui/icons-material";
+import {
+  Box,
+  Divider,
+  Menu,
+  MenuItem,
+  MenuList,
+  Tooltip,
+  alpha,
+  useTheme,
+} from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
 import { Label } from "components/generic/Label";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { inferLayerName } from "components/layer-editor/layers/LayerSource";
-import { TraceLayer } from "components/layer-editor/layers/traceLayerSource";
 import { getColorHex } from "components/renderer/colors";
+import { delay, entries, find, findLast, head, map, startCase } from "lodash";
+import PopupState, { bindMenu } from "material-ui-popup-state";
 import { Page } from "pages/Page";
-import { usePlayback } from "slices/playback";
+import { FC, useCallback, useEffect, useState } from "react";
+import {
+  CustomNodeElementProps,
+  TreeProps,
+  Tree as _Tree,
+} from "react-d3-tree";
+import { useCss, useThrottle } from "react-use";
+import AutoSize from "react-virtualized-auto-sizer";
 import { Layer, useUIState } from "slices/UIState";
+import { usePlayback } from "slices/playback";
 import { PanelState } from "slices/view";
+import { useTreeMemo } from "./TreeWorker";
+import { EventTree } from "./tree.worker";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 const Tree = _Tree as unknown as FC<TreeProps>;
 
 type TreePageContext = PanelState;
-
-function isTraceLayer(e: Layer): e is TraceLayer {
-  return e.source?.type === "trace";
-}
 
 export function useCache<T>(result: T, loading: boolean = false) {
   const [cache, setCache] = useState<T>();

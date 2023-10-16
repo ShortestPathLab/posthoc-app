@@ -8,7 +8,6 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
 } from "react";
 import { useCss } from "react-use";
 
@@ -103,7 +102,9 @@ export type LazyListHandle = Handle;
 export type LazyListProps<T> = {
   items?: T[];
   renderItem?: (item: T, index: number) => ReactElement;
-  listOptions?: Partial<ListProps<T, {}>> & { ref?: Ref<VirtuosoHandle> };
+  listOptions?: Partial<ListProps<T, Record<string, any>>> & {
+    ref?: Ref<VirtuosoHandle>;
+  };
   placeholder?: ReactNode;
 } & Omit<BoxProps, "placeholder">;
 

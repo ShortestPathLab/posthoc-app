@@ -1,6 +1,3 @@
-import { filter, map, sortBy, uniqBy } from "lodash";
-import { nanoid as id } from "nanoid";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import {
   Add,
   DeleteOutlined as DeleteIcon,
@@ -21,7 +18,9 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-
+import { filter, map, sortBy, uniqBy } from "lodash";
+import { nanoid as id } from "nanoid";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 import {
   CSSProperties,
@@ -34,7 +33,6 @@ import {
   useRef,
   useState,
 } from "react";
-
 
 export const DefaultListEditorInput = forwardRef(function StyledInputBase(
   props: ComponentProps<typeof InputBase>,
@@ -181,7 +179,7 @@ export function ListEditorField({
   );
   return (
     <Draggable index={i} draggableId={`${id}`}>
-      {(provided, snapshot) => (
+      {(provided) => (
         <div ref={provided.innerRef} {...provided.draggableProps}>
           <Box
             sx={{
@@ -237,7 +235,6 @@ export default function Editor<T>(props: Props<T>) {
     getOrder,
     onChange,
     extras,
-    sortable,
   } = props;
   const isInitialRender = useInitialRender();
   const theme = useTheme();
@@ -344,7 +341,7 @@ export default function Editor<T>(props: Props<T>) {
       >
         <Box mt={getCategory ? -1 : 0}>
           <Droppable droppableId="list">
-            {(provided, snapshot) => (
+            {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {(() => {
                   const out: ReactNode[] = [];

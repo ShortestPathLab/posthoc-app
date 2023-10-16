@@ -26,10 +26,6 @@ type PageProps = {
   children?: ReactNode;
 };
 
-export type SlotExampleComponentProps = {};
-
-// Describe you future slots name with props
-
 export type Slots = {
   Content: {
     children: React.ReactNode;
@@ -93,7 +89,7 @@ export const Page = withSlots<Slots, PageProps>(
                       type,
                     })
                   }
-                  icon={pages[stack?.type!]?.icon}
+                  icon={pages[stack!.type!]?.icon}
                   value={stack?.type}
                   items={values(pages)}
                 />

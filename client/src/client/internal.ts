@@ -14,13 +14,14 @@ export function parseURI(uri: string) {
 export const internal: Dictionary<Transport["call"]> = {
   trace: async (name, params) => {
     switch (name) {
-      case "about":
+      case "about": {
         return {
           name: "Search Trace",
           description: "Provides JSON Search Trace Support",
           version: "1.0.2",
         };
-      case "features/formats":
+      }
+      case "features/formats": {
         return [
           {
             id: "grid",
@@ -35,7 +36,8 @@ export const internal: Dictionary<Transport["call"]> = {
             name: "Mesh",
           },
         ];
-      case "features/algorithms":
+      }
+      case "features/algorithms": {
         return [
           {
             id: "identity",
@@ -43,7 +45,8 @@ export const internal: Dictionary<Transport["call"]> = {
             hidden: true,
           },
         ];
-      case "solve/pathfinding":
+      }
+      case "solve/pathfinding": {
         const { parameters } = (params as PathfindingTask<{
           content?: string;
         }>["params"])!;
@@ -52,6 +55,7 @@ export const internal: Dictionary<Transport["call"]> = {
         } catch {
           return {};
         }
+      }
     }
   },
 };

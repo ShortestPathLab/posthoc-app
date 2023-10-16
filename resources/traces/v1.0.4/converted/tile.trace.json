@@ -18,7 +18,10 @@
     }
   },
   "path": {
-    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
+    "pivot": {
+      "x": "{{'x' in ctx ? ctx.x : 0}}",
+      "y": "{{'y' in ctx ? ctx.y : 0}}"
+    },
     "scale": 1
   },
   "components": {
@@ -50,8 +53,7 @@
     ]
   },
   "views": {
-    "main": { "renderer": "2d-pixi", "components": [ { "$": "tileboard" } ] },
-    "someOtherView": { "renderer": "2d-pixi", "components": [ { "$": "tileboard" } ] }
+    "main": { "renderer": "2d-pixi", "components": [{ "$": "tileboard" }] }
   },
   "events": [
     {

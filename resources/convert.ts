@@ -20,7 +20,7 @@ for await (const file of globIterate(`${resolve(__dirname, folder)}/*.json`)) {
   } = JSON.parse(await readFile(file, "utf-8"));
   const updated = {
     version: "1.0.4",
-    render: {
+    render: render ?? {
       components: {},
       views: {
         main: {
@@ -37,15 +37,13 @@ for await (const file of globIterate(`${resolve(__dirname, folder)}/*.json`)) {
         },
       },
     },
-    path: {
+    path: path ?? {
       pivot: {
         x: "{{'x' in ctx ? ctx.x : 0}}",
         y: "{{'y' in ctx ? ctx.y : 0}}",
       },
       scale: 1,
     },
-    ...render,
-    ...path,
     events: [...eventList, ...events].map((e) => {
       const { variables, ...rest } = e;
       return {

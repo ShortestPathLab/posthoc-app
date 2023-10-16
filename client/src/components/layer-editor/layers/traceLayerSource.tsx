@@ -1,6 +1,5 @@
 import { ArrowOutwardRounded } from "@mui/icons-material";
 import { useTheme } from "@mui/material";
-import { useDebounce } from "@uidotdev/usehooks";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { TracePicker } from "components/app-bar/Input";
 import { PropertyList } from "components/inspector/PropertyList";
@@ -75,7 +74,7 @@ function makePathIndex(trace: Trace) {
     }
   };
   const getPath = (step: number) => {
-    let path = [step];
+    const path = [step];
     let current: A | undefined = { ...(trace.events ?? [])[step], step };
     while (current) {
       const pId = getParent(current.id, current.step);

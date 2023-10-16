@@ -52,7 +52,7 @@ export function inferLayerName(layer?: Layer) {
 }
 
 export function getLayerHandler(layer?: Layer) {
-  return layerHandlers[layer?.source?.type!];
+  return layerHandlers[layer?.source?.type ?? ""];
 }
 
 export const layerHandlers: Dictionary<LayerSource<string, any>> = {

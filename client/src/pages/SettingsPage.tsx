@@ -1,5 +1,14 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, List, ListItem, ListItemText, Slider, Switch, Tab, Typography as Type } from "@mui/material";
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  Slider,
+  Switch,
+  Tab,
+  Typography as Type,
+} from "@mui/material";
 import { keys, map, startCase } from "lodash";
 import { ReactNode, useState } from "react";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
@@ -139,7 +148,7 @@ export function MapParserListEditor() {
   return (
     <List>
       {keys(mapParsers).map((c) => (
-        <ListItem>
+        <ListItem key={c}>
           <ListItemText primary={c} secondary={"Internal"} />
         </ListItem>
       ))}

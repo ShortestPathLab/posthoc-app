@@ -1,4 +1,14 @@
-import { chain, clamp, Dictionary, first, last, maxBy, mean, minBy, noop } from "lodash";
+import {
+  chain,
+  clamp,
+  Dictionary,
+  first,
+  last,
+  maxBy,
+  mean,
+  minBy,
+  noop,
+} from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
@@ -52,6 +62,7 @@ function uniq<T extends any[]>(segments: T[]) {
 function optimizeNetworkEdges(segments: number[][]) {
   let xs = uniq(segments);
   // let xs = uniqBy(segments, join);
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const byHead = chain(xs).groupBy(first).mapValues(toSet).value();
     const byTail = chain(xs).groupBy(last).mapValues(toSet).value();

@@ -1,20 +1,8 @@
+import { Checkbox, ListItemIcon, Menu, MenuItem, Tooltip } from "@mui/material";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { findIndex, map, max } from "lodash";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { ReactElement, ReactNode } from "react";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
-import {
-  Checkbox,
-  ListItemIcon,
-  Menu,
-  MenuItem,
-  TextField,
-  TextFieldProps,
-  Tooltip,
-} from "@mui/material";
-
-
-
-
 
 type Key = string | number;
 
