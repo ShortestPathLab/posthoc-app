@@ -1,5 +1,5 @@
 import { ArrowDropDownOutlined } from "@mui/icons-material";
-import { Button, Typography as Type } from "@mui/material";
+import { Button, ButtonProps, Typography as Type } from "@mui/material";
 import { find, map, startCase } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactNode } from "react";
@@ -14,6 +14,7 @@ type Props = {
   icon?: ReactNode;
   showArrow?: boolean;
   disabled?: boolean;
+  ButtonProps?: ButtonProps;
 };
 
 export function FeaturePicker({
@@ -24,6 +25,7 @@ export function FeaturePicker({
   icon,
   showArrow,
   disabled,
+  ButtonProps,
 }: Props) {
   const selected = find(items, { id: value });
   return (
@@ -32,6 +34,7 @@ export function FeaturePicker({
       trigger={(props) => (
         <Button
           {...props}
+          {...ButtonProps}
           disabled={!items?.length || disabled}
           startIcon={icon}
           endIcon={showArrow && <ArrowDropDownOutlined sx={{ ml: -0.5 }} />}

@@ -20,6 +20,7 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
   return (
     <FeaturePicker
       showArrow
+      icon={<FileOpenTwoTone />}
       label="Choose Map"
       value={value?.id}
       items={[
@@ -75,7 +76,7 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
         }
       }}
     >
-      {value?.id ? `Uploaded Trace - ${value.name}` : "Upload Search Trace"}
+      {value?.id ? `Uploaded Trace - ${value.name}` : "Choose File"}
     </Button>
   );
 }
