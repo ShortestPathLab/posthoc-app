@@ -11,7 +11,7 @@ import { Context } from "./Context";
 export function mapProperties<T extends Props, TResult>(
   context: Context<T> = {},
   iterator: ObjectIterator<T, TResult>
-): Context<T> {
+): Context<T> & { $: string } {
   const { $, ...props } = context;
   return {
     ...mapValues(props, iterator),

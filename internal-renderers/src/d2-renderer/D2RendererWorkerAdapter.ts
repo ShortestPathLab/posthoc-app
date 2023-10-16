@@ -13,7 +13,7 @@ export class D2RendererWorkerAdapter extends Worker {
   call<T extends keyof D2RendererWorker>(
     action: D2WorkerRequest<T>["action"],
     payload: D2WorkerRequest<T>["payload"],
-    transfer?: Transferable[]
+    transfer: Transferable[] = []
   ) {
     return this.postMessage({ action, payload }, transfer);
   }

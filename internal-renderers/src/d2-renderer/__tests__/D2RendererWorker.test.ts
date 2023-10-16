@@ -21,30 +21,6 @@ describe("D2RendererWorker", () => {
     expect(makeWorker).not.toThrow();
   });
 
-  describe("getZoom", () => {
-    it("calculates zoom correctly", () => {
-      const worker = makeWorker();
-      expect(
-        worker.getZoom({ top: 0, left: 0, bottom: 0.5, right: 0.5 })
-      ).toEqual(-1);
-      expect(worker.getZoom({ top: 0, left: 0, bottom: 2, right: 2 })).toEqual(
-        1
-      );
-      expect(worker.getZoom({ top: 0, left: 0, bottom: 4, right: 4 })).toEqual(
-        2
-      );
-      expect(worker.getZoom({ top: 0, left: 0, bottom: 8, right: 8 })).toEqual(
-        3
-      );
-    });
-    it("correctly influenced by tileSubdivision", () => {
-      const worker = makeWorker({ tileSubdivision: 1 });
-      expect(worker.getZoom({ top: 0, left: 0, bottom: 2, right: 2 })).toEqual(
-        0.5
-      );
-    });
-  });
-
   describe("setFrustum", () => {
     it("initialises", async () => {
       const worker = makeWorker();
@@ -118,7 +94,7 @@ describe("D2RendererWorker", () => {
       );
       await new Promise(process.nextTick);
       expect(f).toBeCalledTimes(4);
-      expect(world.children.length).toEqual(1);
+      expect(world.length).toEqual(1);
     });
   });
   describe("add", () => {

@@ -14,7 +14,6 @@ import { useUIState } from "slices/UIState";
 
 export function DebugPage() {
   const { controls, onChange, state } = useViewTreeContext();
-  const [{ specimen, format, algorithm }] = useSpecimen();
   const [{ monotonicF, monotonicG }, setUIState] = useUIState();
   const [tab, setTab] = useState("standard");
   function renderHeading(label: ReactNode) {
@@ -61,14 +60,14 @@ export function DebugPage() {
                 <Box>
                   {renderHeading("Export")}
                   <Flex mt={1}>
-                    <Button
+                    {/* <Button
                       variant="contained"
                       disableElevation
                       disabled={!specimen}
                       onClick={() => save(`${algorithm}.${format}`, specimen)}
                     >
                       Save Trace as JSON
-                    </Button>
+                    </Button> */}
                   </Flex>
                 </Box>
               </TabPanel>

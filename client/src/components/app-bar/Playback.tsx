@@ -16,16 +16,6 @@ import {
   StopOutlined as StopIcon,
 } from "@mui/icons-material";
 
-
-
-
-
-
-
-
-
-
-
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
   requestAnimationFrame(async () => {
@@ -80,16 +70,16 @@ export function Playback({
                 const r = shouldBreak(step + i);
                 if (r.result || r.error) return { ...r, offset: i };
               }
-              return { result: "", offset: 0 };
+              return { result: "", offset: 0, error: undefined };
             },
             ({ result, offset, error }) => {
               if (!error) {
                 if (result) {
-                  notify(`Breakpoint hit: ${result}.`, offset);
+                  notify(`Breakpoint hit: ${result}.`, `${offset}`);
                   pause(offset);
                 } else tick(playbackRate);
               } else {
-                notify(`${trimEnd(error, ".")}.`, offset);
+                notify(`${trimEnd(error, ".")}.`, `${offset}`);
                 pause();
               }
             }

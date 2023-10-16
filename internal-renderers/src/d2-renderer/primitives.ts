@@ -2,7 +2,7 @@ import { ColorTranslator } from "colortranslator";
 import {
   CompiledD2IntrinsicComponent as CompiledD2Component,
   D2InstrinsicComponents as D2Components,
-} from "d2-renderer/D2IntrinsicComponents";
+} from "./D2IntrinsicComponents";
 import { Dictionary, maxBy, minBy } from "lodash";
 import { Bounds, Point, Size } from "protocol";
 import { defaultContext } from "./EventContext";

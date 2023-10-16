@@ -1,23 +1,20 @@
 import { Box } from "@mui/material";
+import { ListEditor } from "components/generic/ListEditor";
 import { debounce, flatMap as flat, get, keys, map, uniq } from "lodash";
+import { Breakpoint, useUIState } from "slices/UIState";
 import { BreakpointEditor } from "./BreakpointEditor";
 import { comparators } from "./comparators";
 import { intrinsicProperties } from "./intrinsicProperties";
 import { propertyPaths as paths } from "./propertyPaths";
-import { ListEditor } from "components/generic/ListEditor";
-import { useSpecimen } from "slices/specimen";
-import { Breakpoint, useUIState } from "slices/UIState";
 
 export function BreakpointListEditor() {
   const [{ breakpoints = [] }, setUIState] = useUIState();
-  const [{ specimen }] = useSpecimen();
 
   const properties = uniq([
     ...intrinsicProperties,
     ...flat(paths, (p) =>
-      flat(specimen?.nodeStructure, (v) =>
-        map(keys(get(v, p)), (k) => `${p}.${k}`)
-      )
+      //TODO:
+      flat([], (v) => map(keys(get(v, p)), (k) => `${p}.${k}`))
     ),
   ]);
 

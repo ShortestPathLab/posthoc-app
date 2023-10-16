@@ -1,10 +1,8 @@
 import {
   CompiledD2IntrinsicComponent as CompiledD2Component,
   D2InstrinsicComponents as D2Components,
-} from "d2-renderer/D2IntrinsicComponents";
-import { Bounds } from "protocol";
+} from "./D2IntrinsicComponents";
 import { Transform, primitives } from "./primitives";
-import { intersect } from "./intersect";
 
 const ComponentUndefinedError = (c: CompiledD2Component) =>
   new Error(`The component ${c.$} is not supported by this renderer.`);

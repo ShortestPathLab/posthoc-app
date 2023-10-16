@@ -1,5 +1,11 @@
 import { Dictionary as Dict } from "lodash";
-import { ComponentDefinition, ComponentDefinitionMap, IntrinsicComponentMap, ParsedComponent, ParsedComponentDefinition } from "protocol";
+import {
+  ComponentDefinition,
+  ComponentDefinitionMap,
+  IntrinsicComponentMap,
+  ParsedComponent,
+  ParsedComponentDefinition,
+} from "protocol";
 import { applyScope } from "./applyScope";
 import { Context, Key } from "./Context";
 import { normalize } from "./normalize";
@@ -16,7 +22,7 @@ export function parse<T extends IntrinsicComponentMap>(
 ): ParsedComponentDefinition<T> {
   return definition.flatMap((component) => {
     const { $ } = component;
-    const scoped = applyScope(normalize(context), normalize(component));
+    const scoped = applyScope(normalize(context), normalize(component) as any);
     return $ in components
       ? parse(components[$], components, scoped)
       : [scoped as ParsedComponent<Key<T>, T[Key<T>]>];

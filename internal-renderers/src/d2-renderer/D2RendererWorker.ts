@@ -102,7 +102,7 @@ export class D2RendererWorker extends EventEmitter<
   #children: Dictionary<Body<CompiledD2IntrinsicComponent>[]> = {};
 
   getView() {
-    return { system: this.#system };
+    return { system: this.#system, world: this.#children };
   }
 
   setFrustum(frustum: Bounds) {

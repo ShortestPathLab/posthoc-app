@@ -7,7 +7,7 @@ import { Context, createContext, ReactNode, useContext, useMemo } from "react";
 import { ViewControls } from "./ViewControls";
 import { Flex } from "components/generic/Flex";
 import { produce, produce2 } from "produce";
-import { Leaf, Root } from "slices/UIState";
+import { Leaf, Root } from "slices/view";
 
 type ViewTreeContextType<T = any> = {
   controls?: ReactNode;

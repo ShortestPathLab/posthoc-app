@@ -1,4 +1,4 @@
-import { D2Base } from "d2-renderer/D2IntrinsicComponents";
+import { D2Base } from "./D2IntrinsicComponents";
 import { Event, Nodes } from "protocol";
 
 export type EventContext = {

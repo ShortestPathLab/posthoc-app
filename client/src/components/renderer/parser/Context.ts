@@ -1,10 +1,10 @@
 import { Dictionary as Dict } from "lodash";
-import { Component, EventContext, Properties as Props } from "protocol";
+import { CompiledComponent, EventContext, Properties as Props } from "protocol";
 
 export type Context<T extends Props = {}> =
   | PropMap<T>
   | EventContext
-  | Component<any, T>;
+  | CompiledComponent<string, T>;
 
 export type Key<T> = Extract<keyof T, string>;
 

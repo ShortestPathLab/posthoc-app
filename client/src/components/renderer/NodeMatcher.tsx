@@ -2,7 +2,7 @@ import { TraceEvent } from "protocol/Trace";
 import { Point } from "./Size";
 
 export type NodeMatcher<T extends string = string> = (
-  s: TraceEvent<T>,
+  s: TraceEvent,
   point: Point
 ) => boolean;
 

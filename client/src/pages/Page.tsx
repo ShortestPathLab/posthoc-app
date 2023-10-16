@@ -7,8 +7,8 @@ import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
 import { pages } from "pages";
-import { PanelState } from "slices/UIState";
 import { useAcrylic } from "theme";
+import { PanelState } from "slices/view";
 
 const divider = (
   <Divider
