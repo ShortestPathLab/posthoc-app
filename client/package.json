@@ -10,7 +10,6 @@
     "@mui/icons-material": "^5.14.11",
     "@mui/lab": "^5.0.0-alpha.146",
     "@mui/material": "^5.14.11",
-    "@pixi/react": "^7.1.0",
     "@uidotdev/usehooks": "^2.3.1",
     "css-element-queries": "^1.2.3",
     "downloadjs": "^1.4.7",
@@ -28,8 +27,6 @@
     "overlayscrollbars": "^2.3.2",
     "overlayscrollbars-react": "^0.5.2",
     "performant-array-to-tree": "^1.11.0",
-    "pixi-viewport": "^5.0.2",
-    "pixi.js": "^7.3.1",
     "pluralize": "^8.0.0",
     "protocol": "file:../protocol",
     "react": "^18.2.0",
@@ -47,8 +44,7 @@
     "typescript": "^5.2.2",
     "url-parse": "^1.5.3",
     "vite": "^4.4.9",
-    "vite-tsconfig-paths": "^4.2.1",
-    "web-vitals": "^3.5.0"
+    "vite-tsconfig-paths": "^4.2.1"
   },
   "scripts": {
     "start": "vite",

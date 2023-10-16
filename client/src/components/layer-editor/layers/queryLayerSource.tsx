@@ -1,7 +1,10 @@
 import { Typography as Type } from "@mui/material";
 import { filter, find, set } from "lodash";
 import { useMemo } from "react";
-import { useEffectWhen } from "../../../hooks/useEffectWhen";
+import {
+  useEffectWhen,
+  useEffectWhenAsync,
+} from "../../../hooks/useEffectWhen";
 import { inferLayerName, LayerSource } from "./LayerSource";
 import { MapLayerData } from "./mapLayerSource";
 import { Option } from "./Option";
@@ -12,6 +15,7 @@ import { withProduce } from "produce";
 import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { Layer, useUIState } from "slices/UIState";
+
 async function findConnection(
   connections: Connection[],
   algorithm: string,
@@ -25,6 +29,7 @@ async function findConnection(
     }
   }
 }
+
 export type QueryLayerData = {
   mapLayerKey?: string;
   start?: number;
@@ -96,6 +101,7 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
     const { algorithm, mapLayerKey, start, end } = value?.source ?? {};
     const [{ layers }] = useUIState();
     const [connections] = useConnections();
+    const [{ algorithms }] = useFeatures();
     const mapLayer = useMemo(() => {
       if (mapLayerKey && algorithm) {
         return find(layers, {
@@ -103,8 +109,8 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
         }) as Layer<MapLayerData>;
       }
     }, [mapLayerKey, algorithm, layers]);
-    useEffectWhen(
-      async () => {
+    useEffectWhenAsync(
+      async (signal) => {
         if (mapLayer && algorithm) {
           const { format, content } = mapLayer?.source?.map ?? {};
           if (format && content) {
@@ -113,6 +119,7 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
               algorithm,
               format
             );
+            const algorithmInfo = find(algorithms, { id: algorithm });
             if (connection) {
               notify(
                 `Executing ${inferLayerName(value)} using ${connection.name}...`
@@ -128,23 +135,36 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
                 mapURI: `map:${encodeURIComponent(content)}`,
                 algorithm,
               });
-              produce((v) =>
-                set(v, "source.trace", {
-                  name: "Result",
-                  content: result,
-                })
-              );
-              notify("Ready.");
+              if (!signal.aborted) {
+                produce((v) =>
+                  set(v, "source.trace", {
+                    name: `${algorithmInfo?.name}`,
+                    content: result,
+                  })
+                );
+              } else {
+                notify("Canceled.");
+              }
             }
           }
         }
       },
-      [mapLayer, connections, algorithm, start, end, produce, notify, value],
+      [
+        mapLayer,
+        connections,
+        algorithm,
+        start,
+        end,
+        produce,
+        notify,
+        value,
+        algorithms,
+      ],
       [mapLayer, connections, algorithm, start, end]
     );
     return <></>;
   }),
-  inferName: () => "Untitled Query",
+  inferName: (l) => l.source?.trace?.name ?? "Untitled Query",
   renderer: traceLayerSource.renderer,
   steps: traceLayerSource.steps,
   getSelectionInfo: traceLayerSource.getSelectionInfo,

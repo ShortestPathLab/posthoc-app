@@ -1,4 +1,6 @@
-import { useEffect, useRef } from "react";
+import { zip } from "lodash";
+import { useEffect, useRef, useState } from "react";
+import { useAsyncAbortable } from "react-async-hook";
 
 export const useEffectWhen = (
   effect: () => void,
@@ -16,4 +18,26 @@ export const useEffectWhen = (
     whenDepsChanged ? () => void effect() : () => {},
     whenDepsChanged ? deps : nullDeps
   );
+};
+
+function allSame(a: any[], b: any[]) {
+  return zip(a, b).every(([x, y]) => x === y);
+}
+
+export const useEffectWhenAsync = (
+  effect: (signal: AbortSignal) => Promise<void>,
+  deps: any[] = [],
+  whenDeps: any[] = []
+) => {
+  const [prevDeps, setDeps] = useState<any[]>(deps);
+  const [prevWhenDeps, setWhenDeps] = useState<any[]>(whenDeps);
+
+  useEffect(() => {
+    if (!allSame(prevWhenDeps, whenDeps)) {
+      setDeps(deps);
+      setWhenDeps(whenDeps);
+    }
+  }, [deps, whenDeps, prevWhenDeps]);
+
+  return useAsyncAbortable<void, any[]>(effect, [...prevDeps, ...prevWhenDeps]);
 };

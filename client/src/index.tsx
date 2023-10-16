@@ -15,18 +15,6 @@ import { ViewProvider } from "slices/view";
 import "index.css";
 import "overlayscrollbars/overlayscrollbars.css";
 
-
-
-
-
-
-
-
-
-
-
-
-
 const root = createRoot(document.getElementById("root")!);
 
 const slices = [

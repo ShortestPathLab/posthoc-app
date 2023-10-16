@@ -147,7 +147,7 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
         },
         view: "main",
       },
-      [palette, layer]
+      [palette, layer?.source?.trace]
     );
     const path = use2DPath(layer, throttledStep);
     const steps = useMemo(

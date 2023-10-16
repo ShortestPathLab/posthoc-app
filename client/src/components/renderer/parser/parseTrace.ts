@@ -1,7 +1,10 @@
 import pluralize from "pluralize";
 import { useAsync } from "react-async-hook";
 import { useMemo } from "react";
-import { ParseTraceWorkerParameters, ParseTraceWorkerReturnType } from "./parseTrace.worker";
+import {
+  ParseTraceWorkerParameters,
+  ParseTraceWorkerReturnType,
+} from "./parseTrace.worker";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";

@@ -1,5 +1,16 @@
-import { PlaceOutlined as DestinationIcon, TripOriginOutlined as StartIcon } from "@mui/icons-material";
-import { filter, isUndefined, map, reduce, round, set, startCase } from "lodash";
+import {
+  PlaceOutlined as DestinationIcon,
+  TripOriginOutlined as StartIcon,
+} from "@mui/icons-material";
+import {
+  filter,
+  isUndefined,
+  map,
+  reduce,
+  round,
+  set,
+  startCase,
+} from "lodash";
 import { useMemo } from "react";
 import { inferLayerName, LayerSource } from "./LayerSource";
 import { Option } from "./Option";
@@ -104,6 +115,7 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
                                   set(l, "source.start", node);
                                   set(l, "source.query", undefined);
                                   set(l, "source.mapLayerKey", layer.key);
+                                  set(l, "source.trace", undefined);
                                 })
                               : l2
                           ),
@@ -121,6 +133,7 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
                                   set(l, "source.end", node);
                                   set(l, "source.query", undefined);
                                   set(l, "source.mapLayerKey", layer.key);
+                                  set(l, "source.trace", undefined);
                                 })
                               : l2
                           ),
