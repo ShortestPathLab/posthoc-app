@@ -1,10 +1,10 @@
-import { ArrowDropDownOutlined } from "@mui/icons-material";
-import { Button, Typography as Type } from "@mui/material";
+import { Typography as Type } from "@mui/material";
 import { SelectMulti } from "components/generic/SelectMulti";
 import { Space } from "components/generic/Space";
 import { filter, head, map, startCase } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactNode } from "react";
+import { FeaturePickerButton } from "./FeaturePickerButton";
 
 type Props = {
   label?: string;
@@ -38,14 +38,14 @@ export function FeaturePickerMulti({
       defaultChecked
       placeholder={startCase(label)}
       trigger={(props) => (
-        <Button
+        <FeaturePickerButton
           {...props}
           disabled={!items?.length}
-          startIcon={icon}
-          endIcon={showArrow && <ArrowDropDownOutlined sx={{ ml: -0.5 }} />}
+          icon={icon}
+          showArrow={showArrow}
         >
           {buttonLabel}
-        </Button>
+        </FeaturePickerButton>
       )}
       items={map(items, ({ id, name, description, hidden }) => ({
         value: id,

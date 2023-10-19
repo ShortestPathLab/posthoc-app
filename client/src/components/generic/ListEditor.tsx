@@ -1,6 +1,6 @@
 import {
   Add,
-  DeleteOutlined as DeleteIcon,
+  ClearOutlined as DeleteIcon,
   DragHandleOutlined,
   EditOutlined as EditIcon,
   LabelOutlined as LabelIcon,
@@ -16,6 +16,7 @@ import {
   ListSubheader,
   Switch,
   Typography,
+  alpha,
   useTheme,
 } from "@mui/material";
 import { filter, map, sortBy, uniqBy } from "lodash";
@@ -383,18 +384,25 @@ export default function Editor<T>(props: Props<T>) {
             </Typography>
           </Box>
         </Collapse>
-        <Box p={2} mb={-3}>
+        <Box p={2} pt={1} mb={-3}>
           <Button
             disableElevation
-            variant="contained"
+            variant="outlined"
             startIcon={<Add />}
             color="primary"
             onClick={() => {
               onAddItem();
               setNewIndex(items.length);
             }}
+            sx={{
+              borderColor: (t) =>
+                alpha(
+                  t.palette.text.primary,
+                  t.palette.action.activatedOpacity
+                ),
+            }}
           >
-            {addItemLabel}
+            <Box sx={{ color: "text.primary" }}>{addItemLabel}</Box>
           </Button>
           {extras}
         </Box>

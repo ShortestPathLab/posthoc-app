@@ -1,5 +1,5 @@
 import { ArrowOutwardRounded } from "@mui/icons-material";
-import { useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { TracePicker } from "components/app-bar/Input";
 import { PropertyList } from "components/inspector/PropertyList";
@@ -33,7 +33,8 @@ import { Layer, UploadedTrace } from "slices/UIState";
 import { usePlayback } from "slices/playback";
 import { useTraceContent } from "../../../hooks/useTraceContent";
 import { LayerSource, inferLayerName } from "./LayerSource";
-import { Option } from "./Option";
+import { Heading, Option } from "./Option";
+import { TracePreview } from "./TracePreview";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
@@ -128,6 +129,10 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
             />
           }
         />
+        <Heading label="Preview" />
+        <Box sx={{ height: 240, mx: -2, mb: -2 }}>
+          <TracePreview trace={value?.source?.trace?.content} />
+        </Box>
       </>
     );
   }),

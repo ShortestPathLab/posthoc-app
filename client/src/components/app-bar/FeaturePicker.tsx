@@ -1,12 +1,12 @@
-import { ArrowDropDownOutlined } from "@mui/icons-material";
-import { Button, ButtonProps, Typography as Type } from "@mui/material";
+import { ButtonProps, Typography as Type } from "@mui/material";
+import { Select } from "components/generic/Select";
+import { Space } from "components/generic/Space";
 import { find, map, startCase } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactNode } from "react";
-import { Select } from "components/generic/Select";
-import { Space } from "components/generic/Space";
+import { FeaturePickerButton } from "./FeaturePickerButton";
 
-type Props = {
+export type Props = {
   label?: string;
   value?: string;
   onChange?: (key: string) => void;
@@ -32,15 +32,15 @@ export function FeaturePicker({
     <Select
       placeholder={startCase(label)}
       trigger={(props) => (
-        <Button
+        <FeaturePickerButton
           {...props}
           {...ButtonProps}
           disabled={!items?.length || disabled}
-          startIcon={icon}
-          endIcon={showArrow && <ArrowDropDownOutlined sx={{ ml: -0.5 }} />}
+          icon={icon}
+          showArrow={showArrow}
         >
           {selected?.name ?? label}
-        </Button>
+        </FeaturePickerButton>
       )}
       items={map(items, ({ id, name, description, hidden }) => ({
         value: id,

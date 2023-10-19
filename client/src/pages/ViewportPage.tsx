@@ -4,8 +4,9 @@ import {
   CropFreeOutlined,
   LayersOutlined,
 } from "@mui/icons-material";
-import { Box, Button, Divider, Stack } from "@mui/material";
+import { Box, Divider, Stack } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 import { Flex } from "components/generic/Flex";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
@@ -111,24 +112,24 @@ export function ViewportPage() {
             showArrow
           />
           {divider}
-          <Button
+          <FeaturePickerButton
             disabled={!rendererInstance}
             onClick={() => {
               rendererInstance?.fitCamera();
             }}
-            startIcon={<CenterFocusStrongOutlined />}
+            icon={<CenterFocusStrongOutlined />}
           >
             Fit
-          </Button>
-          <Button
+          </FeaturePickerButton>
+          <FeaturePickerButton
             disabled={!rendererInstance}
             onClick={() => {
               rendererInstance?.initialCamera();
             }}
-            startIcon={<CropFreeOutlined />}
+            icon={<CropFreeOutlined />}
           >
             1:1
-          </Button>
+          </FeaturePickerButton>
         </Stack>
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>

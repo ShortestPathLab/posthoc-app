@@ -28,7 +28,7 @@ export const TitleBar = () => {
         minHeight: 36,
         height: visible ? "env(titlebar-area-height, 50px)" : 0,
         width: "env(titlebar-area-width, 100%)",
-        "-webkit-app-region": "drag",
+        WebkitAppRegion: "drag",
       }}
     >
       <Box sx={{ height: "100%" }}>
@@ -56,7 +56,7 @@ function CommandsButton() {
     <ButtonBase
       onClick={() => notify("Commands are not yet implemented.")}
       sx={{
-        "-webkit-app-region": "no-drag",
+        WebkitAppRegion: "no-drag",
         fontSize: 14,
         borderRadius: (t) => t.shape.borderRadius,
         "&:hover": {

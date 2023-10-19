@@ -12,9 +12,6 @@ import {
   yellow,
 } from "@mui/material/colors";
 
-
-
-
 const tint = "500";
 
 export function hex(h: string) {

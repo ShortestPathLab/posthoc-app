@@ -9,6 +9,7 @@ import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { Map, UploadedTrace } from "slices/UIState";
+import { FeaturePickerButton } from "./FeaturePickerButton";
 
 export const mapDefaults = { start: undefined, end: undefined };
 
@@ -58,8 +59,8 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("specimen");
   return (
-    <Button
-      startIcon={<FileOpenOutlined />}
+    <FeaturePickerButton
+      icon={<FileOpenOutlined />}
       onClick={async () => {
         try {
           const f = await uploadTrace();
@@ -77,7 +78,7 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
       }}
     >
       {value?.id ? `Uploaded Trace - ${value.name}` : "Choose File"}
-    </Button>
+    </FeaturePickerButton>
   );
 }
 

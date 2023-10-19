@@ -15,7 +15,7 @@ const shadow = `
 export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   createTheme({
     palette: {
-      primary: { main: colors[theme][mode === "dark" ? "200" : "500"] },
+      primary: { main: colors[theme][mode === "dark" ? "A100" : "500"] },
       mode,
       background:
         mode === "dark"
@@ -30,9 +30,18 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
         textTransform: "none",
         fontWeight: 400,
         letterSpacing: 0,
+        backgroundColor: "background.paper",
       },
     },
     components: {
+      MuiPopover: {
+        styleOverrides: {
+          paper: {
+            backgroundImage:
+              "linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06))",
+          },
+        },
+      },
       MuiTypography: {
         styleOverrides: {
           body1: {

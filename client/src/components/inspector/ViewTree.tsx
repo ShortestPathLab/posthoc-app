@@ -39,14 +39,22 @@ export function ViewTree<T>({
   const { palette, spacing, transitions } = useTheme();
 
   const dragCls = useCss({
-    background: palette.text.secondary,
-    opacity: 1 - palette.action.activatedOpacity,
-    transition: transitions.create("opacity"),
+    "div&": {
+      background: palette.text.secondary,
+      opacity: 1 - palette.action.activatedOpacity,
+      transition: transitions.create("opacity"),
+      "&.Horizontal": { width: "3px" },
+      "&.Vertical": { height: "3px" },
+    },
   });
 
   const gutterCls = useCss({
-    background: palette.background.default,
-    [`&:hover .${dragCls}`]: { opacity: 1 },
+    "div&": {
+      background: palette.background.default,
+      [`&:hover .${dragCls}`]: { opacity: 1 },
+      "&.Horizontal": { padding: 0 },
+      "&.Vertical": { padding: 0 },
+    },
   });
 
   const getSpacing = (n: number) => Number(spacing(n).slice(0, -2));

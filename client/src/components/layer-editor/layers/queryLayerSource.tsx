@@ -1,4 +1,4 @@
-import { Typography as Type } from "@mui/material";
+import { Box, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useSnackbar } from "components/generic/Snackbar";
 import { filter, find, set } from "lodash";
@@ -9,9 +9,11 @@ import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { useEffectWhenAsync } from "../../../hooks/useEffectWhen";
 import { LayerSource, inferLayerName } from "./LayerSource";
-import { Option } from "./Option";
+import { Heading, Option } from "./Option";
 import { MapLayerData } from "./mapLayerSource";
 import { TraceLayerData, traceLayerSource } from "./traceLayerSource";
+import { TracePreview } from "./TracePreview";
+import { CodeOutlined, LayersOutlined } from "@mui/icons-material";
 
 async function findConnection(
   connections: Connection[],
@@ -50,6 +52,7 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
           content={
             <FeaturePicker
               showArrow
+              icon={<CodeOutlined />}
               label="Choose Algorithm"
               value={algorithm}
               items={algorithms.map((c) => ({
@@ -72,6 +75,7 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
           content={
             <FeaturePicker
               showArrow
+              icon={<LayersOutlined />}
               label="Choose Layer"
               value={mapLayerKey}
               items={filteredLayers.map((c) => ({
@@ -85,11 +89,15 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
           }
         />
         {selectedLayer && (
-          <Type variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            Hint: Define source and destination nodes by clicking on valid
-            regions on {inferLayerName(selectedLayer)}
+          <Type variant="body2" color="text.secondary" sx={{ mb: 1, mt: 1 }}>
+            Define source and destination nodes by clicking on valid regions on{" "}
+            {inferLayerName(selectedLayer)}
           </Type>
         )}
+        <Heading label="Preview" />
+        <Box sx={{ height: 240, mx: -2, mb: -2 }}>
+          <TracePreview trace={value?.source?.trace?.content} />
+        </Box>
       </>
     );
   }),

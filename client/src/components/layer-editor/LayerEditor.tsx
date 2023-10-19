@@ -1,6 +1,5 @@
 import { EditOutlined } from "@mui/icons-material";
 import {
-  Avatar,
   Box,
   IconButton,
   Stack,
@@ -14,7 +13,7 @@ import {
   AppBarTitle as Title,
 } from "components/generic/Modal";
 import { Space } from "components/generic/Space";
-import { debounce, set, slice, startCase } from "lodash";
+import { debounce, set, startCase } from "lodash";
 import { produce } from "produce";
 import {
   ForwardedRef,
@@ -91,10 +90,7 @@ function Component(
   return (
     <>
       <Stack alignItems="center" direction="row" gap={2}>
-        <Avatar sx={{ borderRadius: (t) => t.spacing(2) }}>
-          {slice(name, 0, 2)}
-        </Avatar>
-        <Box py={1}>
+        <Box py={1} ml={-1}>
           <Type>{name}</Type>
           <Type variant="body2" color="text.secondary">
             {startCase(draft.source?.type)}
