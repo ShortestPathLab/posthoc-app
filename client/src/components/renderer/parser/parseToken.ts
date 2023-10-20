@@ -7,7 +7,7 @@ export function parseToken(token: string): Prop<any> {
     f(
       new Proxy(normalize(ctx), {
         get(target, prop: string) {
-          return target[prop]({});
+          return target[prop]?.({});
         },
       })
     );
