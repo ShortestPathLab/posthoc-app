@@ -2,6 +2,7 @@ import { fileDialog as file } from "file-select-dialog";
 import { find, startCase } from "lodash";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { UploadedTrace } from "slices/UIState";
+import { parse } from "yaml";
 function ext(s: string) {
   return s.split(".").pop();
 }
@@ -28,20 +29,20 @@ export const customTrace = (trace?: any) => ({
   id: customTraceId,
 });
 
-const TRACE_FORMAT = "json";
+const FORMATS = ["json", "yaml"];
 
 export async function uploadTrace(): Promise<
   (() => Promise<UploadedTrace | undefined>) | undefined
 > {
   const f = await file({
-    accept: [`.${TRACE_FORMAT}`],
+    accept: FORMATS.map((c) => `.${c}`),
     strict: true,
   });
   if (f) {
     return async () => {
-      if (ext(f.name) === TRACE_FORMAT) {
+      if (FORMATS.includes(ext(f.name)!)) {
         const content = await f.text();
-        const parsed = JSON.parse(content);
+        const parsed = parse(content);
         return {
           ...customTrace(),
           format: parsed?.format,
