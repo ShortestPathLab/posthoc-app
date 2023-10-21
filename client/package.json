@@ -48,7 +48,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build": "vite build --emptyOutDir",
     "package": "sh ./package.sh",
     "test": "vitest"
   },

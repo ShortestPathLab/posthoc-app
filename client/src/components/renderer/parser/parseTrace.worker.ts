@@ -1,4 +1,4 @@
-import { chain, findLast, map } from "lodash";
+import { chain, findLast, map, mapValues, negate } from "lodash";
 import {
   CompiledComponent,
   EventContext,
@@ -16,6 +16,9 @@ const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
 type Key = string | number;
 
 type KeyRef = Key | null | undefined;
+
+const isPersistent = (c: CompiledComponent<string, Record<string, any>>) =>
+  c.display !== "transient";
 
 function parse({
   trace,
@@ -61,21 +64,25 @@ function parse({
     .value();
 
   const steps = chain(trace?.events)
-    .map((e, i, esx) =>
-      apply(e, {
+    .map((e, i, esx) => {
+      const component = apply(e, {
         ...context,
         step: i,
         parent: !isNullish(e.pId)
           ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
           : undefined,
-      })
-    )
-    .map((c) => c.filter(isVisible))
-    .map((c, i) => c.map(makeEntryIteratee(i)))
+      });
+      const persistent = component.filter(isPersistent);
+      const transient = component.filter(negate(isPersistent));
+      return { persistent, transient };
+    })
+    .map((c) => mapValues(c, (b) => b.filter(isVisible)))
+    .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(i))))
     .value();
 
   return {
-    steps,
+    stepsPersistent: map(steps, "persistent"),
+    stepsTransient: map(steps, "transient"),
   };
 }
 
@@ -86,7 +93,8 @@ export type ParseTraceWorkerParameters = {
 };
 
 export type ParseTraceWorkerReturnType = {
-  steps: ComponentEntry[][];
+  stepsPersistent: ComponentEntry[][];
+  stepsTransient: ComponentEntry[][];
 };
 
 onmessage = ({ data }: MessageEvent<ParseTraceWorkerParameters>) => {

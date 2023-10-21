@@ -32,7 +32,7 @@ export function useTrace(params: ParseTraceWorkerParameters) {
           const output = await parseTraceAsync(params);
           push(
             "Trace loaded",
-            pluralize("step", output?.steps?.length ?? 0, true)
+            pluralize("step", output?.stepsPersistent?.length ?? 0, true)
           );
           return output;
         }

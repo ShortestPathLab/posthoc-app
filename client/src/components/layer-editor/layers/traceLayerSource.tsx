@@ -156,14 +156,26 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
     const path = use2DPath(layer, throttledStep);
     const steps = useMemo(
       () =>
-        map(result?.steps, (c) =>
+        map(result?.stepsPersistent, (c) =>
           map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
         ),
-      [result?.steps, layer]
+      [result?.stepsPersistent, layer]
+    );
+    const steps1 = useMemo(
+      () =>
+        map(result?.stepsTransient, (c) =>
+          map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
+        ),
+      [result?.stepsTransient, layer]
+    );
+    const steps2 = useMemo(
+      () => [steps1[throttledStep] ?? []],
+      [steps1, throttledStep]
     );
     return (
       <>
         <LazyNodeList step={throttledStep} nodes={steps} />
+        <NodeList nodes={steps2} />
         {path}
       </>
     );

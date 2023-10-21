@@ -54,12 +54,26 @@ server.listen(0, () => {
       autoHideMenuBar: true,
       center: true,
       show: false,
+      titleBarStyle: "hidden",
+      titleBarOverlay: {
+        color: "#00000000",
+        symbolColor: "#00000000",
+      },
+      webPreferences: {
+        preload: path.resolve(__dirname, "preload.js"),
+      },
     });
     win.loadURL(`http://localhost:${port}/index.html`);
     win.maximize();
     win.show();
     win.webContents.on("did-finish-load", () => {
       win.webContents.setZoomFactor(0.9);
+    });
+    electron.ipcMain.handle("title-bar", (_e, background, foreground) => {
+      win.setTitleBarOverlay({
+        color: background,
+        symbolColor: foreground,
+      });
     });
   };
   electron.app.whenReady().then(() => {
