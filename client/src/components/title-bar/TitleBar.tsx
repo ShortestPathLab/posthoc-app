@@ -9,6 +9,7 @@ import {
   Typography as Type,
 } from "@mui/material";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
+import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
 import { fileDialog as file } from "file-select-dialog";
@@ -69,91 +70,94 @@ export const TitleBar = () => {
         height: visible ? "env(titlebar-area-height, 50px)" : 0,
         width: "env(titlebar-area-width, 100%)",
         WebkitAppRegion: "drag",
+        overflowX: "auto",
       }}
     >
-      <Box sx={{ height: "100%" }}>
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ height: "100%" }}
-          alignItems="center"
-        >
-          <Box sx={{ p: 1, pr: 0, height: "100%" }}>
-            <img src={logo} style={{ height: "100%" }} />
-          </Box>
-          <Type sx={{ fontSize: 14, fontWeight: 300, pr: 1.5 }}>{name}</Type>
-          {[
-            {
-              key: "workspace",
-              items: [
-                {
-                  name: "Load workspace",
-                  key: "workspace-load",
-                  action: async () => {
-                    const workspace = await loadWorkspace();
-                    if (workspace) {
-                      setUIState(workspace);
-                    }
+      <Scroll x style={{ height: "100%" }}>
+        <Box sx={{ height: "100%" }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ height: "100%" }}
+            alignItems="center"
+          >
+            <Box sx={{ p: 1, pr: 0, height: "100%" }}>
+              <img src={logo} style={{ height: "100%" }} />
+            </Box>
+            <Type sx={{ fontSize: 14, fontWeight: 300, pr: 1.5 }}>{name}</Type>
+            {[
+              {
+                key: "workspace",
+                items: [
+                  {
+                    name: "Load workspace",
+                    key: "workspace-load",
+                    action: async () => {
+                      const workspace = await loadWorkspace();
+                      if (workspace) {
+                        setUIState(workspace);
+                      }
+                    },
                   },
-                },
-                {
-                  name: "Save workspace",
-                  key: "workspace-save",
-                  action: () => {
-                    saveWorkspace(`${id()}.workspace`, UI);
+                  {
+                    name: "Save workspace",
+                    key: "workspace-save",
+                    action: () => {
+                      saveWorkspace(`${id()}.workspace`, UI);
+                    },
                   },
-                },
-              ],
-            },
-            {
-              key: "help",
-              items: [
-                {
-                  name: "Open repository in GitHub",
-                  key: "github",
-                  action: () => open(repository, "_blank"),
-                },
-              ],
-            },
-          ].map(({ key, items }) => (
-            <PopupState key={key} variant="popover">
-              {(state) => (
-                <>
-                  <Menu {...bindMenu(state)}>
-                    <MenuList dense sx={{ p: 0 }}>
-                      {items.map(({ name, key, action }) => (
-                        <MenuItem
-                          key={key}
-                          onClick={() => {
-                            action?.();
-                            state.close();
-                          }}
-                        >
-                          {name}
-                        </MenuItem>
-                      ))}
-                    </MenuList>
-                  </Menu>
-                  <FeaturePickerButton
-                    {...bindTrigger(state)}
-                    sx={{
-                      WebkitAppRegion: "no-drag",
-                      minWidth: 0,
-                      p: 0.5,
-                      px: 1,
-                    }}
-                  >
-                    {startCase(key)}
-                  </FeaturePickerButton>
-                </>
-              )}
-            </PopupState>
-          ))}
-          <Box sx={{ p: 0.75, height: "100%" }}>
-            <CommandsButton />
-          </Box>
-        </Stack>
-      </Box>
+                ],
+              },
+              {
+                key: "help",
+                items: [
+                  {
+                    name: "Open repository in GitHub",
+                    key: "github",
+                    action: () => open(repository, "_blank"),
+                  },
+                ],
+              },
+            ].map(({ key, items }) => (
+              <PopupState key={key} variant="popover">
+                {(state) => (
+                  <>
+                    <Menu {...bindMenu(state)}>
+                      <MenuList dense sx={{ p: 0 }}>
+                        {items.map(({ name, key, action }) => (
+                          <MenuItem
+                            key={key}
+                            onClick={() => {
+                              action?.();
+                              state.close();
+                            }}
+                          >
+                            {name}
+                          </MenuItem>
+                        ))}
+                      </MenuList>
+                    </Menu>
+                    <FeaturePickerButton
+                      {...bindTrigger(state)}
+                      sx={{
+                        WebkitAppRegion: "no-drag",
+                        minWidth: "fit-content",
+                        p: 0.5,
+                        px: 1,
+                      }}
+                    >
+                      {startCase(key)}
+                    </FeaturePickerButton>
+                  </>
+                )}
+              </PopupState>
+            ))}
+            <Box sx={{ p: 0.75, height: "100%" }}>
+              <CommandsButton />
+            </Box>
+          </Stack>
+        </Box>
+      </Scroll>
     </Box>
   );
 };
