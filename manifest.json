@@ -1,0 +1,44 @@
+{
+  "short_name": "Visualiser",
+  "name": "Visualiser",
+  "version": "1.0.4",
+  "description": "Visualise pathfinding search.",
+  "version_name": "1.0.4 patch 1; mid October 2023",
+  "repository": "https://github.com/path-visualiser/app",
+  "icons": [
+    {
+      "src": "./favicon.png",
+      "sizes": "512x512",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "./logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "./logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./",
+  "display": "standalone",
+  "theme_color": "#607d8b",
+  "scope": ".",
+  "background_color": "#546e7a",
+  "display_override": ["window-controls-overlay"],
+  "screenshots": [
+    {
+      "src": "./screenshots/0.png",
+      "type": "image/jpeg",
+      "sizes": "2560x1600"
+    },
+    {
+      "src": "./screenshots/0.png",
+      "type": "image/jpeg",
+      "sizes": "2560x1600",
+      "form_factor": "wide"
+    }
+  ]
+}
