@@ -4,6 +4,7 @@
   "version": "1.0.4",
   "description": "Visualise pathfinding search.",
   "version_name": "1.0.4 patch 1; mid October 2023",
+  "repository": "https://github.com/path-visualiser/app",
   "icons": [
     {
       "src": "./favicon.png",

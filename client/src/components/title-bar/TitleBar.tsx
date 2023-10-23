@@ -1,11 +1,51 @@
 import { SearchOutlined } from "@mui/icons-material";
-import { Box, ButtonBase, Stack, Typography as Type } from "@mui/material";
+import {
+  Box,
+  ButtonBase,
+  Menu,
+  MenuItem,
+  MenuList,
+  Stack,
+  Typography as Type,
+} from "@mui/material";
+import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { useSnackbar } from "components/generic/Snackbar";
-import { name } from "manifest.json";
+import download from "downloadjs";
+import { fileDialog as file } from "file-select-dialog";
+import { startCase } from "lodash";
+import { name, repository } from "manifest.json";
+import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
+import { customAlphabet } from "nanoid";
 import logo from "public/logo512.png";
 import { useEffect, useState } from "react";
+import { UIState, useUIState } from "slices/UIState";
+import { parse } from "yaml";
+
+const id = customAlphabet("qwertyuiopasdfghjklzxcvbnm1234567890", 6);
+
+function ext(s: string) {
+  return s.split(".").pop();
+}
+
+export function saveWorkspace(filename: string, obj: UIState) {
+  download(JSON.stringify(obj), `${filename}.json`, "application/json");
+}
+
+const FORMATS = ["json", "yaml"];
+export async function loadWorkspace() {
+  const f = await file({
+    accept: FORMATS.map((c) => `.workspace.${c}`),
+    strict: true,
+  });
+  if (f && FORMATS.includes(ext(f.name)!)) {
+    const content = await f.text();
+    const parsed = parse(content);
+    return parsed as UIState;
+  }
+}
 
 export const TitleBar = () => {
+  const [UI, setUIState] = useUIState();
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     if ("windowControlsOverlay" in navigator) {
@@ -41,7 +81,74 @@ export const TitleBar = () => {
           <Box sx={{ p: 1, pr: 0, height: "100%" }}>
             <img src={logo} style={{ height: "100%" }} />
           </Box>
-          <Type sx={{ fontSize: 14, fontWeight: 300 }}>{name}</Type>
+          <Type sx={{ fontSize: 14, fontWeight: 300, pr: 1.5 }}>{name}</Type>
+          {[
+            {
+              key: "file",
+              items: [
+                {
+                  name: "Load workspace",
+                  key: "workspace-load",
+                  action: async () => {
+                    const workspace = await loadWorkspace();
+                    if (workspace) {
+                      setUIState(workspace);
+                    }
+                  },
+                },
+                {
+                  name: "Save workspace",
+                  key: "workspace-save",
+                  action: () => {
+                    saveWorkspace(`${id()}.workspace`, UI);
+                  },
+                },
+              ],
+            },
+            {
+              key: "help",
+              items: [
+                {
+                  name: "Open repository in GitHub",
+                  key: "github",
+                  action: () => open(repository, "_blank"),
+                },
+              ],
+            },
+          ].map(({ key, items }) => (
+            <PopupState key={key} variant="popover">
+              {(state) => (
+                <>
+                  <Menu {...bindMenu(state)}>
+                    <MenuList dense sx={{ p: 0 }}>
+                      {items.map(({ name, key, action }) => (
+                        <MenuItem
+                          key={key}
+                          onClick={() => {
+                            action?.();
+                            state.close();
+                          }}
+                        >
+                          {name}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <FeaturePickerButton
+                    {...bindTrigger(state)}
+                    sx={{
+                      WebkitAppRegion: "no-drag",
+                      minWidth: 0,
+                      p: 0.5,
+                      px: 1,
+                    }}
+                  >
+                    {startCase(key)}
+                  </FeaturePickerButton>
+                </>
+              )}
+            </PopupState>
+          ))}
           <Box sx={{ p: 0.75, height: "100%" }}>
             <CommandsButton />
           </Box>

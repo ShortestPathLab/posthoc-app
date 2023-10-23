@@ -8,6 +8,7 @@ import {
   map,
   once,
   range,
+  shuffle,
   sortBy,
 } from "lodash";
 import memoizee from "memoizee";
@@ -44,22 +45,24 @@ export function getTiles(
   return {
     zoom,
     order,
-    tiles: combinate({
-      x: range(tiles.left, tiles.right + 1),
-      y: range(tiles.top, tiles.bottom + 1),
-    }).map((tile) => {
-      const mapX = tile.x * order;
-      const mapY = tile.y * order;
-      return {
-        tile,
-        bounds: {
-          left: mapX - order / 2,
-          right: mapX + order / 2,
-          top: mapY - order / 2,
-          bottom: mapY + order / 2,
-        },
-      };
-    }),
+    tiles: shuffle(
+      combinate({
+        x: range(tiles.left, tiles.right + 1),
+        y: range(tiles.top, tiles.bottom + 1),
+      }).map((tile) => {
+        const mapX = tile.x * order;
+        const mapY = tile.y * order;
+        return {
+          tile,
+          bounds: {
+            left: mapX - order / 2,
+            right: mapX + order / 2,
+            top: mapY - order / 2,
+            bottom: mapY + order / 2,
+          },
+        };
+      })
+    ),
   };
 }
 

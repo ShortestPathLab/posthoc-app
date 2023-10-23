@@ -69,7 +69,7 @@ export function useAcrylic(): SxProps<Theme> {
   return acrylic
     ? {
         backdropFilter: "blur(10px)",
-        background: ({ palette }) => alpha(palette.background.paper, 0.84),
+        background: ({ palette }) => alpha(palette.background.paper, 0.75),
       }
     : {
         backdropFilter: "blur(0px)",

@@ -3,6 +3,7 @@ import { find, startCase } from "lodash";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { UploadedTrace } from "slices/UIState";
 import { parse } from "yaml";
+
 function ext(s: string) {
   return s.split(".").pop();
 }
@@ -35,7 +36,7 @@ export async function uploadTrace(): Promise<
   (() => Promise<UploadedTrace | undefined>) | undefined
 > {
   const f = await file({
-    accept: FORMATS.map((c) => `.${c}`),
+    accept: FORMATS.map((c) => `.trace.${c}`),
     strict: true,
   });
   if (f) {

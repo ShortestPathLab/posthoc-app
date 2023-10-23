@@ -1,15 +1,14 @@
 import { FileOpenOutlined } from "@mui/icons-material";
-import { Button } from "@mui/material";
-import { find } from "lodash";
-import { EditorProps } from "../Editor";
-import { FeaturePicker } from "./FeaturePicker";
-import { custom as customMap, uploadMap, uploadTrace } from "./upload";
 import { useSnackbar } from "components/generic/Snackbar";
+import { find } from "lodash";
+import { Map, UploadedTrace } from "slices/UIState";
 import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
-import { Map, UploadedTrace } from "slices/UIState";
+import { EditorProps } from "../Editor";
+import { FeaturePicker } from "./FeaturePicker";
 import { FeaturePickerButton } from "./FeaturePickerButton";
+import { custom as customMap, uploadMap, uploadTrace } from "./upload";
 
 export const mapDefaults = { start: undefined, end: undefined };
 

@@ -123,7 +123,7 @@ export function ViewTree<T>({
               })
             )
           }
-          minHeights={map(root.children, () => getSpacing(6) - 11)}
+          minHeights={map(root.children, () => getSpacing(6) - 8)}
           minWidths={map(root.children, () => getSpacing(32))}
           initialSizes={map(
             root.children,
