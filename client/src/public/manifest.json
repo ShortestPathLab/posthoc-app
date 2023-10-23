@@ -32,6 +32,11 @@
     {
       "src": "./screenshots/0.png",
       "type": "image/jpeg",
+      "sizes": "2560x1600"
+    },
+    {
+      "src": "./screenshots/0.png",
+      "type": "image/jpeg",
       "sizes": "2560x1600",
       "form_factor": "wide"
     }

@@ -16,7 +16,7 @@ import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { Page } from "pages/Page";
 import logo from "public/logo512.png";
-import { version_name, name } from "manifest.json";
+import { version_name, name } from "public/manifest.json";
 
 const contacts = [
   { name: "Dr Daniel Harabor", email: "daniel.harabor@monash.edu" },

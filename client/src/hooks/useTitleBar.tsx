@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { name } from "manifest.json";
+import { name } from "public/manifest.json";
 import { getContrastRatio } from "@mui/material";
 
 const getForegroundColor = (bg: string) =>
