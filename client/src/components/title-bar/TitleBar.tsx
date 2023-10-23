@@ -84,7 +84,7 @@ export const TitleBar = () => {
           <Type sx={{ fontSize: 14, fontWeight: 300, pr: 1.5 }}>{name}</Type>
           {[
             {
-              key: "file",
+              key: "workspace",
               items: [
                 {
                   name: "Load workspace",
