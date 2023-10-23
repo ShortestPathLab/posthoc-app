@@ -118,7 +118,6 @@ class D2Renderer
 
   setup(options: Partial<D2RendererOptions>) {
     const o = { ...defaultD2RendererOptions, ...options };
-    // create a pixi application
     this.#setupPixi(o);
     this.setOptions(o);
     this.#handleWorkerChange(o);
@@ -160,6 +159,8 @@ class D2Renderer
       backgroundAlpha: 0,
       width: options.screenSize.width,
       height: options.screenSize.height,
+      autoDensity: true,
+      resolution: 2,
     });
 
     this.#viewport = new Viewport({
@@ -227,7 +228,7 @@ class D2Renderer
   );
 
   #startDynamicResolution() {
-    const { tileResolution, dynamicResolution } = this.#options;
+    const { dynamicResolution } = this.#options;
     const { dtMax, dtMin, increment, intervalMs, maxScale, minScale } =
       dynamicResolution;
     const targetFrames = floor(PIXI.Ticker.targetFPMS * intervalMs);
@@ -235,6 +236,7 @@ class D2Renderer
     let cdt = 0;
     let scale = 1;
     this.#app!.ticker.add((dt) => {
+      const { tileResolution } = this.#options;
       if (!(frames % targetFrames)) {
         const adt = cdt / targetFrames;
         scale = clamp(

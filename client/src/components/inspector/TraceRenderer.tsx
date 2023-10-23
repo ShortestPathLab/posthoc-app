@@ -24,10 +24,10 @@ import { useRenderers } from "slices/renderers";
 
 const rendererOptions = {
   tileSubdivision: 2,
-  workerCount: 2,
+  workerCount: 3,
   tileResolution: {
-    width: 1024,
-    height: 1024,
+    width: 256,
+    height: 256,
   },
 };
 

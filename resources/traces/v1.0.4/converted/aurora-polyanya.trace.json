@@ -16,9 +16,10 @@
       "line1": [
         {
           "$": "path",
+          "visible": "{{ctx.currentStep == ctx.step}}",
           "points": [
-            { "x": "{{ctx.x2}}", "y": "{{ctx.y2}}" },
-            { "x": "{{ctx.x3}}", "y": "{{ctx.y3}}" },
+            { "x": "{{ctx.rayShootX ?? ctx.x}}", "y": "{{ctx.y2}}" },
+            { "x": "{{ctx.x3 ?? ctx.y}}", "y": "{{ctx.y3}}" },
             { "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" },
             { "x": "{{ctx.x2}}", "y": "{{ctx.y2}}" }
           ],
@@ -38,15 +39,18 @@
           "fill": "{{ctx.color[ctx.type]}}"
         }
       ],
-      "mesh-event": [ { "$": "node" }, { "$": "line1" }, { "$": "triangle" } ]
+      "mesh-event": [{ "$": "node" }, { "$": "line1" }, { "$": "triangle" }]
     },
     "views": {
-      "main": { "renderer": "2d-pixi", "components": [ { "$": "mesh-event" } ] }
+      "main": { "renderer": "2d-pixi", "components": [{ "$": "mesh-event" }] }
     },
     "path": { "pivot": { "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" }, "scale": 0.5 }
   },
   "path": {
-    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
+    "pivot": {
+      "x": "{{'x' in ctx ? ctx.x : 0}}",
+      "y": "{{'y' in ctx ? ctx.y : 0}}"
+    },
     "scale": 1
   },
   "events": [

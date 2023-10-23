@@ -29,12 +29,16 @@ export function useTrace(params: ParseTraceWorkerParameters) {
       usingLoadingState(async () => {
         if (params?.trace) {
           push("Processing trace...");
-          const output = await parseTraceAsync(params);
-          push(
-            "Trace loaded",
-            pluralize("step", output?.stepsPersistent?.length ?? 0, true)
-          );
-          return output;
+          try {
+            const output = await parseTraceAsync(params);
+            push(
+              "Trace loaded",
+              pluralize("step", output?.stepsPersistent?.length ?? 0, true)
+            );
+            return output;
+          } catch (e) {
+            push("Error parsing", `${e}`);
+          }
         }
       }),
     [params]

@@ -36,8 +36,8 @@ export const defaultD2RendererOptions: D2RendererOptions = {
   workerCount: 4,
   workerIndex: 0,
   tileResolution: {
-    width: 128,
-    height: 128,
+    width: 64,
+    height: 64,
   },
   tileSubdivision: 0,
   refreshInterval: 1000 / 60,

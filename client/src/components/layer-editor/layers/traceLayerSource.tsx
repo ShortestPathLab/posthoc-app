@@ -204,12 +204,7 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
               items: {
                 properties: {
                   index: -1,
-                  primary: (
-                    <PropertyList
-                      event={pick(event, ["id", "f", "g", "pId"])}
-                      vertical
-                    />
-                  ),
+                  primary: <PropertyList event={event} vertical />,
                 },
                 [`${event}`]: {
                   primary: `Go to Step ${step}`,

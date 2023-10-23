@@ -1,9 +1,9 @@
 {
   "short_name": "Visualiser",
   "name": "Visualiser",
-  "version":"1.0.4",
+  "version": "1.0.4",
   "description": "Visualise pathfinding search.",
-  "version_name":"1.0.4; mid October 2023",
+  "version_name": "1.0.4 patch 1; mid October 2023",
   "icons": [
     {
       "src": "./favicon.png",
@@ -27,12 +27,12 @@
   "scope": ".",
   "background_color": "#546e7a",
   "display_override": ["window-controls-overlay"],
-  "screenshots": 
-    [{
+  "screenshots": [
+    {
       "src": "./screenshots/0.png",
       "type": "image/jpeg",
       "sizes": "2560x1600",
       "form_factor": "wide"
-  }]
-  
+    }
+  ]
 }

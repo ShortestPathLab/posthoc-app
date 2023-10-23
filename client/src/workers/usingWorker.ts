@@ -16,10 +16,11 @@ export const usingWorkerTask =
   (inp: T) =>
     usingWorker<R>(w)((worker) => {
       worker.postMessage(inp);
-      return new Promise<R>((res) => {
+      return new Promise<R>((res, rej) => {
         worker.onmessage = (out) => {
           res(out.data as R);
         };
+        worker.onerror = rej;
       });
     });
 

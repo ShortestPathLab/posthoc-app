@@ -13,27 +13,46 @@
       ],
       "line": [
         {
+          "$": "for",
+          "$let": "i", // Default i
+          "$from": 0, // Default 0
+          "$to": 4, // Required
+          "$step": 1, // Default 1
+          "$component": "circle"
+        },
+        {
+          "$": "circle",
+          "$for": {
+            "$let": "i", // Default i
+            "$from": 0, // Default 0
+            "$to": 4, // Required
+            "$step": 1 // Default 1
+          }
+        },
+        {
+          "$": "if",
+          "$condition": "{{true}}",
+          "$component": "circle"
+        },
+        {
           "$": "path",
-          "points": [
-            {
-              "x": "{{ctx.parent ? ctx.parent.x : ctx.x}}",
-              "y": "{{ctx.parent ? ctx.parent.y : ctx.y}}"
-            },
-            { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }
-          ],
+          "points": "{{ctx.agent1}}",
           "fill": "{{ctx.color[ctx.type]}}",
           "lineWidth": 90
         }
       ],
-      "road-event": [ { "$": "node" }, { "$": "line" } ]
+      "road-event": [{ "$": "node" }, { "$": "line" }]
     },
     "views": {
-      "main": { "renderer": "2d-pixi", "components": [ { "$": "road-event" } ] }
+      "main": { "renderer": "2d-pixi", "components": [{ "$": "road-event" }] }
     },
     "path": { "pivot": { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }, "scale": 120 }
   },
   "path": {
-    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
+    "pivot": {
+      "x": "{{'x' in ctx ? ctx.x : 0}}",
+      "y": "{{'y' in ctx ? ctx.y : 0}}"
+    },
     "scale": 1
   },
   "events": [
