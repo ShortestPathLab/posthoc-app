@@ -24,5 +24,7 @@ export const draw = <T extends keyof D2Components>(
   t: Transform
 ) => {
   drawPrimitive(c.$, c, g, t);
-  drawPrimitive("text", c, g, t);
+  if (c.text) {
+    drawPrimitive("text", c, g, t);
+  }
 };

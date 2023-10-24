@@ -1,19 +1,19 @@
+import { CodeOutlined, LayersOutlined } from "@mui/icons-material";
 import { Box, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useSnackbar } from "components/generic/Snackbar";
-import { filter, find, set } from "lodash";
+import { find, set } from "lodash";
 import { withProduce } from "produce";
 import { useMemo } from "react";
-import { Layer, useUIState } from "slices/UIState";
 import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
+import { useLayer, useLayers } from "slices/layers";
 import { useEffectWhenAsync } from "../../../hooks/useEffectWhen";
 import { LayerSource, inferLayerName } from "./LayerSource";
 import { Heading, Option } from "./Option";
-import { MapLayerData } from "./mapLayerSource";
-import { TraceLayerData, traceLayerSource } from "./traceLayerSource";
 import { TracePreview } from "./TracePreview";
-import { CodeOutlined, LayersOutlined } from "@mui/icons-material";
+import { MapLayer } from "./mapLayerSource";
+import { TraceLayerData, traceLayerSource } from "./traceLayerSource";
 
 async function findConnection(
   connections: Connection[],
@@ -39,12 +39,14 @@ export type QueryLayerData = {
 export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
   key: "query",
   editor: withProduce(({ value, produce }) => {
-    const { algorithm, mapLayerKey } = value?.source ?? {};
-    const [{ layers }] = useUIState();
+    const { algorithm } = value?.source ?? {};
+    const {
+      layers,
+      layer: selectedLayer,
+      key: mapLayerKey,
+    } = useLayer(undefined, (c): c is MapLayer => c.source?.type === "map");
     const [{ algorithms }] = useFeatures();
     const [connections] = useConnections();
-    const filteredLayers = filter(layers, (c) => c.source?.type === "map");
-    const selectedLayer = find(filteredLayers, { key: mapLayerKey });
     return (
       <>
         <Option
@@ -78,7 +80,7 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
               icon={<LayersOutlined />}
               label="Choose Layer"
               value={mapLayerKey}
-              items={filteredLayers.map((c) => ({
+              items={layers.map((c) => ({
                 id: c.key,
                 name: inferLayerName(c),
               }))}
@@ -104,14 +106,14 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
   service: withProduce(({ value, produce }) => {
     const notify = useSnackbar();
     const { algorithm, mapLayerKey, start, end } = value?.source ?? {};
-    const [{ layers }] = useUIState();
+    const [{ layers: layers }] = useLayers();
     const [connections] = useConnections();
     const [{ algorithms }] = useFeatures();
     const mapLayer = useMemo(() => {
       if (mapLayerKey && algorithm) {
         return find(layers, {
           key: mapLayerKey,
-        }) as Layer<MapLayerData>;
+        }) as MapLayer;
       }
     }, [mapLayerKey, algorithm, layers]);
     useEffectWhenAsync(
@@ -167,7 +169,7 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
       ],
       [mapLayer, connections, algorithm, start, end]
     );
-    return <></>;
+    return <>{traceLayerSource.service}</>;
   }),
   inferName: (l) => l.source?.trace?.name ?? "Untitled Query",
   renderer: traceLayerSource.renderer,

@@ -7,7 +7,7 @@ import { useSnackbar } from "components/generic/Snackbar";
 import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { useSettings } from "slices/settings";
-import { Layer, UploadedTrace } from "slices/UIState";
+import { UploadedTrace } from "slices/UIState";
 import {
   SkipNextOutlined as ForwardIcon,
   PauseOutlined as PauseIcon,
@@ -15,6 +15,7 @@ import {
   SkipPreviousOutlined as PreviousIcon,
   StopOutlined as StopIcon,
 } from "@mui/icons-material";
+import { Layer } from "slices/layers";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
@@ -47,7 +48,7 @@ export function Playback({
     stepBackward,
     stepForward,
     stop,
-  } = usePlaybackState(layer);
+  } = usePlaybackState(layer?.key);
   useRaf();
 
   const notify = useSnackbar();

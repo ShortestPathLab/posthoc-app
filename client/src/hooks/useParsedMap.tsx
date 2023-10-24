@@ -19,10 +19,7 @@ export function useParsedMap(map?: Map) {
         if (format && content) {
           notify("Processing map...");
           const parsedMap = (await getParser(format)?.parse?.(content, {
-            color: fn(
-              theme.palette.background.paper,
-              1 - theme.palette.action.hoverOpacity
-            ),
+            color: fn(theme.palette.background.paper, 0.25),
           })) ?? { nodes: [] };
 
           notify(

@@ -14,7 +14,7 @@ export function ServerListEditor() {
         editor={(v) => <ServerEditor value={v} />}
         icon={null}
         value={remote}
-        onChange={debounce((v) => setSettings({ remote: v }), 300)}
+        onChange={debounce((v) => setSettings(() => ({ remote: v })), 300)}
         addItemLabel="Add Solver"
         create={() => ({
           transport: defaultTransport,
@@ -25,7 +25,7 @@ export function ServerListEditor() {
           <FeaturePickerButton
             icon={<ResetIcon />}
             sx={{ ml: 2 }}
-            onClick={() => setSettings({ remote: defaultRemotes })}
+            onClick={() => setSettings(() => ({ remote: defaultRemotes }))}
           >
             Reset to Defaults
           </FeaturePickerButton>

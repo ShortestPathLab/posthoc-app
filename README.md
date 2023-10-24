@@ -4,12 +4,11 @@
 
 ![logo64](./docs/assets/22-09-2023/logo64.png)
 
-# Waypoint
+# Visualiser
 
-Waypoint is a visualiser and debugging tool for pathfinding
-search.
+Visualise pathfinding search and more.
 
-[Open Waypoint](https://path-visualiser.github.io/app)
+[Open Visualiser](https://path-visualiser.github.io/app)
 
 ## Start Development Server
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "render": {
     "components": {
       "node": [
@@ -13,30 +13,14 @@
       ],
       "line": [
         {
-          "$": "for",
-          "$let": "i", // Default i
-          "$from": 0, // Default 0
-          "$to": 4, // Required
-          "$step": 1, // Default 1
-          "$component": "circle"
-        },
-        {
-          "$": "circle",
-          "$for": {
-            "$let": "i", // Default i
-            "$from": 0, // Default 0
-            "$to": 4, // Required
-            "$step": 1 // Default 1
-          }
-        },
-        {
-          "$": "if",
-          "$condition": "{{true}}",
-          "$component": "circle"
-        },
-        {
           "$": "path",
-          "points": "{{ctx.agent1}}",
+          "points": [
+            {
+              "x": "{{ctx.parent ? ctx.parent.x : ctx.x}}",
+              "y": "{{ctx.parent ? ctx.parent.y : ctx.y}}"
+            },
+            { "x": "{{ctx.x}}", "y": "{{ctx.y}}" }
+          ],
           "fill": "{{ctx.color[ctx.type]}}",
           "lineWidth": 90
         }

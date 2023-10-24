@@ -45,9 +45,9 @@ export function useLoadingState(key: keyof Loading) {
 
   return useCallback(
     async <T>(task: () => Promise<T>) => {
-      dispatch({ action: "start", key });
+      dispatch(() => ({ action: "start", key }));
       const out = await task();
-      dispatch({ action: "end", key });
+      dispatch(() => ({ action: "end", key }));
       return out;
     },
     [key, dispatch]

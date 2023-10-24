@@ -24,8 +24,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Layer } from "slices/UIState";
 import { inferLayerName, layerHandlers } from "./layers/LayerSource";
+import { Layer } from "slices/layers";
 
 type LayerEditorProps = {
   value: Layer;
@@ -157,7 +157,7 @@ function Component(
               )}
               {draft.source?.type &&
                 createElement(layerHandlers[draft.source.type].editor, {
-                  onChange: setDraft,
+                  onChange: (e) => setDraft(e(draft)),
                   value: draft,
                 })}
             </Box>

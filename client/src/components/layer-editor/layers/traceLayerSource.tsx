@@ -21,16 +21,15 @@ import {
   map,
   merge,
   negate,
-  pick,
   set,
   startCase,
 } from "lodash";
-import { withProduce } from "produce";
+import { produce, withProduce } from "produce";
 import { Trace, TraceEvent } from "protocol";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useThrottle } from "react-use";
-import { Layer, UploadedTrace } from "slices/UIState";
-import { usePlayback } from "slices/playback";
+import { UploadedTrace } from "slices/UIState";
+import { Layer, useLayer } from "slices/layers";
 import { useTraceContent } from "../../../hooks/useTraceContent";
 import { LayerSource, inferLayerName } from "./LayerSource";
 import { Heading, Option } from "./Option";
@@ -92,10 +91,16 @@ function makePathIndex(trace: Trace) {
   return { getParent, getPath };
 }
 
+export type PlaybackLayerData = {
+  step?: number;
+  playback?: "playing" | "paused";
+  playbackTo?: number;
+};
+
 export type TraceLayerData = {
   trace?: UploadedTrace;
   onion?: "off" | "transparent" | "solid";
-};
+} & PlaybackLayerData;
 
 export type TraceLayer = Layer<TraceLayerData>;
 
@@ -136,10 +141,22 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
       </>
     );
   }),
+  service: withProduce(({ value, produce }) => {
+    useEffect(() => {
+      produce((l) =>
+        set(
+          l,
+          "source.playbackTo",
+          value?.source?.trace?.content?.events?.length ?? 0
+        )
+      );
+    }, [value]);
+    return <></>;
+  }),
   renderer: ({ layer }) => {
     const { palette } = useTheme();
-    const [{ step = 0 }] = usePlayback();
-    const throttledStep = useThrottle(step, 1000 / 60);
+    const step = useThrottle(layer?.source?.step ?? 0, 1000 / 60);
+    console.log(step);
     const { result } = useTraceMemo(
       {
         trace: layer?.source?.trace?.content,
@@ -151,30 +168,32 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
         },
         view: "main",
       },
-      [palette, layer?.source?.trace]
+      [
+        palette.primary.main,
+        palette.text.primary,
+        palette.background.paper,
+        layer?.source?.trace?.content,
+      ]
     );
-    const path = use2DPath(layer, throttledStep);
+    const path = use2DPath(layer, step);
     const steps = useMemo(
       () =>
         map(result?.stepsPersistent, (c) =>
           map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
         ),
-      [result?.stepsPersistent, layer]
+      [result?.stepsPersistent, layer?.key]
     );
     const steps1 = useMemo(
       () =>
         map(result?.stepsTransient, (c) =>
           map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
         ),
-      [result?.stepsTransient, layer]
+      [result?.stepsTransient, layer?.key]
     );
-    const steps2 = useMemo(
-      () => [steps1[throttledStep] ?? []],
-      [steps1, throttledStep]
-    );
+    const steps2 = useMemo(() => [steps1[step] ?? []], [steps1, step]);
     return (
       <>
-        <LazyNodeList step={throttledStep} nodes={steps} />
+        <LazyNodeList step={step} nodes={steps} />
         <NodeList nodes={steps2} />
         {path}
       </>
@@ -184,8 +203,8 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
     const { events } = useTraceContent(layer?.source?.trace?.content);
     return <>{children?.(events)}</>;
   },
-  getSelectionInfo: ({ layer, event, children }) => {
-    const [, setPlayback] = usePlayback();
+  getSelectionInfo: ({ layer: key, event, children }) => {
+    const { layer, setLayer } = useLayer(key);
     const menu = useMemo(() => {
       const events = layer?.source?.trace?.content?.events ?? [];
       const steps = chain(event?.info?.components)
@@ -209,7 +228,12 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
                 [`${event}`]: {
                   primary: `Go to Step ${step}`,
                   secondary: `${startCase(event.type)}`,
-                  action: () => setPlayback({ step }),
+                  action: () =>
+                    setLayer(
+                      produce(layer, (l) => {
+                        set(l, "source.step", step);
+                      })
+                    ),
                   icon: <ArrowOutwardRounded />,
                 },
               },

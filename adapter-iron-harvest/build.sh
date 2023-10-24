@@ -31,10 +31,10 @@ npx --yes resedit-cli \
     --in dist/main-win.exe \
     --out dist/main-win.exe \
     --icon "1,icon.ico" \
-    --product-name "Waypoint" \
+    --product-name "Visualiser" \
     --product-version "0.1.0.0" \
     --file-version "0.1.0.0" \
-    --file-description "Waypoint Adapter Server"
+    --file-description "Visualiser Adapter Server"
 
 # Sign Windows executable
 
@@ -52,7 +52,7 @@ if which osslsigncode >/dev/null; then
             -in private/cert.pem
     fi
     osslsigncode sign -pkcs12 private/cert.p12 \
-        -n "Waypoint Adapter Server" \
+        -n "Visualiser Adapter Server" \
         -i "https://github.com/path-visualiser" \
         -in dist/main-win.exe \
         -out dist/main-win-signed.exe

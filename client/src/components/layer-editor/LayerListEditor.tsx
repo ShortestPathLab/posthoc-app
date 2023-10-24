@@ -1,10 +1,10 @@
 import { Box } from "@mui/material";
-import { LayerEditor } from "./LayerEditor";
 import { ListEditor } from "components/generic/ListEditor";
-import { Layer, useUIState } from "slices/UIState";
+import { useLayers, Layer } from "slices/layers";
+import { LayerEditor } from "./LayerEditor";
 
 export function LayerListEditor() {
-  const [{ layers = [] }, setUIState] = useUIState();
+  const [{ layers: layers = [] }, setLayers] = useLayers();
   //   const [{ specimen }] = useSpecimen();
 
   return (
@@ -20,7 +20,7 @@ export function LayerListEditor() {
           create={() => ({
             source: { type: "trace", trace: {} },
           })}
-          onChange={(v) => setUIState({ layers: v })}
+          onChange={(v) => setLayers(() => ({ layers: v }))}
           addItemLabel="Layer"
           placeholderText={
             <Box pt={2}>Click the button below to add a layer.</Box>

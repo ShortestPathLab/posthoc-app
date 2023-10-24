@@ -1,25 +1,27 @@
+import { EditorSetterProps } from "components/Editor";
+import { isEqual } from "lodash";
 import { createElement, ReactNode } from "react";
-import { EditorProps } from "components/Editor";
 
 export function produce<T>(obj: T, f: (obj: T) => void) {
   const b = structuredClone(obj);
   f(b);
-  return b;
+  return isEqual(b, obj) ? obj : b;
 }
 export function produce2<T, U>(obj: T, f: (obj: T) => U) {
-  return f(structuredClone(obj));
+  const b = f(structuredClone(obj));
+  return isEqual(b, obj) ? obj : b;
 }
 
 export function withProduce<T>(
   component: (
-    props: EditorProps<T> & {
+    props: EditorSetterProps<T> & {
       produce: (f: (obj: T) => void) => void;
     }
   ) => ReactNode
 ) {
-  return (props: EditorProps<T>) =>
+  return (props: EditorSetterProps<T>) =>
     createElement(component, {
       ...props,
-      produce: (f) => props?.onChange?.(produce(props!.value!, f)),
+      produce: (f) => props?.onChange?.((prev) => produce(prev, f)),
     });
 }

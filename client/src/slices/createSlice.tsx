@@ -1,17 +1,15 @@
 import { noop } from "lodash";
-import { useAsync } from "react-use";
-import { merge, Reducer } from "./reducers";
 import {
-  createContext,
   ReactNode,
+  createContext,
+  useCallback,
   useContext,
   useMemo,
-  useReducer,
 } from "react";
+import { useAsync, useGetSet } from "react-use";
+import { Reducer, merge } from "./reducers";
 
-
-
-type Slice<T, U = T> = [T, (next: U) => void];
+type Slice<T, U = T> = [T, (next: (prev: T) => U) => void];
 
 type Options<T, U> = {
   init?: () => Promise<U | undefined>;
@@ -29,15 +27,22 @@ export function createSlice<T, U = T>(
     () => useContext(Store),
     // Context
     ({ children }: { children?: ReactNode }) => {
-      const [value, set] = useReducer((p: T, n: U) => {
-        const next = reduce(p, n);
-        effect?.({ prev: p, next });
-        return next;
-      }, initialState);
-      const slice = useMemo<Slice<T, U>>(() => [value, set], [value, set]);
+      const [get, set] = useGetSet(initialState);
+      const reduceSlice = useCallback(
+        (n: (prev: T) => U) => {
+          const next = reduce(get(), n(get()));
+          effect?.({ prev: get(), next });
+          set(next);
+        },
+        [get]
+      );
+      const slice = useMemo<Slice<T, U>>(
+        () => [get(), reduceSlice],
+        [get(), reduceSlice]
+      );
       useAsync(async () => {
         const r = await init?.();
-        if (r) set(r);
+        if (r) reduceSlice(() => r);
       });
       return <Store.Provider value={slice}>{children}</Store.Provider>;
     },

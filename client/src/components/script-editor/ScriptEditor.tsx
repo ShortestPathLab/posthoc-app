@@ -22,7 +22,7 @@ export function ScriptEditor() {
             height={height}
             language="javascript"
             defaultValue={code}
-            onChange={debounce((v) => setUIState({ code: v }), DELAY)}
+            onChange={debounce((v) => setUIState(() => ({ code: v })), DELAY)}
             options={{
               minimap: {
                 enabled: false,

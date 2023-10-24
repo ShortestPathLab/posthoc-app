@@ -17,7 +17,7 @@ export function Inspector(props: SpecimenInspectorProps) {
       <Flex {...props}>
         <ViewTree<PanelState>
           root={view}
-          onChange={(v) => setView({ view: v })}
+          onChange={(v) => setView(() => ({ view: v }))}
           renderLeaf={({ content }) => (
             <Fade in>
               <Box sx={{ width: "100%", height: "100%" }}>

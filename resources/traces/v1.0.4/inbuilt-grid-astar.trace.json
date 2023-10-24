@@ -1,12 +1,15 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "render": {
-    
     "views": {
-      "main": { "renderer": "2d-pixi", "components" : [{"$":"grid-view"}],  "type": "search" }
+      "main": {
+        "renderer": "2d-pixi",
+        "components": [{ "$": "grid-view" }],
+        "type": "search"
+      }
     }
   },
-  
+
   "eventList": [
     {
       "type": "source",
@@ -23214,5 +23217,4 @@
       "y": 43
     }
   ]
-
 }

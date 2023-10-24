@@ -52,7 +52,7 @@ export function RendererService() {
         });
       }
     }
-    setRenderers(rs);
+    setRenderers(() => rs);
   }, [renderer, setRenderers]);
 
   return <></>;

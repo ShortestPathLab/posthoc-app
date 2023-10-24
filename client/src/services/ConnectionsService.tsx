@@ -47,7 +47,7 @@ export function ConnectionsService() {
               ];
             } else await tp.disconnect();
           }
-          if (!aborted) setConnections(cs);
+          if (!aborted) setConnections(() => cs);
         }
         if (!aborted)
           notify(`Connected to ${cs.length} of ${remote.length} solvers.`);

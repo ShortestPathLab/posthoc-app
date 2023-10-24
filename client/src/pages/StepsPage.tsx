@@ -24,19 +24,12 @@ import {
   inferLayerName,
   layerHandlers,
 } from "components/layer-editor/layers/LayerSource";
-import { delay, find, head, map } from "lodash";
+import { usePlaybackState } from "hooks/usePlaybackState";
+import { delay, map } from "lodash";
 import { Page } from "pages/Page";
 import { TraceEvent } from "protocol";
-import {
-  cloneElement,
-  createElement,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useUIState } from "slices/UIState";
-import { usePlayback } from "slices/playback";
+import { cloneElement, createElement, useEffect, useMemo, useRef } from "react";
+import { useLayer } from "slices/layers";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -45,16 +38,9 @@ const pxToInt = (s: string) => Number(s.replace(/px$/, ""));
 export function StepsPage() {
   const { spacing } = useTheme();
   const { controls, onChange, state } = useViewTreeContext();
-  const [{ step = 0, playback }, setPlayback] = usePlayback();
-  const [{ layers }] = useUIState();
   const ref = useRef<ListHandle | null>(null);
-
-  const [key, setKey] = useState<string>();
-  const layer = find(layers, { key });
-
-  useEffect(() => {
-    if (!key) setKey(head(layers)?.key);
-  }, [key, setKey, layers]);
+  const { key, setKey, layers, layer } = useLayer();
+  const { step, playing, pause, stepTo } = usePlaybackState(key);
 
   const steps = useMemo(() => {
     if (layer) {
@@ -65,7 +51,7 @@ export function StepsPage() {
   }, [layer]);
 
   useEffect(() => {
-    if (playback === "paused") {
+    if (!playing) {
       delay(
         () =>
           ref?.current?.scrollToIndex?.({
@@ -77,14 +63,14 @@ export function StepsPage() {
         150
       );
     }
-  }, [step, playback, spacing]);
+  }, [step, playing, spacing]);
 
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Content>
         <Flex vertical alignItems="center">
           {steps ? (
-            playback !== "playing" ? (
+            !playing ? (
               cloneElement(steps, {
                 children: (steps: TraceEvent[]) =>
                   layer ? (
@@ -113,6 +99,7 @@ export function StepsPage() {
                               index={i}
                               selected={i === step}
                               sx={{ height: "100%" }}
+                              onClick={() => stepTo(i)}
                             />
                             <Divider variant="inset" />
                           </Box>
@@ -136,9 +123,7 @@ export function StepsPage() {
                 label={
                   <>
                     <Type>Running</Type>
-                    <Button onClick={() => setPlayback({ playback: "paused" })}>
-                      Pause
-                    </Button>
+                    <Button onClick={() => pause()}>Pause</Button>
                   </>
                 }
               />

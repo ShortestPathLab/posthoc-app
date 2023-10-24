@@ -11,42 +11,15 @@ import {
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
-import download from "downloadjs";
-import { fileDialog as file } from "file-select-dialog";
 import { startCase } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
-import { customAlphabet } from "nanoid";
 import logo from "public/logo512.png";
-import { name, repository } from "public/manifest.json";
+import { repository, docs, version } from "public/manifest.json";
 import { useEffect, useState } from "react";
-import { UIState, useUIState } from "slices/UIState";
-import { parse } from "yaml";
-
-const id = customAlphabet("qwertyuiopasdfghjklzxcvbnm1234567890", 6);
-
-function ext(s: string) {
-  return s.split(".").pop();
-}
-
-export function saveWorkspace(filename: string, obj: UIState) {
-  download(JSON.stringify(obj), `${filename}.json`, "application/json");
-}
-
-const FORMATS = ["json", "yaml"];
-export async function loadWorkspace() {
-  const f = await file({
-    accept: FORMATS.map((c) => `.workspace.${c}`),
-    strict: true,
-  });
-  if (f && FORMATS.includes(ext(f.name)!)) {
-    const content = await f.text();
-    const parsed = parse(content);
-    return parsed as UIState;
-  }
-}
+import { useWorkspace } from "hooks/useWorkspace";
 
 export const TitleBar = () => {
-  const [UI, setUIState] = useUIState();
+  const { save, load } = useWorkspace();
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     if ("windowControlsOverlay" in navigator) {
@@ -81,10 +54,9 @@ export const TitleBar = () => {
             sx={{ height: "100%" }}
             alignItems="center"
           >
-            <Box sx={{ p: 1, pr: 0, height: "100%" }}>
+            <Box sx={{ p: 1, height: "100%" }}>
               <img src={logo} style={{ height: "100%" }} />
             </Box>
-            <Type sx={{ fontSize: 14, fontWeight: 300, pr: 1.5 }}>{name}</Type>
             {[
               {
                 key: "workspace",
@@ -92,19 +64,12 @@ export const TitleBar = () => {
                   {
                     name: "Load workspace",
                     key: "workspace-load",
-                    action: async () => {
-                      const workspace = await loadWorkspace();
-                      if (workspace) {
-                        setUIState(workspace);
-                      }
-                    },
+                    action: load,
                   },
                   {
                     name: "Save workspace",
                     key: "workspace-save",
-                    action: () => {
-                      saveWorkspace(`${id()}.workspace`, UI);
-                    },
+                    action: save,
                   },
                 ],
               },
@@ -115,6 +80,12 @@ export const TitleBar = () => {
                     name: "Open repository in GitHub",
                     key: "github",
                     action: () => open(repository, "_blank"),
+                  },
+                  {
+                    name: "Open changelog",
+                    key: "changelog",
+                    action: () =>
+                      open(`${docs}/changelog-${version}.md`, "_blank"),
                   },
                 ],
               },

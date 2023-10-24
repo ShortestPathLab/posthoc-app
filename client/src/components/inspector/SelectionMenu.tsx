@@ -17,6 +17,7 @@ import {
   SelectionInfoProvider,
   getLayerHandler,
 } from "components/layer-editor/layers/LayerSource";
+import { useLayers } from "slices/layers";
 
 type Props = {
   selection?: RendererSelectEvent;
@@ -127,21 +128,21 @@ export function SelectionMenu({ selection, onClose }: Props) {
   );
 }
 
-type SelectionInfoProviderProps<T> = ComponentProps<SelectionInfoProvider<T>>;
+type SelectionInfoProviderProps = ComponentProps<SelectionInfoProvider>;
 
-const identity = ({ children }: SelectionInfoProviderProps<any>) => (
+const identity = ({ children }: SelectionInfoProviderProps) => (
   <>{children?.({})}</>
 );
 
 function useSelectionMenu() {
-  const [{ layers }] = useUIState();
+  const [{ layers: layers }] = useLayers();
   return useMemo(
     () =>
       chain(layers)
         .reduce((A, l) => {
           const B = getLayerHandler(l)?.getSelectionInfo ?? identity;
-          return ({ children, event }: SelectionInfoProviderProps<any>) => (
-            <B layer={l} event={event}>
+          return ({ children, event }: SelectionInfoProviderProps) => (
+            <B layer={l.key} event={event}>
               {(a) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}
             </B>
           );

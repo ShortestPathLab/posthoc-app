@@ -1,20 +1,28 @@
-import { clamp } from "lodash";
-import { useMemo } from "react";
-import { useTraceContent } from "./useTraceContent";
 import { useSnackbar } from "components/generic/Snackbar";
-import { usePlayback } from "slices/playback";
-import { Layer, UploadedTrace } from "slices/UIState";
+import { PlaybackLayerData } from "components/layer-editor/layers/traceLayerSource";
+import { clamp, min, set } from "lodash";
+import { produce } from "produce";
+import { useMemo } from "react";
+import { useLayer } from "slices/layers";
 
-export function usePlaybackState(layer?: Layer<{ trace?: UploadedTrace }>) {
+export function usePlaybackState(key?: string) {
   const notify = useSnackbar();
-  const [{ playback, step = 0 }, setPlaybackState] = usePlayback();
-  const { events } = useTraceContent(layer?.source?.trace?.content);
+  const { layer, setLayer } = useLayer<PlaybackLayerData>(key);
 
-  const ready = !!events;
+  const { playback, playbackTo, step: _step = 0 } = layer?.source ?? {};
+
+  const step = min([playbackTo, _step]) ?? 0;
+
+  const ready = !!playbackTo;
   const playing = playback === "playing";
-  const [start, end] = [0, (events?.length ?? 1) - 1];
+  const [start, end] = [0, (playbackTo ?? 1) - 1];
 
   return useMemo(() => {
+    function setPlaybackState(s: Partial<PlaybackLayerData>) {
+      setLayer(
+        produce(layer, (l) => set(l!, "source", { ...l?.source, ...s }))!
+      );
+    }
     const state = {
       start,
       end,
@@ -37,6 +45,7 @@ export function usePlaybackState(layer?: Layer<{ trace?: UploadedTrace }>) {
         notify("Playback paused");
         setPlaybackState({ playback: "paused", step: stepBy(n) });
       },
+      stepTo: (n = 0) => setPlaybackState({ step: n }),
       stop: () => setPlaybackState({ step: start, playback: "paused" }),
       stepForward: () => setPlaybackState({ step: stepBy(1) }),
       stepBackward: () => setPlaybackState({ step: stepBy(-1) }),
@@ -49,5 +58,5 @@ export function usePlaybackState(layer?: Layer<{ trace?: UploadedTrace }>) {
       ...state,
       ...callbacks,
     };
-  }, [end, playback, playing, ready, setPlaybackState, start, step]);
+  }, [end, playback, playing, ready, start, step, layer, setLayer]);
 }

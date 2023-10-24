@@ -34,7 +34,7 @@ export function FeaturesService() {
             );
           }
         }
-        if (!signal.aborted) setFeatures(features);
+        if (!signal.aborted) setFeatures(() => features);
       }),
     [connections, setFeatures]
   );

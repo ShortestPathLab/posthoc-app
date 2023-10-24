@@ -51,10 +51,10 @@ export const text: Primitive<any> = {
   },
   test(c) {
     return {
-      left: c.x,
-      right: c.x,
-      top: c.y,
-      bottom: c.y,
+      left: -Infinity,
+      right: Infinity,
+      top: -Infinity,
+      bottom: Infinity,
     };
   },
 };
@@ -146,10 +146,10 @@ export const path: Primitive<"path"> = {
   },
   test(c) {
     return {
-      left: minBy(c.points, "x")?.x ?? 0,
-      right: maxBy(c.points, "x")?.x ?? 0,
-      top: minBy(c.points, "y")?.y ?? 0,
-      bottom: maxBy(c.points, "y")?.y ?? 0,
+      left: minBy(c.points, "x")?.x ?? 0 - c.lineWidth ?? 0,
+      right: maxBy(c.points, "x")?.x ?? 0 + c.lineWidth ?? 0,
+      top: minBy(c.points, "y")?.y ?? 0 - c.lineWidth ?? 0,
+      bottom: maxBy(c.points, "y")?.y ?? 0 + c.lineWidth ?? 0,
     };
   },
 };

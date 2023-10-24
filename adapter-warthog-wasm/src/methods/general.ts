@@ -6,7 +6,7 @@ export const general = [
    */
   createMethod("about", async () => ({
     name: "Warthog (WebAssembly)",
-    version: "1.0.4",
+    version: "1.0.5",
     description: "Solver Adapter for Warthog & Roadhog",
   })),
 ];

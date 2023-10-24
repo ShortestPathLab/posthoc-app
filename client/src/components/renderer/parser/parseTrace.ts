@@ -9,6 +9,7 @@ import { useSnackbar } from "components/generic/Snackbar";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import parseGridWorkerUrl from "./parseTrace.worker.ts?worker&url";
+import { map } from "lodash";
 
 export class ParseTraceWorker extends Worker {
   constructor() {
@@ -46,6 +47,6 @@ export function useTrace(params: ParseTraceWorkerParameters) {
 }
 
 export function useTraceMemo(trace: ParseTraceWorkerParameters, deps: any[]) {
-  const params = useMemo(() => trace, deps);
+  const params = useMemo(() => trace, map(deps, JSON.stringify));
   return useTrace(params);
 }

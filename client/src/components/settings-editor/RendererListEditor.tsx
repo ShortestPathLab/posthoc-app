@@ -15,7 +15,7 @@ export function RendererListEditor() {
         editor={(v) => <RendererEditor value={v} />}
         icon={null}
         value={renderer}
-        onChange={debounce((v) => setSettings({ renderer: v }), 300)}
+        onChange={debounce((v) => setSettings(() => ({ renderer: v })), 300)}
         addItemLabel="Add Renderer"
         create={() => ({
           transport: defaultTransport,
@@ -26,7 +26,7 @@ export function RendererListEditor() {
           <FeaturePickerButton
             icon={<ResetIcon />}
             sx={{ ml: 2 }}
-            onClick={() => setSettings({ renderer: defaultRenderers })}
+            onClick={() => setSettings(() => ({ renderer: defaultRenderers }))}
           >
             Reset to Defaults
           </FeaturePickerButton>

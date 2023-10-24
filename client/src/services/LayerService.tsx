@@ -1,9 +1,10 @@
+import { getLayerHandler } from "components/layer-editor/layers/LayerSource";
 import { map } from "lodash";
 import { createElement, useMemo } from "react";
-import { getLayerHandler } from "components/layer-editor/layers/LayerSource";
-import { useUIState } from "slices/UIState";
+import { useLayers } from "slices/layers";
+
 function useLayerServices() {
-  const [{ layers }, setUIState] = useUIState();
+  const [{ layers: layers }, setLayers] = useLayers();
   return useMemo(() => {
     return map(layers, (layer) => {
       const service = getLayerHandler(layer).service;
@@ -12,14 +13,15 @@ function useLayerServices() {
           key: layer.key,
           value: layer,
           onChange: (v) =>
-            setUIState({
-              layers: map(layers, (l) => (l.key === layer.key ? v : l)),
-            }),
+            setLayers(({ layers: prev }) => ({
+              layers: map(prev, (l) => (l.key === layer.key ? v(l) : l)),
+            })),
         });
       }
     });
-  }, [layers, setUIState]);
+  }, [layers, setLayers]);
 }
+
 export function LayerService() {
   const layerServices = useLayerServices();
   return <>{layerServices}</>;

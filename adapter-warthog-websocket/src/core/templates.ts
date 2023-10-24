@@ -1,7 +1,7 @@
 import { Trace } from "protocol";
 
 export const gridTemplate: Partial<Trace> = {
-  version: "1.0.4",
+  version: "1.0.5",
   render: {
     context: {},
     components: {
@@ -33,7 +33,7 @@ export const gridTemplate: Partial<Trace> = {
 };
 
 export const xyTemplate: Partial<Trace> = {
-  version: "1.0.4",
+  version: "1.0.5",
   render: {
     components: {
       node: [

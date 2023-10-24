@@ -34,7 +34,10 @@ export function BreakpointListEditor() {
             type: undefined,
             reference: 0,
           })}
-          onChange={debounce((v) => setUIState({ breakpoints: v }), 1000)}
+          onChange={debounce(
+            (v) => setUIState(() => ({ breakpoints: v })),
+            1000
+          )}
           addItemLabel="Breakpoint"
           placeholderText="Click the button below to add a breakpoint."
         />

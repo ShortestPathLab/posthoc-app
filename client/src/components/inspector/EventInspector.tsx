@@ -1,9 +1,3 @@
-import { pick } from "lodash";
-import { TraceEvent } from "protocol/Trace";
-import { EventLabel } from "./EventLabel";
-import { PropertyList } from "./PropertyList";
-import { getColorHex } from "components/renderer/colors";
-import { usePlayback } from "slices/playback";
 import {
   Divider,
   ListItem,
@@ -11,11 +5,16 @@ import {
   ListItemButtonProps,
   ListItemIcon,
   ListItemText,
-  Typography as Type,
-  useTheme,
   Skeleton as Placeholder,
   Tooltip,
+  Typography as Type,
+  useTheme,
 } from "@mui/material";
+import { getColorHex } from "components/renderer/colors";
+import { pick } from "lodash";
+import { TraceEvent } from "protocol/Trace";
+import { EventLabel } from "./EventLabel";
+import { PropertyList } from "./PropertyList";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -30,7 +29,6 @@ export function EventInspector({
   ...props
 }: EventInspectorProps) {
   const { spacing } = useTheme();
-  const [, setPlayback] = usePlayback();
 
   // const cardStyles = selected
   //   ? {
@@ -55,7 +53,6 @@ export function EventInspector({
         borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
         ...props.sx,
       }}
-      onClick={() => setPlayback({ step: index })}
     >
       <ListItemIcon>
         <Type variant="body2">{index}</Type>

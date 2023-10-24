@@ -1,12 +1,6 @@
 import { nanoid as id } from "nanoid";
 import { createSlice } from "./createSlice";
 
-export type Layer<T = Record<string, any>> = {
-  key: string;
-  name?: string;
-  source?: { type: string } & T;
-};
-
 export type Node = { size?: number };
 
 export type Branch<T> = Node & {

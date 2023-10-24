@@ -2,19 +2,6 @@ import {
   PlaceOutlined as DestinationIcon,
   TripOriginOutlined as StartIcon,
 } from "@mui/icons-material";
-import {
-  filter,
-  isUndefined,
-  map,
-  reduce,
-  round,
-  set,
-  startCase,
-} from "lodash";
-import { useMemo } from "react";
-import { inferLayerName, LayerSource } from "./LayerSource";
-import { Option } from "./Option";
-import { QueryLayerData } from "./queryLayerSource";
 import { MapPicker } from "components/app-bar/Input";
 import { NodeList } from "components/render/renderer/generic/NodeList";
 import { getParser } from "components/renderer";
@@ -22,13 +9,21 @@ import { ParsedMap } from "components/renderer/map-parser/Parser";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { useMapContent } from "hooks/useMapContent";
 import { useParsedMap } from "hooks/useParsedMap";
+import { filter, isUndefined, reduce, round, set, startCase } from "lodash";
 import { produce, withProduce } from "produce";
-import { Layer, Map, useUIState } from "slices/UIState";
+import { useMemo } from "react";
+import { Map } from "slices/UIState";
+import { useLayer, Layer } from "slices/layers";
+import { LayerSource, inferLayerName } from "./LayerSource";
+import { Option } from "./Option";
+import { QueryLayerData } from "./queryLayerSource";
 
 export type MapLayerData = {
   map?: Map;
   parsedMap?: ParsedMap;
 };
+
+export type MapLayer = Layer<MapLayerData>;
 
 export const mapLayerSource: LayerSource<"map", MapLayerData> = {
   key: "map",
@@ -67,9 +62,9 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
     );
     return <></>;
   }),
-  getSelectionInfo: ({ children, event, layer }) => {
+  getSelectionInfo: ({ children, event, layer: key }) => {
+    const { layer, setLayer, layers } = useLayer<MapLayerData>(key);
     const { parsedMap } = layer?.source ?? {};
-    const [{ layers }, setUIState] = useUIState();
     const { point, node } = useMemo(() => {
       if (parsedMap && event) {
         const hydratedMap = getParser(layer?.source?.map?.format)?.hydrate?.(
@@ -108,36 +103,28 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
                       primary: `Set as source`,
                       secondary: inferLayerName(next),
                       action: () =>
-                        setUIState({
-                          layers: map(layers, (l2) =>
-                            l2.key === next.key
-                              ? produce(l2, (l) => {
-                                  set(l, "source.start", node);
-                                  set(l, "source.query", undefined);
-                                  set(l, "source.mapLayerKey", layer.key);
-                                  set(l, "source.trace", undefined);
-                                })
-                              : l2
-                          ),
-                        }),
+                        setLayer(
+                          produce(layer, (l) => {
+                            set(l, "source.start", node);
+                            set(l, "source.query", undefined);
+                            set(l, "source.mapLayerKey", layer.key);
+                            set(l, "source.trace", undefined);
+                          })
+                        ),
                       icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
                     },
                     [`${next.key}-b`]: {
                       primary: `Set as destination`,
                       secondary: inferLayerName(next),
                       action: () =>
-                        setUIState({
-                          layers: map(layers, (l2) =>
-                            l2.key === next.key
-                              ? produce(l2, (l) => {
-                                  set(l, "source.end", node);
-                                  set(l, "source.query", undefined);
-                                  set(l, "source.mapLayerKey", layer.key);
-                                  set(l, "source.trace", undefined);
-                                })
-                              : l2
-                          ),
-                        }),
+                        setLayer(
+                          produce(layer, (l) => {
+                            set(l, "source.end", node);
+                            set(l, "source.query", undefined);
+                            set(l, "source.mapLayerKey", layer.key);
+                            set(l, "source.trace", undefined);
+                          })
+                        ),
                       icon: <DestinationIcon />,
                     },
                   }),
@@ -147,7 +134,7 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
             },
           }),
       };
-    }, [point, node, layer, layers, setUIState]);
+    }, [point, node, layer, layers, setLayer]);
     return <>{children?.(menu)}</>;
   },
 };

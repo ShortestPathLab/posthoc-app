@@ -24,7 +24,8 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
     },
     typography: {
       allVariants: {
-        fontFamily: "Inter",
+        fontFamily: `"Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+        "Droid Sans", "Helvetica Neue", "Arial", sans-serif`,
       },
       button: {
         textTransform: "none",

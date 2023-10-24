@@ -1,8 +1,8 @@
 import { TraceEvent } from "protocol/Trace";
 import { FunctionComponent, RefCallback } from "react";
 import { ComponentEntry, Renderer } from "renderer";
-import { Layer } from "slices/UIState";
 import { Point } from "./Size";
+import { Layer } from "slices/layers";
 
 type Step = {
   index: number;

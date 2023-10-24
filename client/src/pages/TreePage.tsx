@@ -21,9 +21,10 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { inferLayerName } from "components/layer-editor/layers/LayerSource";
 import { getColorHex } from "components/renderer/colors";
-import { delay, entries, find, findLast, head, map, startCase } from "lodash";
+import { delay, entries, find, findLast, map, set, startCase } from "lodash";
 import PopupState, { bindMenu } from "material-ui-popup-state";
 import { Page } from "pages/Page";
+import { produce } from "produce";
 import { FC, useCallback, useEffect, useState } from "react";
 import {
   CustomNodeElementProps,
@@ -32,8 +33,7 @@ import {
 } from "react-d3-tree";
 import { useCss, useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
-import { Layer, useUIState } from "slices/UIState";
-import { usePlayback } from "slices/playback";
+import { useLayer } from "slices/layers";
 import { PanelState } from "slices/view";
 import { useTreeMemo } from "./TreeWorker";
 import { EventTree } from "./tree.worker";
@@ -76,17 +76,11 @@ const radius2 = {
 };
 
 export function TreePage() {
-  const [{ step = 0 }] = usePlayback();
-  const throttledStep = useThrottle(step, 600);
   const { palette } = useTheme();
-  const [{ layers }] = useUIState();
-  const [key, setKey] = useState<string>();
 
-  useEffect(() => {
-    if (!key) setKey(head(layers)?.key);
-  }, [key, setKey, layers]);
+  const { key, setKey, layer, setLayer, layers } = useLayer();
 
-  const layer = find(layers, { key }) as Layer<any>;
+  const throttledStep = useThrottle(layer?.source?.step ?? 0, 600);
   const { controls, onChange, state } = useViewTreeContext<TreePageContext>();
 
   const [radius, setRadius] = useState<keyof typeof radius2>("small");
@@ -136,6 +130,14 @@ export function TreePage() {
                         <Node
                           node={nodeDatum as unknown as EventTree}
                           onClick={() => onNodeClick?.({} as any)}
+                          step={layer?.source?.step}
+                          onStep={(s) =>
+                            setLayer(
+                              produce(layer, (l) => {
+                                set(l, "source.step", s);
+                              })
+                            )
+                          }
                         />
                       );
                     }}
@@ -181,12 +183,20 @@ export function TreePage() {
 const width = 16;
 const height = 4;
 
-function Node({ onClick, node }: { onClick?: () => void; node?: EventTree }) {
-  const [{ step = 0 }, setPlayback] = usePlayback();
-  const throttledStep = useThrottle(step, 1000 / 24);
+function Node({
+  onClick,
+  node,
+  step = 0,
+  onStep,
+}: {
+  onClick?: () => void;
+  node?: EventTree;
+  step?: number;
+  onStep?: (s: number) => void;
+}) {
   const { palette, spacing, shape } = useTheme();
-  const a = findLast(node?.events, (e) => e.step <= throttledStep);
-  const isSelected = !!find(node?.events, (e) => e.step === throttledStep);
+  const a = findLast(node?.events, (e) => e.step <= step);
+  const isSelected = !!find(node?.events, (e) => e.step === step);
   const color = getColorHex(a?.data?.type);
   return (
     <PopupState variant="popover">
@@ -295,20 +305,14 @@ function Node({ onClick, node }: { onClick?: () => void; node?: EventTree }) {
             <MenuList dense sx={{ p: 0 }}>
               {map(node?.events, (e) => (
                 <MenuItem
-                  selected={e.step === throttledStep}
+                  selected={e.step === step}
                   sx={{
                     borderLeft: `4px solid ${getColorHex(e.data.type)}`,
                   }}
                   onClick={() => {
                     state.close();
                     onClick?.();
-                    delay(
-                      () =>
-                        setPlayback({
-                          step: e.step,
-                        }),
-                      150
-                    );
+                    delay(() => onStep?.(e.step), 150);
                   }}
                 >
                   <Label

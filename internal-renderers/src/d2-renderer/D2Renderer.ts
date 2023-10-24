@@ -75,7 +75,7 @@ class D2Renderer
         bounds,
         (a, b) => ({
           top: min(a.top, b.top),
-          left: min(a.top, b.left),
+          left: min(a.left, b.left),
           bottom: max(a.bottom, b.bottom),
           right: max(a.right, b.right),
         }),
@@ -86,6 +86,8 @@ class D2Renderer
           right: -Infinity,
         }
       );
+      console.log(out);
+      console.log(this.#system.all());
       this.#viewport?.animate?.({
         position: new PIXI.Point(
           (out.left + out.right) / 2,
@@ -192,7 +194,7 @@ class D2Renderer
       .pinch()
       .wheel()
       .decelerate({ friction: 0.98 })
-      .clampZoom({ maxScale: 300, minScale: 0.0001 });
+      .clampZoom({ maxScale: 300, minScale: 0.00001 });
 
     this.#viewport.on("moved", () => {
       this.#getFrustumChangeQueue()();

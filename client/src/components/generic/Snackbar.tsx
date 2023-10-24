@@ -12,9 +12,6 @@ import {
   useState,
 } from "react";
 
-
-
-
 const SnackbarContext = createContext<
   (message?: string, secondary?: string) => () => void
 >(() => noop);
@@ -62,10 +59,10 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
           key: new Date().getTime(),
         },
       ]);
-      appendLog({
+      appendLog(() => ({
         content: filter([message, secondary]).join(", "),
         timestamp: `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
-      });
+      }));
       return () => handleClose("");
     },
     [setSnackPack]

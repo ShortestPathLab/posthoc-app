@@ -1,9 +1,11 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "render": {
     "context": {},
     "components": {
-      "node": [ { "$": "circle", "radius": 1, "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" } ],
+      "node": [
+        { "$": "circle", "radius": 1, "x": "{{ctx.x1}}", "y": "{{ctx.y1}}" }
+      ],
       "line1": [
         {
           "$": "path",
@@ -51,11 +53,14 @@
       ]
     },
     "views": {
-      "main": { "renderer": "2d-pixi", "components": [ { "$": "mesh-event" } ] }
+      "main": { "renderer": "2d-pixi", "components": [{ "$": "mesh-event" }] }
     }
   },
   "path": {
-    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
+    "pivot": {
+      "x": "{{'x' in ctx ? ctx.x : 0}}",
+      "y": "{{'y' in ctx ? ctx.y : 0}}"
+    },
     "scale": 1
   },
   "events": [

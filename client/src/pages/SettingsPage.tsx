@@ -76,7 +76,7 @@ export function SettingsPage() {
                         valueLabelDisplay="auto"
                         defaultValue={playbackRate}
                         onChangeCommitted={(_, v) =>
-                          setSettings({ playbackRate: v as number })
+                          setSettings(() => ({ playbackRate: v as number }))
                         }
                       />
                     </Flex>
@@ -86,7 +86,7 @@ export function SettingsPage() {
                       <Space flex={1} />
                       <Switch
                         defaultChecked={!!acrylic}
-                        onChange={(_, v) => setSettings({ acrylic: v })}
+                        onChange={(_, v) => setSettings(() => ({ acrylic: v }))}
                       />
                     </Flex>
                     <Flex alignItems="center">
@@ -95,7 +95,7 @@ export function SettingsPage() {
                       <Switch
                         defaultChecked={theme === "dark"}
                         onChange={(_, v) =>
-                          setSettings({ theme: v ? "dark" : "light" })
+                          setSettings(() => ({ theme: v ? "dark" : "light" }))
                         }
                       />
                     </Flex>
@@ -110,7 +110,7 @@ export function SettingsPage() {
                         }))}
                         showArrow
                         onChange={(v) =>
-                          setSettings({ accentColor: v as AccentColor })
+                          setSettings(() => ({ accentColor: v as AccentColor }))
                         }
                       />
                     </Flex>

@@ -19,7 +19,7 @@ for await (const file of globIterate(`${resolve(__dirname, folder)}/*.json`)) {
     path,
   } = JSON.parse(await readFile(file, "utf-8"));
   const updated = {
-    version: "1.0.4",
+    version: "1.0.5",
     render: render ?? {
       components: {},
       views: {

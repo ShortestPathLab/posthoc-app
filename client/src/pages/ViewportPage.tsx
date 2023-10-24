@@ -17,7 +17,7 @@ import { Page } from "pages/Page";
 import { useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
-import { useUIState } from "slices/UIState";
+import { useLayers } from "slices/layers";
 import { Renderer, useRenderers } from "slices/renderers";
 import { PanelState } from "slices/view";
 
@@ -43,7 +43,7 @@ export function ViewportPage() {
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();
 
-  const [{ layers }] = useUIState();
+  const [{ layers: layers }] = useLayers();
   const [layerSet, setLayerSet] = useState<Dictionary<boolean | undefined>>({});
   const selectedLayers = useMemo(
     () => filter(layers, (l) => layerSet?.[l.key] ?? true),

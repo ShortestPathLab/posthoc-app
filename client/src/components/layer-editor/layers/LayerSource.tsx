@@ -4,23 +4,23 @@ import { createElement, FC, ReactNode } from "react";
 import { mapLayerSource } from "./mapLayerSource";
 import { queryLayerSource } from "./queryLayerSource";
 import { traceLayerSource } from "./traceLayerSource";
-import { EditorProps } from "components/Editor";
+import { EditorProps, EditorSetterProps } from "components/Editor";
 import { SelectionMenuContent } from "components/inspector/SelectionMenu";
 import { SelectEvent } from "components/renderer/Renderer";
 import { PlaybackStateType } from "slices/playback";
-import { Layer } from "slices/UIState";
+import { Layer } from "slices/layers";
 
-export type SelectionInfoProvider<T> = FC<{
-  layer?: Layer<T>;
+export type SelectionInfoProvider = FC<{
+  layer?: string;
   event?: SelectEvent;
   children?: (menu: SelectionMenuContent) => ReactNode;
 }>;
 
 export type LayerSource<K extends string, T> = {
   key: K;
-  editor: FC<EditorProps<Layer<T>>>;
+  editor: FC<EditorSetterProps<Layer<T>>>;
   renderer: FC<{ layer?: Layer<T> }>;
-  service?: FC<EditorProps<Layer<T>>>;
+  service?: FC<EditorSetterProps<Layer<T>>>;
   inferName: (layer: Layer<T>) => string;
   steps: FC<{
     layer?: Layer<T>;
@@ -28,7 +28,7 @@ export type LayerSource<K extends string, T> = {
   }>;
   currentStep?: number;
   playback?: PlaybackStateType;
-  getSelectionInfo?: SelectionInfoProvider<T>;
+  getSelectionInfo?: SelectionInfoProvider;
 };
 
 export function RenderLayer({ layer }: { layer?: Layer }) {

@@ -1,16 +1,19 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "render": {
     "views": {
       "main": {
         "renderer": "2d-pixi",
-        "components": [ { "$": "grid-view" } ],
+        "components": [{ "$": "grid-view" }],
         "type": "search"
       }
     }
   },
   "path": {
-    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
+    "pivot": {
+      "x": "{{'x' in ctx ? ctx.x : 0}}",
+      "y": "{{'y' in ctx ? ctx.y : 0}}"
+    },
     "scale": 1
   },
   "events": [

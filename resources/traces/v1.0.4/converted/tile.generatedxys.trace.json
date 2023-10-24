@@ -1,5 +1,5 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "render": {
     "components": {
       "tile": [
@@ -34,13 +34,19 @@
     "views": {
       "main": {
         "renderer": "2d-pixi",
-        "components": [ { "$": "tileboard", "persist": false } ]
+        "components": [{ "$": "tileboard", "persist": false }]
       },
-      "secondary": { "renderer": "2d-pixi", "components": [ { "$": "tree-view" } ] }
+      "secondary": {
+        "renderer": "2d-pixi",
+        "components": [{ "$": "tree-view" }]
+      }
     }
   },
   "path": {
-    "pivot": { "x": "{{'x' in ctx ? ctx.x : 0}}", "y": "{{'y' in ctx ? ctx.y : 0}}" },
+    "pivot": {
+      "x": "{{'x' in ctx ? ctx.x : 0}}",
+      "y": "{{'y' in ctx ? ctx.y : 0}}"
+    },
     "scale": 1
   },
   "events": [
