@@ -5,6 +5,7 @@ import { useSnackbar } from "components/generic/Snackbar";
 import { Connection, useConnections } from "slices/connections";
 import { useLoadingState } from "slices/loading";
 import { useSettings } from "slices/settings";
+
 function wait(ms: number) {
   return new Promise((res) => delay(res, ms));
 }

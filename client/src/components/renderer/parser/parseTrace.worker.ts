@@ -9,6 +9,7 @@ import {
 import { ComponentEntry } from "renderer";
 import { mapProperties } from "./mapProperties";
 import { parse as parseComponents } from "./parse";
+import { normalizeConstant } from "./normalize";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
@@ -39,12 +40,14 @@ function parse({
         ParsedComponent<string, any>,
         CompiledComponent<string, Record<string, any>>
       >(p, (c) =>
-        c({
-          alpha: 1,
-          ...context,
-          ...ctx,
-          ...event,
-        })
+        c(
+          normalizeConstant({
+            alpha: 1,
+            ...context,
+            ...ctx,
+            event,
+          })
+        )
       )
     );
 
@@ -66,7 +69,6 @@ function parse({
   const steps = chain(trace?.events)
     .map((e, i, esx) => {
       const component = apply(e, {
-        ...context,
         step: i,
         parent: !isNullish(e.pId)
           ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
@@ -79,7 +81,6 @@ function parse({
     .map((c) => mapValues(c, (b) => b.filter(isVisible)))
     .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(i))))
     .value();
-
   return {
     stepsPersistent: map(steps, "persistent"),
     stepsTransient: map(steps, "transient"),

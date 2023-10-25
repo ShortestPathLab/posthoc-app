@@ -35,11 +35,16 @@ function stringify(obj: any) {
 export function Property({ label, value, type }: Props) {
   return (
     <Flex width="auto" mr={3} mt={0.5} key={`${label}::${stringify(value)}`}>
-      <Type component="div" sx={{ opacity: 0.54 }} {...type}>
+      <Type
+        component="div"
+        variant="body2"
+        {...type}
+        sx={{ opacity: 0.54, ...type?.sx }}
+      >
         {label}
       </Type>
       <Space />
-      <Type component="div" {...type}>
+      <Type component="div" variant="body2" {...type}>
         {stringify(value) ?? "none"}
       </Type>
     </Flex>

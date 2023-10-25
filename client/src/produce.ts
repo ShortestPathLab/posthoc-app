@@ -1,15 +1,15 @@
 import { EditorSetterProps } from "components/Editor";
-import { isEqual } from "lodash";
-import { createElement, ReactNode } from "react";
+import { clone } from "lodash";
+import { ReactNode, createElement } from "react";
 
 export function produce<T>(obj: T, f: (obj: T) => void) {
-  const b = structuredClone(obj);
+  const b = clone(obj);
   f(b);
-  return isEqual(b, obj) ? obj : b;
+  return b;
 }
 export function produce2<T, U>(obj: T, f: (obj: T) => U) {
-  const b = f(structuredClone(obj));
-  return isEqual(b, obj) ? obj : b;
+  const b = f(clone(obj));
+  return b;
 }
 
 export function withProduce<T>(

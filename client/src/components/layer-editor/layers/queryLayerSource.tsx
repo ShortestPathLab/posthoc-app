@@ -1,19 +1,28 @@
-import { CodeOutlined, LayersOutlined } from "@mui/icons-material";
+import {
+  CodeOutlined,
+  PlaceOutlined as DestinationIcon,
+  LayersOutlined,
+  TripOriginOutlined as StartIcon,
+} from "@mui/icons-material";
 import { Box, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useSnackbar } from "components/generic/Snackbar";
-import { find, set } from "lodash";
-import { withProduce } from "produce";
+import { getParser } from "components/renderer";
+import { filter, find, map, merge, reduce, set } from "lodash";
+import { nanoid as id } from "nanoid";
+import { produce, withProduce } from "produce";
 import { useMemo } from "react";
 import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
-import { useLayer, useLayers } from "slices/layers";
+import { Layer, useLayer, useLayers } from "slices/layers";
 import { useEffectWhenAsync } from "../../../hooks/useEffectWhen";
 import { LayerSource, inferLayerName } from "./LayerSource";
 import { Heading, Option } from "./Option";
 import { TracePreview } from "./TracePreview";
-import { MapLayer } from "./mapLayerSource";
+import { MapLayer, MapLayerData } from "./mapLayerSource";
 import { TraceLayerData, traceLayerSource } from "./traceLayerSource";
+
+const TraceLayerSelectionInfoProvider = traceLayerSource.getSelectionInfo!;
 
 async function findConnection(
   connections: Connection[],
@@ -147,6 +156,7 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
                   set(v, "source.trace", {
                     name: `${algorithmInfo?.name}`,
                     content: result,
+                    key: id(),
                   })
                 );
               } else {
@@ -174,5 +184,86 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
   inferName: (l) => l.source?.trace?.name ?? "Untitled Query",
   renderer: traceLayerSource.renderer,
   steps: traceLayerSource.steps,
-  getSelectionInfo: traceLayerSource.getSelectionInfo,
+  getSelectionInfo: ({ children, event, layer: key }) => {
+    const { layer, setLayer, layers } = useLayer<QueryLayerData>(key);
+    const mapLayerData = useMemo(() => {
+      const filteredLayers = filter(layers, {
+        source: { type: "map" },
+      }) as Layer<MapLayerData>[];
+      return filter(
+        map(filteredLayers, (mapLayer) => {
+          const { parsedMap } = mapLayer?.source ?? {};
+          if (parsedMap && event) {
+            const hydratedMap = getParser(
+              mapLayer?.source?.map?.format
+            )?.hydrate?.(parsedMap);
+            if (hydratedMap) {
+              const point = event?.world && hydratedMap.snap(event.world);
+              if (point) {
+                const node = event?.world && hydratedMap.nodeAt(point);
+                return {
+                  point,
+                  node,
+                  key: mapLayer.key,
+                  name: inferLayerName(mapLayer),
+                };
+              }
+            }
+          }
+        })
+      );
+    }, [layers]);
+    const menu = useMemo(
+      () =>
+        !!layer &&
+        !!mapLayerData.length && {
+          [layer.key]: {
+            primary: inferLayerName(layer),
+            items: {
+              ...reduce(
+                mapLayerData,
+                (prev, next) => ({
+                  ...prev,
+                  [`${key}-${next?.key}-source`]: {
+                    primary: `Set as source`,
+                    secondary: next?.name,
+                    action: () =>
+                      setLayer(
+                        produce(layer, (l) => {
+                          set(l, "source.start", next?.node);
+                          set(l, "source.query", undefined);
+                          set(l, "source.mapLayerKey", next?.key);
+                          set(l, "source.trace", undefined);
+                        })
+                      ),
+                    icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
+                  },
+                  [`${key}-${next?.key}-destination`]: {
+                    primary: `Set as destination`,
+                    secondary: next?.name,
+                    action: () =>
+                      setLayer(
+                        produce(layer, (l) => {
+                          set(l, "source.end", next?.node);
+                          set(l, "source.query", undefined);
+                          set(l, "source.mapLayerKey", next?.key);
+                          set(l, "source.trace", undefined);
+                        })
+                      ),
+                    icon: <DestinationIcon />,
+                  },
+                }),
+                {}
+              ),
+            },
+          },
+        },
+      [mapLayerData, layer, layers, setLayer]
+    );
+    return (
+      <TraceLayerSelectionInfoProvider event={event} layer={key}>
+        {(menuB) => children?.(merge(menuB, menu))}
+      </TraceLayerSelectionInfoProvider>
+    );
+  },
 };

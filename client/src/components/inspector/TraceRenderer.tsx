@@ -3,7 +3,7 @@ import {
   ViewInArOutlined,
 } from "@mui/icons-material";
 import { Box, CircularProgress, useTheme } from "@mui/material";
-import { find, map } from "lodash";
+import { find, map, round } from "lodash";
 import { Size } from "protocol";
 import { useDebounce } from "react-use";
 import {
@@ -23,11 +23,11 @@ import { useLoading } from "slices/loading";
 import { useRenderers } from "slices/renderers";
 
 const rendererOptions = {
-  tileSubdivision: 2,
-  workerCount: 3,
+  tileSubdivision: 1,
+  workerCount: 8,
   tileResolution: {
-    width: 256,
-    height: 256,
+    width: round(256 * devicePixelRatio),
+    height: round(256 * devicePixelRatio),
   },
 };
 
@@ -52,6 +52,10 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
         const instance = new entry.renderer.constructor();
         instance.setup({
           ...rendererOptions,
+          screenSize: {
+            width,
+            height,
+          },
           backgroundColor: theme.palette.background.paper,
           accentColor: theme.palette.primary.main,
         });

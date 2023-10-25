@@ -12,10 +12,12 @@ const shadow = `
     0px 20px 96px 0px rgb(0 0 0 / 0.5%)
 `;
 
+const fontFamily = `"Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+        "Droid Sans", "Helvetica Neue", "Arial", sans-serif`;
 export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   createTheme({
     palette: {
-      primary: { main: colors[theme][mode === "dark" ? "A100" : "500"] },
+      primary: { main: colors[theme][mode === "dark" ? "A100" : "A700"] },
       mode,
       background:
         mode === "dark"
@@ -24,8 +26,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
     },
     typography: {
       allVariants: {
-        fontFamily: `"Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-        "Droid Sans", "Helvetica Neue", "Arial", sans-serif`,
+        fontFamily,
       },
       button: {
         textTransform: "none",
@@ -40,6 +41,14 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
           paper: {
             backgroundImage:
               "linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06))",
+          },
+        },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            backgroundImage: "linear-gradient(#1c2128, #1c2128)",
+            fontFamily,
           },
         },
       },

@@ -2,7 +2,7 @@ import { fileDialog as file } from "file-select-dialog";
 import { find, startCase } from "lodash";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { UploadedTrace } from "slices/UIState";
-import { parse } from "yaml";
+import { parseYamlAsync } from "workers/async";
 
 function ext(s: string) {
   return s.split(".").pop();
@@ -32,62 +32,64 @@ export const customTrace = (trace?: any) => ({
 
 const FORMATS = ["json", "yaml"];
 
+export type FileHandle<T> = {
+  file: File;
+  read: () => Promise<T>;
+};
+
 export async function uploadTrace(): Promise<
-  (() => Promise<UploadedTrace | undefined>) | undefined
+  FileHandle<UploadedTrace | undefined> | undefined
 > {
   const f = await file({
     accept: FORMATS.map((c) => `.trace.${c}`),
     strict: true,
   });
   if (f) {
-    return async () => {
-      if (FORMATS.includes(ext(f.name)!)) {
-        const content = await f.text();
-        const parsed = parse(content);
-        return {
-          ...customTrace(),
-          format: parsed?.format,
-          content: parsed,
-          name: startCase(name(f.name)),
-          type: customTraceId,
-        };
-      } else {
-        throw new Error(`The format (${ext(f.name)}) is unsupported.`);
-      }
+    return {
+      file: f,
+      read: async () => {
+        if (FORMATS.includes(ext(f.name)!)) {
+          const content = await f.text();
+          const parsed = await parseYamlAsync(content);
+          return {
+            ...customTrace(),
+            format: parsed?.format,
+            content: parsed,
+            name: startCase(name(f.name)),
+            type: customTraceId,
+          };
+        } else {
+          throw new Error(`The format (${ext(f.name)}) is unsupported.`);
+        }
+      },
     };
   }
 }
 
-// async function readAll(f: File) {
-//   const a = f.stream().getReader();
-//   let out = "";
-//   const decoder = new TextDecoder();
-//   while (true) {
-//     const { done, value } = await a.read();
-//     out += decoder.decode(value);
-//     console.log(value);
-//     if (done) break;
-//   }
-//   return out;
-// }
-
-export async function uploadMap(accept: FeatureDescriptor[]) {
+export async function uploadMap(
+  accept: FeatureDescriptor[]
+): Promise<
+  FileHandle<(FeatureDescriptor & { content?: string }) | undefined> | undefined
+> {
   const f = await file({
     accept: accept.map(({ id }) => `.${id}`),
     strict: true,
   });
   if (f) {
-    return async () => {
-      if (find(accept, { id: ext(f.name) })) {
-        return {
-          ...custom(),
-          format: ext(f.name),
-          content: await f.text(),
-          name: startCase(name(f.name)),
-        } as Feature & { format?: string };
-      } else {
-        throw new Error(`The format (${ext(f.name)}) is unsupported.`);
-      }
+    return {
+      file: f,
+      read: async () => {
+        if (find(accept, { id: ext(f.name) })) {
+          return {
+            ...custom(),
+            format: ext(f.name),
+            content: await f.text(),
+            name: startCase(name(f.name)),
+          } as Feature & { format?: string };
+        } else {
+          throw new Error(`The format (${ext(f.name)}) is unsupported.`);
+        }
+      },
     };
   }
 }

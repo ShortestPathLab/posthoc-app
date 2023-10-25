@@ -5,6 +5,7 @@ import { createElement } from "react";
 import { useAnyLoading } from "slices/loading";
 import { PanelState, useView } from "slices/view";
 import { ViewTree } from "./ViewTree";
+import { FullscreenProgress } from "./FullscreenProgress";
 
 type SpecimenInspectorProps = Record<string, any> & FlexProps;
 
@@ -37,6 +38,7 @@ export function Inspector(props: SpecimenInspectorProps) {
           sx={{ position: "absolute", bottom: 0, width: "100%", zIndex: 1 }}
         />
       </Fade>
+      <FullscreenProgress />
     </>
   );
 }

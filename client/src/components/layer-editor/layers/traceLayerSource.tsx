@@ -9,7 +9,9 @@ import {
 } from "components/render/renderer/generic/NodeList";
 import { colorsHex, getColorHex } from "components/renderer/colors";
 import { parseString } from "components/renderer/parser/parseString";
-import { useTraceMemo } from "components/renderer/parser/parseTrace";
+import { useTraceParser } from "components/renderer/parser/parseTrace";
+import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTrace.worker";
+import { useEffectWhen } from "hooks/useEffectWhen";
 import {
   chain,
   constant,
@@ -24,16 +26,20 @@ import {
   set,
   startCase,
 } from "lodash";
+import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";
 import { Trace, TraceEvent } from "protocol";
 import { useEffect, useMemo } from "react";
 import { useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { useTraceContent } from "../../../hooks/useTraceContent";
 import { LayerSource, inferLayerName } from "./LayerSource";
 import { Heading, Option } from "./Option";
 import { TracePreview } from "./TracePreview";
+import {
+  PlaybackLayerData,
+  PlaybackService,
+} from "components/app-bar/Playback";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
@@ -91,14 +97,9 @@ function makePathIndex(trace: Trace) {
   return { getParent, getPath };
 }
 
-export type PlaybackLayerData = {
-  step?: number;
-  playback?: "playing" | "paused";
-  playbackTo?: number;
-};
-
 export type TraceLayerData = {
   trace?: UploadedTrace;
+  parsedTrace?: ParseTraceWorkerReturnType;
   onion?: "off" | "transparent" | "solid";
 } & PlaybackLayerData;
 
@@ -114,7 +115,9 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
           label="Trace"
           content={
             <TracePicker
-              onChange={(v) => produce((d) => set(d, "source.trace", v))}
+              onChange={(v) =>
+                produce((d) => set(d, "source.trace", { ...v, key: id() }))
+              }
               value={value?.source?.trace}
             />
           }
@@ -142,6 +145,17 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
     );
   }),
   service: withProduce(({ value, produce }) => {
+    const { palette } = useTheme();
+    const parseTrace = useTraceParser({
+      trace: value?.source?.trace?.content,
+      context: {
+        color: colorsHex,
+        themeAccent: palette.primary.main,
+        themeTextPrimary: palette.text.primary,
+        themeBackground: palette.background.paper,
+      },
+      view: "main",
+    });
     useEffect(() => {
       produce((l) =>
         set(
@@ -150,45 +164,39 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
           value?.source?.trace?.content?.events?.length ?? 0
         )
       );
-    }, [value]);
-    return <></>;
+    }, [value?.source?.trace?.content?.events?.length]);
+    useEffectWhen(
+      async () => {
+        const parsedTrace = await parseTrace();
+        produce((l) => set(l, "source.parsedTrace", parsedTrace));
+      },
+      [parseTrace],
+      [value?.source?.trace?.key]
+    );
+    return (
+      <>
+        <PlaybackService value={value} />
+      </>
+    );
   }),
   renderer: ({ layer }) => {
-    const { palette } = useTheme();
+    const parsedTrace = layer?.source?.parsedTrace;
     const step = useThrottle(layer?.source?.step ?? 0, 1000 / 60);
-    console.log(step);
-    const { result } = useTraceMemo(
-      {
-        trace: layer?.source?.trace?.content,
-        context: {
-          color: colorsHex,
-          themeAccent: palette.primary.main,
-          themeTextPrimary: palette.text.primary,
-          themeBackground: palette.background.paper,
-        },
-        view: "main",
-      },
-      [
-        palette.primary.main,
-        palette.text.primary,
-        palette.background.paper,
-        layer?.source?.trace?.content,
-      ]
-    );
+
     const path = use2DPath(layer, step);
     const steps = useMemo(
       () =>
-        map(result?.stepsPersistent, (c) =>
+        map(parsedTrace?.stepsPersistent, (c) =>
           map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
         ),
-      [result?.stepsPersistent, layer?.key]
+      [parsedTrace?.stepsPersistent, layer?.key]
     );
     const steps1 = useMemo(
       () =>
-        map(result?.stepsTransient, (c) =>
+        map(parsedTrace?.stepsTransient, (c) =>
           map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
         ),
-      [result?.stepsTransient, layer?.key]
+      [parsedTrace?.stepsTransient, layer?.key]
     );
     const steps2 = useMemo(() => [steps1[step] ?? []], [steps1, step]);
     return (
@@ -200,8 +208,7 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
     );
   },
   steps: ({ layer, children }) => {
-    const { events } = useTraceContent(layer?.source?.trace?.content);
-    return <>{children?.(events)}</>;
+    return <>{children?.(layer?.source?.trace?.content?.events ?? [])}</>;
   },
   getSelectionInfo: ({ layer: key, event, children }) => {
     const { layer, setLayer } = useLayer(key);
@@ -211,7 +218,7 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
         .filter((c) => c.meta?.sourceLayer === layer?.key)
         .map((c) => c.meta?.step)
         .filter(negate(isUndefined))
-        .sort((a, b) => b - a)
+        .sort((a, b) => a - b)
         .value() as number[];
       if (steps.length && layer) {
         const step = last(steps)!;

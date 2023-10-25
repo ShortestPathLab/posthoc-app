@@ -62,7 +62,7 @@ export const TitleBar = () => {
                 key: "workspace",
                 items: [
                   {
-                    name: "Load workspace",
+                    name: "Open workspace",
                     key: "workspace-load",
                     action: load,
                   },

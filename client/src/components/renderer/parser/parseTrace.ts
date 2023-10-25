@@ -1,15 +1,13 @@
+import { useSnackbar } from "components/generic/Snackbar";
 import pluralize from "pluralize";
-import { useAsync } from "react-async-hook";
-import { useMemo } from "react";
+import { useCallback } from "react";
+import { useLoadingState } from "slices/loading";
+import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
 } from "./parseTrace.worker";
-import { useSnackbar } from "components/generic/Snackbar";
-import { useLoadingState } from "slices/loading";
-import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import parseGridWorkerUrl from "./parseTrace.worker.ts?worker&url";
-import { map } from "lodash";
 
 export class ParseTraceWorker extends Worker {
   constructor() {
@@ -22,10 +20,10 @@ export const parseTraceAsync = usingMemoizedWorkerTask<
   ParseTraceWorkerReturnType
 >(ParseTraceWorker);
 
-export function useTrace(params: ParseTraceWorkerParameters) {
+export function useTraceParser(params: ParseTraceWorkerParameters) {
   const push = useSnackbar();
   const usingLoadingState = useLoadingState("specimen");
-  return useAsync(
+  return useCallback(
     () =>
       usingLoadingState(async () => {
         if (params?.trace) {
@@ -44,9 +42,4 @@ export function useTrace(params: ParseTraceWorkerParameters) {
       }),
     [params]
   );
-}
-
-export function useTraceMemo(trace: ParseTraceWorkerParameters, deps: any[]) {
-  const params = useMemo(() => trace, map(deps, JSON.stringify));
-  return useTrace(params);
 }

@@ -1,9 +1,10 @@
 import download from "downloadjs";
 import { fileDialog as file } from "file-select-dialog";
 import { UIState, useUIState } from "slices/UIState";
+import { formatByte, useBusyState } from "slices/busy";
 import { Layers, useLayers } from "slices/layers";
 import { generateUsername as id } from "unique-username-generator";
-import { parse } from "yaml";
+import { parseYamlAsync } from "workers/async";
 
 function ext(s: string) {
   return s.split(".").pop();
@@ -18,6 +19,7 @@ type Workspace = {
 export function useWorkspace() {
   const [layers, setLayers] = useLayers();
   const [UIState, setUIState] = useUIState();
+  const usingBusyState = useBusyState("workspace");
   return {
     load: async () => {
       const f = await file({
@@ -25,12 +27,16 @@ export function useWorkspace() {
         strict: true,
       });
       if (f && FORMATS.includes(ext(f.name)!)) {
-        const content = await f.text();
-        const parsed = parse(content) as Workspace | undefined;
-        if (parsed) {
-          setLayers(() => parsed.layers);
-          setUIState(() => parsed.UIState);
-        }
+        await usingBusyState(async () => {
+          const content = await f.text();
+          const parsed = (await parseYamlAsync(content)) as
+            | Workspace
+            | undefined;
+          if (parsed) {
+            setLayers(() => parsed.layers);
+            setUIState(() => parsed.UIState);
+          }
+        }, `Opening workspace (${formatByte(f.size)})`);
       }
     },
     save: () => {

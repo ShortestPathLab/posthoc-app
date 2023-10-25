@@ -8,6 +8,7 @@ export type Layer<T = Record<string, any>> = {
   key: string;
   name?: string;
   source?: { type: string } & T;
+  transparency?: "25" | "50" | "75" | "100";
 };
 
 export type Layers = {
@@ -46,6 +47,7 @@ export function useLayer<T extends Record<string, any> = Record<string, any>>(
         layer,
         setLayer: (newLayer: Layer<T>) => {
           const mergedLayer = { ...layer, ...newLayer };
+          console.log(layer, newLayer, mergedLayer);
           setLayers(({ layers: prev }) => ({
             layers: map(prev, (l) =>
               l.key === mergedLayer.key ? mergedLayer : l
@@ -54,6 +56,6 @@ export function useLayer<T extends Record<string, any> = Record<string, any>>(
         },
         layers: filtered,
       } as const),
-    [layer, setLayers, layers]
+    [layer, setLayers, filtered]
   );
 }

@@ -1,13 +1,3 @@
-import { range, trimEnd } from "lodash";
-import { useRaf } from "react-use";
-import { ReactNode, useCallback, useEffect } from "react";
-import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
-import { Label } from "components/generic/Label";
-import { useSnackbar } from "components/generic/Snackbar";
-import { useBreakpoints } from "hooks/useBreakpoints";
-import { usePlaybackState } from "hooks/usePlaybackState";
-import { useSettings } from "slices/settings";
-import { UploadedTrace } from "slices/UIState";
 import {
   SkipNextOutlined as ForwardIcon,
   PauseOutlined as PauseIcon,
@@ -15,7 +5,18 @@ import {
   SkipPreviousOutlined as PreviousIcon,
   StopOutlined as StopIcon,
 } from "@mui/icons-material";
+import { EditorSetterProps } from "components/Editor";
+import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
+import { Label } from "components/generic/Label";
+import { useSnackbar } from "components/generic/Snackbar";
+import { useBreakpoints } from "hooks/useBreakpoints";
+import { usePlaybackState } from "hooks/usePlaybackState";
+import { range, trimEnd } from "lodash";
+import { ReactNode, useCallback, useEffect } from "react";
+import { useRaf } from "react-use";
+import { UploadedTrace } from "slices/UIState";
 import { Layer } from "slices/layers";
+import { useSettings } from "slices/settings";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
@@ -27,28 +28,17 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
     cancelled = true;
   };
 }
+export type PlaybackLayerData = {
+  step?: number;
+  playback?: "playing" | "paused";
+  playbackTo?: number;
+};
 
-export function Playback({
-  layer,
-}: {
-  layer?: Layer<{ trace?: UploadedTrace }>;
-}) {
-  const {
-    step,
-    tick,
-    end,
-    playing,
-    canPause,
-    canPlay,
-    canStepBackward,
-    canStepForward,
-    canStop,
-    pause,
-    play,
-    stepBackward,
-    stepForward,
-    stop,
-  } = usePlaybackState(layer?.key);
+export function PlaybackService({
+  children,
+  value,
+}: EditorSetterProps<Layer<PlaybackLayerData>>) {
+  const { step, tick, end, playing, pause } = usePlaybackState(value?.key);
   useRaf();
 
   const notify = useSnackbar();
@@ -98,6 +88,28 @@ export function Playback({
     shouldBreak,
     playbackRate,
   ]);
+  return <>{children}</>;
+}
+
+export function Playback({
+  layer,
+}: {
+  layer?: Layer<{ trace?: UploadedTrace }>;
+}) {
+  const {
+    playing,
+    canPause,
+    canPlay,
+    canStepBackward,
+    canStepForward,
+    canStop,
+    pause,
+    play,
+    stepBackward,
+    stepForward,
+    stop,
+  } = usePlaybackState(layer?.key);
+  useRaf();
   return (
     <>
       <Button

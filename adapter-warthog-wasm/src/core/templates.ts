@@ -10,9 +10,9 @@ export const gridTemplate: Partial<Trace> = {
           $: "rect",
           width: 1,
           height: 1,
-          x: "{{ctx.x}}",
-          y: "{{ctx.y}}",
-          fill: "{{ctx.color[ctx.type]}}",
+          x: "{{$.event.x}}",
+          y: "{{$.event.y}}",
+          fill: "{{$.color[$.event.type]}}",
         },
       ],
     },
@@ -26,7 +26,7 @@ export const gridTemplate: Partial<Trace> = {
       },
     },
     path: {
-      pivot: { x: "{{ctx.x + 0.5}}", y: "{{ctx.y + 0.5}}" },
+      pivot: { x: "{{$.event.x + 0.5}}", y: "{{$.event.y + 0.5}}" },
       scale: 0.3,
     },
   },
@@ -39,10 +39,10 @@ export const xyTemplate: Partial<Trace> = {
       node: [
         {
           $: "circle",
-          fill: "{{ctx.color[ctx.type]}}",
+          fill: "{{$.color[$.event.type]}}",
           radius: 120,
-          x: "{{ctx.x}}",
-          y: "{{ctx.y}}",
+          x: "{{$.event.x}}",
+          y: "{{$.event.y}}",
         },
       ],
       line: [
@@ -50,15 +50,15 @@ export const xyTemplate: Partial<Trace> = {
           $: "path",
           points: [
             {
-              x: "{{ctx.parent ? ctx.parent.x: ctx.x}}",
-              y: "{{ctx.parent ? ctx.parent.y: ctx.y}}",
+              x: "{{$.parent ? $.parent.x: $.event.x}}",
+              y: "{{$.parent ? $.parent.y: $.event.y}}",
             },
             {
-              x: "{{ctx.x}}",
-              y: "{{ctx.y}}",
+              x: "{{$.event.x}}",
+              y: "{{$.event.y}}",
             },
           ],
-          fill: "{{ctx.color[ctx.type]}}",
+          fill: "{{$.color[$.event.type]}}",
           lineWidth: 90,
         },
       ],
@@ -78,7 +78,7 @@ export const xyTemplate: Partial<Trace> = {
       },
     },
     path: {
-      pivot: { x: "{{ctx.x}}", y: "{{ctx.y}}" },
+      pivot: { x: "{{$.event.x}}", y: "{{$.event.y}}" },
       scale: 120,
     },
   },

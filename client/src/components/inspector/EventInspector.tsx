@@ -1,4 +1,5 @@
 import {
+  Box,
   Divider,
   ListItem,
   ListItemButton,
@@ -46,25 +47,32 @@ export function EventInspector({
   //   : false;
 
   return (
-    <ListItemButton
-      selected={selected}
-      {...props}
-      sx={{
-        borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
-        ...props.sx,
-      }}
+    <Tooltip
+      title={
+        <Box p={1}>
+          <PropertyList event={event} flexDirection="column" />
+        </Box>
+      }
+      followCursor
     >
-      <ListItemIcon>
-        <Type variant="body2">{index}</Type>
-      </ListItemIcon>
-      <Tooltip title={<PropertyList event={event} flexDirection="column" />}>
+      <ListItemButton
+        selected={selected}
+        {...props}
+        sx={{
+          borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
+          ...props.sx,
+        }}
+      >
+        <ListItemIcon>
+          <Type variant="body2">{index}</Type>
+        </ListItemIcon>
         <ListItemText
           sx={{ overflow: "hidden" }}
           primary={<EventLabel event={event} hidden={false} />}
           secondary={<PropertyList event={pick(event, "f", "g", "pId")} />}
         />
-      </Tooltip>
-    </ListItemButton>
+      </ListItemButton>
+    </Tooltip>
   );
 }
 

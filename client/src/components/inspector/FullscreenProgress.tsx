@@ -1,0 +1,33 @@
+import {
+  Backdrop,
+  CircularProgress,
+  Stack,
+  Typography as Type,
+} from "@mui/material";
+import { values } from "lodash";
+import { useBusy } from "slices/busy";
+import { useAcrylic } from "theme";
+
+export function FullscreenProgress() {
+  const [busy] = useBusy();
+  const acrylic = useAcrylic() as any;
+
+  const messages = values(busy);
+  return (
+    <Backdrop
+      sx={{ ...acrylic, zIndex: (t) => t.zIndex.tooltip + 1 }}
+      open={!!messages.length}
+      unmountOnExit
+      mountOnEnter
+    >
+      <Stack alignItems="center" spacing={4}>
+        <CircularProgress />
+        {messages.map((v, message) => (
+          <Type key={message} variant="body2" color="textSecondary">
+            {v}
+          </Type>
+        ))}
+      </Stack>
+    </Backdrop>
+  );
+}

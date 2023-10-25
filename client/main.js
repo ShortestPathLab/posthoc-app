@@ -56,6 +56,7 @@ server.listen(0, () => {
       show: false,
       titleBarStyle: "hidden",
       titleBarOverlay: {
+        height: 32,
         color: "#00000000",
         symbolColor: "#00000000",
       },

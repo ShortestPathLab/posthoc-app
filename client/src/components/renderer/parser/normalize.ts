@@ -9,3 +9,7 @@ export function normalize<T extends Props>(
 ): PropMap<T> {
   return mapProperties(context, (v) => (isFunction(v) ? v : parseProperty(v)));
 }
+
+export function normalizeConstant(obj: Context<any> = {}) {
+  return new Proxy(obj, { get: (obj, p) => () => obj[p] });
+}

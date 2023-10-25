@@ -13,10 +13,12 @@ import { RendererProvider } from "slices/renderers";
 import { SettingsProvider } from "slices/settings";
 import { LayersProvider } from "slices/layers";
 import { ViewProvider } from "slices/view";
+import { BusyProvider } from "slices/busy";
 
 const root = createRoot(document.getElementById("root")!);
 
 const slices = [
+  BusyProvider,
   SettingsProvider,
   ConnectionsProvider,
   FeaturesProvider,

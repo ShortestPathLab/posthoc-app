@@ -32,7 +32,7 @@ export type D2RendererOptions = RendererOptions & {
 };
 
 export const defaultD2RendererOptions: D2RendererOptions = {
-  screenSize: { width: 256, height: 256 },
+  screenSize: { width: 1, height: 1 },
   workerCount: 4,
   workerIndex: 0,
   tileResolution: {
@@ -48,7 +48,7 @@ export const defaultD2RendererOptions: D2RendererOptions = {
   dynamicResolution: {
     intervalMs: 5000,
     increment: 0.25,
-    maxScale: 1.5,
+    maxScale: 2,
     minScale: 1,
     dtMax: 1.5,
     dtMin: 1.1,

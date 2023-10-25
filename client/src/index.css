@@ -8,13 +8,13 @@ body,
   height: 100%;
   user-select: none;
   overflow: hidden;
+  font-family: "Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", "Arial", sans-serif !important;
 }
 
 body {
   overflow: hidden;
   margin: 0;
-  font-family: "Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", "Arial", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -25,7 +25,8 @@ body {
 
 code {
   font-family: "Roboto Mono", "Consolas", "Courier New", Courier, monospace;
-  transform: translateY(-10px);
+  transform: translateY(-0.75px);
+  display: block;
 }
 
 @media (pointer: fine) {

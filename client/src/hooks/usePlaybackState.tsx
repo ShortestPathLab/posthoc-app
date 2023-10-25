@@ -1,5 +1,5 @@
+import { PlaybackLayerData } from "components/app-bar/Playback";
 import { useSnackbar } from "components/generic/Snackbar";
-import { PlaybackLayerData } from "components/layer-editor/layers/traceLayerSource";
 import { clamp, min, set } from "lodash";
 import { produce } from "produce";
 import { useMemo } from "react";
@@ -58,5 +58,5 @@ export function usePlaybackState(key?: string) {
       ...state,
       ...callbacks,
     };
-  }, [end, playback, playing, ready, start, step, layer, setLayer]);
+  }, [end, playback, playing, ready, start, step, setLayer]);
 }

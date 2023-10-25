@@ -1,14 +1,13 @@
+import { EditorSetterProps } from "components/Editor";
+import { SelectionMenuContent } from "components/inspector/SelectionMenu";
+import { SelectEvent } from "components/renderer/Renderer";
 import { Dictionary } from "lodash";
 import { TraceEvent } from "protocol";
 import { createElement, FC, ReactNode } from "react";
+import { Layer } from "slices/layers";
 import { mapLayerSource } from "./mapLayerSource";
 import { queryLayerSource } from "./queryLayerSource";
 import { traceLayerSource } from "./traceLayerSource";
-import { EditorProps, EditorSetterProps } from "components/Editor";
-import { SelectionMenuContent } from "components/inspector/SelectionMenu";
-import { SelectEvent } from "components/renderer/Renderer";
-import { PlaybackStateType } from "slices/playback";
-import { Layer } from "slices/layers";
 
 export type SelectionInfoProvider = FC<{
   layer?: string;
@@ -26,8 +25,6 @@ export type LayerSource<K extends string, T> = {
     layer?: Layer<T>;
     children?: (steps: TraceEvent[]) => ReactNode;
   }>;
-  currentStep?: number;
-  playback?: PlaybackStateType;
   getSelectionInfo?: SelectionInfoProvider;
 };
 

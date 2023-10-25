@@ -1,11 +1,13 @@
+/// <reference types="vitest" />
+
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { defineConfig } from "vite";
 import viteTsconfigPaths from "vite-tsconfig-paths";
-import { UserConfig } from "vite";
-/// <reference types="vitest" />
-export default {
-  mode: "production",
+
+export default defineConfig(({ mode }) => ({
   root: path.join(process.cwd(), "./src"),
+  publicDir: mode === "development" ? "public-dev" : "public",
   base: "./",
   build: { outDir: path.join(process.cwd(), "./dist") },
   plugins: [
@@ -36,4 +38,4 @@ export default {
       },
     },
   },
-} as UserConfig;
+}));

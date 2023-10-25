@@ -24,8 +24,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import { inferLayerName, layerHandlers } from "./layers/LayerSource";
 import { Layer } from "slices/layers";
+import { inferLayerName, layerHandlers } from "./layers/LayerSource";
 
 type LayerEditorProps = {
   value: Layer;
@@ -126,7 +126,11 @@ function Component(
                 "Transparency",
                 <FeaturePicker
                   label="Transparency"
-                  items={options(["100%"])}
+                  items={["25", "50", "75", "100"].map((c) => ({
+                    id: c,
+                    name: `${c}%`,
+                  }))}
+                  value="100"
                   showArrow
                 />
               )}
@@ -150,7 +154,11 @@ function Component(
                     name: startCase(s),
                   }))}
                   onChange={(v) =>
-                    setDraft?.(produce(draft, (d) => set(d, "source.type", v)))
+                    setDraft?.(
+                      produce(draft, (d) => {
+                        set(d, "source", { type: v });
+                      })
+                    )
                   }
                   showArrow
                 />

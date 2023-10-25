@@ -2,9 +2,11 @@ import {
   ceil,
   clamp,
   debounce,
+  delay,
   find,
   floor,
   isEqual,
+  isNaN,
   map,
   once,
   reduce,
@@ -18,10 +20,7 @@ import * as PIXI from "pixi.js";
 import { Bounds } from "protocol";
 import { ComponentEntry, makeRenderer } from "renderer";
 import { Bush } from "./Bush";
-import {
-  CompiledD2IntrinsicComponent,
-  D2InstrinsicComponents,
-} from "./D2IntrinsicComponents";
+import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 import {
   D2RendererEvents,
   D2RendererInterface,
@@ -43,6 +42,10 @@ class Tile extends PIXI.Sprite {
     super(texture);
     this.age = Tile.age++;
   }
+}
+
+function handleNaN<T>(obj: T, def: T) {
+  return isNaN(obj) ? def : obj;
 }
 
 class D2Renderer
@@ -74,10 +77,10 @@ class D2Renderer
       const out: Bounds = reduce(
         bounds,
         (a, b) => ({
-          top: min(a.top, b.top),
-          left: min(a.left, b.left),
-          bottom: max(a.bottom, b.bottom),
-          right: max(a.right, b.right),
+          top: handleNaN(min(a.top, b.top), a.top),
+          left: handleNaN(min(a.left, b.left), a.left),
+          bottom: handleNaN(max(a.bottom, b.bottom), a.bottom),
+          right: handleNaN(max(a.right, b.right), a.right),
         }),
         {
           bottom: -Infinity,
@@ -86,8 +89,6 @@ class D2Renderer
           right: -Infinity,
         }
       );
-      console.log(out);
-      console.log(this.#system.all());
       this.#viewport?.animate?.({
         position: new PIXI.Point(
           (out.left + out.right) / 2,
@@ -372,7 +373,7 @@ class D2Renderer
         }
       };
       tile.alpha = 0;
-      ticker.add(f);
+      delay(() => ticker.add(f), this.#options.animationDuration);
     });
   }
 }

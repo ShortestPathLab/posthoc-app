@@ -1,7 +1,3 @@
-import {
-  PlaceOutlined as DestinationIcon,
-  TripOriginOutlined as StartIcon,
-} from "@mui/icons-material";
 import { MapPicker } from "components/app-bar/Input";
 import { NodeList } from "components/render/renderer/generic/NodeList";
 import { getParser } from "components/renderer";
@@ -9,14 +5,13 @@ import { ParsedMap } from "components/renderer/map-parser/Parser";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { useMapContent } from "hooks/useMapContent";
 import { useParsedMap } from "hooks/useParsedMap";
-import { filter, isUndefined, reduce, round, set, startCase } from "lodash";
-import { produce, withProduce } from "produce";
+import { isUndefined, round, set, startCase } from "lodash";
+import { withProduce } from "produce";
 import { useMemo } from "react";
 import { Map } from "slices/UIState";
-import { useLayer, Layer } from "slices/layers";
+import { Layer, useLayer } from "slices/layers";
 import { LayerSource, inferLayerName } from "./LayerSource";
 import { Option } from "./Option";
-import { QueryLayerData } from "./queryLayerSource";
 
 export type MapLayerData = {
   map?: Map;
@@ -81,9 +76,6 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
       return {};
     }, [parsedMap, event]);
     const menu = useMemo(() => {
-      const filteredLayers = filter(layers, {
-        source: { type: "query" },
-      }) as Layer<QueryLayerData>[];
       return {
         ...(layer &&
           point &&
@@ -95,41 +87,6 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
                   primary: "Point",
                   secondary: `(${round(point.x, 2)}, ${round(point.y, 2)})`,
                 },
-                ...reduce(
-                  filteredLayers,
-                  (prev, next) => ({
-                    ...prev,
-                    [`${next.key}-a`]: {
-                      primary: `Set as source`,
-                      secondary: inferLayerName(next),
-                      action: () =>
-                        setLayer(
-                          produce(layer, (l) => {
-                            set(l, "source.start", node);
-                            set(l, "source.query", undefined);
-                            set(l, "source.mapLayerKey", layer.key);
-                            set(l, "source.trace", undefined);
-                          })
-                        ),
-                      icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
-                    },
-                    [`${next.key}-b`]: {
-                      primary: `Set as destination`,
-                      secondary: inferLayerName(next),
-                      action: () =>
-                        setLayer(
-                          produce(layer, (l) => {
-                            set(l, "source.end", node);
-                            set(l, "source.query", undefined);
-                            set(l, "source.mapLayerKey", layer.key);
-                            set(l, "source.trace", undefined);
-                          })
-                        ),
-                      icon: <DestinationIcon />,
-                    },
-                  }),
-                  {}
-                ),
               },
             },
           }),
