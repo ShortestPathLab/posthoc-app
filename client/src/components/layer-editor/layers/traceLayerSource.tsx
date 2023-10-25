@@ -268,8 +268,8 @@ function use2DPath(layer?: TraceLayer, step: number = 0) {
 
       const { x, y } = pivot;
 
-      const pivotX = x ? parseString(x) : (c: Partial<TraceEvent>) => c.x;
-      const pivotY = y ? parseString(y) : (c: Partial<TraceEvent>) => c.y;
+      const pivotX = x ? parseString(x) : (c: Partial<TraceEvent>) => c.event.x;
+      const pivotY = y ? parseString(y) : (c: Partial<TraceEvent>) => c.event.y;
 
       const events = map(
         getPath(step),
@@ -280,16 +280,24 @@ function use2DPath(layer?: TraceLayer, step: number = 0) {
         const primitive = [
           {
             $: "rect",
-            x: pivotX({ x: 0, y: 0, ...head(events) }) - (2 * scale) / 2,
-            y: pivotY({ x: 0, y: 0, ...head(events) }) - (2 * scale) / 2,
+            x:
+              pivotX({ event: { x: 0, y: 0, ...head(events) } }) -
+              (2 * scale) / 2,
+            y:
+              pivotY({ event: { x: 0, y: 0, ...head(events) } }) -
+              (2 * scale) / 2,
             fill: getColorHex("destination"),
             width: 2 * scale,
             height: 2 * scale,
           },
           {
             $: "rect",
-            x: pivotX({ x: 0, y: 0, ...last(events) }) - (2 * scale) / 2,
-            y: pivotY({ x: 0, y: 0, ...last(events) }) - (2 * scale) / 2,
+            x:
+              pivotX({ event: { x: 0, y: 0, ...last(events) } }) -
+              (2 * scale) / 2,
+            y:
+              pivotY({ event: { x: 0, y: 0, ...last(events) } }) -
+              (2 * scale) / 2,
             fill: getColorHex("source"),
             width: 2 * scale,
             height: 2 * scale,
@@ -297,8 +305,8 @@ function use2DPath(layer?: TraceLayer, step: number = 0) {
           {
             $: "path",
             points: events.map((c) => ({
-              x: pivotX({ x: 0, y: 0, ...c }),
-              y: pivotY({ x: 0, y: 0, ...c }),
+              x: pivotX({ event: { x: 0, y: 0, ...c } }),
+              y: pivotY({ event: { x: 0, y: 0, ...c } }),
             })),
             fill: palette.primary.main,
             alpha: 1,

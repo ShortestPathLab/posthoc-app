@@ -1,0 +1,2900 @@
+{
+  "version": "1.0.5",
+  "render": {
+    "components": {},
+    "views": {
+      "main": {
+        "components": [
+          {
+            "$": "rect",
+            "fill": "{{$.color[$.event.type]}}",
+            "width": 1,
+            "height": 1,
+            "x": "{{'x' in $.event ? $.event.x : 0}}",
+            "y": "{{'y' in $.event ? $.event.y : 0}}"
+          }
+        ]
+      }
+    }
+  },
+  "path": {
+    "pivot": {
+      "x": "{{'x' in $.event ? $.event.x : 0}}",
+      "y": "{{'y' in $.event ? $.event.y : 0}}"
+    },
+    "scale": 1
+  },
+  "events": [
+    {
+      "id": 0,
+      "type": "source",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": []
+      }
+    },
+    {
+      "id": 17,
+      "type": "destination",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": []
+      }
+    },
+    {
+      "id": 0,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": []
+      }
+    },
+    {
+      "id": 0,
+      "type": "expanding",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": []
+      }
+    },
+    {
+      "id": 1,
+      "pId": 0,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                2,
+                25,
+                "s",
+                "f",
+                11,
+                4,
+                1,
+                "Conflict between Agent 11 and 4 at (25,2) at timestamp 1"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                6,
+                9,
+                "Conflict between Agent 13 and 6 at (18,9) at timestamp 9"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                10,
+                19,
+                "Conflict between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 0,
+      "type": "closing",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": []
+      }
+    },
+    {
+      "id": 1,
+      "pId": 0,
+      "type": "expanding",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                2,
+                25,
+                "hs",
+                "hf",
+                11,
+                4,
+                1,
+                "Chosen Conflict between Agent 11 and 4 at (25,2) at timestamp 1"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                6,
+                9,
+                "Conflict between Agent 13 and 6 at (18,9) at timestamp 9"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                10,
+                19,
+                "Conflict between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "pId": 1,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d11": [
+            [2, 26],
+            [2, 26],
+            [2, 25],
+            [2, 24],
+            [2, 23],
+            [2, 22],
+            [2, 21],
+            [2, 20],
+            [2, 19],
+            [2, 18],
+            [3, 18],
+            [3, 17],
+            [3, 16],
+            [3, 15],
+            [3, 14],
+            [3, 13],
+            [4, 13]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                2,
+                25,
+                "rs",
+                "rf",
+                11,
+                4,
+                1,
+                "Conflict Resolved between Agent 11 and 4 at (25,2) at timestamp 1"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                6,
+                9,
+                "Conflict between Agent 13 and 6 at (18,9) at timestamp 9"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                10,
+                19,
+                "Conflict between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ],
+              [
+                "fs",
+                2,
+                26,
+                "ns",
+                "nf",
+                11,
+                4,
+                1,
+                "New Conflict found between Agent 11 and 4 at (26,2) at timestamp 1"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "pId": 1,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d4": [
+            [2, 24],
+            [3, 24],
+            [3, 25],
+            [4, 25],
+            [5, 25],
+            [6, 25],
+            [7, 25],
+            [7, 26],
+            [8, 26],
+            [9, 26],
+            [9, 27],
+            [10, 27],
+            [11, 27],
+            [11, 28],
+            [12, 28],
+            [13, 28],
+            [14, 28],
+            [15, 28],
+            [15, 29],
+            [16, 29],
+            [16, 30],
+            [17, 30],
+            [18, 30],
+            [19, 30],
+            [20, 30],
+            [21, 30],
+            [22, 30],
+            [23, 30],
+            [24, 30],
+            [25, 30],
+            [26, 30],
+            [27, 30],
+            [28, 30],
+            [29, 30],
+            [30, 30],
+            [31, 30]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                2,
+                25,
+                "rs",
+                "rf",
+                11,
+                4,
+                1,
+                "Conflict Resolved between Agent 11 and 4 at (25,2) at timestamp 1"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                6,
+                9,
+                "Conflict between Agent 13 and 6 at (18,9) at timestamp 9"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                10,
+                19,
+                "Conflict between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "pId": 1,
+      "g": 465,
+      "type": "expanding",
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "hs",
+                "hf",
+                13,
+                6,
+                9,
+                "Chosen Conflict between Agent 13 and 6 at (18,9) at timestamp 9"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                10,
+                19,
+                "Conflict between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "pId": 3,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d13": [
+            [9, 15],
+            [9, 14],
+            [9, 15],
+            [9, 16],
+            [10, 16],
+            [10, 16],
+            [9, 16],
+            [9, 16],
+            [9, 16],
+            [9, 17],
+            [9, 18]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "rs",
+                "rf",
+                13,
+                6,
+                9,
+                "Conflict Resolved between Agent 13 and 6 at (18,9) at timestamp 9"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "rs",
+                "rf",
+                13,
+                10,
+                19,
+                "Conflict Resolved between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "ns",
+                "nf",
+                13,
+                10,
+                9,
+                "New Conflict found between Agent 13 and 10 at (18,9) at timestamp 9"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "pId": 3,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d6": [
+            [16, 20],
+            [15, 20],
+            [15, 19],
+            [14, 19],
+            [14, 18],
+            [13, 18],
+            [13, 17],
+            [12, 17],
+            [12, 16],
+            [11, 16],
+            [10, 16],
+            [9, 16],
+            [8, 16],
+            [7, 16],
+            [7, 15],
+            [6, 15],
+            [6, 14],
+            [6, 16]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "rs",
+                "rf",
+                13,
+                6,
+                9,
+                "Conflict Resolved between Agent 13 and 6 at (18,9) at timestamp 9"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "s",
+                "f",
+                13,
+                10,
+                19,
+                "Conflict between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "pId": 3,
+      "g": 465,
+      "type": "expanding",
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "hs",
+                "hf",
+                13,
+                10,
+                19,
+                "Chosen Conflict between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "pId": 5,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d13": [
+            [9, 15],
+            [9, 16],
+            [9, 16],
+            [10, 16],
+            [9, 16],
+            [9, 15],
+            [9, 15],
+            [9, 15],
+            [9, 15],
+            [9, 16],
+            [9, 17],
+            [8, 17],
+            [8, 17],
+            [8, 17],
+            [8, 17],
+            [9, 17],
+            [9, 17],
+            [9, 17],
+            [9, 18],
+            [8, 18],
+            [9, 18]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "rs",
+                "rf",
+                13,
+                10,
+                19,
+                "Conflict Resolved between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "pId": 5,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d10": [
+            [2, 6],
+            [2, 7],
+            [3, 7],
+            [3, 8],
+            [4, 8],
+            [4, 9],
+            [5, 9],
+            [6, 9],
+            [7, 9],
+            [7, 10],
+            [8, 10],
+            [9, 10],
+            [9, 11],
+            [9, 12],
+            [10, 12],
+            [10, 13],
+            [10, 14],
+            [10, 15],
+            [10, 16],
+            [11, 16],
+            [11, 17],
+            [12, 17],
+            [12, 18],
+            [12, 19],
+            [12, 20],
+            [12, 21],
+            [12, 22],
+            [13, 22],
+            [13, 23],
+            [14, 23],
+            [14, 24],
+            [15, 24],
+            [15, 25],
+            [16, 25],
+            [16, 26],
+            [16, 27],
+            [16, 28],
+            [17, 28],
+            [17, 29],
+            [18, 29],
+            [19, 29],
+            [20, 29],
+            [20, 30],
+            [21, 30],
+            [22, 30],
+            [23, 30],
+            [24, 30],
+            [25, 30],
+            [26, 30],
+            [27, 30],
+            [28, 30]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                3,
+                20,
+                "Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                9,
+                18,
+                "rs",
+                "rf",
+                13,
+                10,
+                19,
+                "Conflict Resolved between Agent 13 and 10 at (18,9) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "ns",
+                "nf",
+                18,
+                10,
+                19,
+                "New Conflict found between Agent 18 and 10 at (29,18) at timestamp 19"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "pId": 5,
+      "g": 465,
+      "type": "expanding",
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "hs",
+                "hf",
+                0,
+                3,
+                20,
+                "Chosen Conflict between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "s",
+                "f",
+                18,
+                10,
+                19,
+                "Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "pId": 7,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d0": [
+            [12, 3],
+            [13, 3],
+            [13, 3],
+            [14, 3],
+            [14, 3],
+            [14, 4],
+            [13, 4],
+            [13, 5],
+            [13, 6],
+            [13, 7],
+            [13, 8],
+            [13, 9],
+            [13, 10],
+            [14, 10],
+            [14, 11],
+            [14, 12],
+            [14, 13],
+            [14, 14],
+            [14, 15],
+            [14, 16],
+            [14, 17],
+            [15, 17]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "rs",
+                "rf",
+                0,
+                3,
+                20,
+                "Conflict Resolved between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "rs",
+                "rf",
+                0,
+                8,
+                22,
+                "Conflict Resolved between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "rs",
+                "rf",
+                0,
+                17,
+                28,
+                "Conflict Resolved between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                3,
+                27,
+                "Conflict between Agent 14 and 3 at (12,17) at timestamp 27"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "ns",
+                "nf",
+                18,
+                10,
+                19,
+                "New Conflict found between Agent 18 and 10 at (29,18) at timestamp 19"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "ns",
+                "nf",
+                0,
+                8,
+                20,
+                "New Conflict found between Agent 0 and 8 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "ns",
+                "nf",
+                0,
+                17,
+                20,
+                "New Conflict found between Agent 0 and 17 at (17,15) at timestamp 20"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "pId": 7,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d3": [
+            [7, 29],
+            [7, 28],
+            [8, 28],
+            [8, 27],
+            [8, 26],
+            [8, 25],
+            [9, 25],
+            [10, 25],
+            [11, 25],
+            [11, 24],
+            [11, 23],
+            [12, 23],
+            [12, 22],
+            [12, 21],
+            [13, 21],
+            [14, 21],
+            [14, 20],
+            [14, 19],
+            [14, 18],
+            [14, 17],
+            [14, 16],
+            [15, 16],
+            [16, 16],
+            [16, 15],
+            [16, 14],
+            [17, 14],
+            [18, 14],
+            [18, 13],
+            [18, 12],
+            [19, 12],
+            [20, 12],
+            [21, 12],
+            [21, 11],
+            [22, 11],
+            [23, 11],
+            [23, 10],
+            [24, 10],
+            [25, 10],
+            [26, 10],
+            [27, 10],
+            [27, 9],
+            [28, 9],
+            [29, 9],
+            [30, 9],
+            [31, 9]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "rs",
+                "rf",
+                0,
+                3,
+                20,
+                "Conflict Resolved between Agent 0 and 3 at (17,15) at timestamp 20"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                8,
+                22,
+                "Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "rs",
+                "rf",
+                14,
+                3,
+                27,
+                "Conflict Resolved between Agent 14 and 3 at (12,17) at timestamp 27"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "s",
+                "f",
+                18,
+                10,
+                19,
+                "Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "pId": 7,
+      "g": 465,
+      "type": "expanding",
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "hs",
+                "hf",
+                0,
+                8,
+                22,
+                "Chosen Conflict between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "s",
+                "f",
+                18,
+                10,
+                19,
+                "Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "pId": 9,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d0": [
+            [12, 3],
+            [13, 3],
+            [12, 3],
+            [11, 3],
+            [11, 3],
+            [12, 3],
+            [13, 3],
+            [13, 4],
+            [13, 4],
+            [13, 5],
+            [13, 6],
+            [13, 7],
+            [13, 8],
+            [13, 9],
+            [13, 10],
+            [14, 10],
+            [14, 11],
+            [14, 12],
+            [14, 13],
+            [14, 14],
+            [14, 15],
+            [14, 16],
+            [15, 16],
+            [15, 17]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "rs",
+                "rf",
+                0,
+                8,
+                22,
+                "Conflict Resolved between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "rs",
+                "rf",
+                0,
+                17,
+                28,
+                "Conflict Resolved between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "s",
+                "f",
+                5,
+                8,
+                28,
+                "Conflict between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                40,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "s",
+                "f",
+                18,
+                10,
+                19,
+                "Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "ns",
+                "nf",
+                0,
+                17,
+                22,
+                "New Conflict found between Agent 0 and 17 at (17,15) at timestamp 22"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "pId": 9,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d8": [
+            [26, 28],
+            [26, 27],
+            [26, 26],
+            [26, 25],
+            [25, 25],
+            [25, 24],
+            [24, 24],
+            [23, 24],
+            [22, 24],
+            [22, 23],
+            [21, 23],
+            [21, 22],
+            [21, 21],
+            [20, 21],
+            [19, 21],
+            [19, 20],
+            [18, 20],
+            [17, 20],
+            [17, 19],
+            [16, 19],
+            [15, 19],
+            [14, 19],
+            [13, 19],
+            [13, 18],
+            [13, 17],
+            [13, 16],
+            [12, 16],
+            [12, 15],
+            [12, 14],
+            [12, 13],
+            [12, 12],
+            [12, 11],
+            [12, 10],
+            [11, 10],
+            [10, 10]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "rs",
+                "rf",
+                0,
+                8,
+                22,
+                "Conflict Resolved between Agent 0 and 8 at (17,15) at timestamp 22"
+              ],
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                11,
+                15,
+                "rs",
+                "rf",
+                5,
+                8,
+                28,
+                "Conflict Resolved between Agent 5 and 8 at (15,11) at timestamp 28"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "rs",
+                "rf",
+                8,
+                17,
+                40,
+                "Conflict Resolved between Agent 8 and 17 at (10,10) at timestamp 40"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "s",
+                "f",
+                9,
+                17,
+                23,
+                "Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "s",
+                "f",
+                18,
+                10,
+                19,
+                "Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "ns",
+                "nf",
+                8,
+                17,
+                22,
+                "New Conflict found between Agent 8 and 17 at (10,10) at timestamp 22"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "pId": 9,
+      "g": 465,
+      "type": "expanding",
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "hs",
+                "hf",
+                9,
+                17,
+                23,
+                "Chosen Conflict between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "s",
+                "f",
+                18,
+                10,
+                19,
+                "Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                22,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 22"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "pId": 11,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d9": [
+            [18, 23],
+            [17, 23],
+            [17, 23],
+            [16, 23],
+            [16, 22],
+            [16, 21],
+            [16, 21],
+            [16, 20],
+            [16, 21],
+            [16, 21],
+            [16, 21],
+            [15, 21],
+            [15, 22],
+            [15, 23],
+            [15, 23],
+            [15, 23],
+            [16, 23],
+            [16, 22],
+            [17, 22],
+            [17, 21],
+            [17, 20],
+            [17, 19],
+            [18, 19],
+            [19, 19],
+            [19, 18]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "s",
+                "f",
+                0,
+                17,
+                28,
+                "Conflict between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "rs",
+                "rf",
+                9,
+                17,
+                23,
+                "Conflict Resolved between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "s",
+                "f",
+                18,
+                10,
+                19,
+                "Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "s",
+                "f",
+                8,
+                17,
+                22,
+                "Conflict between Agent 8 and 17 at (10,10) at timestamp 22"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "pId": 11,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d17": [
+            [29, 31],
+            [28, 31],
+            [27, 31],
+            [27, 30],
+            [26, 30],
+            [25, 30],
+            [24, 30],
+            [23, 30],
+            [23, 29],
+            [23, 28],
+            [23, 27],
+            [22, 27],
+            [22, 26],
+            [22, 25],
+            [21, 25],
+            [20, 25],
+            [20, 24],
+            [19, 24],
+            [19, 23],
+            [18, 23],
+            [17, 23],
+            [17, 22],
+            [16, 22],
+            [15, 22],
+            [15, 21],
+            [15, 20],
+            [14, 20],
+            [13, 20],
+            [12, 20],
+            [11, 20],
+            [10, 20],
+            [9, 20],
+            [8, 20],
+            [7, 20],
+            [7, 19],
+            [6, 19],
+            [5, 19],
+            [4, 19],
+            [4, 18],
+            [3, 18],
+            [3, 17],
+            [3, 16],
+            [3, 15],
+            [3, 14],
+            [3, 13],
+            [3, 12],
+            [3, 11],
+            [3, 10],
+            [3, 9],
+            [3, 8],
+            [3, 7],
+            [3, 6],
+            [2, 6]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                15,
+                17,
+                "rs",
+                "rf",
+                0,
+                17,
+                28,
+                "Conflict Resolved between Agent 0 and 17 at (17,15) at timestamp 28"
+              ],
+              [
+                "fs",
+                19,
+                18,
+                "rs",
+                "rf",
+                9,
+                17,
+                23,
+                "Conflict Resolved between Agent 9 and 17 at (18,19) at timestamp 23"
+              ],
+              [
+                "fs",
+                18,
+                29,
+                "s",
+                "f",
+                18,
+                10,
+                19,
+                "Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ],
+              [
+                "fs",
+                10,
+                10,
+                "rs",
+                "rf",
+                8,
+                17,
+                22,
+                "Conflict Resolved between Agent 8 and 17 at (10,10) at timestamp 22"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "pId": 11,
+      "g": 465,
+      "type": "expanding",
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                18,
+                29,
+                "hs",
+                "hf",
+                18,
+                10,
+                19,
+                "Chosen Conflict between Agent 18 and 10 at (29,18) at timestamp 19"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "pId": 13,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d18": [
+            [11, 29],
+            [11, 29],
+            [11, 28],
+            [11, 28],
+            [12, 28],
+            [12, 28],
+            [12, 28],
+            [11, 28],
+            [11, 29],
+            [10, 29],
+            [10, 29],
+            [10, 29],
+            [10, 30],
+            [10, 30],
+            [10, 30],
+            [10, 30],
+            [11, 30],
+            [10, 30],
+            [9, 30],
+            [10, 30],
+            [10, 30],
+            [10, 29],
+            [11, 29],
+            [11, 29],
+            [11, 29],
+            [10, 29],
+            [11, 29],
+            [12, 29],
+            [12, 30],
+            [12, 30],
+            [12, 29],
+            [12, 29],
+            [12, 29],
+            [12, 29],
+            [13, 29],
+            [13, 29],
+            [14, 29],
+            [15, 29],
+            [16, 29],
+            [17, 29],
+            [18, 29]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                18,
+                29,
+                "rs",
+                "rf",
+                18,
+                10,
+                19,
+                "Conflict Resolved between Agent 18 and 10 at (29,18) at timestamp 19"
+              ],
+              [
+                "fs",
+                12,
+                30,
+                "ns",
+                "nf",
+                15,
+                18,
+                39,
+                "New Conflict found between Agent 15 and 18 at (30,12) at timestamp 39"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "pId": 13,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d10": [
+            [2, 6],
+            [2, 7],
+            [3, 7],
+            [4, 7],
+            [5, 7],
+            [6, 7],
+            [7, 7],
+            [7, 8],
+            [8, 8],
+            [9, 8],
+            [9, 9],
+            [10, 9],
+            [10, 10],
+            [11, 10],
+            [12, 10],
+            [13, 10],
+            [14, 10],
+            [15, 10],
+            [15, 11],
+            [16, 11],
+            [17, 11],
+            [17, 12],
+            [17, 13],
+            [18, 13],
+            [19, 13],
+            [20, 13],
+            [20, 14],
+            [21, 14],
+            [21, 15],
+            [21, 16],
+            [21, 17],
+            [21, 18],
+            [21, 19],
+            [21, 20],
+            [21, 21],
+            [21, 22],
+            [21, 23],
+            [22, 23],
+            [22, 24],
+            [23, 24],
+            [23, 25],
+            [23, 26],
+            [24, 26],
+            [24, 27],
+            [24, 28],
+            [25, 28],
+            [25, 29],
+            [26, 29],
+            [27, 29],
+            [27, 30],
+            [28, 30]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                18,
+                29,
+                "rs",
+                "rf",
+                18,
+                10,
+                19,
+                "Conflict Resolved between Agent 18 and 10 at (29,18) at timestamp 19"
+              ],
+              [
+                "fs",
+                16,
+                11,
+                "ns",
+                "nf",
+                16,
+                10,
+                19,
+                "New Conflict found between Agent 16 and 10 at (11,16) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "ns",
+                "nf",
+                14,
+                10,
+                21,
+                "New Conflict found between Agent 14 and 10 at (12,17) at timestamp 21"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "pId": 13,
+      "g": 465,
+      "type": "expanding",
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                16,
+                11,
+                "hs",
+                "hf",
+                16,
+                10,
+                19,
+                "Chosen Conflict between Agent 16 and 10 at (11,16) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                10,
+                21,
+                "Conflict between Agent 14 and 10 at (12,17) at timestamp 21"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "pId": 15,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d16": [
+            [18, 3],
+            [18, 3],
+            [18, 4],
+            [18, 4],
+            [18, 4],
+            [18, 4],
+            [18, 4],
+            [17, 4],
+            [17, 4],
+            [17, 5],
+            [16, 5],
+            [16, 5],
+            [16, 5],
+            [16, 5],
+            [16, 6],
+            [16, 6],
+            [16, 7],
+            [16, 8],
+            [16, 9],
+            [16, 10],
+            [16, 11]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                16,
+                11,
+                "rs",
+                "rf",
+                16,
+                10,
+                19,
+                "Conflict Resolved between Agent 16 and 10 at (11,16) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "s",
+                "f",
+                14,
+                10,
+                21,
+                "Conflict between Agent 14 and 10 at (12,17) at timestamp 21"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "pId": 15,
+      "type": "generating",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {
+          "d10": [
+            [2, 6],
+            [2, 7],
+            [3, 7],
+            [4, 7],
+            [5, 7],
+            [6, 7],
+            [7, 7],
+            [7, 8],
+            [8, 8],
+            [9, 8],
+            [10, 8],
+            [10, 9],
+            [11, 9],
+            [11, 10],
+            [12, 10],
+            [13, 10],
+            [14, 10],
+            [15, 10],
+            [15, 11],
+            [15, 12],
+            [15, 13],
+            [15, 14],
+            [16, 14],
+            [17, 14],
+            [18, 14],
+            [19, 14],
+            [19, 15],
+            [19, 16],
+            [20, 16],
+            [20, 17],
+            [21, 17],
+            [22, 17],
+            [23, 17],
+            [24, 17],
+            [24, 18],
+            [24, 19],
+            [24, 20],
+            [24, 21],
+            [25, 21],
+            [26, 21],
+            [26, 22],
+            [27, 22],
+            [27, 23],
+            [27, 24],
+            [27, 25],
+            [27, 26],
+            [27, 27],
+            [28, 27],
+            [28, 28],
+            [28, 29],
+            [28, 30]
+          ]
+        },
+        "newScaffoldComponents": [
+          {
+            "type": "conflict",
+            "children": [
+              [
+                "fs",
+                16,
+                11,
+                "rs",
+                "rf",
+                16,
+                10,
+                19,
+                "Conflict Resolved between Agent 16 and 10 at (11,16) at timestamp 19"
+              ],
+              [
+                "fs",
+                17,
+                12,
+                "rs",
+                "rf",
+                14,
+                10,
+                21,
+                "Conflict Resolved between Agent 14 and 10 at (12,17) at timestamp 21"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "pId": 15,
+      "type": "expanding",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": []
+      }
+    },
+    {
+      "id": 17,
+      "pId": 15,
+      "type": "end",
+      "g": 465,
+      "f": 465,
+      "state_variables": {
+        "overrideDefaultValues": {},
+        "newScaffoldComponents": []
+      }
+    }
+  ]
+}
