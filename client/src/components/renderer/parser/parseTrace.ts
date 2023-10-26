@@ -8,6 +8,7 @@ import {
   ParseTraceWorkerReturnType,
 } from "./parseTrace.worker";
 import parseGridWorkerUrl from "./parseTrace.worker.ts?worker&url";
+import { stringify } from "yaml";
 
 export class ParseTraceWorker extends Worker {
   constructor() {
@@ -36,7 +37,7 @@ export function useTraceParser(params: ParseTraceWorkerParameters) {
             );
             return output;
           } catch (e) {
-            push("Error parsing", `${e}`);
+            push("Error parsing", `${stringify(e)}`);
           }
         }
       }),

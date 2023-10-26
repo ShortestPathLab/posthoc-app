@@ -205,6 +205,23 @@ export class D2RendererWorker extends EventEmitter<
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = this.#options.backgroundColor;
     ctx.fillRect(0, 0, tile.width, tile.height);
+
+    const x = 16;
+    const thickness = 1;
+    ctx.fillStyle = `rgba(127,127,127,0.25)`;
+    ctx.fillRect(
+      (tile.width - x) / 2,
+      (tile.height - thickness) / 2,
+      x,
+      thickness
+    );
+    ctx.fillRect(
+      (tile.width - thickness) / 2,
+      (tile.height - x) / 2,
+      thickness,
+      x
+    );
+
     for (const { component } of sortBy(
       this.#system.search({
         minX: left,

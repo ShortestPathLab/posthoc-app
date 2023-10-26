@@ -47,7 +47,6 @@ export function useLayer<T extends Record<string, any> = Record<string, any>>(
         layer,
         setLayer: (newLayer: Layer<T>) => {
           const mergedLayer = { ...layer, ...newLayer };
-          console.log(layer, newLayer, mergedLayer);
           setLayers(({ layers: prev }) => ({
             layers: map(prev, (l) =>
               l.key === mergedLayer.key ? mergedLayer : l

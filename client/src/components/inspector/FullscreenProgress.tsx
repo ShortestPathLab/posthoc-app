@@ -15,7 +15,11 @@ export function FullscreenProgress() {
   const messages = values(busy);
   return (
     <Backdrop
-      sx={{ ...acrylic, zIndex: (t) => t.zIndex.tooltip + 1 }}
+      sx={{
+        ...acrylic,
+        zIndex: (t) => t.zIndex.tooltip + 1,
+        WebkitAppRegion: "drag",
+      }}
       open={!!messages.length}
       unmountOnExit
       mountOnEnter
