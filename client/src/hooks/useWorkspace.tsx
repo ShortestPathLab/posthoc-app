@@ -1,15 +1,14 @@
+import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
 import { fileDialog as file } from "file-select-dialog";
+import { find } from "lodash";
 import { UIState, useUIState } from "slices/UIState";
 import { formatByte, useBusyState } from "slices/busy";
 import { Layers, useLayers } from "slices/layers";
 import { generateUsername as id } from "unique-username-generator";
 import { parseYamlAsync } from "workers/async";
 
-function ext(s: string) {
-  return s.split(".").pop();
-}
-const FORMATS = ["json", "yaml"];
+const acceptedFormats = [`.workspace.yaml`, `.workspace.json`];
 
 type Workspace = {
   UIState: UIState;
@@ -17,26 +16,33 @@ type Workspace = {
 };
 
 export function useWorkspace() {
+  const notify = useSnackbar();
   const [layers, setLayers] = useLayers();
   const [UIState, setUIState] = useUIState();
   const usingBusyState = useBusyState("workspace");
   return {
-    load: async () => {
-      const f = await file({
-        accept: FORMATS.map((c) => `.workspace.${c}`),
-        strict: true,
-      });
-      if (f && FORMATS.includes(ext(f.name)!)) {
-        await usingBusyState(async () => {
-          const content = await f.text();
-          const parsed = (await parseYamlAsync(content)) as
-            | Workspace
-            | undefined;
-          if (parsed) {
-            setLayers(() => parsed.layers);
-            setUIState(() => parsed.UIState);
-          }
-        }, `Opening workspace (${formatByte(f.size)})`);
+    load: async (selectedFile?: File) => {
+      const f =
+        selectedFile ??
+        (await file({
+          accept: acceptedFormats,
+          strict: true,
+        }));
+      if (f) {
+        if (isWorkspaceFile(f)) {
+          await usingBusyState(async () => {
+            const content = await f.text();
+            const parsed = (await parseYamlAsync(content)) as
+              | Workspace
+              | undefined;
+            if (parsed) {
+              setLayers(() => parsed.layers);
+              setUIState(() => parsed.UIState);
+            }
+          }, `Opening workspace (${formatByte(f.size)})`);
+        } else {
+          notify(`${f?.name} is not a workspace file.`);
+        }
       }
     },
     save: () => {
@@ -47,4 +53,8 @@ export function useWorkspace() {
       );
     },
   };
+}
+
+export function isWorkspaceFile(f: File) {
+  return find(acceptedFormats, (format) => f.name.endsWith(format));
 }

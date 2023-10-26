@@ -21,8 +21,6 @@ export function FullscreenProgress() {
         WebkitAppRegion: "drag",
       }}
       open={!!messages.length}
-      unmountOnExit
-      mountOnEnter
     >
       <Stack alignItems="center" spacing={4}>
         <CircularProgress />

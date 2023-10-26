@@ -38,8 +38,8 @@ export function PlaybackService({
   children,
   value,
 }: EditorSetterProps<Layer<PlaybackLayerData>>) {
-  const { step, tick, end, playing, pause } = usePlaybackState(value?.key);
   useRaf();
+  const { step, tick, end, playing, pause } = usePlaybackState(value?.key);
 
   const notify = useSnackbar();
   const [{ playbackRate = 1 }] = useSettings();

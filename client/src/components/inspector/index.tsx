@@ -6,6 +6,7 @@ import { useAnyLoading } from "slices/loading";
 import { PanelState, useView } from "slices/view";
 import { ViewTree } from "./ViewTree";
 import { FullscreenProgress } from "./FullscreenProgress";
+import { WorkspaceDropZone } from "./WorkspaceDropZone";
 
 type SpecimenInspectorProps = Record<string, any> & FlexProps;
 
@@ -39,6 +40,7 @@ export function Inspector(props: SpecimenInspectorProps) {
         />
       </Fade>
       <FullscreenProgress />
+      <WorkspaceDropZone />
     </>
   );
 }
