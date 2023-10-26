@@ -3,7 +3,7 @@
 html,
 body,
 #root {
-  background-color: #1c2128;
+  background-color: #1c2128 !important;
   width: 100%;
   height: 100%;
   user-select: none;

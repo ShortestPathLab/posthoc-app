@@ -1,6 +1,7 @@
-import { useEffect } from "react";
-import { name } from "public/manifest.json";
 import { getContrastRatio } from "@mui/material";
+import { defer } from "lodash";
+import { name } from "public/manifest.json";
+import { useEffect } from "react";
 
 const getForegroundColor = (bg: string) =>
   getContrastRatio(bg, "#ffffff") > getContrastRatio(bg, "#000000")
@@ -9,9 +10,11 @@ const getForegroundColor = (bg: string) =>
 
 export function useTitleBar(color: string) {
   useEffect(() => {
-    document
-      .querySelector('meta[name="theme-color"]')!
-      .setAttribute("content", color);
+    defer(() =>
+      document
+        .querySelector('meta[name="theme-color"]')!
+        .setAttribute("content", color)
+    );
     document.title = name;
     if ("electron" in window) {
       (window.electron as any).invoke(

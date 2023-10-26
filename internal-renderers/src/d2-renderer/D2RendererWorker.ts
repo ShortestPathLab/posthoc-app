@@ -206,7 +206,7 @@ export class D2RendererWorker extends EventEmitter<
     ctx.fillStyle = this.#options.backgroundColor;
     ctx.fillRect(0, 0, tile.width, tile.height);
 
-    const length = 16;
+    const length = tile.width * 0.05;
     const thickness = 1;
     ctx.fillStyle = `rgba(127,127,127,0.36)`;
     ctx.fillRect(
