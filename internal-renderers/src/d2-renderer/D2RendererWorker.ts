@@ -11,7 +11,7 @@ import {
   shuffle,
   sortBy,
 } from "lodash";
-import memoizee from "memoizee";
+import memo from "memoizee";
 import type { Bounds, Point, Size } from "protocol";
 import { ComponentEntry } from "renderer";
 import { Bush } from "./Bush";
@@ -25,6 +25,8 @@ import { EventEmitter } from "./EventEmitter";
 import { draw } from "./draw";
 import { pointToIndex } from "./pointToIndex";
 import { primitives } from "./primitives";
+
+const hash = JSON.stringify;
 
 const { log2, max } = Math;
 
@@ -126,6 +128,8 @@ export class D2RendererWorker extends EventEmitter<
     return this.#count++;
   }
 
+  #cache: { [K in string]: { key: string; tile: ImageBitmap } } = {};
+
   add(component: CompiledD2IntrinsicComponent[], id: string) {
     const bodies = map(component, (c) => ({
       ...primitives[c.$].test(c),
@@ -162,17 +166,19 @@ export class D2RendererWorker extends EventEmitter<
     ).tiles) {
       if (this.#shouldRender(tile)) {
         const bitmap = this.renderTile(bounds, this.#options.tileResolution);
-        this.emit(
-          "message",
-          {
-            action: "update",
-            payload: {
-              bounds,
-              bitmap,
+        if (bitmap) {
+          this.emit(
+            "message",
+            {
+              action: "update",
+              payload: {
+                bounds,
+                bitmap,
+              },
             },
-          },
-          []
-        );
+            []
+          );
+        }
       }
     }
   }
@@ -189,7 +195,7 @@ export class D2RendererWorker extends EventEmitter<
     return pointToIndex({ x, y }) % workerCount === workerIndex;
   }
 
-  renderTile = memoizee((b: Bounds, t: Size) => this.#renderTile(b, t), {
+  renderTile = memo((b: Bounds, t: Size) => this.#renderTile(b, t), {
     normalizer: JSON.stringify,
     max: TILE_CACHE_SIZE,
   });
@@ -200,29 +206,7 @@ export class D2RendererWorker extends EventEmitter<
       x: tile.width / (right - left),
       y: tile.height / (bottom - top),
     };
-    const g = new OffscreenCanvas(tile.width, tile.height);
-    const ctx = g.getContext("2d")!;
-    ctx.imageSmoothingEnabled = false;
-    // ctx.fillStyle = this.#options.backgroundColor;
-    // ctx.fillRect(0, 0, tile.width, tile.height);
-
-    const length = tile.width * 0.05;
-    const thickness = 1;
-    ctx.fillStyle = `rgba(127,127,127,0.36)`;
-    ctx.fillRect(
-      (tile.width - length) / 2,
-      (tile.height - thickness) / 2,
-      length,
-      thickness
-    );
-    ctx.fillRect(
-      (tile.width - thickness) / 2,
-      (tile.height - length) / 2,
-      thickness,
-      length
-    );
-
-    for (const { component } of sortBy(
+    const bodies = sortBy(
       this.#system.search({
         minX: left,
         maxX: right,
@@ -230,13 +214,46 @@ export class D2RendererWorker extends EventEmitter<
         minY: top,
       }),
       "index"
-    )) {
-      draw(component, ctx, {
-        scale,
-        x: -left * scale.x,
-        y: -top * scale.y,
-      });
+    );
+    const newKey = hash(map(bodies, "index"));
+    const prevKey = hash([top, right, bottom, left]);
+    const oldTile = this.#cache[prevKey];
+    if (!oldTile || newKey !== oldTile.key) {
+      const g = new OffscreenCanvas(tile.width, tile.height);
+      const ctx = g.getContext("2d")!;
+      ctx.imageSmoothingEnabled = false;
+      // ctx.fillStyle = this.#options.backgroundColor;
+      // ctx.fillRect(0, 0, tile.width, tile.height);
+
+      const length = tile.width * 0.05;
+      const thickness = 1;
+      ctx.fillStyle = `rgba(127,127,127,0.36)`;
+      ctx.fillRect(
+        (tile.width - length) / 2,
+        (tile.height - thickness) / 2,
+        length,
+        thickness
+      );
+      ctx.fillRect(
+        (tile.width - thickness) / 2,
+        (tile.height - length) / 2,
+        thickness,
+        length
+      );
+
+      for (const { component } of bodies) {
+        draw(component, ctx, {
+          scale,
+          x: -left * scale.x,
+          y: -top * scale.y,
+        });
+      }
+      const bitmap = g.transferToImageBitmap();
+
+      this.#cache[prevKey] = { key: newKey, tile: bitmap };
+      return bitmap;
+    } else {
+      return oldTile.tile;
     }
-    return g.transferToImageBitmap();
   }
 }

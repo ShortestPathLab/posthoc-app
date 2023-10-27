@@ -38,6 +38,7 @@ const { max, min } = Math;
 class Tile extends PIXI.Sprite {
   static age: number = 0;
   age: number;
+  destroying: boolean = false;
   constructor(texture?: PIXI.Texture, public bounds?: Bounds) {
     super(texture);
     this.age = Tile.age++;
@@ -355,9 +356,12 @@ class D2Renderer
       await this.#show(tile);
       forEach(this.#world?.children, async (c) => {
         if (intersect(c.bounds!, bounds) && c.age < tile.age) {
-          await this.#hide(c);
-          if (!c.destroyed) {
-            c.destroy({ texture: true, baseTexture: true });
+          if (!c.destroying) {
+            c.destroying = true;
+            await this.#hide(c);
+            if (!c.destroyed) {
+              c.destroy({ texture: true, baseTexture: true });
+            }
           }
         }
       });
