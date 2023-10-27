@@ -201,10 +201,10 @@ export class D2RendererWorker extends EventEmitter<
       y: tile.height / (bottom - top),
     };
     const g = new OffscreenCanvas(tile.width, tile.height);
-    const ctx = g.getContext("2d", { alpha: false })!;
+    const ctx = g.getContext("2d")!;
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = this.#options.backgroundColor;
-    ctx.fillRect(0, 0, tile.width, tile.height);
+    // ctx.fillStyle = this.#options.backgroundColor;
+    // ctx.fillRect(0, 0, tile.width, tile.height);
 
     const length = tile.width * 0.05;
     const thickness = 1;

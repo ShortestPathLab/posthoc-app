@@ -2,9 +2,9 @@ import {
   ceil,
   clamp,
   debounce,
-  delay,
   find,
   floor,
+  forEach,
   isEqual,
   isNaN,
   map,
@@ -352,16 +352,19 @@ class D2Renderer
         ?.addChild(tile)
         .setTransform(bounds.left, bounds.top, scale.x, scale.y);
       this.#getUpdateGridQueue()();
-      await this.#animate(tile);
-      for (const c of this.#world!.children) {
+      await this.#show(tile);
+      forEach(this.#world?.children, async (c) => {
         if (intersect(c.bounds!, bounds) && c.age < tile.age) {
-          c.destroy({ texture: true, baseTexture: true });
+          await this.#hide(c);
+          if (!c.destroyed) {
+            c.destroy({ texture: true, baseTexture: true });
+          }
         }
-      }
+      });
     }
   }
 
-  #animate(tile: Tile) {
+  #show(tile: Tile) {
     const ticker = this.#app!.ticker;
     return new Promise<void>((res) => {
       const f = (dt: number) => {
@@ -373,7 +376,23 @@ class D2Renderer
         }
       };
       tile.alpha = 0;
-      delay(() => ticker.add(f), this.#options.animationDuration);
+      ticker.add(f);
+    });
+  }
+
+  #hide(tile: Tile) {
+    const ticker = this.#app!.ticker;
+    return new Promise<void>((res) => {
+      const f = (dt: number) => {
+        tile.alpha -=
+          dt / PIXI.Ticker.targetFPMS / this.#options.animationDuration;
+        if (tile.alpha < 0) {
+          ticker.remove(f);
+          res();
+        }
+      };
+      tile.alpha = 1;
+      ticker.add(f);
     });
   }
 }

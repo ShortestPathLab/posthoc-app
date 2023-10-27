@@ -10,9 +10,9 @@
           "text": "{{$.event[`${$.tile_x}${$.tile_y}`] === 0 ? '' : $.event[`${$.tile_x}${$.tile_y}`]}}",
           "textX": 0.27,
           "textY": 0.75,
-          "fill": "{{$.event[`${$.tile_x}${$.tile_y}`] ? $.themeTextPrimary : $.themeAccent}}",
           "fontSize": 0.75,
-          "fontColor": "{{$.event.themeBackground}}",
+          "fontColor": "{{$.themeBackground}}",
+          "fill": "{{$.event[`${$.tile_x}${$.tile_y}`] ? $.themeTextPrimary : $.themeAccent}}",
           "x": "{{$.tile_x}}",
           "y": "{{$.tile_y}}",
           "display": "persistent"
@@ -36,13 +36,6 @@
         "components": [{ "$": "tileboard" }]
       }
     }
-  },
-  "path": {
-    "pivot": {
-      "x": "{{'x' in $.event ? $.event.x : 0}}",
-      "y": "{{'y' in $.event ? $.event.y : 0}}"
-    },
-    "scale": 1
   },
   "events": [
     {
