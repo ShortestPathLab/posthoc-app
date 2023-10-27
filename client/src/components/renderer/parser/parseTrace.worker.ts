@@ -46,6 +46,7 @@ function parse({
             ...context,
             ...ctx,
             event,
+            events: trace?.events,
           })
         )
       )

@@ -128,7 +128,7 @@ export class D2RendererWorker extends EventEmitter<
     return this.#count++;
   }
 
-  #cache: { [K in string]: { key: string; tile: ImageBitmap } } = {};
+  #cache: { [K in string]: { hash: string; tile: ImageBitmap } } = {};
 
   add(component: CompiledD2IntrinsicComponent[], id: string) {
     const bodies = map(component, (c) => ({
@@ -215,10 +215,10 @@ export class D2RendererWorker extends EventEmitter<
       }),
       "index"
     );
-    const newKey = hash(map(bodies, "index"));
-    const prevKey = hash([top, right, bottom, left]);
-    const oldTile = this.#cache[prevKey];
-    if (!oldTile || newKey !== oldTile.key) {
+    const nextHash = hash(map(bodies, "index"));
+    const tileKey = hash([top, right, bottom, left]);
+    const prevTile = this.#cache[tileKey];
+    if (!prevTile || nextHash !== prevTile.hash) {
       const g = new OffscreenCanvas(tile.width, tile.height);
       const ctx = g.getContext("2d")!;
       ctx.imageSmoothingEnabled = false;
@@ -249,11 +249,11 @@ export class D2RendererWorker extends EventEmitter<
         });
       }
       const bitmap = g.transferToImageBitmap();
+      this.#cache[tileKey] = { hash: nextHash, tile: bitmap };
 
-      this.#cache[prevKey] = { key: newKey, tile: bitmap };
       return bitmap;
     } else {
-      return oldTile.tile;
+      return prevTile.tile;
     }
   }
 }
