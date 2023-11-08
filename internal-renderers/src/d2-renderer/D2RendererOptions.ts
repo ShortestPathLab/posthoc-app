@@ -40,7 +40,7 @@ export const defaultD2RendererOptions: D2RendererOptions = {
     height: 64,
   },
   tileSubdivision: 0,
-  refreshInterval: 1000 / 60,
+  refreshInterval: 1000 / 30,
   animationDuration: 150,
   debounceInterval: 75,
   backgroundColor: "#ffffff",

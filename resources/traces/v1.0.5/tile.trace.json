@@ -30,11 +30,7 @@
       ]
     },
     "views": {
-      "main": { "renderer": "2d-pixi", "components": [{ "$": "tileboard" }] },
-      "someOtherView": {
-        "renderer": "2d-pixi",
-        "components": [{ "$": "tileboard" }]
-      }
+      "main": { "components": [{ "$": "tileboard" }] }
     }
   },
   "events": [

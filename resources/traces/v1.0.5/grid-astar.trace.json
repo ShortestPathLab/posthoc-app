@@ -1,7 +1,6 @@
 {
   "version": "1.0.5",
   "render": {
-    "context": {},
     "components": {
       "tile": [
         {
@@ -15,7 +14,7 @@
       ]
     },
     "views": {
-      "main": { "renderer": "2d-pixi", "components": [{ "$": "tile" }] }
+      "main": { "components": [{ "$": "tile" }] }
     },
     "path": {
       "pivot": { "x": "{{$.event.x + 0.5}}", "y": "{{$.event.y + 0.5}}" },
