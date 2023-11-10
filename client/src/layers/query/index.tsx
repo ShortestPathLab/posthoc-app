@@ -15,14 +15,14 @@ import { useMemo } from "react";
 import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { Layer, useLayer, useLayers } from "slices/layers";
-import { useEffectWhenAsync } from "../../../hooks/useEffectWhen";
-import { LayerSource, inferLayerName } from "./LayerSource";
-import { Heading, Option } from "./Option";
-import { TracePreview } from "./TracePreview";
-import { MapLayer, MapLayerData } from "./mapLayerSource";
-import { TraceLayerData, traceLayerSource } from "./traceLayerSource";
+import { useEffectWhenAsync } from "hooks/useEffectWhen";
+import { LayerController, inferLayerName } from "layers";
+import { Heading, Option } from "components/layer-editor/Option";
+import { TracePreview } from "components/layer-editor/TracePreview";
+import { MapLayer, MapLayerData } from "layers/map";
+import { TraceLayerData, controller as traceController } from "layers/trace";
 
-const TraceLayerSelectionInfoProvider = traceLayerSource.getSelectionInfo!;
+const TraceLayerSelectionInfoProvider = traceController.getSelectionInfo;
 
 async function findConnection(
   connections: Connection[],
@@ -30,9 +30,9 @@ async function findConnection(
   format: string
 ) {
   for (const connection of connections) {
-    const algs = await connection.call("features/algorithms");
+    const algorithms = await connection.call("features/algorithms");
     const formats = await connection.call("features/formats");
-    if (find(algs, { id: algorithm }) && find(formats, { id: format })) {
+    if (find(algorithms, { id: algorithm }) && find(formats, { id: format })) {
       return connection;
     }
   }
@@ -45,7 +45,8 @@ export type QueryLayerData = {
   algorithm?: string;
 } & TraceLayerData;
 
-export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
+export const controller = {
+  ...traceController,
   key: "query",
   editor: withProduce(({ value, produce }) => {
     const { algorithm } = value?.source ?? {};
@@ -179,11 +180,9 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
       ],
       [mapLayer, connections, algorithm, start, end]
     );
-    return <>{traceLayerSource.service}</>;
+    return <>{traceController.service}</>;
   }),
   inferName: (l) => l.source?.trace?.name ?? "Untitled Query",
-  renderer: traceLayerSource.renderer,
-  steps: traceLayerSource.steps,
   getSelectionInfo: ({ children, event, layer: key }) => {
     const { layer, setLayer, layers } = useLayer<QueryLayerData>(key);
     const mapLayerData = useMemo(() => {
@@ -266,4 +265,4 @@ export const queryLayerSource: LayerSource<"query", QueryLayerData> = {
       </TraceLayerSelectionInfoProvider>
     );
   },
-};
+} satisfies LayerController<"query", QueryLayerData>;

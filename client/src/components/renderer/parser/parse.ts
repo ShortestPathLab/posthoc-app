@@ -1,4 +1,4 @@
-import { Dictionary as Dict, flatMap, range } from "lodash";
+import { Dictionary as Dict, range } from "lodash";
 import {
   ComponentDefinition,
   ComponentDefinitionMap,
@@ -37,7 +37,7 @@ export function parse<T extends IntrinsicComponentMap>(
   return definition.flatMap((c) => {
     const { $ } = c;
     const c2 = parseFor(c);
-    return flatMap(c2, (component) => {
+    return c2.flatMap((component) => {
       const scoped = applyScope(
         normalize(context),
         normalize(component) as any

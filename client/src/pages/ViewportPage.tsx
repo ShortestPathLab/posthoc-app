@@ -11,7 +11,7 @@ import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 import { Flex } from "components/generic/Flex";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { inferLayerName } from "components/layer-editor/layers/LayerSource";
+import { inferLayerName } from "layers/Layer";
 import { Dictionary, every, filter, find, head, keyBy, map } from "lodash";
 import { Page } from "pages/Page";
 import { useMemo, useState } from "react";

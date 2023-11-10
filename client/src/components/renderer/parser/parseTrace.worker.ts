@@ -1,4 +1,4 @@
-import { chain, findLast, map, mapValues, negate } from "lodash";
+import { chain, findLast, mapValues, negate } from "lodash";
 import {
   CompiledComponent,
   EventContext,
@@ -8,8 +8,8 @@ import {
 } from "protocol";
 import { ComponentEntry } from "renderer";
 import { mapProperties } from "./mapProperties";
-import { parse as parseComponents } from "./parse";
 import { normalizeConstant } from "./normalize";
+import { parse as parseComponents } from "./parse";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
@@ -35,7 +35,7 @@ function parse({
     event: TraceEvent,
     ctx?: EventContext
   ): CompiledComponent<string, Record<string, any>>[] =>
-    map(parsed, (p) =>
+    parsed.map((p) =>
       mapProperties<
         ParsedComponent<string, any>,
         CompiledComponent<string, Record<string, any>>
@@ -83,8 +83,8 @@ function parse({
     .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(i))))
     .value();
   return {
-    stepsPersistent: map(steps, "persistent"),
-    stepsTransient: map(steps, "transient"),
+    stepsPersistent: steps.map((c) => c.persistent),
+    stepsTransient: steps.map((c) => c.transient),
   };
 }
 

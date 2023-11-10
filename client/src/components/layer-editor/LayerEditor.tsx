@@ -25,7 +25,7 @@ import {
   useState,
 } from "react";
 import { Layer } from "slices/layers";
-import { inferLayerName, layerHandlers } from "./layers/LayerSource";
+import { inferLayerName, layerHandlers } from "../../layers/Layer";
 
 type LayerEditorProps = {
   value: Layer;

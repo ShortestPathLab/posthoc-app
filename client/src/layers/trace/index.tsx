@@ -3,10 +3,7 @@ import { Box, useTheme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { TracePicker } from "components/app-bar/Input";
 import { PropertyList } from "components/inspector/PropertyList";
-import {
-  LazyNodeList,
-  NodeList,
-} from "components/render/renderer/generic/NodeList";
+import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { colorsHex, getColorHex } from "components/renderer/colors";
 import { parseString } from "components/renderer/parser/parseString";
 import { useTraceParser } from "components/renderer/parser/parseTrace";
@@ -33,9 +30,9 @@ import { useEffect, useMemo } from "react";
 import { useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { LayerSource, inferLayerName } from "./LayerSource";
-import { Heading, Option } from "./Option";
-import { TracePreview } from "./TracePreview";
+import { LayerController, inferLayerName } from "layers";
+import { Heading, Option } from "components/layer-editor/Option";
+import { TracePreview } from "components/layer-editor/TracePreview";
 import {
   PlaybackLayerData,
   PlaybackService,
@@ -105,7 +102,7 @@ export type TraceLayerData = {
 
 export type TraceLayer = Layer<TraceLayerData>;
 
-export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
+export const controller = {
   key: "trace",
   inferName: (layer) => layer.source?.trace?.name ?? "Untitled Trace",
   editor: withProduce(({ value, produce }) => {
@@ -252,7 +249,8 @@ export const traceLayerSource: LayerSource<"trace", TraceLayerData> = {
     }, [layer, event]);
     return <>{children?.(menu)}</>;
   },
-};
+} satisfies LayerController<"trace", TraceLayerData>;
+
 function use2DPath(layer?: TraceLayer, step: number = 0) {
   const { palette } = useTheme();
   const { getPath } = useMemo(

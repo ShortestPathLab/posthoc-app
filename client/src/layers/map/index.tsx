@@ -1,17 +1,17 @@
 import { MapPicker } from "components/app-bar/Input";
-import { NodeList } from "components/render/renderer/generic/NodeList";
+import { Option } from "components/layer-editor/Option";
 import { getParser } from "components/renderer";
+import { NodeList } from "components/renderer/NodeList";
 import { ParsedMap } from "components/renderer/map-parser/Parser";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { useMapContent } from "hooks/useMapContent";
 import { useParsedMap } from "hooks/useParsedMap";
+import { LayerController, inferLayerName } from "layers";
 import { isUndefined, round, set, startCase } from "lodash";
 import { withProduce } from "produce";
 import { useMemo } from "react";
 import { Map } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { LayerSource, inferLayerName } from "./LayerSource";
-import { Option } from "./Option";
 
 export type MapLayerData = {
   map?: Map;
@@ -20,7 +20,7 @@ export type MapLayerData = {
 
 export type MapLayer = Layer<MapLayerData>;
 
-export const mapLayerSource: LayerSource<"map", MapLayerData> = {
+export const controller = {
   key: "map",
   inferName: (layer) =>
     layer?.source?.map
@@ -75,8 +75,8 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
       }
       return {};
     }, [parsedMap, event]);
-    const menu = useMemo(() => {
-      return {
+    const menu = useMemo(
+      () => ({
         ...(layer &&
           point &&
           !isUndefined(node) && {
@@ -90,8 +90,9 @@ export const mapLayerSource: LayerSource<"map", MapLayerData> = {
               },
             },
           }),
-      };
-    }, [point, node, layer, layers, setLayer]);
+      }),
+      [point, node, layer, layers, setLayer]
+    );
     return <>{children?.(menu)}</>;
   },
-};
+} satisfies LayerController<"map", MapLayerData>;

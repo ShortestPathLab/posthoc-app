@@ -8,10 +8,7 @@ import {
   MenuList,
   Typography,
 } from "@mui/material";
-import {
-  getLayerHandler,
-  SelectionInfoProvider,
-} from "components/layer-editor/layers/LayerSource";
+import { getLayerHandler, SelectionInfoProvider } from "layers/Layer";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { chain, Dictionary, entries, merge } from "lodash";
 import { useCache } from "pages/TreePage";

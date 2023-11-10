@@ -20,10 +20,7 @@ import {
 import { EventInspector } from "components/inspector/EventInspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import {
-  inferLayerName,
-  layerHandlers,
-} from "components/layer-editor/layers/LayerSource";
+import { inferLayerName, layerHandlers } from "layers/Layer";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { delay, map } from "lodash";
 import { Page } from "pages/Page";

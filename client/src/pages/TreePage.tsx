@@ -19,7 +19,7 @@ import { Flex } from "components/generic/Flex";
 import { Label } from "components/generic/Label";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { inferLayerName } from "components/layer-editor/layers/LayerSource";
+import { inferLayerName } from "layers/Layer";
 import { getColorHex } from "components/renderer/colors";
 import { delay, entries, find, findLast, map, set, startCase } from "lodash";
 import PopupState, { bindMenu } from "material-ui-popup-state";

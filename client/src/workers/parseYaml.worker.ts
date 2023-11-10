@@ -1,3 +1,3 @@
-import { parse } from "yaml";
+import { load } from "js-yaml";
 
-onmessage = (str: MessageEvent<string>) => postMessage(parse(str.data));
+onmessage = (str: MessageEvent<string>) => postMessage(load(str.data));

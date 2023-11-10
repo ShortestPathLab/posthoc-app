@@ -2,6 +2,7 @@ import {
   ceil,
   clamp,
   debounce,
+  defer,
   find,
   floor,
   forEach,
@@ -144,10 +145,11 @@ class D2Renderer
     map(this.#workers, (w) =>
       w.call("add", [map(components, "component"), id])
     );
-    return () => {
-      for (const c of bodies) this.#system.remove(c);
-      map(this.#workers, (w) => w.call("remove", [id]));
-    };
+    return () =>
+      defer(() => {
+        for (const c of bodies) this.#system.remove(c);
+        map(this.#workers, (w) => w.call("remove", [id]));
+      });
   }
 
   setOptions(o: D2RendererOptions) {

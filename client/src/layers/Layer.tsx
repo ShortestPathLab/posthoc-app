@@ -5,9 +5,9 @@ import { Dictionary } from "lodash";
 import { TraceEvent } from "protocol";
 import { createElement, FC, ReactNode } from "react";
 import { Layer } from "slices/layers";
-import { mapLayerSource } from "./mapLayerSource";
-import { queryLayerSource } from "./queryLayerSource";
-import { traceLayerSource } from "./traceLayerSource";
+import { controller as mapController } from "./map";
+import { controller as queryController } from "./query";
+import { controller as traceController } from "./trace";
 
 export type SelectionInfoProvider = FC<{
   layer?: string;
@@ -15,7 +15,7 @@ export type SelectionInfoProvider = FC<{
   children?: (menu: SelectionMenuContent) => ReactNode;
 }>;
 
-export type LayerSource<K extends string, T> = {
+export type LayerController<K extends string, T> = {
   key: K;
   editor: FC<EditorSetterProps<Layer<T>>>;
   renderer: FC<{ layer?: Layer<T> }>;
@@ -52,8 +52,8 @@ export function getLayerHandler(layer?: Layer) {
   return layerHandlers[layer?.source?.type ?? ""];
 }
 
-export const layerHandlers: Dictionary<LayerSource<string, any>> = {
-  map: mapLayerSource,
-  trace: traceLayerSource,
-  query: queryLayerSource,
+export const layerHandlers: Dictionary<LayerController<string, any>> = {
+  map: mapController,
+  trace: traceController,
+  query: queryController,
 };

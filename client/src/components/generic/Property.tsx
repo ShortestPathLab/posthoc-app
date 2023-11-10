@@ -6,7 +6,7 @@ import { truncate } from "lodash";
 import { ReactNode } from "react";
 import { Flex } from "./Flex";
 import { Space } from "./Space";
-import YAML from "yaml";
+import YAML from "js-yaml";
 
 type Props = {
   label?: ReactNode;
@@ -24,7 +24,7 @@ function stringify(obj: any) {
     default:
       return (
         <code>
-          {truncate(YAML.stringify(obj).replace("\n", ", "), {
+          {truncate(YAML.dump(obj).replace("\n", ", "), {
             length: 30,
           })}
         </code>
