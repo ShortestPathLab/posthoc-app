@@ -7,7 +7,13 @@ import {
 import { Box, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useSnackbar } from "components/generic/Snackbar";
+import { Heading, Option } from "components/layer-editor/Option";
+import { TracePreview } from "components/layer-editor/TracePreview";
 import { getParser } from "components/renderer";
+import { useEffectWhenAsync } from "hooks/useEffectWhen";
+import { LayerController, inferLayerName } from "layers";
+import { MapLayer, MapLayerData } from "layers/map";
+import { TraceLayerData, controller as traceController } from "layers/trace";
 import { filter, find, map, merge, reduce, set } from "lodash";
 import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";
@@ -15,14 +21,6 @@ import { useMemo } from "react";
 import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { Layer, useLayer, useLayers } from "slices/layers";
-import { useEffectWhenAsync } from "hooks/useEffectWhen";
-import { LayerController, inferLayerName } from "layers";
-import { Heading, Option } from "components/layer-editor/Option";
-import { TracePreview } from "components/layer-editor/TracePreview";
-import { MapLayer, MapLayerData } from "layers/map";
-import { TraceLayerData, controller as traceController } from "layers/trace";
-
-const TraceLayerSelectionInfoProvider = traceController.getSelectionInfo;
 
 async function findConnection(
   connections: Connection[],
@@ -184,6 +182,7 @@ export const controller = {
   }),
   inferName: (l) => l.source?.trace?.name ?? "Untitled Query",
   getSelectionInfo: ({ children, event, layer: key }) => {
+    const TraceLayerSelectionInfoProvider = traceController.getSelectionInfo;
     const { layer, setLayer, layers } = useLayer<QueryLayerData>(key);
     const mapLayerData = useMemo(() => {
       const filteredLayers = filter(layers, {

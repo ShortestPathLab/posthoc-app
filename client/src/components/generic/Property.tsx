@@ -6,7 +6,6 @@ import { truncate } from "lodash";
 import { ReactNode } from "react";
 import { Flex } from "./Flex";
 import { Space } from "./Space";
-import YAML from "js-yaml";
 
 type Props = {
   label?: ReactNode;
@@ -24,7 +23,7 @@ function stringify(obj: any) {
     default:
       return (
         <code>
-          {truncate(YAML.dump(obj).replace("\n", ", "), {
+          {truncate(JSON.stringify(obj).replace("\n", ", "), {
             length: 30,
           })}
         </code>
@@ -34,7 +33,7 @@ function stringify(obj: any) {
 
 export function Property({ label, value, type }: Props) {
   return (
-    <Flex width="auto" mr={3} mt={0.5} key={`${label}::${stringify(value)}`}>
+    <Flex width="auto" mr={3} mb={0.5} key={`${label}::${stringify(value)}`}>
       <Type
         component="div"
         variant="body2"
