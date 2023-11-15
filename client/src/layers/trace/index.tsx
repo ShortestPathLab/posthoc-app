@@ -220,7 +220,7 @@ export const controller = {
         .value() as number[];
       const info = chain(event?.info?.components)
         .filter((c) => c.meta?.sourceLayer === layer?.key)
-        .map((c) => c.meta)
+        .filter((c) => c.meta.info)
         .value() as any[];
       if (steps.length && layer) {
         const step = last(steps)!;
@@ -228,16 +228,17 @@ export const controller = {
         if (event) {
           return {
             ...keyBy(
-              map(info, (x) => ({
+              map(info, (x, i) => ({
+                key: `${layer.key}.${i}`,
                 primary: `Selection in ${inferLayerName(layer)}`,
                 items: {
                   info: {
                     index: -1,
-                    primary: <PropertyList event={x.info} vertical />,
+                    primary: <PropertyList event={x.meta.info} vertical />,
                   },
                 },
               })),
-              "primary"
+              "key"
             ),
             [layer.key]: {
               primary: inferLayerName(layer),
