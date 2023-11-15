@@ -6,13 +6,13 @@ import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
-} from "./parseTrace.worker";
-import parseGridWorkerUrl from "./parseTrace.worker.ts?worker&url";
+} from "./parseTraceSlave.worker";
+import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
 import { dump } from "js-yaml";
 
 export class ParseTraceWorker extends Worker {
   constructor() {
-    super(parseGridWorkerUrl, { type: "module" });
+    super(parseTraceWorkerUrl, { type: "module" });
   }
 }
 
@@ -37,6 +37,7 @@ export function useTraceParser(params: ParseTraceWorkerParameters) {
             );
             return output;
           } catch (e) {
+            console.error(e);
             push("Error parsing", `${dump(e)}`);
           }
         }

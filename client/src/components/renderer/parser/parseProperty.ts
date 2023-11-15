@@ -1,4 +1,4 @@
-import { constant, map, mapValues } from "lodash";
+import { map, mapValues } from "lodash";
 import { Prop } from "./Context";
 import { parseString } from "./parseString";
 /**
@@ -20,6 +20,6 @@ export function parseProperty(prop: any): Prop<any> {
     case String:
       return parseString(prop);
     default:
-      return constant(prop);
+      return () => prop;
   }
 }

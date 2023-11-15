@@ -40,7 +40,7 @@ export const defaultRenderers = [
   },
 ];
 
-export const defaultPlaybackRate = 4;
+export const defaultPlaybackRate = 1;
 
 const defaults = {
   renderer: defaultRenderers,

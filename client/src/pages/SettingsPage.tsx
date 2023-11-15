@@ -65,13 +65,13 @@ export function SettingsPage() {
                       <Space flex={1} />
                       <Slider
                         sx={{ maxWidth: 320, mr: 2 }}
-                        marks={[0.25, 1, 5].map((v) => ({
+                        marks={[1, 2, 5, 10].map((v) => ({
                           value: v * baseRate,
                           label: formatLabel(v),
                         }))}
-                        step={0.25 * baseRate}
-                        min={0.25 * baseRate}
-                        max={5 * baseRate}
+                        step={1 * baseRate}
+                        min={1 * baseRate}
+                        max={10 * baseRate}
                         valueLabelFormat={(v) => formatLabel(v / baseRate)}
                         valueLabelDisplay="auto"
                         defaultValue={playbackRate}

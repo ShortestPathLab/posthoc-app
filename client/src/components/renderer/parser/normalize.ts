@@ -11,5 +11,7 @@ export function normalize<T extends Props>(
 }
 
 export function normalizeConstant(obj: Context<any> = {}) {
-  return new Proxy(obj, { get: (obj, p) => () => obj[p] });
+  return new Proxy(obj, {
+    get: (obj, p) => (typeof obj[p] === "function" ? obj[p] : () => obj[p]),
+  });
 }

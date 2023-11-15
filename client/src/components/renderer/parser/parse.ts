@@ -7,16 +7,16 @@ import {
   ParsedComponentDefinition,
   TraceComponent,
 } from "protocol";
-import { applyScope } from "./applyScope";
 import { Context, Key } from "./Context";
-import { normalize } from "./normalize";
+import { applyScope } from "./applyScope";
+import { normalize, normalizeConstant } from "./normalize";
 
 function parseFor(component: TraceComponent<string, Dict<any>>) {
   const { $for, ...rest } = component;
   if ($for) {
     const { $let = "i", $from = 0, $to = 1, $step = 1 } = $for;
     return range($from, $to, $step).map((i) =>
-      applyScope(normalize({ [$let]: i }), normalize(rest as any))
+      applyScope(normalizeConstant({ [$let]: i }), normalize(rest as any))
     );
   } else {
     return [component];
@@ -39,8 +39,8 @@ export function parse<T extends IntrinsicComponentMap>(
     const c2 = parseFor(c);
     return c2.flatMap((component) => {
       const scoped = applyScope(
-        normalize(context),
-        normalize(component) as any
+        normalizeConstant(context),
+        normalize(component)
       );
       return $ in components
         ? parse(components[$], components, scoped)

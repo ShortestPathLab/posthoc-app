@@ -11,9 +11,8 @@ import { Label } from "components/generic/Label";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
-import { range, trimEnd } from "lodash";
+import { noop, range, trimEnd } from "lodash";
 import { ReactNode, useCallback, useEffect } from "react";
-import { useRaf } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer } from "slices/layers";
 import { useSettings } from "slices/settings";
@@ -38,7 +37,6 @@ export function PlaybackService({
   children,
   value,
 }: EditorSetterProps<Layer<PlaybackLayerData>>) {
-  useRaf();
   const { step, tick, end, playing, pause } = usePlaybackState(value?.key);
 
   const notify = useSnackbar();
@@ -54,8 +52,10 @@ export function PlaybackService({
 
   useEffect(() => {
     if (playing) {
-      return step < end
-        ? cancellable(
+      let cancel = noop;
+      const r = setInterval(() => {
+        if (step < end) {
+          cancel = cancellable(
             async () => {
               for (const i of range(playbackRate)) {
                 const r = shouldBreak(step + i);
@@ -74,8 +74,15 @@ export function PlaybackService({
                 pause();
               }
             }
-          )
-        : pause();
+          );
+        } else {
+          pause();
+        }
+      }, 1000 / 60);
+      return () => {
+        cancel();
+        clearInterval(r);
+      };
     }
   }, [
     renderLabel,
@@ -109,7 +116,6 @@ export function Playback({
     stepForward,
     stop,
   } = usePlaybackState(layer?.key);
-  useRaf();
   return (
     <>
       <Button

@@ -16,8 +16,8 @@ export function PropertyList({
   const a = filter(entries(event), ([, v]) => v !== undefined);
   return (
     <Flex {...props}>
-      {map(slice(a, 0, max), ([k, v]) => (
-        <Property label={k} value={v} type={{ variant }} />
+      {map(slice(a, 0, max), ([k, v], i) => (
+        <Property label={k} value={v} key={i} type={{ variant }} />
       ))}
       {a.length > max && (
         <Property
