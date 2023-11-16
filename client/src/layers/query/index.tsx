@@ -159,7 +159,7 @@ export const controller = {
                   })
                 );
               } else {
-                notify("Canceled.");
+                notify("Canceled");
               }
             }
           }

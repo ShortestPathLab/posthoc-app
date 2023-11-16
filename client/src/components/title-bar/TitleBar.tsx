@@ -71,6 +71,11 @@ export const TitleBar = () => {
                     key: "workspace-save",
                     action: save,
                   },
+                  {
+                    name: "Save workspace (JSON)",
+                    key: "workspace-save",
+                    action: () => save(true),
+                  },
                 ],
               },
               {
@@ -136,7 +141,7 @@ function CommandsButton() {
   const notify = useSnackbar();
   return (
     <ButtonBase
-      onClick={() => notify("Commands are not yet implemented.")}
+      onClick={() => notify("Commands are not yet implemented")}
       sx={{
         WebkitAppRegion: "no-drag",
         fontSize: 14,

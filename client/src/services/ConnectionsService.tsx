@@ -35,7 +35,7 @@ export function ConnectionsService() {
             await tp.connect();
             const { result, delta } = await timed(() => tp.call("about"));
             if (result) {
-              notify(`Connected to ${result.name}.`);
+              notify(`Connected to ${result.name}`);
               cs = [
                 ...cs,
                 {
@@ -51,7 +51,7 @@ export function ConnectionsService() {
           if (!aborted) setConnections(() => cs);
         }
         if (!aborted)
-          notify(`Connected to ${cs.length} of ${remote.length} solvers.`);
+          notify(`Connected to ${cs.length} of ${remote.length} solvers`);
       }
     });
     return () => {
