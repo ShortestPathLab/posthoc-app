@@ -1,5 +1,10 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Tab, Typography as Type } from "@mui/material";
+import {
+  LayersOutlined as LayersIcon,
+  SortOutlined as StepsIcon,
+} from "@mui/icons-material";
+import { delay, map } from "lodash";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/Switch";
@@ -9,11 +14,16 @@ import { Page } from "pages/Page";
 import { ReactNode, useState } from "react";
 import { useUIState } from "slices/UIState";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
+import { useLayer } from "slices/layers";
+import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { inferLayerName, layerHandlers } from "layers/Layer";
+
 
 export function DebugPage() {
   const { controls, onChange, state } = useViewTreeContext();
   const [{ monotonicF, monotonicG }, setUIState] = useUIState();
   const [tab, setTab] = useState("standard");
+  const { key, setKey, layers, layer } = useLayer();
   function renderHeading(label: ReactNode) {
     return (
       <Type variant="overline" color="text.secondary">
@@ -25,6 +35,17 @@ export function DebugPage() {
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
         <Page.Options>
+        <FeaturePicker
+          icon={<LayersIcon />}
+          label="Layer"
+          value={key}
+          items={map(layers, (l) => ({
+            id: l.key,
+            name: inferLayerName(l),
+          }))}
+          onChange={setKey}
+          showArrow
+        />
           <TabList onChange={(_, v) => setTab(v)}>
             <Tab label="Standard" value="standard" />
             <Tab label="Advanced" value="advanced" />
