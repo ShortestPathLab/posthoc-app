@@ -10,7 +10,7 @@ export function mapIsSupported(path: string) {
 }
 
 export async function getMapDescriptor(path: string) {
-  const { maps: mapsPath } = await getConfig();
+  const { maps: mapsPath } = getConfig();
   const file = parse(path);
   return {
     id: relative(resolve(mapsPath), path),

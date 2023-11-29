@@ -4,7 +4,6 @@ import {
   InfoOutlined,
   LayersOutlined,
   ListOutlined,
-  SettingsInputComponentOutlined,
   SettingsOutlined,
   SortOutlined as StepsIcon,
   ViewInArOutlined,

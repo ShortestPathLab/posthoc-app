@@ -24,7 +24,8 @@
             { "x": "{{$.event.x2}}", "y": "{{$.event.y2}}" }
           ],
           "lineWidth": 0.25,
-          "fill": "{{$.color[$.event.type]}}"
+          "fill": "{{$.color[$.event.type]}}",
+          "display": "transient"
         }
       ],
       "triangle": [

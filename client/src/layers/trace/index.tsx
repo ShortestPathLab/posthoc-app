@@ -1,13 +1,21 @@
 import { ArrowOutwardRounded } from "@mui/icons-material";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { TracePicker } from "components/app-bar/Input";
+import {
+  PlaybackLayerData,
+  PlaybackService,
+} from "components/app-bar/Playback";
 import { PropertyList } from "components/inspector/PropertyList";
+import { Heading, Option } from "components/layer-editor/Option";
+import { TracePreview } from "components/layer-editor/TracePreview";
 import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { colorsHex, getColorHex } from "components/renderer/colors";
 import { parseString } from "components/renderer/parser/parseString";
 import { useTraceParser } from "components/renderer/parser/parseTrace";
+import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTraceSlave.worker";
 import { useEffectWhen } from "hooks/useEffectWhen";
+import { LayerController, inferLayerName } from "layers";
 import {
   chain,
   constant,
@@ -30,14 +38,6 @@ import { useEffect, useMemo } from "react";
 import { useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { LayerController, inferLayerName } from "layers";
-import { Heading, Option } from "components/layer-editor/Option";
-import { TracePreview } from "components/layer-editor/TracePreview";
-import {
-  PlaybackLayerData,
-  PlaybackService,
-} from "components/app-bar/Playback";
-import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTraceSlave.worker";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
