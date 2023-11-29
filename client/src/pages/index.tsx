@@ -8,6 +8,7 @@ import {
   SettingsOutlined,
   SortOutlined as StepsIcon,
   ViewInArOutlined,
+  WorkspacesOutlined,
 } from "@mui/icons-material";
 import { Dictionary } from "lodash";
 import { ReactNode } from "react";
@@ -19,6 +20,8 @@ import { SettingsPage } from "./SettingsPage";
 import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
+import { RecipesPage } from "./RecipesPage";
+
 
 export type PageMeta = {
   id: string;
@@ -75,5 +78,11 @@ export const pages: Dictionary<PageMeta> = {
     name: "About",
     icon: <InfoOutlined />,
     content: AboutPage,
+  },
+  recipes: {
+    id: "recipes",
+    name: "Recipes",
+    icon: <WorkspacesOutlined />,
+    content: RecipesPage,
   },
 };
