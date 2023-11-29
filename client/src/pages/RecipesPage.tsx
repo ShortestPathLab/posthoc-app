@@ -5,51 +5,54 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography as Type
+  Typography as Type,
 } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useWorkspace } from "hooks/useWorkspace";
-import { startCase, values } from "lodash";
+import { map, startCase, values } from "lodash";
 import { Page } from "pages/Page";
 import { ReactNode } from "react";
+import { useAsync } from "react-async-hook";
 
-
-const paths = (import.meta.glob("/public/recipes/*.workspace", { as: "url" }));
-const files = await Promise.all(values(paths).map(f => f()))
-
-function stripExtension(path:string) {
-   return path.split(".")[0];
-}  
+function stripExtension(path: string) {
+  return path.split(".")[0];
+}
 
 function basename(path: string) {
-  return path.split('/').pop()!;
+  return path.split("/").pop()!;
 }
 
 export function RecipesPage() {
   const { controls, onChange, state } = useViewTreeContext();
   const { load } = useWorkspace();
-  
-  async function open(path:string){
+
+  const { result: files } = useAsync(async () => {
+    const paths = import.meta.glob("/public/recipes/*.workspace", {
+      as: "url",
+    });
+    return await Promise.all(values(paths).map((f) => f()));
+  }, []);
+
+  async function open(path: string) {
     try {
       const response = await fetch(path);
-      
+
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
-    
+
       const blob = await response.blob();
       const filename = basename(path);
       const file = new File([blob], filename, { type: blob.type });
-      
-      load(file)
-      
+
+      load(file);
     } catch (error) {
-      console.error('There was a problem with the fetch operation:', error);
+      console.error("There was a problem with the fetch operation:", error);
     }
   }
-  
+
   function renderSection(label: ReactNode, content: ReactNode) {
     return (
       <Box sx={{ pt: 2 }}>
@@ -64,21 +67,22 @@ export function RecipesPage() {
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Content>
-       
-        <Flex>
+        <Flex vertical>
           <Scroll y>
-            <Box sx={{ p: 2, width: '100%' }}> 
-              <Type variant="h6">Recipes</Type>
+            <Box sx={{ pt: 6 }}>
               {renderSection(
-                "Recipes",
+                <Box sx={{ px: 2 }}>Recipes</Box>,
                 <>
-                  <List sx={{ width: '100%', maxWidth: '100%' }}> 
-                    {files.map(( path , i) => (
+                  <List>
+                    {map(files, (path, i) => (
                       <ListItemButton key={i} onClick={() => open(path)}>
                         <ListItemIcon>
-                          <WorkspacesOutlined/>
+                          <WorkspacesOutlined />
                         </ListItemIcon>
-                        <ListItemText primary={startCase(stripExtension(basename(path)))} />
+                        <ListItemText
+                          primary={startCase(stripExtension(basename(path)))}
+                          secondary={basename(path)}
+                        />
                       </ListItemButton>
                     ))}
                   </List>
@@ -92,5 +96,3 @@ export function RecipesPage() {
     </Page>
   );
 }
-
-
