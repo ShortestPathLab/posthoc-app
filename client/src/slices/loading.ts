@@ -8,6 +8,7 @@ type Loading = {
   map: number;
   connections: number;
   features: number;
+  general: number;
 };
 
 type A = { action: "start" | "end"; key: keyof Loading };
@@ -18,6 +19,7 @@ export const [useLoading, LoadingProvider] = createSlice<Loading, A>(
     connections: 0,
     features: 0,
     map: 0,
+    general: 0,
   },
   {
     reduce: (prev, { action, key }: A) => {
@@ -40,7 +42,7 @@ export function useAnyLoading() {
   return some(values(loading));
 }
 
-export function useLoadingState(key: keyof Loading) {
+export function useLoadingState(key: keyof Loading = "general") {
   const [, dispatch] = useLoading();
 
   return useCallback(

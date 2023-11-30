@@ -1,20 +1,21 @@
 import { WorkspacesOutlined } from "@mui/icons-material";
 import {
   Box,
+  CircularProgress,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography as Type,
 } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
+import { useSnackbar } from "components/generic/Snackbar";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useWorkspace } from "hooks/useWorkspace";
-import { map, startCase, values } from "lodash";
+import { chain as _, entries, map } from "lodash";
 import { Page } from "pages/Page";
-import { ReactNode } from "react";
 import { useAsync } from "react-async-hook";
+import { useLoadingState } from "slices/loading";
 
 function stripExtension(path: string) {
   return path.split(".")[0];
@@ -25,44 +26,40 @@ function basename(path: string) {
 }
 
 export function RecipesPage() {
+  const notify = useSnackbar();
   const { controls, onChange, state } = useViewTreeContext();
   const { load } = useWorkspace();
+  const usingLoadingState = useLoadingState();
 
-  const { result: files } = useAsync(async () => {
+  const { result: files, loading } = useAsync(async () => {
     const paths = import.meta.glob("/public/recipes/*.workspace", {
       as: "url",
     });
-    return await Promise.all(values(paths).map((f) => f()));
+    return await Promise.all(
+      entries(paths).map((entry) => getFileInfo(...entry))
+    );
   }, []);
 
-  async function open(path: string) {
-    try {
-      const response = await fetch(path);
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+  const open = (path: string) =>
+    usingLoadingState(async () => {
+      try {
+        notify(`Loading ${basename(path)}...`);
+        const response = await fetch(path);
+        if (!response.ok) {
+          notify(`Couldn't load ${basename(path)}`, `Network error`, {
+            error: true,
+          });
+        }
+        const blob = await response.blob();
+        const file = new File([blob], basename(path), { type: blob.type });
+        // It is correct to not wait for this promise
+        load(file);
+      } catch (e) {
+        notify(`Couldn't load ${basename(path)}`, `${e}`, {
+          error: true,
+        });
       }
-
-      const blob = await response.blob();
-      const filename = basename(path);
-      const file = new File([blob], filename, { type: blob.type });
-
-      load(file);
-    } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
-    }
-  }
-
-  function renderSection(label: ReactNode, content: ReactNode) {
-    return (
-      <Box sx={{ pt: 2 }}>
-        <Type variant="overline" color="text.secondary">
-          {label}
-        </Type>
-        <Type variant="body2">{content}</Type>
-      </Box>
-    );
-  }
+    });
 
   return (
     <Page onChange={onChange} stack={state}>
@@ -70,23 +67,19 @@ export function RecipesPage() {
         <Flex vertical>
           <Scroll y>
             <Box sx={{ pt: 6 }}>
-              {renderSection(
-                <Box sx={{ px: 2 }}>Recipes</Box>,
-                <>
-                  <List>
-                    {map(files, (path, i) => (
-                      <ListItemButton key={i} onClick={() => open(path)}>
-                        <ListItemIcon>
-                          <WorkspacesOutlined />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={startCase(stripExtension(basename(path)))}
-                          secondary={basename(path)}
-                        />
-                      </ListItemButton>
-                    ))}
-                  </List>
-                </>
+              {!loading ? (
+                <List>
+                  {map(files, ({ name, path }, i) => (
+                    <ListItemButton key={i} onClick={() => open(path)}>
+                      <ListItemIcon>
+                        <WorkspacesOutlined />
+                      </ListItemIcon>
+                      <ListItemText primary={name} secondary={basename(path)} />
+                    </ListItemButton>
+                  ))}
+                </List>
+              ) : (
+                <CircularProgress sx={{ m: 2 }} />
               )}
             </Box>
           </Scroll>
@@ -95,4 +88,10 @@ export function RecipesPage() {
       <Page.Extras>{controls}</Page.Extras>
     </Page>
   );
+}
+async function getFileInfo(k: string, f: () => Promise<string>) {
+  return {
+    name: _(k).thru(basename).thru(stripExtension).startCase().value(),
+    path: await f(),
+  };
 }

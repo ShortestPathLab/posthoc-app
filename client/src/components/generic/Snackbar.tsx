@@ -12,9 +12,15 @@ import {
   useState,
 } from "react";
 
-const SnackbarContext = createContext<
-  (message?: string, secondary?: string) => () => void
->(() => noop);
+type A = (
+  message?: string,
+  secondary?: string,
+  options?: {
+    error?: boolean;
+  }
+) => () => void;
+
+const SnackbarContext = createContext<A>(() => noop);
 
 export interface SnackbarMessage {
   message?: ReactNode;
@@ -51,7 +57,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
   }, [snackPack, current, open]);
 
   const handleMessage = useCallback(
-    (message?: string, secondary?: string) => {
+    ((message?: string, secondary?: string, options = {}) => {
       setSnackPack((prev) => [
         ...prev,
         {
@@ -63,8 +69,11 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         content: filter([message, secondary]).join(", "),
         timestamp: `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
       }));
+      if (options.error) {
+        console.error(`${message}, ${secondary}`);
+      }
       return () => handleClose("");
-    },
+    }) as A,
     [setSnackPack]
   );
 
