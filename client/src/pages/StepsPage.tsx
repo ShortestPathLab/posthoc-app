@@ -2,14 +2,7 @@ import {
   LayersOutlined as LayersIcon,
   SortOutlined as StepsIcon,
 } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  Typography as Type,
-  useTheme,
-} from "@mui/material";
+import { Box, Divider, useTheme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Playback } from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
@@ -17,12 +10,12 @@ import {
   LazyList as List,
   LazyListHandle as ListHandle,
 } from "components/generic/LazyList";
-import { EventInspector } from "components/inspector/EventInspector";
+import { EventInspector, Skeleton } from "components/inspector/EventInspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { inferLayerName, layerHandlers } from "layers/Layer";
 import { usePlaybackState } from "hooks/usePlaybackState";
-import { delay, map } from "lodash";
+import { inferLayerName, layerHandlers } from "layers/Layer";
+import { defer, map } from "lodash";
 import { Page } from "pages/Page";
 import { TraceEvent } from "protocol";
 import { cloneElement, createElement, useEffect, useMemo, useRef } from "react";
@@ -37,7 +30,7 @@ export function StepsPage() {
   const { controls, onChange, state } = useViewTreeContext();
   const ref = useRef<ListHandle | null>(null);
   const { key, setKey, layers, layer } = useLayer();
-  const { step, playing, pause, stepTo } = usePlaybackState(key);
+  const { step, playing, stepTo } = usePlaybackState(key);
 
   const steps = useMemo(() => {
     if (layer) {
@@ -48,18 +41,16 @@ export function StepsPage() {
   }, [layer]);
 
   useEffect(() => {
-    if (!playing) {
-      delay(
-        () =>
-          ref?.current?.scrollToIndex?.({
-            index: step,
-            align: "start",
-            behavior: "smooth",
-            offset: -pxToInt(spacing(6 + 2)),
-          }),
-        150
-      );
-    }
+    defer(
+      () =>
+        ref?.current?.scrollToIndex?.({
+          index: step,
+          align: "start",
+          behavior: "smooth",
+          offset: -pxToInt(spacing(6 + 2)),
+        }),
+      0
+    );
   }, [step, playing, spacing]);
 
   return (
@@ -67,24 +58,25 @@ export function StepsPage() {
       <Page.Content>
         <Flex vertical alignItems="center">
           {steps ? (
-            !playing ? (
-              cloneElement(steps, {
-                children: (steps: TraceEvent[]) =>
-                  layer ? (
-                    steps.length ? (
-                      <List
-                        sx={{
-                          width: "100%",
-                          height: "100%",
-                        }}
-                        items={steps}
-                        listOptions={{
-                          ref,
-                          defaultItemHeight: 80,
-                          overscan: 0,
-                        }}
-                        // placeholder={<Skeleton />}
-                        renderItem={(item, i) => (
+            cloneElement(steps, {
+              children: (steps: TraceEvent[]) =>
+                layer ? (
+                  steps.length ? (
+                    <List
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                      }}
+                      items={steps}
+                      listOptions={{
+                        ref,
+                        defaultItemHeight: 80,
+                        overscan: 0,
+                      }}
+                      renderItem={(item, i) =>
+                        playing ? (
+                          <Skeleton event={item} />
+                        ) : (
                           <Box
                             sx={{
                               height: spacing(i ? 10 : 16),
@@ -100,31 +92,19 @@ export function StepsPage() {
                             />
                             <Divider variant="inset" />
                           </Box>
-                        )}
-                      />
-                    ) : (
-                      <Placeholder
-                        icon={<StepsIcon />}
-                        label={`${inferLayerName(
-                          layer
-                        )} has no steps to display`}
-                      />
-                    )
+                        )
+                      }
+                    />
                   ) : (
-                    <Placeholder icon={<StepsIcon />} label="Steps" />
-                  ),
-              })
-            ) : (
-              <Placeholder
-                icon={<CircularProgress />}
-                label={
-                  <>
-                    <Type>Running</Type>
-                    <Button onClick={() => pause()}>Pause</Button>
-                  </>
-                }
-              />
-            )
+                    <Placeholder
+                      icon={<StepsIcon />}
+                      label={`${inferLayerName(layer)} has no steps to display`}
+                    />
+                  )
+                ) : (
+                  <Placeholder icon={<StepsIcon />} label="Steps" />
+                ),
+            })
           ) : (
             <Placeholder icon={<StepsIcon />} label="Steps" />
           )}

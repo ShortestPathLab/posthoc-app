@@ -23,7 +23,7 @@ export function BreakpointEditor({
     onChange?.({ ...value, ...next });
   }
   return (
-    <Flex>
+    <Flex sx={{ mx: -2 }}>
       <Select
         placeholder="Event"
         sx={{ minWidth: 160 }}

@@ -76,14 +76,14 @@ export function EventInspector({
   );
 }
 
-export function Skeleton() {
+export function Skeleton({ event }: EventInspectorProps) {
   const { spacing } = useTheme();
   return (
     <>
       <ListItem
         sx={{
           height: 80,
-          borderLeft: `${spacing(0.5)} solid transparent`,
+          borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
         }}
       >
         <ListItemIcon>

@@ -14,6 +14,7 @@ import { colorsHex, getColorHex } from "components/renderer/colors";
 import { parseString } from "components/renderer/parser/parseString";
 import { useTraceParser } from "components/renderer/parser/parseTrace";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTraceSlave.worker";
+import { DebugLayerData } from "hooks/useBreakpoints";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { LayerController, inferLayerName } from "layers";
 import {
@@ -99,7 +100,7 @@ export type TraceLayerData = {
   trace?: UploadedTrace;
   parsedTrace?: ParseTraceWorkerReturnType;
   onion?: "off" | "transparent" | "solid";
-} & PlaybackLayerData;
+} & PlaybackLayerData & DebugLayerData;
 
 export type TraceLayer = Layer<TraceLayerData>;
 

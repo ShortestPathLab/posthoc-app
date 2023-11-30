@@ -38,11 +38,11 @@ export function usePlaybackState(key?: string) {
 
     const callbacks = {
       play: () => {
-        notify("Playback started");
+        // notify("Playback started");
         setPlaybackState({ playback: "playing", step: stepBy(1) });
       },
       pause: (n = 0) => {
-        notify("Playback paused");
+        // notify("Playback paused");
         setPlaybackState({ playback: "paused", step: stepBy(n) });
       },
       stepTo: (n = 0) => setPlaybackState({ step: n }),
