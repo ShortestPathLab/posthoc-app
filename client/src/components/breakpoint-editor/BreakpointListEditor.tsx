@@ -3,35 +3,32 @@ import { ListEditor } from "components/generic/ListEditor";
 import { Breakpoint, DebugLayerData } from "hooks/useBreakpoints";
 import { flatMap as flat, get, keys, map, set, uniq } from "lodash";
 import { produce } from "produce";
-import { Layer, useLayer } from "slices/layers";
+import { useLayer } from "slices/layers";
 import { BreakpointEditor } from "./BreakpointEditor";
 import { comparators } from "./comparators";
 import { intrinsicProperties } from "./intrinsicProperties";
 import { propertyPaths as paths } from "./propertyPaths";
 
 type BreakpointListEditorProps = {
-    breakpoints: Breakpoint[] |undefined;
-    onValueChange?: (v: Breakpoint[]) => void;
-    layer: Layer<DebugLayerData> |undefined
-  };
+  breakpoints?: Breakpoint[];
+  onValueChange?: (v: Breakpoint[]) => void;
+  layer?: string;
+};
 
 export function BreakpointListEditor({
-    breakpoints,
-    onValueChange,
-    layer
-  }: BreakpointListEditorProps) {
-    
-    const {setLayer} = useLayer<DebugLayerData>();
+  layer: key,
+}: BreakpointListEditorProps) {
+  const { layer, setLayer } = useLayer<DebugLayerData>(key);
+  const { breakpoints } = layer?.source ?? {};
 
-    function handleBreakpointsChange(updatedBreakpoints: Breakpoint[]) {
-      onValueChange?.(updatedBreakpoints);
-        layer &&
-          setLayer(
-            produce(layer, (layer) => 
-              set(layer, "source.breakpoints" , updatedBreakpoints)
-            )
-          );
-      }
+  function handleBreakpointsChange(updatedBreakpoints: Breakpoint[]) {
+    layer &&
+      setLayer(
+        produce(layer, (layer) =>
+          set(layer, "source.breakpoints", updatedBreakpoints)
+        )
+      );
+  }
 
   const properties = uniq([
     ...intrinsicProperties,
@@ -59,7 +56,8 @@ export function BreakpointListEditor({
           })}
           onChange={(updatedBreakpoints) =>
             handleBreakpointsChange(updatedBreakpoints)
-          }          addItemLabel="Breakpoint"
+          }
+          addItemLabel="Breakpoint"
           placeholderText="Click the button below to add a breakpoint."
         />
       </Box>

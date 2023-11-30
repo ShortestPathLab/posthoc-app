@@ -41,7 +41,7 @@ export function PlaybackService({
 
   const notify = useSnackbar();
   const [{ playbackRate = 1 }] = useSettings();
-  const shouldBreak = useBreakpoints();
+  const shouldBreak = useBreakpoints(value?.key);
 
   const renderLabel = useCallback(
     (label: ReactNode, offset: number) => (
