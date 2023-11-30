@@ -111,7 +111,8 @@ export const controller = {
       </>
     );
   }),
-  service: withProduce(({ value, produce }) => {
+  service: withProduce(({ value, produce, onChange }) => {
+    const TraceLayerService = traceController.service;
     const notify = useSnackbar();
     const { algorithm, mapLayerKey, start, end } = value?.source ?? {};
     const [{ layers: layers }] = useLayers();
@@ -178,7 +179,7 @@ export const controller = {
       ],
       [mapLayer, connections, algorithm, start, end]
     );
-    return <>{traceController.service}</>;
+    return <>{<TraceLayerService value={value} onChange={onChange} />}</>;
   }),
   inferName: (l) => l.source?.trace?.name ?? "Untitled Query",
   getSelectionInfo: ({ children, event, layer: key }) => {
