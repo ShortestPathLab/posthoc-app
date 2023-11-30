@@ -1,29 +1,28 @@
+import {
+  LayersOutlined as LayersIcon
+} from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Tab, Typography as Type } from "@mui/material";
-import {
-  LayersOutlined as LayersIcon,
-  SortOutlined as StepsIcon,
-} from "@mui/icons-material";
-import { delay, map } from "lodash";
+import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/Switch";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { ScriptEditor } from "components/script-editor/ScriptEditor";
+import { DebugLayerData } from "hooks/useBreakpoints";
+import { inferLayerName } from "layers/Layer";
+import { map, set } from "lodash";
 import { Page } from "pages/Page";
+import { produce } from "produce";
 import { ReactNode, useState } from "react";
-import { useUIState } from "slices/UIState";
-import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { useLayer } from "slices/layers";
-import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { inferLayerName, layerHandlers } from "layers/Layer";
-
+import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 
 export function DebugPage() {
   const { controls, onChange, state } = useViewTreeContext();
-  const [{ monotonicF, monotonicG }, setUIState] = useUIState();
   const [tab, setTab] = useState("standard");
-  const { key, setKey, layers, layer } = useLayer();
+  const { key, setKey, layers, layer ,setLayer} = useLayer<DebugLayerData>();
+  const {monotonicF,monotonicG,breakpoints} = layer?.source??{}
   function renderHeading(label: ReactNode) {
     return (
       <Type variant="overline" color="text.secondary">
@@ -61,20 +60,22 @@ export function DebugPage() {
                     <Switch
                       label="Monotonic f value"
                       checked={!!monotonicF}
-                      onChange={(_, v) => setUIState(() => ({ monotonicF: v }))}
+                      disabled = {!layer}
+                      onChange={(_, v) => layer && setLayer(produce(layer, (layer) => set(layer, 'source.monotonicF',v)))}
                     />
                     <Space />
                     <Switch
                       label="Monotonic g value"
                       checked={!!monotonicG}
-                      onChange={(_, v) => setUIState(() => ({ monotonicG: v }))}
+                      disabled = {!layer}
+                      onChange={(_, v) => layer && setLayer(produce(layer, (layer) => set(layer, 'source.monotonicG',v)))}
                     />
                   </Flex>
                 </Box>
                 <Space />
                 <Box>
                   {renderHeading("Breakpoints")}
-                  <BreakpointListEditor />
+                  <BreakpointListEditor breakpoints={breakpoints} layer={layer}/>
                 </Box>
                 <Box>
                   {renderHeading("Export")}
