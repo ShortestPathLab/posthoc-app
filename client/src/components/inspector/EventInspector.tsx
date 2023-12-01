@@ -16,6 +16,9 @@ import { pick } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
+import IconButton from "@mui/material/IconButton";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { useCss } from "react-use";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -29,50 +32,46 @@ export function EventInspector({
   selected,
   ...props
 }: EventInspectorProps) {
-  const { spacing } = useTheme();
+  const { spacing, transitions } = useTheme();
 
-  // const cardStyles = selected
-  //   ? {
-  //       color: "primary.contrastText",
-  //       bgcolor: "primary.main",
-  //     }
-  //   : acrylic;
-
-  // const hidden = event
-  //   ? !call(code ?? "", "shouldRender", [
-  //       index ?? 0,
-  //       event,
-  //       specimen?.eventList ?? [],
-  //     ])
-  //   : false;
+  const cls = useCss({
+    "& .info-button": { opacity: 0, transition: transitions.create("opacity") },
+    "&:hover .info-button": {
+      opacity: 1,
+    },
+  });
 
   return (
-    <Tooltip
-      title={
-        <Box p={1}>
-          <PropertyList event={event} flexDirection="column" />
-        </Box>
-      }
-      followCursor
+    <ListItemButton
+      selected={selected}
+      {...props}
+      className={cls}
+      sx={{
+        borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
+        ...props.sx,
+      }}
     >
-      <ListItemButton
-        selected={selected}
-        {...props}
-        sx={{
-          borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
-          ...props.sx,
-        }}
+      <ListItemIcon>
+        <Type variant="body2">{index}</Type>
+      </ListItemIcon>
+
+      <ListItemText
+        sx={{ overflow: "hidden" }}
+        primary={<EventLabel event={event} hidden={false} />}
+        secondary={<PropertyList event={pick(event, "f", "g", "pId")} />}
+      />
+      <Tooltip
+        title={
+          <Box p={1}>
+            <PropertyList event={event} flexDirection="column" />
+          </Box>
+        }
       >
-        <ListItemIcon>
-          <Type variant="body2">{index}</Type>
-        </ListItemIcon>
-        <ListItemText
-          sx={{ overflow: "hidden" }}
-          primary={<EventLabel event={event} hidden={false} />}
-          secondary={<PropertyList event={pick(event, "f", "g", "pId")} />}
-        />
-      </ListItemButton>
-    </Tooltip>
+        <Box className="info-button" sx={{ pl: 2, color: "text.secondary" }}>
+          <InfoOutlinedIcon />
+        </Box>
+      </Tooltip>
+    </ListItemButton>
   );
 }
 
