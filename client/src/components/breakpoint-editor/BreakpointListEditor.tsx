@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { ListEditor } from "components/generic/ListEditor";
 import { Breakpoint, DebugLayerData } from "hooks/useBreakpoints";
-import { flatMap as flat, get, keys, map, set, uniq } from "lodash";
+import { chain as _, flatMap as flat, get, keys, map, set, uniq } from "lodash";
 import { produce } from "produce";
 import { useLayer } from "slices/layers";
 import { BreakpointEditor } from "./BreakpointEditor";
@@ -30,13 +30,11 @@ export function BreakpointListEditor({
       );
   }
 
-  const properties = uniq([
-    ...intrinsicProperties,
-    ...flat(paths, (p) =>
-      //TODO:
-      flat([], (v) => map(keys(get(v, p)), (k) => `${p}.${k}`))
-    ),
-  ]);
+  const properties = _(layer?.source?.trace?.content?.events)
+    .flatMap(keys)
+    .uniq()
+    .filter((p) => p !== "type")
+    .value();
 
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>
