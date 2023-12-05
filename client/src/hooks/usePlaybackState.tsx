@@ -1,12 +1,10 @@
 import { PlaybackLayerData } from "components/app-bar/Playback";
-import { useSnackbar } from "components/generic/Snackbar";
 import { clamp, min, set } from "lodash";
 import { produce } from "produce";
 import { useMemo } from "react";
 import { useLayer } from "slices/layers";
 
 export function usePlaybackState(key?: string) {
-  const notify = useSnackbar();
   const { layer, setLayer } = useLayer<PlaybackLayerData>(key);
 
   const { playback, playbackTo, step: _step = 0 } = layer?.source ?? {};
