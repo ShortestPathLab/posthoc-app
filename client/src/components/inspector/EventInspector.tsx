@@ -1,3 +1,4 @@
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
   Box,
   Divider,
@@ -14,11 +15,9 @@ import {
 import { getColorHex } from "components/renderer/colors";
 import { pick } from "lodash";
 import { TraceEvent } from "protocol/Trace";
+import { useCss } from "react-use";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
-import IconButton from "@mui/material/IconButton";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { useCss } from "react-use";
 
 type EventInspectorProps = {
   event?: TraceEvent;

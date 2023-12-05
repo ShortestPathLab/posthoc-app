@@ -1,10 +1,11 @@
 import { PlaybackLayerData } from "components/app-bar/Playback";
+import { useSnackbar } from "components/generic/Snackbar";
 import { clamp, min, range, set, trimEnd } from "lodash";
 import { produce } from "produce";
 import { useMemo } from "react";
 import { useLayer } from "slices/layers";
 import { useBreakpoints } from "./useBreakpoints";
-import { useSnackbar } from "components/generic/Snackbar";
+
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
   requestAnimationFrame(async () => {
