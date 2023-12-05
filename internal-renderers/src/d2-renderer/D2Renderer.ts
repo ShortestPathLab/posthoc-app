@@ -135,6 +135,7 @@ class D2Renderer
 
   add(components: ComponentEntry<CompiledD2IntrinsicComponent>[]) {
     const id = nanoid();
+    map(this.#workers, (w) => w.call("add", [components, id]));
     const bodies = map(components, ({ component, meta }) => ({
       ...primitives[component.$].test(component),
       component,
@@ -142,9 +143,6 @@ class D2Renderer
       index: this.#next(),
     }));
     this.#system.load(bodies);
-    map(this.#workers, (w) =>
-      w.call("add", [map(components, "component"), id])
-    );
     return () =>
       defer(() => {
         for (const c of bodies) this.#system.remove(c);

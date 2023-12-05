@@ -18,7 +18,7 @@ export type SelectionInfoProvider = FC<{
 export type LayerController<K extends string, T> = {
   key: K;
   editor: FC<EditorSetterProps<Layer<T>>>;
-  renderer: FC<{ layer?: Layer<T> }>;
+  renderer: FC<{ layer?: Layer<T>; index?: number }>;
   service?: FC<EditorSetterProps<Layer<T>>>;
   inferName: (layer: Layer<T>) => string;
   steps: FC<{
@@ -28,12 +28,19 @@ export type LayerController<K extends string, T> = {
   getSelectionInfo?: SelectionInfoProvider;
 };
 
-export function RenderLayer({ layer }: { layer?: Layer }) {
+export function RenderLayer({
+  layer,
+  index,
+}: {
+  layer?: Layer;
+  index?: number;
+}) {
   return (
     <>
       {layer &&
         createElement(layerHandlers[layer?.source?.type ?? ""]?.renderer, {
           layer,
+          index,
         })}
     </>
   );
