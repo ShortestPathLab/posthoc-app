@@ -54,7 +54,7 @@ export function usePlaybackState(key?: string) {
     const tick = (n = 1) =>
       setPlaybackState({ playback: "playing", step: stepBy(n) });
 
-    const stepWithBreakpointCheck = (count: number,offset:number=0) =>
+    const stepWithBreakpointCheck = (count: number, offset: number = 0) =>
       cancellable(
         async () => {
           for (const i of range(offset, count)) {
@@ -66,11 +66,11 @@ export function usePlaybackState(key?: string) {
         ({ result, offset, error }) => {
           if (!error) {
             if (result) {
-              notify(`Breakpoint hit: ${result}`, `Step ${offset}`);
+              notify(`Breakpoint hit: ${result}`, `Step ${step + offset}`);
               pause(offset);
             } else tick(count);
           } else {
-            notify(`${trimEnd(error, ".")}`, `Step ${offset}`);
+            notify(`${trimEnd(error, ".")}`, `Step ${step + offset}`);
             pause();
           }
         }

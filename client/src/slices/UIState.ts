@@ -23,6 +23,7 @@ type InputState = {
 export type Comparator = {
   key: string;
   apply: (value: number, reference: number) => boolean;
+  needsReference?:boolean
 };
 
 export type Breakpoint = {
