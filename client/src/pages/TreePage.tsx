@@ -3,6 +3,7 @@ import {
   ChevronRightOutlined,
   LayersOutlined as LayersIcon,
   VisibilityOutlined,
+  FlipOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -75,6 +76,15 @@ const radius2 = {
   },
 };
 
+const orientationOptions = {
+  horizontal: {
+    value: "horizontal",
+  },
+  vertical: {
+    value: "vertical",
+  },
+};
+
 export function TreePage() {
   const { palette } = useTheme();
 
@@ -84,6 +94,9 @@ export function TreePage() {
   const { controls, onChange, state } = useViewTreeContext<TreePageContext>();
 
   const [radius, setRadius] = useState<keyof typeof radius2>("small");
+
+  const [orientation, setOrientation] =
+    useState<keyof typeof orientationOptions>("horizontal");
 
   const pathCls = useCss({
     "&.rd3t-link": {
@@ -114,12 +127,13 @@ export function TreePage() {
                 <Box {...{ width, height }}>
                   <Tree
                     scaleExtent={{ max: 10, min: 0.01 }}
+                    orientation={orientation}
                     translate={{ x: width / 2, y: width / 2 }}
                     data={cache.tree}
                     dimensions={{ width, height }}
                     separation={{
-                      siblings: 0.4,
-                      nonSiblings: 0.4,
+                      siblings: 1,
+                      nonSiblings: 1,
                     }}
                     pathClassFunc={pathClassFunc}
                     renderCustomNodeElement={({
@@ -171,6 +185,18 @@ export function TreePage() {
           items={map(entries(radius2), ([k, v]) => ({
             id: k,
             ...v,
+          }))}
+          showArrow
+        />
+        {divider}
+        <FeaturePicker
+          icon={<FlipOutlined />}
+          label="Tree Orientation"
+          value={radius}
+          onChange={(e) => setOrientation(e as keyof typeof orientationOptions)}
+          items={Object.entries(orientationOptions).map(([key, value]) => ({
+            id: key,
+            name: value.value,
           }))}
           showArrow
         />
