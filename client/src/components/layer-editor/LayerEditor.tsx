@@ -27,6 +27,35 @@ import {
 import { Layer } from "slices/layers";
 import { inferLayerName, layerHandlers } from "../../layers/Layer";
 
+const compositeOperations = [
+  "color",
+  "color-burn",
+  "color-dodge",
+  "copy",
+  "darken",
+  "destination-atop",
+  "destination-in",
+  "destination-out",
+  "destination-over",
+  "difference",
+  "exclusion",
+  "hard-light",
+  "hue",
+  "lighten",
+  "lighter",
+  "luminosity",
+  "multiply",
+  "overlay",
+  "saturation",
+  "screen",
+  "soft-light",
+  "source-atop",
+  "source-in",
+  "source-out",
+  "source-over",
+  "xor",
+];
+
 type LayerEditorProps = {
   value: Layer;
   onValueChange?: (v: Layer) => void;
@@ -126,21 +155,27 @@ function Component(
                 "Transparency",
                 <FeaturePicker
                   label="Transparency"
-                  items={["25", "50", "75", "100"].map((c) => ({
+                  items={["0", "25", "50", "75"].map((c) => ({
                     id: c,
                     name: `${c}%`,
                   }))}
-                  value="100"
+                  value={draft.transparency ?? "0"}
                   showArrow
+                  onChange={(e) =>
+                    setDraft?.(produce(draft, (d) => set(d, "transparency", e)))
+                  }
                 />
               )}
               {renderOption(
                 "Display Mode",
                 <FeaturePicker
                   label="Display Mode"
-                  value="normal"
-                  items={options(["normal", "difference"])}
+                  value={draft.displayMode ?? "source-over"}
+                  items={options(compositeOperations)}
                   showArrow
+                  onChange={(e) =>
+                    setDraft?.(produce(draft, (d) => set(d, "displayMode", e)))
+                  }
                 />
               )}
               {renderHeading("Source Options")}

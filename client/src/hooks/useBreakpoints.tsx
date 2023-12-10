@@ -6,7 +6,6 @@ import { useMemo } from "react";
 import { UploadedTrace } from "slices/UIState";
 import { useLayer } from "slices/layers";
 
-
 export type Comparator = {
   key: string;
   apply: (value: number, reference: number) => boolean;
@@ -30,7 +29,8 @@ export type DebugLayerData = {
 };
 export function useBreakpoints(key?: string) {
   const { layer } = useLayer<DebugLayerData>(key);
-  const {monotonicF, monotonicG,breakpoints ,code,trace} = layer?.source??{}
+  const { monotonicF, monotonicG, breakpoints, code, trace } =
+    layer?.source ?? {};
   // TODO:
   return useMemo(() => {
     const memo = keyBy(trace?.content?.events, "id");
@@ -53,7 +53,7 @@ export function useBreakpoints(key?: string) {
             type,
             property = "",
             reference = 0,
-          } of breakpoints??[]) {
+          } of breakpoints ?? []) {
             const isType = !type || type === event.type;
             const match = condition?.apply?.(get(event, property), reference);
             if (active && isType && match) {
@@ -69,7 +69,7 @@ export function useBreakpoints(key?: string) {
             call(code ?? "", "shouldBreak", [
               step,
               event,
-              trace?.content?.events?? [],
+              trace?.content?.events ?? [],
             ])
           ) {
             return { result: "Script editor" };
@@ -81,5 +81,4 @@ export function useBreakpoints(key?: string) {
       return { result: "" };
     });
   }, [code, trace?.content, breakpoints, monotonicF, monotonicG]);
-
 }

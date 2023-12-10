@@ -154,8 +154,8 @@ export function TraceRenderer({
           ) : (
             <>
               <Box ref={ref}>
-                {layers.map((l) => (
-                  <RenderLayer key={l.key} layer={l} />
+                {layers.map((l, i) => (
+                  <RenderLayer index={i} key={l.key} layer={l} />
                 ))}
               </Box>
             </>

@@ -1,32 +1,20 @@
 import {
-  SkipNextOutlined as ForwardIcon,
+  ChevronLeftOutlined as PreviousIcon,
+  ChevronRightOutlined as NextIcon,
+  SkipNextOutlined as SkipIcon,
   PauseOutlined as PauseIcon,
   PlayArrowOutlined as PlayIcon,
-  SkipPreviousOutlined as PreviousIcon,
-  StopOutlined as StopIcon,
+  StopOutlined as StopIcon
 } from "@mui/icons-material";
 import { EditorSetterProps } from "components/Editor";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
-import { Label } from "components/generic/Label";
-import { useSnackbar } from "components/generic/Snackbar";
-import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
-import { noop, range, trimEnd } from "lodash";
-import { ReactNode, useCallback, useEffect } from "react";
+import { noop } from "lodash";
+import { useEffect } from "react";
 import { UploadedTrace } from "slices/UIState";
 import { Layer } from "slices/layers";
 import { useSettings } from "slices/settings";
 
-function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
-  let cancelled = false;
-  requestAnimationFrame(async () => {
-    const result = await f();
-    if (!cancelled) g(result);
-  });
-  return () => {
-    cancelled = true;
-  };
-}
 export type PlaybackLayerData = {
   step?: number;
   playback?: "playing" | "paused";
@@ -37,44 +25,17 @@ export function PlaybackService({
   children,
   value,
 }: EditorSetterProps<Layer<PlaybackLayerData>>) {
-  const { step, tick, end, playing, pause } = usePlaybackState(value?.key);
+  const { step, end, playing, pause, stepWithBreakpointCheck } =
+    usePlaybackState(value?.key);
 
-  const notify = useSnackbar();
   const [{ playbackRate = 1 }] = useSettings();
-  const shouldBreak = useBreakpoints(value?.key);
-
-  const renderLabel = useCallback(
-    (label: ReactNode, offset: number) => (
-      <Label primary={label} secondary={`Step ${step + offset}`} />
-    ),
-    [step]
-  );
 
   useEffect(() => {
     if (playing) {
       let cancel = noop;
       const r = setInterval(() => {
         if (step < end) {
-          cancel = cancellable(
-            async () => {
-              for (const i of range(playbackRate)) {
-                const r = shouldBreak(step + i);
-                if (r.result || r.error) return { ...r, offset: i };
-              }
-              return { result: "", offset: 0, error: undefined };
-            },
-            ({ result, offset, error }) => {
-              if (!error) {
-                if (result) {
-                  notify(`Breakpoint hit: ${result}`, `${offset}`);
-                  pause(offset);
-                } else tick(playbackRate);
-              } else {
-                notify(`${trimEnd(error, ".")}`, `${offset}`);
-                pause();
-              }
-            }
-          );
+          cancel = stepWithBreakpointCheck(playbackRate);
         } else {
           pause();
         }
@@ -84,17 +45,8 @@ export function PlaybackService({
         clearInterval(r);
       };
     }
-  }, [
-    renderLabel,
-    playing,
-    end,
-    step,
-    pause,
-    tick,
-    notify,
-    shouldBreak,
-    playbackRate,
-  ]);
+  }, [stepWithBreakpointCheck, playing, end, step, pause, playbackRate]);
+
   return <>{children}</>;
 }
 
@@ -115,6 +67,9 @@ export function Playback({
     stepBackward,
     stepForward,
     stop,
+    stepWithBreakpointCheck,
+    step,
+    end,
   } = usePlaybackState(layer?.key);
   return (
     <>
@@ -142,8 +97,16 @@ export function Playback({
       />
       <Button
         label="step-forward"
-        icon={<ForwardIcon />}
+        icon={<NextIcon />}
         onClick={stepForward}
+        disabled={!canStepForward}
+      />
+      <Button
+        label="step-to-next-breakpoint"
+        icon={<SkipIcon />}
+        onClick={() => {
+          stepWithBreakpointCheck(end - step, 1);
+        }}
         disabled={!canStepForward}
       />
       <Button
