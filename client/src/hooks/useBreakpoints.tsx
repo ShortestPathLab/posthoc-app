@@ -1,25 +1,17 @@
 import { call } from "components/script-editor/call";
-import { get, keyBy, toLower as lower, startCase, range } from "lodash";
+import { get, keyBy, toLower as lower, range, startCase } from "lodash";
 import memoizee from "memoizee";
-import { TraceEventType } from "protocol";
+import { useTreeMemo } from "pages/TreeWorker";
+import { EventTree } from "pages/tree.worker";
+import { TraceEvent, TraceEventType } from "protocol";
 import { useMemo } from "react";
 import { UploadedTrace } from "slices/UIState";
 import { useLayer } from "slices/layers";
-import { TraceEvent } from "protocol";
-import { useTreeMemo } from "pages/TreeWorker";
-import { EventTree } from "pages/tree.worker";
-import { comparators } from "components/breakpoint-editor/comparators";
 
 export type Comparator = {
   key: string;
   apply: (value: number, reference: number) => boolean;
 };
-
-interface TreeNode {
-  obj: TraceEvent;
-  id: number | string;
-  children?: TreeNode[];
-}
 
 export type Breakpoint = {
   key: string;
@@ -47,7 +39,7 @@ export function useBreakpoints(key?: string) {
   const { layer } = useLayer<DebugLayerData>(key);
   const { monotonicF, monotonicG, breakpoints, code, trace } =
     layer?.source ?? {};
-  const { result, loading } = useTreeMemo(
+  const { result } = useTreeMemo(
     {
       trace: layer?.source?.trace?.content,
       step: layer?.source?.trace?.content?.events?.length,
@@ -135,7 +127,7 @@ function generateStaticBreakpoints(
     type: string,
     condition: Comparator
   ) {
-    let array: number[] = [];
+    const array: number[] = [];
     let bool = true;
     const dict: { [index: number]: Result } = {};
     // Loop through traces array
@@ -162,15 +154,10 @@ function generateStaticBreakpoints(
   }
   const combinedDictionary: { [index: number]: Result } = {};
 
-  for (const {
-    active,
-    condition,
-    type = "",
-    property = "",
-    reference = 0,
-  } of breakpoints ?? []) {
-    if (condition?.key === "changed") {
-      let curDict = findBreakPoints(traces, property, type, condition);
+  for (const { active, condition, type = "", property = "" } of breakpoints ??
+    []) {
+    if (active && condition?.key === "changed") {
+      const curDict = findBreakPoints(traces, property, type, condition);
       for (const key in curDict) {
         combinedDictionary[Number(key)] = curDict[key];
       }

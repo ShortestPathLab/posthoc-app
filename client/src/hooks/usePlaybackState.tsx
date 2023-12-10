@@ -5,6 +5,7 @@ import { produce } from "produce";
 import { useMemo } from "react";
 import { useLayer } from "slices/layers";
 import { useBreakpoints } from "./useBreakpoints";
+
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
   requestAnimationFrame(async () => {
@@ -17,8 +18,8 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
 }
 
 export function usePlaybackState(key?: string) {
-  const notify = useSnackbar();
   const { layer, setLayer } = useLayer<PlaybackLayerData>(key);
+  const notify = useSnackbar();
   const shouldBreak = useBreakpoints(key);
 
   const { playback, playbackTo, step: _step = 0 } = layer?.source ?? {};

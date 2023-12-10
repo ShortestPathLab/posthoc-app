@@ -21,7 +21,6 @@ import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
 import { RecipesPage } from "./RecipesPage";
 
-
 export type PageMeta = {
   id: string;
   name: string;
@@ -30,6 +29,12 @@ export type PageMeta = {
 };
 
 export const pages: Dictionary<PageMeta> = {
+  recipes: {
+    id: "recipes",
+    name: "Recipes",
+    icon: <WorkspacesOutlined />,
+    content: RecipesPage,
+  },
   viewport: {
     id: "viewport",
     name: "Viewport",
@@ -77,11 +82,5 @@ export const pages: Dictionary<PageMeta> = {
     name: "About",
     icon: <InfoOutlined />,
     content: AboutPage,
-  },
-  recipes: {
-    id: "recipes",
-    name: "Recipes",
-    icon: <WorkspacesOutlined />,
-    content: RecipesPage,
   },
 };

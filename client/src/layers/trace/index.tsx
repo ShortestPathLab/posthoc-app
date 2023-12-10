@@ -100,7 +100,8 @@ export type TraceLayerData = {
   trace?: UploadedTrace;
   parsedTrace?: ParseTraceWorkerReturnType;
   onion?: "off" | "transparent" | "solid";
-} & PlaybackLayerData & DebugLayerData;
+} & PlaybackLayerData &
+  DebugLayerData;
 
 export type TraceLayer = Layer<TraceLayerData>;
 
@@ -178,24 +179,54 @@ export const controller = {
       </>
     );
   }),
-  renderer: ({ layer }) => {
+  renderer: ({ layer, index }) => {
     const parsedTrace = layer?.source?.parsedTrace;
     const step = useThrottle(layer?.source?.step ?? 0, 1000 / 60);
 
-    const path = use2DPath(layer, step);
+    const path = use2DPath(layer, index, step);
     const steps = useMemo(
       () =>
         map(parsedTrace?.stepsPersistent, (c) =>
-          map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
+          map(c, (d) =>
+            merge(d, {
+              meta: {
+                sourceLayer: layer?.key,
+                sourceLayerIndex: index,
+                sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
+                sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
+              },
+            })
+          )
         ),
-      [parsedTrace?.stepsPersistent, layer?.key]
+      [
+        parsedTrace?.stepsPersistent,
+        layer?.key,
+        layer?.transparency,
+        layer?.displayMode,
+        index,
+      ]
     );
     const steps1 = useMemo(
       () =>
         map(parsedTrace?.stepsTransient, (c) =>
-          map(c, (d) => merge(d, { meta: { sourceLayer: layer?.key } }))
+          map(c, (d) =>
+            merge(d, {
+              meta: {
+                sourceLayer: layer?.key,
+                sourceLayerIndex: index,
+                sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
+                sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
+              },
+            })
+          )
         ),
-      [parsedTrace?.stepsTransient, layer?.key]
+      [
+        parsedTrace?.stepsTransient,
+        layer?.key,
+        layer?.transparency,
+        layer?.displayMode,
+        index,
+      ]
     );
     const steps2 = useMemo(() => [steps1[step] ?? []], [steps1, step]);
     return (
@@ -217,11 +248,11 @@ export const controller = {
         .filter((c) => c.meta?.sourceLayer === layer?.key)
         .map((c) => c.meta?.step)
         .filter(negate(isUndefined))
-        .sort((a, b) => a - b)
+        .sort((a, b) => a! - b!)
         .value() as number[];
       const info = chain(event?.info?.components)
         .filter((c) => c.meta?.sourceLayer === layer?.key)
-        .filter((c) => c.meta.info)
+        .filter((c) => c.meta?.info)
         .value() as any[];
       if (steps.length && layer) {
         const step = last(steps)!;
@@ -271,7 +302,7 @@ export const controller = {
   },
 } satisfies LayerController<"trace", TraceLayerData>;
 
-function use2DPath(layer?: TraceLayer, step: number = 0) {
+function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
   const { palette } = useTheme();
   const { getPath } = useMemo(
     () =>
@@ -336,7 +367,7 @@ function use2DPath(layer?: TraceLayer, step: number = 0) {
             nodes={[
               map(primitive, (c) => ({
                 component: c,
-                meta: { source: "path" },
+                meta: { source: "path", sourceLayerIndex: -99999 + index },
               })),
             ]}
           />
@@ -344,6 +375,6 @@ function use2DPath(layer?: TraceLayer, step: number = 0) {
       }
     }
     return <></>;
-  }, [layer, step, palette, getPath]);
+  }, [layer, index, step, palette, getPath]);
   return element;
 }

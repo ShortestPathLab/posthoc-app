@@ -15,10 +15,17 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName, layerHandlers } from "layers/Layer";
-import { defer, map } from "lodash";
+import { defer, map, throttle } from "lodash";
 import { Page } from "pages/Page";
 import { TraceEvent } from "protocol";
-import { cloneElement, createElement, useEffect, useMemo, useRef } from "react";
+import {
+  cloneElement,
+  createElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { useLayer } from "slices/layers";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
@@ -40,18 +47,23 @@ export function StepsPage() {
     }
   }, [layer]);
 
-  useEffect(() => {
-    defer(
-      () =>
+  const f = useCallback(
+    throttle(
+      (step: number) =>
         ref?.current?.scrollToIndex?.({
           index: step,
           align: "start",
           behavior: "smooth",
           offset: -pxToInt(spacing(6 + 2)),
         }),
-      0
-    );
-  }, [step, playing, spacing]);
+      1000 / 30
+    ),
+    [ref]
+  );
+
+  useEffect(() => {
+    defer(() => f(step));
+  }, [f, step]);
 
   return (
     <Page onChange={onChange} stack={state}>

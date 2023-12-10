@@ -2,11 +2,14 @@ import combinate from "combinate";
 import {
   Dictionary,
   ceil,
+  chain as _,
   debounce,
   floor,
+  head,
   isEqual,
   map,
   once,
+  pick,
   range,
   shuffle,
   sortBy,
@@ -130,10 +133,16 @@ export class D2RendererWorker extends EventEmitter<
 
   #cache: { [K in string]: { hash: string; tile: ImageBitmap } } = {};
 
-  add(component: CompiledD2IntrinsicComponent[], id: string) {
-    const bodies = map(component, (c) => ({
-      ...primitives[c.$].test(c),
-      component: c,
+  add(components: ComponentEntry<CompiledD2IntrinsicComponent>[], id: string) {
+    const bodies = map(components, ({ component, meta }) => ({
+      ...primitives[component.$].test(component),
+      component,
+      meta: pick(
+        meta,
+        "sourceLayerIndex",
+        "sourceLayerAlpha",
+        "sourceLayerDisplayMode"
+      ),
       index: this.#next(),
     }));
     this.#system.load(bodies);
@@ -241,13 +250,28 @@ export class D2RendererWorker extends EventEmitter<
         length
       );
 
-      for (const { component } of bodies) {
-        draw(component, ctx, {
-          scale,
-          x: -left * scale.x,
-          y: -top * scale.y,
-        });
-      }
+      _(bodies)
+        .sortBy((c) => -(c.meta?.sourceLayerIndex ?? 0))
+        .groupBy((c) => c.meta?.sourceLayerIndex ?? 0)
+        .forEach((group) => {
+          const g2 = new OffscreenCanvas(tile.width, tile.height);
+          const ctx2 = g2.getContext("2d")!;
+          for (const { component } of group) {
+            draw(component, ctx2, {
+              scale,
+              x: -left * scale.x,
+              y: -top * scale.y,
+            });
+          }
+          const alpha = head(group)?.meta?.sourceLayerAlpha ?? 1;
+          const displayMode =
+            head(group)?.meta?.sourceLayerDisplayMode ?? "source-over";
+          ctx.globalCompositeOperation = displayMode;
+          ctx.globalAlpha = alpha;
+          ctx.drawImage(g2, 0, 0);
+        })
+        .value();
+
       const bitmap = g.transferToImageBitmap();
       this.#cache[tileKey] = { hash: nextHash, tile: bitmap };
 

@@ -7,7 +7,7 @@ import { useEffectWhen } from "hooks/useEffectWhen";
 import { useMapContent } from "hooks/useMapContent";
 import { useParsedMap } from "hooks/useParsedMap";
 import { LayerController, inferLayerName } from "layers";
-import { isUndefined, round, set, startCase } from "lodash";
+import { isUndefined, map, round, set, startCase } from "lodash";
 import { withProduce } from "produce";
 import { useMemo } from "react";
 import { Map } from "slices/UIState";
@@ -41,9 +41,22 @@ export const controller = {
       </>
     );
   }),
-  renderer: ({ layer }) => {
+  renderer: ({ layer, index }) => {
     const { nodes } = layer?.source?.parsedMap ?? {};
-    const nodes2 = useMemo(() => [nodes ?? []], [nodes]);
+    const nodes2 = useMemo(
+      () => [
+        map(nodes, (n) => ({
+          ...n,
+          meta: {
+            ...n.meta,
+            sourceLayerIndex: index,
+            sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
+            sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
+          },
+        })),
+      ],
+      [nodes, index, layer?.transparency, layer?.displayMode]
+    );
     return <NodeList nodes={nodes2} />;
   },
   steps: ({ children }) => <>{children?.([])}</>,

@@ -21,7 +21,14 @@ export type RemoveElementCallback = () => void;
 
 export type ComponentEntry<
   V extends CompiledComponent<any, any> = CompiledComponent<string, {}>,
-  M = any
+  M = {
+    sourceLayer?: string;
+    sourceLayerIndex?: number;
+    sourceLayerDisplayMode?: GlobalCompositeOperation;
+    sourceLayerAlpha?: number;
+    step?: number;
+    info?: any;
+  }
 > = {
   component: V;
   meta?: M;
