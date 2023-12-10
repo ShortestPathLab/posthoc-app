@@ -92,6 +92,15 @@ export const TitleBar = () => {
                     action: () =>
                       open(`${docs}/changelog-${version}.md`, "_blank"),
                   },
+                  {
+                    name: "Open documentation",
+                    key: "documentation",
+                    action: () =>
+                      open(
+                        `https://path-visualiser.github.io/docs/overview/`,
+                        "_blank"
+                      ),
+                  },
                 ],
               },
             ].map(({ key, items }) => (
