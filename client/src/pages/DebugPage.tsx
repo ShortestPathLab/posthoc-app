@@ -9,18 +9,20 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { inferLayerName } from "layers/Layer";
-import { map, set } from "lodash";
+import { map, set, values } from "lodash";
 import { Page } from "pages/Page";
 import { produce } from "produce";
 import { ReactNode, useState } from "react";
 import { useLayer } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
+import { makeTemplate } from "components/script-editor/makeTemplate";
+import { templates } from "components/script-editor/templates";
 
 export function DebugPage() {
   const { controls, onChange, state } = useViewTreeContext();
   const [tab, setTab] = useState("standard");
   const { key, setKey, layers, layer, setLayer } = useLayer<DebugLayerData>();
-  const { monotonicF, monotonicG } = layer?.source ?? {};
+  const { monotonicF, monotonicG, code } = layer?.source ?? {};
   function renderHeading(label: ReactNode) {
     return (
       <Type variant="overline" color="text.secondary">
@@ -91,7 +93,15 @@ export function DebugPage() {
                 </Box>
               </TabPanel>
               <TabPanel value="advanced" sx={{ p: 0, height: "100%" }}>
-                <ScriptEditor />
+                <ScriptEditor
+                  code={code ?? makeTemplate(values(templates))}
+                  onChange={(v) =>
+                    layer &&
+                    setLayer(
+                      produce(layer, (layer) => set(layer, "source.code", v))
+                    )
+                  }
+                />
               </TabPanel>
             </Box>
           </Box>{" "}

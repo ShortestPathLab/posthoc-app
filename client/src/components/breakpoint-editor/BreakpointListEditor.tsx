@@ -8,6 +8,7 @@ import { BreakpointEditor } from "./BreakpointEditor";
 import { comparators } from "./comparators";
 import { intrinsicProperties } from "./intrinsicProperties";
 import { propertyPaths as paths } from "./propertyPaths";
+import { useMemo } from "react";
 
 type BreakpointListEditorProps = {
   breakpoints?: Breakpoint[];
@@ -30,11 +31,15 @@ export function BreakpointListEditor({
       );
   }
 
-  const properties = _(layer?.source?.trace?.content?.events)
-    .flatMap(keys)
-    .uniq()
-    .filter((p) => p !== "type")
-    .value();
+  const properties = useMemo(
+    () =>
+      _(layer?.source?.trace?.content?.events)
+        .flatMap(keys)
+        .uniq()
+        .filter((p) => p !== "type")
+        .value(),
+    [layer?.source?.trace?.content?.events]
+  );
 
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>

@@ -63,12 +63,13 @@ export function BreakpointEditor({
           value: c.key,
           label: startCase(c.key),
         }))}
-        value={value?.condition?.key ?? comparators?.[0]?.key}
+        value={value.condition?.key ?? comparators?.[0]?.key}
         onChange={(v) =>
           handleChange({ condition: find(comparators, { key: v }) })
         }
       />
       <Space />
+
       <TextField
         label="Reference"
         fullWidth
@@ -77,6 +78,7 @@ export function BreakpointEditor({
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
         onChange={(v) => handleChange({ reference: +v.target.value })}
         type="number"
+        disabled={!value.condition?.needsReference}
       />
       <Space sx={{ px: 2 }} />
       <Switch

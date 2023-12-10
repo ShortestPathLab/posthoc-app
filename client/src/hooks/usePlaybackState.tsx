@@ -67,11 +67,11 @@ export function usePlaybackState(key?: string) {
         ({ result, offset, error }) => {
           if (!error) {
             if (result) {
-              notify(`Breakpoint hit: ${result}`, `Step ${offset}`);
+              notify(`Breakpoint hit: ${result}`, `Step ${step + offset}`);
               pause(offset);
             } else tick(count);
           } else {
-            notify(`${trimEnd(error, ".")}`, `Step ${offset}`);
+            notify(`${trimEnd(error, ".")}`, `Step ${step + offset}`);
             pause();
           }
         }

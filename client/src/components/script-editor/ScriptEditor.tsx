@@ -8,8 +8,13 @@ import { ComponentProps } from "react";
 
 const DELAY = 2500;
 
-export function ScriptEditor() {
-  const [{ code }, setUIState] = useUIState();
+export function ScriptEditor({
+  code,
+  onChange,
+}: {
+  code?: string;
+  onChange?: (code?: string) => void;
+}) {
   const theme = useTheme();
   return (
     <Flex height="100%" overflow="hidden">
@@ -22,7 +27,7 @@ export function ScriptEditor() {
             height={height}
             language="javascript"
             defaultValue={code}
-            onChange={debounce((v) => setUIState(() => ({ code: v })), DELAY)}
+            onChange={debounce((v) => onChange?.(v), DELAY)}
             options={{
               minimap: {
                 enabled: false,
