@@ -51,7 +51,6 @@ export function useBreakpoints(key?: string) {
   return useMemo(() => {
     const events = trace?.content?.events ?? []; // the actual trace array
     const staticBreakpoints = generateStaticBreakpoints(breakpoints, events);
-    console.log(staticBreakpoints);
     const memo = keyBy(events, "id");
     const treeDict = treeToDict(result?.tree ?? []);
 
@@ -96,8 +95,8 @@ export function useBreakpoints(key?: string) {
               step,
               event,
               events,
-              treeDict[step].parent,
-              treeDict[step].children,
+              treeDict[step]?.parent,
+              treeDict[step]?.children,
             ])
           ) {
             return { result: "Script editor" };
