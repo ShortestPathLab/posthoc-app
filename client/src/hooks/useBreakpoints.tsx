@@ -45,7 +45,7 @@ export function useBreakpoints(key?: string) {
       step: layer?.source?.trace?.content?.events?.length,
       radius: undefined,
     },
-    [layer]
+    [layer?.source?.trace?.content]
   );
 
   return useMemo(() => {
