@@ -2,8 +2,8 @@ import {
   AccountTreeOutlined,
   ChevronRightOutlined,
   LayersOutlined as LayersIcon,
+  FlipCameraAndroidOutlined as RotateIcon,
   VisibilityOutlined,
-  FlipOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -20,8 +20,8 @@ import { Flex } from "components/generic/Flex";
 import { Label } from "components/generic/Label";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { inferLayerName } from "layers/Layer";
 import { getColorHex } from "components/renderer/colors";
+import { inferLayerName } from "layers/Layer";
 import { delay, entries, find, findLast, map, set, startCase } from "lodash";
 import PopupState, { bindMenu } from "material-ui-popup-state";
 import { Page } from "pages/Page";
@@ -190,13 +190,13 @@ export function TreePage() {
         />
         {divider}
         <FeaturePicker
-          icon={<FlipOutlined />}
-          label="Tree Orientation"
-          value={radius}
+          icon={<RotateIcon />}
+          label="Orientation"
+          value={orientation}
           onChange={(e) => setOrientation(e as keyof typeof orientationOptions)}
-          items={Object.entries(orientationOptions).map(([key, value]) => ({
+          items={entries(orientationOptions).map(([key, value]) => ({
             id: key,
-            name: value.value,
+            name: startCase(value.value),
           }))}
           showArrow
         />
