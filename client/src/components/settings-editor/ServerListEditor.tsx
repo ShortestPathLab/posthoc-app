@@ -21,7 +21,7 @@ export function ServerListEditor() {
           url: "",
           disabled: true,
         })}
-        extras={
+        addItemExtras={
           <FeaturePickerButton
             icon={<ResetIcon />}
             sx={{ ml: 2 }}

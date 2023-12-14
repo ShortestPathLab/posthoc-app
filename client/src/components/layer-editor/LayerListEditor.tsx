@@ -1,7 +1,8 @@
-import { Box } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { ListEditor } from "components/generic/ListEditor";
 import { useLayers, Layer } from "slices/layers";
 import { LayerEditor } from "./LayerEditor";
+import { MoreVertOutlined } from "@mui/icons-material";
 
 export function LayerListEditor() {
   const [{ layers: layers = [] }, setLayers] = useLayers();
@@ -14,17 +15,20 @@ export function LayerListEditor() {
           sortable
           icon={null}
           value={layers}
-          useDelete
-          useReorder
+          deletable
+          orderable
+          extras={(v) => (
+            <IconButton>
+              <MoreVertOutlined />
+            </IconButton>
+          )}
           editor={(v) => <LayerEditor value={v} />}
           create={() => ({
             source: { type: "trace", trace: {} },
           })}
           onChange={(v) => setLayers(() => ({ layers: v }))}
           addItemLabel="Layer"
-          placeholderText={
-            <Box pt={2}>Click the button below to add a layer.</Box>
-          }
+          placeholder={<Box pt={2}>Click the button below to add a layer.</Box>}
         />
       </Box>
     </Box>

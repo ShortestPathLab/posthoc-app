@@ -22,7 +22,7 @@ export function RendererListEditor() {
           url: "",
           disabled: true,
         })}
-        extras={
+        addItemExtras={
           <FeaturePickerButton
             icon={<ResetIcon />}
             sx={{ ml: 2 }}

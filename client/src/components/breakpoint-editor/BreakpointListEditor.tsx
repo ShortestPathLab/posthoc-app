@@ -42,8 +42,8 @@ export function BreakpointListEditor({
         <ListEditor<Breakpoint>
           icon={null}
           value={breakpoints}
-          useDelete
-          useEdit={false}
+          deletable
+          editable={false}
           editor={(v) => <BreakpointEditor value={v} properties={properties} />} //v = a breakpoint
           create={() => ({
             active: true,
@@ -56,7 +56,7 @@ export function BreakpointListEditor({
             handleBreakpointsChange(updatedBreakpoints)
           }
           addItemLabel="Breakpoint"
-          placeholderText="Click the button below to add a breakpoint."
+          placeholder="Click the button below to add a breakpoint."
         />
       </Box>
     </Box>
