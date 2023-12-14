@@ -75,13 +75,14 @@ export function ViewportPage() {
   useEffect(() => {
     delay(() => {
       rendererInstance?.fitCamera?.((b) =>
-        includes(map(selectedLayers, "key"), b.meta?.sourceLayer)
+        _(selectedLayers)
+          .filter("viewKey")
+          .map("key")
+          .includes(b.meta?.sourceLayer!)
+          .value()
       );
     }, 150);
-  }, [
-    rendererInstance,
-    _(selectedLayers).map("lastModified").join(".").value(),
-  ]);
+  }, [rendererInstance, _(selectedLayers).map("viewKey").join(".").value()]);
 
   return (
     <Page onChange={onChange} stack={state}>

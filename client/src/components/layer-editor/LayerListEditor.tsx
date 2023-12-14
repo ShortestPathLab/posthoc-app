@@ -1,8 +1,11 @@
-import { Box, IconButton } from "@mui/material";
-import { ListEditor } from "components/generic/ListEditor";
-import { useLayers, Layer } from "slices/layers";
-import { LayerEditor } from "./LayerEditor";
 import { MoreVertOutlined } from "@mui/icons-material";
+import { Box, IconButton, Menu, MenuItem, MenuList } from "@mui/material";
+import { ListEditor } from "components/generic/ListEditor";
+import { map, noop } from "lodash";
+import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
+import { Layer, useLayers } from "slices/layers";
+import { LayerEditor } from "./LayerEditor";
+import { nanoid as id } from "nanoid";
 
 export function LayerListEditor() {
   const [{ layers: layers = [] }, setLayers] = useLayers();
@@ -18,9 +21,42 @@ export function LayerListEditor() {
           deletable
           orderable
           extras={(v) => (
-            <IconButton>
-              <MoreVertOutlined />
-            </IconButton>
+            <PopupState variant="popover">
+              {(state) => (
+                <>
+                  <Menu {...bindMenu(state)}>
+                    <MenuList dense sx={{ p: 0 }}>
+                      {[
+                        {
+                          name: "Fit Layer",
+                          key: "fit-layer",
+                          action: () =>
+                            setLayers(({ layers }) => ({
+                              layers: map(layers, (l) => ({
+                                ...l,
+                                viewKey: l.key === v?.key ? id() : undefined,
+                              })),
+                            })),
+                        },
+                      ].map(({ name, key, action }) => (
+                        <MenuItem
+                          key={key}
+                          onClick={() => {
+                            action?.();
+                            state.close();
+                          }}
+                        >
+                          {name}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                  <IconButton {...bindTrigger(state)}>
+                    <MoreVertOutlined />
+                  </IconButton>
+                </>
+              )}
+            </PopupState>
           )}
           editor={(v) => <LayerEditor value={v} />}
           create={() => ({

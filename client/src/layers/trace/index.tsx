@@ -170,7 +170,7 @@ export const controller = {
         const parsedTrace = await parseTrace();
         produce((l) => {
           set(l, "source.parsedTrace", parsedTrace);
-          set(l, "lastModified", Date.now());
+          set(l, "viewKey", id());
         });
       },
       [parseTrace],

@@ -8,6 +8,7 @@ import { useMapContent } from "hooks/useMapContent";
 import { useParsedMap } from "hooks/useParsedMap";
 import { LayerController, inferLayerName } from "layers";
 import { isUndefined, map, round, set, startCase } from "lodash";
+import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";
 import { Map } from "slices/UIState";
@@ -68,7 +69,7 @@ export const controller = {
       () =>
         void produce((v) => {
           set(v, "source.parsedMap", parsedMap);
-          set(v, "lastModified", Date.now());
+          set(v, "viewKey", id());
         }),
       [parsedMap, produce],
       [parsedMap]
