@@ -49,6 +49,7 @@ export const controller = {
           ...n,
           meta: {
             ...n.meta,
+            sourceLayer: layer?.key,
             sourceLayerIndex: index,
             sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
             sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
@@ -64,7 +65,11 @@ export const controller = {
     const { result: mapContent } = useMapContent(value?.source?.map);
     const { result: parsedMap } = useParsedMap(mapContent);
     useEffectWhen(
-      () => void produce((v) => set(v, "source.parsedMap", parsedMap)),
+      () =>
+        void produce((v) => {
+          set(v, "source.parsedMap", parsedMap);
+          set(v, "lastModified", Date.now());
+        }),
       [parsedMap, produce],
       [parsedMap]
     );

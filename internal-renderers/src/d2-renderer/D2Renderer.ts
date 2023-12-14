@@ -1,6 +1,7 @@
 import {
   ceil,
   clamp,
+  constant,
   debounce,
   defer,
   find,
@@ -28,7 +29,7 @@ import {
   D2RendererOptions,
   defaultD2RendererOptions,
 } from "./D2RendererOptions";
-import { D2WorkerEvent, getTiles } from "./D2RendererWorker";
+import { Body, D2WorkerEvent, getTiles } from "./D2RendererWorker";
 import { D2RendererWorkerAdapter } from "./D2RendererWorkerAdapter";
 import { EventEmitter } from "./EventEmitter";
 import { intersect } from "./intersect";
@@ -73,10 +74,12 @@ class D2Renderer
     return { app: this.#app, viewport: this.#viewport };
   }
 
-  fitCamera() {
-    const bounds = values(this.#system.all()).flat();
+  fitCamera(
+    fn: (body: Body<CompiledD2IntrinsicComponent>) => boolean = constant(true)
+  ) {
+    const bounds = values(this.#system.all()).flat().filter(fn);
     if (bounds.length) {
-      const out: Bounds = reduce(
+      const out = reduce(
         bounds,
         (a, b) => ({
           top: handleNaN(min(a.top, b.top), a.top),
@@ -91,6 +94,7 @@ class D2Renderer
           right: -Infinity,
         }
       );
+
       this.#viewport?.animate?.({
         position: new PIXI.Point(
           (out.left + out.right) / 2,
