@@ -18,23 +18,38 @@ import { TraceEvent } from "protocol/Trace";
 import { useCss } from "react-use";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
+import { DataObjectOutlined, FiberManualRecord } from "@mui/icons-material";
+import { ReactNode } from "react";
 
 type EventInspectorProps = {
   event?: TraceEvent;
   index?: number;
   selected?: boolean;
+  label?: ReactNode;
 } & ListItemButtonProps;
+
+function Dot({ label }: { label?: ReactNode }) {
+  return (
+    <Tooltip title={label}>
+      <FiberManualRecord
+        sx={{ color: "error.main", transform: "scale(0.5)", pl: 0.5 }}
+        fontSize="small"
+      />
+    </Tooltip>
+  );
+}
 
 export function EventInspector({
   event,
   index,
   selected,
+  label,
   ...props
 }: EventInspectorProps) {
-  const { spacing, transitions } = useTheme();
+  const { spacing } = useTheme();
 
   const cls = useCss({
-    "& .info-button": { opacity: 0, transition: transitions.create("opacity") },
+    "& .info-button": { opacity: 0 },
     "&:hover .info-button": {
       opacity: 1,
     },
@@ -50,8 +65,9 @@ export function EventInspector({
         ...props.sx,
       }}
     >
-      <ListItemIcon>
+      <ListItemIcon sx={{ alignItems: "center" }}>
         <Type variant="body2">{index}</Type>
+        {label && <Dot label={label} />}
       </ListItemIcon>
 
       <ListItemText
@@ -67,7 +83,7 @@ export function EventInspector({
         }
       >
         <Box className="info-button" sx={{ pl: 2, color: "text.secondary" }}>
-          <InfoOutlinedIcon />
+          <DataObjectOutlined fontSize="small" />
         </Box>
       </Tooltip>
     </ListItemButton>

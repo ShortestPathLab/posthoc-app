@@ -1,6 +1,6 @@
 import { call } from "components/script-editor/call";
-import { get, keyBy, toLower as lower, range, startCase } from "lodash";
-import memoizee from "memoizee";
+import { get, toLower as lower, startCase } from "lodash";
+import memo from "memoizee";
 import { useTreeMemo } from "pages/TreeWorker";
 import { EventTree } from "pages/tree.worker";
 import { TraceEvent, TraceEventType } from "protocol";
@@ -8,9 +8,21 @@ import { useMemo } from "react";
 import { UploadedTrace } from "slices/UIState";
 import { useLayer } from "slices/layers";
 
+type ApplyOptions = {
+  value: number;
+  reference: number;
+  step: number;
+  events: TraceEvent[];
+  event: TraceEvent;
+  node: EventTree;
+  type?: TraceEventType;
+  property: string;
+};
+
 export type Comparator = {
   key: string;
-  apply: (value: number, reference: number) => boolean;
+  apply: (options: ApplyOptions) => boolean;
+  needsReference?: boolean;
 };
 
 export type Breakpoint = {
@@ -30,46 +42,27 @@ export type DebugLayerData = {
   trace?: UploadedTrace;
 };
 
-type Result = {
-  result?: string;
-  error?: string;
-};
-
 export function useBreakpoints(key?: string) {
   const { layer } = useLayer<DebugLayerData>(key);
   const { monotonicF, monotonicG, breakpoints, code, trace } =
     layer?.source ?? {};
+  const content = trace?.content;
   const { result } = useTreeMemo(
     {
-      trace: layer?.source?.trace?.content,
-      step: layer?.source?.trace?.content?.events?.length,
+      trace: content,
+      step: content?.events?.length,
       radius: undefined,
     },
-    [layer?.source?.trace?.content]
+    [content]
   );
 
   return useMemo(() => {
-    const events = trace?.content?.events ?? []; // the actual trace array
-    const staticBreakpoints = generateStaticBreakpoints(breakpoints, events);
-    const memo = keyBy(events, "id");
-    const treeDict = treeToDict(result?.tree ?? []);
-
-    return memoizee((step: number) => {
+    const events = content?.events ?? []; // the actual trace array
+    const trees = treeToDict(result?.tree ?? []);
+    return memo((step: number) => {
       const event = events[step];
       if (event) {
         try {
-          // Check if step is in staticBreakpoints
-          if (staticBreakpoints[step]) {
-            return staticBreakpoints[step];
-          }
-          // Check monotonic f or g values
-          if (step) {
-            for (const p of [monotonicF && "f", monotonicG && "g"]) {
-              if (p && get(memo[`${event.pId}`], p) > get(event, p)) {
-                return { result: `Monotonicity violation on ${p}` };
-              }
-            }
-          }
           // Check breakpoints in the breakpoints section
           for (const {
             active,
@@ -80,13 +73,28 @@ export function useBreakpoints(key?: string) {
           } of breakpoints ?? []) {
             const isType = !type || type === event.type;
 
-            const match = condition?.apply?.(get(event, property), reference);
-            if (condition?.key !== "changed" && active && isType && match) {
-              return {
-                result: `${property} ${lower(
-                  startCase(condition?.key)
-                )} ${reference}`,
-              };
+            const match = () =>
+              condition?.apply?.({
+                type,
+                event: event,
+                property,
+                value: get(event, property),
+                reference,
+                step,
+                events,
+                node: trees[step],
+              });
+            console.log(active, isType, match(), condition);
+            if (active && isType && match()) {
+              return condition?.needsReference
+                ? {
+                    result: `${property} ${lower(
+                      startCase(condition?.key)
+                    )} ${reference}`,
+                  }
+                : {
+                    result: `${property} ${lower(startCase(condition?.key))}`,
+                  };
             }
           }
           // Check breakpoints in the script editor section
@@ -95,8 +103,8 @@ export function useBreakpoints(key?: string) {
               step,
               event,
               events,
-              treeDict[step]?.parent,
-              treeDict[step]?.children,
+              trees[step]?.parent,
+              trees[step]?.children,
             ])
           ) {
             return { result: "Script editor" };
@@ -107,79 +115,19 @@ export function useBreakpoints(key?: string) {
       }
       return { result: "" };
     });
-  }, [
-    code,
-    trace?.content?.events,
-    breakpoints,
-    monotonicF,
-    monotonicG,
-    result,
-  ]);
+  }, [code, content, breakpoints, monotonicF, monotonicG, result]);
 }
-function generateStaticBreakpoints(
-  breakpoints: Breakpoint[] | undefined,
-  traces: TraceEvent[]
-) {
-  function findBreakPoints(
-    traces: TraceEvent[],
-    property: keyof TraceEvent,
-    type: string,
-    condition: Comparator
-  ) {
-    const array: number[] = [];
-    let bool = true;
-    const dict: { [index: number]: Result } = {};
-    // Loop through traces array
-    for (const i of range(traces.length)) {
-      const isType = !type || type === traces[i].type;
-      if (bool && isType) {
-        dict[i] = { result: `${property} changed` };
-        array.push(i);
-        bool = false;
-      }
-      if (isType && traces[i].type === type) {
-        if (
-          condition?.apply?.(
-            traces[i][property],
-            traces[array[array.length - 1]][property]
-          )
-        ) {
-          dict[i] = { result: `${property} changed` };
-          array.push(i);
-        }
-      }
-    }
-    return dict;
-  }
-  const combinedDictionary: { [index: number]: Result } = {};
 
-  for (const { active, condition, type = "", property = "" } of breakpoints ??
-    []) {
-    if (active && condition?.key === "changed") {
-      const curDict = findBreakPoints(traces, property, type, condition);
-      for (const key in curDict) {
-        combinedDictionary[Number(key)] = curDict[key];
-      }
-    }
-  }
-
-  return combinedDictionary;
-}
 type TreeDict = {
   [K in number]: EventTree;
 };
-function treeToDict(trees: EventTree[]) {
-  const dict: TreeDict = {};
 
-  nodeToDict(trees);
-
-  function nodeToDict(trees: EventTree[] = []) {
-    for (const tree of trees) {
-      for (const event of tree.events) {
-        dict[event.step] = tree;
-      }
-      nodeToDict(tree.children);
+function treeToDict(trees: EventTree[] = [], dict: TreeDict = {}) {
+  for (const tree of trees) {
+    for (const event of tree.events) {
+      dict[event.step] = tree;
     }
+    treeToDict(tree.children, dict);
   }
   return dict;
 }

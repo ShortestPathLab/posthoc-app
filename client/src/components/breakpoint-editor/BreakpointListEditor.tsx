@@ -1,14 +1,12 @@
 import { Box } from "@mui/material";
 import { ListEditor } from "components/generic/ListEditor";
 import { Breakpoint, DebugLayerData } from "hooks/useBreakpoints";
-import { chain as _, flatMap as flat, get, keys, map, set, uniq } from "lodash";
+import { chain as _, keys, set } from "lodash";
 import { produce } from "produce";
+import { useMemo } from "react";
 import { useLayer } from "slices/layers";
 import { BreakpointEditor } from "./BreakpointEditor";
 import { comparators } from "./comparators";
-import { intrinsicProperties } from "./intrinsicProperties";
-import { propertyPaths as paths } from "./propertyPaths";
-import { useMemo } from "react";
 
 type BreakpointListEditorProps = {
   breakpoints?: Breakpoint[];
@@ -23,12 +21,13 @@ export function BreakpointListEditor({
   const { breakpoints } = layer?.source ?? {};
 
   function handleBreakpointsChange(updatedBreakpoints: Breakpoint[]) {
-    layer &&
+    if (layer) {
       setLayer(
         produce(layer, (layer) =>
           set(layer, "source.breakpoints", updatedBreakpoints)
         )
       );
+    }
   }
 
   const properties = useMemo(

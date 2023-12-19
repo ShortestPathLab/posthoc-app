@@ -13,6 +13,7 @@ import {
 import { EventInspector, Skeleton } from "components/inspector/EventInspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
+import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName, layerHandlers } from "layers/Layer";
 import { defer, map, throttle } from "lodash";
@@ -46,6 +47,8 @@ export function StepsPage() {
       });
     }
   }, [layer]);
+
+  const shouldBreak = useBreakpoints(key);
 
   const f = useCallback(
     throttle(
@@ -100,6 +103,7 @@ export function StepsPage() {
                               index={i}
                               selected={i === step}
                               sx={{ height: "100%" }}
+                              label={shouldBreak(i)?.result}
                               onClick={() => stepTo(i)}
                             />
                             <Divider variant="inset" />

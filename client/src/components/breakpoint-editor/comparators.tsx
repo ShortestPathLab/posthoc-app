@@ -1,24 +1,33 @@
-import { Comparator } from "slices/UIState";
+import { Comparator } from "hooks/useBreakpoints";
+import { findLast, get } from "lodash";
 
 export const comparators: Comparator[] = [
   {
     key: "equal",
-    apply: (a, b) => a === b,
+    apply: ({ value, reference }) => value === reference,
     needsReference: true,
   },
   {
     key: "less-than",
-    apply: (a, b) => a < b,
+    apply: ({ value, reference }) => value < reference,
     needsReference: true,
   },
   {
     key: "greater-than",
-    apply: (a, b) => a > b,
+    apply: ({ value, reference }) => value > reference,
     needsReference: true,
   },
   {
     //find a unique next value (typically for f or g value)
     key: "changed",
-    apply: (a, b) => a != b,
+    apply: ({ value, property, step, node }) => {
+      if (node.parent) {
+        const previous = findLast(node.parent.events, (e) => e.step < step);
+        if (previous) {
+          return get(previous.data, property) !== value;
+        }
+      }
+      return false;
+    },
   },
 ];

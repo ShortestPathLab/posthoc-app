@@ -55,39 +55,6 @@ export function DebugPage() {
             <Box pt={6} height="100%">
               <TabPanel value="standard">
                 <Box>
-                  {renderHeading("General")}
-                  <Flex>
-                    <Switch
-                      label="Monotonic f value"
-                      checked={!!monotonicF}
-                      disabled={!layer}
-                      onChange={(_, v) =>
-                        layer &&
-                        setLayer(
-                          produce(layer, (layer) =>
-                            set(layer, "source.monotonicF", v)
-                          )
-                        )
-                      }
-                    />
-                    <Space />
-                    <Switch
-                      label="Monotonic g value"
-                      checked={!!monotonicG}
-                      disabled={!layer}
-                      onChange={(_, v) =>
-                        layer &&
-                        setLayer(
-                          produce(layer, (layer) =>
-                            set(layer, "source.monotonicG", v)
-                          )
-                        )
-                      }
-                    />
-                  </Flex>
-                </Box>
-                <Space />
-                <Box>
                   {renderHeading("Breakpoints")}
                   <BreakpointListEditor layer={layer?.key} />
                 </Box>

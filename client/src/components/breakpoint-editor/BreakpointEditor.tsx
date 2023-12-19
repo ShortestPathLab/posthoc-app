@@ -6,7 +6,7 @@ import { Flex } from "components/generic/Flex";
 import { SelectField as Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/Switch";
-import { Breakpoint } from "slices/UIState";
+import { Breakpoint } from "hooks/useBreakpoints";
 
 type BreakpointEditorProps = {
   value: Breakpoint;
@@ -73,7 +73,7 @@ export function BreakpointEditor({
       <TextField
         label="Reference"
         fullWidth
-        value={`${value.reference ?? 0}`}
+        defaultValue={`${value.reference ?? 0}`}
         variant="filled"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
         onChange={(v) => handleChange({ reference: +v.target.value })}
@@ -84,6 +84,7 @@ export function BreakpointEditor({
       <Switch
         checked={!!value.active}
         onChange={(_, v) => handleChange({ active: v })}
+        sx={{ mr: -2 }}
       />
     </Flex>
   );
