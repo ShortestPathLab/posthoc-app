@@ -12,9 +12,21 @@ import { Flex } from "components/generic/Flex";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { inferLayerName } from "layers/Layer";
-import { Dictionary, every, filter, find, head, keyBy, map } from "lodash";
+import {
+  Dictionary,
+  chain as _,
+  defer,
+  delay,
+  every,
+  filter,
+  find,
+  head,
+  includes,
+  keyBy,
+  map,
+} from "lodash";
 import { Page } from "pages/Page";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
 import { useLayers } from "slices/layers";
@@ -43,7 +55,7 @@ export function ViewportPage() {
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();
 
-  const [{ layers: layers }] = useLayers();
+  const [{ layers }] = useLayers();
   const [layerSet, setLayerSet] = useState<Dictionary<boolean | undefined>>({});
   const selectedLayers = useMemo(
     () => filter(layers, (l) => layerSet?.[l.key] ?? true),
@@ -59,6 +71,18 @@ export function ViewportPage() {
     state?.renderer && state.renderer !== "internal:auto"
       ? state.renderer
       : autoRenderer?.renderer?.meta?.id;
+
+  useEffect(() => {
+    delay(() => {
+      rendererInstance?.fitCamera?.((b) =>
+        _(selectedLayers)
+          .filter("viewKey")
+          .map("key")
+          .includes(b.meta?.sourceLayer!)
+          .value()
+      );
+    }, 150);
+  }, [rendererInstance, _(selectedLayers).map("viewKey").join(".").value()]);
 
   return (
     <Page onChange={onChange} stack={state}>

@@ -59,28 +59,29 @@ type Item<T = any> = {
 };
 
 type Props<T = any> = {
+  UNSAFE_label?: ReactNode;
+  UNSAFE_text?: ReactNode;
+  UNSAFE_extrasPlacement?: "flex-start" | "center" | "flex-end";
   onChange?: (value: Item<T>[]) => void;
-  sortable?: boolean;
-  extras?: ReactNode;
-  addItemLabel?: ReactNode;
-  label?: ReactNode;
-  text?: ReactNode;
-  items?: Item<T>[];
-  useSwitch?: boolean;
-  useDelete?: boolean;
   onChangeItem?: (key: Key, value: T, enabled: boolean) => void;
   onAddItem?: () => void;
   onDeleteItem?: (key: Key) => void;
+  category?: (value?: T) => string;
+  order?: (value?: T) => string | number;
+  extras?: (value?: T) => ReactNode;
+  items?: Item<T>[];
+  addItemLabel?: ReactNode;
+  addItemExtras?: ReactNode;
+  sortable?: boolean;
+  toggleable?: boolean;
+  deletable?: boolean;
   icon?: ReactElement | null;
-  useReorder?: boolean;
-  useEdit?: boolean;
+  orderable?: boolean;
+  editable?: boolean;
   variant?: "outlined" | "default";
-  extrasPlacement?: "flex-start" | "center" | "flex-end";
-  placeholderText?: ReactNode;
+  placeholder?: ReactNode;
   cardStyle?: CSSProperties;
   autoFocus?: boolean;
-  getCategory?: (value?: T) => string;
-  getOrder?: (value?: T) => string | number;
 };
 
 type ListEditorFieldProps = {
@@ -97,18 +98,19 @@ function useInitialRender() {
 
 export function ListEditorField({
   icon = <LabelIcon />,
-  useSwitch,
-  useDelete,
-  useEdit: useEditButton = true,
+  toggleable: useSwitch,
+  deletable: useDelete,
+  editable: useEditButton = true,
   onChangeItem = () => {},
   onDeleteItem = () => {},
+  extras: getExtras,
   enabled = false,
   element = <DefaultListEditorInput />,
   value,
   id,
   i = 0,
   variant = "default",
-  extrasPlacement = "center",
+  UNSAFE_extrasPlacement: extrasPlacement = "center",
   autoFocus,
   cardStyle: style,
   sortable,
@@ -175,6 +177,7 @@ export function ListEditorField({
             <DeleteIcon />
           </IconButton>
         )}
+        {getExtras && getExtras(value)}
       </Box>
     </Box>
   );
@@ -225,17 +228,17 @@ function reorder<T>(list: T[], startIndex: number, endIndex: number) {
 export default function Editor<T>(props: Props<T>) {
   const {
     addItemLabel = "Add Item",
-    label,
-    text,
+    UNSAFE_label: label,
+    UNSAFE_text: text,
     onAddItem = () => {},
     onDeleteItem = () => {},
     items = [],
-    placeholderText,
+    placeholder: placeholderText,
     autoFocus,
-    getCategory,
-    getOrder,
+    category: getCategory,
+    order: getOrder,
     onChange,
-    extras,
+    addItemExtras: extras,
   } = props;
   const isInitialRender = useInitialRender();
   const theme = useTheme();
@@ -449,8 +452,8 @@ export function ListEditor<T extends { key: string }>({
           value: c,
           element: editor?.(c),
         }))}
-        useDelete
-        useEdit={false}
+        deletable
+        editable={false}
         onAddItem={() =>
           handleChange?.([...state, { key: id(), ...create?.() } as T])
         }

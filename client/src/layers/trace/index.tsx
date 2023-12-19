@@ -168,7 +168,10 @@ export const controller = {
     useEffectWhen(
       async () => {
         const parsedTrace = await parseTrace();
-        produce((l) => set(l, "source.parsedTrace", parsedTrace));
+        produce((l) => {
+          set(l, "source.parsedTrace", parsedTrace);
+          set(l, "viewKey", id());
+        });
       },
       [parseTrace],
       [value?.source?.trace?.key]

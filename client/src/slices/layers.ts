@@ -10,6 +10,7 @@ export type Layer<T = Record<string, any>> = {
   source?: { type: string } & T;
   transparency?: "25" | "50" | "75" | "100";
   displayMode?: GlobalCompositeOperation;
+  viewKey?: string;
 };
 
 export type Layers = {

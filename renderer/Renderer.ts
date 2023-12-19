@@ -1,4 +1,4 @@
-import { CompiledComponent, Point, Size } from "protocol";
+import { CompiledComponent, Point, Size, Bounds } from "protocol";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import EventEmitter from "typed-emitter";
 
@@ -19,16 +19,18 @@ export type RendererEvents = {
 
 export type RemoveElementCallback = () => void;
 
+type Meta = {
+  sourceLayer?: string;
+  sourceLayerIndex?: number;
+  sourceLayerDisplayMode?: GlobalCompositeOperation;
+  sourceLayerAlpha?: number;
+  step?: number;
+  info?: any;
+};
+
 export type ComponentEntry<
   V extends CompiledComponent<any, any> = CompiledComponent<string, {}>,
-  M = {
-    sourceLayer?: string;
-    sourceLayerIndex?: number;
-    sourceLayerDisplayMode?: GlobalCompositeOperation;
-    sourceLayerAlpha?: number;
-    step?: number;
-    info?: any;
-  }
+  M = Meta
 > = {
   component: V;
   meta?: M;
@@ -41,14 +43,15 @@ export type ComponentEntry<
 export interface Renderer<
   T extends RendererOptions = RendererOptions,
   U extends RendererEvents = RendererEvents,
-  V extends CompiledComponent<any, any> = CompiledComponent<string, {}>
+  V extends CompiledComponent<any, any> = CompiledComponent<string, {}>,
+  M = Meta
 > extends EventEmitter<U> {
   setup(options: Partial<T>): void;
   destroy(): void;
   setOptions(options: Partial<T>): void;
   add(components: ComponentEntry<V>[]): RemoveElementCallback;
   getView(): HTMLElement | undefined;
-  fitCamera(): void;
+  fitCamera(fn?: (body: Bounds & ComponentEntry<V, M>) => boolean): void;
   initialCamera(): void;
   getInstance(): any;
 }
