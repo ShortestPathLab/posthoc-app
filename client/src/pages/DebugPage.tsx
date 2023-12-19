@@ -2,11 +2,10 @@ import { LayersOutlined as LayersIcon } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Tab, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Flex } from "components/generic/Flex";
-import { Space } from "components/generic/Space";
-import { Switch } from "components/generic/Switch";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { ScriptEditor } from "components/script-editor/ScriptEditor";
+import { makeTemplate } from "components/script-editor/makeTemplate";
+import { templates } from "components/script-editor/templates";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { inferLayerName } from "layers/Layer";
 import { map, set, values } from "lodash";
@@ -15,14 +14,12 @@ import { produce } from "produce";
 import { ReactNode, useState } from "react";
 import { useLayer } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
-import { makeTemplate } from "components/script-editor/makeTemplate";
-import { templates } from "components/script-editor/templates";
 
 export function DebugPage() {
   const { controls, onChange, state } = useViewTreeContext();
   const [tab, setTab] = useState("standard");
   const { key, setKey, layers, layer, setLayer } = useLayer<DebugLayerData>();
-  const { monotonicF, monotonicG, code } = layer?.source ?? {};
+  const { code } = layer?.source ?? {};
   function renderHeading(label: ReactNode) {
     return (
       <Type variant="overline" color="text.secondary">

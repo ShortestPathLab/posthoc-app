@@ -15,13 +15,11 @@ import { inferLayerName } from "layers/Layer";
 import {
   Dictionary,
   chain as _,
-  defer,
   delay,
   every,
   filter,
   find,
   head,
-  includes,
   keyBy,
   map,
 } from "lodash";
@@ -78,11 +76,14 @@ export function ViewportPage() {
         _(selectedLayers)
           .filter("viewKey")
           .map("key")
-          .includes(b.meta?.sourceLayer!)
+          .includes(b.meta?.sourceLayer ?? "")
           .value()
       );
     }, 150);
-  }, [rendererInstance, _(selectedLayers).map("viewKey").join(".").value()]);
+  }, [
+    rendererInstance,
+    _(selectedLayers).map("viewKey").sort().join(".").value(),
+  ]);
 
   return (
     <Page onChange={onChange} stack={state}>
