@@ -1,4 +1,4 @@
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { DataObjectOutlined, FiberManualRecord } from "@mui/icons-material";
 import {
   Box,
   Divider,
@@ -15,11 +15,10 @@ import {
 import { getColorHex } from "components/renderer/colors";
 import { pick } from "lodash";
 import { TraceEvent } from "protocol/Trace";
+import { ReactNode } from "react";
 import { useCss } from "react-use";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
-import { DataObjectOutlined, FiberManualRecord } from "@mui/icons-material";
-import { ReactNode } from "react";
 
 type EventInspectorProps = {
   event?: TraceEvent;
