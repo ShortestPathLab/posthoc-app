@@ -89,9 +89,9 @@ export const Page = withSlots<Slots, PageProps>(
                       type,
                     })
                   }
-                  icon={pages[stack!.type!]?.icon}
                   value={stack?.type}
                   items={values(pages)}
+                  itemOrientation="vertical"
                 />
                 {slotProps.Options?.children && (
                   <>

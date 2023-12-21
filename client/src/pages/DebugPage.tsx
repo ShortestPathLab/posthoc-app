@@ -1,6 +1,6 @@
 import { LayersOutlined as LayersIcon } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Tab, Typography as Type } from "@mui/material";
+import { Box, Divider, Tab, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { ScriptEditor } from "components/script-editor/ScriptEditor";
@@ -14,6 +14,14 @@ import { produce } from "produce";
 import { ReactNode, useState } from "react";
 import { useLayer } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
+
+const divider = (
+  <Divider
+    orientation="vertical"
+    flexItem
+    sx={{ m: 1, height: (t) => t.spacing(3), alignSelf: "auto" }}
+  />
+);
 
 export function DebugPage() {
   const { controls, onChange, state } = useViewTreeContext();
@@ -42,6 +50,7 @@ export function DebugPage() {
             onChange={setKey}
             showArrow
           />
+          {divider}
           <TabList onChange={(_, v) => setTab(v)}>
             <Tab label="Standard" value="standard" />
             <Tab label="Advanced" value="advanced" />

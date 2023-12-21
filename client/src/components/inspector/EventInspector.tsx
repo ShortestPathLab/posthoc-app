@@ -31,7 +31,7 @@ function Dot({ label }: { label?: ReactNode }) {
   return (
     <Tooltip title={label}>
       <FiberManualRecord
-        sx={{ color: "error.main", transform: "scale(0.5)", pl: 0.5 }}
+        sx={{ color: "error.main", transform: "scale(0.5)", pl: 0.5, mr: 2 }}
         fontSize="small"
       />
     </Tooltip>

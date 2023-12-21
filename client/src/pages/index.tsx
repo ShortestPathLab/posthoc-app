@@ -1,30 +1,33 @@
 import {
-  AccountTreeOutlined,
-  BugReportOutlined,
-  InfoOutlined,
-  LayersOutlined,
-  ListOutlined,
-  SettingsOutlined,
-  SortOutlined as StepsIcon,
-  ViewInArOutlined,
-  WorkspacesOutlined,
+  AccountTreeOutlined as TreeIcon,
+  BugReportOutlined as DebuggerIcon,
+  InfoOutlined as AboutIcon,
+  LayersOutlined as LayersIcon,
+  ListOutlined as LogsIcon,
+  SettingsOutlined as SettingsIcon,
+  SegmentOutlined as StepsIcon,
+  ViewInArOutlined as ViewportIcon,
+  WorkspacesOutlined as WorkspacesIcon,
 } from "@mui/icons-material";
 import { Dictionary } from "lodash";
 import { ReactNode } from "react";
+import { AccentColor } from "theme";
 import { AboutPage } from "./AboutPage";
 import { DebugPage } from "./DebugPage";
 import { InfoPage } from "./InfoPage";
 import { LayersPage } from "./LayersPage";
+import { RecipesPage } from "./RecipesPage";
 import { SettingsPage } from "./SettingsPage";
 import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
-import { RecipesPage } from "./RecipesPage";
 
 export type PageMeta = {
   id: string;
   name: string;
   icon: ReactNode;
+  color?: AccentColor;
+  description?: string;
   content: () => ReactNode;
 };
 
@@ -32,55 +35,73 @@ export const pages: Dictionary<PageMeta> = {
   recipes: {
     id: "recipes",
     name: "Recipes",
-    icon: <WorkspacesOutlined />,
+    description: "Browse a library of included examples",
+    color: "pink",
+    icon: <WorkspacesIcon />,
     content: RecipesPage,
+  },
+  layers: {
+    id: "layers",
+    name: "Layers",
+    description: "",
+    color: "deepPurple",
+    icon: <LayersIcon />,
+    content: LayersPage,
+  },
+  steps: {
+    id: "steps",
+    name: "Steps",
+    description: "",
+    color: "deepPurple",
+    icon: <StepsIcon />,
+    content: StepsPage,
   },
   viewport: {
     id: "viewport",
     name: "Viewport",
-    icon: <ViewInArOutlined />,
+    description: "",
+    color: "indigo",
+    icon: <ViewportIcon />,
     content: ViewportPage,
   },
   tree: {
     id: "tree",
     name: "Tree",
-    icon: <AccountTreeOutlined />,
+    description: "",
+    color: "indigo",
+    icon: <TreeIcon />,
     content: TreePage,
-  },
-  steps: {
-    id: "steps",
-    name: "Steps",
-    icon: <StepsIcon />,
-    content: StepsPage,
-  },
-  info: {
-    id: "info",
-    name: "Logs",
-    icon: <ListOutlined />,
-    content: InfoPage,
-  },
-  layers: {
-    id: "layers",
-    name: "Layers",
-    icon: <LayersOutlined />,
-    content: LayersPage,
   },
   debug: {
     id: "debug",
     name: "Debugger",
-    icon: <BugReportOutlined />,
+    description: "",
+    color: "lightBlue",
+    icon: <DebuggerIcon />,
     content: DebugPage,
+  },
+  info: {
+    id: "info",
+    name: "Logs",
+    description: "",
+    color: "blueGrey",
+    icon: <LogsIcon />,
+    content: InfoPage,
   },
   settings: {
     id: "settings",
     name: "Settings",
-    icon: <SettingsOutlined />,
+    description: "",
+    color: "blueGrey",
+    icon: <SettingsIcon />,
     content: SettingsPage,
   },
   about: {
     id: "about",
     name: "About",
-    icon: <InfoOutlined />,
+    description: "",
+    color: "blueGrey",
+    icon: <AboutIcon />,
     content: AboutPage,
   },
 };
