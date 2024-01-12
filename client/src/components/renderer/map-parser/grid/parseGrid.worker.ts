@@ -1,6 +1,18 @@
-import { last, map, range } from "lodash";
+import {
+  chain as _,
+  flatten,
+  last,
+  map,
+  mapValues,
+  range,
+  values,
+} from "lodash";
 import { Point, Size } from "protocol";
 import { ParsedMap } from "../Parser";
+
+function map2D<R>(cells: string[], iterator: (t: string) => R) {
+  return map(cells, (row) => map(row, (cell) => iterator(cell)));
+}
 
 const { min } = Math;
 
@@ -82,8 +94,9 @@ export function optimizeGridMap(
 }
 
 export type Options = {
-  floor?: string;
-  color?: string;
+  colors?: Record<string, string>;
+  // floor?: string;
+  // color?: string;
 };
 
 export type ParseGridWorkerParameters = {
@@ -98,32 +111,44 @@ export type ParseGridWorkerReturnType = Pick<
 
 function parseGrid({
   map: m,
-  options: { floor = ".", color = "#151d2f" } = {},
+  //map out all symbols within the map to a color
+  options: { colors } = {
+    colors: {
+      ".": "black",
+      "@": "white",
+      T: "grey",
+    },
+  },
 }: ParseGridWorkerParameters): ParseGridWorkerReturnType {
   const lines = m.split("\n");
   const [, h = "", w = "", , ...grid] = lines;
   const [width, height] = [w, h].map((d) => +last(d.split(" "))!);
 
-  const nodes = optimizeGridMap(
-    grid.map((l) => map(l, (c) => c !== floor)),
-    { width, height }
-  );
+  const nodes = _(colors)
+    .mapValues((color, symbol) => {
+      const nodes = optimizeGridMap(
+        map2D(grid, (c) => c === symbol),
+        { width, height }
+      );
+      return map(nodes, (node) => ({
+        $: "rect",
+        fill: color,
+        alpha: 1,
+        ...node,
+      }));
+    })
+    .values()
+    .flatten()
+    .value();
 
   return {
     log: [
       `${((nodes.length * 100) / (width * height)).toFixed(2)}% of original`,
     ],
     bounds: { width, height, minX: 0, minY: 0, maxX: width, maxY: height },
-    nodes: nodes
-      .map((node) => ({
-        $: "rect",
-        fill: color,
-        alpha: 1,
-        ...node,
-      }))
-      .map((c) => ({
-        component: c,
-      })),
+    nodes: nodes.map((c) => ({
+      component: c,
+    })),
   };
 }
 
