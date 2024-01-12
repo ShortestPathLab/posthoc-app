@@ -4,6 +4,8 @@ import { useSettings } from "slices/settings";
 
 export type AccentColor = Exclude<keyof typeof colors, "common" | undefined>;
 
+export type Shade = keyof (typeof colors)[AccentColor];
+
 export const { common, ...accentColors } = colors;
 
 const shadow = `
@@ -12,16 +14,25 @@ const shadow = `
     0px 20px 96px 0px rgb(0 0 0 / 0.5%)
 `;
 
+export const getShade = (
+  color: AccentColor = "blue",
+  mode: "light" | "dark" = "light",
+  shade?: Shade
+) => {
+  return colors[color][shade ?? (mode === "dark" ? "A100" : "A700")];
+};
+
 const fontFamily = `"Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
         "Droid Sans", "Helvetica Neue", "Arial", sans-serif`;
 export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   createTheme({
     palette: {
-      primary: { main: colors[theme][mode === "dark" ? "A100" : "A700"] },
+      primary: { main: getShade(theme, mode) },
       mode,
       background:
         mode === "dark"
-          ? { default: "#1c2128", paper: "#22272e" }
+          ? // ? { default: "#101418", paper: "#14191f" }
+            { default: "#09090b", paper: "#0f1114" }
           : { default: "#f6f8fa", paper: "#ffffff" },
     },
     typography: {

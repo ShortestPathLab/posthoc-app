@@ -424,7 +424,7 @@ export default function Editor<T>(props: Props<T>) {
 
 export function ListEditor<T extends { key: string }>({
   onChange,
-  value = [],
+  value,
   editor,
   create,
   ...props
@@ -441,7 +441,7 @@ export function ListEditor<T extends { key: string }>({
     onChange?.(next);
   }
   useEffect(() => {
-    setState(value);
+    setState(value ?? []);
   }, [value]);
   return (
     <Box sx={{ ml: -2 }}>

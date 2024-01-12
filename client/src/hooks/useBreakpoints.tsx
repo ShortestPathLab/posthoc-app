@@ -84,7 +84,6 @@ export function useBreakpoints(key?: string) {
                 events,
                 node: trees[step],
               });
-            console.log(active, isType, match(), condition);
             if (active && isType && match()) {
               return condition?.needsReference
                 ? {

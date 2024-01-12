@@ -1,24 +1,26 @@
-import { findIndex, map, max } from "lodash";
-import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
-import { ReactElement, ReactNode } from "react";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
 import {
+  ListItemIcon,
   Menu,
   MenuItem,
   TextField,
   TextFieldProps,
   Tooltip,
 } from "@mui/material";
-
-
-
-
+import { useSmallDisplay } from "hooks/useSmallDisplay";
+import { findIndex, map, max } from "lodash";
+import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
+import { ReactElement, ReactNode } from "react";
 
 type Key = string | number;
 
 export type SelectProps<T extends Key> = {
   trigger?: (props: ReturnType<typeof bindTrigger>) => ReactElement;
-  items?: { value: T; label?: ReactNode; disabled?: boolean }[];
+  items?: {
+    value: T;
+    label?: ReactNode;
+    disabled?: boolean;
+    icon?: ReactNode;
+  }[];
   value?: T;
   onChange?: (value: T) => void;
   placeholder?: string;
@@ -54,7 +56,7 @@ export function Select<T extends string>({
               horizontal: "center",
             }}
           >
-            {map(items, ({ value: v, label, disabled }) => (
+            {map(items, ({ value: v, label, disabled, icon }) => (
               <MenuItem
                 disabled={disabled}
                 key={v}
@@ -65,6 +67,11 @@ export function Select<T extends string>({
                   onChange?.(v);
                 }}
               >
+                {icon && (
+                  <ListItemIcon sx={{ transform: "scale(0.8)" }}>
+                    {icon}
+                  </ListItemIcon>
+                )}
                 {label}
               </MenuItem>
             ))}

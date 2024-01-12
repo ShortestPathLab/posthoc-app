@@ -1,4 +1,4 @@
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { DataObjectOutlined, FiberManualRecord } from "@mui/icons-material";
 import {
   Box,
   Divider,
@@ -15,11 +15,10 @@ import {
 import { getColorHex } from "components/renderer/colors";
 import { pick } from "lodash";
 import { TraceEvent } from "protocol/Trace";
+import { ReactNode } from "react";
 import { useCss } from "react-use";
 import { EventLabel } from "./EventLabel";
 import { PropertyList } from "./PropertyList";
-import { DataObjectOutlined, FiberManualRecord } from "@mui/icons-material";
-import { ReactNode } from "react";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -32,7 +31,7 @@ function Dot({ label }: { label?: ReactNode }) {
   return (
     <Tooltip title={label}>
       <FiberManualRecord
-        sx={{ color: "error.main", transform: "scale(0.5)", pl: 0.5 }}
+        sx={{ color: "error.main", transform: "scale(0.5)", pl: 0.5, mr: 2 }}
         fontSize="small"
       />
     </Tooltip>
