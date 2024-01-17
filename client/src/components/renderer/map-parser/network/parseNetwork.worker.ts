@@ -104,7 +104,7 @@ function parseNetwork({
   map: m,
   options: { vert = "v", edge = "e", color = "#151d2f" },
 }: ParseNetworkWorkerParameters) {
-  const lines = m.split("\n");
+  const lines = m.split(/\r?\n/);
 
   const edges = lines
     .filter((c) => c.startsWith(edge))

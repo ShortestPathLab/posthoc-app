@@ -2,12 +2,13 @@ import { Dictionary } from "lodash";
 import * as grid from "./grid";
 import * as mesh from "./mesh";
 import * as xy from "./network";
-import { MapParser, ParsedMapHydrator } from "./Parser";
+import { MapEditor, MapParser, ParsedMapHydrator } from "./Parser";
 import * as poly from "./poly";
 
 export const mapParsers: Dictionary<{
   parse: MapParser;
   hydrate: ParsedMapHydrator;
+  editor: MapEditor<any>;
 }> = {
   grid,
   xy,

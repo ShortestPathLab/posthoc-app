@@ -1,11 +1,12 @@
-import { darken, lighten, useTheme } from "@mui/material";
-import { useAsync } from "react-async-hook";
+import { useTheme } from "@mui/material";
+import interpolate from "color-interpolate";
 import { useSnackbar } from "components/generic/Snackbar";
 import { getParser } from "components/renderer";
-import { useLoadingState } from "slices/loading";
+import { useAsync } from "react-async-hook";
 import { Map } from "slices/UIState";
+import { useLoadingState } from "slices/loading";
 
-export function useParsedMap(map?: Map) {
+export function useParsedMap(map?: Map, options?: Record<string, any>) {
   const notify = useSnackbar();
   const theme = useTheme();
   const usingLoadingState = useLoadingState("map");
@@ -15,14 +16,15 @@ export function useParsedMap(map?: Map) {
   return useAsync(
     () =>
       usingLoadingState(async () => {
-        const fn = theme.palette.mode === "dark" ? lighten : darken;
         if (format && content) {
+          const gradient = interpolate([
+            theme.palette.background.paper,
+            theme.palette.text.primary,
+          ]);
           notify("Processing map...");
           const parsedMap = (await getParser(format)?.parse?.(content, {
-            color: fn(
-              theme.palette.background.paper,
-              1 - theme.palette.action.hoverOpacity
-            ),
+            color: gradient(0.85),
+            ...options,
           })) ?? { nodes: [] };
 
           notify(
@@ -32,6 +34,6 @@ export function useParsedMap(map?: Map) {
           return parsedMap;
         }
       }),
-    [format, content, theme]
+    [format, content, theme, options]
   );
 }

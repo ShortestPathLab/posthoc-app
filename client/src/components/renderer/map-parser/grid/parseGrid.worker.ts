@@ -1,14 +1,7 @@
-import {
-  chain as _,
-  flatten,
-  last,
-  map,
-  mapValues,
-  range,
-  values,
-} from "lodash";
+import { chain as _, last, map, range } from "lodash";
 import { Point, Size } from "protocol";
 import { ParsedMap } from "../Parser";
+import { getGridSymbols } from "./getGridSymbols.worker";
 
 function map2D<R>(cells: string[], iterator: (t: string) => R) {
   return map(cells, (row) => map(row, (cell) => iterator(cell)));
@@ -94,9 +87,9 @@ export function optimizeGridMap(
 }
 
 export type Options = {
-  colors?: Record<string, string>;
-  // floor?: string;
-  // color?: string;
+  symbols?: Record<string, string>;
+  floor?: string;
+  color?: string;
 };
 
 export type ParseGridWorkerParameters = {
@@ -111,21 +104,22 @@ export type ParseGridWorkerReturnType = Pick<
 
 function parseGrid({
   map: m,
-  //map out all symbols within the map to a color
-  options: { colors } = {
-    colors: {
-      ".": "black",
-      "@": "white",
-      T: "grey",
-    },
-  },
+  options: { symbols: colors = {}, floor = ".", color = "#fff" } = {},
 }: ParseGridWorkerParameters): ParseGridWorkerReturnType {
-  const lines = m.split("\n");
+  const lines = m.split(/\r?\n/);
   const [, h = "", w = "", , ...grid] = lines;
   const [width, height] = [w, h].map((d) => +last(d.split(" "))!);
 
-  const nodes = _(colors)
-    .mapValues((color, symbol) => {
+  const { symbols } = getGridSymbols({ map: m });
+
+  const nodes = _(symbols)
+    .map((symbol) =>
+      [undefined, "auto"].includes(colors[symbol])
+        ? [symbol, symbol !== floor ? color : ""]
+        : [symbol, colors[symbol]]
+    )
+    .filter(([, color]) => !!color)
+    .map(([symbol, color]) => {
       const nodes = optimizeGridMap(
         map2D(grid, (c) => c === symbol),
         { width, height }
@@ -137,7 +131,6 @@ function parseGrid({
         ...node,
       }));
     })
-    .values()
     .flatten()
     .value();
 
