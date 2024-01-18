@@ -1,10 +1,12 @@
+import { CircularProgress } from "@mui/material";
 import { MapPicker } from "components/app-bar/Input";
-import { Option } from "components/layer-editor/Option";
+import { Heading, Option } from "components/layer-editor/Option";
 import { getParser } from "components/renderer";
 import { NodeList } from "components/renderer/NodeList";
 import { ParsedMap } from "components/renderer/map-parser/Parser";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { useMapContent } from "hooks/useMapContent";
+import { useMapOptions } from "hooks/useMapOptions";
 import { useParsedMap } from "hooks/useParsedMap";
 import { LayerController, inferLayerName } from "layers";
 import { isUndefined, map, round, set, startCase } from "lodash";
@@ -16,6 +18,7 @@ import { Layer, useLayer } from "slices/layers";
 
 export type MapLayerData = {
   map?: Map;
+  options?: Record<string, any>;
   parsedMap?: ParsedMap;
 };
 
@@ -28,6 +31,7 @@ export const controller = {
       ? `${layer.source.map.name} (${startCase(layer.source.map.format)})`
       : "Untitled Map",
   editor: withProduce(({ value, produce }) => {
+    const { result: Editor } = useMapOptions(value?.source?.map);
     return (
       <>
         <Option
@@ -39,6 +43,23 @@ export const controller = {
             />
           }
         />
+        {!!value?.source?.map && (
+          <>
+            <Heading label="Map Options" />
+            {Editor ? (
+              <Editor
+                value={value?.source?.options}
+                onChange={(v) =>
+                  produce((prev) => {
+                    set(prev, "source.options", v(prev.source?.options ?? {}));
+                  })
+                }
+              />
+            ) : (
+              <CircularProgress sx={{ mt: 2 }} />
+            )}
+          </>
+        )}
       </>
     );
   }),
@@ -64,7 +85,10 @@ export const controller = {
   steps: ({ children }) => <>{children?.([])}</>,
   service: withProduce(({ value, produce }) => {
     const { result: mapContent } = useMapContent(value?.source?.map);
-    const { result: parsedMap } = useParsedMap(mapContent);
+    const { result: parsedMap } = useParsedMap(
+      mapContent,
+      value?.source?.options
+    );
     useEffectWhen(
       () =>
         void produce((v) => {

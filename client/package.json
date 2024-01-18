@@ -10,6 +10,7 @@
     "@mui/icons-material": "^5.14.11",
     "@mui/lab": "^5.0.0-alpha.146",
     "@mui/material": "^5.14.11",
+    "color-interpolate": "^1.0.5",
     "css-element-queries": "^1.2.3",
     "downloadjs": "^1.4.7",
     "file-select-dialog": "^1.5.4",

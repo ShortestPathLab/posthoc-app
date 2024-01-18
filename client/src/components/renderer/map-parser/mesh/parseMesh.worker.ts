@@ -35,7 +35,7 @@ function parseMesh({
   map: m,
   options: { color = "#151d2f" },
 }: ParseMeshWorkerParameters) {
-  const lines = m.split("\n");
+  const lines = m.split(/\r?\n/);
 
   const [, , counts, ...rest] = lines.filter(identity);
 

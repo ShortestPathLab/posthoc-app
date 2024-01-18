@@ -1,12 +1,12 @@
-import { Box, ButtonProps, Typography as Type, useTheme } from "@mui/material";
+import { ButtonProps, Typography as Type, useTheme } from "@mui/material";
+import { Flex } from "components/generic/Flex";
 import { Select } from "components/generic/Select";
+import { Space } from "components/generic/Space";
 import { find, map, startCase } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactElement, ReactNode, cloneElement } from "react";
 import { AccentColor, getShade } from "theme";
 import { FeaturePickerButton } from "./FeaturePickerButton";
-import { Flex } from "components/generic/Flex";
-import { Space } from "components/generic/Space";
 
 export type Props = {
   label?: string;
