@@ -129,7 +129,7 @@ export function StepsPage() {
       <Page.Options>
         <FeaturePicker
           icon={<LayersIcon />}
-          label="Layer"
+          label={layer?.name ? layer.name : "layer"}
           value={key}
           items={map(layers, (l) => ({
             id: l.key,

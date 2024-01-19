@@ -30,9 +30,9 @@ export function useLayer<T extends Record<string, any> = Record<string, any>>(
   const [key, setKey] = useState(defaultKey);
   const [{ layers }, setLayers] = useLayers();
   const filtered = filter(layers, guard);
-  const layer = (key ? find(filtered, { key }) : head(filtered)) as
-    | Layer<T>
-    | undefined;
+  const layer = (
+    key ? find(filtered, { key }) ?? head(filtered) : head(filtered)
+  ) as Layer<T> | undefined;
   useEffect(() => {
     setKey(defaultKey);
   }, [defaultKey]);
