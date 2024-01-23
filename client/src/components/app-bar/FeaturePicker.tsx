@@ -9,6 +9,7 @@ import { AccentColor, getShade } from "theme";
 import { FeaturePickerButton } from "./FeaturePickerButton";
 
 export type Props = {
+  showTooltip?: boolean;
   label?: string;
   value?: string;
   onChange?: (key: string) => void;
@@ -29,6 +30,7 @@ export function FeaturePicker({
   showArrow,
   disabled,
   ButtonProps,
+  showTooltip,
   itemOrientation = "horizontal",
 }: Props) {
   const { palette } = useTheme();
@@ -44,6 +46,7 @@ export function FeaturePicker({
   const selected = find(items, { id: value });
   return (
     <Select
+      showTooltip={showTooltip}
       placeholder={startCase(label)}
       trigger={(props) => (
         <FeaturePickerButton

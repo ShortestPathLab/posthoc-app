@@ -20,6 +20,7 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
   const [{ maps, formats }] = useFeatures();
   return (
     <FeaturePicker
+      showTooltip
       showArrow
       icon={<FileOpenOutlined />}
       label="Choose Map"
@@ -72,8 +73,8 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
   const [{ traces }] = useFeatures();
   return (
     <FeaturePicker
+      showTooltip
       showArrow
-      itemOrientation="vertical"
       icon={<FileOpenOutlined />}
       label="Choose Trace"
       value={value?.id}
@@ -81,9 +82,7 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
         custom(value, "trace"),
         ...traces.map((c) => ({
           ...c,
-          description: `${c.description} (${
-            find(connections, { url: c.source })?.name
-          })`,
+          description: find(connections, { url: c.source })?.name,
         })),
       ]}
       onChange={async (v) => {

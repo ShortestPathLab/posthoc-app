@@ -143,7 +143,7 @@ export const controller = {
         />
         <Heading label="Preview" />
         <Box sx={{ height: 240, mx: -2, mb: -2 }}>
-          <TracePreview trace={value?.source?.trace?.content} />
+          <TracePreview trace={value?.source?.parsedTrace?.content} />
         </Box>
       </>
     );
