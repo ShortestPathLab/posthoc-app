@@ -247,7 +247,7 @@ export const controller = {
   getSelectionInfo: ({ layer: key, event, children }) => {
     const { layer, setLayer } = useLayer(key);
     const menu = useMemo(() => {
-      const events = layer?.source?.trace?.content?.events ?? [];
+      const events = layer?.source?.parsedTrace?.content?.events ?? [];
       const steps = chain(event?.info?.components)
         .filter((c) => c.meta?.sourceLayer === layer?.key)
         .map((c) => c.meta?.step)
@@ -310,14 +310,15 @@ function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
   const { palette } = useTheme();
   const { getPath } = useMemo(
     () =>
-      layer?.source?.trace?.content
-        ? makePathIndex(layer.source.trace.content)
+      layer?.source?.parsedTrace?.content
+        ? makePathIndex(layer.source.parsedTrace.content)
         : { getParent: constant(undefined), getPath: constant([]) },
-    [layer?.source?.trace?.content]
+    [layer?.source?.parsedTrace?.content]
   );
   const element = useMemo(() => {
-    if (layer?.source?.trace?.content?.render?.path) {
-      const { pivot = {}, scale = 1 } = layer.source.trace.content.render.path;
+    if (layer?.source?.parsedTrace?.content?.render?.path) {
+      const { pivot = {}, scale = 1 } =
+        layer.source.parsedTrace.content.render.path;
 
       const { x, y } = pivot;
 
@@ -326,7 +327,7 @@ function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
 
       const events = map(
         getPath(step),
-        (p) => layer?.source?.trace?.content?.events?.[p]
+        (p) => layer?.source?.parsedTrace?.content?.events?.[p]
       );
 
       if (events.length) {
