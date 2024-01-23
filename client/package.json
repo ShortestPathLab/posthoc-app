@@ -30,6 +30,7 @@
     "performant-array-to-tree": "^1.11.0",
     "pluralize": "^8.0.0",
     "protocol": "file:../protocol",
+    "push-code-generator": "file:../push-code-generator",
     "react": "^18.2.0",
     "react-async-hook": "^4.0.0",
     "react-beautiful-dnd": "^13.1.1",

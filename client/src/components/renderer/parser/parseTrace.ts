@@ -35,7 +35,7 @@ export function useTraceParser(params: ParseTraceWorkerParameters) {
               "Trace loaded",
               pluralize("step", output?.stepsPersistent?.length ?? 0, true)
             );
-            return output;
+            return { components: output, content: params.trace };
           } catch (e) {
             console.error(e);
             push("Error parsing", `${dump(e)}`);

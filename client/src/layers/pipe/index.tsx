@@ -3,7 +3,7 @@ import { Option } from "components/layer-editor/Option";
 import { LayerController } from "layers";
 import { withProduce } from "produce";
 import { useState } from "react";
-import { decode } from "./codeGenerator";
+import { decode } from "push-code-generator";
 
 export const controller = {
   key: "pipe",

@@ -23,6 +23,7 @@ export type Specimen = {
 
 export type UploadedTrace = FeatureDescriptor & {
   content?: Trace;
+  source?: string;
   /**
    * Uniquely identifies a trace.
    */

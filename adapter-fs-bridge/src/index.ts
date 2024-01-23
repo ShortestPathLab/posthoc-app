@@ -1,9 +1,8 @@
 import box, { Options as BoxOptions } from "boxen";
 import chalk from "chalk";
 import { emojify } from "node-emoji";
-import { text } from "node:stream/consumers";
 import { getConfig } from "./config";
-import { readFileSync } from "fs";
+import { createAdapter } from "./createAdapter";
 
 const log = console.log;
 
@@ -18,11 +17,13 @@ const boxOptions: BoxOptions = {
 
 const { port, name } = getConfig();
 
-const mainText = `Pairing code: ${chalk.blueBright(`AH2G1`)}`;
+const mainText = `Adapter started on ${chalk.blueBright(
+  `http://localhost:${port}/`
+)}`;
 
-const hintText = chalk.dim(`Keep this process open`);
+const hintText = chalk.dim(`(Hint: Add it to Visualiser's connections list)`);
 
-// const server = createAdapter(port);
+const server = createAdapter(port);
 
 log(
   box(emojify(`:rocket: ${mainText}\n\n${hintText}`), {
@@ -31,6 +32,4 @@ log(
   })
 );
 
-log(readFileSync(0, "utf-8"));
-
-// server.listen();
+server.listen();

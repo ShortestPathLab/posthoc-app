@@ -141,7 +141,7 @@ function Component(
                   fullWidth
                   variant="filled"
                   label="Layer Name"
-                  value={draft.name ?? ""}
+                  defaultValue={draft.name ?? ""}
                   onChange={(e) =>
                     setDraft?.(
                       produce(draft, (d) => set(d, "name", e.target.value))

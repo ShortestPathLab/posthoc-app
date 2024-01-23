@@ -5,13 +5,14 @@ import { cwd, env } from "process";
 import { parse } from "yaml";
 import { z } from "zod";
 
-const DEFAULT_PORT = 8221;
+const DEFAULT_PORT = 8224;
 
 export const Config = z.object({
   name: z.string(),
   version: z.string(),
   description: z.string(),
   port: z.optional(z.number()).default(DEFAULT_PORT),
+  path: z.string(),
 });
 
 export const getConfig = once(() => {

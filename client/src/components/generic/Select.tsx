@@ -95,7 +95,7 @@ export function SelectField<T extends string>(props: SelectFieldProps<T>) {
       sx={{ minWidth: 120 }}
       select
       label={placeholder}
-      value={value}
+      defaultValue={value}
       variant="filled"
       {...props}
       onChange={(e) => onChange?.(e.target.value as T)}

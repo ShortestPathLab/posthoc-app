@@ -89,7 +89,7 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
         >
           <Box p={2.5}>
             <TextField
-              value={value.url}
+              defaultValue={value.url}
               onChange={(e) => handleChange({ url: e.target.value })}
               fullWidth
               variant="filled"

@@ -16,6 +16,7 @@ import { useTraceParser } from "components/renderer/parser/parseTrace";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTraceSlave.worker";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { useEffectWhen } from "hooks/useEffectWhen";
+import { useTraceContent } from "hooks/useTraceContent";
 import { LayerController, inferLayerName } from "layers";
 import {
   chain,
@@ -98,7 +99,10 @@ function makePathIndex(trace: Trace) {
 
 export type TraceLayerData = {
   trace?: UploadedTrace;
-  parsedTrace?: ParseTraceWorkerReturnType;
+  parsedTrace?: {
+    components: ParseTraceWorkerReturnType;
+    content: Trace;
+  };
   onion?: "off" | "transparent" | "solid";
 } & PlaybackLayerData &
   DebugLayerData;
@@ -146,8 +150,9 @@ export const controller = {
   }),
   service: withProduce(({ value, produce }) => {
     const { palette } = useTheme();
+    const { result: trace } = useTraceContent(value?.source?.trace);
     const parseTrace = useTraceParser({
-      trace: value?.source?.trace?.content,
+      trace: trace?.content,
       context: {
         color: colorsHex,
         themeAccent: palette.primary.main,
@@ -158,13 +163,9 @@ export const controller = {
     });
     useEffect(() => {
       produce((l) =>
-        set(
-          l,
-          "source.playbackTo",
-          value?.source?.trace?.content?.events?.length ?? 0
-        )
+        set(l, "source.playbackTo", trace?.content?.events?.length ?? 0)
       );
-    }, [value?.source?.trace?.content?.events?.length]);
+    }, [trace?.content?.events?.length]);
     useEffectWhen(
       async () => {
         const parsedTrace = await parseTrace();
@@ -174,7 +175,7 @@ export const controller = {
         });
       },
       [parseTrace],
-      [value?.source?.trace?.key]
+      [trace?.key]
     );
     return (
       <>
@@ -183,7 +184,7 @@ export const controller = {
     );
   }),
   renderer: ({ layer, index }) => {
-    const parsedTrace = layer?.source?.parsedTrace;
+    const parsedTrace = layer?.source?.parsedTrace?.components;
     const step = useThrottle(layer?.source?.step ?? 0, 1000 / 60);
 
     const path = use2DPath(layer, index, step);
@@ -241,7 +242,7 @@ export const controller = {
     );
   },
   steps: ({ layer, children }) => {
-    return <>{children?.(layer?.source?.trace?.content?.events ?? [])}</>;
+    return <>{children?.(layer?.source?.parsedTrace?.content?.events ?? [])}</>;
   },
   getSelectionInfo: ({ layer: key, event, children }) => {
     const { layer, setLayer } = useLayer(key);

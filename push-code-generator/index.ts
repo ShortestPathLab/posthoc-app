@@ -1,3 +1,5 @@
+import { sumBy } from "lodash";
+
 export function encode(
   port: number,
   id: number
@@ -47,23 +49,13 @@ export function decode(code: string): {
   return { port, id };
 }
 
-function calculateChecksum(input: string): string {
-  let sum = 0;
-  for (let char of input) {
-    const value = char.match(/[0-9]/)
-      ? parseInt(char, 10)
-      : char.charCodeAt(0) - 55;
-    sum += value;
-  }
+function calculateChecksum(input: string) {
+  const sum = sumBy(input, (c) =>
+    c.match(/[0-9]/) ? parseInt(c, 10) : c.charCodeAt(0) - 55
+  );
+
   const checksumValue = sum % 36;
   return checksumValue < 10
     ? checksumValue.toString()
     : String.fromCharCode(checksumValue + 55);
 }
-
-// // Example Usage
-// const encoded = encode(12345, 67);
-// console.log("Encoded:", encoded); // Encoded Code with Checksum
-
-// const decoded = CodeGenerator.decode(encoded);
-// console.log("Decoded:", decoded); // Original Port and ID

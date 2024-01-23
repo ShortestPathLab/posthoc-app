@@ -1,0 +1,5 @@
+name: Filesystem Sync
+version: 1.0.5
+description: Sync search traces
+port: 8224
+path: ~/projects/path-visualiser/app/resources/traces/v1.0.5

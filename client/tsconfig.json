@@ -19,5 +19,9 @@
     "baseUrl": "src",
     "downlevelIteration": true
   },
-  "include": ["src", "src/components/app-bar/Title.test.tsx"]
+  "include": [
+    "src",
+    "src/components/app-bar/Title.test.tsx",
+    "../push-code-generator/index.ts"
+  ]
 }
