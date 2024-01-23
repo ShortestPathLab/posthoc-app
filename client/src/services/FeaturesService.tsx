@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { useConnections } from "slices/connections";
 import { Features, useFeatures } from "slices/features";
-import { useLoadingState } from "slices/loading";
+import { useLoading, useLoadingState } from "slices/loading";
 import { timed, wait } from "utils/timed";
 
 const withSource = (source: string) => (v: any) => ({ ...v, source });
@@ -12,6 +12,7 @@ const withSource = (source: string) => (v: any) => ({ ...v, source });
 export function FeaturesService() {
   const [connections] = useConnections();
   const [, setFeatures] = useFeatures();
+  const [{ connections: connectionsLoading }] = useLoading();
 
   const getFeatures = useCallback(async () => {
     const features: Features = {
@@ -37,7 +38,7 @@ export function FeaturesService() {
 
   useAsync(
     async (signal) => {
-      while (true) {
+      while (!connectionsLoading) {
         const features = await getFeatures();
         if (!signal.aborted) {
           setFeatures(() => features);
@@ -47,7 +48,7 @@ export function FeaturesService() {
         }
       }
     },
-    [connections, getFeatures, setFeatures]
+    [connections, getFeatures, setFeatures, connectionsLoading]
   );
 
   return <></>;

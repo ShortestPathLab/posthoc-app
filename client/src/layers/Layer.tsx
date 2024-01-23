@@ -64,5 +64,5 @@ export const layerHandlers: Dictionary<LayerController<string, any>> = {
   map: mapController,
   trace: traceController,
   query: queryController,
-  pipe: pipeController,
+  // pipe: pipeController,
 };
