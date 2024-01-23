@@ -1,0 +1,35 @@
+{
+  "name": "adapter-pipe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite-node src/index.ts",
+    "watch": "vite-node -w src/index.ts",
+    "build": "sh build.sh",
+    "build:docker": "docker build . -t server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "boxen": "^7.1.1",
+    "chalk": "^5.3.0",
+    "express": "^4.17.1",
+    "json-rpc-2.0": "^0.2.18",
+    "lodash": "^4.17.21",
+    "lru-cache": "^6.0.0",
+    "md5": "^2.3.0",
+    "node-emoji": "^2.1.0",
+    "protocol": "file:../protocol",
+    "vite-node": "^0.34.4",
+    "vite-tsconfig-paths": "^4.2.1",
+    "yaml": "^2.3.2",
+    "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/lodash": "^4.14.202",
+    "@types/lru-cache": "^5.1.1",
+    "@types/md5": "^2.3.1"
+  }
+}

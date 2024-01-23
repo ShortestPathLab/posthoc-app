@@ -1,18 +1,28 @@
+import { TextField } from "@mui/material";
+import { Option } from "components/layer-editor/Option";
 import { LayerController } from "layers";
 import { withProduce } from "produce";
-import { Heading, Option } from "components/layer-editor/Option";
-import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { TextField } from "@mui/material";
 import { useState } from "react";
-import { encode, decode } from "./codeGenerator";
+import { decode } from "./codeGenerator";
 
 export const controller = {
   key: "pipe",
-  inferName: (layer) => "Untitled Pipe",
+  inferName: () => "Untitled Pipe",
   editor: withProduce(() => {
     const [pairingCode, setPairingCode] = useState("");
     const { error: decodeError, id, port } = decode(pairingCode);
     const error = pairingCode && decodeError;
+
+    function handleChange(v: string) {
+      setPairingCode(
+        Array.from(
+          v
+            .toUpperCase()
+            .slice(0, 6)
+            .matchAll(/[0-9A-Z]/g)
+        ).join("")
+      );
+    }
 
     return (
       <>
@@ -24,16 +34,13 @@ export const controller = {
               variant="filled"
               size="small"
               hiddenLabel
-              placeholder="xxxxxx"
+              placeholder="XXX-XXX"
               helperText={error && "Invalid code"}
-              onChange={(e) =>
-                setPairingCode(e.target.value.toUpperCase().slice(0, 6))
-              }
+              onChange={(e) => handleChange(e.target.value)}
               value={pairingCode}
             />
           }
         />
-        {id},{port}
       </>
     );
   }),

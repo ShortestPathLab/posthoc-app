@@ -4,11 +4,12 @@ rm -rf dist
 
 # Build
 
-npx --yes vite build
+npx --yes vite@4.5.2 build
 
 # Copy files
 
 mkdir -p dist/content
+mkdir -p content
 cp -r content dist
 cp -r adapter.config.yaml dist
 

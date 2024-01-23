@@ -1,0 +1,4 @@
+name: CLI Adapter
+version: 1.0.5
+description: Push search traces to Visualiser
+port: 8221
