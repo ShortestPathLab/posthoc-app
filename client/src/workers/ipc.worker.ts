@@ -1,6 +1,7 @@
 import { delay, now, once } from "lodash";
 import { Request, Response } from "protocol/Message";
 import { Transport } from "client/Transport";
+
 function wait(ms: number) {
   return new Promise((res) => delay(res, ms));
 }

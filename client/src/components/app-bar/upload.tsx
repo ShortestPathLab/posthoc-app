@@ -11,26 +11,21 @@ function name(s: string) {
   return s.split(".").shift();
 }
 
-const customMapId = "internal/custom";
+const customId = "internal/custom";
 
-const customTraceId = "json";
-
-export const custom = (map?: Partial<Feature>) => ({
-  name: map?.id === customMapId ? `Imported Map - ${map?.name}` : "Import Map",
-  description: "Internal",
-  id: customMapId,
-});
-
-export const customTrace = (trace?: any) => ({
+export const custom = (
+  resource?: Partial<Pick<Feature, "id" | "name">>,
+  name = "resource"
+) => ({
   name:
-    trace?.type === customTraceId
-      ? `Imported Trace - ${trace?.name}`
-      : "Import Trace",
+    resource?.id === customId
+      ? `Imported ${startCase(name)} - ${resource?.name}`
+      : `Import ${startCase(name)}`,
   description: "Internal",
-  id: customTraceId,
+  id: customId,
 });
 
-const FORMATS = ["json", "yaml"];
+const FORMATS = ["json", "yaml", "yml"];
 
 export type FileHandle<T> = {
   file: File;
@@ -52,11 +47,11 @@ export async function uploadTrace(): Promise<
           const content = await f.text();
           const parsed = await parseYamlAsync(content);
           return {
-            ...customTrace(),
+            ...custom(),
             format: parsed?.format,
             content: parsed,
             name: startCase(name(f.name)),
-            type: customTraceId,
+            type: customId,
           };
         } else {
           throw new Error(`The format (${ext(f.name)}) is unsupported.`);

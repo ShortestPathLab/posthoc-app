@@ -4,8 +4,7 @@ import { replace } from "./reducers";
 import { Transport } from "client/Transport";
 
 export type Connection = CheckConnectionResponse["result"] & {
-  call: Transport["call"];
-  disconnect: Transport["disconnect"];
+  transport: () => Transport;
   url: string;
   ping: number;
 };

@@ -8,6 +8,7 @@ import { Layer } from "slices/layers";
 import { controller as mapController } from "./map";
 import { controller as queryController } from "./query";
 import { controller as traceController } from "./trace";
+import { controller as pipeController } from "./pipe";
 
 export type SelectionInfoProvider = FC<{
   layer?: string;
@@ -63,4 +64,5 @@ export const layerHandlers: Dictionary<LayerController<string, any>> = {
   map: mapController,
   trace: traceController,
   query: queryController,
+  // pipe: pipeController,
 };

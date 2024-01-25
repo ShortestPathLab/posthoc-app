@@ -24,6 +24,7 @@ export type SelectProps<T extends Key> = {
   value?: T;
   onChange?: (value: T) => void;
   placeholder?: string;
+  showTooltip?: boolean;
 };
 
 const itemHeight = (sm: boolean) => (sm ? 48 : 36);
@@ -34,6 +35,7 @@ export function Select<T extends string>({
   items,
   value,
   onChange,
+  showTooltip,
   placeholder = "Select Option",
 }: SelectProps<T>) {
   const sm = useSmallDisplay();
@@ -57,23 +59,25 @@ export function Select<T extends string>({
             }}
           >
             {map(items, ({ value: v, label, disabled, icon }) => (
-              <MenuItem
-                disabled={disabled}
-                key={v}
-                value={v}
-                selected={v === value}
-                onClick={() => {
-                  state.close();
-                  onChange?.(v);
-                }}
-              >
-                {icon && (
-                  <ListItemIcon sx={{ transform: "scale(0.8)" }}>
-                    {icon}
-                  </ListItemIcon>
-                )}
-                {label}
-              </MenuItem>
+              <Tooltip title={showTooltip && v} placement="right">
+                <MenuItem
+                  disabled={disabled}
+                  key={v}
+                  value={v}
+                  selected={v === value}
+                  onClick={() => {
+                    state.close();
+                    onChange?.(v);
+                  }}
+                >
+                  {icon && (
+                    <ListItemIcon sx={{ transform: "scale(0.8)" }}>
+                      {icon}
+                    </ListItemIcon>
+                  )}
+                  {label}
+                </MenuItem>
+              </Tooltip>
             ))}
           </Menu>
         </>
@@ -95,7 +99,7 @@ export function SelectField<T extends string>(props: SelectFieldProps<T>) {
       sx={{ minWidth: 120 }}
       select
       label={placeholder}
-      value={value}
+      defaultValue={value}
       variant="filled"
       {...props}
       onChange={(e) => onChange?.(e.target.value as T)}

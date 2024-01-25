@@ -13,7 +13,7 @@ import {
   AppBarTitle as Title,
 } from "components/generic/Modal";
 import { Space } from "components/generic/Space";
-import { debounce, set, startCase } from "lodash";
+import { debounce, keys, set, startCase } from "lodash";
 import { produce } from "produce";
 import {
   ForwardedRef,
@@ -141,7 +141,7 @@ function Component(
                   fullWidth
                   variant="filled"
                   label="Layer Name"
-                  value={draft.name ?? ""}
+                  defaultValue={draft.name ?? ""}
                   onChange={(e) =>
                     setDraft?.(
                       produce(draft, (d) => set(d, "name", e.target.value))
@@ -184,7 +184,7 @@ function Component(
                 <FeaturePicker
                   label="Type"
                   value={draft.source?.type}
-                  items={["map", "trace", "query"].map((s) => ({
+                  items={keys(layerHandlers).map((s) => ({
                     id: s,
                     name: startCase(s),
                   }))}

@@ -5,6 +5,7 @@ import {
   TextField,
   Tooltip,
   Typography as Type,
+  debounce,
 } from "@mui/material";
 import { entries, startCase } from "lodash";
 import { transports } from "client";
@@ -21,6 +22,7 @@ import { useConnection } from "hooks/useConnectionResolver";
 import { useConnectionStatus } from "hooks/useConnectionStatus";
 import { merge } from "slices/reducers";
 import { Remote } from "slices/settings";
+import { useMemo } from "react";
 
 const statusColor = {
   connected: "success.light",
@@ -38,9 +40,13 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
   const connection = useConnection(value.url);
   const status = useConnectionStatus(value.url);
 
-  function handleChange(next: Partial<Remote>) {
-    onValueChange?.(merge(value, next));
-  }
+  const handleChange = useMemo(
+    () =>
+      debounce((next: Partial<Remote>) => {
+        onValueChange?.(merge(value, next));
+      }, 300),
+    [onValueChange, value]
+  );
 
   return (
     <>
@@ -60,7 +66,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
         <Tooltip title={`${value.disabled ? "Enable" : "Disable"} Connection`}>
           <Box>
             <Switch
-              checked={!value.disabled}
+              defaultChecked={!value.disabled}
               onChange={(_, v) => handleChange({ disabled: !v })}
             />
           </Box>
@@ -77,7 +83,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
         >
           <Box p={2.5}>
             <TextField
-              value={value.url}
+              defaultValue={value.url}
               onChange={(e) => handleChange({ url: e.target.value })}
               fullWidth
               variant="filled"

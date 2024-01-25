@@ -4,14 +4,7 @@
 
 export type Properties = { [K in string]: any };
 
-export type TraceEventType =
-  | "source"
-  | "destination"
-  | "generating"
-  | "updating"
-  | "closing"
-  | "expanding"
-  | "end";
+export type TraceEventType = string;
 
 export type TraceEvent = {
   type?: TraceEventType;

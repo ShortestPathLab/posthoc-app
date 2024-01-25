@@ -28,8 +28,8 @@ async function findConnection(
   format: string
 ) {
   for (const connection of connections) {
-    const algorithms = await connection.call("features/algorithms");
-    const formats = await connection.call("features/formats");
+    const algorithms = await connection.transport().call("features/algorithms");
+    const formats = await connection.transport().call("features/formats");
     if (find(algorithms, { id: algorithm }) && find(formats, { id: format })) {
       return connection;
     }
@@ -140,17 +140,19 @@ export const controller = {
               notify(
                 `Executing ${inferLayerName(value)} using ${connection.name}...`
               );
-              const result = await connection.call("solve/pathfinding", {
-                format,
-                instances: [
-                  {
-                    start: start ?? 0,
-                    end: end ?? 0,
-                  },
-                ],
-                mapURI: `map:${encodeURIComponent(content)}`,
-                algorithm,
-              });
+              const result = await connection
+                .transport()
+                .call("solve/pathfinding", {
+                  format,
+                  instances: [
+                    {
+                      start: start ?? 0,
+                      end: end ?? 0,
+                    },
+                  ],
+                  mapURI: `map:${encodeURIComponent(content)}`,
+                  algorithm,
+                });
               if (!signal.aborted) {
                 produce((v) =>
                   set(v, "source.trace", {

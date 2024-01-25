@@ -1,10 +1,12 @@
 import { Method, Namespace, Response } from "./Message";
+import { Trace } from "./Trace";
 
 export interface FeatureDescriptor {
   id: string;
   name?: string;
   description?: string;
   hidden?: boolean;
+  lastModified?: number;
 }
 
 export interface Feature extends FeatureDescriptor {
@@ -29,6 +31,12 @@ export type MapsFeatureQuery = FeatureQuery<"maps">;
 
 export type AlgorithmFeatureQuery = FeatureQuery<"algorithms">;
 
+export type TraceFeatureQuery = FeatureQuery<"trace", { id: string }>;
+
+export type TracesFeatureQuery = FeatureQuery<"traces">;
+
+export type ChangedFeatureQuery = FeatureQuery<"changed">;
+
 //
 // ─── RESPONSE ───────────────────────────────────────────────────────────────────
 //
@@ -40,6 +48,12 @@ export type MapListResult = Response<
 >;
 
 export type MapResult = Response<(Feature & { format: string }) | undefined>;
+
+export type TraceListResult = Response<FeatureDescriptor[]>;
+
+export type TraceResult = Response<
+  (FeatureDescriptor & { content?: Trace }) | undefined
+>;
 
 //
 // ─── METHOD ─────────────────────────────────────────────────────────────────────
@@ -54,7 +68,16 @@ export type MapFeatureQueryMethod = Method<MapFeatureQuery, MapResult>;
 
 export type MapsFeatureQueryMethod = Method<MapsFeatureQuery, MapListResult>;
 
+export type TraceFeatureQueryMethod = Method<TraceFeatureQuery, TraceResult>;
+
+export type TracesFeatureQueryMethod = Method<
+  TracesFeatureQuery,
+  TraceListResult
+>;
+
 export type AlgorithmFeatureQueryMethod = Method<
   AlgorithmFeatureQuery,
   FeatureDescriptorListResult
 >;
+
+export type ChangedFeatureQueryMethod = Method<ChangedFeatureQuery>;
