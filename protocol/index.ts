@@ -1,6 +1,7 @@
 import { CheckConnectionMethod } from "./CheckConnection";
 import {
   AlgorithmFeatureQueryMethod,
+  ChangedFeatureQueryMethod,
   MapFeatureQueryMethod,
   MapsFeatureQueryMethod,
   MapTypeFeatureQueryMethod,
@@ -22,4 +23,5 @@ export type NameMethodMap = Entry<CheckConnectionMethod> &
   Entry<MapsFeatureQueryMethod> &
   Entry<PathfindingTaskMethod> &
   Entry<TraceFeatureQueryMethod> &
+  Entry<ChangedFeatureQueryMethod> &
   Entry<TracesFeatureQueryMethod>;

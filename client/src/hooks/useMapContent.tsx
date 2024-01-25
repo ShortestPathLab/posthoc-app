@@ -19,7 +19,9 @@ export function useMapContent(map?: Map) {
             const connection = resolve({ url: source });
             if (connection) {
               notify("Fetching map...");
-              const result = await connection.call("features/map", { id });
+              const result = await connection
+                .transport()
+                .call("features/map", { id });
               return result?.content;
             }
           }

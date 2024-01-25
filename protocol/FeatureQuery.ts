@@ -35,6 +35,8 @@ export type TraceFeatureQuery = FeatureQuery<"trace", { id: string }>;
 
 export type TracesFeatureQuery = FeatureQuery<"traces">;
 
+export type ChangedFeatureQuery = FeatureQuery<"changed">;
+
 //
 // ─── RESPONSE ───────────────────────────────────────────────────────────────────
 //
@@ -77,3 +79,5 @@ export type AlgorithmFeatureQueryMethod = Method<
   AlgorithmFeatureQuery,
   FeatureDescriptorListResult
 >;
+
+export type ChangedFeatureQueryMethod = Method<ChangedFeatureQuery>;

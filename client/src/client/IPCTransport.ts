@@ -1,14 +1,19 @@
 import { JSONRPCClient, JSONRPCResponse as Response } from "json-rpc-2.0";
 import { NameMethodMap } from "protocol";
 import { Request, RequestOf, ResponseOf } from "protocol/Message";
-import { Transport, TransportOptions } from "./Transport";
 import { IPCWorker } from "workers";
+import { EventEmitter } from "./EventEmitter";
+import { Transport, TransportEvents, TransportOptions } from "./Transport";
 
-export class IPCTransport implements Transport {
+export class IPCTransport
+  extends EventEmitter<TransportEvents>
+  implements Transport
+{
   worker: IPCWorker;
   rpc: JSONRPCClient;
 
   constructor(readonly options: TransportOptions) {
+    super();
     this.worker = new IPCWorker();
     this.rpc = new JSONRPCClient(async (request: Request) => {
       const listener = ({ data }: MessageEvent<Response>) => {

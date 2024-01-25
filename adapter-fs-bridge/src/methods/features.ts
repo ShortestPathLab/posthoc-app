@@ -2,12 +2,16 @@ import { watch } from "chokidar";
 import { getConfig } from "config";
 import { readFile, stat } from "fs/promises";
 import glob from "glob-promise";
-import { map, startCase } from "lodash";
+import { defer, map, startCase } from "lodash";
 import memo from "memoizee";
 import { resolve as _resolve, isAbsolute, join, parse, relative } from "path";
 import untildify from "untildify";
 import { createMethod } from "./createMethod";
 import { load } from "js-yaml";
+import { EventEmitter } from "../EventEmitter";
+import { RPCServiceEvents } from "RPCServer";
+
+export const featuresService = new EventEmitter<RPCServiceEvents>();
 
 function name(s: string) {
   return s.split(".").shift();
@@ -49,9 +53,10 @@ const getTrace = memo(async ({ id }) => {
   };
 });
 
-watch(root).on("all", (e) => {
+watch(root).on("all", async () => {
   getTrace.clear();
-  getTraces.clear();
+  await getTraces.clear();
+  featuresService.emit("call", { method: "features/changed" });
 });
 
 export const features = [

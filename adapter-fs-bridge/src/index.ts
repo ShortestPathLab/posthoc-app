@@ -25,6 +25,8 @@ const hintText = chalk.dim(`(Hint: Add it to Visualiser's connections list)`);
 
 const server = createAdapter(port);
 
+process.stdout.write("\x1bc");
+
 log(
   box(emojify(`:rocket: ${mainText}\n\n${hintText}`), {
     ...boxOptions,

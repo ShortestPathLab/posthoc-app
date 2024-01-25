@@ -22,7 +22,9 @@ export function useTraceContent(trace?: UploadedTrace) {
             const connection = resolve({ url: source });
             if (connection) {
               notify("Fetching trace...");
-              const result = await connection.call("features/trace", { id });
+              const result = await connection
+                .transport()
+                .call("features/trace", { id });
               return result?.content;
             }
           }

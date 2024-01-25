@@ -1,12 +1,23 @@
 import { createServer as createHTTPServer } from "http";
-import { JSONRPCServer } from "json-rpc-2.0";
-import { forEach } from "lodash";
-import { Method, Request } from "protocol/Message";
+import {
+  JSONRPCClient,
+  JSONRPCServer,
+  JSONRPCResponse as Response,
+} from "json-rpc-2.0";
+import { forEach, map } from "lodash";
+import { Method, Request, RequestOf } from "protocol/Message";
 import { Server as WebSocketServer } from "socket.io";
 import express from "express";
+import TypedEmitter, { EventMap } from "typed-emitter";
+import { NameMethodMap } from "protocol";
+
+export type RPCServiceEvents = {
+  call: (request: RequestOf<NameMethodMap[keyof NameMethodMap]>) => void;
+};
 
 export interface RPCServerOptions {
   methods?: Method[];
+  services?: TypedEmitter<RPCServiceEvents>[];
   port?: number;
 }
 
@@ -34,6 +45,28 @@ export class RPCServer {
           await this.rpc.receive({ jsonrpc: "2.0", ...req })
         );
       });
+      // Create RPC Client
+      const client = new JSONRPCClient(async (request: Request) => {
+        const listener = (response: Response) => {
+          if (response.id === request.id) {
+            socket.off("response", listener);
+            client.receive(response);
+          }
+        };
+
+        socket.emit("request", request);
+        socket.on("response", listener);
+      });
+      const f = (
+        request: RequestOf<NameMethodMap[keyof NameMethodMap]>
+      ): void => {
+        client.send(request);
+      };
+      // Bind services to RPC Client
+      map(this.options.services, (service) => service.on("call", f));
+      socket.on("disconnect", () =>
+        map(this.options.services, (service) => service.off("call", f))
+      );
     });
     return new Promise<void>((res) =>
       this.server.listen(this.options.port ?? 8001, res)

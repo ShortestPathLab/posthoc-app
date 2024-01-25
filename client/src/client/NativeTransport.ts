@@ -2,11 +2,16 @@ import { NameMethodMap } from "protocol";
 import { RequestOf, ResponseOf } from "protocol/Message";
 import url from "url-parse";
 import { internal } from "./internal";
-import { Transport, TransportOptions } from "./Transport";
+import { Transport, TransportEvents, TransportOptions } from "./Transport";
+import { EventEmitter } from "./EventEmitter";
 
-export class NativeTransport implements Transport {
+export class NativeTransport
+  extends EventEmitter<TransportEvents>
+  implements Transport
+{
   handler: Transport["call"];
   constructor(readonly options: TransportOptions) {
+    super();
     const { hostname } = url(options.url);
     this.handler = internal[hostname];
   }

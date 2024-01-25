@@ -44,7 +44,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
     () =>
       debounce((next: Partial<Remote>) => {
         onValueChange?.(merge(value, next));
-      }, 1000),
+      }, 300),
     [onValueChange, value]
   );
 

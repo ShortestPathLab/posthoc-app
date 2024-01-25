@@ -32,8 +32,7 @@ export function ConnectionsService() {
                   ...result,
                   url,
                   ping: delta,
-                  call: tp.call.bind(tp),
-                  disconnect: tp.disconnect.bind(tp),
+                  transport: () => tp,
                 },
               ];
             } else await tp.disconnect();
@@ -46,7 +45,7 @@ export function ConnectionsService() {
     });
     return () => {
       aborted = true;
-      cs.map((c) => c.disconnect());
+      cs.map((c) => c.transport().disconnect());
     };
   }, [remote, setConnections, notify, usingLoadingState]);
 

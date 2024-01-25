@@ -15,7 +15,7 @@
           "fill": "{{$.event[`${$.tile_x}${$.tile_y}`] ? $.themeTextPrimary : $.themeAccent}}",
           "x": "{{$.tile_x}}",
           "y": "{{$.tile_y}}",
-          "display": "persistent"
+          "display": "transient"
         }
       ],
       "tilerow": [
