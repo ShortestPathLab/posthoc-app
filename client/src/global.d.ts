@@ -16,3 +16,11 @@ declare interface WindowControlsOverlayGeometryChangeEvent extends Event {
   titlebarAreaRect?: DOMRect;
   visible?: boolean;
 }
+
+declare module "nearest-pantone" {
+  export function getClosestColor(hex: string): {
+    pantone: string;
+    name: string;
+    hex: string;
+  };
+}

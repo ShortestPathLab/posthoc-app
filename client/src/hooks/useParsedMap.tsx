@@ -1,5 +1,4 @@
 import { useTheme } from "@mui/material";
-import interpolate from "color-interpolate";
 import { useSnackbar } from "components/generic/Snackbar";
 import { getParser } from "components/renderer";
 import { useAsync } from "react-async-hook";
@@ -17,13 +16,10 @@ export function useParsedMap(map?: Map, options?: Record<string, any>) {
     () =>
       usingLoadingState(async () => {
         if (format && content) {
-          const gradient = interpolate([
-            theme.palette.background.paper,
-            theme.palette.text.primary,
-          ]);
           notify("Processing map...");
           const parsedMap = (await getParser(format)?.parse?.(content, {
-            color: gradient(0.85),
+            color: theme.palette.text.primary,
+            background: theme.palette.background.paper,
             ...options,
           })) ?? { nodes: [] };
 

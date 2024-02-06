@@ -1,1 +1,2 @@
-export * from "./Layer";
+export * from "./LayerController";
+export * from "./inferLayerName";

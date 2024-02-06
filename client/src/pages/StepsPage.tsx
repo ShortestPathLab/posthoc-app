@@ -15,7 +15,8 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
-import { inferLayerName, layerHandlers } from "layers/Layer";
+import { layerHandlers } from "layers/layerHandlers";
+import { inferLayerName } from "layers/inferLayerName";
 import { defer, map, throttle } from "lodash";
 import { Page } from "pages/Page";
 import { TraceEvent } from "protocol";
@@ -129,7 +130,7 @@ export function StepsPage() {
       <Page.Options>
         <FeaturePicker
           icon={<LayersIcon />}
-          label={layer?.name ? layer.name : "layer"}
+          label="Layer"
           value={key}
           items={map(layers, (l) => ({
             id: l.key,

@@ -59,7 +59,7 @@ export function Select<T extends string>({
             }}
           >
             {map(items, ({ value: v, label, disabled, icon }) => (
-              <Tooltip title={showTooltip && v} placement="right">
+              <Tooltip title={showTooltip && v} placement="right" key={v}>
                 <MenuItem
                   disabled={disabled}
                   key={v}

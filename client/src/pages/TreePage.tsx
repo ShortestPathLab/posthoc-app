@@ -21,7 +21,7 @@ import { Label } from "components/generic/Label";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
-import { inferLayerName } from "layers/Layer";
+import { inferLayerName } from "layers/inferLayerName";
 import { delay, entries, find, findLast, map, set, startCase } from "lodash";
 import PopupState, { bindMenu } from "material-ui-popup-state";
 import { Page } from "pages/Page";

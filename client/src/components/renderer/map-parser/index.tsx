@@ -11,6 +11,7 @@ export const mapParsers: Dictionary<{
   editor: MapEditor<any>;
 }> = {
   grid,
+  map: grid,
   xy,
   mesh,
   poly,

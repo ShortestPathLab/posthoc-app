@@ -25,7 +25,8 @@ import {
   useState,
 } from "react";
 import { Layer } from "slices/layers";
-import { inferLayerName, layerHandlers } from "../../layers/Layer";
+import { layerHandlers } from "layers/layerHandlers";
+import { inferLayerName } from "layers/inferLayerName";
 
 const compositeOperations = [
   "color",

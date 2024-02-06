@@ -7,7 +7,7 @@ import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { makeTemplate } from "components/script-editor/makeTemplate";
 import { templates } from "components/script-editor/templates";
 import { DebugLayerData } from "hooks/useBreakpoints";
-import { inferLayerName } from "layers/Layer";
+import { inferLayerName } from "layers/inferLayerName";
 import { map, set, values } from "lodash";
 import { Page } from "pages/Page";
 import { produce } from "produce";

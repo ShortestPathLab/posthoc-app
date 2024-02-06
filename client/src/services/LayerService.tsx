@@ -1,4 +1,4 @@
-import { getLayerHandler } from "layers/Layer";
+import { getLayerHandler } from "layers/layerHandlers";
 import { map } from "lodash";
 import { createElement, useMemo } from "react";
 import { useLayers } from "slices/layers";

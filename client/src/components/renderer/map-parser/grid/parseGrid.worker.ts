@@ -1,3 +1,4 @@
+import interpolate from "color-interpolate";
 import { chain as _, last, map, range } from "lodash";
 import { Point, Size } from "protocol";
 import { ParsedMap } from "../Parser";
@@ -90,6 +91,7 @@ export type Options = {
   symbols?: Record<string, string>;
   floor?: string;
   color?: string;
+  background?: string;
 };
 
 export type ParseGridWorkerParameters = {
@@ -104,7 +106,7 @@ export type ParseGridWorkerReturnType = Pick<
 
 function parseGrid({
   map: m,
-  options: { symbols: colors = {}, floor = ".", color = "#fff" } = {},
+  options: { symbols: colors = {}, color = "#fff", background = "#000" } = {},
 }: ParseGridWorkerParameters): ParseGridWorkerReturnType {
   const lines = m.split(/\r?\n/);
   const [, h = "", w = "", , ...grid] = lines;
@@ -112,10 +114,13 @@ function parseGrid({
 
   const { symbols } = getGridSymbols({ map: m });
 
+  const gradient = interpolate([background, color]);
+
   const nodes = _(symbols)
-    .map((symbol) =>
+    .filter(({ value, symbol }) => !!value || !!colors[symbol])
+    .map(({ symbol, value }) =>
       [undefined, "auto"].includes(colors[symbol])
-        ? [symbol, symbol !== floor ? color : ""]
+        ? [symbol, gradient(value)]
         : [symbol, colors[symbol]]
     )
     .filter(([, color]) => !!color)

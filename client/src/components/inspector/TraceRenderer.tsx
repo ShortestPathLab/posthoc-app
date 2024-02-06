@@ -17,7 +17,7 @@ import {
 import { Renderer, RendererEvent } from "renderer";
 import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
-import { RenderLayer } from "layers/Layer";
+import { RenderLayer } from "layers/RenderLayer";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { useLoading } from "slices/loading";
 import { useRenderers } from "slices/renderers";

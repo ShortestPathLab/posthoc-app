@@ -159,6 +159,7 @@ export const controller = {
                     name: `${algorithmInfo?.name}`,
                     content: result,
                     key: id(),
+                    id: id(),
                   })
                 );
               } else {

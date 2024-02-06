@@ -11,7 +11,7 @@ import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 import { Flex } from "components/generic/Flex";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { inferLayerName } from "layers/Layer";
+import { inferLayerName } from "layers/inferLayerName";
 import {
   Dictionary,
   chain as _,
