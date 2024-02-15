@@ -3,6 +3,7 @@ import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
 import { Trace } from "protocol/Trace";
 import { createSlice } from "./createSlice";
+import { nanoid as id } from "nanoid";
 
 export type Map = Partial<
   Feature & {
@@ -30,11 +31,27 @@ export type UploadedTrace = FeatureDescriptor & {
   key?: string;
 };
 
-export type UIState = BusyState;
+export type WorkspaceMeta = {
+  screenshots?: string[];
+  size?: number;
+  author?: string;
+} & FeatureDescriptor;
+
+export type UIState = BusyState & {
+  workspaceMeta: WorkspaceMeta;
+};
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
   Partial<UIState>
 >({
   busy: {},
+  workspaceMeta: {
+    id: id(),
+    name: "",
+    description: "",
+    screenshots: [],
+    author: "",
+    size: 0,
+  },
 });

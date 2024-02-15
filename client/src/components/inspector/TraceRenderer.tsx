@@ -3,9 +3,11 @@ import {
   ViewInArOutlined,
 } from "@mui/icons-material";
 import { Box, CircularProgress, useTheme } from "@mui/material";
+import { RendererProps, SelectEvent } from "components/renderer/Renderer";
+import { RenderLayer } from "layers/RenderLayer";
 import { find, map, round } from "lodash";
+import { nanoid } from "nanoid";
 import { Size } from "protocol";
-import { useDebounce } from "react-use";
 import {
   createContext,
   useContext,
@@ -14,13 +16,13 @@ import {
   useRef,
   useState,
 } from "react";
+import { useDebounce } from "react-use";
 import { Renderer, RendererEvent } from "renderer";
-import { Placeholder } from "./Placeholder";
-import { SelectionMenu } from "./SelectionMenu";
-import { RenderLayer } from "layers/RenderLayer";
-import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { useLoading } from "slices/loading";
 import { useRenderers } from "slices/renderers";
+import { useScreenshots } from "slices/screenshots";
+import { Placeholder } from "./Placeholder";
+import { SelectionMenu } from "./SelectionMenu";
 
 const rendererOptions = {
   tileSubdivision: 1,
@@ -109,7 +111,10 @@ export function TraceRenderer({
   rendererRef,
   layers,
 }: RendererProps) {
+  const key = useMemo(nanoid, []);
   const { instance, error, ref } = useRenderer(renderer, { width, height });
+
+  const [, setScreenshots] = useScreenshots();
 
   const [selection, setSelection] = useState<SelectEvent>();
 
@@ -130,6 +135,14 @@ export function TraceRenderer({
   const context = useMemo(() => ({ renderer: instance }), [instance]);
 
   useEffect(() => rendererRef?.(instance), [instance, rendererRef]);
+
+  useEffect(() => {
+    const f = async () => await instance?.toDataUrl?.();
+    setScreenshots(() => ({
+      [key]: f,
+    }));
+    return () => setScreenshots(() => ({ [key]: undefined }));
+  }, [key, instance]);
 
   return (
     <>

@@ -1,4 +1,11 @@
-import { alpha, colors, createTheme, SxProps, Theme } from "@mui/material";
+import {
+  alpha,
+  colors,
+  createTheme,
+  SxProps,
+  TextFieldProps,
+  Theme,
+} from "@mui/material";
 import { constant, times } from "lodash";
 import { useSettings } from "slices/settings";
 
@@ -9,9 +16,9 @@ export type Shade = keyof (typeof colors)[AccentColor];
 export const { common, ...accentColors } = colors;
 
 const shadow = `
-    0px 8px 18px -1px rgb(0 0 0 / 8%), 
-    0px 10px 48px 0px rgb(0 0 0 / 1%), 
-    0px 20px 96px 0px rgb(0 0 0 / 0.5%)
+    0px 4px 9px -1px rgb(0 0 0 / 4%), 
+    0px 5px 24px 0px rgb(0 0 0 / 4%), 
+    0px 10px 48px 0px rgb(0 0 0 / 4%)
 `;
 
 export const getShade = (
@@ -44,6 +51,9 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
         fontWeight: 400,
         letterSpacing: 0,
         backgroundColor: "background.paper",
+      },
+      subtitle2: {
+        fontWeight: 400,
       },
     },
     components: {
@@ -97,3 +107,24 @@ export function useAcrylic(): SxProps<Theme> {
         background: ({ palette }) => palette.background.paper,
       };
 }
+
+export function usePaper(): (e?: number) => SxProps<Theme> {
+  return (elevation: number = 1) => ({
+    boxShadow: ({ shadows, palette }) =>
+      palette.mode === "dark"
+        ? shadows[1]
+        : shadows[Math.max(elevation - 1, 0)],
+    backgroundColor: ({ palette }) =>
+      palette.mode === "dark"
+        ? alpha(palette.action.disabledBackground, elevation * 0.02)
+        : palette.background.paper,
+    border: ({ palette }) =>
+      palette.mode === "dark"
+        ? `1px solid ${alpha(palette.text.primary, elevation * 0.08)}`
+        : `1px solid ${alpha(palette.text.primary, elevation * 0.16)}`,
+  });
+}
+
+export const textFieldProps = {
+  variant: "filled",
+} satisfies TextFieldProps;

@@ -11,6 +11,10 @@ export function FeaturePickerButton({
   return (
     <Button
       {...props}
+      sx={{
+        minWidth: 0,
+        ...props.sx,
+      }}
       startIcon={icon}
       endIcon={
         showArrow && (

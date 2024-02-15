@@ -54,6 +54,7 @@ export interface Renderer<
   fitCamera(fn?: (body: Bounds & ComponentEntry<V, M>) => boolean): void;
   initialCamera(): void;
   getInstance(): any;
+  toDataUrl(): Promise<string | undefined>;
 }
 
 type RendererMetadata = FeatureDescriptor & {

@@ -125,6 +125,11 @@ class D2Renderer
     return this.#app?.view;
   }
 
+  async toDataUrl(): Promise<string | undefined> {
+    this.#app?.render?.();
+    return this.#app?.view?.toDataURL?.();
+  }
+
   setup(options: Partial<D2RendererOptions>) {
     const o = { ...defaultD2RendererOptions, ...options };
     this.#setupPixi(o);
@@ -178,7 +183,6 @@ class D2Renderer
       events: this.#app.renderer.events,
       passiveWheel: false,
     });
-
     this.#viewport.on("clicked", (e) => {
       const { x, y } = e.world;
       const bodies = this.#system.search({

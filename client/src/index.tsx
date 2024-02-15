@@ -14,6 +14,7 @@ import { SettingsProvider } from "slices/settings";
 import { LayersProvider } from "slices/layers";
 import { ViewProvider } from "slices/view";
 import { BusyProvider } from "slices/busy";
+import { ScreenshotsProvider } from "slices/screenshots";
 
 const root = createRoot(document.getElementById("root")!);
 
@@ -28,6 +29,7 @@ const slices = [
   LogProvider,
   ViewProvider,
   LayersProvider,
+  ScreenshotsProvider,
 ];
 
 root.render(

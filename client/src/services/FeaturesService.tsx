@@ -5,9 +5,11 @@ import {
   isArray,
   keys,
   map,
+  // map,
   mergeWith,
   uniqBy,
 } from "lodash";
+import { map as mapAsync } from "promise-tools";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { Connection, useConnections } from "slices/connections";
 import { Features, useFeatures } from "slices/features";
@@ -19,17 +21,21 @@ function withSource<T>(source: string) {
 }
 
 const getFeatures = async ({ transport, url }: Connection) => {
-  const a = _(["algorithms", "formats", "maps", "traces"] as const)
-    .map(async (prop) => {
-      const { result } = await timed(
-        () => transport().call(`features/${prop}`),
-        1000
-      );
-      return { prop, result: map(result, withSource(url)) };
-    })
-    .value();
-  const b = await Promise.all(a);
-  return _(b).keyBy("prop").mapValues("result").value() as Features;
+  return _(
+    await mapAsync(
+      ["algorithms", "formats", "maps", "traces"] as const,
+      async (prop) => {
+        const { result } = await timed(
+          () => transport().call(`features/${prop}`),
+          1000
+        );
+        return { prop, result: map(result, withSource(url)) };
+      }
+    )
+  )
+    .keyBy("prop")
+    .mapValues("result")
+    .value() as Features;
 };
 
 export function FeaturesService() {

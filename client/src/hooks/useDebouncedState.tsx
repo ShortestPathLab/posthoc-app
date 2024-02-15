@@ -11,7 +11,6 @@ export function useDebouncedState<T>(
   useEffectWhen(
     () => {
       const timeout = delay(() => {
-        console.log("hi", state);
         onChange(state);
       }, wait);
       return () => clearTimeout(timeout);

@@ -8,6 +8,7 @@ import {
   SegmentOutlined as StepsIcon,
   ViewInArOutlined as ViewportIcon,
   WorkspacesOutlined as WorkspacesIcon,
+  RocketLaunchOutlined as RocketIcon,
 } from "@mui/icons-material";
 import { Dictionary } from "lodash";
 import { ReactNode } from "react";
@@ -21,6 +22,7 @@ import { SettingsPage } from "./SettingsPage";
 import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
+import { ExplorePage } from "./ExplorePage";
 
 export type PageMeta = {
   id: string;
@@ -32,13 +34,13 @@ export type PageMeta = {
 };
 
 export const pages: Dictionary<PageMeta> = {
-  recipes: {
-    id: "recipes",
-    name: "Recipes",
-    description: "Browse a library of included examples",
+  explore: {
+    id: "explore",
+    name: "Explore",
     color: "pink",
-    icon: <WorkspacesIcon />,
-    content: RecipesPage,
+    description: "Browse a library of examples and guides",
+    icon: <RocketIcon />,
+    content: ExplorePage,
   },
   layers: {
     id: "layers",

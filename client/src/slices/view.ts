@@ -29,12 +29,13 @@ export const [useView, ViewProvider] = createSlice<
   Partial<ViewTreeState>
 >({
   view: {
-    type: "branch",
     key: id(),
+    type: "branch",
     orientation: "horizontal",
     children: [
+      { key: id(), type: "leaf", size: 20, content: { type: "explore" } },
       {
-        size: 75,
+        size: 80,
         type: "branch",
         key: id(),
         orientation: "horizontal",
@@ -49,43 +50,23 @@ export const [useView, ViewProvider] = createSlice<
                 type: "leaf",
                 size: 40,
                 key: id(),
-                content: { type: "recipes" },
+                content: { type: "layers" },
               },
               {
                 type: "leaf",
                 size: 60,
                 key: id(),
-                content: { type: "layers" },
+                content: { type: "steps" },
               },
             ],
           },
           {
             size: 75,
-            type: "branch",
+            type: "leaf",
             key: id(),
-            orientation: "vertical",
-            children: [
-              {
-                type: "leaf",
-                size: 75,
-                key: id(),
-                content: { type: "viewport" },
-              },
-              {
-                type: "leaf",
-                size: 25,
-                key: id(),
-                content: { type: "info" },
-              },
-            ],
+            content: { type: "viewport" },
           },
         ],
-      },
-      {
-        size: 25,
-        type: "leaf",
-        key: id(),
-        content: { type: "steps" },
       },
     ],
   },

@@ -12,6 +12,7 @@ type ScrollProps = {
   x?: boolean;
   y?: boolean;
   px?: number;
+  py?: number;
 };
 
 export const Scroll = forwardRef(
@@ -21,6 +22,7 @@ export const Scroll = forwardRef(
       x,
       y,
       px = 6,
+      py = 0,
       ...rest
     }: ScrollProps & OverlayScrollbarsComponentProps,
     ref: ForwardedRef<HTMLDivElement>
@@ -30,6 +32,10 @@ export const Scroll = forwardRef(
       "div.os-scrollbar-vertical > div.os-scrollbar-track": {
         height: `calc(100% - ${spacing(px)})`,
         marginTop: spacing(px),
+      },
+      "div.os-scrollbar-horizontal > div.os-scrollbar-track": {
+        width: `calc(100% - ${spacing(py * 2)})`,
+        marginLeft: spacing(py),
       },
     });
     const handleRef = useCallback(
