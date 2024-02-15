@@ -12,12 +12,14 @@ import { useSettings } from "slices/settings";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { makeTheme } from "theme";
 import { TitleBar } from "components/title-bar/TitleBar";
+import { LogCaptureService } from "services/LogCaptureService";
 
 const services = [
   ConnectionsService,
   FeaturesService,
   RendererService,
   LayerService,
+  LogCaptureService,
 ];
 
 function App() {
