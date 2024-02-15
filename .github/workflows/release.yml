@@ -26,13 +26,13 @@ jobs:
           cd client && npm run build && npm run package
       - name: Build Adapter FS Bridge
         run: |
-          cd adapter-fs-bridge && npm run build && zip -r dist.zip dist
+          cd adapter-fs-bridge && npm i && npm run build && zip -r dist.zip dist
       - name: Build Adapter Iron Harvest
         run: |
-          cd adapter-iron-harvest && npm run build && zip -r dist.zip dist
+          cd adapter-iron-harvest && npm i && npm run build && zip -r dist.zip dist
       - name: Build Adapter Warthog Websocket
         run: |
-          cd adapter-warthog-websocket && npm run build && zip -r dist.zip dist
+          cd adapter-warthog-websocket && npm i && npm run build && zip -r dist.zip dist
       - name: Deploy
         uses: actions/create-release@v1
         id: create_release
