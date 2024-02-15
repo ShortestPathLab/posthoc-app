@@ -4,7 +4,7 @@ on:
     tags:
       - "v*"
 jobs:
-  release:
+  create-release:
     runs-on: ubuntu-latest
     env:
       CI: false
@@ -18,20 +18,20 @@ jobs:
           sudo add-apt-repository ppa:cybermax-dexter/sdl2-backport
           sudo apt-add-repository "deb https://dl.winehq.org/wine-builds/ubuntu $(lsb_release -cs) main"
           sudo apt install --install-recommends winehq-stable
-      - name: Build Client
+      - name: Build client
         run: |
           npm install
           cd client && npm run build && npm run package
-      - name: Build Adapter FS Bridge
+      - name: Build adapter (Filesystem Sync)
         run: |
           cd adapter-fs-bridge && npm i && npm run build && zip -r dist.zip dist
-      - name: Build Adapter Iron Harvest
+      - name: Build adapter (Iron Harvest)
         run: |
           cd adapter-iron-harvest && npm i && npm run build && zip -r dist.zip dist
-      - name: Build Adapter Warthog Websocket
+      - name: Build adapter (Warthog Websocket)
         run: |
           cd adapter-warthog-websocket && npm i && npm run build && zip -r dist.zip dist
-      - name: Deploy
+      - name: Create release
         uses: actions/create-release@v1
         id: create_release
         env:
@@ -43,7 +43,7 @@ jobs:
             No release notes.
           draft: true
           prerelease: true
-      - name: Upload Release Asset
+      - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,7 +52,7 @@ jobs:
           asset_path: ./client/bin/Visualiser-linux-x64.zip
           asset_name: Visualiser-linux-x64.zip
           asset_content_type: application/zip
-      - name: Upload Release Asset
+      - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -61,7 +61,7 @@ jobs:
           asset_path: ./client/bin/Visualiser-win32-x64.zip
           asset_name: Visualiser-win32-x64.zip
           asset_content_type: application/zip
-      - name: Upload Release Asset
+      - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
           asset_path: ./adapter-fs-bridge/dist.zip
           asset_name: adapter-fs-bridge.zip
           asset_content_type: application/zip
-      - name: Upload Release Asset
+      - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,7 +79,7 @@ jobs:
           asset_path: ./adapter-iron-harvest/dist.zip
           asset_name: adapter-iron-harvest.zip
           asset_content_type: application/zip
-      - name: Upload Release Asset
+      - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
