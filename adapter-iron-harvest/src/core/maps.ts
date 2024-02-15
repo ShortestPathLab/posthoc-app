@@ -1,7 +1,8 @@
 import { keys, some, startCase } from "lodash";
 import { parse, relative, resolve } from "path";
-import { handlers } from "./scenario";
 import { getConfig } from "../config";
+
+const handlers = { grid: undefined };
 
 export type MapTypeKey = keyof typeof handlers;
 
