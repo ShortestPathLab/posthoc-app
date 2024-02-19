@@ -85,6 +85,7 @@ export function A() {
         />
         <TextField
           {...textFieldProps}
+          minRows={3}
           defaultValue={fields.description}
           size="small"
           onChange={(e) => set("description", e.target.value)}

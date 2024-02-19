@@ -41,7 +41,7 @@ export function ViewTree<T>({
   const dragCls = useCss({
     "div&": {
       background: palette.text.secondary,
-      opacity: 1 - palette.action.activatedOpacity,
+      opacity: 0,
       transition: transitions.create("opacity"),
       "&.Horizontal": { width: "3px" },
       "&.Vertical": { height: "3px" },
@@ -51,8 +51,14 @@ export function ViewTree<T>({
   const gutterCls = useCss({
     "div&": {
       background: palette.background.default,
+      boxShadow: `inset 0 0 0 1px ${palette.background.paper}`,
       [`&:hover .${dragCls}`]: { opacity: 1 },
-      "&.Horizontal": { padding: 0 },
+      "&.Horizontal": {
+        padding: 0,
+        // marginLeft: "-1px",
+        // marginRight: "-1px",
+        width: "3px",
+      },
       "&.Vertical": { padding: 0 },
     },
   });
@@ -104,7 +110,7 @@ export function ViewTree<T>({
     <>
       {root.type === "leaf" ? (
         <Flex>
-          <Flex sx={{ borderRadius: (t) => t.spacing(1), overflow: "hidden" }}>
+          <Flex sx={{ overflow: "hidden" }}>
             <ViewTreeContext.Provider value={context}>
               {renderLeaf?.(root)}
             </ViewTreeContext.Provider>

@@ -40,7 +40,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
       background:
         mode === "dark"
           ? // ? { default: "#101418", paper: "#14191f" }
-            { default: "#09090b", paper: "#0f1114" }
+            { default: "#09090b", paper: "#111317" }
           : { default: "#f6f8fa", paper: "#ffffff" },
     },
     typography: {

@@ -46,7 +46,8 @@ export const TitleBar = () => {
     <>
       <Box
         sx={{
-          mt: -0.5,
+          mx: 0.5,
+          borderBottom: (t) => `1px solid ${t.palette.background.default}`,
           minHeight: 36,
           height: visible ? "env(titlebar-area-height, 50px)" : 0,
           width: "env(titlebar-area-width, 100%)",

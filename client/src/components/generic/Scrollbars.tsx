@@ -60,7 +60,7 @@ export const Scroll = forwardRef(
         options={{
           overflow: { x: x ? "scroll" : "hidden", y: y ? "scroll" : "hidden" },
           scrollbars: {
-            autoHide: "move",
+            autoHide: "leave",
             theme: palette.mode === "dark" ? "os-theme-light" : "os-theme-dark",
           },
         }}

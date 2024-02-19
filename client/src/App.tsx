@@ -32,7 +32,7 @@ function App() {
       vertical
       sx={{
         bgcolor: color,
-        p: 0.5,
+        // p: 0.5,
         color: "text.primary",
       }}
     >
