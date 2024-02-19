@@ -31,6 +31,7 @@ export const getShade = (
 
 const fontFamily = `"Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
         "Droid Sans", "Helvetica Neue", "Arial", sans-serif`;
+
 export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   createTheme({
     palette: {

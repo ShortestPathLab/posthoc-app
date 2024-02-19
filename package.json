@@ -17,8 +17,6 @@
     "url": "https://github.com/path-visualiser/app/issues"
   },
   "homepage": "https://path-visualiser.github.io/app",
-  "dependencies": {
-    "yaml": "^2.3.3"
-  },
+  "dependencies": {},
   "type": "module"
 }

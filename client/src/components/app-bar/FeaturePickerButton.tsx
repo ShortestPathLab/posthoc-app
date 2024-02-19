@@ -1,5 +1,5 @@
 import { KeyboardArrowDownOutlined } from "@mui/icons-material";
-import { Box, Button, ButtonProps, useTheme } from "@mui/material";
+import { Box, Button, ButtonProps } from "@mui/material";
 import { Props } from "./FeaturePicker";
 
 export function FeaturePickerButton({
@@ -8,7 +8,6 @@ export function FeaturePickerButton({
   showArrow,
   ...props
 }: ButtonProps & Pick<Props, "icon" | "showArrow">) {
-  const theme = useTheme();
   return (
     <Button
       {...props}
@@ -22,8 +21,7 @@ export function FeaturePickerButton({
           <KeyboardArrowDownOutlined
             sx={{
               ml: -0.5,
-              // For some reason this color must be explicit
-              color: theme.palette.text.primary,
+              color: "text.primary",
               opacity: (t) =>
                 props.disabled ? t.palette.action.disabledOpacity : 1,
             }}
@@ -33,7 +31,7 @@ export function FeaturePickerButton({
     >
       <Box
         sx={{
-          color: (t) => t.palette.text.primary,
+          color: "text.primary",
           opacity: (t) =>
             props.disabled ? t.palette.action.disabledOpacity : 1,
         }}
