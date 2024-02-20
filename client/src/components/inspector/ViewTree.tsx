@@ -50,7 +50,8 @@ export function ViewTree<T>({
 
   const gutterCls = useCss({
     "div&": {
-      background: palette.background.default,
+      background:
+        palette.mode === "dark" ? palette.background.default : palette.divider,
       boxShadow: `inset 0 0 0 1px ${palette.background.paper}`,
       [`&:hover .${dragCls}`]: { opacity: 1 },
       "&.Horizontal": {

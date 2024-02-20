@@ -6,21 +6,23 @@ import { useEffect } from "react";
 export function LogCaptureService() {
   const notify = useSnackbar();
   useEffect(() => {
-    const cc = new CaptureConsole();
-    cc.start(true);
-    const interval = setInterval(() => {
-      const captures = cc.getCaptures();
-      if (captures.length) {
-        for (const { args } of captures) {
-          notify(`${truncate(head(args), { length: 200 })}`);
+    if (import.meta.env.DEV) {
+      const cc = new CaptureConsole();
+      cc.start(true);
+      const interval = setInterval(() => {
+        const captures = cc.getCaptures();
+        if (captures.length) {
+          for (const { args } of captures) {
+            notify(`${truncate(head(args), { length: 200 })}`);
+          }
+          cc.flush();
         }
-        cc.flush();
-      }
-    }, 300);
-    return () => {
-      clearInterval(interval);
-      cc.stop();
-    };
+      }, 300);
+      return () => {
+        clearInterval(interval);
+        cc.stop();
+      };
+    }
   }, []);
   return <></>;
 }

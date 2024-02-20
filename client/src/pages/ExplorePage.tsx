@@ -309,7 +309,7 @@ export function ExplorePage() {
                         ),
                       }}
                       onChange={(e) => setSearch(e.target.value)}
-                      placeholder="Search Examples"
+                      placeholder="Search examples"
                     />
                   </Box>
                   {!loading ? (

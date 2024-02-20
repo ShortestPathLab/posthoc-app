@@ -26,9 +26,9 @@
   ],
   "start_url": "./",
   "display": "standalone",
-  "theme_color": "#1c2128",
+  "theme_color": "#0a0c10",
   "scope": ".",
-  "background_color": "#1c2128",
+  "background_color": "#0a0c10",
   "display_override": ["window-controls-overlay"],
   "screenshots": [
     {
