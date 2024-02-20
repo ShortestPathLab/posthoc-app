@@ -1,9 +1,9 @@
 {
   "short_name": "Visualiser",
   "name": "Visualiser",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Visualise pathfinding search and more",
-  "version_name": "1.1.6; mid February 2024",
+  "version_name": "1.1.7; mid February 2024",
   "repository": "https://github.com/path-visualiser/app",
   "docs": "https://github.com/path-visualiser/app/blob/master/docs",
   "homepage": "https://path-visualiser.github.io/",
@@ -26,9 +26,9 @@
   ],
   "start_url": "./",
   "display": "standalone",
-  "theme_color": "#1c2128",
+  "theme_color": "#0a0c10",
   "scope": ".",
-  "background_color": "#1c2128",
+  "background_color": "#0a0c10",
   "display_override": ["window-controls-overlay"],
   "screenshots": [
     {
