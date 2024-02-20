@@ -28,8 +28,8 @@ const rendererOptions = {
   tileSubdivision: 1,
   workerCount: 8,
   tileResolution: {
-    width: round(256 * devicePixelRatio),
-    height: round(256 * devicePixelRatio),
+    width: round(512 * devicePixelRatio),
+    height: round(512 * devicePixelRatio),
   },
 };
 
