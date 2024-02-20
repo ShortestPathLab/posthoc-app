@@ -1,14 +1,15 @@
-import { Box, Divider, Fade } from "@mui/material";
-import { values } from "lodash";
-import { withSlots } from "react-slot-component";
-import { ReactNode } from "react";
+import { Box, Divider } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
+import { values } from "lodash";
 import { pages } from "pages";
-import { useAcrylic } from "theme";
+import { ReactNode } from "react";
+import { withSlots } from "react-slot-component";
 import { PanelState } from "slices/view";
+import { useAcrylic } from "theme";
+import { DragIndicatorOutlined } from "@mui/icons-material";
 
 const divider = (
   <Divider
@@ -18,7 +19,7 @@ const divider = (
   />
 );
 
-type PageProps = {
+export type PageProps = {
   stack?: PanelState;
   renderExtras?: (content?: PanelState) => ReactNode;
   onChange?: (state: PanelState) => void;
@@ -44,17 +45,15 @@ export const Page = withSlots<Slots, PageProps>(
     return (
       <Flex vertical>
         <Flex sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
-          <Fade in>
-            <Box
-              sx={{
-                width: "100%",
-                height: "100%",
-                bgcolor: "background.paper",
-              }}
-            >
-              {slotProps.Content?.children}
-            </Box>
-          </Fade>
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              bgcolor: "background.paper",
+            }}
+          >
+            {slotProps.Content?.children}
+          </Box>
         </Flex>
         <Flex sx={{ height: (t) => t.spacing(6) }}>
           <Flex
@@ -80,8 +79,13 @@ export const Page = withSlots<Slots, PageProps>(
                   p: 1,
                 }}
               >
+                <DragIndicatorOutlined
+                  fontSize="small"
+                  color="disabled"
+                  sx={{ mr: 0.5, cursor: "grab" }}
+                />
                 <FeaturePicker
-                  showArrow
+                  // showArrow
                   label="Page"
                   onChange={(type) =>
                     onChange?.({

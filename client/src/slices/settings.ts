@@ -22,6 +22,7 @@ type Settings = {
   acrylic?: boolean;
   theme?: "dark" | "light";
   accentColor?: AccentColor;
+  "behaviour/showExplorePageOnStart"?: boolean;
 };
 
 export const defaultRemotes = [
@@ -49,6 +50,7 @@ const defaults = {
   theme: "dark",
   acrylic: true,
   accentColor: "blue",
+  "behaviour/showExplorePageOnStart": true,
 } as Settings;
 
 export const [useSettings, SettingsProvider] = createSlice<Settings>(

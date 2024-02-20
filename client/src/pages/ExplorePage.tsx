@@ -32,7 +32,6 @@ import {
   round,
   upperCase,
 } from "lodash";
-import { Page } from "pages/Page";
 import { map as mapAsync } from "promise-tools";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { homepage, name } from "public/manifest.json";
@@ -43,7 +42,7 @@ import { useSettings } from "slices/settings";
 import { textFieldProps, usePaper } from "theme";
 import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/Button";
-
+import { PageContentProps } from "./PageMeta";
 const paths = import.meta.glob("/public/recipes/*.workspace", {
   as: "url",
 });
@@ -232,7 +231,7 @@ export function FeatureCard({
   );
 }
 
-export function ExplorePage() {
+export function ExplorePage({ template: Page }: PageContentProps) {
   const notify = useSnackbar();
   const { controls, onChange, state } = useViewTreeContext();
   const [search, setSearch] = useState("");

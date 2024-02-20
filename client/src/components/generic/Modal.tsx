@@ -15,8 +15,6 @@ import {
   useTheme,
 } from "@mui/material";
 
-
-
 import {
   cloneElement,
   ComponentProps,
@@ -28,9 +26,6 @@ import {
   useState,
 } from "react";
 
-
-
-
 export function AppBarTitle({ children }: { children?: ReactNode }) {
   return <Typography variant="h6">{children}</Typography>;
 }
@@ -38,7 +33,7 @@ export function AppBarTitle({ children }: { children?: ReactNode }) {
 export type Props = {
   children?: ReactNode;
   actions?: ReactNode;
-  width?: number;
+  width?: string | number;
   height?: string | number;
   onTarget?: (target: HTMLDivElement | null) => void;
   variant?: "default" | "submodal";
@@ -211,7 +206,9 @@ export default function Modal({
           ...(useVariant && {
             borderRadius: `${theme.shape.borderRadius}px ${theme.shape.borderRadius}px 0 0`,
           }),
-          background: theme.palette.background.paper,
+          background: sm
+            ? theme.palette.background.default
+            : theme.palette.background.paper,
           overflow: "hidden",
           height:
             height && !sm
@@ -221,6 +218,7 @@ export default function Modal({
               : childHeight || "fit-content",
           position: "relative",
           maxWidth: "none",
+          ...(sm && { paddingTop: 36 }),
           ...props.PaperProps?.style,
         },
         ...props.PaperProps,

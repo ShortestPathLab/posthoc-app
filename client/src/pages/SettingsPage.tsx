@@ -9,8 +9,6 @@ import {
   Tab,
   Typography as Type,
 } from "@mui/material";
-import { keys, map, startCase } from "lodash";
-import { ReactNode, useState } from "react";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
@@ -19,16 +17,23 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { mapParsers } from "components/renderer/map-parser";
 import { RendererListEditor } from "components/settings-editor/RendererListEditor";
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
-import { Page } from "pages/Page";
+import { keys, map, startCase } from "lodash";
+import { ReactNode, useState } from "react";
 import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
 import { AccentColor, accentColors } from "theme";
-
+import { PageContentProps } from "./PageMeta";
 const formatLabel = (v: number) => `${v}x`;
 
-export function SettingsPage() {
+export function SettingsPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state } = useViewTreeContext();
   const [
-    { playbackRate = 1, acrylic, theme = "light", accentColor = "teal" },
+    {
+      playbackRate = 1,
+      acrylic,
+      theme = "light",
+      accentColor = "teal",
+      "behaviour/showExplorePageOnStart": behaviourShowExplorePageOnStart,
+    },
     setSettings,
   ] = useSettings();
   const [tab, setTab] = useState("general");
@@ -80,7 +85,7 @@ export function SettingsPage() {
                         }
                       />
                     </Flex>
-                    {renderHeading("UI")}
+                    {renderHeading("Appearance")}
                     <Flex alignItems="center">
                       {renderLabel("Acrylic")}
                       <Space flex={1} />
@@ -111,6 +116,19 @@ export function SettingsPage() {
                         showArrow
                         onChange={(v) =>
                           setSettings(() => ({ accentColor: v as AccentColor }))
+                        }
+                      />
+                    </Flex>
+                    {renderHeading("Behaviour")}
+                    <Flex alignItems="center">
+                      {renderLabel("Show Explore Panel on Start-up")}
+                      <Space flex={1} />
+                      <Switch
+                        defaultChecked={!!behaviourShowExplorePageOnStart}
+                        onChange={(_, v) =>
+                          setSettings(() => ({
+                            "behaviour/showExplorePageOnStart": v,
+                          }))
                         }
                       />
                     </Flex>

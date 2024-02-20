@@ -1,9 +1,4 @@
-import {
-  ArrowOutwardOutlined,
-  LinkOutlined,
-  OpenInNewOutlined,
-  SearchOutlined,
-} from "@mui/icons-material";
+import { OpenInNewOutlined, SearchOutlined } from "@mui/icons-material";
 import {
   Box,
   ButtonBase,
@@ -17,16 +12,46 @@ import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useWorkspace } from "hooks/useWorkspace";
-import { startCase } from "lodash";
+import { startCase, values } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
+import { nanoid as id } from "nanoid";
+import { pages } from "pages";
 import logo from "public/logo512.png";
 import { docs, repository, version } from "public/manifest.json";
-import { useEffect, useState } from "react";
+import {
+  ReactElement,
+  ReactNode,
+  cloneElement,
+  useEffect,
+  useState,
+} from "react";
+import { useView } from "slices/view";
 import { ExportWorkspaceModal } from "./ExportWorkspaceModal";
+
+function MenuEntry({
+  startIcon,
+  endIcon,
+  label,
+}: {
+  startIcon?: ReactElement;
+  endIcon?: ReactElement;
+  label: ReactNode;
+}) {
+  return (
+    <Stack direction="row" gap={1}>
+      {!!startIcon &&
+        cloneElement(startIcon, { fontSize: "small", color: "disabled" })}
+      <span>{label}</span>
+      {!!endIcon &&
+        cloneElement(endIcon, { fontSize: "small", color: "disabled" })}
+    </Stack>
+  );
+}
 
 export const TitleBar = () => {
   const { save, load } = useWorkspace();
   const [visible, setVisible] = useState(false);
+  const [, setView] = useView();
   const [exportModalOpen, setExportModalOpen] = useState(false);
   useEffect(() => {
     if ("windowControlsOverlay" in navigator) {
@@ -42,6 +67,26 @@ export const TitleBar = () => {
         );
     }
   }, [setVisible]);
+  function handleOpenPanel(type: string) {
+    setView(({ view }) => {
+      // const orientation =
+      //   view.type === "leaf" || view.orientation === "vertical"
+      //     ? "horizontal"
+      //     : "vertical";
+      const orientation = "horizontal";
+      return {
+        view: {
+          type: "branch",
+          orientation,
+          key: id(),
+          children: [
+            { ...view, size: 75 },
+            { type: "leaf", key: id(), content: { type }, size: 25 },
+          ],
+        },
+      };
+    });
+  }
   return (
     <>
       <Box
@@ -82,18 +127,23 @@ export const TitleBar = () => {
                     },
                     {
                       name: (
-                        <Stack direction="row" gap={1}>
-                          <span>Publish workspace</span>
-                          <OpenInNewOutlined
-                            fontSize="small"
-                            color="disabled"
-                          />
-                        </Stack>
+                        <MenuEntry
+                          label="Publish Workspace"
+                          endIcon={<OpenInNewOutlined />}
+                        />
                       ),
                       key: "workspace-save-metadata",
                       action: () => setExportModalOpen(true),
                     },
                   ],
+                },
+                {
+                  key: "Panel",
+                  items: values(pages).map(({ name, id, icon }) => ({
+                    key: `panel-open-${id}`,
+                    name: <MenuEntry label={name} startIcon={icon} />,
+                    action: () => handleOpenPanel(id),
+                  })),
                 },
                 {
                   key: "help",

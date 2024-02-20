@@ -1,6 +1,30 @@
-import { CloseOutlined, MoreVertOutlined as MoreIcon, ViewAgendaOutlined as SplitIcon } from "@mui/icons-material";
-import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack as MuiStack, Tooltip } from "@mui/material";
+import {
+  CloseOutlined,
+  MoreVertOutlined as MoreIcon,
+  ViewAgendaOutlined as SplitIcon,
+  OpenInNewOutlined as PopOutIcon,
+} from "@mui/icons-material";
+import {
+  Divider,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack as MuiStack,
+  Tooltip,
+} from "@mui/material";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
+
+type ViewControlsProps = {
+  splitVerticalDisabled?: boolean;
+  splitHorizontalDisabled?: boolean;
+  closeDisabled?: boolean;
+  onSplitVertical?: () => void;
+  onSplitHorizontal?: () => void;
+  onClose?: () => void;
+  onPopOut?: () => void;
+};
 
 export function ViewControls({
   onSplitHorizontal,
@@ -9,14 +33,8 @@ export function ViewControls({
   closeDisabled,
   splitHorizontalDisabled,
   splitVerticalDisabled,
-}: {
-  splitVerticalDisabled?: boolean;
-  splitHorizontalDisabled?: boolean;
-  closeDisabled?: boolean;
-  onSplitVertical?: () => void;
-  onSplitHorizontal?: () => void;
-  onClose?: () => void;
-}) {
+  onPopOut,
+}: ViewControlsProps) {
   return (
     <PopupState variant="popover">
       {(state) => (
@@ -34,7 +52,10 @@ export function ViewControls({
             anchorOrigin={{ horizontal: "right", vertical: "top" }}
           >
             <MenuItem
-              onClick={onSplitVertical}
+              onClick={() => {
+                onSplitVertical?.();
+                state.close();
+              }}
               disabled={splitVerticalDisabled}
             >
               <ListItemIcon>
@@ -43,7 +64,10 @@ export function ViewControls({
               <ListItemText>Split Vertical</ListItemText>
             </MenuItem>
             <MenuItem
-              onClick={onSplitHorizontal}
+              onClick={() => {
+                onSplitHorizontal?.();
+                state.close();
+              }}
               disabled={splitHorizontalDisabled}
             >
               <ListItemIcon>
@@ -55,7 +79,26 @@ export function ViewControls({
               <ListItemText>Split Horizontal</ListItemText>
             </MenuItem>
             <Divider />
-            <MenuItem onClick={onClose} disabled={closeDisabled}>
+            <MenuItem
+              onClick={() => {
+                onPopOut?.();
+                state.close();
+              }}
+              disabled={closeDisabled}
+            >
+              <ListItemIcon>
+                <PopOutIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Pop Out</ListItemText>
+            </MenuItem>
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                onClose?.();
+                state.close();
+              }}
+              disabled={closeDisabled}
+            >
               <ListItemIcon>
                 <CloseOutlined fontSize="small" />
               </ListItemIcon>

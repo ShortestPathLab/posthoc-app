@@ -24,7 +24,6 @@ import { getColorHex } from "components/renderer/colors";
 import { inferLayerName } from "layers/inferLayerName";
 import { delay, entries, find, findLast, map, set, startCase } from "lodash";
 import PopupState, { bindMenu } from "material-ui-popup-state";
-import { Page } from "pages/Page";
 import { produce } from "produce";
 import { FC, useCallback, useEffect, useState } from "react";
 import {
@@ -36,9 +35,9 @@ import { useCss, useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { useLayer } from "slices/layers";
 import { PanelState } from "slices/view";
+import { PageContentProps } from "./PageMeta";
 import { useTreeMemo } from "./TreeWorker";
 import { EventTree } from "./tree.worker";
-
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 const Tree = _Tree as unknown as FC<TreeProps>;
@@ -85,7 +84,7 @@ const orientationOptions = {
   },
 };
 
-export function TreePage() {
+export function TreePage({ template: Page }: PageContentProps) {
   const { palette } = useTheme();
 
   const { key, setKey, layer, setLayer, layers } = useLayer();

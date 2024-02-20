@@ -13,10 +13,10 @@ import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { head } from "lodash";
-import { Page } from "pages/Page";
 import logo from "public/logo512.png";
 import { name, version_name } from "public/manifest.json";
 import { ReactNode } from "react";
+import { PageContentProps } from "./PageMeta";
 
 const contacts = [
   { name: "Dr Daniel Harabor", email: "daniel.harabor@monash.edu" },
@@ -29,7 +29,7 @@ const contacts = [
   { name: "Rory Tobin-Underwood", email: "rorytu@gmail.com" },
 ];
 
-export function AboutPage() {
+export function AboutPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state } = useViewTreeContext();
   function renderSection(label: ReactNode, content: ReactNode) {
     return (

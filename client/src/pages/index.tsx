@@ -1,37 +1,26 @@
 import {
-  AccountTreeOutlined as TreeIcon,
-  BugReportOutlined as DebuggerIcon,
   InfoOutlined as AboutIcon,
+  BugReportOutlined as DebuggerIcon,
   LayersOutlined as LayersIcon,
   ListOutlined as LogsIcon,
+  RocketLaunchOutlined as RocketIcon,
   SettingsOutlined as SettingsIcon,
   SegmentOutlined as StepsIcon,
+  AccountTreeOutlined as TreeIcon,
   ViewInArOutlined as ViewportIcon,
-  WorkspacesOutlined as WorkspacesIcon,
-  RocketLaunchOutlined as RocketIcon,
 } from "@mui/icons-material";
 import { Dictionary } from "lodash";
-import { ReactNode } from "react";
-import { AccentColor } from "theme";
 import { AboutPage } from "./AboutPage";
 import { DebugPage } from "./DebugPage";
+import { ExplorePage } from "./ExplorePage";
 import { InfoPage } from "./InfoPage";
 import { LayersPage } from "./LayersPage";
-import { RecipesPage } from "./RecipesPage";
 import { SettingsPage } from "./SettingsPage";
 import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
-import { ExplorePage } from "./ExplorePage";
-
-export type PageMeta = {
-  id: string;
-  name: string;
-  icon: ReactNode;
-  color?: AccentColor;
-  description?: string;
-  content: () => ReactNode;
-};
+import { Page } from "./Page";
+import { PageMeta } from "./PageMeta";
 
 export const pages: Dictionary<PageMeta> = {
   explore: {

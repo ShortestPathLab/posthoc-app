@@ -13,10 +13,9 @@ import { useSnackbar } from "components/generic/Snackbar";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useWorkspace } from "hooks/useWorkspace";
 import { chain as _, entries, map } from "lodash";
-import { Page } from "pages/Page";
 import { useAsync } from "react-async-hook";
 import { useLoadingState } from "slices/loading";
-
+import { PageContentProps } from "./PageMeta";
 function stripExtension(path: string) {
   return path.split(".")[0];
 }
@@ -25,7 +24,7 @@ function basename(path: string) {
   return path.split("/").pop()!;
 }
 
-export function RecipesPage() {
+export function RecipesPage({ template: Page }: PageContentProps) {
   const notify = useSnackbar();
   const { controls, onChange, state } = useViewTreeContext();
   const { load } = useWorkspace();

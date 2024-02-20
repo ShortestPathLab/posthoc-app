@@ -9,11 +9,11 @@ import { templates } from "components/script-editor/templates";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { inferLayerName } from "layers/inferLayerName";
 import { map, set, values } from "lodash";
-import { Page } from "pages/Page";
 import { produce } from "produce";
 import { ReactNode, useState } from "react";
 import { useLayer } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
+import { PageContentProps } from "./PageMeta";
 
 const divider = (
   <Divider
@@ -23,7 +23,7 @@ const divider = (
   />
 );
 
-export function DebugPage() {
+export function DebugPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state } = useViewTreeContext();
   const [tab, setTab] = useState("standard");
   const { key, setKey, layers, layer, setLayer } = useLayer<DebugLayerData>();

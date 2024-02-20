@@ -13,6 +13,7 @@ import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { makeTheme } from "theme";
 import { TitleBar } from "components/title-bar/TitleBar";
 import { LogCaptureService } from "services/LogCaptureService";
+import { SettingsService } from "services/SettingsService";
 
 const services = [
   ConnectionsService,
@@ -20,6 +21,7 @@ const services = [
   RendererService,
   LayerService,
   LogCaptureService,
+  SettingsService,
 ];
 
 function App() {

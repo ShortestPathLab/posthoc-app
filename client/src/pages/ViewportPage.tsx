@@ -23,13 +23,13 @@ import {
   keyBy,
   map,
 } from "lodash";
-import { Page } from "pages/Page";
 import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
 import { useLayers } from "slices/layers";
 import { Renderer, useRenderers } from "slices/renderers";
 import { PanelState } from "slices/view";
+import { PageContentProps } from "./PageMeta";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -48,7 +48,7 @@ export function autoSelectRenderer(
   });
 }
 
-export function ViewportPage() {
+export function ViewportPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state } =
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();

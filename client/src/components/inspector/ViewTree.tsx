@@ -1,13 +1,13 @@
 import Split, { SplitDirection } from "@devbookhq/splitter";
 import { useTheme } from "@mui/material";
+import { Flex } from "components/generic/Flex";
 import { filter, forEach, map, sumBy } from "lodash";
 import { nanoid } from "nanoid";
-import { useCss } from "react-use";
-import { Context, createContext, ReactNode, useContext, useMemo } from "react";
-import { ViewControls } from "./ViewControls";
-import { Flex } from "components/generic/Flex";
 import { produce, produce2 } from "produce";
+import { Context, ReactNode, createContext, useContext, useMemo } from "react";
+import { useCss } from "react-use";
 import { Leaf, Root } from "slices/view";
+import { ViewControls } from "./ViewControls";
 
 type ViewTreeContextType<T = any> = {
   controls?: ReactNode;
@@ -27,6 +27,7 @@ type ViewTreeProps<T> = {
   onChange?: (root: Root<T>) => void;
   onClose?: () => void;
   depth?: number;
+  onPopOut?: (leaf: Leaf<T>) => void;
 };
 
 export function ViewTree<T>({
@@ -34,6 +35,7 @@ export function ViewTree<T>({
   renderLeaf,
   onChange,
   onClose,
+  onPopOut,
   depth = 0,
 }: ViewTreeProps<T>) {
   const { palette, spacing, transitions } = useTheme();
@@ -95,6 +97,7 @@ export function ViewTree<T>({
               closeDisabled={!depth}
               onSplitHorizontal={() => handleSplit("horizontal")}
               onSplitVertical={() => handleSplit("vertical")}
+              onPopOut={() => onPopOut?.(root)}
             />
           ),
           onChange: (c: any) =>
@@ -154,6 +157,7 @@ export function ViewTree<T>({
                   produce(root, (draft) => (draft.children[i] = newChild))
                 )
               }
+              onPopOut={onPopOut}
               onClose={() =>
                 onChange?.(
                   produce2(root, (draft) => {

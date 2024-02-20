@@ -15,10 +15,9 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
-import { layerHandlers } from "layers/layerHandlers";
 import { inferLayerName } from "layers/inferLayerName";
+import { layerHandlers } from "layers/layerHandlers";
 import { defer, map, throttle } from "lodash";
-import { Page } from "pages/Page";
 import { TraceEvent } from "protocol";
 import {
   cloneElement,
@@ -29,12 +28,12 @@ import {
   useRef,
 } from "react";
 import { useLayer } from "slices/layers";
-
+import { PageContentProps } from "./PageMeta";
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 const pxToInt = (s: string) => Number(s.replace(/px$/, ""));
 
-export function StepsPage() {
+export function StepsPage({ template: Page }: PageContentProps) {
   const { spacing } = useTheme();
   const { controls, onChange, state } = useViewTreeContext();
   const ref = useRef<ListHandle | null>(null);

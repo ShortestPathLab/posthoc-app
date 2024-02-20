@@ -1,14 +1,14 @@
 import { ListOutlined } from "@mui/icons-material";
 import { Divider, List, ListItem, ListItemText } from "@mui/material";
-import { map } from "lodash";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Page } from "pages/Page";
+import { map } from "lodash";
 import { useLog } from "slices/log";
+import { PageContentProps } from "./PageMeta";
 
-export function InfoPage() {
+export function InfoPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state } = useViewTreeContext();
   const [log] = useLog();
   return (

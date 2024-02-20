@@ -5,11 +5,12 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useState,
 } from "react";
 import { useAsync, useGetSet } from "react-use";
 import { Reducer, merge } from "./reducers";
 
-type Slice<T, U = T> = [T, (next: (prev: T) => U) => void];
+type Slice<T, U = T> = [T, (next: (prev: T) => U) => void, boolean];
 
 type Options<T, U> = {
   init?: () => Promise<U | undefined>;
@@ -21,12 +22,13 @@ export function createSlice<T, U = T>(
   initialState: T,
   { init, effect, reduce = merge }: Options<T, U> = {}
 ) {
-  const Store = createContext<Slice<T, U>>([initialState, noop]);
+  const Store = createContext<Slice<T, U>>([initialState, noop, false]);
   return [
     // Hook
     () => useContext(Store),
     // Context
     ({ children }: { children?: ReactNode }) => {
+      const [initialised, setInitialised] = useState(false);
       const [get, set] = useGetSet(initialState);
       const reduceSlice = useCallback(
         (n: (prev: T) => U) => {
@@ -37,12 +39,13 @@ export function createSlice<T, U = T>(
         [get]
       );
       const slice = useMemo<Slice<T, U>>(
-        () => [get(), reduceSlice],
-        [get(), reduceSlice]
+        () => [get(), reduceSlice, initialised],
+        [get(), reduceSlice, initialised]
       );
       useAsync(async () => {
         const r = await init?.();
         if (r) reduceSlice(() => r);
+        setInitialised(true);
       });
       return <Store.Provider value={slice}>{children}</Store.Provider>;
     },

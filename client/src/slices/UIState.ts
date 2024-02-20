@@ -4,6 +4,7 @@ import { PathfindingTask } from "protocol/SolveTask";
 import { Trace } from "protocol/Trace";
 import { createSlice } from "./createSlice";
 import { nanoid as id } from "nanoid";
+import { pages } from "pages";
 
 export type Map = Partial<
   Feature & {
@@ -37,15 +38,22 @@ export type WorkspaceMeta = {
   author?: string;
 } & FeatureDescriptor;
 
-export type UIState = BusyState & {
+type WorkspaceMetaState = {
   workspaceMeta: WorkspaceMeta;
 };
+
+type FullscreenModalState = {
+  fullscreenModal?: keyof typeof pages;
+};
+
+export type UIState = BusyState & WorkspaceMetaState & FullscreenModalState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
   Partial<UIState>
 >({
   busy: {},
+  fullscreenModal: undefined,
   workspaceMeta: {
     id: id(),
     name: "",
