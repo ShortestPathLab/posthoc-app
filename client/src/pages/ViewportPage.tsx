@@ -49,7 +49,7 @@ export function autoSelectRenderer(
 }
 
 export function ViewportPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state } =
+  const { controls, onChange, state, dragHandle } =
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();
 
@@ -87,6 +87,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex>
           <AutoSize>

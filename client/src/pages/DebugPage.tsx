@@ -24,7 +24,8 @@ const divider = (
 );
 
 export function DebugPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext();
+
   const [tab, setTab] = useState("standard");
   const { key, setKey, layers, layer, setLayer } = useLayer<DebugLayerData>();
   const { code } = layer?.source ?? {};
@@ -38,6 +39,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
+        <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
           <FeaturePicker
             icon={<LayersIcon />}

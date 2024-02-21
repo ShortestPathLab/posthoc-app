@@ -9,10 +9,12 @@ import { useLog } from "slices/log";
 import { PageContentProps } from "./PageMeta";
 
 export function InfoPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext();
+
   const [log] = useLog();
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex vertical>
           {log.length ? (

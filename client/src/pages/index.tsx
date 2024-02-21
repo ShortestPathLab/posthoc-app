@@ -15,12 +15,11 @@ import { DebugPage } from "./DebugPage";
 import { ExplorePage } from "./ExplorePage";
 import { InfoPage } from "./InfoPage";
 import { LayersPage } from "./LayersPage";
+import { PageMeta } from "./PageMeta";
 import { SettingsPage } from "./SettingsPage";
 import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
-import { Page } from "./Page";
-import { PageMeta } from "./PageMeta";
 
 export const pages: Dictionary<PageMeta> = {
   explore: {
@@ -30,6 +29,7 @@ export const pages: Dictionary<PageMeta> = {
     description: "Browse a library of examples and guides",
     icon: <RocketIcon />,
     content: ExplorePage,
+    allowFullscreen: true,
   },
   layers: {
     id: "layers",

@@ -25,14 +25,15 @@ import { PageContentProps } from "./PageMeta";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext();
+
   const [
     {
-      playbackRate = 1,
-      acrylic,
-      theme = "light",
-      accentColor = "teal",
-      "behaviour/showExplorePageOnStart": behaviourShowExplorePageOnStart,
+      "playback/playbackRate": playbackRate = 1,
+      "appearance/acrylic": acrylic,
+      "appearance/theme": theme = "light",
+      "appearance/accentColor": accentColor = "teal",
+      "behaviour/showOnStart": showOnStart,
     },
     setSettings,
   ] = useSettings();
@@ -50,6 +51,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
+        <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
           <TabList onChange={(_, v) => setTab(v)}>
             <Tab label="General" value="general" />
@@ -81,7 +83,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                         valueLabelDisplay="auto"
                         defaultValue={playbackRate}
                         onChangeCommitted={(_, v) =>
-                          setSettings(() => ({ playbackRate: v as number }))
+                          setSettings(() => ({
+                            "playback/playbackRate": v as number,
+                          }))
                         }
                       />
                     </Flex>
@@ -91,7 +95,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       <Space flex={1} />
                       <Switch
                         defaultChecked={!!acrylic}
-                        onChange={(_, v) => setSettings(() => ({ acrylic: v }))}
+                        onChange={(_, v) =>
+                          setSettings(() => ({ "appearance/acrylic": v }))
+                        }
                       />
                     </Flex>
                     <Flex alignItems="center">
@@ -100,7 +106,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       <Switch
                         defaultChecked={theme === "dark"}
                         onChange={(_, v) =>
-                          setSettings(() => ({ theme: v ? "dark" : "light" }))
+                          setSettings(() => ({
+                            "appearance/theme": v ? "dark" : "light",
+                          }))
                         }
                       />
                     </Flex>
@@ -115,7 +123,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                         }))}
                         showArrow
                         onChange={(v) =>
-                          setSettings(() => ({ accentColor: v as AccentColor }))
+                          setSettings(() => ({
+                            "appearance/accentColor": v as AccentColor,
+                          }))
                         }
                       />
                     </Flex>
@@ -124,10 +134,10 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       {renderLabel("Show Explore Panel on Start-up")}
                       <Space flex={1} />
                       <Switch
-                        defaultChecked={!!behaviourShowExplorePageOnStart}
+                        defaultChecked={!!showOnStart}
                         onChange={(_, v) =>
                           setSettings(() => ({
-                            "behaviour/showExplorePageOnStart": v,
+                            "behaviour/showOnStart": v ? "explore" : undefined,
                           }))
                         }
                       />

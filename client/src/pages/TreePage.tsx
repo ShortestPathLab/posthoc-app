@@ -90,7 +90,8 @@ export function TreePage({ template: Page }: PageContentProps) {
   const { key, setKey, layer, setLayer, layers } = useLayer();
 
   const throttledStep = useThrottle(layer?.source?.step ?? 0, 600);
-  const { controls, onChange, state } = useViewTreeContext<TreePageContext>();
+  const { controls, onChange, state, dragHandle } =
+    useViewTreeContext<TreePageContext>();
 
   const [radius, setRadius] = useState<keyof typeof radius2>("small");
 
@@ -118,6 +119,7 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex>
           {layer?.source?.trace?.content && cache?.tree ? (

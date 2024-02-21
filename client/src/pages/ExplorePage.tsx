@@ -132,7 +132,7 @@ export function FeatureCard({
   onOpenClick,
   ...rest
 }: Partial<ExampleDescriptor> & CardProps & { onOpenClick?: () => void }) {
-  const [{ acrylic }] = useSettings();
+  const [{ "appearance/acrylic": acrylic }] = useSettings();
   const paper = usePaper();
 
   const { name: authorName, avatar } = useMemo(
@@ -233,7 +233,7 @@ export function FeatureCard({
 
 export function ExplorePage({ template: Page }: PageContentProps) {
   const notify = useSnackbar();
-  const { controls, onChange, state } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext();
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("explore");
 
@@ -272,10 +272,10 @@ export function ExplorePage({ template: Page }: PageContentProps) {
       ),
     [search, files]
   );
-
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
+        <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
           <TabList onChange={(_, v) => setTab(v)}>
             <Tab label="Examples" value="explore" />

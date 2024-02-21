@@ -4,7 +4,7 @@ import {
   SkipNextOutlined as SkipIcon,
   PauseOutlined as PauseIcon,
   PlayArrowOutlined as PlayIcon,
-  StopOutlined as StopIcon
+  StopOutlined as StopIcon,
 } from "@mui/icons-material";
 import { EditorSetterProps } from "components/Editor";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
@@ -28,7 +28,7 @@ export function PlaybackService({
   const { step, end, playing, pause, stepWithBreakpointCheck } =
     usePlaybackState(value?.key);
 
-  const [{ playbackRate = 1 }] = useSettings();
+  const [{ "playback/playbackRate": playbackRate = 1 }] = useSettings();
 
   useEffect(() => {
     if (playing) {

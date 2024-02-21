@@ -26,7 +26,8 @@ function basename(path: string) {
 
 export function RecipesPage({ template: Page }: PageContentProps) {
   const notify = useSnackbar();
-  const { controls, onChange, state } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext();
+
   const { load } = useWorkspace();
   const usingLoadingState = useLoadingState();
 
@@ -62,6 +63,7 @@ export function RecipesPage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex vertical>
           <Scroll y>

@@ -41,44 +41,36 @@ export const [useView, ViewProvider] = createSlice<
       }
     : {
         view: {
-          key: id(),
+          size: 80,
           type: "branch",
+          key: id(),
           orientation: "horizontal",
           children: [
-            { key: id(), type: "leaf", size: 20, content: { type: "explore" } },
             {
-              size: 80,
               type: "branch",
               key: id(),
-              orientation: "horizontal",
+              orientation: "vertical",
+              size: 25,
               children: [
                 {
-                  type: "branch",
+                  type: "leaf",
+                  size: 40,
                   key: id(),
-                  orientation: "vertical",
-                  size: 25,
-                  children: [
-                    {
-                      type: "leaf",
-                      size: 40,
-                      key: id(),
-                      content: { type: "layers" },
-                    },
-                    {
-                      type: "leaf",
-                      size: 60,
-                      key: id(),
-                      content: { type: "steps" },
-                    },
-                  ],
+                  content: { type: "layers" },
                 },
                 {
-                  size: 75,
                   type: "leaf",
+                  size: 60,
                   key: id(),
-                  content: { type: "viewport" },
+                  content: { type: "steps" },
                 },
               ],
+            },
+            {
+              size: 75,
+              type: "leaf",
+              key: id(),
+              content: { type: "viewport" },
             },
           ],
         },
