@@ -120,13 +120,25 @@ function Component(
   return (
     <>
       <Stack alignItems="center" direction="row" gap={2}>
-        <Box py={1} ml={-1}>
+        <Box
+          sx={{
+            py: 1,
+            flex: 1,
+            width: 0,
+            ml: 0,
+            overflow: "hidden",
+            "> *": {
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            },
+          }}
+        >
           <Type>{name}</Type>
           <Type variant="body2" color="text.secondary">
             {startCase(draft.source?.type)}
           </Type>
         </Box>
-        <Space flex={1} />
         <Stack alignItems="center" direction="row">
           <Dialog
             appBar={{ children: <Title>Edit Layer</Title> }}

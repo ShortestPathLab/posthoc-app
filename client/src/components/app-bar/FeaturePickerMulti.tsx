@@ -1,7 +1,7 @@
 import { Typography as Type } from "@mui/material";
 import { SelectMulti } from "components/generic/SelectMulti";
 import { Space } from "components/generic/Space";
-import { filter, head, map, startCase } from "lodash";
+import { filter, head, map, startCase, truncate } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactNode } from "react";
 import { FeaturePickerButton } from "./FeaturePickerButton";
@@ -14,6 +14,7 @@ type Props = {
   icon?: ReactNode;
   showArrow?: boolean;
   defaultChecked?: boolean;
+  ellipsis?: number;
 };
 
 export function FeaturePickerMulti({
@@ -24,6 +25,7 @@ export function FeaturePickerMulti({
   icon,
   showArrow,
   defaultChecked,
+  ellipsis = Infinity,
 }: Props) {
   const selected = filter(items, ({ id }) => !!(value?.[id] ?? defaultChecked));
 
@@ -44,7 +46,7 @@ export function FeaturePickerMulti({
           icon={icon}
           showArrow={showArrow}
         >
-          {buttonLabel}
+          {truncate(buttonLabel, { length: ellipsis })}
         </FeaturePickerButton>
       )}
       items={map(items, ({ id, name, description, hidden }) => ({

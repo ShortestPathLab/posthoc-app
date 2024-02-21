@@ -1,9 +1,9 @@
 import {
-  ChevronLeftOutlined as PreviousIcon,
   ChevronRightOutlined as NextIcon,
-  SkipNextOutlined as SkipIcon,
   PauseOutlined as PauseIcon,
   PlayArrowOutlined as PlayIcon,
+  ChevronLeftOutlined as PreviousIcon,
+  SkipNextOutlined as SkipIcon,
   StopOutlined as StopIcon,
 } from "@mui/icons-material";
 import { EditorSetterProps } from "components/Editor";
@@ -11,7 +11,6 @@ import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWi
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { noop } from "lodash";
 import { useEffect } from "react";
-import { UploadedTrace } from "slices/UIState";
 import { Layer } from "slices/layers";
 import { useSettings } from "slices/settings";
 
@@ -50,11 +49,7 @@ export function PlaybackService({
   return <>{children}</>;
 }
 
-export function Playback({
-  layer,
-}: {
-  layer?: Layer<{ trace?: UploadedTrace }>;
-}) {
+export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
   const {
     playing,
     canPause,

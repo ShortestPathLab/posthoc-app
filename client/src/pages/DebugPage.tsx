@@ -51,6 +51,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
             }))}
             onChange={setKey}
             showArrow
+            ellipsis={12}
           />
           {divider}
           <TabList onChange={(_, v) => setTab(v)}>
@@ -79,7 +80,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
                 />
               </TabPanel>
             </Box>
-          </Box>{" "}
+          </Box>
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>
       </Page>

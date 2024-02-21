@@ -225,7 +225,7 @@ export class D2RendererWorker extends EventEmitter<
       "index"
     );
     const nextHash = hash(map(bodies, "index"));
-    const tileKey = hash([top, right, bottom, left]);
+    const tileKey = hash([top, right, bottom, left, tile.width, tile.height]);
     const prevTile = this.#cache[tileKey];
     if (!prevTile || nextHash !== prevTile.hash) {
       const g = new OffscreenCanvas(tile.width, tile.height);

@@ -4,7 +4,7 @@ import {
 } from "@mui/icons-material";
 import { Box, Divider, useTheme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Playback } from "components/app-bar/Playback";
+import { Playback, PlaybackLayerData } from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
 import {
   LazyList as List,
@@ -16,8 +16,8 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
-import { layerHandlers } from "layers/layerHandlers";
-import { defer, map, throttle } from "lodash";
+import { getLayerHandler, layerHandlers } from "layers/layerHandlers";
+import { defer, find, map, throttle } from "lodash";
 import { TraceEvent } from "protocol";
 import {
   cloneElement,
@@ -27,8 +27,9 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { useLayer } from "slices/layers";
+import { Layer, useLayer } from "slices/layers";
 import { PageContentProps } from "./PageMeta";
+
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 const pxToInt = (s: string) => Number(s.replace(/px$/, ""));
@@ -38,7 +39,12 @@ export function StepsPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
 
   const ref = useRef<ListHandle | null>(null);
-  const { key, setKey, layers, layer } = useLayer();
+  const stepsLayerGuard = (l: Layer): l is Layer<PlaybackLayerData> =>
+    !!getLayerHandler(l).steps;
+  const { key, setKey, layers, layer, allLayers } = useLayer(
+    undefined,
+    stepsLayerGuard
+  );
   const { step, playing, stepTo } = usePlaybackState(key);
 
   const steps = useMemo(() => {
@@ -133,12 +139,14 @@ export function StepsPage({ template: Page }: PageContentProps) {
           icon={<LayersIcon />}
           label="Layer"
           value={key}
-          items={map(layers, (l) => ({
+          items={map(allLayers, (l) => ({
             id: l.key,
+            hidden: !find(layers, { key: l.key }),
             name: inferLayerName(l),
           }))}
           onChange={setKey}
           showArrow
+          ellipsis={12}
         />
         {divider}
         <Playback layer={layer} />

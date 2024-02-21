@@ -8,17 +8,17 @@ import {
   ListItemIcon,
   ListItemText,
   Skeleton as Placeholder,
+  Stack,
   Tooltip,
   Typography as Type,
   useTheme,
 } from "@mui/material";
 import { getColorHex } from "components/renderer/colors";
-import { pick } from "lodash";
+import { omit, pick, startCase } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { ReactNode } from "react";
 import { useCss } from "react-use";
-import { EventLabel } from "./EventLabel";
-import { PropertyList } from "./PropertyList";
+import { ESSENTIAL_PROPS, OMIT_PROPS, PropertyList } from "./PropertyList";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -54,6 +54,12 @@ export function EventInspector({
     },
   });
 
+  const omitProps = omit(event, ...OMIT_PROPS);
+
+  const essentialProps = pick(omitProps, ...ESSENTIAL_PROPS);
+
+  const extraProps = omit(omitProps, ...ESSENTIAL_PROPS);
+
   return (
     <ListItemButton
       selected={selected}
@@ -71,10 +77,41 @@ export function EventInspector({
 
       <ListItemText
         sx={{ overflow: "hidden" }}
-        primary={<EventLabel event={event} hidden={false} />}
-        secondary={<PropertyList event={pick(event, "f", "g", "pId")} />}
+        primary={
+          <Box
+            sx={{
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              display: "block",
+              textOverflow: "ellipsis",
+              my: 0.5,
+            }}
+          >
+            {startCase(`${event?.type ?? "unsupported"} ${event?.id ?? "-"}`)}{" "}
+          </Box>
+        }
+        secondaryTypographyProps={{
+          component: "div",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+        }}
+        secondary={
+          <Stack
+            direction="row"
+            justifyContent="flex-start"
+            sx={{
+              "> *": { flex: 0 },
+            }}
+          >
+            <PropertyList event={essentialProps} simple />
+            <PropertyList event={extraProps} simple />
+          </Stack>
+        }
       />
       <Tooltip
+        slotProps={{
+          popper: { sx: { zIndex: (t) => t.zIndex.modal - 1 } },
+        }}
         title={
           <Box p={1}>
             <PropertyList event={event} flexDirection="column" />

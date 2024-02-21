@@ -9,7 +9,7 @@ import { useMapContent } from "hooks/useMapContent";
 import { useMapOptions } from "hooks/useMapOptions";
 import { useParsedMap } from "hooks/useParsedMap";
 import { LayerController, inferLayerName } from "layers";
-import { isEqual, isUndefined, map, round, set, startCase } from "lodash";
+import { isUndefined, map, round, set, startCase } from "lodash";
 import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";
@@ -82,7 +82,6 @@ export const controller = {
     );
     return <NodeList nodes={nodes2} />;
   },
-  steps: ({ children }) => <>{children?.([])}</>,
   service: withProduce(({ value, produce }) => {
     const { result: mapContent } = useMapContent(value?.source?.map);
     const { result: parsedMap } = useParsedMap(

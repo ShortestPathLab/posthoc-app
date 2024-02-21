@@ -176,6 +176,7 @@ export function TreePage({ template: Page }: PageContentProps) {
           }))}
           onChange={setKey}
           showArrow
+          ellipsis={12}
         />
         {divider}
         <FeaturePicker
