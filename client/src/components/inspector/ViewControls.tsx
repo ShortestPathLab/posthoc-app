@@ -20,6 +20,7 @@ type ViewControlsProps = {
   splitVerticalDisabled?: boolean;
   splitHorizontalDisabled?: boolean;
   closeDisabled?: boolean;
+  popOutDisabled?: boolean;
   onSplitVertical?: () => void;
   onSplitHorizontal?: () => void;
   onClose?: () => void;
@@ -34,6 +35,7 @@ export function ViewControls({
   splitHorizontalDisabled,
   splitVerticalDisabled,
   onPopOut,
+  popOutDisabled,
 }: ViewControlsProps) {
   return (
     <PopupState variant="popover">
@@ -79,19 +81,23 @@ export function ViewControls({
               <ListItemText>Split Horizontal</ListItemText>
             </MenuItem>
             <Divider />
-            <MenuItem
-              onClick={() => {
-                onPopOut?.();
-                state.close();
-              }}
-              disabled={closeDisabled}
-            >
-              <ListItemIcon>
-                <PopOutIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Pop Out</ListItemText>
-            </MenuItem>
-            <Divider />
+            {!(popOutDisabled || closeDisabled) && (
+              <>
+                <MenuItem
+                  onClick={() => {
+                    onPopOut?.();
+                    onClose?.();
+                    state.close();
+                  }}
+                >
+                  <ListItemIcon>
+                    <PopOutIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Pop Out</ListItemText>
+                </MenuItem>
+                <Divider />
+              </>
+            )}
             <MenuItem
               onClick={() => {
                 onClose?.();

@@ -3,9 +3,11 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { LayerListEditor } from "components/layer-editor/LayerListEditor";
 import { PageContentProps } from "./PageMeta";
 export function LayersPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext();
+
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Box p={2} pr={1} pt={6}>
           <LayerListEditor />

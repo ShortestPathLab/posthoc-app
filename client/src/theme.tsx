@@ -98,7 +98,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   });
 
 export function useAcrylic(): SxProps<Theme> {
-  const [{ acrylic }] = useSettings();
+  const [{ "appearance/acrylic": acrylic }] = useSettings();
   return acrylic
     ? {
         backdropFilter: "blur(10px)",

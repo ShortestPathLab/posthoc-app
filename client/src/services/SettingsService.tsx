@@ -3,12 +3,12 @@ import { useUIState } from "slices/UIState";
 import { useSettings } from "slices/settings";
 
 export function SettingsService() {
-  const [{ "behaviour/showExplorePageOnStart": showExplore }, , initialised] =
+  const [{ "behaviour/showOnStart": showOnStart }, , initialised] =
     useSettings();
   const [, setUIState] = useUIState();
   useEffect(() => {
-    if (showExplore && initialised) {
-      setUIState(() => ({ fullscreenModal: "explore" }));
+    if (showOnStart && initialised) {
+      setUIState(() => ({ fullscreenModal: showOnStart }));
     }
   }, [initialised]);
   return <></>;

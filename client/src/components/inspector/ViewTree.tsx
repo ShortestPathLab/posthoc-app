@@ -1,18 +1,37 @@
 import Split, { SplitDirection } from "@devbookhq/splitter";
-import { useTheme } from "@mui/material";
+import { DragIndicatorOutlined } from "@mui/icons-material";
+import { Box, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
-import { filter, forEach, map, sumBy } from "lodash";
+import { filter, find, flatMap, forEach, map, sumBy } from "lodash";
 import { nanoid } from "nanoid";
 import { produce, produce2 } from "produce";
 import { Context, ReactNode, createContext, useContext, useMemo } from "react";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { useCss } from "react-use";
 import { Leaf, Root } from "slices/view";
 import { ViewControls } from "./ViewControls";
+
+type TreeNode<S extends TreeNode = any> =
+  | {
+      children?: S[];
+    }
+  | object;
+
+function findInTree<T extends TreeNode<T>>(
+  data: T,
+  iterator: (a: T) => boolean
+): T | undefined {
+  const f = (a: T): T[] =>
+    "children" in a && a.children?.length ? flatMap(a.children, f) : [a];
+  return find(f(data), iterator);
+}
 
 type ViewTreeContextType<T = any> = {
   controls?: ReactNode;
   onChange?: (state: Partial<T>) => void;
   state?: T;
+  dragHandle?: ReactNode;
 };
 
 const ViewTreeContext = createContext<ViewTreeContextType>({});
@@ -28,16 +47,149 @@ type ViewTreeProps<T> = {
   onClose?: () => void;
   depth?: number;
   onPopOut?: (leaf: Leaf<T>) => void;
+  canPopOut?: (leaf: Leaf<T>) => boolean;
 };
 
-export function ViewTree<T>({
+type ViewBranchProps<T> = ViewTreeProps<T> & {
+  onSwap?: (a: string, b: string) => void;
+};
+
+type ViewLeafProps<T> = ViewBranchProps<T> & { root?: Leaf<T> };
+
+function handleSwap<T>(root: Root<T>, a: string, b: string) {
+  const leafA = findInTree(root, (c) => c.key === a);
+  const leafB = findInTree(root, (c) => c.key === b);
+  if (leafA?.type === "leaf" && leafB?.type === "leaf") {
+    const leafAContent = leafA.content;
+    const leafBContent = leafB.content;
+    leafA.content = leafBContent;
+    leafB.content = leafAContent;
+  }
+  return root;
+}
+export function ViewTree<T>(props: ViewTreeProps<T>) {
+  const { onChange, root } = props;
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <ViewBranch<T>
+        {...props}
+        onSwap={(a, b) => {
+          if (root) {
+            onChange?.(produce(root, (root) => handleSwap(root, a, b)));
+          }
+        }}
+      />
+    </DndProvider>
+  );
+}
+
+export function ViewLeaf<T>({
   root = { type: "leaf", key: "" },
   renderLeaf,
   onChange,
   onClose,
   onPopOut,
+  canPopOut,
   depth = 0,
-}: ViewTreeProps<T>) {
+  onSwap,
+}: ViewLeafProps<T>) {
+  const [{ isOver }, drop] = useDrop<
+    { key: string },
+    void,
+    { isOver: boolean }
+  >(() => ({
+    accept: ["panel"],
+    collect: (monitor) => ({
+      isOver: monitor.isOver() && monitor.getItem().key !== root.key,
+    }),
+    drop: (item) => onSwap?.(item.key, root.key),
+  }));
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "panel",
+    item: { key: root.key },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
+
+  const context = useMemo(() => {
+    const handleSplit = (orientation: "vertical" | "horizontal") =>
+      onChange?.(
+        produce2(root, (draft) => ({
+          key: nanoid(),
+          type: "branch",
+          orientation,
+          children: [
+            { ...structuredClone(draft), size: 50, key: nanoid() },
+            { ...structuredClone(draft), size: 50, key: nanoid() },
+          ],
+        }))
+      );
+    return root.type === "leaf"
+      ? {
+          state: root.content,
+          controls: (
+            <ViewControls
+              onClose={onClose}
+              closeDisabled={!depth}
+              onSplitHorizontal={() => handleSplit("horizontal")}
+              onSplitVertical={() => handleSplit("vertical")}
+              onPopOut={() => onPopOut?.(root)}
+              popOutDisabled={!canPopOut?.(root)}
+            />
+          ),
+          dragHandle: (
+            <Box ref={drag} sx={{ display: "flex", alignItems: "center" }}>
+              <DragIndicatorOutlined
+                fontSize="small"
+                color="disabled"
+                sx={{ mr: 0.5, cursor: "grab" }}
+              />
+            </Box>
+          ),
+          onChange: (c: any) =>
+            onChange?.(
+              produce(root, (draft) => {
+                draft.content = { ...draft.content, ...c };
+              })
+            ),
+        }
+      : {};
+  }, [onChange, onClose, depth, root, drag]);
+
+  return (
+    <>
+      <Flex
+        ref={drop}
+        sx={{
+          overflow: "hidden",
+          "::before": {
+            pointerEvents: "none",
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1,
+            boxShadow: (t) =>
+              isOver ? `inset 0 0 0 2px ${t.palette.primary.main}` : "none",
+            transition: (t) => t.transitions.create("box-shadow"),
+          },
+          transition: (t) => t.transitions.create("opacity"),
+          opacity: (t) => (isDragging ? t.palette.action.disabledOpacity : 1),
+        }}
+      >
+        <ViewTreeContext.Provider value={context}>
+          {renderLeaf?.(root)}
+        </ViewTreeContext.Provider>
+      </Flex>
+    </>
+  );
+}
+
+export function ViewBranch<T>(props: ViewBranchProps<T>) {
+  const { root = { type: "leaf", key: "" }, onChange, depth = 0 } = props;
   const { palette, spacing, transitions } = useTheme();
 
   const dragCls = useCss({
@@ -74,52 +226,10 @@ export function ViewTree<T>({
     return undef ? space / undef : 0;
   }
 
-  const context = useMemo(() => {
-    const handleSplit = (orientation: "vertical" | "horizontal") =>
-      onChange?.(
-        produce2(root, (draft) => ({
-          key: nanoid(),
-          type: "branch",
-          orientation,
-          children: [
-            { ...structuredClone(draft), size: 50, key: nanoid() },
-            { ...structuredClone(draft), size: 50, key: nanoid() },
-          ],
-        }))
-      );
-
-    return root.type === "leaf"
-      ? {
-          state: root.content,
-          controls: (
-            <ViewControls
-              onClose={onClose}
-              closeDisabled={!depth}
-              onSplitHorizontal={() => handleSplit("horizontal")}
-              onSplitVertical={() => handleSplit("vertical")}
-              onPopOut={() => onPopOut?.(root)}
-            />
-          ),
-          onChange: (c: any) =>
-            onChange?.(
-              produce(root, (draft) => {
-                draft.content = { ...draft.content, ...c };
-              })
-            ),
-        }
-      : {};
-  }, [onChange, onClose, depth, root]);
-
   return (
     <>
       {root.type === "leaf" ? (
-        <Flex>
-          <Flex sx={{ overflow: "hidden" }}>
-            <ViewTreeContext.Provider value={context}>
-              {renderLeaf?.(root)}
-            </ViewTreeContext.Provider>
-          </Flex>
-        </Flex>
+        <ViewLeaf<T> {...(props as ViewLeafProps<T>)} />
       ) : (
         <Split
           gutterClassName={gutterCls}
@@ -147,17 +257,16 @@ export function ViewTree<T>({
           }
         >
           {map(root.children, (c, i) => (
-            <ViewTree
+            <ViewBranch
+              {...props}
               key={c.key}
               depth={depth + 1}
-              renderLeaf={renderLeaf}
               root={c}
               onChange={(newChild) =>
                 onChange?.(
                   produce(root, (draft) => (draft.children[i] = newChild))
                 )
               }
-              onPopOut={onPopOut}
               onClose={() =>
                 onChange?.(
                   produce2(root, (draft) => {

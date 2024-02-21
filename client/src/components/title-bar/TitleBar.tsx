@@ -80,8 +80,8 @@ export const TitleBar = () => {
           orientation,
           key: id(),
           children: [
-            { ...view, size: 75 },
-            { type: "leaf", key: id(), content: { type }, size: 25 },
+            { ...view, size: 80 },
+            { type: "leaf", key: id(), content: { type }, size: 20 },
           ],
         },
       };
@@ -113,6 +113,14 @@ export const TitleBar = () => {
               </Box>
               {[
                 {
+                  key: "Panel",
+                  items: values(pages).map(({ name, id, icon }) => ({
+                    key: `panel-open-${id}`,
+                    name: <MenuEntry label={name} startIcon={icon} />,
+                    action: () => handleOpenPanel(id),
+                  })),
+                },
+                {
                   key: "workspace",
                   items: [
                     {
@@ -136,14 +144,6 @@ export const TitleBar = () => {
                       action: () => setExportModalOpen(true),
                     },
                   ],
-                },
-                {
-                  key: "Panel",
-                  items: values(pages).map(({ name, id, icon }) => ({
-                    key: `panel-open-${id}`,
-                    name: <MenuEntry label={name} startIcon={icon} />,
-                    action: () => handleOpenPanel(id),
-                  })),
                 },
                 {
                   key: "help",

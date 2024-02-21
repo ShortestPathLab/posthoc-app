@@ -1,3 +1,4 @@
+import type { pages } from "pages";
 import { createSlice, withLocalStorage } from "./createSlice";
 import { AccentColor } from "theme";
 
@@ -18,11 +19,11 @@ export type Renderer = {
 type Settings = {
   remote?: Remote[];
   renderer?: Renderer[];
-  playbackRate?: number;
-  acrylic?: boolean;
-  theme?: "dark" | "light";
-  accentColor?: AccentColor;
-  "behaviour/showExplorePageOnStart"?: boolean;
+  "playback/playbackRate"?: number;
+  "appearance/acrylic"?: boolean;
+  "appearance/theme"?: "dark" | "light";
+  "appearance/accentColor"?: AccentColor;
+  "behaviour/showOnStart"?: keyof typeof pages;
 };
 
 export const defaultRemotes = [
@@ -46,11 +47,11 @@ export const defaultPlaybackRate = 1;
 const defaults = {
   renderer: defaultRenderers,
   remote: defaultRemotes,
-  playbackRate: defaultPlaybackRate,
-  theme: "dark",
-  acrylic: true,
-  accentColor: "blue",
-  "behaviour/showExplorePageOnStart": true,
+  "playback/playbackRate": defaultPlaybackRate,
+  "appearance/theme": "dark",
+  "appearance/acrylic": true,
+  "appearance/accentColor": "blue",
+  "behaviour/showOnStart": "explore",
 } as Settings;
 
 export const [useSettings, SettingsProvider] = createSlice<Settings>(

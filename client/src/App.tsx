@@ -45,8 +45,12 @@ function App() {
 }
 
 function ThemedApp() {
-  const [{ theme: mode = "light", accentColor: accent = "teal" }] =
-    useSettings();
+  const [
+    {
+      "appearance/theme": mode = "light",
+      "appearance/accentColor": accent = "teal",
+    },
+  ] = useSettings();
   const theme = useMemo(() => makeTheme(mode, accent), [mode, accent]);
   return (
     <ThemeProvider theme={theme}>

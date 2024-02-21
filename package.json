@@ -17,6 +17,9 @@
     "url": "https://github.com/path-visualiser/app/issues"
   },
   "homepage": "https://path-visualiser.github.io/app",
-  "dependencies": {},
+  "dependencies": {
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1"
+  },
   "type": "module"
 }

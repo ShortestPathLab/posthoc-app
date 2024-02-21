@@ -30,7 +30,8 @@ const contacts = [
 ];
 
 export function AboutPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext();
+
   function renderSection(label: ReactNode, content: ReactNode) {
     return (
       <Box sx={{ pt: 2 }}>
@@ -43,6 +44,7 @@ export function AboutPage({ template: Page }: PageContentProps) {
   }
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex>
           {" "}

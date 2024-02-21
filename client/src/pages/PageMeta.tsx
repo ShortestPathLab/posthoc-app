@@ -1,10 +1,10 @@
 import { ReactElement, ReactNode } from "react";
 import { withSlots } from "react-slot-component";
 import { AccentColor } from "theme";
-import { PageProps, Slots } from "./Page";
+import { PageProps, PageSlots } from "./Page";
 
 export type PageContentProps = {
-  template: ReturnType<typeof withSlots<Slots, PageProps>>;
+  template: ReturnType<typeof withSlots<PageSlots, PageProps>>;
 };
 
 export type PageMeta = {
@@ -14,4 +14,5 @@ export type PageMeta = {
   color?: AccentColor;
   description?: string;
   content: (props: PageContentProps) => ReactNode;
+  allowFullscreen?: boolean;
 };

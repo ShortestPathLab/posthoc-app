@@ -9,7 +9,6 @@ import { ReactNode } from "react";
 import { withSlots } from "react-slot-component";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
-import { DragIndicatorOutlined } from "@mui/icons-material";
 
 const divider = (
   <Divider
@@ -27,7 +26,7 @@ export type PageProps = {
   children?: ReactNode;
 };
 
-export type Slots = {
+export type PageSlots = {
   Content: {
     children: React.ReactNode;
   };
@@ -37,9 +36,12 @@ export type Slots = {
   Extras: {
     children: React.ReactNode;
   };
+  Handle: {
+    children: React.ReactNode;
+  };
 };
 
-export const Page = withSlots<Slots, PageProps>(
+export const Page = withSlots<PageSlots, PageProps>(
   ({ slotProps, onChange, stack }) => {
     const acrylic = useAcrylic();
     return (
@@ -79,11 +81,7 @@ export const Page = withSlots<Slots, PageProps>(
                   p: 1,
                 }}
               >
-                <DragIndicatorOutlined
-                  fontSize="small"
-                  color="disabled"
-                  sx={{ mr: 0.5, cursor: "grab" }}
-                />
+                {slotProps.Handle?.children}
                 <FeaturePicker
                   // showArrow
                   label="Page"
