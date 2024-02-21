@@ -87,6 +87,9 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
             letterSpacing: 0,
             fontSize: "0.875rem",
           },
+          h4: {
+            marginBottom: 12,
+          },
           h6: {
             fontWeight: 500,
             letterSpacing: -0.4,

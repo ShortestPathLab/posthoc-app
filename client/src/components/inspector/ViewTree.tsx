@@ -28,6 +28,7 @@ function findInTree<T extends TreeNode<T>>(
 }
 
 type ViewTreeContextType<T = any> = {
+  isViewTree?: true;
   controls?: ReactNode;
   onChange?: (state: Partial<T>) => void;
   state?: T;
@@ -126,7 +127,8 @@ export function ViewLeaf<T>({
         }))
       );
     return root.type === "leaf"
-      ? {
+      ? ({
+          isViewTree: true,
           state: root.content,
           controls: (
             <ViewControls
@@ -153,7 +155,7 @@ export function ViewLeaf<T>({
                 draft.content = { ...draft.content, ...c };
               })
             ),
-        }
+        } satisfies ViewTreeContextType<T>)
       : {};
   }, [onChange, onClose, depth, root, drag]);
 
