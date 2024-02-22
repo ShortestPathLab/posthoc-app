@@ -16,12 +16,13 @@ import {
   SxProps,
   Tab,
   TextField,
-  Typography,
+  Typography as Type,
 } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useViewTreeContext } from "components/inspector/ViewTree";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
 import {
   chain as _,
@@ -188,9 +189,9 @@ export function FeatureCard({
             ></Box>
           </Box>
         }
-        titleTypographyProps={ellipsisProps}
+        titleTypeProps={ellipsisProps}
         title={name || "Untitled"}
-        subheaderTypographyProps={ellipsisProps}
+        subheaderTypeProps={ellipsisProps}
         subheader={
           <Stack gap={2} sx={{ pt: 1, alignItems: "flex-start" }}>
             <Box
@@ -208,7 +209,7 @@ export function FeatureCard({
             </Box>
             <Stack direction="row" alignItems="center" gap={1}>
               {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
-              <Typography variant="caption">{authorName}</Typography>
+              <Type variant="caption">{authorName}</Type>
             </Stack>
             <Button
               onClick={onOpenClick}
@@ -216,11 +217,11 @@ export function FeatureCard({
               sx={paper(2)}
             >
               <Stack direction="row" gap={1}>
-                <Typography>Open</Typography>
+                <Type>Open</Type>
                 {!!size && (
-                  <Typography color="text.secondary">
+                  <Type color="text.secondary">
                     {round(size / 1024 / 1024, 2)} MB
-                  </Typography>
+                  </Type>
                 )}
               </Stack>
             </Button>
@@ -231,9 +232,13 @@ export function FeatureCard({
   );
 }
 
+const CONTENT_WIDTH = 940;
+
 export function ExplorePage({ template: Page }: PageContentProps) {
   const notify = useSnackbar();
-  const { controls, onChange, state, dragHandle } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle, isViewTree } =
+    useViewTreeContext();
+  const sm = useSmallDisplay() || isViewTree;
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("explore");
 
@@ -285,100 +290,112 @@ export function ExplorePage({ template: Page }: PageContentProps) {
         <Page.Content>
           <Flex vertical>
             <Scroll y>
-              <Box pt={6}>
-                <TabPanel value="explore" sx={{ p: 0 }}>
-                  <Box p={2}>
-                    <Typography variant="h6">Examples</Typography>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Browse a library of included and community-made examples
-                    </Typography>
-                  </Box>
-                  <Box px={2} py={1}>
-                    <TextField
-                      {...textFieldProps}
-                      size="small"
-                      hiddenLabel
-                      fullWidth
-                      sx={{ maxWidth: 480 }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <SearchOutlined />
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder="Search examples"
-                    />
-                  </Box>
-                  {!loading ? (
-                    <Box
-                      sx={{
-                        p: 1,
-                        display: "grid",
-                        gridAutoFlow: "row",
-                        gridTemplateColumns:
-                          "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
-                      }}
-                    >
-                      {filteredFiles.length ? (
-                        map(
-                          filteredFiles,
-                          (
-                            {
-                              name,
-                              path,
-                              description,
-                              screenshots,
-                              author,
-                              size,
-                            },
-                            i
-                          ) => (
-                            <Box key={i} sx={{ p: 1 }}>
-                              <FeatureCard
-                                name={name}
-                                description={description ?? "No description"}
-                                image={first(screenshots)}
-                                author={author}
-                                onOpenClick={() => open(path)}
-                                size={size}
-                              />
-                            </Box>
+              <Box
+                sx={
+                  !sm
+                    ? {
+                        p: 4,
+                        maxWidth: CONTENT_WIDTH,
+                        mx: "auto",
+                      }
+                    : undefined
+                }
+              >
+                <Box pt={6}>
+                  <TabPanel value="explore" sx={{ p: 0 }}>
+                    <Box p={2}>
+                      <Type variant={sm ? "h6" : "h4"}>Examples</Type>
+                      <Type variant="subtitle2" color="text.secondary">
+                        Browse a library of included and community-made examples
+                      </Type>
+                    </Box>
+                    <Box px={2} py={1}>
+                      <TextField
+                        {...textFieldProps}
+                        size="small"
+                        hiddenLabel
+                        fullWidth
+                        sx={{ maxWidth: 480 }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchOutlined />
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search examples"
+                      />
+                    </Box>
+                    {!loading ? (
+                      <Box
+                        sx={{
+                          p: 1,
+                          display: "grid",
+                          gridAutoFlow: "row",
+                          gridTemplateColumns:
+                            "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
+                        }}
+                      >
+                        {filteredFiles.length ? (
+                          map(
+                            filteredFiles,
+                            (
+                              {
+                                name,
+                                path,
+                                description,
+                                screenshots,
+                                author,
+                                size,
+                              },
+                              i
+                            ) => (
+                              <Box key={i} sx={{ p: 1 }}>
+                                <FeatureCard
+                                  name={name}
+                                  description={description ?? "No description"}
+                                  image={first(screenshots)}
+                                  author={author}
+                                  onOpenClick={() => open(path)}
+                                  size={size}
+                                />
+                              </Box>
+                            )
                           )
-                        )
-                      ) : (
-                        <Typography color="text.secondary" sx={{ p: 1 }}>
-                          No results match your search.
-                        </Typography>
-                      )}
+                        ) : (
+                          <Type color="text.secondary" sx={{ p: 1 }}>
+                            No results match your search.
+                          </Type>
+                        )}
+                      </Box>
+                    ) : (
+                      <Box sx={{ p: 2 }}>
+                        <CircularProgress />
+                      </Box>
+                    )}
+                  </TabPanel>
+                  <TabPanel value="guides" sx={{ p: 0 }}>
+                    <Box p={2}>
+                      <Type variant={sm ? "h6" : "h4"}>Guides</Type>
+                      <Type variant="subtitle2" color="text.secondary">
+                        {`Learn how to use ${name} and explore ${name} features`}
+                      </Type>
                     </Box>
-                  ) : (
-                    <Box sx={{ p: 2 }}>
-                      <CircularProgress />
-                    </Box>
-                  )}
-                </TabPanel>
-                <TabPanel value="guides" sx={{ p: 0 }}>
-                  <Box p={2}>
-                    <Typography variant="h6">Guides</Typography>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {`Learn how to use ${name} and explore ${name} features`}
-                    </Typography>
-                  </Box>
-                  <Stack sx={{ p: 2 }} gap={2}>
-                    <Typography>
-                      We're still working on this feature. Check out our
-                      documentation instead.
-                    </Typography>
-                    <Button
-                      onClick={() => window.open(homepage, "_blank")}
-                      startIcon={<LaunchOutlined />}
-                    >
-                      Open Documentation
-                    </Button>
-                  </Stack>
-                </TabPanel>
+                    <Stack sx={{ p: 2 }} gap={2}>
+                      <Type>
+                        We're still working on this feature. Check out our
+                        documentation instead.
+                      </Type>
+                      <Button
+                        onClick={() => window.open(homepage, "_blank")}
+                        startIcon={<LaunchOutlined />}
+                      >
+                        Open Documentation
+                      </Button>
+                    </Stack>
+                  </TabPanel>
+                </Box>
               </Box>
             </Scroll>
           </Flex>

@@ -34,6 +34,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
 import { usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
+
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 const pxToInt = (s: string) => Number(s.replace(/px$/, ""));
@@ -225,12 +226,14 @@ export function StepsPage({ template: Page }: PageContentProps) {
           icon={<LayersIcon />}
           label="Layer"
           value={key}
-          items={map(layers, (l) => ({
+          items={map(allLayers, (l) => ({
             id: l.key,
+            hidden: !find(layers, { key: l.key }),
             name: inferLayerName(l),
           }))}
           onChange={setKey}
           showArrow
+          ellipsis={12}
         />
         {divider}
         <Playback layer={layer} />

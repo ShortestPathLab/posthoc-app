@@ -56,7 +56,8 @@ export function useLayer<T extends Record<string, any> = Record<string, any>>(
           }));
         },
         layers: filtered,
+        allLayers: layers,
       } as const),
-    [layer, setLayers, filtered]
+    [layers, layer, setLayers, filtered]
   );
 }

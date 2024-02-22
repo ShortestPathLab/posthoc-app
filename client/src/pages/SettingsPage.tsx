@@ -46,7 +46,11 @@ export function SettingsPage({ template: Page }: PageContentProps) {
     );
   }
   function renderLabel(label: ReactNode) {
-    return <Type variant="body1">{label}</Type>;
+    return (
+      <Type variant="body1" sx={{ minWidth: "max-content", mr: 4 }}>
+        {label}
+      </Type>
+    );
   }
   return (
     <TabContext value={tab}>

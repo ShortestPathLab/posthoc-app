@@ -292,6 +292,14 @@ class D2Renderer
     const { width, height } = options.screenSize;
     this.#app?.renderer?.resize?.(width, height);
     this.#viewport?.resize(width, height);
+    map(this.#workers, (w) => {
+      w.call("setTileResolution", [
+        {
+          width: ceil(options.tileResolution.width),
+          height: ceil(options.tileResolution.height),
+        },
+      ]);
+    });
   }
 
   #handleUpdate({ bounds, bitmap }: D2WorkerEvent<"update">["payload"]) {

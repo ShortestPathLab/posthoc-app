@@ -2,7 +2,7 @@ import { ButtonProps, Typography as Type, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";
-import { find, map, startCase } from "lodash";
+import { find, map, startCase, truncate } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactElement, ReactNode, cloneElement } from "react";
 import { AccentColor, getShade } from "theme";
@@ -19,6 +19,7 @@ export type Props = {
   disabled?: boolean;
   ButtonProps?: ButtonProps;
   itemOrientation?: "vertical" | "horizontal";
+  ellipsis?: number;
 };
 
 export function FeaturePicker({
@@ -32,6 +33,7 @@ export function FeaturePicker({
   ButtonProps,
   showTooltip,
   itemOrientation = "horizontal",
+  ellipsis = Infinity,
 }: Props) {
   const { palette } = useTheme();
 
@@ -56,7 +58,7 @@ export function FeaturePicker({
           icon={selected?.icon ? getIcon(selected.icon, selected.color) : icon}
           showArrow={showArrow}
         >
-          {selected?.name ?? label}
+          {truncate(selected?.name ?? label, { length: ellipsis })}
         </FeaturePickerButton>
       )}
       items={map(items, ({ id, name, description, hidden, icon, color }) => ({

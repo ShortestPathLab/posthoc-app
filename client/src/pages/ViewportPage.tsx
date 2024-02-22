@@ -136,6 +136,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
               name: inferLayerName(c),
             }))}
             showArrow
+            ellipsis={12}
           />
           {divider}
           <FeaturePickerButton

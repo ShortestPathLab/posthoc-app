@@ -4,8 +4,9 @@ import {
 } from "@mui/icons-material";
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
+import { usePlaybackState } from "hooks/usePlaybackState";
 import { RenderLayer } from "layers/RenderLayer";
-import { find, map, round } from "lodash";
+import { clamp, find, map, max } from "lodash";
 import { nanoid } from "nanoid";
 import { Size } from "protocol";
 import {
@@ -24,12 +25,21 @@ import { useScreenshots } from "slices/screenshots";
 import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
 
+const PLAYBACK_RESOLUTION_SCALE = 0.25;
+
+const TILE_RESOLUTION = 128;
+
+const tileSize = (playing: boolean = false) =>
+  (playing ? PLAYBACK_RESOLUTION_SCALE : 1) *
+  TILE_RESOLUTION *
+  devicePixelRatio;
+
 const rendererOptions = {
-  tileSubdivision: 1,
-  workerCount: 8,
+  tileSubdivision: 2,
+  workerCount: clamp(navigator.hardwareConcurrency - 1, 1, 12),
   tileResolution: {
-    width: round(256 * devicePixelRatio),
-    height: round(256 * devicePixelRatio),
+    width: tileSize(),
+    height: tileSize(),
   },
 };
 
@@ -113,6 +123,7 @@ export function TraceRenderer({
 }: RendererProps) {
   const key = useMemo(nanoid, []);
   const { instance, error, ref } = useRenderer(renderer, { width, height });
+  const { playing } = usePlaybackState();
 
   const [, setScreenshots] = useScreenshots();
 
@@ -143,6 +154,17 @@ export function TraceRenderer({
     }));
     return () => setScreenshots(() => ({ [key]: undefined }));
   }, [key, instance]);
+
+  useEffect(() => {
+    if (instance) {
+      instance.setOptions({
+        tileResolution: {
+          width: tileSize(playing),
+          height: tileSize(playing),
+        },
+      } as any);
+    }
+  }, [instance, playing]);
 
   return (
     <>

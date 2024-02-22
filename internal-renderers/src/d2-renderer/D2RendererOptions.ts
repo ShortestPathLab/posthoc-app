@@ -48,7 +48,7 @@ export const defaultD2RendererOptions: D2RendererOptions = {
   dynamicResolution: {
     intervalMs: 5000,
     increment: 0.25,
-    maxScale: 2,
+    maxScale: 1.5,
     minScale: 1,
     dtMax: 1.5,
     dtMin: 1.1,
