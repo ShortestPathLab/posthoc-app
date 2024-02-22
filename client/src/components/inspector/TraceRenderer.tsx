@@ -6,7 +6,7 @@ import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { RenderLayer } from "layers/RenderLayer";
-import { clamp, find, map, max } from "lodash";
+import { clamp, find, map } from "lodash";
 import { nanoid } from "nanoid";
 import { Size } from "protocol";
 import {
@@ -25,14 +25,10 @@ import { useScreenshots } from "slices/screenshots";
 import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
 
-const PLAYBACK_RESOLUTION_SCALE = 0.25;
-
 const TILE_RESOLUTION = 128;
 
 const tileSize = (playing: boolean = false) =>
-  (playing ? PLAYBACK_RESOLUTION_SCALE : 1) *
-  TILE_RESOLUTION *
-  devicePixelRatio;
+  (playing ? 1 : devicePixelRatio) * TILE_RESOLUTION;
 
 const rendererOptions = {
   tileSubdivision: 2,
