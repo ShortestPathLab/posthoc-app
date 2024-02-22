@@ -5,7 +5,7 @@ import {
 } from "@mui/icons-material";
 import { Box, Divider, Typography, useTheme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Playback } from "components/app-bar/Playback";
+import { Playback, PlaybackLayerData } from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
 import {
   LazyList as List,

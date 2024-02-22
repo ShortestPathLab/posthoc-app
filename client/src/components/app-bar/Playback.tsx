@@ -62,11 +62,7 @@ export function PlaybackService({
   return <>{children}</>;
 }
 
-export function Playback({
-  layer,
-}: {
-  layer?: Layer<{ trace?: UploadedTrace }>;
-}) {
+export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
   const {
     playing,
     canPause,
