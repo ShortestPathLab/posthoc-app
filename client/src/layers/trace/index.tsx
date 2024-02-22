@@ -241,9 +241,7 @@ export const controller = {
       </>
     );
   },
-  steps: ({ layer, children }) => {
-    return <>{children?.(layer?.source?.parsedTrace?.content?.events ?? [])}</>;
-  },
+  steps: (layer) => layer?.source?.parsedTrace?.content?.events ?? [],
   getSelectionInfo: ({ layer: key, event, children }) => {
     const { layer, setLayer } = useLayer(key);
     const menu = useMemo(() => {

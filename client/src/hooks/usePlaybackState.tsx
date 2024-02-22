@@ -2,7 +2,7 @@ import { PlaybackLayerData } from "components/app-bar/Playback";
 import { useSnackbar } from "components/generic/Snackbar";
 import { clamp, min, range, set, trimEnd } from "lodash";
 import { produce } from "produce";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useLayer } from "slices/layers";
 import { useBreakpoints } from "./useBreakpoints";
 
@@ -18,9 +18,13 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
 }
 
 export function usePlaybackState(key?: string) {
-  const { layer, setLayer } = useLayer<PlaybackLayerData>(key);
+  const { layer, setLayer, setKey } = useLayer<PlaybackLayerData>(key);
   const notify = useSnackbar();
   const shouldBreak = useBreakpoints(key);
+
+  useEffect(() => {
+    if (key) setKey(key);
+  }, [key]);
 
   const { playback, playbackTo, step: _step = 0 } = layer?.source ?? {};
 

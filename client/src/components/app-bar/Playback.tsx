@@ -9,7 +9,7 @@ import {
 import { EditorSetterProps } from "components/Editor";
 import { IconButtonWithTooltip as Button } from "components/generic/IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
-import { noop } from "lodash";
+import { ceil, noop } from "lodash";
 import { useEffect } from "react";
 import { UploadedTrace } from "slices/UIState";
 import { Layer } from "slices/layers";
@@ -20,6 +20,8 @@ export type PlaybackLayerData = {
   playback?: "playing" | "paused";
   playbackTo?: number;
 };
+
+const FRAME_TIME_MS = 1000 / 60;
 
 export function PlaybackService({
   children,
@@ -32,17 +34,27 @@ export function PlaybackService({
 
   useEffect(() => {
     if (playing) {
+      let cancelled = false;
       let cancel = noop;
-      const r = setInterval(() => {
-        if (step < end) {
-          cancel = stepWithBreakpointCheck(playbackRate);
-        } else {
-          pause();
+      let prev = Date.now();
+      const f = () => {
+        if (!cancelled) {
+          const now = Date.now();
+          const elapsed = ceil((playbackRate * (now - prev)) / FRAME_TIME_MS);
+          if (step < end) {
+            cancel = stepWithBreakpointCheck(elapsed);
+            prev = now;
+          } else {
+            cancelled = true;
+            pause();
+          }
+          requestAnimationFrame(f);
         }
-      }, 1000 / 60);
+      };
+      requestAnimationFrame(f);
       return () => {
         cancel();
-        clearInterval(r);
+        cancelled = true;
       };
     }
   }, [stepWithBreakpointCheck, playing, end, step, pause, playbackRate]);
@@ -102,18 +114,18 @@ export function Playback({
         disabled={!canStepForward}
       />
       <Button
+        label="stop"
+        icon={<StopIcon />}
+        onClick={stop}
+        disabled={!canStop}
+      />
+      <Button
         label="step-to-next-breakpoint"
         icon={<SkipIcon />}
         onClick={() => {
           stepWithBreakpointCheck(end - step, 1);
         }}
         disabled={!canStepForward}
-      />
-      <Button
-        label="stop"
-        icon={<StopIcon />}
-        onClick={stop}
-        disabled={!canStop}
       />
     </>
   );

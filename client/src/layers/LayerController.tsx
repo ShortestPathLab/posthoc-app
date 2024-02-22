@@ -17,9 +17,6 @@ export type LayerController<K extends string, T> = {
   renderer: FC<{ layer?: Layer<T>; index?: number }>;
   service?: FC<EditorSetterProps<Layer<T>>>;
   inferName: (layer: Layer<T>) => string;
-  steps: FC<{
-    layer?: Layer<T>;
-    children?: (steps: TraceEvent[]) => ReactNode;
-  }>;
+  steps?: (layer?: Layer<T>) => TraceEvent[];
   getSelectionInfo?: SelectionInfoProvider;
 };

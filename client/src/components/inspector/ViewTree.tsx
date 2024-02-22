@@ -2,7 +2,7 @@ import Split, { SplitDirection } from "@devbookhq/splitter";
 import { DragIndicatorOutlined } from "@mui/icons-material";
 import { Box, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
-import { filter, find, flatMap, forEach, map, sumBy } from "lodash";
+import { filter, find, flatMap, forEach, map, pick, sumBy } from "lodash";
 import { nanoid } from "nanoid";
 import { produce, produce2 } from "produce";
 import { Context, ReactNode, createContext, useContext, useMemo } from "react";
@@ -37,7 +37,9 @@ type ViewTreeContextType<T = any> = {
 const ViewTreeContext = createContext<ViewTreeContextType>({});
 
 export function useViewTreeContext<T = any>() {
-  return useContext(ViewTreeContext as Context<ViewTreeContextType<T>>);
+  return useContext(
+    ViewTreeContext as Context<ViewTreeContextType<T & { type: string }>>
+  );
 }
 
 type ViewTreeProps<T> = {
@@ -60,10 +62,10 @@ function handleSwap<T>(root: Root<T>, a: string, b: string) {
   const leafA = findInTree(root, (c) => c.key === a);
   const leafB = findInTree(root, (c) => c.key === b);
   if (leafA?.type === "leaf" && leafB?.type === "leaf") {
-    const leafAContent = leafA.content;
-    const leafBContent = leafB.content;
-    leafA.content = leafBContent;
-    leafB.content = leafAContent;
+    const deltaA = pick(leafA, "content", "key");
+    const deltaB = pick(leafB, "content", "key");
+    Object.assign(leafA, deltaB);
+    Object.assign(leafB, deltaA);
   }
   return root;
 }
