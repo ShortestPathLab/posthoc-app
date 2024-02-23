@@ -1,6 +1,6 @@
 import { FileOpenOutlined } from "@mui/icons-material";
 import { useSnackbar } from "components/generic/Snackbar";
-import { find } from "lodash";
+import { find, get } from "lodash";
 import { Map, UploadedTrace } from "slices/UIState";
 import { LARGE_FILE_B, formatByte, useBusyState } from "slices/busy";
 import { useConnections } from "slices/connections";
@@ -94,19 +94,25 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
                 if (f)
                   usingLoadingState(async () => {
                     notify("Opening trace...");
-                    const output =
-                      f.file.size > LARGE_FILE_B
-                        ? await usingBusyState(
-                            f.read,
-                            `Opening trace (${formatByte(f.file.size)})`
-                          )
-                        : await f.read();
-                    if (output) {
-                      onChange?.(output);
+                    try {
+                      const output =
+                        f.file.size > LARGE_FILE_B
+                          ? await usingBusyState(
+                              f.read,
+                              `Opening trace (${formatByte(f.file.size)})`
+                            )
+                          : await f.read();
+                      if (output) {
+                        onChange?.(output);
+                      }
+                    } catch (e) {
+                      console.error(e);
+                      notify(`Error opening, ${get(e, "message")}`);
                     }
                   });
               } catch (e) {
-                notify(`${e}`);
+                console.error(e);
+                notify(`Error opening, ${get(e, "message")}`);
               }
             }
             break;

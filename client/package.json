@@ -9,6 +9,7 @@
     "@mui/lab": "^5.0.0-alpha.146",
     "@mui/material": "^5.15.10",
     "capture-console-logs": "^2.0.1-rc.1",
+    "caught-object-report-json": "^7.1.7",
     "color-interpolate": "^1.0.5",
     "css-element-queries": "^1.2.3",
     "downloadjs": "^1.4.7",

@@ -1,14 +1,14 @@
 import { useSnackbar } from "components/generic/Snackbar";
+import { get } from "lodash";
 import pluralize from "pluralize";
 import { useCallback } from "react";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
+import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
 } from "./parseTraceSlave.worker";
-import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
-import { dump } from "js-yaml";
 
 export class ParseTraceWorker extends Worker {
   constructor() {
@@ -38,7 +38,7 @@ export function useTraceParser(params: ParseTraceWorkerParameters) {
             return { components: output, content: params.trace };
           } catch (e) {
             console.error(e);
-            push("Error parsing", `${dump(e)}`);
+            push("Error parsing", get(e, "message"));
           }
         }
       }),
