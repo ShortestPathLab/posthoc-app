@@ -1,4 +1,4 @@
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 import { MapPicker } from "components/app-bar/Input";
 import { Heading, Option } from "components/layer-editor/Option";
 import { getParser } from "components/renderer";
@@ -15,11 +15,12 @@ import { withProduce } from "produce";
 import { useMemo } from "react";
 import { Map } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
+import { usePaper } from "theme";
 
 export type MapLayerData = {
   map?: Map;
   options?: Record<string, any>;
-  parsedMap?: ParsedMap;
+  parsedMap?: ParsedMap & { error?: string };
 };
 
 export type MapLayer = Layer<MapLayerData>;
@@ -30,7 +31,9 @@ export const controller = {
     layer?.source?.map
       ? `${layer.source.map.name} (${startCase(layer.source.map.format)})`
       : "Untitled Map",
+  error: (layer) => layer?.source?.parsedMap?.error,
   editor: withProduce(({ value, produce }) => {
+    const paper = usePaper();
     const { result: Editor } = useMapOptions(value?.source?.map);
     return (
       <>
@@ -43,6 +46,22 @@ export const controller = {
             />
           }
         />
+        {value?.source?.parsedMap?.error && (
+          <Typography
+            variant="body2"
+            color={(t) => t.palette.error.main}
+            sx={{
+              whiteSpace: "pre-line",
+              mb: 1,
+              mt: 1,
+              ...paper(1),
+              p: 1,
+              borderRadius: 1,
+            }}
+          >
+            <code>{value?.source?.parsedMap?.error}</code>
+          </Typography>
+        )}
         {!!value?.source?.map && (
           <>
             <Heading label="Map Options" />

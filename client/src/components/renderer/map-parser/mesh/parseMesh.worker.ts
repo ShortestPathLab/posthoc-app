@@ -39,9 +39,9 @@ function parseMesh({
 
   const [, , counts, ...rest] = lines.filter(identity);
 
-  const [vertexCount] = counts.split(" ").map(parseInt);
+  const [vertexCount] = counts.split(/\s+/).map(parseInt);
 
-  const lines2 = rest.map((line) => line.split(" ").map(parseFloat));
+  const lines2 = rest.map((line) => line.split(/\s+/).map(parseFloat));
 
   // 1-indexed vertices
   const vertices = lines2.slice(0, vertexCount);

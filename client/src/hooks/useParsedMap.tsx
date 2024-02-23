@@ -33,6 +33,7 @@ export function useParsedMap(map?: Map, options?: Record<string, any>) {
           } catch (e) {
             console.error(e);
             notify("Error parsing", get(e, "message"));
+            return { error: get(e, "message") };
           }
         }
       }),
