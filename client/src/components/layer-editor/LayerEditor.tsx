@@ -1,9 +1,11 @@
 import { EditOutlined } from "@mui/icons-material";
 import {
   Box,
+  Chip,
   IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography as Type,
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
@@ -13,7 +15,9 @@ import {
   AppBarTitle as Title,
 } from "components/generic/Modal";
 import { Space } from "components/generic/Space";
-import { debounce, keys, set, startCase } from "lodash";
+import { inferLayerName } from "layers/inferLayerName";
+import { getLayerHandler, layerHandlers } from "layers/layerHandlers";
+import { debounce, keys, set, startCase, truncate } from "lodash";
 import { produce } from "produce";
 import {
   ForwardedRef,
@@ -25,8 +29,7 @@ import {
   useState,
 } from "react";
 import { Layer } from "slices/layers";
-import { layerHandlers } from "layers/layerHandlers";
-import { inferLayerName } from "layers/inferLayerName";
+import { usePaper } from "theme";
 
 const compositeOperations = [
   "color",
@@ -86,6 +89,7 @@ function Component(
   { value, onValueChange: onChange }: LayerEditorProps,
   _ref: ForwardedRef<HTMLElement>
 ) {
+  const paper = usePaper();
   const [draft, setDraft] = useDraft(value, onChange);
 
   const renderHeading = (label: ReactNode) => (
@@ -117,6 +121,8 @@ function Component(
 
   const name = draft.name || inferLayerName(value);
 
+  const error = getLayerHandler(value)?.error?.(value);
+
   return (
     <>
       <Stack alignItems="center" direction="row" gap={2}>
@@ -139,86 +145,102 @@ function Component(
             {startCase(draft.source?.type)}
           </Type>
         </Box>
-        <Stack alignItems="center" direction="row">
-          <Dialog
-            appBar={{ children: <Title>Edit Layer</Title> }}
-            trigger={(onClick) => (
+
+        <Dialog
+          appBar={{ children: <Title>Edit Layer</Title> }}
+          trigger={(onClick) => (
+            <Stack alignItems="center" direction="row">
+              {!!error && (
+                <Tooltip title={error}>
+                  <Chip
+                    onClick={onClick}
+                    sx={{
+                      mr: 1,
+                      ...paper(1),
+                      color: (t) => t.palette.error.main,
+                      flex: 1,
+                    }}
+                    label={`${truncate(`${error}`, { length: 8 })}`}
+                    size="small"
+                  />
+                </Tooltip>
+              )}
               <IconButton size="small" onClick={onClick}>
                 <EditOutlined />
               </IconButton>
-            )}
-          >
-            <Box p={2}>
-              <Box pb={2}>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label="Layer Name"
-                  defaultValue={draft.name ?? ""}
-                  onChange={(e) =>
-                    setDraft?.(
-                      produce(draft, (d) => set(d, "name", e.target.value))
-                    )
-                  }
-                />
-              </Box>
-
-              {renderHeading("Layer Options")}
-              {renderOption(
-                "Transparency",
-                <FeaturePicker
-                  label="Transparency"
-                  items={["0", "25", "50", "75"].map((c) => ({
-                    id: c,
-                    name: `${c}%`,
-                  }))}
-                  value={draft.transparency ?? "0"}
-                  showArrow
-                  onChange={(e) =>
-                    setDraft?.(produce(draft, (d) => set(d, "transparency", e)))
-                  }
-                />
-              )}
-              {renderOption(
-                "Display Mode",
-                <FeaturePicker
-                  label="Display Mode"
-                  value={draft.displayMode ?? "source-over"}
-                  items={options(compositeOperations)}
-                  showArrow
-                  onChange={(e) =>
-                    setDraft?.(produce(draft, (d) => set(d, "displayMode", e)))
-                  }
-                />
-              )}
-              {renderHeading("Source Options")}
-              {renderOption(
-                "Type",
-                <FeaturePicker
-                  label="Type"
-                  value={draft.source?.type}
-                  items={keys(layerHandlers).map((s) => ({
-                    id: s,
-                    name: startCase(s),
-                  }))}
-                  onChange={(v) =>
-                    setDraft?.(
-                      produce(draft, (d) => {
-                        set(d, "source", { type: v });
-                      })
-                    )
-                  }
-                  showArrow
-                />
-              )}
-              {draft.source?.type &&
-                createElement(layerHandlers[draft.source.type].editor, {
-                  onChange: (e) => setDraft(e(draft)),
-                  value: draft,
-                })}
+            </Stack>
+          )}
+        >
+          <Box p={2}>
+            <Box pb={2}>
+              <TextField
+                fullWidth
+                variant="filled"
+                label="Layer Name"
+                defaultValue={draft.name ?? ""}
+                onChange={(e) =>
+                  setDraft?.(
+                    produce(draft, (d) => set(d, "name", e.target.value))
+                  )
+                }
+              />
             </Box>
-          </Dialog>
-        </Stack>
+
+            {renderHeading("Layer Options")}
+            {renderOption(
+              "Transparency",
+              <FeaturePicker
+                label="Transparency"
+                items={["0", "25", "50", "75"].map((c) => ({
+                  id: c,
+                  name: `${c}%`,
+                }))}
+                value={draft.transparency ?? "0"}
+                showArrow
+                onChange={(e) =>
+                  setDraft?.(produce(draft, (d) => set(d, "transparency", e)))
+                }
+              />
+            )}
+            {renderOption(
+              "Display Mode",
+              <FeaturePicker
+                label="Display Mode"
+                value={draft.displayMode ?? "source-over"}
+                items={options(compositeOperations)}
+                showArrow
+                onChange={(e) =>
+                  setDraft?.(produce(draft, (d) => set(d, "displayMode", e)))
+                }
+              />
+            )}
+            {renderHeading("Source Options")}
+            {renderOption(
+              "Type",
+              <FeaturePicker
+                label="Type"
+                value={draft.source?.type}
+                items={keys(layerHandlers).map((s) => ({
+                  id: s,
+                  name: startCase(s),
+                }))}
+                onChange={(v) =>
+                  setDraft?.(
+                    produce(draft, (d) => {
+                      set(d, "source", { type: v });
+                    })
+                  )
+                }
+                showArrow
+              />
+            )}
+            {draft.source?.type &&
+              createElement(layerHandlers[draft.source.type].editor, {
+                onChange: (e) => setDraft(e(draft)),
+                value: draft,
+              })}
+          </Box>
+        </Dialog>
       </Stack>
     </>
   );

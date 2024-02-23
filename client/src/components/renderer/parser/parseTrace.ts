@@ -39,6 +39,7 @@ export function useTraceParser(params: ParseTraceWorkerParameters) {
           } catch (e) {
             console.error(e);
             push("Error parsing", get(e, "message"));
+            return { error: get(e, "message") };
           }
         }
       }),

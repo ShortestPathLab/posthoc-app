@@ -1,6 +1,5 @@
 import { ArrowOutwardRounded } from "@mui/icons-material";
-import { Box, useTheme } from "@mui/material";
-import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { Box, Typography, useTheme } from "@mui/material";
 import { TracePicker } from "components/app-bar/Input";
 import {
   PlaybackLayerData,
@@ -40,6 +39,7 @@ import { useEffect, useMemo } from "react";
 import { useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
+import { usePaper } from "theme";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
@@ -98,10 +98,11 @@ function makePathIndex(trace: Trace) {
 }
 
 export type TraceLayerData = {
-  trace?: UploadedTrace;
+  trace?: UploadedTrace & { error?: string };
   parsedTrace?: {
     components: ParseTraceWorkerReturnType;
     content: Trace;
+    error?: string;
   };
   onion?: "off" | "transparent" | "solid";
 } & PlaybackLayerData &
@@ -112,7 +113,10 @@ export type TraceLayer = Layer<TraceLayerData>;
 export const controller = {
   key: "trace",
   inferName: (layer) => layer.source?.trace?.name ?? "Untitled Trace",
+  error: (layer) =>
+    layer?.source?.trace?.error || layer?.source?.parsedTrace?.error,
   editor: withProduce(({ value, produce }) => {
+    const paper = usePaper();
     return (
       <>
         <Option
@@ -126,21 +130,38 @@ export const controller = {
             />
           }
         />
-        <Option
-          label="Onion Skinning"
-          content={
-            <FeaturePicker
-              disabled
-              showArrow
-              value={value?.source?.onion ?? "off"}
-              items={["off", "transparent", "solid"].map((c) => ({
-                id: c,
-                name: startCase(c),
-              }))}
-              onChange={(v) => produce((d) => set(d, "source.onion", v))}
-            />
-          }
-        />
+        {value?.source?.trace?.error && (
+          <Typography
+            variant="body2"
+            color={(t) => t.palette.error.main}
+            sx={{
+              whiteSpace: "pre-line",
+              mb: 1,
+              mt: 1,
+              ...paper(1),
+              p: 1,
+              borderRadius: 1,
+            }}
+          >
+            <code>{value?.source?.trace?.error}</code>
+          </Typography>
+        )}
+        {value?.source?.parsedTrace?.error && (
+          <Typography
+            variant="body2"
+            color={(t) => t.palette.error.main}
+            sx={{
+              whiteSpace: "pre-line",
+              mb: 1,
+              mt: 1,
+              ...paper(1),
+              p: 1,
+              borderRadius: 1,
+            }}
+          >
+            <code>{value?.source?.parsedTrace?.error}</code>
+          </Typography>
+        )}
         <Heading label="Preview" />
         <Box sx={{ height: 240, mx: -2, mb: -2 }}>
           <TracePreview trace={value?.source?.parsedTrace?.content} />

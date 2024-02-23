@@ -1,6 +1,6 @@
 import { FileOpenOutlined } from "@mui/icons-material";
 import { useSnackbar } from "components/generic/Snackbar";
-import { find, get } from "lodash";
+import { find, get, startCase } from "lodash";
 import { Map, UploadedTrace } from "slices/UIState";
 import { LARGE_FILE_B, formatByte, useBusyState } from "slices/busy";
 import { useConnections } from "slices/connections";
@@ -9,6 +9,9 @@ import { useLoadingState } from "slices/loading";
 import { EditorProps } from "../Editor";
 import { FeaturePicker } from "./FeaturePicker";
 import { custom, uploadMap, uploadTrace } from "./upload";
+function name(s: string) {
+  return s.split(".").shift();
+}
 
 export const mapDefaults = { start: undefined, end: undefined };
 
@@ -65,7 +68,10 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
   );
 }
 
-export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
+export function TracePicker({
+  onChange,
+  value,
+}: EditorProps<UploadedTrace & { error?: string }>) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("specimen");
   const usingBusyState = useBusyState("specimen");
@@ -108,11 +114,21 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace>) {
                     } catch (e) {
                       console.error(e);
                       notify(`Error opening, ${get(e, "message")}`);
+                      onChange?.({
+                        id: custom().id,
+                        error: get(e, "message"),
+                        name: startCase(name(f.file.name)),
+                      });
                     }
                   });
               } catch (e) {
                 console.error(e);
                 notify(`Error opening, ${get(e, "message")}`);
+                onChange?.({
+                  id: custom().id,
+                  error: get(e, "message"),
+                  name: "File",
+                });
               }
             }
             break;

@@ -19,4 +19,5 @@ export type LayerController<K extends string, T> = {
   inferName: (layer: Layer<T>) => string;
   steps?: (layer?: Layer<T>) => TraceEvent[];
   getSelectionInfo?: SelectionInfoProvider;
+  error?: (layer?: Layer<T>) => string | boolean | undefined;
 };
