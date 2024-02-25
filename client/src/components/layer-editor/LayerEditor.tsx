@@ -223,7 +223,7 @@ function Component(
                     onChange={(_, v) =>
                       setDraft?.(
                         produce(draft, (d) => {
-                          set(d, "source", { type: v });
+                          set(d, "source.type", v);
                         })
                       )
                     }

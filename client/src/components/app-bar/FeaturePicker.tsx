@@ -62,7 +62,9 @@ export function FeaturePicker({
           icon={selected?.icon ? getIcon(selected.icon, selected.color) : icon}
           arrow={arrow}
         >
-          {truncate(selected?.name ?? label, { length: ellipsis })}
+          {truncate(selected?.name ?? label, {
+            length: ellipsis,
+          })}
         </FeaturePickerButton>
       )}
       items={map(items, ({ id, name, description, hidden, icon, color }) => ({
