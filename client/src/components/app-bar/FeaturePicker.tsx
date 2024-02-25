@@ -5,7 +5,7 @@ import { Space } from "components/generic/Space";
 import { find, map, startCase, truncate } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactElement, ReactNode, cloneElement } from "react";
-import { AccentColor, getShade } from "theme";
+import { AccentColor, getShade, usePaper } from "theme";
 import { FeaturePickerButton } from "./FeaturePickerButton";
 
 export type Props = {
@@ -15,11 +15,12 @@ export type Props = {
   onChange?: (key: string) => void;
   items?: (FeatureDescriptor & { icon?: ReactNode; color?: AccentColor })[];
   icon?: ReactNode;
-  showArrow?: boolean;
+  arrow?: boolean;
   disabled?: boolean;
   ButtonProps?: ButtonProps;
   itemOrientation?: "vertical" | "horizontal";
   ellipsis?: number;
+  paper?: boolean;
 };
 
 export function FeaturePicker({
@@ -28,13 +29,15 @@ export function FeaturePicker({
   onChange,
   items,
   icon,
-  showArrow,
+  arrow,
   disabled,
   ButtonProps,
   showTooltip,
   itemOrientation = "horizontal",
   ellipsis = Infinity,
+  paper: _paper,
 }: Props) {
+  const paper = usePaper();
   const { palette } = useTheme();
 
   const getIcon = (icon: ReactNode, color?: AccentColor) =>
@@ -54,9 +57,10 @@ export function FeaturePicker({
         <FeaturePickerButton
           {...props}
           {...ButtonProps}
+          sx={_paper ? { ...paper(1), m: 0.5, px: 1.25, py: 0.5 } : {}}
           disabled={!items?.length || disabled}
           icon={selected?.icon ? getIcon(selected.icon, selected.color) : icon}
-          showArrow={showArrow}
+          arrow={arrow}
         >
           {truncate(selected?.name ?? label, { length: ellipsis })}
         </FeaturePickerButton>

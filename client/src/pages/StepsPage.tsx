@@ -1,9 +1,17 @@
 import {
   FiberManualRecordOutlined,
   LayersOutlined as LayersIcon,
-  SortOutlined as StepsIcon,
+  SegmentOutlined,
 } from "@mui/icons-material";
-import { Box, Divider, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Stack,
+  SxProps,
+  Theme,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Playback, PlaybackLayerData } from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
@@ -21,19 +29,27 @@ import { inferLayerName } from "layers/inferLayerName";
 import { getLayerHandler } from "layers/layerHandlers";
 import {
   chain as _,
-  defer,
+  clamp,
   find,
   findIndex,
+  isUndefined,
   map,
   reduce,
   startCase,
-  throttle,
 } from "lodash";
 import { nanoid as id } from "nanoid";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
-import { usePaper } from "theme";
+import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
+
+function lerp(start: number, end: number, amount: number): number {
+  return start + clamp(amount, 0, 1) * (end - start);
+}
+
+const ITEM_HEIGHT = 80;
+
+const PADDING_TOP = 8;
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -86,7 +102,11 @@ function useStepsPageState(
 export function StepsPage({ template: Page }: PageContentProps) {
   const { spacing } = useTheme();
   const paper = usePaper();
+  const acrylic = useAcrylic();
   const ref = useRef<ListHandle | null>(null);
+  const [scrollerRef, setScrollerRef] = useState<HTMLElement | Window | null>(
+    null
+  );
 
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<StepsPageState>();
@@ -145,23 +165,34 @@ export function StepsPage({ template: Page }: PageContentProps) {
 
   const shouldBreak = useBreakpoints(key);
 
-  const snapTo = useCallback(
-    throttle((step: number) => {
-      if (stepToFilteredStep) {
-        ref?.current?.scrollToIndex?.({
-          index: stepToFilteredStep(step),
-          align: "start",
+  useEffect(() => {
+    if (stepToFilteredStep && scrollerRef && ref.current) {
+      const i = stepToFilteredStep(step!);
+      if (playing) {
+        let cancelled = false;
+        const f = (timestamp: DOMHighResTimeStamp) => {
+          if (!cancelled && "scrollTop" in scrollerRef && !isUndefined(step)) {
+            const { scrollTop } = scrollerRef;
+            const offset = i * ITEM_HEIGHT;
+            ref.current?.scrollTo({
+              top: lerp(scrollTop, offset, 0.0000001 * timestamp),
+            });
+            requestAnimationFrame(f);
+          }
+        };
+        requestAnimationFrame(f);
+        return () => {
+          cancelled = true;
+        };
+      } else {
+        ref.current.scrollToIndex({
+          index: i,
           behavior: "smooth",
-          offset: -pxToInt(spacing(6 + 2)),
+          offset: -pxToInt(spacing(6 + PADDING_TOP)),
         });
       }
-    }, 1000 / 30),
-    [ref, stepToFilteredStep]
-  );
-
-  useEffect(() => {
-    defer(() => snapTo(step));
-  }, [snapTo, step]);
+    }
+  }, [step, ref, scrollerRef, stepToFilteredStep, playing]);
 
   return (
     <Page onChange={onChange} stack={state}>
@@ -177,24 +208,29 @@ export function StepsPage({ template: Page }: PageContentProps) {
                 }}
                 items={steps}
                 listOptions={{
+                  scrollerRef: setScrollerRef,
                   ref,
-                  defaultItemHeight: 80,
+                  defaultItemHeight: ITEM_HEIGHT,
                   overscan: 0,
                 }}
                 renderItem={([event, eventIndex], i) =>
                   playing ? (
                     <Box
+                      key={i}
                       sx={{
-                        pt: i ? 0 : spacing(6),
+                        pt: i ? 0 : spacing(6 + PADDING_TOP),
                       }}
                     >
                       <Skeleton event={event} />
                     </Box>
                   ) : (
                     <Box
+                      key={i}
                       sx={{
-                        height: spacing(i ? 10 : 16),
-                        pt: i ? 0 : spacing(6),
+                        height:
+                          pxToInt(spacing(i ? 0 : 6 + PADDING_TOP)) +
+                          ITEM_HEIGHT,
+                        pt: i ? 0 : spacing(6 + PADDING_TOP),
                       }}
                     >
                       <EventInspector
@@ -212,14 +248,49 @@ export function StepsPage({ template: Page }: PageContentProps) {
               />
             ) : (
               <Placeholder
-                icon={<StepsIcon />}
-                label={`${inferLayerName(layer)} no steps`}
+                icon={<SegmentOutlined />}
+                label={`${inferLayerName(layer)}`}
               />
             )
           ) : (
-            <Placeholder icon={<StepsIcon />} label="Steps" />
+            <Placeholder icon={<SegmentOutlined />} label="Steps" />
           )}
         </Flex>
+        {!!steps?.length && (
+          <Stack
+            direction="row"
+            sx={
+              {
+                ...paper(1),
+                ...acrylic,
+                alignItems: "center",
+                position: "absolute",
+                top: (t) => t.spacing(6),
+                height: (t) => t.spacing(6),
+                borderRadius: 1,
+                px: 1,
+                m: 1,
+              } as SxProps<Theme>
+            }
+          >
+            <Playback layer={layer} />
+            {divider}
+            <Typography
+              component="div"
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                px: 1,
+                py: 0.25,
+                textAlign: "center",
+                ...paper(0),
+                borderRadius: 1,
+              }}
+            >
+              {step}
+            </Typography>
+          </Stack>
+        )}
       </Page.Content>
       <Page.Options>
         <FeaturePicker
@@ -232,26 +303,9 @@ export function StepsPage({ template: Page }: PageContentProps) {
             name: inferLayerName(l),
           }))}
           onChange={setKey}
-          showArrow
+          arrow
           ellipsis={12}
         />
-        {divider}
-        <Playback layer={layer} />
-        {divider}
-        <Typography
-          component="div"
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            px: 1,
-            py: 0.25,
-            textAlign: "center",
-            ...paper(0),
-            borderRadius: 1,
-          }}
-        >
-          {step}
-        </Typography>
         {divider}
         <FeaturePicker
           icon={
@@ -269,7 +323,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
             })),
           ]}
           onChange={setSelectedType}
-          showArrow
+          arrow
           ellipsis={12}
         />
       </Page.Options>

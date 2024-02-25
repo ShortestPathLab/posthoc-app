@@ -1,23 +1,33 @@
-import { EditOutlined } from "@mui/icons-material";
+import { TabContext, TabList } from "@mui/lab";
 import {
   Box,
+  ButtonBase,
   Chip,
-  IconButton,
+  Divider,
+  Popover,
   Stack,
+  Tab,
+  Tabs,
   TextField,
   Tooltip,
   Typography as Type,
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
-import {
-  ManagedModal as Dialog,
-  AppBarTitle as Title,
-} from "components/generic/Modal";
 import { Space } from "components/generic/Space";
 import { inferLayerName } from "layers/inferLayerName";
 import { getLayerHandler, layerHandlers } from "layers/layerHandlers";
-import { debounce, keys, set, startCase, truncate } from "lodash";
+import {
+  debounce,
+  first,
+  keys,
+  merge,
+  omit,
+  set,
+  startCase,
+  truncate,
+} from "lodash";
+import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { produce } from "produce";
 import {
   ForwardedRef,
@@ -29,7 +39,7 @@ import {
   useState,
 } from "react";
 import { Layer } from "slices/layers";
-import { usePaper } from "theme";
+import { useAcrylic, usePaper } from "theme";
 
 const compositeOperations = [
   "color",
@@ -68,10 +78,15 @@ type LayerEditorProps = {
 function useDraft<T>(
   initial: T,
   commit?: (value: T) => void,
-  ms: number = 600
+  ms: number = 300,
+  stayDraft: string[] = []
 ) {
   const [state, setState] = useState(initial);
-  useEffect(() => void setState(initial), [setState, initial]);
+  useEffect(() => {
+    if (initial) {
+      setState(merge(state, omit(initial, ...stayDraft)));
+    }
+  }, [setState, initial]);
   const handleChange = useMemo(
     () => debounce((v: T) => commit?.(v), ms),
     [commit, ms]
@@ -90,7 +105,11 @@ function Component(
   _ref: ForwardedRef<HTMLElement>
 ) {
   const paper = usePaper();
-  const [draft, setDraft] = useDraft(value, onChange);
+  const acrylic = useAcrylic();
+  const [draft, setDraft] = useDraft(value, onChange, 300, [
+    "name",
+    "source.type",
+  ]);
 
   const renderHeading = (label: ReactNode) => (
     <Type
@@ -125,123 +144,143 @@ function Component(
 
   return (
     <>
-      <Stack alignItems="center" direction="row" gap={2}>
-        <Box
-          sx={{
-            py: 1,
-            flex: 1,
-            width: 0,
-            ml: 0,
-            overflow: "hidden",
-            "> *": {
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-            },
-          }}
-        >
-          <Type>{name}</Type>
-          <Type variant="body2" color="text.secondary">
-            {startCase(draft.source?.type)}
-          </Type>
-        </Box>
-
-        <Dialog
-          appBar={{ children: <Title>Edit Layer</Title> }}
-          trigger={(onClick) => (
-            <Stack alignItems="center" direction="row">
-              {!!error && (
-                <Tooltip title={error}>
-                  <Chip
-                    onClick={onClick}
-                    sx={{
-                      mr: 1,
-                      ...paper(1),
-                      color: (t) => t.palette.error.main,
-                      flex: 1,
-                    }}
-                    label={`${truncate(`${error}`, { length: 8 })}`}
-                    size="small"
+      <PopupState variant="popover">
+        {(state) => (
+          <>
+            <ButtonBase
+              className={draft.key}
+              {...bindTrigger(state)}
+              sx={{
+                flex: 1,
+                display: "block",
+                textAlign: "left",
+                px: 2,
+              }}
+            >
+              <Stack alignItems="center" direction="row" gap={2}>
+                <Box
+                  sx={{
+                    py: 1.5,
+                    flex: 1,
+                    width: 0,
+                    ml: 0,
+                    overflow: "hidden",
+                    "> *": {
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                    },
+                  }}
+                >
+                  <Type>{name}</Type>
+                  <Type variant="body2" color="text.secondary">
+                    {startCase(value.source?.type)}
+                  </Type>
+                </Box>
+                {!!error && (
+                  <Tooltip title={error}>
+                    <Chip
+                      sx={{
+                        mr: -2,
+                        ...omit(paper(1), "borderRadius"),
+                        color: (t) => t.palette.error.main,
+                        flex: 0,
+                      }}
+                      label={`${truncate(`${error}`, { length: 8 })}`}
+                      size="small"
+                    />
+                  </Tooltip>
+                )}
+              </Stack>
+            </ButtonBase>
+            <Popover
+              {...bindPopover(state)}
+              slotProps={{
+                paper: { sx: acrylic },
+              }}
+              anchorOrigin={{ horizontal: -12, vertical: -12 }}
+            >
+              <Box p={2} width={360} sx={paper(1)}>
+                <Box pb={2}>
+                  <TextField
+                    autoComplete="off"
+                    autoFocus
+                    placeholder={inferLayerName(draft)}
+                    fullWidth
+                    variant="filled"
+                    label="Layer Name"
+                    defaultValue={draft.name ?? ""}
+                    onChange={(e) =>
+                      setDraft?.(
+                        produce(draft, (d) => set(d, "name", e.target.value))
+                      )
+                    }
                   />
-                </Tooltip>
-              )}
-              <IconButton size="small" onClick={onClick}>
-                <EditOutlined />
-              </IconButton>
-            </Stack>
-          )}
-        >
-          <Box p={2}>
-            <Box pb={2}>
-              <TextField
-                fullWidth
-                variant="filled"
-                label="Layer Name"
-                defaultValue={draft.name ?? ""}
-                onChange={(e) =>
-                  setDraft?.(
-                    produce(draft, (d) => set(d, "name", e.target.value))
-                  )
-                }
-              />
-            </Box>
+                </Box>
+                <Box sx={{ mx: -2, pb: 1 }}>
+                  <Tabs
+                    variant="fullWidth"
+                    onChange={(_, v) =>
+                      setDraft?.(
+                        produce(draft, (d) => {
+                          set(d, "source", { type: v });
+                        })
+                      )
+                    }
+                    value={
+                      draft.source?.type ?? first(keys(layerHandlers)) ?? ""
+                    }
+                  >
+                    {keys(layerHandlers).map((s) => (
+                      <Tab label={startCase(s)} value={s} key={s} />
+                    ))}
+                  </Tabs>
+                  <Divider sx={{ width: "100%" }} />
+                </Box>
 
-            {renderHeading("Layer Options")}
-            {renderOption(
-              "Transparency",
-              <FeaturePicker
-                label="Transparency"
-                items={["0", "25", "50", "75"].map((c) => ({
-                  id: c,
-                  name: `${c}%`,
-                }))}
-                value={draft.transparency ?? "0"}
-                showArrow
-                onChange={(e) =>
-                  setDraft?.(produce(draft, (d) => set(d, "transparency", e)))
-                }
-              />
-            )}
-            {renderOption(
-              "Display Mode",
-              <FeaturePicker
-                label="Display Mode"
-                value={draft.displayMode ?? "source-over"}
-                items={options(compositeOperations)}
-                showArrow
-                onChange={(e) =>
-                  setDraft?.(produce(draft, (d) => set(d, "displayMode", e)))
-                }
-              />
-            )}
-            {renderHeading("Source Options")}
-            {renderOption(
-              "Type",
-              <FeaturePicker
-                label="Type"
-                value={draft.source?.type}
-                items={keys(layerHandlers).map((s) => ({
-                  id: s,
-                  name: startCase(s),
-                }))}
-                onChange={(v) =>
-                  setDraft?.(
-                    produce(draft, (d) => {
-                      set(d, "source", { type: v });
-                    })
-                  )
-                }
-                showArrow
-              />
-            )}
-            {draft.source?.type &&
-              createElement(layerHandlers[draft.source.type].editor, {
-                onChange: (e) => setDraft(e(draft)),
-                value: draft,
-              })}
-          </Box>
-        </Dialog>
-      </Stack>
+                {renderHeading("Source Options")}
+                {draft.source?.type &&
+                  createElement(layerHandlers[draft.source.type].editor, {
+                    onChange: (e) => setDraft(e(draft)),
+                    value: draft,
+                  })}
+                {renderHeading("Layer Options")}
+                {renderOption(
+                  "Transparency",
+                  <FeaturePicker
+                    label="Transparency"
+                    items={["0", "25", "50", "75"].map((c) => ({
+                      id: c,
+                      name: `${c}%`,
+                    }))}
+                    value={draft.transparency ?? "0"}
+                    arrow
+                    onChange={(e) =>
+                      setDraft?.(
+                        produce(draft, (d) => set(d, "transparency", e))
+                      )
+                    }
+                  />
+                )}
+                {renderOption(
+                  "Display Mode",
+                  <FeaturePicker
+                    arrow
+                    label="Display Mode"
+                    value={draft.displayMode ?? "source-over"}
+                    items={options(compositeOperations)}
+                    onChange={(e) =>
+                      setDraft?.(
+                        produce(draft, (d) => set(d, "displayMode", e))
+                      )
+                    }
+                  />
+                )}
+              </Box>
+            </Popover>
+          </>
+        )}
+      </PopupState>
     </>
   );
 }

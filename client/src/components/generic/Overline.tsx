@@ -8,7 +8,6 @@ export function OverlineDot(props: ComponentProps<typeof Dot>) {
       {...props}
       sx={{
         fontSize: 12,
-        transform: "translateY(1.75px) translateX(-2px)",
         ...props.sx,
       }}
     />

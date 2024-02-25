@@ -1,12 +1,13 @@
 import { EditOutlined as EditIcon } from "@mui/icons-material";
 import {
   Box,
+  Chip,
   Switch,
   TextField,
   Tooltip,
   Typography as Type,
 } from "@mui/material";
-import { entries, find, join, startCase } from "lodash";
+import { entries, find, join, omit, startCase } from "lodash";
 import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
 import {
@@ -20,6 +21,7 @@ import { transports } from "services/RendererService";
 import { merge } from "slices/reducers";
 import { useRenderers } from "slices/renderers";
 import { Renderer } from "slices/settings";
+import { usePaper } from "theme";
 
 const statusColor = {
   connected: "success.light",
@@ -35,6 +37,7 @@ type RendererEditorProps = {
 
 export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
   const [renderers] = useRenderers();
+  const paper = usePaper();
 
   const current = find(renderers, { key: value.key });
 
@@ -46,9 +49,7 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
 
   return (
     <>
-      <Flex alignItems="center" py={0.5}>
-        <Dot sx={{ color: statusColor[status] }} />
-        <Space />
+      <Flex alignItems="center" py={1}>
         <Box flex={1}>
           <Type>
             {current
@@ -69,6 +70,15 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
             )}
           </Type>
         </Box>
+        <Chip
+          sx={{
+            mx: 1,
+            color: statusColor[status],
+            ...omit(paper(1), "borderRadius"),
+          }}
+          size="small"
+          label={startCase(status)}
+        />
         <Tooltip title={`${value.disabled ? "Enable" : "Disable"} Renderer`}>
           <Box>
             <Switch
@@ -82,6 +92,7 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
             <IconButton
               icon={<EditIcon />}
               label="Edit Renderer"
+              sx={{ mr: -3 }}
               {...{ onClick }}
             />
           )}

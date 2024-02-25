@@ -175,7 +175,7 @@ export function TreePage({ template: Page }: PageContentProps) {
             name: inferLayerName(l),
           }))}
           onChange={setKey}
-          showArrow
+          arrow
           ellipsis={12}
         />
         {divider}
@@ -188,7 +188,7 @@ export function TreePage({ template: Page }: PageContentProps) {
             id: k,
             ...v,
           }))}
-          showArrow
+          arrow
         />
         {divider}
         <FeaturePicker
@@ -200,7 +200,7 @@ export function TreePage({ template: Page }: PageContentProps) {
             id: key,
             name: startCase(value.value),
           }))}
-          showArrow
+          arrow
         />
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>

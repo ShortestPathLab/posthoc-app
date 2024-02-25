@@ -1,28 +1,30 @@
 import { EditOutlined as EditIcon } from "@mui/icons-material";
 import {
   Box,
+  Chip,
   Switch,
   TextField,
   Tooltip,
   Typography as Type,
   debounce,
 } from "@mui/material";
-import { entries, startCase } from "lodash";
 import { transports } from "client";
 import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
 import {
-  AppBarTitle as Title,
   ManagedModal as Dialog,
+  AppBarTitle as Title,
 } from "components/generic/Modal";
 import { OverlineDot as Dot } from "components/generic/Overline";
 import { SelectField as Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";
 import { useConnection } from "hooks/useConnectionResolver";
 import { useConnectionStatus } from "hooks/useConnectionStatus";
+import { entries, omit, startCase } from "lodash";
+import { useMemo } from "react";
 import { merge } from "slices/reducers";
 import { Remote } from "slices/settings";
-import { useMemo } from "react";
+import { usePaper } from "theme";
 
 const statusColor = {
   connected: "success.light",
@@ -38,6 +40,7 @@ type ServerEditorProps = {
 
 export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
   const connection = useConnection(value.url);
+  const paper = usePaper();
   const status = useConnectionStatus(value.url);
 
   const handleChange = useMemo(
@@ -51,8 +54,6 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
   return (
     <>
       <Flex alignItems="center" py={0.5}>
-        <Dot sx={{ color: statusColor[status] }} />
-        <Space />
         <Box flex={1}>
           <Type>
             {connection
@@ -63,6 +64,15 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
             {connection?.description ?? (value?.url || "No URL")}
           </Type>
         </Box>
+        <Chip
+          sx={{
+            mx: 1,
+            color: statusColor[status],
+            ...omit(paper(1), "borderRadius"),
+          }}
+          size="small"
+          label={startCase(status)}
+        />
         <Tooltip title={`${value.disabled ? "Enable" : "Disable"} Connection`}>
           <Box>
             <Switch
@@ -76,6 +86,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
             <IconButton
               icon={<EditIcon />}
               label="Edit Connection"
+              sx={{ mr: -3 }}
               {...{ onClick }}
             />
           )}

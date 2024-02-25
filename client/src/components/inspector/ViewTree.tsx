@@ -199,7 +199,7 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
   const dragCls = useCss({
     "div&": {
       background: palette.text.secondary,
-      opacity: 0,
+      opacity: 0.5,
       transition: transitions.create("opacity"),
       "&.Horizontal": { width: "3px" },
       "&.Vertical": { height: "3px" },
@@ -208,10 +208,14 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
 
   const gutterCls = useCss({
     "div&": {
+      transition: transitions.create(["box-shadow", "background"]),
       background:
         palette.mode === "dark" ? palette.background.default : palette.divider,
       boxShadow: `inset 0 0 0 1px ${palette.background.paper}`,
-      [`&:hover .${dragCls}`]: { opacity: 1 },
+      "&:hover": {
+        background: palette.primary.main,
+        boxShadow: "none",
+      },
       "&.Horizontal": {
         padding: 0,
         // marginLeft: "-1px",

@@ -54,9 +54,6 @@ export const controller = {
               whiteSpace: "pre-line",
               mb: 1,
               mt: 1,
-              ...paper(1),
-              p: 1,
-              borderRadius: 1,
             }}
           >
             <code>{value?.source?.parsedMap?.error}</code>

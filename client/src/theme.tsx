@@ -104,7 +104,7 @@ export function useAcrylic(): SxProps<Theme> {
   const [{ "appearance/acrylic": acrylic }] = useSettings();
   return acrylic
     ? {
-        backdropFilter: "blur(10px)",
+        backdropFilter: "blur(16px)",
         background: ({ palette }) => alpha(palette.background.paper, 0.75),
       }
     : {
@@ -115,6 +115,9 @@ export function useAcrylic(): SxProps<Theme> {
 
 export function usePaper(): (e?: number) => SxProps<Theme> {
   return (elevation: number = 1) => ({
+    borderRadius: 1,
+    transition: ({ transitions }) =>
+      transitions.create(["background-color", "box-shadow"]),
     boxShadow: ({ shadows, palette }) =>
       palette.mode === "dark"
         ? shadows[1]

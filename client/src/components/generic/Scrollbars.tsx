@@ -65,6 +65,11 @@ export const Scroll = forwardRef(
           },
         }}
         {...rest}
+        style={{
+          width: "100%",
+          height: "100%",
+          ...rest.style,
+        }}
         className={`${cls} ${rest.className}`}
         events={{ initialized: handleRef }}
       >

@@ -2,14 +2,17 @@ import {
   ListItemIcon,
   Menu,
   MenuItem,
+  SxProps,
   TextField,
   TextFieldProps,
+  Theme,
   Tooltip,
 } from "@mui/material";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { findIndex, map, max } from "lodash";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { ReactElement, ReactNode } from "react";
+import { useAcrylic, usePaper } from "theme";
 
 type Key = string | number;
 

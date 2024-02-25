@@ -44,7 +44,7 @@ export function FeaturePickerMulti({
           {...props}
           disabled={!items?.length}
           icon={icon}
-          showArrow={showArrow}
+          arrow={showArrow}
         >
           {truncate(buttonLabel, { length: ellipsis })}
         </FeaturePickerButton>

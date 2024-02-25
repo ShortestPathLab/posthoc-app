@@ -24,7 +24,9 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
   return (
     <FeaturePicker
       showTooltip
-      showArrow
+      arrow
+      paper
+      ellipsis={30}
       icon={<FileOpenOutlined />}
       label="Choose Map"
       value={value?.id}
@@ -80,7 +82,9 @@ export function TracePicker({
   return (
     <FeaturePicker
       showTooltip
-      showArrow
+      paper
+      arrow
+      ellipsis={30}
       icon={<FileOpenOutlined />}
       label="Choose Trace"
       value={value?.id}

@@ -5,9 +5,9 @@ import { Props } from "./FeaturePicker";
 export function FeaturePickerButton({
   children,
   icon,
-  showArrow,
+  arrow,
   ...props
-}: ButtonProps & Pick<Props, "icon" | "showArrow">) {
+}: ButtonProps & Pick<Props, "icon" | "arrow">) {
   return (
     <Button
       {...props}
@@ -17,7 +17,7 @@ export function FeaturePickerButton({
       }}
       startIcon={icon}
       endIcon={
-        showArrow && (
+        arrow && (
           <KeyboardArrowDownOutlined
             sx={{
               ml: -0.5,

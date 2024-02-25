@@ -8,18 +8,21 @@ import {
 import {
   Box,
   Button,
-  Card,
+  ButtonBase,
   Collapse,
   IconButton,
   InputBase,
   List,
   ListSubheader,
+  Stack,
   Switch,
+  SxProps,
+  Theme,
   Typography,
   alpha,
   useTheme,
 } from "@mui/material";
-import { filter, map, sortBy, uniqBy } from "lodash";
+import { defer, filter, map, sortBy, uniqBy } from "lodash";
 import { nanoid as id } from "nanoid";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -34,6 +37,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { useAcrylic, usePaper } from "theme";
+import { Flex } from "./Flex";
 
 export const DefaultListEditorInput = forwardRef(function StyledInputBase(
   props: ComponentProps<typeof InputBase>,
@@ -52,7 +57,7 @@ export const DefaultListEditorInput = forwardRef(function StyledInputBase(
 type Key = string | number;
 
 type Item<T = any> = {
-  element?: ReactElement;
+  editor?: ReactElement;
   enabled?: boolean;
   value?: T;
   id: Key;
@@ -82,6 +87,13 @@ type Props<T = any> = {
   placeholder?: ReactNode;
   cardStyle?: CSSProperties;
   autoFocus?: boolean;
+  renderEditor?: (parts: {
+    value: T;
+    onValueChange: (v: T) => void;
+    handle: ReactNode;
+    content: ReactNode;
+    extras: ReactNode;
+  }) => ReactNode;
 };
 
 type ListEditorFieldProps = {
@@ -96,6 +108,18 @@ function useInitialRender() {
   return !current;
 }
 
+const defaultEditorRenderer: Props["renderEditor"] = ({
+  handle,
+  content,
+  extras,
+}) => (
+  <>
+    {handle}
+    {content}
+    {extras}
+  </>
+);
+
 export function ListEditorField({
   icon = <LabelIcon />,
   toggleable: useSwitch,
@@ -105,111 +129,106 @@ export function ListEditorField({
   onDeleteItem = () => {},
   extras: getExtras,
   enabled = false,
-  element = <DefaultListEditorInput />,
+  editor = <DefaultListEditorInput />,
   value,
   id,
   i = 0,
-  variant = "default",
-  UNSAFE_extrasPlacement: extrasPlacement = "center",
   autoFocus,
-  cardStyle: style,
   sortable,
+  renderEditor = defaultEditorRenderer,
 }: Props & ListEditorFieldProps & Item) {
+  const acrylic = useAcrylic();
+  const paper = usePaper();
   const [field, setField] = useState<HTMLElement | null>(null);
-  const theme = useTheme();
-  const content = (handleProps?: ComponentProps<"div"> | null) => (
-    <Box display="flex" alignItems={extrasPlacement}>
-      {sortable && (
-        <div {...handleProps}>
-          <Box color="text.secondary" sx={{ pr: 2 }}>
-            <DragHandleOutlined />
-          </Box>
-        </div>
-      )}
-      {icon !== null &&
-        cloneElement(icon, {
-          style: {
-            marginRight: theme.spacing(1),
-            marginTop: theme.spacing(0.5),
-            marginBottom: theme.spacing(0.5),
-          },
-          color: "action",
-        })}
-      <Box
-        flexGrow={1}
-        sx={{
-          ml: icon === null ? 2 : 0,
-        }}
-      >
-        {cloneElement(element, {
-          onDelete: () => onDeleteItem(id ?? i),
-          autoFocus,
-          value,
-          key: id ?? i,
-          onValueChange: (e: any) => onChangeItem(id ?? i, e, enabled),
-          onChange: (e: any) => onChangeItem(id ?? i, e.target.value, enabled),
-          ref: (e: HTMLElement | null) => setField(e),
-        })}
-      </Box>
-      <Box display="flex" alignItems="center">
-        {useSwitch && (
-          <Switch
-            color="primary"
-            edge="end"
-            onChange={(_, v) => onChangeItem(id ?? i, value, v)}
-            checked={enabled}
-          />
-        )}
-        {useEditButton && (
-          <IconButton
-            edge="end"
-            onClick={() => {
-              if (field?.focus) {
-                field.focus();
-              }
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-        )}
-        {useDelete && (
-          <IconButton onClick={() => onDeleteItem(id ?? i)}>
-            <DeleteIcon />
-          </IconButton>
-        )}
-        {getExtras && getExtras(value)}
-      </Box>
-    </Box>
-  );
   return (
     <Draggable index={i} draggableId={`${id}`}>
-      {(provided) => (
+      {(provided, snapshot) => (
         <div ref={provided.innerRef} {...provided.draggableProps}>
-          <Box
+          <Stack
+            direction="row"
+            alignItems="center"
             sx={{
-              pb: 1,
-              ml: 2,
+              transition: (t) => t.transitions.create("background"),
+              "&:hover": {
+                background: (t) => t.palette.action.hover,
+              },
+              ...(snapshot.isDragging
+                ? ({
+                    ...paper(1),
+                    ...acrylic,
+                  } as SxProps<Theme>)
+                : undefined),
             }}
           >
-            {variant === "outlined" ? (
-              <Card
-                variant="outlined"
-                style={{
-                  borderColor: "transparent",
-                  paddingRight: theme.spacing(2),
-                  transition: theme.transitions.create([
-                    "box-shadow",
-                    "border-color",
-                  ]),
-                  ...style,
-                }}
-              >
-                {content(provided.dragHandleProps)}
-              </Card>
-            ) : (
-              content(provided.dragHandleProps)
-            )}
-          </Box>
+            {renderEditor?.({
+              value,
+              onValueChange: (e: any) => onChangeItem(id ?? i, e, enabled),
+              handle: sortable && (
+                <Flex
+                  {...provided.dragHandleProps}
+                  color="text.secondary"
+                  sx={{
+                    flex: 0,
+                    p: 2,
+                  }}
+                >
+                  <DragHandleOutlined />
+                </Flex>
+              ),
+              content: (
+                <ButtonBase
+                  sx={{
+                    flex: 1,
+                    display: "block",
+                    textAlign: "left",
+                    px: 2,
+                  }}
+                >
+                  {cloneElement(editor, {
+                    onDelete: () => onDeleteItem(id ?? i),
+                    autoFocus,
+                    value,
+                    key: id ?? i,
+                    onValueChange: (e: any) =>
+                      onChangeItem(id ?? i, e, enabled),
+                    onChange: (e: any) =>
+                      onChangeItem(id ?? i, e.target.value, enabled),
+                    ref: (e: HTMLElement | null) => setField(e),
+                  })}
+                </ButtonBase>
+              ),
+              extras: (
+                <Flex sx={{ flex: 0, px: 1 }}>
+                  {useSwitch && (
+                    <Switch
+                      color="primary"
+                      edge="end"
+                      onChange={(_, v) => onChangeItem(id ?? i, value, v)}
+                      checked={enabled}
+                    />
+                  )}
+                  {useEditButton && (
+                    <IconButton
+                      edge="end"
+                      onClick={() => {
+                        if (field?.focus) {
+                          field.focus();
+                        }
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  )}
+                  {useDelete && (
+                    <IconButton onClick={() => onDeleteItem(id ?? i)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
+                  {getExtras && getExtras(value)}
+                </Flex>
+              ),
+            })}
+          </Stack>
         </div>
       )}
     </Draggable>
@@ -240,6 +259,7 @@ export default function Editor<T>(props: Props<T>) {
     onChange,
     addItemExtras: extras,
   } = props;
+  const paper = usePaper();
   const isInitialRender = useInitialRender();
   const theme = useTheme();
   const [intermediateItems, setIntermediateItems] = useState(items);
@@ -260,7 +280,7 @@ export default function Editor<T>(props: Props<T>) {
   }[] = uniqBy([...intermediateItems, ...items], (c) => c.id)
     .map((c) => items.find((c2) => c.id === c2.id) ?? c)
     .map((x, i) => {
-      const { enabled, element, value, id } = x ?? {};
+      const { enabled, editor, value, id } = x ?? {};
       return {
         value,
         render: (p?: ComponentProps<typeof ListEditorField>) => (
@@ -277,7 +297,7 @@ export default function Editor<T>(props: Props<T>) {
                 setNewIndex(-1);
               }}
               enabled={enabled}
-              element={element}
+              editor={editor}
               value={value}
               id={id}
               i={i}
@@ -387,22 +407,17 @@ export default function Editor<T>(props: Props<T>) {
             </Typography>
           </Box>
         </Collapse>
-        <Box p={2} pt={1} mb={-3}>
+        <Box p={2} pt={2}>
           <Button
             disableElevation
             variant="outlined"
             startIcon={<Add />}
-            color="primary"
             onClick={() => {
               onAddItem();
               setNewIndex(items.length);
             }}
             sx={{
-              borderColor: (t) =>
-                alpha(
-                  t.palette.text.primary,
-                  t.palette.action.activatedOpacity
-                ),
+              ...paper(1),
             }}
           >
             <Box sx={{ color: "text.primary" }}>{addItemLabel}</Box>
@@ -427,6 +442,7 @@ export function ListEditor<T extends { key: string }>({
   value,
   editor,
   create,
+  onFocus,
   ...props
 }: Omit<Props<T>, "items" | "onChange"> & {
   items?: T[];
@@ -434,6 +450,7 @@ export function ListEditor<T extends { key: string }>({
   value?: T[];
   editor?: (item: T) => ReactElement;
   create?: () => Omit<T, "key">;
+  onFocus?: (key: string) => void;
 }) {
   const [state, setState] = useState(value ?? []);
   function handleChange(next: T[]) {
@@ -444,19 +461,21 @@ export function ListEditor<T extends { key: string }>({
     setState(value ?? []);
   }, [value]);
   return (
-    <Box sx={{ ml: -2 }}>
+    <Box>
       <Editor
         {...props}
         items={state.map((c) => ({
           id: c.key,
           value: c,
-          element: editor?.(c),
+          editor: editor?.(c),
         }))}
         deletable
         editable={false}
-        onAddItem={() =>
-          handleChange?.([...state, { key: id(), ...create?.() } as T])
-        }
+        onAddItem={() => {
+          const _id = id();
+          handleChange?.([...state, { key: _id, ...create?.() } as T]);
+          defer(() => onFocus?.(_id));
+        }}
         onDeleteItem={(k) => {
           return handleChange?.(filter(state, (b) => b.key !== k));
         }}

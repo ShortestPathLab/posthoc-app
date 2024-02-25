@@ -125,7 +125,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           id: c,
                           name: startCase(c),
                         }))}
-                        showArrow
+                        arrow
                         onChange={(v) =>
                           setSettings(() => ({
                             "appearance/accentColor": v as AccentColor,

@@ -10,7 +10,7 @@ export function getLayerHandler(layer?: Layer) {
 }
 
 export const layerHandlers: Dictionary<LayerController<string, any>> = {
-  map: mapController,
   trace: traceController,
+  map: mapController,
   query: queryController,
 };

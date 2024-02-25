@@ -50,6 +50,7 @@ export const controller = {
     const { algorithm } = value?.source ?? {};
     const {
       layers,
+      allLayers,
       layer: selectedLayer,
       key: mapLayerKey,
     } = useLayer(undefined, (c): c is MapLayer => c.source?.type === "map");
@@ -61,9 +62,10 @@ export const controller = {
           label="Algorithm"
           content={
             <FeaturePicker
-              showArrow
+              arrow
+              paper
               icon={<CodeOutlined />}
-              label="Choose Algorithm"
+              label="Algorithm"
               value={algorithm}
               items={algorithms.map((c) => ({
                 ...c,
@@ -84,12 +86,14 @@ export const controller = {
           label="Map"
           content={
             <FeaturePicker
-              showArrow
+              arrow
+              paper
               icon={<LayersOutlined />}
-              label="Choose Layer"
+              label="Layer"
               value={mapLayerKey}
-              items={layers.map((c) => ({
+              items={allLayers.map((c) => ({
                 id: c.key,
+                hidden: !find(layers, (d) => d.key === c.key),
                 name: inferLayerName(c),
               }))}
               onChange={async (v) =>
@@ -105,7 +109,7 @@ export const controller = {
           </Type>
         )}
         <Heading label="Preview" />
-        <Box sx={{ height: 240, mx: -2, mb: -2 }}>
+        <Box sx={{ height: 240, mx: -2 }}>
           <TracePreview trace={value?.source?.trace?.content} />
         </Box>
       </>

@@ -122,7 +122,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
                 description: renderer.meta.id,
               })),
             ]}
-            showArrow
+            arrow
           />
           {divider}
           <FeaturePickerMulti

@@ -1,4 +1,6 @@
 import { Box } from "@mui/material";
+import { Flex } from "components/generic/Flex";
+import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { LayerListEditor } from "components/layer-editor/LayerListEditor";
 import { PageContentProps } from "./PageMeta";
@@ -9,9 +11,13 @@ export function LayersPage({ template: Page }: PageContentProps) {
     <Page onChange={onChange} stack={state}>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Box p={2} pr={1} pt={6}>
-          <LayerListEditor />
-        </Box>
+        <Flex>
+          <Scroll y>
+            <Flex pt={6}>
+              <LayerListEditor />
+            </Flex>
+          </Scroll>
+        </Flex>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

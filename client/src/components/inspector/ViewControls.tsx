@@ -5,6 +5,7 @@ import {
   OpenInNewOutlined as PopOutIcon,
 } from "@mui/icons-material";
 import {
+  Box,
   Divider,
   IconButton,
   ListItemIcon,
@@ -49,6 +50,7 @@ export function ViewControls({
             </Tooltip>
           </MuiStack>
           <Menu
+            TransitionProps={{ mountOnEnter: true, unmountOnExit: true }}
             {...bindMenu(state)}
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "top" }}
@@ -82,7 +84,7 @@ export function ViewControls({
             </MenuItem>
             <Divider />
             {!(popOutDisabled || closeDisabled) && (
-              <>
+              <Box>
                 <MenuItem
                   onClick={() => {
                     onPopOut?.();
@@ -96,7 +98,7 @@ export function ViewControls({
                   <ListItemText>Pop Out</ListItemText>
                 </MenuItem>
                 <Divider />
-              </>
+              </Box>
             )}
             <MenuItem
               onClick={() => {

@@ -47,7 +47,6 @@ export function AboutPage({ template: Page }: PageContentProps) {
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex>
-          {" "}
           <Scroll y>
             <Box sx={{ p: 2 }}>
               <Box sx={{ pt: 6, pb: 2 }}>

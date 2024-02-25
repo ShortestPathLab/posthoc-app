@@ -50,7 +50,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
               name: inferLayerName(l),
             }))}
             onChange={setKey}
-            showArrow
+            arrow
             ellipsis={12}
           />
           {divider}

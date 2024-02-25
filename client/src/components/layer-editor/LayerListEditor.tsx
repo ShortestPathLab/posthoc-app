@@ -1,11 +1,11 @@
 import { MoreVertOutlined } from "@mui/icons-material";
 import { Box, IconButton, Menu, MenuItem, MenuList } from "@mui/material";
 import { ListEditor } from "components/generic/ListEditor";
-import { map, noop } from "lodash";
+import { head, map } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
+import { nanoid as id } from "nanoid";
 import { Layer, useLayers } from "slices/layers";
 import { LayerEditor } from "./LayerEditor";
-import { nanoid as id } from "nanoid";
 
 export function LayerListEditor() {
   const [{ layers: layers = [] }, setLayers] = useLayers();
@@ -58,13 +58,31 @@ export function LayerListEditor() {
               )}
             </PopupState>
           )}
-          editor={(v) => <LayerEditor value={v} />}
+          renderEditor={({ extras, handle, value, onValueChange }) => (
+            <>
+              {handle}
+              <LayerEditor {...{ value, onValueChange }} />
+              {extras}
+            </>
+          )}
           create={() => ({
             source: { type: "trace", trace: {} },
           })}
-          onChange={(v) => setLayers(() => ({ layers: v }))}
+          onChange={(v) =>
+            requestIdleCallback(() => setLayers(() => ({ layers: v })))
+          }
           addItemLabel="Layer"
           placeholder={<Box pt={2}>Click the button below to add a layer.</Box>}
+          onFocus={(key) => {
+            const element = head(document.getElementsByClassName(key));
+            if (
+              element &&
+              "click" in element &&
+              typeof element.click === "function"
+            ) {
+              element.click();
+            }
+          }}
         />
       </Box>
     </Box>

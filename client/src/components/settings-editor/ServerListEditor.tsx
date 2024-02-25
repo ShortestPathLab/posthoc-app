@@ -1,4 +1,5 @@
 import { ReplayOutlined as ResetIcon } from "@mui/icons-material";
+import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { ListEditor } from "components/generic/ListEditor";
@@ -9,8 +10,9 @@ import { ServerEditor } from "./ServerEditor";
 export function ServerListEditor() {
   const [{ remote }, setSettings] = useSettings();
   return (
-    <>
+    <Box sx={{ mx: -2 }}>
       <ListEditor<Remote>
+        sortable
         editor={(v) => <ServerEditor value={v} />}
         icon={null}
         value={remote}
@@ -31,6 +33,6 @@ export function ServerListEditor() {
           </FeaturePickerButton>
         }
       />
-    </>
+    </Box>
   );
 }

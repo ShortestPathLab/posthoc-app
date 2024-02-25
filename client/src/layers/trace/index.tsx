@@ -138,9 +138,6 @@ export const controller = {
               whiteSpace: "pre-line",
               mb: 1,
               mt: 1,
-              ...paper(1),
-              p: 1,
-              borderRadius: 1,
             }}
           >
             <code>{value?.source?.trace?.error}</code>
@@ -154,16 +151,13 @@ export const controller = {
               whiteSpace: "pre-line",
               mb: 1,
               mt: 1,
-              ...paper(1),
-              p: 1,
-              borderRadius: 1,
             }}
           >
             <code>{value?.source?.parsedTrace?.error}</code>
           </Typography>
         )}
         <Heading label="Preview" />
-        <Box sx={{ height: 240, mx: -2, mb: -2 }}>
+        <Box sx={{ height: 240, mx: -2 }}>
           <TracePreview trace={value?.source?.parsedTrace?.content} />
         </Box>
       </>
