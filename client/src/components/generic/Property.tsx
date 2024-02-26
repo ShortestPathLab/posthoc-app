@@ -2,7 +2,7 @@ import {
   Typography as Type,
   TypographyProps as TypeProps,
 } from "@mui/material";
-import { get, isNull, round, truncate } from "lodash";
+import { get, isNull, round, startCase, truncate } from "lodash";
 import { CSSProperties, ReactNode } from "react";
 import { Flex } from "./Flex";
 import { Space } from "./Space";
@@ -40,7 +40,7 @@ export function renderProperty(obj: any, simple: boolean = false) {
       }
     }
     case "string":
-      return `${obj}`;
+      return startCase(`${obj}`);
     case "undefined":
       return "null";
     default:

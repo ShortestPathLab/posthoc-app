@@ -60,7 +60,7 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
               <FormControlLabel
                 label="Show on start-up"
                 labelPlacement="start"
-                sx={{ ml: "auto", mr: -5 }}
+                sx={{ ml: "auto", mr: -5, minWidth: "fit-content" }}
                 control={
                   <Checkbox
                     defaultChecked={showOnStartUpChecked}

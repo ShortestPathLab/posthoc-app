@@ -1,4 +1,5 @@
 import {
+  DragIndicatorOutlined,
   FiberManualRecordOutlined,
   LayersOutlined as LayersIcon,
   SegmentOutlined,
@@ -175,7 +176,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
             const { scrollTop } = scrollerRef;
             const offset = i * ITEM_HEIGHT;
             ref.current?.scrollTo({
-              top: lerp(scrollTop, offset, 0.0000001 * timestamp),
+              top: lerp(scrollTop, offset, 0.000001 * timestamp),
             });
             requestAnimationFrame(f);
           }

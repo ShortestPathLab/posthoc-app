@@ -15,7 +15,6 @@ import { withProduce } from "produce";
 import { useMemo } from "react";
 import { Map } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { usePaper } from "theme";
 
 export type MapLayerData = {
   map?: Map;
@@ -33,7 +32,6 @@ export const controller = {
       : "Untitled Map",
   error: (layer) => layer?.source?.parsedMap?.error,
   editor: withProduce(({ value, produce }) => {
-    const paper = usePaper();
     const { result: Editor } = useMapOptions(value?.source?.map);
     return (
       <>

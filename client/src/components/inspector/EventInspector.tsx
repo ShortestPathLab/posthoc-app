@@ -13,12 +13,18 @@ import {
   Typography as Type,
   useTheme,
 } from "@mui/material";
+import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
 import { getColorHex } from "components/renderer/colors";
 import { omit, pick, startCase } from "lodash";
 import { TraceEvent } from "protocol/Trace";
 import { ReactNode } from "react";
 import { useCss } from "react-use";
-import { ESSENTIAL_PROPS, OMIT_PROPS, PropertyList } from "./PropertyList";
+import {
+  ESSENTIAL_PROPS,
+  OMIT_PROPS,
+  PropertyDialog,
+  PropertyList,
+} from "./PropertyList";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -47,12 +53,8 @@ export function EventInspector({
 }: EventInspectorProps) {
   const { spacing } = useTheme();
 
-  const cls = useCss({
-    "& .info-button": { opacity: 0 },
-    "&:hover .info-button": {
-      opacity: 1,
-    },
-  });
+  const buttonCls = useCss({});
+  const extrasCls = useCss({});
 
   const omitProps = omit(event, ...OMIT_PROPS);
 
@@ -61,68 +63,88 @@ export function EventInspector({
   const extraProps = omit(omitProps, ...ESSENTIAL_PROPS);
 
   return (
-    <ListItemButton
-      selected={selected}
-      {...props}
-      className={cls}
+    <Box
       sx={{
-        borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
-        ...props.sx,
+        position: "relative",
+        [`> .${extrasCls}`]: { opacity: 0 },
+        [`&:hover > .${extrasCls}`]: { opacity: 1 },
+        [`&:hover > .${buttonCls}`]: { pr: 8 },
       }}
     >
-      <ListItemIcon sx={{ alignItems: "center" }}>
-        <Type variant="body2">{index}</Type>
-        {label && <Dot label={label} />}
-      </ListItemIcon>
-
-      <ListItemText
-        sx={{ overflow: "hidden" }}
-        primary={
-          <Box
-            sx={{
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              display: "block",
-              textOverflow: "ellipsis",
-              my: 0.5,
-            }}
-          >
-            {startCase(`${event?.type ?? "unsupported"} ${event?.id ?? "-"}`)}{" "}
-          </Box>
-        }
-        secondaryTypographyProps={{
-          component: "div",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
+      <ListItemButton
+        className={buttonCls}
+        selected={selected}
+        {...props}
+        sx={{
+          borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
+          ...props.sx,
         }}
-        secondary={
-          <Stack
-            direction="row"
-            justifyContent="flex-start"
-            sx={{
-              "> *": { flex: 0 },
-            }}
-          >
-            <PropertyList event={essentialProps} simple />
-            <PropertyList event={extraProps} simple />
-          </Stack>
-        }
-      />
-      <Tooltip
-        slotProps={{
-          popper: { sx: { zIndex: (t) => t.zIndex.modal - 1 } },
-        }}
-        title={
-          <Box p={1}>
-            <PropertyList event={event} flexDirection="column" />
-          </Box>
-        }
       >
-        <Box className="info-button" sx={{ pl: 2, color: "text.secondary" }}>
-          <DataObjectOutlined fontSize="small" />
-        </Box>
-      </Tooltip>
-    </ListItemButton>
+        <ListItemIcon sx={{ alignItems: "center" }}>
+          <Type variant="body2">{index}</Type>
+          {label && <Dot label={label} />}
+        </ListItemIcon>
+
+        <ListItemText
+          sx={{ overflow: "hidden" }}
+          primary={
+            <Box
+              sx={{
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                display: "block",
+                textOverflow: "ellipsis",
+                my: 0.5,
+              }}
+            >
+              {startCase(`${event?.type ?? "unsupported"} ${event?.id ?? "-"}`)}{" "}
+            </Box>
+          }
+          secondaryTypographyProps={{
+            component: "div",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+          }}
+          secondary={
+            <Stack
+              direction="row"
+              justifyContent="flex-start"
+              sx={{
+                "> *": { flex: 0 },
+              }}
+            >
+              <PropertyList event={essentialProps} simple />
+              <PropertyList event={extraProps} simple />
+            </Stack>
+          }
+        />
+      </ListItemButton>
+      <Stack
+        className={extrasCls}
+        direction="row"
+        sx={{
+          p: 1,
+          justifyContent: "center",
+          position: "absolute",
+          right: 0,
+          alignItems: "center",
+          top: 0,
+          height: "100%",
+        }}
+      >
+        <PropertyDialog
+          {...{ event }}
+          trigger={(onClick) => (
+            <IconButton
+              {...{ onClick }}
+              sx={{ p: 1.5, color: "text.secondary" }}
+              label="See All Properties"
+              icon={<DataObjectOutlined fontSize="small" />}
+            ></IconButton>
+          )}
+        />
+      </Stack>
+    </Box>
   );
 }
 

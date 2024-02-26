@@ -29,7 +29,7 @@ export function WorkspaceDropZone() {
           <Stack alignItems="center" spacing={4}>
             <WorkspacesOutlined />
             <Type variant="body2" color="textSecondary">
-              Open workspace
+              Open
             </Type>
           </Stack>
         </Backdrop>

@@ -12,10 +12,10 @@ export function LayersPage({ template: Page }: PageContentProps) {
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex>
-          <Scroll y>
-            <Flex pt={6}>
+          <Scroll y style={{ width: "100%" }}>
+            <Box pt={6}>
               <LayerListEditor />
-            </Flex>
+            </Box>
           </Scroll>
         </Flex>
       </Page.Content>

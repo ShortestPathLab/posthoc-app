@@ -25,7 +25,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useView } from "slices/view";
+import { getDefaultViewTree, useView } from "slices/view";
 import { ExportWorkspaceModal } from "./ExportWorkspaceModal";
 
 function MenuEntry({
@@ -48,11 +48,8 @@ function MenuEntry({
   );
 }
 
-export const TitleBar = () => {
-  const { save, load } = useWorkspace();
+export function useTitleBarVisible() {
   const [visible, setVisible] = useState(false);
-  const [, setView] = useView();
-  const [exportModalOpen, setExportModalOpen] = useState(false);
   useEffect(() => {
     if ("windowControlsOverlay" in navigator) {
       const f = () => {
@@ -67,6 +64,14 @@ export const TitleBar = () => {
         );
     }
   }, [setVisible]);
+  return visible;
+}
+
+export const TitleBar = () => {
+  const { save, load } = useWorkspace();
+  const visible = useTitleBarVisible();
+  const [, setView] = useView();
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   function handleOpenPanel(type: string) {
     setView(({ view }) => {
       // const orientation =
@@ -113,7 +118,7 @@ export const TitleBar = () => {
               </Box>
               {[
                 {
-                  key: "Panel",
+                  key: "panel",
                   items: values(pages).map(({ name, id, icon }) => ({
                     key: `panel-open-${id}`,
                     name: <MenuEntry label={name} startIcon={icon} />,
@@ -142,6 +147,11 @@ export const TitleBar = () => {
                       ),
                       key: "workspace-save-metadata",
                       action: () => setExportModalOpen(true),
+                    },
+                    {
+                      name: "Reset Layout",
+                      key: "workspace-reset",
+                      action: () => setView(getDefaultViewTree),
                     },
                   ],
                 },

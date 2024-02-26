@@ -1,20 +1,26 @@
 import { ArrowBack } from "@mui/icons-material";
-import { ResizeSensor } from "css-element-queries";
-import PopupState from "material-ui-popup-state";
-import { ScrollPanel, usePanel } from "./ScrollPanel";
-import { useScrollState } from "hooks/useScrollState";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
 import {
   AppBar,
   Box,
+  BoxProps,
   Dialog,
   Fade,
   IconButton,
+  ModalProps,
+  Popover,
+  PopoverProps,
   Toolbar,
   Typography,
   useTheme,
 } from "@mui/material";
+import { ResizeSensor } from "css-element-queries";
+import { useScrollState } from "hooks/useScrollState";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
+import PopupState, { bindPopover } from "material-ui-popup-state";
+import { usePanel } from "./ScrollPanel";
 
+import { useTitleBarVisible } from "components/title-bar/TitleBar";
+import { merge } from "lodash";
 import {
   cloneElement,
   ComponentProps,
@@ -25,6 +31,8 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useAcrylic, usePaper } from "theme";
+import { Scroll } from "./Scrollbars";
 
 export function AppBarTitle({ children }: { children?: ReactNode }) {
   return <Typography variant="h6">{children}</Typography>;
@@ -35,7 +43,6 @@ export type Props = {
   actions?: ReactNode;
   width?: string | number;
   height?: string | number;
-  onTarget?: (target: HTMLDivElement | null) => void;
   variant?: "default" | "submodal";
   scrollable?: boolean;
 };
@@ -84,6 +91,14 @@ export function ModalAppBar({
         ...elevatedStyle,
       };
 
+  function renderTitle(label: ReactNode) {
+    return typeof label === "string" ? (
+      <AppBarTitle>{label}</AppBarTitle>
+    ) : (
+      label
+    );
+  }
+
   return (
     <AppBar
       elevation={0}
@@ -120,7 +135,7 @@ export function ModalAppBar({
               mountOnEnter
               unmountOnExit
             >
-              <Box style={{ width: "100%" }}>{children}</Box>
+              <Box style={{ width: "100%" }}>{renderTitle(children)}</Box>
             </Fade>
           </div>
         )}
@@ -138,7 +153,9 @@ export function ModalAppBar({
               mountOnEnter
               unmountOnExit
             >
-              <Box style={{ width: "100%" }}>{elevatedChildren}</Box>
+              <Box style={{ width: "100%" }}>
+                {renderTitle(elevatedChildren)}
+              </Box>
             </Fade>
           </div>
         )}
@@ -152,7 +169,6 @@ export default function Modal({
   actions,
   width = 480,
   height,
-  onTarget,
   variant = "default",
   scrollable = true,
   ...props
@@ -168,6 +184,7 @@ export default function Modal({
   const [contentRef, setContentRef] = useState<HTMLElement | null>(null);
   const [hasOverflowingChildren, setHasOverflowingChildren] = useState(false);
   const [childHeight, setChildHeight] = useState(0);
+  const titleBarVisible = useTitleBarVisible();
 
   useEffect(() => {
     if (target && contentRef && !sm && !height) {
@@ -194,6 +211,11 @@ export default function Modal({
     <Dialog
       fullScreen={sm}
       {...props}
+      keepMounted={false}
+      TransitionProps={{
+        unmountOnExit: true,
+        mountOnEnter: true,
+      }}
       style={{
         ...(useVariant && {
           paddingTop: theme.spacing(8),
@@ -218,57 +240,87 @@ export default function Modal({
               : childHeight || "fit-content",
           position: "relative",
           maxWidth: "none",
-          ...(sm && { paddingTop: 36 }),
+          ...(sm && titleBarVisible && { paddingTop: 36 }),
           ...props.PaperProps?.style,
         },
         ...props.PaperProps,
       }}
     >
-      <ScrollPanel
+      <Scroll
+        y
         style={{
           height: "100%",
           width: sm ? undefined : width,
           maxWidth: "100%",
           overflow: scrollable ? undefined : "hidden",
         }}
-        onTarget={onTarget}
       >
-        <div
-          ref={(e) => setContentRef(e)}
-          style={{ width: "100%", height: "100%" }}
-        >
+        <div ref={(e) => setContentRef(e)} style={{ width: "100%" }}>
           {content}
         </div>
-      </ScrollPanel>
+      </Scroll>
       {actions}
     </Dialog>
   );
 }
 
 export function ManagedModal({
-  options: ModalProps,
   appBar: ModalAppBarProps,
   trigger = () => <></>,
   children,
+  popover,
+  slotProps,
 }: {
   options?: ComponentProps<typeof Modal>;
   trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void) => ReactElement;
   appBar?: ModalAppBarProps;
   children?: ReactNode;
+  popover?: boolean;
+  slotProps?: {
+    popover?: Partial<PopoverProps>;
+    paper?: Partial<BoxProps>;
+    modal?: Partial<ModalProps>;
+  };
 }) {
+  const paper = usePaper();
+  const acrylic = useAcrylic();
+  const sm = useSmallDisplay();
+  const shouldDisplayPopover = popover && !sm;
   return (
     <PopupState variant="popover">
-      {({ open, close, isOpen }) => {
+      {(state) => {
+        const { open, close, isOpen } = state;
         return (
           <>
             {cloneElement(trigger(open))}
-            <Modal open={isOpen} onClose={close} {...ModalProps}>
-              <ModalAppBar onClose={close} {...ModalAppBarProps} />
-              {children ?? ModalProps?.children}
-            </Modal>
+            {shouldDisplayPopover ? (
+              <Popover
+                {...merge(
+                  bindPopover(state),
+                  { slotProps: { paper: { sx: acrylic } } },
+                  slotProps?.popover
+                )}
+              >
+                <Box
+                  {...merge(
+                    { sx: { width: 360, ...paper(1) } },
+                    slotProps?.paper
+                  )}
+                >
+                  {children ?? slotProps?.modal?.children}
+                </Box>
+              </Popover>
+            ) : (
+              <Modal open={isOpen} onClose={close} {...slotProps?.modal}>
+                <ModalAppBar onClose={close} {...ModalAppBarProps} />
+                {children ?? slotProps?.modal?.children}
+              </Modal>
+            )}
           </>
         );
       }}
     </PopupState>
   );
 }
+
+export type ManagedModalProps = ComponentProps<typeof ManagedModal>;

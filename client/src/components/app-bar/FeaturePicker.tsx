@@ -2,7 +2,7 @@ import { ButtonProps, Typography as Type, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { Select } from "components/generic/Select";
 import { Space } from "components/generic/Space";
-import { find, map, startCase, truncate } from "lodash";
+import { filter, find, map, startCase, truncate } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactElement, ReactNode, cloneElement } from "react";
 import { AccentColor, getShade, usePaper } from "theme";
@@ -57,8 +57,8 @@ export function FeaturePicker({
         <FeaturePickerButton
           {...props}
           {...ButtonProps}
-          sx={_paper ? { ...paper(1), m: 0.5, px: 1.25, py: 0.5 } : {}}
-          disabled={!items?.length || disabled}
+          sx={_paper ? { ...paper(1), my: 0.5, px: 1.25, py: 0.5 } : {}}
+          disabled={!filter(items, (item) => !item.hidden)?.length || disabled}
           icon={selected?.icon ? getIcon(selected.icon, selected.color) : icon}
           arrow={arrow}
         >
