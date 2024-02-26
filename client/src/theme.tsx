@@ -6,7 +6,7 @@ import {
   TextFieldProps,
   Theme,
 } from "@mui/material";
-import { constant, times } from "lodash";
+import { constant, floor, times } from "lodash";
 import { useSettings } from "slices/settings";
 
 export type AccentColor = Exclude<keyof typeof colors, "common" | undefined>;
@@ -121,7 +121,7 @@ export function usePaper(): (e?: number) => SxProps<Theme> {
     boxShadow: ({ shadows, palette }) =>
       palette.mode === "dark"
         ? shadows[1]
-        : shadows[Math.max(elevation - 1, 0)],
+        : shadows[Math.max(floor(elevation) - 1, 0)],
     backgroundColor: ({ palette }) =>
       palette.mode === "dark"
         ? alpha(palette.action.disabledBackground, elevation * 0.02)

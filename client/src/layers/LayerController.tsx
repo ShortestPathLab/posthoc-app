@@ -2,7 +2,7 @@ import { EditorSetterProps } from "components/Editor";
 import { SelectionMenuContent } from "components/inspector/SelectionMenu";
 import { SelectEvent } from "components/renderer/Renderer";
 import { TraceEvent } from "protocol";
-import { FC, ReactNode } from "react";
+import { FC, ReactElement, ReactNode } from "react";
 import { Layer } from "slices/layers";
 
 export type SelectionInfoProvider = FC<{
@@ -13,11 +13,19 @@ export type SelectionInfoProvider = FC<{
 
 export type LayerController<K extends string, T> = {
   key: K;
+  icon: ReactElement;
   editor: FC<EditorSetterProps<Layer<T>>>;
   renderer: FC<{ layer?: Layer<T>; index?: number }>;
   service?: FC<EditorSetterProps<Layer<T>>>;
   inferName: (layer: Layer<T>) => string;
   steps?: (layer?: Layer<T>) => TraceEvent[];
-  getSelectionInfo?: SelectionInfoProvider;
   error?: (layer?: Layer<T>) => string | boolean | undefined;
+  provideSelectionInfo?: SelectionInfoProvider;
+  claimImportedFile?: (file: File) => Promise<
+    | {
+        claimed: true;
+        layer: (notify: (s: string) => void) => Promise<T>;
+      }
+    | { claimed: false }
+  >;
 };

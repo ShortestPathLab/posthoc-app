@@ -56,10 +56,10 @@ export function useWorkspace() {
                 setUIState(() => parsed.UIState);
               }
             }, `Opening workspace (${formatByte(f.size)})`);
-          } else {
-            notify(`${f?.name} is not a workspace file`);
+            return true;
           }
         }
+        return false;
       },
       save: async (raw?: boolean, name?: string) => {
         notify("Saving workspace...");

@@ -4,7 +4,7 @@ import { Box, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { filter, find, flatMap, forEach, map, pick, sumBy } from "lodash";
 import { nanoid } from "nanoid";
-import { produce, produce2 } from "produce";
+import { produce, transaction } from "produce";
 import { Context, ReactNode, createContext, useContext, useMemo } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -118,7 +118,7 @@ export function ViewLeaf<T>({
   const context = useMemo(() => {
     const handleSplit = (orientation: "vertical" | "horizontal") =>
       onChange?.(
-        produce2(root, (draft) => ({
+        transaction(root, (draft) => ({
           key: nanoid(),
           type: "branch",
           orientation,
@@ -277,7 +277,7 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
               }
               onClose={() =>
                 onChange?.(
-                  produce2(root, (draft) => {
+                  transaction(root, (draft) => {
                     draft.children.splice(i, 1);
                     if (draft.children.length === 1) {
                       if (draft.children[0].type === "leaf") {

@@ -29,8 +29,10 @@ const isSm = once(() => window.innerWidth < 640);
 export const [useView, ViewProvider] = createSlice<
   ViewTreeState,
   Partial<ViewTreeState>
->(
-  isSm()
+>(getDefaultViewTree());
+
+export function getDefaultViewTree(): ViewTreeState {
+  return isSm()
     ? {
         view: {
           key: id(),
@@ -74,5 +76,5 @@ export const [useView, ViewProvider] = createSlice<
             },
           ],
         },
-      }
-);
+      };
+}

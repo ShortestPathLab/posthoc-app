@@ -9,6 +9,7 @@ import { useLoadingState } from "slices/loading";
 import { EditorProps } from "../Editor";
 import { FeaturePicker } from "./FeaturePicker";
 import { custom, uploadMap, uploadTrace } from "./upload";
+
 function name(s: string) {
   return s.split(".").shift();
 }

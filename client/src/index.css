@@ -49,8 +49,3 @@ code {
     min-width: 64px;
   }
 }
-
-#pathfinder {
-  position: "fixed";
-  top: 100vh;
-}

@@ -3,13 +3,8 @@ import { find, startCase } from "lodash";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { UploadedTrace } from "slices/UIState";
 import { parseYamlAsync } from "workers/async";
-
-function ext(s: string) {
-  return s.split(".").pop();
-}
-function name(s: string) {
-  return s.split(".").shift();
-}
+import { name, ext } from "../../utils/path";
+import { nanoid as id } from "nanoid";
 
 const customId = "internal/custom";
 
@@ -25,7 +20,9 @@ export const custom = (
   id: customId,
 });
 
-const FORMATS = ["json", "yaml", "yml"];
+export const EXTENSIONS = ["json", "yaml", "yml"];
+
+const FORMATS = EXTENSIONS.map((c) => `.trace.${c}`);
 
 export type FileHandle<T> = {
   file: File;
@@ -36,29 +33,38 @@ export async function uploadTrace(): Promise<
   FileHandle<UploadedTrace | undefined> | undefined
 > {
   const f = await file({
-    accept: FORMATS.map((c) => `.trace.${c}`),
+    accept: FORMATS,
     strict: true,
   });
   if (f) {
-    return {
-      file: f,
-      read: async () => {
-        if (FORMATS.includes(ext(f.name)!)) {
-          const content = await f.text();
-          const parsed = await parseYamlAsync(content);
-          return {
-            ...custom(),
-            format: parsed?.format,
-            content: parsed,
-            name: startCase(name(f.name)),
-            type: customId,
-          };
-        } else {
-          throw new Error(`The format (${ext(f.name)}) is unsupported.`);
-        }
-      },
-    };
+    return readUploadedTrace(f);
   }
+}
+
+export function readUploadedTrace(f: File) {
+  return {
+    file: f,
+    read: async () => {
+      if (isTraceFormat(f)) {
+        const content = await f.text();
+        const parsed = await parseYamlAsync(content);
+        return {
+          ...custom(),
+          format: parsed?.format,
+          content: parsed,
+          name: startCase(name(f.name)),
+          type: customId,
+          key: id(),
+        };
+      } else {
+        throw new Error(`The format (${ext(f.name)}) is unsupported.`);
+      }
+    },
+  };
+}
+
+export function isTraceFormat(f: File) {
+  return !!find(FORMATS, (r) => f.name.endsWith(r));
 }
 
 export async function uploadMap(
@@ -71,20 +77,24 @@ export async function uploadMap(
     strict: true,
   });
   if (f) {
-    return {
-      file: f,
-      read: async () => {
-        if (find(accept, { id: ext(f.name) })) {
-          return {
-            ...custom(),
-            format: ext(f.name),
-            content: await f.text(),
-            name: startCase(name(f.name)),
-          } as Feature & { format?: string };
-        } else {
-          throw new Error(`The format (${ext(f.name)}) is unsupported.`);
-        }
-      },
-    };
+    return readUploadedMap(f, accept);
   }
+}
+
+export function readUploadedMap(f: File, accept: FeatureDescriptor[]) {
+  return {
+    file: f,
+    read: async () => {
+      if (find(accept, { id: ext(f.name) })) {
+        return {
+          ...custom(),
+          format: ext(f.name),
+          content: await f.text(),
+          name: startCase(name(f.name)),
+        } as Feature & { format?: string };
+      } else {
+        throw new Error(`The format (${ext(f.name)}) is unsupported.`);
+      }
+    },
+  };
 }

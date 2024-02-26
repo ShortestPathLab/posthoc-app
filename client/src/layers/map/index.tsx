@@ -1,21 +1,33 @@
+import { MapTwoTone } from "@mui/icons-material";
 import { CircularProgress, Typography } from "@mui/material";
 import { MapPicker } from "components/app-bar/Input";
+import { custom, readUploadedMap } from "components/app-bar/upload";
 import { Heading, Option } from "components/layer-editor/Option";
 import { getParser } from "components/renderer";
 import { NodeList } from "components/renderer/NodeList";
+import { mapParsers } from "components/renderer/map-parser";
 import { ParsedMap } from "components/renderer/map-parser/Parser";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { useMapContent } from "hooks/useMapContent";
 import { useMapOptions } from "hooks/useMapOptions";
 import { useParsedMap } from "hooks/useParsedMap";
 import { LayerController, inferLayerName } from "layers";
-import { isUndefined, map, round, set, startCase } from "lodash";
+import {
+  entries,
+  get,
+  isUndefined,
+  keys,
+  map,
+  round,
+  set,
+  startCase,
+} from "lodash";
 import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";
 import { Map } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { usePaper } from "theme";
+import { ext, name } from "utils/path";
 
 export type MapLayerData = {
   map?: Map;
@@ -27,13 +39,42 @@ export type MapLayer = Layer<MapLayerData>;
 
 export const controller = {
   key: "map",
+  icon: <MapTwoTone />,
   inferName: (layer) =>
     layer?.source?.map
       ? `${layer.source.map.name} (${startCase(layer.source.map.format)})`
       : "Untitled Map",
   error: (layer) => layer?.source?.parsedMap?.error,
+  claimImportedFile: async (file) =>
+    keys(mapParsers).includes(ext(file.name))
+      ? {
+          claimed: true,
+          layer: async (notify) => {
+            notify("Opening map...");
+            try {
+              const output = readUploadedMap(
+                file,
+                entries(mapParsers).map(([k]) => ({
+                  id: k,
+                }))
+              );
+              return { map: { ...(await output.read()) } };
+            } catch (e) {
+              console.error(e);
+              notify(`Error opening, ${get(e, "message")}`);
+              return {
+                map: {
+                  key: id(),
+                  id: custom().id,
+                  error: get(e, "message"),
+                  name: startCase(name(file.name)),
+                },
+              };
+            }
+          },
+        }
+      : { claimed: false },
   editor: withProduce(({ value, produce }) => {
-    const paper = usePaper();
     const { result: Editor } = useMapOptions(value?.source?.map);
     return (
       <>
@@ -115,7 +156,7 @@ export const controller = {
     );
     return <></>;
   }),
-  getSelectionInfo: ({ children, event, layer: key }) => {
+  provideSelectionInfo: ({ children, event, layer: key }) => {
     const { layer, setLayer, layers } = useLayer<MapLayerData>(key);
     const { parsedMap } = layer?.source ?? {};
     const { point, node } = useMemo(() => {

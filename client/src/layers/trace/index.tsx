@@ -1,10 +1,15 @@
-import { ArrowOutwardRounded } from "@mui/icons-material";
+import { ArrowOutwardRounded, RouteTwoTone } from "@mui/icons-material";
 import { Box, Typography, useTheme } from "@mui/material";
 import { TracePicker } from "components/app-bar/Input";
 import {
   PlaybackLayerData,
   PlaybackService,
 } from "components/app-bar/Playback";
+import {
+  custom,
+  isTraceFormat,
+  readUploadedTrace,
+} from "components/app-bar/upload";
 import { PropertyList } from "components/inspector/PropertyList";
 import { Heading, Option } from "components/layer-editor/Option";
 import { TracePreview } from "components/layer-editor/TracePreview";
@@ -22,6 +27,7 @@ import {
   constant,
   findLast,
   forEach,
+  get,
   head,
   isUndefined,
   keyBy,
@@ -39,7 +45,7 @@ import { useEffect, useMemo } from "react";
 import { useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { usePaper } from "theme";
+import { name } from "utils/path";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
@@ -112,20 +118,42 @@ export type TraceLayer = Layer<TraceLayerData>;
 
 export const controller = {
   key: "trace",
+  icon: <RouteTwoTone />,
   inferName: (layer) => layer.source?.trace?.name ?? "Untitled Trace",
   error: (layer) =>
     layer?.source?.trace?.error || layer?.source?.parsedTrace?.error,
+  claimImportedFile: async (file) =>
+    isTraceFormat(file)
+      ? {
+          claimed: true,
+          layer: async (notify) => {
+            notify("Opening trace...");
+            try {
+              const output = readUploadedTrace(file);
+              return { trace: { ...(await output.read()) } };
+            } catch (e) {
+              console.error(e);
+              notify(`Error opening, ${get(e, "message")}`);
+              return {
+                trace: {
+                  key: id(),
+                  id: custom().id,
+                  error: get(e, "message"),
+                  name: startCase(name(file.name)),
+                },
+              };
+            }
+          },
+        }
+      : { claimed: false },
   editor: withProduce(({ value, produce }) => {
-    const paper = usePaper();
     return (
       <>
         <Option
           label="Trace"
           content={
             <TracePicker
-              onChange={(v) =>
-                produce((d) => set(d, "source.trace", { ...v, key: id() }))
-              }
+              onChange={(v) => produce((d) => set(d, "source.trace", v))}
               value={value?.source?.trace}
             />
           }
@@ -257,7 +285,7 @@ export const controller = {
     );
   },
   steps: (layer) => layer?.source?.parsedTrace?.content?.events ?? [],
-  getSelectionInfo: ({ layer: key, event, children }) => {
+  provideSelectionInfo: ({ layer: key, event, children }) => {
     const { layer, setLayer } = useLayer(key);
     const menu = useMemo(() => {
       const events = layer?.source?.parsedTrace?.content?.events ?? [];

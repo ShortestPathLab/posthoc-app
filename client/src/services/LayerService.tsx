@@ -4,7 +4,7 @@ import { createElement, useMemo } from "react";
 import { useLayers } from "slices/layers";
 
 function useLayerServices() {
-  const [{ layers: layers }, setLayers] = useLayers();
+  const [{ layers }, setLayers] = useLayers();
   return useMemo(() => {
     return map(layers, (layer) => {
       const service = getLayerHandler(layer).service;
