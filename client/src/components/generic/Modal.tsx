@@ -68,6 +68,7 @@ export function ModalAppBar({
   simple,
   position = "sticky",
 }: ModalAppBarProps) {
+  const sm = useSmallDisplay();
   const panel = usePanel();
   const theme = useTheme();
   const [, , isAbsoluteTop, , setTarget] = useScrollState();
@@ -77,14 +78,18 @@ export function ModalAppBar({
 
   const styles = isAbsoluteTop
     ? {
-        background: theme.palette.background.paper,
+        background: sm
+          ? theme.palette.background.default
+          : theme.palette.background.paper,
         ...(!simple && {
           boxShadow: theme.shadows[0],
         }),
         ...style,
       }
     : {
-        background: theme.palette.background.paper,
+        background: sm
+          ? theme.palette.background.default
+          : theme.palette.background.paper,
         ...(!simple && {
           boxShadow: theme.shadows[4],
         }),
@@ -272,7 +277,10 @@ export function ManagedModal({
   slotProps,
 }: {
   options?: ComponentProps<typeof Modal>;
-  trigger?: (onClick: (e: SyntheticEvent<any, Event>) => void) => ReactElement;
+  trigger?: (
+    onClick: (e: SyntheticEvent<any, Event>) => void,
+    isOpen: boolean
+  ) => ReactElement;
   appBar?: ModalAppBarProps;
   children?: ReactNode;
   popover?: boolean;
@@ -292,7 +300,7 @@ export function ManagedModal({
         const { open, close, isOpen } = state;
         return (
           <>
-            {cloneElement(trigger(open))}
+            {cloneElement(trigger(open, isOpen))}
             {shouldDisplayPopover ? (
               <Popover
                 {...merge(

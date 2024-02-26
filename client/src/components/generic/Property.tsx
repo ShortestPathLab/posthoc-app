@@ -6,6 +6,7 @@ import { get, isNull, round, startCase, truncate } from "lodash";
 import { CSSProperties, ReactNode } from "react";
 import { Flex } from "./Flex";
 import { Space } from "./Space";
+import beautify from "json-beautify";
 
 type Props = {
   label?: ReactNode;
@@ -49,9 +50,9 @@ export function renderProperty(obj: any, simple: boolean = false) {
           {isNull(obj) ? "null" : get(obj, "constructor.name") ?? typeof obj}
         </code>
       ) : (
-        <code>
-          {truncate(JSON.stringify(obj).replace("\n", ", "), {
-            length: 30,
+        <code style={{ whiteSpace: "pre" }}>
+          {truncate(beautify(obj, undefined as any, 2), {
+            length: 100,
           })}
         </code>
       );

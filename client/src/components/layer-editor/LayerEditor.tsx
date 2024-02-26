@@ -162,6 +162,18 @@ function Component(
             }}
           >
             <Stack alignItems="center" direction="row" gap={2}>
+              <Stack
+                sx={{
+                  ...paper(0.5),
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 36,
+                  height: 36,
+                  color: "action.disabled",
+                }}
+              >
+                {getLayerHandler(value).icon}
+              </Stack>
               <Box
                 sx={{
                   py: 1.5,

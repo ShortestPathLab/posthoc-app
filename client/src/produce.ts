@@ -7,10 +7,18 @@ export function produce<T>(obj: T, f: (obj: T) => void) {
   f(b);
   return b;
 }
-export function produce2<T, U>(obj: T, f: (obj: T) => U) {
+export function transaction<T, U>(obj: T, f: (obj: T) => U) {
   const b = f(clone(obj));
   return b;
 }
+
+export const producify =
+  <T>(f: (obj: T) => void) =>
+  (obj: T) => {
+    const b = structuredClone(obj);
+    f(b);
+    return b;
+  };
 
 export function withProduce<T>(
   component: (

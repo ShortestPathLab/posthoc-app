@@ -137,7 +137,7 @@ function useSelectionMenu() {
     () =>
       chain(layers)
         .reduce((A, l) => {
-          const B = getLayerHandler(l)?.getSelectionInfo ?? identity;
+          const B = getLayerHandler(l)?.provideSelectionInfo ?? identity;
           return ({ children, event }: SelectionInfoProviderProps) => (
             <B layer={l.key} event={event}>
               {(a) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}

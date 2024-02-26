@@ -2,6 +2,7 @@ import {
   CodeOutlined,
   PlaceOutlined as DestinationIcon,
   LayersOutlined,
+  RouteTwoTone,
   TripOriginOutlined as StartIcon,
 } from "@mui/icons-material";
 import { Box, Typography as Type } from "@mui/material";
@@ -14,7 +15,7 @@ import { useEffectWhenAsync } from "hooks/useEffectWhen";
 import { LayerController, inferLayerName } from "layers";
 import { MapLayer, MapLayerData } from "layers/map";
 import { TraceLayerData, controller as traceController } from "layers/trace";
-import { filter, find, map, merge, reduce, set } from "lodash";
+import { filter, find, map, merge, omit, reduce, set } from "lodash";
 import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";
 import { useMemo } from "react";
@@ -44,8 +45,9 @@ export type QueryLayerData = {
 } & TraceLayerData;
 
 export const controller = {
-  ...traceController,
+  ...omit(traceController, "claimImportedFile"),
   key: "query",
+  icon: <RouteTwoTone />,
   editor: withProduce(({ value, produce }) => {
     const { algorithm } = value?.source ?? {};
     const {
@@ -189,8 +191,9 @@ export const controller = {
     return <>{<TraceLayerService value={value} onChange={onChange} />}</>;
   }),
   inferName: (l) => l.source?.trace?.name ?? "Untitled Query",
-  getSelectionInfo: ({ children, event, layer: key }) => {
-    const TraceLayerSelectionInfoProvider = traceController.getSelectionInfo;
+  provideSelectionInfo: ({ children, event, layer: key }) => {
+    const TraceLayerSelectionInfoProvider =
+      traceController.provideSelectionInfo;
     const { layer, setLayer, layers } = useLayer<QueryLayerData>(key);
     const mapLayerData = useMemo(() => {
       const filteredLayers = filter(layers, {

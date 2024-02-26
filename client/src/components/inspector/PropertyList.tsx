@@ -25,7 +25,6 @@ import {
   slice,
   startCase,
 } from "lodash";
-import { ComponentProps } from "react";
 
 export const OMIT_PROPS = ["type", "id"];
 
