@@ -13,6 +13,7 @@ export function RendererListEditor() {
     <Box sx={{ mx: -2 }}>
       <ListEditor<Renderer>
         sortable
+        button={false}
         editor={(v) => <RendererEditor value={v} />}
         icon={null}
         value={renderer}

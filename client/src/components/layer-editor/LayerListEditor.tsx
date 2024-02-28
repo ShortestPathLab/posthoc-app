@@ -69,10 +69,12 @@ export function LayerListEditor() {
             source: { type: "trace", trace: {} },
           })}
           onChange={(v) =>
-            requestIdleCallback(() => setLayers(() => ({ layers: v })))
+            requestIdleCallback(() => setLayers(() => ({ layers: v })), {
+              timeout: 300,
+            })
           }
           addItemLabel="Layer"
-          placeholder={<Box pt={2}>Click the button below to add a layer.</Box>}
+          placeholder={<Box pt={2}>Get started by adding a layer.</Box>}
           onFocus={(key) => {
             const element = head(document.getElementsByClassName(key));
             if (

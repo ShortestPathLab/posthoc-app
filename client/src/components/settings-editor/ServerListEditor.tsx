@@ -13,6 +13,7 @@ export function ServerListEditor() {
     <Box sx={{ mx: -2 }}>
       <ListEditor<Remote>
         sortable
+        button={false}
         editor={(v) => <ServerEditor value={v} />}
         icon={null}
         value={remote}

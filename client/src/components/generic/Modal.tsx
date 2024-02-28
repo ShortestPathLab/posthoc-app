@@ -305,7 +305,15 @@ export function ManagedModal({
               <Popover
                 {...merge(
                   bindPopover(state),
-                  { slotProps: { paper: { sx: acrylic } } },
+                  {
+                    slotProps: {
+                      paper: {
+                        sx: {
+                          ...acrylic,
+                        },
+                      },
+                    },
+                  },
                   slotProps?.popover
                 )}
               >

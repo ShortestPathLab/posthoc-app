@@ -44,6 +44,7 @@ const Scroller = forwardRef<HTMLDivElement, ComponentProps<"div">>(
     const containerRef = useRef<HTMLDivElement | null>(null);
     const { palette, spacing } = useTheme();
     const cls = useCss({
+      "--os-padding-perpendicular": "2px",
       ".os-scrollbar": { visibility: "visible", opacity: 1 },
       ".os-scrollbar-vertical > .os-scrollbar-track > .os-scrollbar-handle": {
         "min-height": spacing(12),
@@ -51,6 +52,16 @@ const Scroller = forwardRef<HTMLDivElement, ComponentProps<"div">>(
       "div.os-scrollbar-vertical > div.os-scrollbar-track": {
         height: `calc(100% - ${spacing(6)})`,
         marginTop: spacing(6),
+      },
+      "div > div.os-scrollbar-track": {
+        "--os-handle-perpendicular-size": "2px",
+        "--os-handle-perpendicular-size-hover": "6px",
+        "--os-handle-perpendicular-size-active": "6px",
+        "> div.os-scrollbar-handle": {
+          borderRadius: 0,
+          opacity: 0.5,
+          "&:hover": { opacity: 0.8 },
+        },
       },
     });
     const [initialize] = useOverlayScrollbars({

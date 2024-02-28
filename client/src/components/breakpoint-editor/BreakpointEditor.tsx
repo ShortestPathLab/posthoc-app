@@ -23,7 +23,7 @@ export function BreakpointEditor({
     onChange?.({ ...value, ...next });
   }
   return (
-    <Flex sx={{ mx: -2 }}>
+    <Flex sx={{ py: 1 }}>
       <Select
         placeholder="Event"
         sx={{ minWidth: 160 }}
@@ -84,7 +84,7 @@ export function BreakpointEditor({
       <Switch
         checked={!!value.active}
         onChange={(_, v) => handleChange({ active: v })}
-        sx={{ mr: -2 }}
+        sx={{ mr: -4 }}
       />
     </Flex>
   );

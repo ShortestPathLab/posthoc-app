@@ -64,6 +64,7 @@ type Item<T = any> = {
 };
 
 type Props<T = any> = {
+  button?: boolean;
   UNSAFE_label?: ReactNode;
   UNSAFE_text?: ReactNode;
   UNSAFE_extrasPlacement?: "flex-start" | "center" | "flex-end";
@@ -121,10 +122,9 @@ const defaultEditorRenderer: Props["renderEditor"] = ({
 );
 
 export function ListEditorField({
-  icon = <LabelIcon />,
-  toggleable: useSwitch,
-  deletable: useDelete,
-  editable: useEditButton = true,
+  toggleable,
+  deletable,
+  editable = true,
   onChangeItem = () => {},
   onDeleteItem = () => {},
   extras: getExtras,
@@ -135,11 +135,13 @@ export function ListEditorField({
   i = 0,
   autoFocus,
   sortable,
+  button = true,
   renderEditor = defaultEditorRenderer,
 }: Props & ListEditorFieldProps & Item) {
   const acrylic = useAcrylic();
   const paper = usePaper();
   const [field, setField] = useState<HTMLElement | null>(null);
+  const ListElement = (button ? ButtonBase : Box) as typeof Box;
   return (
     <Draggable index={i} draggableId={`${id}`}>
       {(provided, snapshot) => (
@@ -148,10 +150,14 @@ export function ListEditorField({
             direction="row"
             alignItems="center"
             sx={{
-              transition: (t) => t.transitions.create("background"),
-              "&:hover": {
-                background: (t) => t.palette.action.hover,
-              },
+              ...(button
+                ? {
+                    transition: (t) => t.transitions.create("background"),
+                    "&:hover": {
+                      background: (t) => t.palette.action.hover,
+                    },
+                  }
+                : undefined),
               ...(snapshot.isDragging
                 ? ({
                     ...paper(1),
@@ -176,7 +182,7 @@ export function ListEditorField({
                 </Flex>
               ),
               content: (
-                <ButtonBase
+                <ListElement
                   sx={{
                     flex: 1,
                     display: "block",
@@ -195,11 +201,11 @@ export function ListEditorField({
                       onChangeItem(id ?? i, e.target.value, enabled),
                     ref: (e: HTMLElement | null) => setField(e),
                   })}
-                </ButtonBase>
+                </ListElement>
               ),
               extras: (
                 <Flex sx={{ flex: 0, px: 1 }}>
-                  {useSwitch && (
+                  {toggleable && (
                     <Switch
                       color="primary"
                       edge="end"
@@ -207,7 +213,7 @@ export function ListEditorField({
                       checked={enabled}
                     />
                   )}
-                  {useEditButton && (
+                  {editable && (
                     <IconButton
                       edge="end"
                       onClick={() => {
@@ -219,7 +225,7 @@ export function ListEditorField({
                       <EditIcon />
                     </IconButton>
                   )}
-                  {useDelete && (
+                  {deletable && (
                     <IconButton onClick={() => onDeleteItem(id ?? i)}>
                       <DeleteIcon />
                     </IconButton>

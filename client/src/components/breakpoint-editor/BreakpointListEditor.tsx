@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { useLayer } from "slices/layers";
 import { BreakpointEditor } from "./BreakpointEditor";
 import { comparators } from "./comparators";
+import { Scroll } from "components/generic/Scrollbars";
 
 type BreakpointListEditorProps = {
   breakpoints?: Breakpoint[];
@@ -42,27 +43,33 @@ export function BreakpointListEditor({
 
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>
-      <Box sx={{ minWidth: 720, mb: 2 }}>
-        <ListEditor<Breakpoint>
-          icon={null}
-          value={breakpoints}
-          deletable
-          editable={false}
-          editor={(v) => <BreakpointEditor value={v} properties={properties} />} //v = a breakpoint
-          create={() => ({
-            active: true,
-            property: properties?.[0],
-            condition: comparators?.[0],
-            type: undefined,
-            reference: 0,
-          })}
-          onChange={(updatedBreakpoints) =>
-            handleBreakpointsChange(updatedBreakpoints)
-          }
-          addItemLabel="Breakpoint"
-          placeholder="Click the button below to add a breakpoint."
-        />
-      </Box>
+      <Scroll x>
+        <Box sx={{ minWidth: 720, mb: 2 }}>
+          <ListEditor<Breakpoint>
+            sortable
+            button={false}
+            icon={null}
+            value={breakpoints}
+            deletable
+            editable={false}
+            editor={(v) => (
+              <BreakpointEditor value={v} properties={properties} />
+            )} //v = a breakpoint
+            create={() => ({
+              active: true,
+              property: properties?.[0],
+              condition: comparators?.[0],
+              type: undefined,
+              reference: 0,
+            })}
+            onChange={(updatedBreakpoints) =>
+              handleBreakpointsChange(updatedBreakpoints)
+            }
+            addItemLabel="Breakpoint"
+            placeholder="No breakpoints."
+          />
+        </Box>
+      </Scroll>
     </Box>
   );
 }

@@ -1,4 +1,7 @@
-import { LayersOutlined as LayersIcon } from "@mui/icons-material";
+import {
+  BugReportOutlined,
+  LayersOutlined as LayersIcon,
+} from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Divider, Tab, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
@@ -14,6 +17,7 @@ import { ReactNode, useState } from "react";
 import { useLayer } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { PageContentProps } from "./PageMeta";
+import { Placeholder } from "components/inspector/Placeholder";
 
 const divider = (
   <Divider
@@ -55,32 +59,36 @@ export function DebugPage({ template: Page }: PageContentProps) {
           />
           {divider}
           <TabList onChange={(_, v) => setTab(v)}>
-            <Tab label="Standard" value="standard" />
-            <Tab label="Advanced" value="advanced" />
+            <Tab label="Standard" value="standard" disabled={!layer} />
+            <Tab label="Advanced" value="advanced" disabled={!layer} />
           </TabList>
         </Page.Options>
         <Page.Content>
-          <Box overflow="auto" height="100%">
-            <Box pt={6} height="100%">
-              <TabPanel value="standard">
-                <Box>
-                  {renderHeading("Breakpoints")}
-                  <BreakpointListEditor layer={layer?.key} />
-                </Box>
-              </TabPanel>
-              <TabPanel value="advanced" sx={{ p: 0, height: "100%" }}>
-                <ScriptEditor
-                  code={code ?? makeTemplate(values(templates))}
-                  onChange={(v) =>
-                    layer &&
-                    setLayer(
-                      produce(layer, (layer) => set(layer, "source.code", v))
-                    )
-                  }
-                />
-              </TabPanel>
+          {layer ? (
+            <Box overflow="auto" height="100%">
+              <Box pt={6} height="100%">
+                <TabPanel value="standard">
+                  <Box mx={-2}>
+                    <Box px={2}>{renderHeading("Breakpoints")}</Box>
+                    <BreakpointListEditor layer={layer?.key} />
+                  </Box>
+                </TabPanel>
+                <TabPanel value="advanced" sx={{ p: 0, height: "100%" }}>
+                  <ScriptEditor
+                    code={code ?? makeTemplate(values(templates))}
+                    onChange={(v) =>
+                      layer &&
+                      setLayer(
+                        produce(layer, (layer) => set(layer, "source.code", v))
+                      )
+                    }
+                  />
+                </TabPanel>
+              </Box>
             </Box>
-          </Box>
+          ) : (
+            <Placeholder icon={<BugReportOutlined />} label="Debugger" />
+          )}
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>
       </Page>

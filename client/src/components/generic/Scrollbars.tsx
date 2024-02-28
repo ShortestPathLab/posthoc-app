@@ -29,6 +29,7 @@ export const Scroll = forwardRef(
   ) => {
     const { palette, spacing } = useTheme();
     const cls = useCss({
+      "--os-padding-perpendicular": "2px",
       "div.os-scrollbar-vertical > div.os-scrollbar-track": {
         height: `calc(100% - ${spacing(px)})`,
         marginTop: spacing(px),
@@ -36,6 +37,16 @@ export const Scroll = forwardRef(
       "div.os-scrollbar-horizontal > div.os-scrollbar-track": {
         width: `calc(100% - ${spacing(py * 2)})`,
         marginLeft: spacing(py),
+      },
+      "div > div.os-scrollbar-track": {
+        "--os-handle-perpendicular-size": "2px",
+        "--os-handle-perpendicular-size-hover": "6px",
+        "--os-handle-perpendicular-size-active": "6px",
+        "> div.os-scrollbar-handle": {
+          borderRadius: 0,
+          opacity: 0.5,
+          "&:hover": { opacity: 0.8 },
+        },
       },
     });
     const handleRef = useCallback(
