@@ -87,7 +87,11 @@ export function DebugPage({ template: Page }: PageContentProps) {
               </Box>
             </Box>
           ) : (
-            <Placeholder icon={<BugReportOutlined />} label="Debugger" />
+            <Placeholder
+              icon={<BugReportOutlined />}
+              label="Debugger"
+              secondary="Configure breakpoints and other debugging options here. First, you'll need to load a trace."
+            />
           )}
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>

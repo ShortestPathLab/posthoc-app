@@ -413,7 +413,7 @@ export default function Editor<T>(props: Props<T>) {
             </Typography>
           </Box>
         </Collapse>
-        <Box p={2} pt={2}>
+        <Stack p={2} pt={2} gap={2} direction="row">
           <Button
             disableElevation
             variant="outlined"
@@ -429,7 +429,7 @@ export default function Editor<T>(props: Props<T>) {
             <Box sx={{ color: "text.primary" }}>{addItemLabel}</Box>
           </Button>
           {extras}
-        </Box>
+        </Stack>
       </List>
     </DragDropContext>
   );

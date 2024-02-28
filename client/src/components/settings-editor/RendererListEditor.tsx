@@ -27,7 +27,6 @@ export function RendererListEditor() {
         addItemExtras={
           <FeaturePickerButton
             icon={<ResetIcon />}
-            sx={{ ml: 2 }}
             onClick={() => setSettings(() => ({ renderer: defaultRenderers }))}
           >
             Reset to Defaults

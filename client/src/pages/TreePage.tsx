@@ -161,7 +161,11 @@ export function TreePage({ template: Page }: PageContentProps) {
               )}
             </AutoSize>
           ) : (
-            <Placeholder icon={<AccountTreeOutlined />} label="Tree" />
+            <Placeholder
+              icon={<AccountTreeOutlined />}
+              label="Tree"
+              secondary="When you load a trace that has tree-like data, you'll see it as a decision tree here."
+            />
           )}
         </Flex>
       </Page.Content>{" "}

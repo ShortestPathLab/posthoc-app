@@ -27,7 +27,6 @@ export function ServerListEditor() {
         addItemExtras={
           <FeaturePickerButton
             icon={<ResetIcon />}
-            sx={{ ml: 2 }}
             onClick={() => setSettings(() => ({ remote: defaultRemotes }))}
           >
             Reset to Defaults

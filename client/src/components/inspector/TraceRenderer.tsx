@@ -110,6 +110,9 @@ function TraceRendererCircularProgress() {
   );
 }
 
+const VIEWPORT_PAGE_DESCRIPTION =
+  "When you create a layer, you'll see it visualised here.";
+
 export function TraceRenderer({
   width,
   height,
@@ -194,9 +197,10 @@ export function TraceRenderer({
         ) : (
           <Placeholder
             icon={<ViewInArOutlined />}
-            label="No layers to render"
+            label="Viewport"
             width={width}
             height={height}
+            secondary={VIEWPORT_PAGE_DESCRIPTION}
           />
         )}
       </TraceRendererContext.Provider>

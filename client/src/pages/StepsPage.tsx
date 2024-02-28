@@ -1,5 +1,4 @@
 import {
-  DragIndicatorOutlined,
   FiberManualRecordOutlined,
   LayersOutlined as LayersIcon,
   SegmentOutlined,
@@ -99,6 +98,11 @@ function useStepsPageState(
     layer,
   };
 }
+
+const getStepsPageDescription = (s?: string) =>
+  s
+    ? `${s} contains 0 steps.`
+    : "When you load a trace, you'll see its steps here.";
 
 export function StepsPage({ template: Page }: PageContentProps) {
   const { spacing } = useTheme();
@@ -250,11 +254,16 @@ export function StepsPage({ template: Page }: PageContentProps) {
             ) : (
               <Placeholder
                 icon={<SegmentOutlined />}
-                label={`${inferLayerName(layer)}`}
+                label="Steps"
+                secondary={getStepsPageDescription(inferLayerName(layer))}
               />
             )
           ) : (
-            <Placeholder icon={<SegmentOutlined />} label="Steps" />
+            <Placeholder
+              icon={<SegmentOutlined />}
+              label="Steps"
+              secondary={getStepsPageDescription()}
+            />
           )}
         </Flex>
         {!!steps?.length && (

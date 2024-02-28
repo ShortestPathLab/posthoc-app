@@ -1,5 +1,6 @@
-import { ListOutlined } from "@mui/icons-material";
+import { CloseOutlined, ListOutlined } from "@mui/icons-material";
 import { Divider, List, ListItem, ListItemText } from "@mui/material";
+import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { Placeholder } from "components/inspector/Placeholder";
@@ -11,10 +12,19 @@ import { PageContentProps } from "./PageMeta";
 export function InfoPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
 
-  const [log] = useLog();
+  const [log, setLog] = useLog();
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Handle>{dragHandle}</Page.Handle>
+      <Page.Options>
+        <FeaturePickerButton
+          disabled={!log.length}
+          icon={<CloseOutlined />}
+          onClick={() => setLog(() => ({ action: "clear" }))}
+        >
+          Clear
+        </FeaturePickerButton>
+      </Page.Options>
       <Page.Content>
         <Flex vertical>
           {log.length ? (

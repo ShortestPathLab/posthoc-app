@@ -7,6 +7,15 @@ type LogEntry = {
 
 type Log = LogEntry[];
 
-export const [useLog, LogProvider] = createSlice<Log, LogEntry>([], {
-  reduce: (prev, next) => [next, ...prev],
+type LogAction = { action: "append"; log: LogEntry } | { action: "clear" };
+
+export const [useLog, LogProvider] = createSlice<Log, LogAction>([], {
+  reduce: (prev, next) => {
+    switch (next.action) {
+      case "append":
+        return [next.log, ...prev];
+      case "clear":
+        return [];
+    }
+  },
 });

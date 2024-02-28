@@ -50,7 +50,18 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
   return (
     <>
       <Flex alignItems="center" py={1}>
-        <Box flex={1}>
+        <Box
+          flex={1}
+          sx={{
+            width: 0,
+            overflow: "hidden",
+            "> *": {
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            },
+          }}
+        >
           <Type>
             {current
               ? `${current.renderer.meta.name} ${current.renderer.meta.version}`

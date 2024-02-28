@@ -47,7 +47,15 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   }
   function renderLabel(label: ReactNode) {
     return (
-      <Type variant="body1" sx={{ minWidth: "max-content", mr: 4 }}>
+      <Type
+        variant="body1"
+        sx={{
+          mr: 4,
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
         {label}
       </Type>
     );
@@ -71,9 +79,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                 <TabPanel value="general">
                   <Box>
                     {renderHeading("Playback")}
-                    <Flex alignItems="center">
+                    <Flex alignItems="center" justifyContent="space-between">
                       {renderLabel("Playback Rate")}
-                      <Space flex={1} />
                       <Slider
                         sx={{ maxWidth: 320, mr: 2 }}
                         marks={[1, 2, 5, 10].map((v) => ({
@@ -94,9 +101,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       />
                     </Flex>
                     {renderHeading("Appearance")}
-                    <Flex alignItems="center">
+                    <Flex alignItems="center" justifyContent="space-between">
                       {renderLabel("Acrylic")}
-                      <Space flex={1} />
                       <Switch
                         defaultChecked={!!acrylic}
                         onChange={(_, v) =>
@@ -104,7 +110,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                         }
                       />
                     </Flex>
-                    <Flex alignItems="center">
+                    <Flex alignItems="center" justifyContent="space-between">
                       {renderLabel("Dark Mode")}
                       <Space flex={1} />
                       <Switch
@@ -116,9 +122,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                         }
                       />
                     </Flex>
-                    <Flex alignItems="center">
+                    <Flex alignItems="center" justifyContent="space-between">
                       {renderLabel("Accent")}
-                      <Space flex={1} />
                       <FeaturePicker
                         value={accentColor}
                         items={map(keys(accentColors), (c) => ({
@@ -134,9 +139,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       />
                     </Flex>
                     {renderHeading("Behaviour")}
-                    <Flex alignItems="center">
+                    <Flex alignItems="center" justifyContent="space-between">
                       {renderLabel("Show Explore Panel on Start-up")}
-                      <Space flex={1} />
                       <Switch
                         defaultChecked={!!showOnStart}
                         onChange={(_, v) =>

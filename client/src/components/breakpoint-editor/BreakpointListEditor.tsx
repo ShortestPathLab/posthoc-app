@@ -66,7 +66,7 @@ export function BreakpointListEditor({
               handleBreakpointsChange(updatedBreakpoints)
             }
             addItemLabel="Breakpoint"
-            placeholder="No breakpoints."
+            placeholder="Get started by adding a breakpoint."
           />
         </Box>
       </Scroll>

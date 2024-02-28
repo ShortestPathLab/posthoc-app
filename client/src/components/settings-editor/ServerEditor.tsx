@@ -15,9 +15,7 @@ import {
   ManagedModal as Dialog,
   AppBarTitle as Title,
 } from "components/generic/Modal";
-import { OverlineDot as Dot } from "components/generic/Overline";
 import { SelectField as Select } from "components/generic/Select";
-import { Space } from "components/generic/Space";
 import { useConnection } from "hooks/useConnectionResolver";
 import { useConnectionStatus } from "hooks/useConnectionStatus";
 import { entries, omit, startCase } from "lodash";
@@ -54,7 +52,18 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
   return (
     <>
       <Flex alignItems="center" py={0.5}>
-        <Box flex={1}>
+        <Box
+          flex={1}
+          sx={{
+            width: 0,
+            overflow: "hidden",
+            "> *": {
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            },
+          }}
+        >
           <Type>
             {connection
               ? `${connection.name} ${connection.version}`

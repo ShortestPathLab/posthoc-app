@@ -4,6 +4,7 @@ import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { LayerListEditor } from "components/layer-editor/LayerListEditor";
 import { PageContentProps } from "./PageMeta";
+
 export function LayersPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
 

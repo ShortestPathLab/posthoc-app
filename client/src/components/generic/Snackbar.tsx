@@ -66,8 +66,11 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         },
       ]);
       appendLog(() => ({
-        content: filter([message, secondary]).join(", "),
-        timestamp: `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
+        action: "append",
+        log: {
+          content: filter([message, secondary]).join(", "),
+          timestamp: `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
+        },
       }));
       if (options.error) {
         console.error(`${message}, ${secondary}`);
