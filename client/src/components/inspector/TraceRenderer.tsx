@@ -28,7 +28,7 @@ import { SelectionMenu } from "./SelectionMenu";
 const TILE_RESOLUTION = 128;
 
 const tileSize = (playing: boolean = false) =>
-  (playing ? 0.75 : devicePixelRatio) * TILE_RESOLUTION;
+  (playing ? 0.75 : devicePixelRatio * 2) * TILE_RESOLUTION;
 
 const rendererOptions = {
   tileSubdivision: 2,

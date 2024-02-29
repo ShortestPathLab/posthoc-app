@@ -4,6 +4,7 @@ import EventEmitter from "typed-emitter";
 
 export type RendererOptions = {
   screenSize: Size;
+  errorColor: string;
   backgroundColor: string;
   accentColor: string;
 };

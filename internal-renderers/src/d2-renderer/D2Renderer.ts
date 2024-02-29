@@ -11,6 +11,7 @@ import {
   isNaN,
   map,
   once,
+  pickBy,
   reduce,
   throttle,
   times,
@@ -29,7 +30,13 @@ import {
   D2RendererOptions,
   defaultD2RendererOptions,
 } from "./D2RendererOptions";
-import { Body, D2WorkerEvent, getTiles } from "./D2RendererWorker";
+import {
+  Body,
+  D2WorkerEvent,
+  getTiles,
+  defaultBounds,
+  isValue,
+} from "./D2RendererWorker";
 import { D2RendererWorkerAdapter } from "./D2RendererWorkerAdapter";
 import { EventEmitter } from "./EventEmitter";
 import { intersect } from "./intersect";
@@ -146,7 +153,8 @@ class D2Renderer
     const id = nanoid();
     map(this.#workers, (w) => w.call("add", [components, id]));
     const bodies = map(components, ({ component, meta }) => ({
-      ...primitives[component.$].test(component),
+      ...defaultBounds,
+      ...pickBy(primitives[component.$].test(component), isValue),
       component,
       meta,
       index: this.#next(),
@@ -321,7 +329,7 @@ class D2Renderer
     this.#grid?.clear();
     this.#grid?.lineStyle(1 * px, accentColor, 0.5);
     this.#grid?.beginFill(accentColor, 0.05);
-    for (const { bounds: b, tile: t } of tiles) {
+    for (const { bounds: b } of tiles) {
       if (!find(this.#world?.children, (c) => isEqual(c.bounds, b))) {
         this.#grid?.drawRect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       }

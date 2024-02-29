@@ -43,6 +43,7 @@ export const defaultD2RendererOptions: D2RendererOptions = {
   refreshInterval: 1000 / 60,
   animationDuration: 150,
   debounceInterval: 1000 / 60,
+  errorColor: "#f44336",
   backgroundColor: "#ffffff",
   accentColor: "#333333",
   dynamicResolution: {

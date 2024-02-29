@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "adapter": "file:../adapter",
+    "color-interpolate": "^1.0.5",
     "colortranslator": "^2.0.0",
     "combinate": "^1.1.11",
     "detect-collisions": "^9.1.1",

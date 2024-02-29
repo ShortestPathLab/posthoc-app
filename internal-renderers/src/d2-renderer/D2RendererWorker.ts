@@ -13,6 +13,13 @@ import {
   range,
   shuffle,
   sortBy,
+  get,
+  truncate,
+  isNumber,
+  values,
+  isUndefined,
+  negate,
+  identity,
 } from "lodash";
 import memo from "memoizee";
 import type { Bounds, Point, Size } from "protocol";
@@ -28,12 +35,32 @@ import { EventEmitter } from "./EventEmitter";
 import { draw } from "./draw";
 import { pointToIndex } from "./pointToIndex";
 import { primitives } from "./primitives";
+import interpolate from "color-interpolate";
 
 const hash = JSON.stringify;
 
 const { log2, max } = Math;
 
 const z = (x: number) => floor(log2(x + 1));
+
+function wordWrap(text: string, width: number) {
+  return _(text)
+    .split(" ")
+    .reduce(
+      (prev, next) =>
+        next.length + prev.width > width
+          ? {
+              text: `${prev.text}\n${next} `,
+              width: next.length + 1,
+            }
+          : {
+              text: `${prev.text}${next} `,
+              width: prev.width + next.length + 1,
+            },
+      { width: 0, text: "" }
+    )
+    .value().text;
+}
 
 export function getTiles(
   { right, left, bottom, top }: Bounds,
@@ -92,12 +119,21 @@ export type D2WorkerEvent<
   payload: D2WorkerEvents[T];
 };
 
+export const defaultBounds = {
+  top: 0,
+  left: 0,
+  right: 1,
+  bottom: 1,
+};
+
 export type Body<T> = Bounds &
   ComponentEntry<T> & {
     index: number;
   };
 
 const TILE_CACHE_SIZE = 200;
+
+export const isValue = (a: any) => isNumber(a) && !isNaN(a);
 
 export class D2RendererWorker extends EventEmitter<
   D2RendererEvents & {
@@ -132,6 +168,7 @@ export class D2RendererWorker extends EventEmitter<
   }
 
   #cache: { [K in string]: { hash: string; tile: ImageBitmap } } = {};
+  #errors: { [K in string]: string } = {};
 
   add(components: ComponentEntry<CompiledD2IntrinsicComponent>[], id: string) {
     const bodies = map(components, ({ component, meta }) => ({
@@ -145,16 +182,30 @@ export class D2RendererWorker extends EventEmitter<
       ),
       index: this.#next(),
     }));
+    const b = bodies.find(
+      (c) =>
+        !isValue(c.top) ||
+        !isValue(c.bottom) ||
+        !isValue(c.left) ||
+        !isValue(c.right)
+    );
+    if (b) {
+      this.#errors[
+        id
+      ] = `Component '${b.component.$}' is missing required properties`;
+      return;
+    }
     this.#system.load(bodies);
     this.#children[id] = bodies;
     this.#invalidate();
   }
 
   remove(id: string) {
-    for (const c of this.#children[id]) {
+    map(this.#children[id], (c) => {
       this.#system.remove(c);
-    }
+    });
     delete this.#children[id];
+    delete this.#errors[id];
     this.#invalidate();
   }
 
@@ -209,75 +260,121 @@ export class D2RendererWorker extends EventEmitter<
     max: TILE_CACHE_SIZE,
   });
 
+  #getPx() {
+    const { tileResolution, tileSubdivision } = this.#options;
+    // Estimate a reasonable "1 screen pixel"
+    return (tileResolution.width * 2 ** tileSubdivision) / 4096;
+  }
+
+  #drawError(tile: Size, e: string = "") {
+    const fontSize = 64;
+    const leading = 12;
+    const { errorColor, backgroundColor } = this.#options;
+    const g = new OffscreenCanvas(tile.width, tile.height);
+    const ctx = g.getContext("2d", { alpha: false })!;
+    const px = this.#getPx();
+
+    ctx.fillStyle = interpolate([backgroundColor, errorColor])(0.05);
+    ctx.fillRect(0, 0, tile.width, tile.height);
+
+    ctx.font = `${px * fontSize}px Inter, Helvetica, Arial, sans-serif`;
+    ctx.fillStyle = errorColor;
+
+    for (const [a, i] of wordWrap(truncate(e, { length: 100 }), 28)
+      .split("\n")
+      .map((...args) => args)) {
+      ctx.fillText(
+        a,
+        px * fontSize,
+        px * fontSize * 2 + (leading + fontSize) * px * i
+      );
+    }
+
+    ctx.lineWidth = px * 0.5;
+    ctx.strokeStyle = errorColor;
+    ctx.strokeRect(0, 0, tile.width, tile.height);
+
+    return g;
+  }
+
   #renderTile(bounds: Bounds, tile: Size) {
-    const { top, right, bottom, left } = bounds;
-    const scale = {
-      x: tile.width / (right - left),
-      y: tile.height / (bottom - top),
-    };
-    const bodies = sortBy(
-      this.#system.search({
-        minX: left,
-        maxX: right,
-        maxY: bottom,
-        minY: top,
-      }),
-      "index"
-    );
-    const nextHash = hash(map(bodies, "index"));
-    const tileKey = hash([top, right, bottom, left, tile.width, tile.height]);
-    const prevTile = this.#cache[tileKey];
-    if (!prevTile || nextHash !== prevTile.hash) {
-      const g = new OffscreenCanvas(tile.width, tile.height);
-      const ctx = g.getContext("2d", { alpha: false })!;
-      ctx.imageSmoothingEnabled = false;
-      ctx.fillStyle = this.#options.backgroundColor;
-      ctx.fillRect(0, 0, tile.width, tile.height);
+    try {
+      const primitiveError = values(this.#errors).find(identity);
+      if (primitiveError) throw new Error(primitiveError);
 
-      const length = tile.width * 0.05;
-      const thickness = 1;
-      ctx.fillStyle = `rgba(127,127,127,0.36)`;
-      ctx.fillRect(
-        (tile.width - length) / 2,
-        (tile.height - thickness) / 2,
-        length,
-        thickness
+      const { top, right, bottom, left } = bounds;
+      const scale = {
+        x: tile.width / (right - left),
+        y: tile.height / (bottom - top),
+      };
+      const bodies = sortBy(
+        this.#system.search({
+          minX: left,
+          maxX: right,
+          maxY: bottom,
+          minY: top,
+        }),
+        "index"
       );
-      ctx.fillRect(
-        (tile.width - thickness) / 2,
-        (tile.height - length) / 2,
-        thickness,
-        length
-      );
+      const nextHash = hash(map(bodies, "index"));
+      const tileKey = hash([top, right, bottom, left, tile.width, tile.height]);
+      const prevTile = this.#cache[tileKey];
+      if (!prevTile || nextHash !== prevTile.hash) {
+        const g = new OffscreenCanvas(tile.width, tile.height);
+        const ctx = g.getContext("2d", { alpha: false })!;
+        ctx.imageSmoothingEnabled = false;
 
-      _(bodies)
-        .sortBy((c) => -(c.meta?.sourceLayerIndex ?? 0))
-        .groupBy((c) => c.meta?.sourceLayerIndex ?? 0)
-        .forEach((group) => {
-          const g2 = new OffscreenCanvas(tile.width, tile.height);
-          const ctx2 = g2.getContext("2d")!;
-          for (const { component } of group) {
-            draw(component, ctx2, {
-              scale,
-              x: -left * scale.x,
-              y: -top * scale.y,
-            });
-          }
-          const alpha = head(group)?.meta?.sourceLayerAlpha ?? 1;
-          const displayMode =
-            head(group)?.meta?.sourceLayerDisplayMode ?? "source-over";
-          ctx.globalCompositeOperation = displayMode;
-          ctx.globalAlpha = alpha;
-          ctx.drawImage(g2, 0, 0);
-        })
-        .value();
+        ctx.fillStyle = this.#options.backgroundColor;
+        ctx.fillRect(0, 0, tile.width, tile.height);
 
-      const bitmap = g.transferToImageBitmap();
-      this.#cache[tileKey] = { hash: nextHash, tile: bitmap };
+        const length = tile.width * 0.05;
+        const thickness = 1;
+        ctx.fillStyle = `rgba(127,127,127,0.36)`;
+        ctx.fillRect(
+          (tile.width - length) / 2,
+          (tile.height - thickness) / 2,
+          length,
+          thickness
+        );
+        ctx.fillRect(
+          (tile.width - thickness) / 2,
+          (tile.height - length) / 2,
+          thickness,
+          length
+        );
+        _(bodies)
+          .sortBy((c) => -(c.meta?.sourceLayerIndex ?? 0))
+          .groupBy((c) => c.meta?.sourceLayerIndex ?? 0)
+          .forEach((group) => {
+            const g2 = new OffscreenCanvas(tile.width, tile.height);
+            const ctx2 = g2.getContext("2d")!;
+            for (const { component } of group) {
+              draw(component, ctx2, {
+                scale,
+                x: -left * scale.x,
+                y: -top * scale.y,
+              });
+            }
+            const alpha = head(group)?.meta?.sourceLayerAlpha ?? 1;
+            const displayMode =
+              head(group)?.meta?.sourceLayerDisplayMode ?? "source-over";
+            ctx.globalCompositeOperation = displayMode;
+            ctx.globalAlpha = alpha;
+            ctx.drawImage(g2, 0, 0);
+          })
+          .value();
 
-      return bitmap;
-    } else {
-      return prevTile.tile;
+        const bitmap = g.transferToImageBitmap();
+        this.#cache[tileKey] = { hash: nextHash, tile: bitmap };
+
+        return bitmap;
+      } else {
+        return prevTile.tile;
+      }
+    } catch (e) {
+      console.error(e);
+      const g = this.#drawError(tile, get(e, "message"));
+      return g.transferToImageBitmap();
     }
   }
 }
