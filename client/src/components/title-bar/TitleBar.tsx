@@ -80,7 +80,13 @@ export const TitleBar = () => {
           key: id(),
           children: [
             { ...view, size: 80 },
-            { type: "leaf", key: id(), content: { type: "" }, size: 20 },
+            {
+              type: "leaf",
+              key: id(),
+              content: { type: "" },
+              size: 20,
+              acceptDrop: true,
+            },
           ],
         },
       };
