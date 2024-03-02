@@ -10,6 +10,7 @@ export function LayersPage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Title>Layers</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex>

@@ -41,7 +41,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
         mode === "dark"
           ? // ? { default: "#101418", paper: "#14191f" }
             { default: "#0a0c10", paper: "#111317" }
-          : { default: "#f6f8fa", paper: "#ffffff" },
+          : { default: "#ebecef", paper: "#ffffff" },
     },
     typography: {
       allVariants: {
@@ -100,16 +100,17 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
     shadows: ["", ...times(24, constant(shadow))] as any,
   });
 
-export function useAcrylic(): SxProps<Theme> {
+export function useAcrylic(color?: string): SxProps<Theme> {
   const [{ "appearance/acrylic": acrylic }] = useSettings();
   return acrylic
     ? {
         backdropFilter: "blur(16px)",
-        background: ({ palette }) => alpha(palette.background.paper, 0.75),
+        background: ({ palette }) =>
+          alpha(color ?? palette.background.paper, 0.75),
       }
     : {
         backdropFilter: "blur(0px)",
-        background: ({ palette }) => palette.background.paper,
+        background: ({ palette }) => color ?? palette.background.paper,
       };
 }
 

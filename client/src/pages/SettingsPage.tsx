@@ -22,6 +22,7 @@ import { ReactNode, useState } from "react";
 import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
 import { AccentColor, accentColors } from "theme";
 import { PageContentProps } from "./PageMeta";
+import { AboutContent } from "./AboutPage";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsPage({ template: Page }: PageContentProps) {
@@ -63,6 +64,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
+        <Page.Title>Settings</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
           <TabList onChange={(_, v) => setTab(v)}>
@@ -70,6 +72,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
             <Tab label="Connections" value="connections" />
             <Tab label="Renderers" value="renderers" />
             <Tab label="Map Parsers" value="map-parsers" />
+            <Tab label="About" value="about" />
           </TabList>
         </Page.Options>
         <Page.Content>
@@ -168,6 +171,11 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                   <Box>
                     {renderHeading("Map Parsers")}
                     <MapParserListEditor />
+                  </Box>
+                </TabPanel>
+                <TabPanel value="about">
+                  <Box>
+                    <AboutContent />
                   </Box>
                 </TabPanel>
               </Flex>

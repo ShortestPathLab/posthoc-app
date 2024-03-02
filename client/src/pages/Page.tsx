@@ -1,3 +1,4 @@
+import { WidgetsOutlined } from "@mui/icons-material";
 import { Box, Divider } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
@@ -5,13 +6,13 @@ import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
 import { values } from "lodash";
 import { pages } from "pages";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { withSlots } from "react-slot-component";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
-import { ErrorBoundary } from "react-error-boundary";
 
-const divider = (
+export const divider = (
   <Divider
     orientation="vertical"
     flexItem
@@ -28,6 +29,9 @@ export type PageProps = {
 };
 
 export type PageSlots = {
+  Title: {
+    children: React.ReactNode;
+  };
   Content: {
     children: React.ReactNode;
   };
@@ -86,7 +90,8 @@ export const Page = withSlots<PageSlots, PageProps>(
                   {slotProps.Handle?.children}
                   <FeaturePicker
                     // showArrow
-                    label="Page"
+                    icon={<WidgetsOutlined />}
+                    label="Choose View"
                     onChange={(type) =>
                       onChange?.({
                         ...stack,

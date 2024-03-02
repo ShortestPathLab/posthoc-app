@@ -151,14 +151,14 @@ export function FeatureCard({
         <Box
           sx={{
             zIndex: -1,
-            filter: "blur(64px)",
-            opacity: 0.15,
+            filter: "blur(48px)",
+            opacity: 0.1,
             position: "absolute",
             width: "100%",
             height: "100%",
             backgroundImage: `url("${image}")`,
-            backgroundSize: "200%",
-            backgroundPosition: "bottom right",
+            backgroundSize: "120%",
+            backgroundPosition: "center",
           }}
         ></Box>
       )}
@@ -180,10 +180,11 @@ export function FeatureCard({
           >
             <Box
               sx={{
+                imageRendering: "pixelated",
                 width: 64,
                 height: 64,
                 backgroundImage: `url("${image}")`,
-                backgroundSize: "cover",
+                backgroundSize: "130%",
                 backgroundPosition: "center",
               }}
             ></Box>
@@ -194,7 +195,7 @@ export function FeatureCard({
         subheaderTypeProps={ellipsisProps}
         subheader={
           <Stack gap={2} sx={{ pt: 1, alignItems: "flex-start" }}>
-            <Box
+            <Type
               sx={{
                 ...ellipsisProps,
                 maxWidth: "100%",
@@ -206,7 +207,7 @@ export function FeatureCard({
               }}
             >
               {description || "No description"}
-            </Box>
+            </Type>
             <Stack direction="row" alignItems="center" gap={1}>
               {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
               <Type variant="caption">{authorName}</Type>
@@ -280,6 +281,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
+        <Page.Title>Explore</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
           <TabList onChange={(_, v) => setTab(v)}>

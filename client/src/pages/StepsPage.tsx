@@ -193,7 +193,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
         ref.current.scrollToIndex({
           index: i,
           behavior: "smooth",
-          offset: -pxToInt(spacing(6 + PADDING_TOP)),
+          offset: -pxToInt(spacing(12 + PADDING_TOP)),
         });
       }
     }
@@ -201,6 +201,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Title>Steps</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex vertical alignItems="center">

@@ -18,6 +18,7 @@ import { useLayer } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { PageContentProps } from "./PageMeta";
 import { Placeholder } from "components/inspector/Placeholder";
+import { Scroll } from "components/generic/Scrollbars";
 
 const divider = (
   <Divider
@@ -43,6 +44,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
+        <Page.Title>Debugger</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
           <FeaturePicker
@@ -65,7 +67,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
         </Page.Options>
         <Page.Content>
           {layer ? (
-            <Box overflow="auto" height="100%">
+            <Scroll y>
               <Box pt={6} height="100%">
                 <TabPanel value="standard">
                   <Box mx={-2}>
@@ -85,7 +87,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
                   />
                 </TabPanel>
               </Box>
-            </Box>
+            </Scroll>
           ) : (
             <Placeholder
               icon={<BugReportOutlined />}

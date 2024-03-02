@@ -12,10 +12,9 @@ import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useWorkspace } from "hooks/useWorkspace";
-import { startCase, values } from "lodash";
+import { startCase } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { nanoid as id } from "nanoid";
-import { pages } from "pages";
 import logo from "public/logo512.png";
 import { docs, repository, version } from "public/manifest.json";
 import {
@@ -72,13 +71,8 @@ export const TitleBar = () => {
   const visible = useTitleBarVisible();
   const [, setView] = useView();
   const [exportModalOpen, setExportModalOpen] = useState(false);
-  function handleOpenPanel(type: string) {
+  function handleOpenPanel(orientation: "horizontal" | "vertical") {
     setView(({ view }) => {
-      // const orientation =
-      //   view.type === "leaf" || view.orientation === "vertical"
-      //     ? "horizontal"
-      //     : "vertical";
-      const orientation = "horizontal";
       return {
         view: {
           type: "branch",
@@ -86,7 +80,7 @@ export const TitleBar = () => {
           key: id(),
           children: [
             { ...view, size: 80 },
-            { type: "leaf", key: id(), content: { type }, size: 20 },
+            { type: "leaf", key: id(), content: { type: "" }, size: 20 },
           ],
         },
       };
@@ -118,12 +112,24 @@ export const TitleBar = () => {
               </Box>
               {[
                 {
-                  key: "panel",
-                  items: values(pages).map(({ name, id, icon }) => ({
-                    key: `panel-open-${id}`,
-                    name: <MenuEntry label={name} startIcon={icon} />,
-                    action: () => handleOpenPanel(id),
-                  })),
+                  key: "view",
+                  items: [
+                    {
+                      key: `panel-new-right`,
+                      name: "Add panel to the right",
+                      action: () => handleOpenPanel("horizontal"),
+                    },
+                    {
+                      key: `panel-new-bottom`,
+                      name: "Add panel below",
+                      action: () => handleOpenPanel("vertical"),
+                    },
+                    {
+                      name: "Reset layout",
+                      key: "panel-reset",
+                      action: () => setView(getDefaultViewTree),
+                    },
+                  ],
                 },
                 {
                   key: "workspace",
@@ -141,17 +147,12 @@ export const TitleBar = () => {
                     {
                       name: (
                         <MenuEntry
-                          label="Publish Workspace"
+                          label="Publish workspace"
                           endIcon={<OpenInNewOutlined />}
                         />
                       ),
                       key: "workspace-save-metadata",
                       action: () => setExportModalOpen(true),
-                    },
-                    {
-                      name: "Reset Layout",
-                      key: "workspace-reset",
-                      action: () => setView(getDefaultViewTree),
                     },
                   ],
                 },

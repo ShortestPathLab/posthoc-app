@@ -1,8 +1,17 @@
 import Split, { SplitDirection } from "@devbookhq/splitter";
 import { DragIndicatorOutlined } from "@mui/icons-material";
-import { Box, useTheme } from "@mui/material";
+import { Box, alpha, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
-import { filter, find, flatMap, forEach, map, pick, sumBy } from "lodash";
+import _, {
+  filter,
+  find,
+  flatMap,
+  forEach,
+  isUndefined,
+  map,
+  pick,
+  sumBy,
+} from "lodash";
 import { nanoid } from "nanoid";
 import { produce, transaction } from "produce";
 import { Context, ReactNode, createContext, useContext, useMemo } from "react";
@@ -51,6 +60,7 @@ type ViewTreeProps<T> = {
   depth?: number;
   onPopOut?: (leaf: Leaf<T>) => void;
   canPopOut?: (leaf: Leaf<T>) => boolean;
+  onDrop?: (leaf: Leaf<any>, root: Leaf<T>) => void;
 };
 
 type ViewBranchProps<T> = ViewTreeProps<T> & {
@@ -95,21 +105,25 @@ export function ViewLeaf<T>({
   canPopOut,
   depth = 0,
   onSwap,
+  onDrop,
 }: ViewLeafProps<T>) {
-  const [{ isOver }, drop] = useDrop<
-    { key: string },
-    void,
-    { isOver: boolean }
-  >(() => ({
-    accept: ["panel"],
-    collect: (monitor) => ({
-      isOver: monitor.isOver() && monitor.getItem().key !== root.key,
-    }),
-    drop: (item) => onSwap?.(item.key, root.key),
-  }));
+  const [{ isOver }, drop] = useDrop<Leaf<any>, void, { isOver: boolean }>(
+    () => ({
+      accept: ["panel"],
+      collect: (monitor) => ({
+        isOver:
+          monitor.isOver() &&
+          monitor.getItem().key !== root.key &&
+          !!root.acceptDrop,
+      }),
+      drop: (item) => {
+        onDrop?.(item, root), onSwap?.(item.key, root.key);
+      },
+    })
+  );
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "panel",
-    item: { key: root.key },
+    item: root,
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -208,7 +222,6 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
 
   const gutterCls = useCss({
     "div&": {
-      transition: transitions.create(["box-shadow", "background"]),
       background:
         palette.mode === "dark" ? palette.background.default : palette.divider,
       boxShadow: `inset 0 0 0 1px ${palette.background.paper}`,
@@ -218,8 +231,6 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
       },
       "&.Horizontal": {
         padding: 0,
-        // marginLeft: "-1px",
-        // marginRight: "-1px",
         width: "3px",
       },
       "&.Vertical": { padding: 0 },
@@ -232,6 +243,12 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
     const space = 100 - sumBy(all, "size");
     const undef = filter(all, (s) => !s.size).length;
     return undef ? space / undef : 0;
+  }
+
+  function share(n?: number, root: Root<T>[] = []) {
+    return !isUndefined(n)
+      ? (n / _(root).map("size").sum()) * 100
+      : inferSize(root);
   }
 
   return (
@@ -253,10 +270,7 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
           }
           minHeights={map(root.children, () => getSpacing(6) - 8)}
           minWidths={map(root.children, () => getSpacing(32))}
-          initialSizes={map(
-            root.children,
-            (c, _, all) => c.size ?? inferSize(all)
-          )}
+          initialSizes={map(root.children, (c, _, all) => share(c.size, all))}
           direction={
             {
               vertical: SplitDirection.Vertical,

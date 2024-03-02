@@ -1,5 +1,4 @@
 import {
-  InfoOutlined as AboutIcon,
   BugReportOutlined as DebuggerIcon,
   LayersOutlined as LayersIcon,
   ListOutlined as LogsIcon,
@@ -10,7 +9,6 @@ import {
   ViewInArOutlined as ViewportIcon,
 } from "@mui/icons-material";
 import { Dictionary } from "lodash";
-import { AboutPage } from "./AboutPage";
 import { DebugPage } from "./DebugPage";
 import { ExplorePage } from "./ExplorePage";
 import { InfoPage } from "./InfoPage";
@@ -31,6 +29,14 @@ export const pages: Dictionary<PageMeta> = {
     content: ExplorePage,
     allowFullscreen: true,
   },
+  viewport: {
+    id: "viewport",
+    name: "Viewport",
+    description: "",
+    color: "deepPurple",
+    icon: <ViewportIcon />,
+    content: ViewportPage,
+  },
   layers: {
     id: "layers",
     name: "Layers",
@@ -47,19 +53,11 @@ export const pages: Dictionary<PageMeta> = {
     icon: <StepsIcon />,
     content: StepsPage,
   },
-  viewport: {
-    id: "viewport",
-    name: "Viewport",
-    description: "",
-    color: "indigo",
-    icon: <ViewportIcon />,
-    content: ViewportPage,
-  },
   tree: {
     id: "tree",
     name: "Tree",
     description: "",
-    color: "indigo",
+    color: "deepPurple",
     icon: <TreeIcon />,
     content: TreePage,
   },
@@ -67,7 +65,7 @@ export const pages: Dictionary<PageMeta> = {
     id: "debug",
     name: "Debugger",
     description: "",
-    color: "lightBlue",
+    color: "indigo",
     icon: <DebuggerIcon />,
     content: DebugPage,
   },
@@ -87,12 +85,12 @@ export const pages: Dictionary<PageMeta> = {
     icon: <SettingsIcon />,
     content: SettingsPage,
   },
-  about: {
-    id: "about",
-    name: "About",
-    description: "",
-    color: "grey",
-    icon: <AboutIcon />,
-    content: AboutPage,
-  },
+  // about: {
+  //   id: "about",
+  //   name: "About",
+  //   description: "",
+  //   color: "grey",
+  //   icon: <AboutIcon />,
+  //   content: AboutPage,
+  // },
 };

@@ -119,6 +119,7 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Title>Tree</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex>

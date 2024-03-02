@@ -23,8 +23,8 @@ export function Placeholder({
         background: (t) => `repeating-linear-gradient(
           45deg,
           ${t.palette.background.default},
-          ${t.palette.background.paper} 1px,
-          ${t.palette.background.paper} 7px,
+          transparent 1px,
+          transparent 7px,
           ${t.palette.background.default} 8px
         )`,
       }}

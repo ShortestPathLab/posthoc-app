@@ -13,6 +13,7 @@ export type Branch<T> = Node & {
 export type Leaf<T> = Node & {
   type: "leaf";
   key: string;
+  acceptDrop?: boolean;
   content?: T;
 };
 
@@ -38,6 +39,7 @@ export function getDefaultViewTree(): ViewTreeState {
           key: id(),
           type: "leaf",
           size: 100,
+          acceptDrop: true,
           content: { type: "explore" },
         },
       }
@@ -58,12 +60,14 @@ export function getDefaultViewTree(): ViewTreeState {
                   type: "leaf",
                   size: 40,
                   key: id(),
+                  acceptDrop: true,
                   content: { type: "layers" },
                 },
                 {
                   type: "leaf",
                   size: 60,
                   key: id(),
+                  acceptDrop: true,
                   content: { type: "steps" },
                 },
               ],
@@ -72,6 +76,7 @@ export function getDefaultViewTree(): ViewTreeState {
               size: 75,
               type: "leaf",
               key: id(),
+              acceptDrop: true,
               content: { type: "viewport" },
             },
           ],
