@@ -10,7 +10,9 @@ import {
   Card,
   CardHeader,
   CardProps,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
   InputAdornment,
   Stack,
   SxProps,
@@ -236,6 +238,7 @@ export function FeatureCard({
 const CONTENT_WIDTH = 940;
 
 export function ExplorePage({ template: Page }: PageContentProps) {
+  const [{ "behaviour/showOnStart": showOnStart }, setSettings] = useSettings();
   const notify = useSnackbar();
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
@@ -278,6 +281,15 @@ export function ExplorePage({ template: Page }: PageContentProps) {
       ),
     [search, files]
   );
+
+  const showOnStartUpChecked = showOnStart === "explore";
+
+  function onShowOnStartUpCheckedChange(v: boolean) {
+    setSettings(() => ({
+      "behaviour/showOnStart": v ? "explore" : undefined,
+    }));
+  }
+
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
@@ -402,7 +414,22 @@ export function ExplorePage({ template: Page }: PageContentProps) {
             </Scroll>
           </Flex>
         </Page.Content>
-        <Page.Extras>{controls}</Page.Extras>
+        <Page.Extras>
+          {!sm && (
+            <FormControlLabel
+              label="Show on start-up"
+              labelPlacement="start"
+              sx={{ ml: "auto", mr: -5, minWidth: "fit-content" }}
+              control={
+                <Checkbox
+                  defaultChecked={showOnStartUpChecked}
+                  onChange={(_, v) => onShowOnStartUpCheckedChange?.(v)}
+                />
+              }
+            />
+          )}
+          {controls}
+        </Page.Extras>
       </Page>
     </TabContext>
   );

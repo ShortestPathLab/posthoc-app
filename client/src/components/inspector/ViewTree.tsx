@@ -2,7 +2,8 @@ import Split, { SplitDirection } from "@devbookhq/splitter";
 import { DragIndicatorOutlined } from "@mui/icons-material";
 import { Box, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
-import _, {
+import {
+  chain as _,
   filter,
   find,
   flatMap,
@@ -246,9 +247,11 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
   }
 
   function share(n?: number, root: Root<T>[] = []) {
-    return !isUndefined(n)
-      ? (n / _(root).map("size").sum()) * 100
-      : inferSize(root);
+    const all = _(root)
+      .map((c) => (isUndefined(c.size) || isNaN(c.size) ? 0 : c.size))
+      .sum()
+      .value();
+    return !isUndefined(n) ? n : 100 - all ?? inferSize(root);
   }
 
   return (

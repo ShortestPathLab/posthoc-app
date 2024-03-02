@@ -28,9 +28,9 @@ const defaultRoot: Root<PanelState | undefined> = {
       type: "leaf",
       content: { type: "explore" },
       key: nanoid(),
-      size: 20,
+      size: 30,
     },
-    { type: "leaf", content: undefined, key: nanoid(), size: 80 },
+    { type: "leaf", content: undefined, key: nanoid(), size: 70 },
   ],
 };
 

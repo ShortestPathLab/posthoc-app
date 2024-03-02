@@ -83,12 +83,11 @@ export function ViewControls({
               <ListItemText>Split Horizontal</ListItemText>
             </MenuItem>
             <Divider />
-            {!(popOutDisabled || closeDisabled) && (
+            {!popOutDisabled && (
               <Box>
                 <MenuItem
                   onClick={() => {
                     onPopOut?.();
-                    onClose?.();
                     state.close();
                   }}
                 >

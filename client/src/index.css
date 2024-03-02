@@ -29,23 +29,46 @@ code {
   display: block;
 }
 
+@property --scrollbar-size {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 2px;
+}
+
 @media (pointer: fine) {
   * {
-    scrollbar-color: #888888 #f0f0f0;
-    scrollbar-width: 14px;
+    scrollbar-color: inherit transparent;
+    scrollbar-width: var(--scrollbar-size);
+    transition: --scrollbar-size 300ms linear;
   }
   *::-webkit-scrollbar {
-    width: 14px;
+    width: var(--scrollbar-size);
     height: 14px;
-    background-color: #f0f0f0;
+    background-color: transparent;
+  }
+  .MuiPaper-root:hover {
+    --scrollbar-size: 10px;
   }
   *::-webkit-scrollbar-track {
-    background: #f0f0f0;
+    background: inherit;
   }
   *::-webkit-scrollbar-thumb {
-    background: #888888;
+    background-color: color-mix(in srgb, currentColor 20%, transparent);
+    opacity: 0.5;
     height: 14px;
     min-height: 64px;
-    min-width: 64px;
+    width: var(--scrollbar-size);
+    padding: 2px;
+    border: 2px solid transparent;
+    border-left: 6px solid transparent;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    border-left: 0px solid transparent;
+    background-color: color-mix(in srgb, currentColor 25%, transparent);
+  }
+  *::-webkit-scrollbar-thumb:active {
+    border-left: 0px solid transparent;
+    background-color: color-mix(in srgb, currentColor 30%, transparent);
   }
 }

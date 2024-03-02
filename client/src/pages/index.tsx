@@ -36,6 +36,7 @@ export const pages: Dictionary<PageMeta> = {
     color: "deepPurple",
     icon: <ViewportIcon />,
     content: ViewportPage,
+    allowFullscreen: true,
   },
   layers: {
     id: "layers",
@@ -44,6 +45,7 @@ export const pages: Dictionary<PageMeta> = {
     color: "deepPurple",
     icon: <LayersIcon />,
     content: LayersPage,
+    allowFullscreen: true,
   },
   steps: {
     id: "steps",
@@ -52,6 +54,7 @@ export const pages: Dictionary<PageMeta> = {
     color: "deepPurple",
     icon: <StepsIcon />,
     content: StepsPage,
+    allowFullscreen: true,
   },
   tree: {
     id: "tree",
@@ -60,6 +63,7 @@ export const pages: Dictionary<PageMeta> = {
     color: "deepPurple",
     icon: <TreeIcon />,
     content: TreePage,
+    allowFullscreen: true,
   },
   debug: {
     id: "debug",
@@ -68,6 +72,7 @@ export const pages: Dictionary<PageMeta> = {
     color: "indigo",
     icon: <DebuggerIcon />,
     content: DebugPage,
+    allowFullscreen: true,
   },
   info: {
     id: "info",
@@ -76,6 +81,7 @@ export const pages: Dictionary<PageMeta> = {
     color: "grey",
     icon: <LogsIcon />,
     content: InfoPage,
+    allowFullscreen: true,
   },
   settings: {
     id: "settings",
@@ -84,6 +90,7 @@ export const pages: Dictionary<PageMeta> = {
     color: "grey",
     icon: <SettingsIcon />,
     content: SettingsPage,
+    allowFullscreen: true,
   },
   // about: {
   //   id: "about",

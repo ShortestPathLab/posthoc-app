@@ -17,12 +17,10 @@ export type FullscreenPageProps = {
   renderExtras?: (content?: PanelState) => ReactNode;
   controls?: ReactNode;
   children?: ReactNode;
-  showOnStartUpChecked?: boolean;
-  onShowOnStartUpCheckedChange?: (v: boolean) => void;
 };
 
 export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
-  ({ slotProps, showOnStartUpChecked, onShowOnStartUpCheckedChange }) => {
+  ({ slotProps }) => {
     const sm = useSmallDisplay();
     return (
       <Box sx={{ height: "100%" }}>
@@ -57,20 +55,8 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
                   )}
                 </Flex>
               </Scroll>
-              <FormControlLabel
-                label="Show on start-up"
-                labelPlacement="start"
-                sx={{ ml: "auto", mr: -5, minWidth: "fit-content" }}
-                control={
-                  <Checkbox
-                    defaultChecked={showOnStartUpChecked}
-                    onChange={(_, v) => onShowOnStartUpCheckedChange?.(v)}
-                  />
-                }
-              />
+              {slotProps.Extras?.children}
             </Flex>
-            <Space sx={{ mx: "auto" }} />
-            {slotProps.Extras?.children}
           </Flex>
         )}
         <Box
@@ -90,7 +76,6 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
 );
 
 export function FullscreenModalHost() {
-  const [{ "behaviour/showOnStart": showOnStart }, setSettings] = useSettings();
   const [{ fullscreenModal: key }, setUIState] = useUIState();
   const [closing, setClosing] = useState(false);
 
@@ -109,21 +94,16 @@ export function FullscreenModalHost() {
 
       const FullScreenPageTemplate = withSlots<PageSlots, FullscreenPageProps>(
         ({ slotProps, ...props }) => (
-          <FullscreenPage
-            {...props}
-            onShowOnStartUpCheckedChange={(v) =>
-              setSettings(() => ({
-                "behaviour/showOnStart": v ? key : undefined,
-              }))
-            }
-            showOnStartUpChecked={showOnStart === key}
-          >
+          <FullscreenPage {...props}>
             <FullscreenPage.Content>
               {slotProps!.Content?.children}
             </FullscreenPage.Content>
             <FullscreenPage.Options>
               {slotProps!.Options?.children}
             </FullscreenPage.Options>
+            <FullscreenPage.Extras>
+              {slotProps!.Extras?.children}
+            </FullscreenPage.Extras>
           </FullscreenPage>
         )
       );
