@@ -351,10 +351,11 @@ function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
   const { palette } = useTheme();
   const { getPath } = useMemo(
     () =>
+      layer?.source?.playback !== "playing" &&
       layer?.source?.parsedTrace?.content
         ? makePathIndex(layer.source.parsedTrace.content)
         : { getParent: constant(undefined), getPath: constant([]) },
-    [layer?.source?.parsedTrace?.content]
+    [layer?.source?.parsedTrace?.content, layer?.source?.playback]
   );
   const element = useMemo(() => {
     if (layer?.source?.parsedTrace?.content?.render?.path) {

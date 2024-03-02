@@ -1,6 +1,6 @@
 import Split, { SplitDirection } from "@devbookhq/splitter";
 import { DragIndicatorOutlined } from "@mui/icons-material";
-import { Box, alpha, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import _, {
   filter,
