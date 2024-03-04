@@ -159,8 +159,9 @@ export function FeatureCard({
             width: "100%",
             height: "100%",
             backgroundImage: `url("${image}")`,
-            backgroundSize: "120%",
-            backgroundPosition: "center",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "-52px -52px",
           }}
         ></Box>
       )}

@@ -2,6 +2,7 @@ import { OpenInNewOutlined, SearchOutlined } from "@mui/icons-material";
 import {
   Box,
   ButtonBase,
+  Divider,
   Menu,
   MenuItem,
   MenuList,
@@ -121,16 +122,20 @@ export const TitleBar = () => {
                   key: "view",
                   items: [
                     {
+                      type: "action",
                       key: `panel-new-right`,
                       name: "Add panel to the right",
                       action: () => handleOpenPanel("horizontal"),
                     },
                     {
+                      type: "action",
                       key: `panel-new-bottom`,
                       name: "Add panel below",
                       action: () => handleOpenPanel("vertical"),
                     },
+                    { type: "divider" },
                     {
+                      type: "action",
                       name: "Reset layout",
                       key: "panel-reset",
                       action: () => setView(getDefaultViewTree),
@@ -141,16 +146,19 @@ export const TitleBar = () => {
                   key: "workspace",
                   items: [
                     {
+                      type: "action",
                       name: "Open workspace",
                       key: "workspace-load",
                       action: load,
                     },
                     {
+                      type: "action",
                       name: "Save workspace",
                       key: "workspace-save",
                       action: save,
                     },
                     {
+                      type: "action",
                       name: (
                         <MenuEntry
                           label="Publish workspace"
@@ -166,17 +174,20 @@ export const TitleBar = () => {
                   key: "help",
                   items: [
                     {
+                      type: "action",
                       name: "Open repository in GitHub",
                       key: "github",
                       action: () => open(repository, "_blank"),
                     },
                     {
+                      type: "action",
                       name: "Open changelog",
                       key: "changelog",
                       action: () =>
                         open(`${docs}/changelog-${version}.md`, "_blank"),
                     },
                     {
+                      type: "action",
                       name: "Open documentation",
                       key: "documentation",
                       action: () =>
@@ -193,17 +204,24 @@ export const TitleBar = () => {
                     <>
                       <Menu {...bindMenu(state)}>
                         <MenuList dense sx={{ p: 0 }}>
-                          {items.map(({ name, key, action }) => (
-                            <MenuItem
-                              key={key}
-                              onClick={() => {
-                                action?.();
-                                state.close();
-                              }}
-                            >
-                              {name}
-                            </MenuItem>
-                          ))}
+                          {items.map((item, i) => {
+                            if (item.type === "action") {
+                              const { name, key, action } = item;
+                              return (
+                                <MenuItem
+                                  key={key}
+                                  onClick={() => {
+                                    action?.();
+                                    state.close();
+                                  }}
+                                >
+                                  {name}
+                                </MenuItem>
+                              );
+                            } else {
+                              return <Divider key={i} />;
+                            }
+                          })}
                         </MenuList>
                       </Menu>
                       <FeaturePickerButton
@@ -221,9 +239,9 @@ export const TitleBar = () => {
                   )}
                 </PopupState>
               ))}
-              <Box sx={{ p: 0.75, height: "100%" }}>
+              {/* <Box sx={{ p: 0.75, height: "100%" }}>
                 <CommandsButton />
-              </Box>
+              </Box> */}
             </Stack>
           </Box>
         </Scroll>
@@ -236,7 +254,7 @@ export const TitleBar = () => {
   );
 };
 
-function CommandsButton() {
+export function CommandsButton() {
   const notify = useSnackbar();
   return (
     <ButtonBase

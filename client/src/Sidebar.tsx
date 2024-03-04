@@ -33,8 +33,8 @@ const defaultRoot: Root<PanelState | undefined> = {
   ],
 };
 
-const LEFT = 0;
-const RIGHT = 1;
+const SIDEBAR = 0;
+const CONTENT = 1;
 
 export function useSidebarState() {
   const [open, setOpen] = useState(false);
@@ -42,19 +42,19 @@ export function useSidebarState() {
   const produceRoot = (f: (obj: Root<PanelState | undefined>) => void) =>
     setRoot(produce(root, f));
   const { Content, derivedRoot, tab } = useMemo(() => {
-    const tab = get(root, `children[${LEFT}].content.type`) ?? "";
+    const tab = get(root, `children[${SIDEBAR}].content.type`) ?? "";
     const Content = pages[tab]?.content;
     const derivedRoot = produce(root, (r) => {
       if (r.type === "branch") {
         r.locked = !open;
-        r.children[LEFT].hidden = !open;
+        r.children[SIDEBAR].hidden = !open;
         const size = open
-          ? r.children[LEFT].size === 0
+          ? !r.children[SIDEBAR].size
             ? 20
-            : r.children[LEFT].size ?? 20
+            : r.children[SIDEBAR].size ?? 20
           : 0;
-        r.children[LEFT].size = size;
-        r.children[RIGHT].size = 100 - size;
+        r.children[SIDEBAR].size = size;
+        r.children[CONTENT].size = 100 - size;
       }
     });
     const derivedTab = open ? tab : "";
@@ -110,7 +110,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
             TabIndicatorProps={{ sx: { left: 0, right: "auto" } }}
             onChange={(_, t) => {
               produceRoot(
-                (r) => void set(r, `children[${LEFT}].content.type`, t)
+                (r) => void set(r, `children[${SIDEBAR}].content.type`, t)
               );
               setOpen(true);
             }}
