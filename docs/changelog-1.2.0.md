@@ -20,11 +20,20 @@ We added copy and a subtle design to panels that are empty to indicate that an a
 
 [Clip: Empty Panels](./assets/1-03-2024/1.2.0-empty-panels.mp4)
 
+https://github.com/path-visualiser/app/assets/15244945/59d4de07-4abe-4d25-a34c-cd332f344773
+
+
+
 ### Layer Editor Panel Redesign
 
 Previously, the layer editor is presented as a modal. It required multiple clicks to load a file and the interface is a bit confusing. In this version, the layer editor is redesigned as a popover and is significantly more usable.
 
 [Clip: Layer Editor](./assets/1-03-2024/1.2.0-layer-panel.mp4)
+
+https://github.com/path-visualiser/app/assets/15244945/f9d38482-8454-436b-98b2-34d92a9efc28
+
+
+
 
 ### Steps Panel Redesign
 
@@ -50,6 +59,10 @@ We introduced a per-layer error API that displays an error label when a layer en
 
 [Clip: Error Handling](./assets/1-03-2024/1.2.0-error-handling.mp4)
 
+https://github.com/path-visualiser/app/assets/15244945/3e6e8131-07a9-4ea8-aff1-87647a5fbcbd
+
+
+
 ### Workspaces
 
 We introduced a simple import/export mechanism for quickly sharing or restoring your work. This can be found in the title bar menu (**Workspace** > **Open Workspace**, **Workspace** > **Save Workspace**).
@@ -65,6 +78,10 @@ We designed a simple way to export your workspaces with metadata. In the future,
 You can now drag and drop any assortment of files into the visualiser.
 
 [Clip: Drag and Drop](./assets/1-03-2024/1.2.0-drag-and-drop.mp4)
+
+https://github.com/path-visualiser/app/assets/15244945/863713c7-95d9-448e-bd80-8890bb1609e6
+
+
 
 ### Filesystem Bridge Adapter (Experimental)
 
@@ -88,6 +105,10 @@ We introduced a way to fit specific layers to the viewport.
 
 [Clip: Fit to Viewport](./assets/1-03-2024/1.2.0-fit.mp4)
 
+https://github.com/path-visualiser/app/assets/15244945/65b6e26d-ffbb-4865-8f49-e1de250e4f62
+
+
+
 ### Filter Steps by Type
 
 We added the ability to filter events in the Steps view by event type.
@@ -105,6 +126,10 @@ The debugger was updated with some new features. In the standard editor, you can
 ### Performance Improvements
 
 We slightly improved perceived performance by increasing resolution when playback is paused and decreasing resolution when it is playing. We also implement dynamic framerate so the playback should feel more consistent.
+
+https://github.com/path-visualiser/app/assets/15244945/7d14972c-e496-4763-8886-155698899c65
+
+
 
 # Known Issues
 
