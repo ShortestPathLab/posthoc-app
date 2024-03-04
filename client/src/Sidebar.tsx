@@ -9,7 +9,6 @@ import {
   useTheme,
 } from "@mui/material";
 import interpolate from "color-interpolate";
-import { Flex } from "components/generic/Flex";
 import { ViewTree } from "components/inspector/ViewTree";
 import { get, set, values } from "lodash";
 import { nanoid } from "nanoid";
@@ -28,9 +27,9 @@ const defaultRoot: Root<PanelState | undefined> = {
       type: "leaf",
       content: { type: "explore" },
       key: nanoid(),
-      size: 30,
+      size: 20,
     },
-    { type: "leaf", content: undefined, key: nanoid(), size: 70 },
+    { type: "leaf", content: undefined, key: nanoid(), size: 80 },
   ],
 };
 
@@ -45,7 +44,19 @@ export function useSidebarState() {
   const { Content, derivedRoot, tab } = useMemo(() => {
     const tab = get(root, `children[${LEFT}].content.type`) ?? "";
     const Content = pages[tab]?.content;
-    const derivedRoot = open ? root : get(root, `children[${RIGHT}]`);
+    const derivedRoot = produce(root, (r) => {
+      if (r.type === "branch") {
+        r.locked = !open;
+        r.children[LEFT].hidden = !open;
+        const size = open
+          ? r.children[LEFT].size === 0
+            ? 20
+            : r.children[LEFT].size ?? 20
+          : 0;
+        r.children[LEFT].size = size;
+        r.children[RIGHT].size = 100 - size;
+      }
+    });
     const derivedTab = open ? tab : "";
     return { Content, derivedRoot, tab: derivedTab };
   }, [root, open]);
@@ -72,7 +83,7 @@ export function useSidebarBackground() {
 }
 
 export function Sidebar({ children }: { children?: ReactNode }) {
-  const { Content, produceRoot, root, setRoot, setOpen, tab } =
+  const { Content, produceRoot, root, setRoot, setOpen, tab, open } =
     useSidebarState();
   const bgcolor = useSidebarBackground();
   return (
@@ -81,17 +92,18 @@ export function Sidebar({ children }: { children?: ReactNode }) {
         <Stack
           sx={{
             width: 64,
-            bgcolor,
             alignItems: "center",
             p: 1,
             gap: 1,
-            // bgcolor: "background.paper",
-            borderRight: (t) =>
-              `1px solid ${
-                t.palette.mode === "dark"
-                  ? t.palette.background.default
-                  : t.palette.divider
-              }`,
+            bgcolor: bgcolor,
+            borderRight: open
+              ? (t) =>
+                  `1px solid ${
+                    t.palette.mode === "dark"
+                      ? t.palette.background.default
+                      : t.palette.divider
+                  }`
+              : "none",
           }}
         >
           <TabList
@@ -142,29 +154,24 @@ export function Sidebar({ children }: { children?: ReactNode }) {
           <ViewTree
             onChange={setRoot}
             root={root}
-            // onDrop={(l) =>
-            //   produceRoot(
-            //     (c) => void set(c, `children[${LEFT}].content`, l.content)
-            //   )
-            // }
             renderLeaf={(l) =>
               l.content ? (
                 <Stack direction="row" sx={{ width: "100%", bgcolor }}>
                   {!!Content && (
-                    <Box
-                      sx={{
-                        flex: 1,
-                        height: "100%",
-                      }}
-                    >
-                      <Content template={SidebarPage}></Content>
-                    </Box>
+                    <Fade in>
+                      <Box
+                        sx={{
+                          flex: 1,
+                          height: "100%",
+                        }}
+                      >
+                        <Content template={SidebarPage}></Content>
+                      </Box>
+                    </Fade>
                   )}
                 </Stack>
               ) : (
-                <Fade in>
-                  <Flex>{children}</Flex>
-                </Fade>
+                children
               )
             }
           />

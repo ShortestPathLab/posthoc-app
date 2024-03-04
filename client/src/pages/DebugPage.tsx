@@ -69,7 +69,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
           {layer ? (
             <Scroll y>
               <Box pt={6} height="100%">
-                <TabPanel value="standard">
+                <TabPanel value="standard" sx={{ p: 2 }}>
                   <Box mx={-2}>
                     <Box px={2}>{renderHeading("Breakpoints")}</Box>
                     <BreakpointListEditor layer={layer?.key} />

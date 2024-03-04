@@ -1,18 +1,18 @@
 import { nanoid as id } from "nanoid";
 import { createSlice } from "./createSlice";
 import { once } from "lodash";
-export type Node = { size?: number };
+
+export type Node = { size?: number; key: string; hidden?: boolean };
 
 export type Branch<T> = Node & {
   type: "branch";
-  key: string;
   orientation: "vertical" | "horizontal";
   children: Root<T>[];
+  locked?: boolean;
 };
 
 export type Leaf<T> = Node & {
   type: "leaf";
-  key: string;
   acceptDrop?: boolean;
   content?: T;
 };

@@ -79,7 +79,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
           <Flex vertical>
             <Scroll y>
               <Flex vertical pt={6}>
-                <TabPanel value="general">
+                <TabPanel value="general" sx={{ p: 2 }}>
                   <Box>
                     {renderHeading("Playback")}
                     <Flex alignItems="center" justifyContent="space-between">
@@ -155,25 +155,25 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     </Flex>
                   </Box>
                 </TabPanel>
-                <TabPanel value="connections">
+                <TabPanel value="connections" sx={{ p: 2 }}>
                   <Box>
                     {renderHeading("Solvers")}
                     <ServerListEditor />
                   </Box>
                 </TabPanel>
-                <TabPanel value="renderers">
+                <TabPanel value="renderers" sx={{ p: 2 }}>
                   <Box>
                     {renderHeading("Renderers")}
                     <RendererListEditor />
                   </Box>
                 </TabPanel>
-                <TabPanel value="map-parsers">
+                <TabPanel value="map-parsers" sx={{ p: 2 }}>
                   <Box>
                     {renderHeading("Map Parsers")}
                     <MapParserListEditor />
                   </Box>
                 </TabPanel>
-                <TabPanel value="about">
+                <TabPanel value="about" sx={{ p: 2 }}>
                   <Box>
                     <AboutContent />
                   </Box>

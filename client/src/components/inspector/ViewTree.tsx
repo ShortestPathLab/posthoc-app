@@ -210,8 +210,10 @@ export function ViewLeaf<T>({
 export function ViewBranch<T>(props: ViewBranchProps<T>) {
   const { root = { type: "leaf", key: "" }, onChange, depth = 0 } = props;
   const { palette, spacing, transitions } = useTheme();
+  const isLocked = root.type === "branch" && root.locked;
 
   const dragCls = useCss({
+    ...(isLocked && { display: "none" }),
     "div&": {
       background: palette.text.secondary,
       opacity: 0.5,
@@ -222,6 +224,7 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
   });
 
   const gutterCls = useCss({
+    ...(isLocked && { pointerEvents: "none" }),
     "div&": {
       background:
         palette.mode === "dark" ? palette.background.default : palette.divider,
@@ -281,43 +284,47 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
             }[root.orientation as "vertical" | "horizontal"]
           }
         >
-          {map(root.children, (c, i) => (
-            <ViewBranch
-              {...props}
-              key={c.key}
-              depth={depth + 1}
-              root={c}
-              onChange={(newChild) =>
-                onChange?.(
-                  produce(root, (draft) => (draft.children[i] = newChild))
-                )
-              }
-              onClose={() =>
-                onChange?.(
-                  transaction(root, (draft) => {
-                    draft.children.splice(i, 1);
-                    if (draft.children.length === 1) {
-                      if (draft.children[0].type === "leaf") {
-                        return {
-                          type: "leaf",
-                          key: nanoid(),
-                          content: draft.children[0].content,
-                        };
+          {map(root.children, (c, i) =>
+            !c.hidden ? (
+              <ViewBranch
+                {...props}
+                key={c.key}
+                depth={depth + 1}
+                root={c}
+                onChange={(newChild) =>
+                  onChange?.(
+                    produce(root, (draft) => (draft.children[i] = newChild))
+                  )
+                }
+                onClose={() =>
+                  onChange?.(
+                    transaction(root, (draft) => {
+                      draft.children.splice(i, 1);
+                      if (draft.children.length === 1) {
+                        if (draft.children[0].type === "leaf") {
+                          return {
+                            type: "leaf",
+                            key: nanoid(),
+                            content: draft.children[0].content,
+                          };
+                        } else {
+                          return draft.children[0];
+                        }
                       } else {
-                        return draft.children[0];
+                        forEach(
+                          draft.children,
+                          (c, _, all) => (c.size = 100 / all.length)
+                        );
+                        return draft;
                       }
-                    } else {
-                      forEach(
-                        draft.children,
-                        (c, _, all) => (c.size = 100 / all.length)
-                      );
-                      return draft;
-                    }
-                  })
-                )
-              }
-            />
-          ))}
+                    })
+                  )
+                }
+              />
+            ) : (
+              <Box key="placeholder" />
+            )
+          )}
         </Split>
       )}
     </>
