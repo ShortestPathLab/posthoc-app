@@ -1,0 +1,28 @@
+version: 1.1.0
+
+components:
+  tile:
+    - $: rect
+      width: 1
+      height: 1
+      x: ${{ event.x + i }}
+      y: ${{ event.y }}
+      fill: ${{ color[event.type] }}
+      text: i = ${{ i }}
+      textX: 0.1
+      textY: 0.9
+      fontSize: 0.35
+      fontColor: ${{ themeBackground }}
+      $for:
+        $to: 10 # Optional, default 1
+        $step: 2 # Optional, default 1
+
+views:
+  main:
+    - $: tile
+
+events:
+  - type: source
+    id: 1736
+    x: 8
+    y: 15
