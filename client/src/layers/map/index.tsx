@@ -92,7 +92,7 @@ export const controller = {
             variant="body2"
             color={(t) => t.palette.error.main}
             sx={{
-              whiteSpace: "pre-line",
+              whiteSpace: "pre-wrap",
               mb: 1,
               mt: 1,
             }}
