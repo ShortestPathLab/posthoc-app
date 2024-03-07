@@ -46,10 +46,10 @@ export function FileDropZone() {
     if (!totalClaimed) {
       const success = await loadWorkspace(head(fs));
       if (success) return;
+      notify(
+        `Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`
+      );
     }
-    notify(
-      `Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`
-    );
   }
 
   return (
