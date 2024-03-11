@@ -181,14 +181,14 @@ export const TitleBar = () => {
                     },
                     {
                       type: "action",
-                      name: "Open changelog",
+                      name: "Changelog",
                       key: "changelog",
                       action: () =>
                         open(`${docs}/changelog-${version}.md`, "_blank"),
                     },
                     {
                       type: "action",
-                      name: "Open documentation",
+                      name: "Documentation",
                       key: "documentation",
                       action: () =>
                         open(

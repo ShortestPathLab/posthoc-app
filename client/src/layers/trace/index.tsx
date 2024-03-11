@@ -218,7 +218,7 @@ export const controller = {
         });
       },
       [parseTrace],
-      [trace?.key]
+      [trace?.key, palette.mode]
     );
     return (
       <>

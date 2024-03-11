@@ -17,12 +17,13 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { mapParsers } from "components/renderer/map-parser";
 import { RendererListEditor } from "components/settings-editor/RendererListEditor";
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
-import { keys, map, startCase } from "lodash";
+import { keys, map, sortBy, startCase } from "lodash";
 import { ReactNode, useState } from "react";
 import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
-import { AccentColor, accentColors } from "theme";
-import { PageContentProps } from "./PageMeta";
+import { AccentColor, accentColors, getShade } from "theme";
 import { AboutContent } from "./AboutPage";
+import { PageContentProps } from "./PageMeta";
+import { ColorTranslator } from "colortranslator";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsPage({ template: Page }: PageContentProps) {
@@ -127,19 +128,40 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     </Flex>
                     <Flex alignItems="center" justifyContent="space-between">
                       {renderLabel("Accent")}
-                      <FeaturePicker
-                        value={accentColor}
-                        items={map(keys(accentColors), (c) => ({
-                          id: c,
-                          name: startCase(c),
-                        }))}
-                        arrow
-                        onChange={(v) =>
-                          setSettings(() => ({
-                            "appearance/accentColor": v as AccentColor,
-                          }))
-                        }
-                      />
+                      <Box sx={{ p: 1 }}>
+                        <FeaturePicker
+                          paper
+                          value={accentColor}
+                          items={map(
+                            sortBy(
+                              keys(accentColors) as AccentColor[],
+                              (c) => new ColorTranslator(getShade(c, theme)).H
+                            ),
+                            (c) => ({
+                              id: c,
+                              name: startCase(c),
+                              icon: (
+                                <Box>
+                                  <Box
+                                    sx={{
+                                      width: 12,
+                                      height: 12,
+                                      backgroundColor: getShade(c, theme),
+                                      borderRadius: 4,
+                                    }}
+                                  />
+                                </Box>
+                              ),
+                            })
+                          )}
+                          arrow
+                          onChange={(v) =>
+                            setSettings(() => ({
+                              "appearance/accentColor": v as AccentColor,
+                            }))
+                          }
+                        />
+                      </Box>
                     </Flex>
                     {renderHeading("Behaviour")}
                     <Flex alignItems="center" justifyContent="space-between">

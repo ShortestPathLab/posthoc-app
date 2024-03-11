@@ -139,7 +139,7 @@ export function ExportWorkspaceModal(props: ComponentProps<typeof Modal>) {
   return (
     <Modal {...props}>
       <ModalAppBar onClose={() => props?.onClose?.({}, "backdropClick")}>
-        <Typography variant="h6">Export Workspace</Typography>
+        <Typography variant="h6">Publish Workspace</Typography>
       </ModalAppBar>
       <A />
     </Modal>

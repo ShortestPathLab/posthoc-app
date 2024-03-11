@@ -2,6 +2,24 @@ version: 1.0.6
 render:
   components:
     tile:
+      - $: tile2
+        $for:
+          $from: 0 # Optional, default 0
+          $to: 10 # Optional, default 1
+          $step: 2 # Optional, default 1
+          $let: i # Optional, default "i"
+    tile2:
+      - $: rect
+        width: 1
+        height: 1
+        x: "{{$.event.x + $.i}}"
+        y: "{{$.event.y + 5}}"
+        fill: "{{$.color[$.event.type]}}"
+        text: "i: {{$.i}}"
+        textX: 0.1
+        textY: 0.9
+        fontSize: 0.35
+        fontColor: "{{$.themeBackground}}"
       - $: rect
         width: 1
         height: 1
@@ -13,11 +31,6 @@ render:
         textY: 0.9
         fontSize: 0.35
         fontColor: "{{$.themeBackground}}"
-        $for:
-          $from: 0 # Optional, default 0
-          $to: 10 # Optional, default 1
-          $step: 2 # Optional, default 1
-          $let: i # Optional, default "i"
   views:
     main:
       components:

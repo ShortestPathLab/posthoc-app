@@ -46,6 +46,7 @@ import { textFieldProps, usePaper } from "theme";
 import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/Button";
 import { PageContentProps } from "./PageMeta";
+import { useFullscreenModalContext } from "components/inspector/FullscreenModalHost";
 const paths = import.meta.glob("/public/recipes/*.workspace", {
   as: "url",
 });
@@ -243,6 +244,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   const notify = useSnackbar();
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
+  const { close: closeModal } = useFullscreenModalContext();
   const sm = useSmallDisplay() || isViewTree;
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("explore");
@@ -372,7 +374,10 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                                   description={description ?? "No description"}
                                   image={first(screenshots)}
                                   author={author}
-                                  onOpenClick={() => open(path)}
+                                  onOpenClick={() => {
+                                    open(path);
+                                    closeModal?.();
+                                  }}
                                   size={size}
                                 />
                               </Box>

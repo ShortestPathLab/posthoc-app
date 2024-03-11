@@ -7,16 +7,14 @@ import {
   Tooltip,
   Typography as Type,
 } from "@mui/material";
-import { entries, find, join, omit, startCase } from "lodash";
 import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
 import {
-  AppBarTitle as Title,
   ManagedModal as Dialog,
+  AppBarTitle as Title,
 } from "components/generic/Modal";
-import { OverlineDot as Dot } from "components/generic/Overline";
 import { SelectField as Select } from "components/generic/Select";
-import { Space } from "components/generic/Space";
+import { entries, find, join, omit, startCase } from "lodash";
 import { transports } from "services/RendererService";
 import { merge } from "slices/reducers";
 import { useRenderers } from "slices/renderers";

@@ -347,8 +347,12 @@ class D2Renderer
       maxY: y + Number.MIN_VALUE,
     });
     this.#overlay!.clear();
-    this.#overlay!.lineStyle(2 * px, accentColor, 1);
     for (const b of bodies) {
+      this.#overlay!.lineStyle(
+        2 * px,
+        accentColor,
+        "$info" in b.component ? 1 : 0.02
+      );
       this.#overlay?.drawRect(
         b.left,
         b.top,

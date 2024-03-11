@@ -1,17 +1,29 @@
-import { Box, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import Modal, { ModalAppBar } from "components/generic/Modal";
 import { Scroll } from "components/generic/Scrollbars";
-import { Space } from "components/generic/Space";
+import { useConnection } from "hooks/useConnectionResolver";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { pages } from "pages";
 import { PageSlots } from "pages/Page";
-import { ReactNode, useMemo, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { withSlots } from "react-slot-component";
 import { useUIState } from "slices/UIState";
-import { useSettings } from "slices/settings";
 import { PanelState } from "slices/view";
 import { wait } from "utils/timed";
+
+const FullscreenModalContext = createContext<{ close?: () => void }>({});
+
+export function useFullscreenModalContext() {
+  return useContext(FullscreenModalContext);
+}
 
 export type FullscreenPageProps = {
   renderExtras?: (content?: PanelState) => ReactNode;
@@ -79,12 +91,17 @@ export function FullscreenModalHost() {
   const [{ fullscreenModal: key }, setUIState] = useUIState();
   const [closing, setClosing] = useState(false);
 
-  async function handleClose() {
-    setClosing(true);
-    await wait(300);
-    setUIState(() => ({ fullscreenModal: undefined }));
-    setClosing(false);
-  }
+  const handleClose = useCallback(
+    async function () {
+      setClosing(true);
+      await wait(300);
+      setUIState(() => ({ fullscreenModal: undefined }));
+      setClosing(false);
+    },
+    [setUIState]
+  );
+
+  const value = useMemo(() => ({ close: handleClose }), [handleClose]);
 
   const page = key ? pages[key] : undefined;
 
@@ -112,13 +129,15 @@ export function FullscreenModalHost() {
   }, [key, page]);
 
   return (
-    !!page && (
-      <Modal open={!closing} onClose={handleClose} width="70vw">
-        <ModalAppBar onClose={handleClose}>
-          <Typography variant="h6">{page.name}</Typography>
-        </ModalAppBar>
-        {content}
-      </Modal>
-    )
+    <FullscreenModalContext.Provider {...{ value }}>
+      {!!page && (
+        <Modal open={!closing} onClose={handleClose} width="70vw">
+          <ModalAppBar onClose={handleClose}>
+            <Typography variant="h6">{page.name}</Typography>
+          </ModalAppBar>
+          {content}
+        </Modal>
+      )}
+    </FullscreenModalContext.Provider>
   );
 }

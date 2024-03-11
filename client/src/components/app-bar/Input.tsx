@@ -5,7 +5,7 @@ import { Map, UploadedTrace } from "slices/UIState";
 import { LARGE_FILE_B, formatByte, useBusyState } from "slices/busy";
 import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
-import { useLoadingState } from "slices/loading";
+import { useLoading, useLoadingState } from "slices/loading";
 import { EditorProps } from "../Editor";
 import { FeaturePicker } from "./FeaturePicker";
 import { custom, uploadMap, uploadTrace } from "./upload";
@@ -19,6 +19,8 @@ export const mapDefaults = { start: undefined, end: undefined };
 export function MapPicker({ onChange, value }: EditorProps<Map>) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("map");
+  const [{ features: featuresLoading, connections: connectionsLoading }] =
+    useLoading();
   const usingBusyState = useBusyState("map");
   const [connections] = useConnections();
   const [{ maps, formats }] = useFeatures();
@@ -27,6 +29,7 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
       showTooltip
       arrow
       paper
+      disabled={!!featuresLoading || !!connectionsLoading}
       ellipsis={25}
       icon={<FileOpenOutlined />}
       label="Choose Map"
@@ -79,6 +82,8 @@ export function TracePicker({
   const usingLoadingState = useLoadingState("specimen");
   const usingBusyState = useBusyState("specimen");
   const [connections] = useConnections();
+  const [{ features: featuresLoading, connections: connectionsLoading }] =
+    useLoading();
   const [{ traces }] = useFeatures();
   return (
     <FeaturePicker
@@ -86,6 +91,7 @@ export function TracePicker({
       paper
       arrow
       ellipsis={25}
+      disabled={!!featuresLoading || !!connectionsLoading}
       icon={<FileOpenOutlined />}
       label="Choose Trace"
       value={value?.id}
