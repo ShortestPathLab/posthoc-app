@@ -76,7 +76,7 @@ export function useSidebarBackground() {
   return useMemo(
     () =>
       interpolate([palette.background.paper, palette.text.primary])(
-        palette.mode === "dark" ? 0.0125 : 0.025
+        palette.mode === "dark" ? 0.025 : 0.025
       ),
     [palette]
   );
@@ -117,37 +117,41 @@ export function Sidebar({ children }: { children?: ReactNode }) {
             orientation="vertical"
             sx={{ width: 64 }}
           >
-            {values(pages).flatMap((c, i, cx) => [
-              !!i && c.color !== cx[i - 1].color && (
-                <Divider sx={{ mx: 2, my: 1 }} />
-              ),
-              <Tab
-                onClick={() => (tab === c.id ? setOpen(false) : setOpen(true))}
-                key={c.id}
-                value={c.id}
-                sx={{
-                  minWidth: 0,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                label={
-                  <Tooltip key={c.id} title={c.name} placement="right">
-                    <Box
-                      sx={{
-                        alignItems: "center",
-                        display: "flex",
-                        "> svg > path": {
-                          strokeWidth: 0.5,
-                          stroke: bgcolor,
-                        },
-                      }}
-                    >
-                      {c.icon}
-                    </Box>
-                  </Tooltip>
-                }
-              />,
-            ])}
+            {values(pages)
+              .filter((c) => c.showInSidebar)
+              .flatMap((c, i, cx) => [
+                !!i && c.color !== cx[i - 1].color && (
+                  <Divider sx={{ mx: 2, my: 1 }} />
+                ),
+                <Tab
+                  onClick={() =>
+                    tab === c.id ? setOpen(false) : setOpen(true)
+                  }
+                  key={c.id}
+                  value={c.id}
+                  sx={{
+                    minWidth: 0,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  label={
+                    <Tooltip key={c.id} title={c.name} placement="right">
+                      <Box
+                        sx={{
+                          alignItems: "center",
+                          display: "flex",
+                          "> svg > path": {
+                            strokeWidth: 0.5,
+                            stroke: bgcolor,
+                          },
+                        }}
+                      >
+                        {c.icon}
+                      </Box>
+                    </Tooltip>
+                  }
+                />,
+              ])}
           </TabList>
         </Stack>
         <Box sx={{ flex: 1 }}>

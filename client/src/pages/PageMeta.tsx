@@ -15,4 +15,5 @@ export type PageMeta = {
   description?: string;
   content: (props: PageContentProps) => ReactNode;
   allowFullscreen?: boolean;
+  showInSidebar?: boolean;
 };

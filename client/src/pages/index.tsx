@@ -28,6 +28,7 @@ export const pages: Dictionary<PageMeta> = {
     icon: <RocketIcon />,
     content: ExplorePage,
     allowFullscreen: true,
+    showInSidebar: true,
   },
   viewport: {
     id: "viewport",
@@ -82,6 +83,7 @@ export const pages: Dictionary<PageMeta> = {
     icon: <LogsIcon />,
     content: InfoPage,
     allowFullscreen: true,
+    showInSidebar: true,
   },
   settings: {
     id: "settings",
@@ -91,6 +93,7 @@ export const pages: Dictionary<PageMeta> = {
     icon: <SettingsIcon />,
     content: SettingsPage,
     allowFullscreen: true,
+    showInSidebar: true,
   },
   // about: {
   //   id: "about",
