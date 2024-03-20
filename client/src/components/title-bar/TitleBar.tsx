@@ -121,6 +121,7 @@ export const TitleBar = () => {
                   height: "100%",
                   // Firefox fix
                   maxWidth: "min-content",
+                  aspectRatio: 1,
                 }}
               >
                 <img src={logo} style={{ height: "100%" }} />
