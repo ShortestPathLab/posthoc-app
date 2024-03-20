@@ -113,8 +113,16 @@ export const TitleBar = () => {
               spacing={1}
               sx={{ height: "100%" }}
               alignItems="center"
+              justifyContent="flex-start"
             >
-              <Box sx={{ p: 1, height: "100%" }}>
+              <Box
+                sx={{
+                  p: 1,
+                  height: "100%",
+                  // Firefox fix
+                  maxWidth: "min-content",
+                }}
+              >
                 <img src={logo} style={{ height: "100%" }} />
               </Box>
               {[
