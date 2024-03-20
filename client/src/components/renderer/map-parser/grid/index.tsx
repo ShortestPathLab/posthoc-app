@@ -11,7 +11,7 @@ import interpolate from "color-interpolate";
 import { EditorProps } from "components/Editor";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Option } from "components/layer-editor/Option";
-import { find, flow, set, sortBy, startCase } from "lodash";
+import { find, flow, round, set, sortBy, startCase } from "lodash";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import memo from "memoizee";
 import { getClosestColor } from "nearest-pantone";
@@ -156,7 +156,7 @@ export const hydrate: ParsedMapHydrator = (result) => {
   return {
     ...result,
     snap: ({ x: x1, y: y1 }, scale = 1) => {
-      const [x, y] = [floor(x1 + scale / 2), floor(y1 + scale / 2)];
+      const [x, y] = [round(-1 + x1 + scale / 2), round(-1 + y1 + scale / 2)];
       if (between(x, 0, width) && between(y, 0, height)) return { x, y };
     },
     nodeAt: (point) => {

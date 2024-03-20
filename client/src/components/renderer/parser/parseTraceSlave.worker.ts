@@ -64,7 +64,7 @@ function parse({
       return { persistent, transient };
     })
     .map((c) => mapValues(c, (b) => b.filter(isVisible)))
-    .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(i))))
+    .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(from + i))))
     .value();
   return {
     stepsPersistent: map(steps, (c) => c.persistent),
