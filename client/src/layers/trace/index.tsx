@@ -1,5 +1,16 @@
-import { ArrowOutwardRounded, RouteTwoTone } from "@mui/icons-material";
-import { Box, Typography, useTheme } from "@mui/material";
+import {
+  ArrowOutwardRounded,
+  DataObjectOutlined,
+  RouteTwoTone,
+} from "@mui/icons-material";
+import {
+  Box,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { TracePicker } from "components/app-bar/Input";
 import {
   PlaybackLayerData,
@@ -10,7 +21,10 @@ import {
   isTraceFormat,
   readUploadedTrace,
 } from "components/app-bar/upload";
-import { PropertyList } from "components/inspector/PropertyList";
+import {
+  PropertyDialog,
+  PropertyList,
+} from "components/inspector/PropertyList";
 import { Heading, Option } from "components/layer-editor/Option";
 import { TracePreview } from "components/layer-editor/TracePreview";
 import { LazyNodeList, NodeList } from "components/renderer/NodeList";
@@ -322,11 +336,31 @@ export const controller = {
               items: {
                 properties: {
                   index: -2,
-                  primary: <PropertyList event={event} vertical />,
+                  primary: (
+                    <PropertyList event={event} vertical simple primitives />
+                  ),
                 },
-
+                propertiesDetails: {
+                  index: -1,
+                  extras: (
+                    <PropertyDialog
+                      {...{ event }}
+                      trigger={(onClick) => (
+                        <MenuItem {...{ onClick }}>
+                          <ListItemIcon>
+                            <DataObjectOutlined />
+                          </ListItemIcon>
+                          <ListItemText>See properties</ListItemText>
+                          <Typography variant="body2" color="text.secondary">
+                            Step {step}
+                          </Typography>
+                        </MenuItem>
+                      )}
+                    />
+                  ),
+                },
                 [`${event}`]: {
-                  primary: `Go to Step ${step}`,
+                  primary: `Go to step ${step}`,
                   secondary: `${startCase(event.type)}`,
                   action: () =>
                     setLayer(

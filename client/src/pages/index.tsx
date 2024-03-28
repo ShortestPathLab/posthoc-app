@@ -1,7 +1,7 @@
 import {
   BugReportOutlined as DebuggerIcon,
   LayersOutlined as LayersIcon,
-  ListOutlined as LogsIcon,
+  CodeOutlined as LogsIcon,
   RocketLaunchOutlined as RocketIcon,
   SettingsOutlined as SettingsIcon,
   SegmentOutlined as StepsIcon,
@@ -24,7 +24,7 @@ export const pages: Dictionary<PageMeta> = {
     id: "explore",
     name: "Explore",
     color: "pink",
-    description: "Browse a library of examples and guides",
+    description: "Browse examples and guides",
     icon: <RocketIcon />,
     content: ExplorePage,
     allowFullscreen: true,

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@turf/point-to-line-distance": "^6.5.0",
     "adapter": "file:../adapter",
     "color-interpolate": "^1.0.5",
     "colortranslator": "^2.0.0",

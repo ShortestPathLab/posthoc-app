@@ -27,6 +27,7 @@ export type SelectionMenuEntry = {
   primary?: ReactNode;
   secondary?: ReactNode;
   icon?: ReactNode;
+  extras?: ReactNode;
 };
 
 type SelectionMenuSection = {
@@ -75,35 +76,54 @@ export function SelectionMenu({ selection, onClose }: Props) {
                       {chain(items)
                         .entries()
                         .sortBy(([, v]) => v.index)
-                        .map(([k, { action, icon, primary, secondary }]) =>
-                          action ? (
-                            <MenuItem
-                              key={k}
-                              onClick={() => {
-                                action();
-                                onClose?.();
-                              }}
-                            >
-                              {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                              <ListItemText primary={primary} sx={{ mr: 4 }} />
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                {secondary}
-                              </Typography>
-                            </MenuItem>
-                          ) : (
-                            <ListItem key={k}>
-                              {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                              <ListItemText primary={primary} sx={{ mr: 4 }} />
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                {secondary}
-                              </Typography>
-                            </ListItem>
+                        .map(
+                          ([
+                            k,
+                            { action, icon, primary, secondary, extras },
+                          ]) => (
+                            <>
+                              {!!(action || primary || secondary) &&
+                                (action ? (
+                                  <MenuItem
+                                    key={k}
+                                    onClick={() => {
+                                      action?.();
+                                      onClose?.();
+                                    }}
+                                  >
+                                    {icon && (
+                                      <ListItemIcon>{icon}</ListItemIcon>
+                                    )}
+                                    <ListItemText
+                                      primary={primary}
+                                      sx={{ mr: 4 }}
+                                    />
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      {secondary}
+                                    </Typography>
+                                  </MenuItem>
+                                ) : (
+                                  <ListItem key={k}>
+                                    {icon && (
+                                      <ListItemIcon>{icon}</ListItemIcon>
+                                    )}
+                                    <ListItemText
+                                      primary={primary}
+                                      sx={{ mr: 4 }}
+                                    />
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      {secondary}
+                                    </Typography>
+                                  </ListItem>
+                                ))}
+                              {!!extras && extras}
+                            </>
                           )
                         )
                         .value()}

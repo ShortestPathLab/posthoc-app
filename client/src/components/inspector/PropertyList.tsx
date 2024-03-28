@@ -17,12 +17,14 @@ import { Property, renderProperty } from "components/generic/Property";
 import {
   Dictionary,
   chain as _,
+  constant,
   filter,
   indexOf,
+  isNumber,
+  isString,
   isUndefined,
   map,
   merge,
-  slice,
   startCase,
 } from "lodash";
 
@@ -44,13 +46,14 @@ type PropertyListProps = {
   variant?: TypographyVariant;
   max?: number;
   simple?: boolean;
+  primitives?: boolean;
 };
 
 export function PropertyDialog({
   event,
   max = 10,
-  simple,
-  variant,
+  simple: _simple,
+  variant: _variant,
   ...rest
 }: PropertyListProps & DialogProps) {
   const sorted = sortEventKeys(event);
@@ -129,23 +132,38 @@ export function PropertyDialog({
 }
 
 export function PropertyList(props: PropertyListProps & FlexProps) {
-  const { event, variant = "body2", max = 10, simple, ...rest } = props;
+  const {
+    event,
+    variant = "body2",
+    max = 10,
+    simple,
+    primitives,
+    ...rest
+  } = props;
 
   const sorted = sortEventKeys(event);
   return (
     <>
       <Flex {...rest}>
-        {map(slice(sorted, 0, max), ([k, v], i) => (
-          <Property
-            label={k}
-            value={v}
-            key={i}
-            type={{ variant }}
-            simple={simple}
-          />
-        ))}
+        {_(sorted)
+          .filter(primitives ? ([, v]) => isPrimitive(v) : constant(true))
+          .slice(0, max)
+          .map(([k, v], i) => (
+            <Property
+              label={k}
+              value={v}
+              key={i}
+              type={{ variant }}
+              simple={simple}
+            />
+          ))
+          .value()}
         {sorted.length > max && !simple && <PropertyDialog {...props} />}
       </Flex>
     </>
   );
+}
+
+function isPrimitive(v: any): boolean {
+  return isString(v) || isNumber(v);
 }

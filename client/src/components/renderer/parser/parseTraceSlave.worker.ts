@@ -34,7 +34,7 @@ function parse({
     (component: CompiledComponent<string, Record<string, any>>) => {
       return {
         component,
-        meta: { source: "trace", step, info: component.$info },
+        meta: { source: "trace", step: from + step, info: component.$info },
       };
     };
 
@@ -64,7 +64,7 @@ function parse({
       return { persistent, transient };
     })
     .map((c) => mapValues(c, (b) => b.filter(isVisible)))
-    .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(from + i))))
+    .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(i))))
     .value();
   return {
     stepsPersistent: map(steps, (c) => c.persistent),

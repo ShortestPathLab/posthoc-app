@@ -6,6 +6,8 @@ import {
 import { Dictionary, maxBy, minBy } from "lodash";
 import { Bounds, Point, Size } from "protocol";
 import { defaultContext } from "./EventContext";
+import dist from "@turf/point-to-line-distance";
+import { point, lineString } from "@turf/helpers";
 
 const { ceil, PI } = Math;
 
@@ -37,6 +39,7 @@ type Primitive<T extends keyof D2Components = keyof D2Components> = {
     t: Transform
   ): void;
   test(c: CompiledD2Component<T>): Bounds;
+  narrow(c: CompiledD2Component<T>, p: Point): boolean;
 };
 
 export const text: Primitive<any> = {
@@ -57,6 +60,9 @@ export const text: Primitive<any> = {
       bottom: Infinity,
     };
   },
+  narrow() {
+    return true;
+  },
 };
 
 export const rect: Primitive<"rect"> = {
@@ -72,6 +78,9 @@ export const rect: Primitive<"rect"> = {
       top: c.y,
       bottom: c.y + c.height,
     };
+  },
+  narrow() {
+    return true;
   },
 };
 
@@ -99,6 +108,9 @@ export const circle: Primitive<"circle"> = {
       bottom: c.y + c.radius,
     };
   },
+  narrow() {
+    return true;
+  },
 };
 
 export const polygon: Primitive<"polygon"> = {
@@ -123,6 +135,9 @@ export const polygon: Primitive<"polygon"> = {
       bottom: maxBy(c.points, "y")?.y ?? 0,
     };
   },
+  narrow() {
+    return true;
+  },
 };
 
 export const path: Primitive<"path"> = {
@@ -146,11 +161,17 @@ export const path: Primitive<"path"> = {
   },
   test(c) {
     return {
-      left: minBy(c.points, "x")?.x ?? 0 - c.lineWidth ?? 0,
-      right: maxBy(c.points, "x")?.x ?? 0 + c.lineWidth ?? 0,
-      top: minBy(c.points, "y")?.y ?? 0 - c.lineWidth ?? 0,
-      bottom: maxBy(c.points, "y")?.y ?? 0 + c.lineWidth ?? 0,
+      left: (minBy(c.points, "x")?.x ?? 0 - c.lineWidth ?? 0) - 1,
+      right: (maxBy(c.points, "x")?.x ?? 0 + c.lineWidth ?? 0) + 1,
+      top: (minBy(c.points, "y")?.y ?? 0 - c.lineWidth ?? 0) - 1,
+      bottom: (maxBy(c.points, "y")?.y ?? 0 + c.lineWidth ?? 0) + 1,
     };
+  },
+  narrow(c, p) {
+    return (
+      dist(point([p.x, p.y]), lineString(c.points.map(({ x, y }) => [x, y]))) <
+      500 * c.lineWidth
+    );
   },
 };
 

@@ -193,12 +193,14 @@ class D2Renderer
     });
     this.#viewport.on("clicked", (e) => {
       const { x, y } = e.world;
-      const bodies = this.#system.search({
-        minX: x,
-        minY: y,
-        maxX: x + Number.MIN_VALUE,
-        maxY: y + Number.MIN_VALUE,
-      });
+      const bodies = this.#system
+        .search({
+          minX: x,
+          minY: y,
+          maxX: x + Number.MIN_VALUE,
+          maxY: y + Number.MIN_VALUE,
+        })
+        .filter((c) => primitives[c.component.$].narrow(c.component, { x, y }));
       this.emit("click", e.event, {
         world: e.world,
         components: bodies,
@@ -340,12 +342,14 @@ class D2Renderer
     const { accentColor } = this.#options;
     const px = this.#getPx();
     const { x, y } = this.#viewport!.toWorld(e.globalX, e.globalY);
-    const bodies = this.#system.search({
-      minX: x,
-      minY: y,
-      maxX: x + Number.MIN_VALUE,
-      maxY: y + Number.MIN_VALUE,
-    });
+    const bodies = this.#system
+      .search({
+        minX: x,
+        minY: y,
+        maxX: x + Number.MIN_VALUE,
+        maxY: y + Number.MIN_VALUE,
+      })
+      .filter((c) => primitives[c.component.$].narrow(c.component, { x, y }));
     this.#overlay!.clear();
     for (const b of bodies) {
       this.#overlay!.lineStyle(
