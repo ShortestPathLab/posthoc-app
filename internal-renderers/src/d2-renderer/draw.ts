@@ -24,7 +24,8 @@ export const draw = <T extends keyof D2Components>(
   t: Transform
 ) => {
   drawPrimitive(c.$, c, g, t);
-  if (c.text) {
+  /// version < 1.4.0 compat
+  if (c.text || c.label) {
     drawPrimitive("text", c, g, t);
   }
 };

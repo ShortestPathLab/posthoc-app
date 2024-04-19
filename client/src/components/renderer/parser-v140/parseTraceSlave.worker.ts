@@ -1,5 +1,6 @@
 import { chain, findLast, map, mapValues, negate, range } from "lodash";
-import { CompiledComponent, EventContext, Trace } from "protocol";
+import { CompiledComponent, EventContext } from "protocol";
+import { Trace } from "protocol/Trace-v130";
 import { ComponentEntry } from "renderer";
 import { normalizeConstant } from "./normalize";
 import { parse as parseComponents } from "./parse";
@@ -12,7 +13,12 @@ type Key = string | number;
 type KeyRef = Key | null | undefined;
 
 const isPersistent = (c: CompiledComponent<string, Record<string, any>>) =>
-  c.display !== "transient";
+  !c.clear;
+
+function mergePrototype<T>(target: T, source: any) {
+  Object.setPrototypeOf(target, source);
+  return target;
+}
 
 function parse({
   trace,
@@ -22,8 +28,8 @@ function parse({
   to = trace?.events?.length ?? 0,
 }: ParseTraceWorkerParameters): ParseTraceWorkerReturnType {
   const parsed = parseComponents(
-    trace?.render?.views?.[view]?.components ?? [],
-    trace?.render?.components ?? {}
+    trace?.views?.[view] ?? [],
+    trace?.views ?? {}
   );
 
   const isVisible = (c: CompiledComponent<string, { alpha?: number }>) =>
@@ -48,16 +54,20 @@ function parse({
       const e = trace!.events![i]!;
       const esx = trace!.events!;
       const component = parsed(
-        normalizeConstant({
-          alpha: 1,
-          ...context,
-          step: i,
-          parent: !isNullish(e.pId)
-            ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
-            : undefined,
-          event: e,
-          events: esx,
-        })
+        normalizeConstant(
+          mergePrototype(
+            {
+              alpha: 1,
+              ...context,
+              step: i,
+              parent: !isNullish(e.pId)
+                ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
+                : undefined,
+              events: esx,
+            },
+            e
+          )
+        )
       );
       const persistent = component.filter(isPersistent);
       const transient = component.filter(negate(isPersistent));

@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
 import { ScriptViewer } from "components/script-editor/ScriptEditor";
-import beautify from "json-beautify";
+import { dump } from "js-yaml";
 import { take } from "lodash";
 import { Trace } from "protocol";
 
 export function TracePreview({
   trace,
-  language = "json",
+  language = "yaml",
 }: {
   trace?: Trace;
   language?: string;
@@ -18,14 +18,12 @@ export function TracePreview({
         language={language}
         value={
           trace
-            ? beautify(
+            ? dump(
                 {
                   ...trace,
                   events: take(trace.events, 10),
                 },
-                null as any,
-                2,
-                1
+                { noCompatMode: true }
               )
             : "No data"
         }

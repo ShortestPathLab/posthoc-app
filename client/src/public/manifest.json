@@ -1,9 +1,9 @@
 {
   "short_name": "Visualiser",
   "name": "Visualiser",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Visualise pathfinding search and more",
-  "version_name": "1.2.0-1; late March 2024",
+  "version_name": "1.2.1; mid April 2024",
   "repository": "https://github.com/path-visualiser/app",
   "docs": "https://github.com/path-visualiser/app/blob/master/docs",
   "homepage": "https://path-visualiser.github.io/",

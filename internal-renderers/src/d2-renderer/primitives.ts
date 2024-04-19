@@ -44,12 +44,21 @@ type Primitive<T extends keyof D2Components = keyof D2Components> = {
 
 export const text: Primitive<any> = {
   draw(c, g, t) {
-    if (c.text) {
-      const a = transform(c, { x: c.textX, y: c.textY, scale: { x: 1, y: 1 } });
+    /// version < 1.4.0 compat
+    const _text = c.label ?? c.text;
+    if (_text) {
+      const a = transform(c, {
+        x: c["label-x"] ?? c.textX ?? 0,
+        y: c["label-y"] ?? c.textY ?? 0,
+        scale: { x: 1, y: 1 },
+      });
       const box = transform(a, t);
-      g.font = `${c.fontSize * t.scale.x}px Arial`;
-      g.fillStyle = getFillStyle(c.fontColor, c.alpha);
-      g.fillText(c.text, box.x, box.y);
+      g.font = `${(c["label-size"] ?? c.fontSize ?? 4) * t.scale.x}px Inter`;
+      g.fillStyle = getFillStyle(
+        c["label-color"] ?? c.fontColor ?? "grey",
+        c.alpha
+      );
+      g.fillText(_text, box.x, box.y);
     }
   },
   test(c) {

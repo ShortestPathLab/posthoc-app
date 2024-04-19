@@ -53,12 +53,12 @@ export function Select<T extends string>({
           <Menu
             {...bindMenu(state)}
             anchorOrigin={{
-              horizontal: "center",
-              vertical: -itemHeight(sm) * index - padding,
+              horizontal: "left",
+              vertical: "bottom",
             }}
             transformOrigin={{
               vertical: "top",
-              horizontal: "center",
+              horizontal: "left",
             }}
           >
             {map(items, ({ value: v, label, disabled, icon }) => (

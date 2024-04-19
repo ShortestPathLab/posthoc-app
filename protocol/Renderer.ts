@@ -15,7 +15,6 @@ export type EventContext = {
   scale?: number;
   current?: TraceEvent | null;
   events?: TraceEvent[] | null;
-  color?: EventTypeColors;
   [key: string]: any;
 } & Partial<Event>;
 

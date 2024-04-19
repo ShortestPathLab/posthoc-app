@@ -1,0 +1,27 @@
+version: 1.4.0
+
+views:
+  main:
+    - $: rect
+      x: ${{ $.x }}
+      y: ${{ $.y }}
+      width: 1
+      height: 1
+      fill: ${{ color.red }}
+      clear: false
+    - $: rect
+      x: ${{ $.x + 4 }}
+      y: ${{ $.y + 4 }}
+      width: 1
+      height: 1
+      fill: ${{ color.amber }}
+      $if: ${{ $.type == 'expanding' }}
+
+pivot:
+  x: ${{ $.x + 0.5 }}
+  y: ${{ $.y + 0.5 }}
+  scale: 1
+
+events:
+  - { type: closing, x: 1, y: 2, c: 3 }
+  - { type: expanding, x: 1, y: 3, c: 3 }

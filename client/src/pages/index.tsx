@@ -1,6 +1,8 @@
 import {
+  CodeOutlined,
   BugReportOutlined as DebuggerIcon,
   LayersOutlined as LayersIcon,
+  ListOutlined,
   CodeOutlined as LogsIcon,
   RocketLaunchOutlined as RocketIcon,
   SettingsOutlined as SettingsIcon,
@@ -18,6 +20,7 @@ import { SettingsPage } from "./SettingsPage";
 import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
+import { SourcePage } from "./SourcePage";
 
 export const pages: Dictionary<PageMeta> = {
   explore: {
@@ -66,6 +69,15 @@ export const pages: Dictionary<PageMeta> = {
     content: TreePage,
     allowFullscreen: true,
   },
+  source: {
+    id: "source",
+    name: "Source",
+    description: "",
+    color: "deepPurple",
+    icon: <CodeOutlined />,
+    content: SourcePage,
+    allowFullscreen: true,
+  },
   debug: {
     id: "debug",
     name: "Debugger",
@@ -80,10 +92,9 @@ export const pages: Dictionary<PageMeta> = {
     name: "Logs",
     description: "",
     color: "grey",
-    icon: <LogsIcon />,
+    icon: <ListOutlined />,
     content: InfoPage,
     allowFullscreen: true,
-    showInSidebar: true,
   },
   settings: {
     id: "settings",

@@ -1,5 +1,5 @@
-import Editor from "@monaco-editor/react";
-import { CircularProgress, useTheme } from "@mui/material";
+import Editor, { useMonaco } from "@monaco-editor/react";
+import { CircularProgress, Theme, useTheme } from "@mui/material";
 import { debounce } from "lodash";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Flex } from "components/generic/Flex";
@@ -16,12 +16,15 @@ export function ScriptEditor({
   onChange?: (code?: string) => void;
 }) {
   const theme = useTheme();
+
+  useMonacoTheme(theme);
+
   return (
     <Flex height="100%" overflow="hidden">
       <AutoSize>
         {({ width, height }) => (
           <Editor
-            theme={theme.palette.mode === "dark" ? "vs-dark" : "light"}
+            theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
             width={width}
             loading={<CircularProgress variant="indeterminate" />}
             height={height}
@@ -40,14 +43,27 @@ export function ScriptEditor({
   );
 }
 
+export function useMonacoTheme(theme: Theme) {
+  const monaco = useMonaco();
+  monaco?.editor?.defineTheme("posthoc-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [],
+    colors: {
+      "editor.background": theme.palette.background.paper,
+    },
+  });
+}
+
 export function ScriptViewer(props: ComponentProps<typeof Editor>) {
   const theme = useTheme();
+  useMonacoTheme(theme);
   return (
     <Flex height="100%" overflow="hidden">
       <AutoSize>
         {({ width, height }) => (
           <Editor
-            theme={theme.palette.mode === "dark" ? "vs-dark" : "light"}
+            theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
             width={width}
             loading={<CircularProgress variant="indeterminate" />}
             height={height}

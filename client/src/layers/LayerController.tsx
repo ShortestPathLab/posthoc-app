@@ -2,6 +2,7 @@ import { EditorSetterProps } from "components/Editor";
 import { SelectionMenuContent } from "components/inspector/SelectionMenu";
 import { SelectEvent } from "components/renderer/Renderer";
 import { TraceEvent } from "protocol";
+import { Feature } from "protocol/FeatureQuery";
 import { FC, ReactElement, ReactNode } from "react";
 import { Layer } from "slices/layers";
 
@@ -28,4 +29,5 @@ export type LayerController<K extends string, T> = {
       }
     | { claimed: false }
   >;
+  getSources?: (layer?: Layer<T>) => (Feature & { language?: string })[];
 };

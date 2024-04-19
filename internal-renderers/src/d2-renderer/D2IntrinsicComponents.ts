@@ -1,6 +1,8 @@
 import { CompiledComponent, ParsedComponent, Point } from "protocol";
 
 export type D2Base = {
+  /// version < 1.4.0 compat
+  label: string;
   text: string;
   fontSize: number;
   fill: string;

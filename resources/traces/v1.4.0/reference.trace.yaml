@@ -1,0 +1,39 @@
+version: 1.4.0
+
+views:
+  label:
+    - $: rect
+      fill: ${{ $.collection[$.key] }}
+      x: ${{ $.series * 64 }}
+      y: ${{ $.i * 32 }}
+      width: 16
+      height: 16
+      label: ${{ $.name }}.${{ $.key }}
+      label-x: 0
+      label-y: -4
+      label-size: 4
+      label-color: ${{ theme.foreground }}
+      clear: true
+      $info:
+        token: ${{ $.name }}.${{ $.key }}
+        color: ${{ $.collection[$.key] }}
+  main:
+    - $for:
+        $to: ${{ Object.keys(color).length }}
+      $: label
+      series: 0
+      name: color
+      collection: ${{ color }}
+      key: ${{ Object.keys(color)[$.i] }}
+      i: ${{ $.i }}
+    - $for:
+        $to: ${{ Object.keys(theme).length }}
+      $: label
+      series: 1
+      name: theme
+      collection: ${{ theme }}
+      key: ${{ Object.keys(theme)[$.i] }}
+      i: ${{ $.i }}
+
+events:
+  - { type: palette, comment: List of available colors }

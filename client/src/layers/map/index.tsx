@@ -194,4 +194,17 @@ export const controller = {
     );
     return <>{children?.(menu)}</>;
   },
+  getSources: (layer) => {
+    const map = layer?.source?.map;
+    if (map) {
+      return [
+        {
+          id: "trace",
+          name: `(Source) ${map.name}`,
+          language: "txt",
+          content: map.content,
+        },
+      ];
+    } else return [];
+  },
 } satisfies LayerController<"map", MapLayerData>;

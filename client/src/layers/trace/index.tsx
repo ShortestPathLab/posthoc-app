@@ -29,12 +29,14 @@ import { Heading, Option } from "components/layer-editor/Option";
 import { TracePreview } from "components/layer-editor/TracePreview";
 import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { colorsHex, getColorHex } from "components/renderer/colors";
-import { parseString } from "components/renderer/parser/parseString";
-import { useTraceParser } from "components/renderer/parser/parseTrace";
+import { parseProperty } from "components/renderer/parser-v140/parseProperty";
+import { parseProperty as parsePropertyLegacy } from "components/renderer/parser/parseProperty";
+import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTraceSlave.worker";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { useTraceContent } from "hooks/useTraceContent";
+import { dump } from "js-yaml";
 import { LayerController, inferLayerName } from "layers";
 import {
   chain,
@@ -47,6 +49,7 @@ import {
   keyBy,
   last,
   map,
+  mapValues,
   merge,
   negate,
   set,
@@ -54,11 +57,13 @@ import {
 } from "lodash";
 import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";
-import { Trace, TraceEvent } from "protocol";
+import { TraceEvent, Trace as TraceLegacy } from "protocol";
+import { Trace } from "protocol/Trace-v140";
 import { useEffect, useMemo } from "react";
 import { useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
+import { AccentColor, accentColors, getShade } from "theme";
 import { name } from "utils/path";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
@@ -121,7 +126,7 @@ export type TraceLayerData = {
   trace?: UploadedTrace & { error?: string };
   parsedTrace?: {
     components: ParseTraceWorkerReturnType;
-    content: Trace;
+    content: Trace & TraceLegacy;
     error?: string;
   };
   onion?: "off" | "transparent" | "solid";
@@ -211,7 +216,17 @@ export const controller = {
     const parseTrace = useTraceParser({
       trace: trace?.content,
       context: {
-        color: colorsHex,
+        theme: {
+          foreground: palette.text.primary,
+          background: palette.background.paper,
+          accent: palette.primary.main,
+        },
+        color: {
+          ...colorsHex,
+          ...mapValues(accentColors, (_, v: AccentColor) =>
+            getShade(v, palette.mode)
+          ),
+        },
         themeAccent: palette.primary.main,
         themeTextPrimary: palette.text.primary,
         themeBackground: palette.background.paper,
@@ -350,7 +365,9 @@ export const controller = {
                           <ListItemIcon>
                             <DataObjectOutlined />
                           </ListItemIcon>
-                          <ListItemText>See properties</ListItemText>
+                          <ListItemText sx={{ mr: 4 }}>
+                            See properties
+                          </ListItemText>
                           <Typography variant="body2" color="text.secondary">
                             Step {step}
                           </Typography>
@@ -379,9 +396,23 @@ export const controller = {
     }, [layer, event]);
     return <>{children?.(menu)}</>;
   },
+  getSources: (layer) => {
+    const trace = layer?.source?.trace;
+    if (trace) {
+      return [
+        {
+          id: "trace",
+          name: `(Source) ${trace.name}`,
+          language: "yaml",
+          content: dump(trace.content, { noCompatMode: true }),
+        },
+      ];
+    } else return [];
+  },
 } satisfies LayerController<"trace", TraceLayerData>;
 
 function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
+  /// version < 1.4.0 compat
   const { palette } = useTheme();
   const { getPath } = useMemo(
     () =>
@@ -392,55 +423,62 @@ function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
     [layer?.source?.parsedTrace?.content, layer?.source?.playback]
   );
   const element = useMemo(() => {
-    if (layer?.source?.parsedTrace?.content?.render?.path) {
-      const { pivot = {}, scale = 1 } =
-        layer.source.parsedTrace.content.render.path;
-
+    const trace = layer?.source?.parsedTrace?.content;
+    if (trace?.render?.path || trace?.pivot) {
+      const pivot = trace?.render?.path?.pivot ?? trace?.pivot ?? {};
+      const scale = trace?.render?.path?.scale ?? trace?.pivot?.scale ?? 1;
       const { x, y } = pivot;
 
-      const pivotX = x ? parseString(x) : (c: Partial<TraceEvent>) => c.event.x;
-      const pivotY = y ? parseString(y) : (c: Partial<TraceEvent>) => c.event.y;
+      const f =
+        trace?.version === "1.4.0"
+          ? parseProperty
+          : (s: string) => (c: Partial<TraceEvent>) =>
+              parsePropertyLegacy(s)({ event: c });
 
-      const events = map(
-        getPath(step),
-        (p) => layer?.source?.parsedTrace?.content?.events?.[p]
-      );
+      const pivotX = x ? f(x) : (c: Partial<TraceEvent>) => c.x;
+      const pivotY = y ? f(y) : (c: Partial<TraceEvent>) => c.y;
+
+      const events = map(getPath(step), (p) => trace?.events?.[p]);
 
       if (events.length) {
         const primitive = [
           {
-            $: "rect",
-            x:
-              pivotX({ event: { x: 0, y: 0, ...head(events) } }) -
-              (2 * scale) / 2,
-            y:
-              pivotY({ event: { x: 0, y: 0, ...head(events) } }) -
-              (2 * scale) / 2,
-            fill: getColorHex("destination"),
-            width: 2 * scale,
-            height: 2 * scale,
+            $: "circle",
+            x: pivotX({ x: 0, y: 0, ...head(events) }),
+            y: pivotY({ x: 0, y: 0, ...head(events) }),
+            fill: palette.background.paper,
+            radius: 0.45 * scale,
           },
           {
-            $: "rect",
-            x:
-              pivotX({ event: { x: 0, y: 0, ...last(events) } }) -
-              (2 * scale) / 2,
-            y:
-              pivotY({ event: { x: 0, y: 0, ...last(events) } }) -
-              (2 * scale) / 2,
+            $: "circle",
+            x: pivotX({ x: 0, y: 0, ...last(events) }),
+            y: pivotY({ x: 0, y: 0, ...last(events) }),
+            fill: palette.background.paper,
+            radius: 0.45 * scale,
+          },
+          {
+            $: "circle",
+            x: pivotX({ x: 0, y: 0, ...head(events) }),
+            y: pivotY({ x: 0, y: 0, ...head(events) }),
+            fill: getColorHex("destination"),
+            radius: 0.4 * scale,
+          },
+          {
+            $: "circle",
+            x: pivotX({ x: 0, y: 0, ...last(events) }),
+            y: pivotY({ x: 0, y: 0, ...last(events) }),
             fill: getColorHex("source"),
-            width: 2 * scale,
-            height: 2 * scale,
+            radius: 0.4 * scale,
           },
           {
             $: "path",
             points: events.map((c) => ({
-              x: pivotX({ event: { x: 0, y: 0, ...c } }),
-              y: pivotY({ event: { x: 0, y: 0, ...c } }),
+              x: pivotX({ x: 0, y: 0, ...c }),
+              y: pivotY({ x: 0, y: 0, ...c }),
             })),
             fill: palette.primary.main,
             alpha: 1,
-            lineWidth: 1 * scale,
+            lineWidth: 0.3 * scale,
           },
         ];
         return (
