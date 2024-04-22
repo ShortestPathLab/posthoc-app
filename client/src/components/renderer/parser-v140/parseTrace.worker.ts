@@ -1,10 +1,39 @@
-import { ceil, flatMap, flatten, map, range } from "lodash";
+import {
+  Dictionary,
+  ceil,
+  filter,
+  flatten,
+  get,
+  map,
+  range,
+  values,
+} from "lodash";
+import { CompiledComponent } from "protocol";
+import { ComponentEntry } from "renderer";
 import { usingWorkerTask } from "../../../workers/usingWorker";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
+  ParseTraceWorkerSlaveReturnType,
 } from "./parseTraceSlave.worker";
 import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";
+
+type C = CompiledComponent<string, Record<string, any>>;
+
+const makeKey = (id: string | number = "", condition: string | number = "") =>
+  `${id}::::${condition}`;
+
+const getPersistence = (c: C) =>
+  !c.clear
+    ? "persistent"
+    : typeof c.clear === "string"
+    ? "special"
+    : "transient";
+
+const isVisible = ({ component: c }: ComponentEntry) =>
+  c && Object.hasOwn(c, "alpha") ? get(c, "alpha")! > 0 : true;
+
+type Persistence = ReturnType<typeof getPersistence>;
 
 const { min } = Math;
 
@@ -18,7 +47,7 @@ export class ParseTraceWorker extends Worker {
 
 const parseTraceWorker = usingWorkerTask<
   ParseTraceWorkerParameters,
-  ParseTraceWorkerReturnType
+  ParseTraceWorkerSlaveReturnType
 >(ParseTraceWorker);
 
 async function parse({
@@ -42,9 +71,31 @@ async function parse({
     )
   );
 
+  const stack: Dictionary<ComponentEntry[]> = {};
+
+  const out: {
+    [K in Exclude<Persistence, "special">]: ComponentEntry[];
+  }[] = [];
+  for (const {
+    event,
+    components: { transient = [], special = [], persistent = [] },
+  } of outs) {
+    delete stack[makeKey(event.id, event.type)];
+    transient.push(...values(stack).flat());
+    for (const a of special) {
+      const key = makeKey(event.id, get(a.component, "clear"));
+      stack[key] = stack[key] ?? [];
+      stack[key].push(a);
+      transient.push(a);
+    }
+    out.push({ transient, persistent });
+  }
+
+  console.log(JSON.stringify(out));
+
   return {
-    stepsPersistent: flatMap(outs, "stepsPersistent"),
-    stepsTransient: flatMap(outs, "stepsTransient"),
+    stepsPersistent: map(out, "persistent").map((c) => filter(c, isVisible)),
+    stepsTransient: map(out, "transient").map((c) => filter(c, isVisible)),
   };
 }
 

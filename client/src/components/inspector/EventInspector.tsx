@@ -76,6 +76,7 @@ export function EventInspector({
         selected={selected}
         {...props}
         sx={{
+          height: 80,
           borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
           ...props.sx,
         }}

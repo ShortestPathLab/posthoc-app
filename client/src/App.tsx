@@ -1,11 +1,9 @@
 import { ThemeProvider, useTheme } from "@mui/material";
-import { Sidebar } from "Sidebar";
 import { Flex } from "components/generic/Flex";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { Inspector } from "components/inspector";
 import { TitleBar } from "components/title-bar/TitleBar";
 import { useTitleBar } from "hooks/useTitleBar";
-import { producify } from "produce";
 import { useMemo } from "react";
 import { ConnectionsService } from "services/ConnectionsService";
 import { FeaturesService } from "services/FeaturesService";
@@ -15,7 +13,6 @@ import { RendererService } from "services/RendererService";
 import { SettingsService } from "services/SettingsService";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { useSettings } from "slices/settings";
-import { Root } from "slices/view";
 import { makeTheme } from "theme";
 
 const services = [
@@ -37,7 +34,6 @@ function App() {
       vertical
       sx={{
         bgcolor: color,
-        // p: 0.5,
         color: "text.primary",
       }}
     >

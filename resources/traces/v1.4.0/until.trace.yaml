@@ -1,0 +1,19 @@
+version: 1.4.0
+
+views:
+  main:
+    - $: rect
+      width: 1
+      height: 1
+      x: ${{ $.step }}
+      y: 0
+      fill: "${{ $.id === 1 ? color.red : color.blue }}"
+      clear: c
+
+events:
+  - { type: a, id: 1 }
+  - { type: b, id: 1, message: "none" }
+  - { type: a, id: 2, message: "none" }
+  - { type: b, id: 2, message: "none" }
+  - { type: c, id: 1, message: "all id=1 should be cleared" }
+  - { type: c, id: 2, message: "all id=2 should be cleared" }

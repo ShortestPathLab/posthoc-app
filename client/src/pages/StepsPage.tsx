@@ -243,7 +243,6 @@ export function StepsPage({ template: Page }: PageContentProps) {
                         event={event}
                         index={eventIndex}
                         selected={eventIndex === step}
-                        sx={{ height: "100%" }}
                         label={shouldBreak(eventIndex)?.result}
                         onClick={() => stepTo(eventIndex)}
                       />
