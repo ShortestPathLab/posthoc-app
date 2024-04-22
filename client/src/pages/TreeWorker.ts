@@ -21,5 +21,6 @@ export function useTree(trace: TreeWorkerParameters) {
 
 export function useTreeMemo(trace: TreeWorkerParameters, deps: any[]) {
   const params = useMemo(() => trace, deps);
+
   return useTree(params);
 }

@@ -50,7 +50,19 @@ export const Page = withSlots<PageSlots, PageProps>(
   ({ slotProps, onChange, stack }) => {
     const acrylic = useAcrylic();
     return (
-      <ErrorBoundary fallback={<>This page encountered an error.</>}>
+      <ErrorBoundary
+        fallback={
+          <Box
+            sx={{
+              p: 6,
+              background: (t) => t.palette.background.paper,
+              height: "100%",
+            }}
+          >
+            This page encountered an error.
+          </Box>
+        }
+      >
         <Flex vertical>
           <Flex sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
             <Box

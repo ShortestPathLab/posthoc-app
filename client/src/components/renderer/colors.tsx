@@ -9,7 +9,7 @@ import {
   orange,
   pink,
   red,
-  yellow,
+  amber,
 } from "@mui/material/colors";
 
 const tint = "500";
@@ -23,7 +23,7 @@ export const colorsHex: EventTypeColors = {
   destination: red["A400"],
   updating: orange[tint],
   expanding: deepPurple[tint],
-  generating: yellow[tint],
+  generating: amber[tint],
   closing: pink[tint],
   end: blue["A400"],
 };
@@ -37,6 +37,9 @@ export function getColor(key?: TraceEventType) {
   return (key && colors[key]) || hex(orange[tint]);
 }
 
-export function getColorHex(key?: TraceEventType) {
-  return (key && colorsHex[key]) ?? grey[tint];
+export function getColorHex(
+  key?: TraceEventType,
+  fallback: string = grey[tint]
+) {
+  return (key && colorsHex[key]) ?? fallback;
 }

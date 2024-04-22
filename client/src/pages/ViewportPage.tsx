@@ -19,7 +19,6 @@ import {
   every,
   filter,
   find,
-  head,
   keyBy,
   map,
 } from "lodash";
@@ -30,6 +29,7 @@ import { useLayers } from "slices/layers";
 import { Renderer, useRenderers } from "slices/renderers";
 import { PanelState } from "slices/view";
 import { PageContentProps } from "./PageMeta";
+import { useRendererResolver } from "./useRendererResolver";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -63,12 +63,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   const [rendererInstance, setRendererInstance] =
     useState<RendererInstance | null>();
 
-  const autoRenderer = useMemo(() => head(renderers), [renderers]);
-
-  const selectedRenderer =
-    state?.renderer && state.renderer !== "internal:auto"
-      ? state.renderer
-      : autoRenderer?.renderer?.meta?.id;
+  const { selected, auto } = useRendererResolver(state?.renderer);
 
   useEffect(() => {
     delay(() => {
@@ -97,7 +92,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
                 <TraceRenderer
                   {...size}
                   layers={selectedLayers}
-                  renderer={selectedRenderer}
+                  renderer={selected}
                   rendererRef={setRendererInstance}
                 />
               </Box>
@@ -115,7 +110,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
             items={[
               {
                 id: "internal:auto",
-                name: `Auto (${autoRenderer?.renderer?.meta?.name ?? "None"})`,
+                name: `Auto (${auto?.renderer?.meta?.name ?? "None"})`,
               },
               ...map(renderers, ({ renderer }) => ({
                 id: renderer.meta.id,
