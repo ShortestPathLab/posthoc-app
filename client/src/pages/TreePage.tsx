@@ -393,7 +393,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                               Step {selected.current.step}
                             </Typography>
                           </ListItem>
-                          <Box px={2}>
+                          <Box px={2} py={1}>
                             <PropertyList
                               event={selected.current.event}
                               vertical

@@ -37,7 +37,7 @@ import {
 } from "lodash";
 import { map as mapAsync } from "promise-tools";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
-import { homepage, name } from "public/manifest.json";
+import { docs, name } from "public/manifest.json";
 import { CSSProperties, ReactNode, useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useLoadingState } from "slices/loading";
@@ -408,7 +408,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                         documentation instead.
                       </Type>
                       <Button
-                        onClick={() => window.open(homepage, "_blank")}
+                        onClick={() => window.open(docs, "_blank")}
                         startIcon={<LaunchOutlined />}
                       >
                         Open Documentation

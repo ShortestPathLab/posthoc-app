@@ -17,7 +17,7 @@ import { startCase } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { nanoid as id } from "nanoid";
 import logo from "public/logo512.png";
-import { docs, repository, version } from "public/manifest.json";
+import { changelog, repository, version, docs } from "public/manifest.json";
 import {
   ReactElement,
   ReactNode,
@@ -193,17 +193,13 @@ export const TitleBar = () => {
                       name: "Changelog",
                       key: "changelog",
                       action: () =>
-                        open(`${docs}/changelog-${version}.md`, "_blank"),
+                        open(`${changelog}/changelog-${version}.md`, "_blank"),
                     },
                     {
                       type: "action",
                       name: "Documentation",
                       key: "documentation",
-                      action: () =>
-                        open(
-                          `https://path-visualiser.github.io/docs/overview/`,
-                          "_blank"
-                        ),
+                      action: () => open(docs, "_blank"),
                     },
                   ],
                 },
