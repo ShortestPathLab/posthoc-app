@@ -3,6 +3,7 @@ import {
   ChevronRightOutlined,
   DataObjectOutlined,
   LayersOutlined as LayersIcon,
+  FlipCameraAndroidOutlined as RotateIcon,
 } from "@mui/icons-material";
 import {
   Box,
@@ -10,7 +11,6 @@ import {
   Divider,
   ListItem,
   ListItemIcon,
-  ListItemText,
   Menu,
   MenuItem,
   MenuList,
@@ -31,15 +31,24 @@ import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
 import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
 import interpolate from "color-interpolate";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { PlaybackLayerData } from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
 import { Label } from "components/generic/Label";
 import { Placeholder } from "components/inspector/Placeholder";
+import {
+  PropertyDialog,
+  PropertyList,
+} from "components/inspector/PropertyList";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
+import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
+import { getLayerHandler } from "layers/layerHandlers";
+import { TraceLayerData } from "layers/trace";
 import {
   delay,
+  entries,
   filter,
   find,
   findLast,
@@ -64,15 +73,8 @@ import { Layer, useLayer } from "slices/layers";
 import { PanelState } from "slices/view";
 import { PageContentProps } from "./PageMeta";
 import { useTreeMemo } from "./TreeWorker";
-import { EventTree } from "./tree.worker";
-import { PlaybackLayerData } from "components/app-bar/Playback";
-import { getLayerHandler } from "layers/layerHandlers";
-import { TraceLayerData } from "layers/trace";
-import { usePlaybackState } from "hooks/usePlaybackState";
-import {
-  PropertyDialog,
-  PropertyList,
-} from "components/inspector/PropertyList";
+import { EventTree, TreeWorkerReturnType } from "./tree.worker";
+import { Property } from "components/generic/Property";
 
 const isDefined = (a: any) => !isUndefined(a) && !isNull(a);
 
@@ -176,10 +178,12 @@ export function TreeGraph({
   trace,
   tree,
   step = 0,
+  orientation = "vertical",
 }: {
   trace?: Trace;
-  tree?: any;
+  tree?: TreeWorkerReturnType;
   step?: number;
+  orientation?: keyof typeof orientationOptions;
 }) {
   const theme = useTheme();
   const gradient = interpolate([
@@ -189,13 +193,14 @@ export function TreeGraph({
   const load = useLoadGraph();
 
   const graph = useMemo(() => {
+    const isVertical = orientation === "vertical";
     const graph = new MultiDirectedGraph();
     forEach(tree, (v) => {
       graph.addNode(v.label, {
-        x: v.x,
-        y: v.y,
+        x: isVertical ? v.x : -v.y,
+        y: isVertical ? v.y : -v.x,
         label: v.label,
-        size: 3,
+        size: Math.log(v.size) + 2,
         color: theme.palette.action.disabledBackground,
       });
     });
@@ -206,29 +211,37 @@ export function TreeGraph({
           graph.addDirectedEdgeWithKey(key, `${pId}`, `${id}`, {
             label: "",
             color: "white",
+            size: 2,
           });
         }
+        graph.updateEdgeAttribute(
+          key,
+          "size",
+          (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5
+        );
       }
     });
     return graph;
-  }, [load, trace, tree]);
+  }, [load, trace, tree, orientation]);
   useEffect(() => {
     const r = memoizee((a: string) =>
       interpolate([theme.palette.background.paper, a])
     );
-    const pastSteps = 200;
-    const n = gradient(0.2);
+    const pastSteps = 400;
+    const n = gradient(0.1);
     graph.forEachNode((v) => {
       graph.setNodeAttribute(v, "color", n);
+      graph.setNodeAttribute(v, "forceLabel", false);
       graph.setNodeAttribute(v, "label", truncate(v, { length: 15 }));
     });
     graph.forEachEdge((v) => {
       graph.setEdgeAttribute(v, "color", n);
+      graph.setEdgeAttribute(v, "forceLabel", false);
       graph.setEdgeAttribute(v, "label", "");
     });
     forEach(slice(trace?.events, 0, step + 1), ({ id, type, pId }, i) => {
       const color = getColorHex(type);
-      const finalColor = r(color)(max([1 - (step - i) / pastSteps, 0.2])!);
+      const finalColor = r(color)(max([1 - (step - i) / pastSteps, 0.1])!);
       if (graph.hasNode(`${id}`)) {
         graph.setNodeAttribute(`${id}`, "color", finalColor);
         graph.setNodeAttribute(
@@ -236,7 +249,13 @@ export function TreeGraph({
           "label",
           truncate(`${startCase(type)} ${id}`, { length: 15 })
         );
+        graph.setNodeAttribute(`${id}`, "forceLabel", step === i);
         if (isDefined(pId) && graph.hasNode(`${pId}`)) {
+          graph.setEdgeAttribute(
+            makeEdgeKey(id, pId),
+            "forceLabel",
+            step === i
+          );
           graph.setEdgeAttribute(makeEdgeKey(id, pId), "color", finalColor);
           graph.setEdgeAttribute(makeEdgeKey(id, pId), "label", `Step ${i}`);
         }
@@ -272,11 +291,20 @@ export function TreePage({ template: Page }: PageContentProps) {
   const { stepTo } = usePlaybackState(key);
 
   const [orientation, setOrientation] =
-    useState<keyof typeof orientationOptions>("horizontal");
+    useState<keyof typeof orientationOptions>("vertical");
 
   const trace = layer?.source?.trace?.content;
   const [selection, setSelection] = useState<R>();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const selected = useMemo(() => {
+    const events = filter(
+      map(trace?.events, (c, i) => ({ event: c, step: i })),
+      (c) => `${c.event.id}` === selection?.node
+    );
+
+    return { events, current: findLast(events, (c) => c.step <= step) };
+  }, [selection, step]);
 
   const params = useMemo(() => ({ trace }), [trace]);
 
@@ -289,7 +317,7 @@ export function TreePage({ template: Page }: PageContentProps) {
         edgeLabelColor: { color: theme.palette.text.secondary },
         labelFont: "Inter",
         labelSize: 14,
-        labelDensity: 1,
+        labelDensity: 0.1,
         renderEdgeLabels: true,
         edgeLabelFont: "Inter",
         edgeLabelSize: 12,
@@ -313,53 +341,75 @@ export function TreePage({ template: Page }: PageContentProps) {
         <Flex>
           {trace ? (
             !loading ? (
-              <>
-                <AutoSize>
-                  {(size) => (
-                    <SigmaContainer
-                      style={{
-                        ...size,
-                        background: theme.palette.background.paper,
-                      }}
-                      graph={MultiDirectedGraph}
-                      settings={settings}
-                    >
-                      <TreeGraph step={step} tree={tree} trace={trace} />
-                      <GraphEvents
-                        layer={key}
-                        onSelection={(e) => {
-                          setSelection(e);
-                          setMenuOpen(true);
+              tree?.length ? (
+                <>
+                  <AutoSize>
+                    {(size) => (
+                      <SigmaContainer
+                        style={{
+                          ...size,
+                          background: theme.palette.background.paper,
                         }}
-                      />
-                    </SigmaContainer>
-                  )}
-                </AutoSize>
-                <Menu
-                  onClose={() => setMenuOpen(false)}
-                  anchorReference="anchorPosition"
-                  anchorPosition={{
-                    left: selection?.event.clientX ?? 0,
-                    top: selection?.event.clientY ?? 0,
-                  }}
-                  transformOrigin={{
-                    horizontal: "left",
-                    vertical: "top",
-                  }}
-                  open={menuOpen}
-                >
-                  <MenuList dense sx={{ p: 0 }}>
-                    <ListItem sx={{ py: 0 }}>
-                      <Typography color="text.secondary" variant="overline">
-                        Node {selection?.node}
-                      </Typography>
-                    </ListItem>
-                    {map(
-                      filter(
-                        map(trace.events, (c, i) => ({ event: c, step: i })),
-                        (c) => `${c.event.id}` === selection?.node
-                      ),
-                      (entry, _, es) => {
+                        graph={MultiDirectedGraph}
+                        settings={settings}
+                      >
+                        <TreeGraph
+                          step={step}
+                          tree={tree}
+                          trace={trace}
+                          orientation={orientation}
+                        />
+                        <GraphEvents
+                          layer={key}
+                          onSelection={(e) => {
+                            setSelection(e);
+                            setMenuOpen(true);
+                          }}
+                        />
+                      </SigmaContainer>
+                    )}
+                  </AutoSize>
+                  <Menu
+                    onClose={() => setMenuOpen(false)}
+                    anchorReference="anchorPosition"
+                    anchorPosition={{
+                      left: selection?.event.clientX ?? 0,
+                      top: selection?.event.clientY ?? 0,
+                    }}
+                    transformOrigin={{
+                      horizontal: "left",
+                      vertical: "top",
+                    }}
+                    open={menuOpen}
+                  >
+                    <MenuList dense sx={{ p: 0 }}>
+                      {!!selected.current && (
+                        <>
+                          <ListItem sx={{ py: 0 }}>
+                            <Typography
+                              color="text.secondary"
+                              variant="overline"
+                            >
+                              Step {selected.current.step}
+                            </Typography>
+                          </ListItem>
+                          <Box px={2}>
+                            <PropertyList
+                              event={selected.current.event}
+                              vertical
+                              simple
+                              primitives
+                            />
+                          </Box>
+                          <Divider sx={{ my: 1, mx: 2 }} />
+                        </>
+                      )}
+                      <ListItem sx={{ py: 0 }}>
+                        <Typography color="text.secondary" variant="overline">
+                          Events at {selection?.node}
+                        </Typography>
+                      </ListItem>
+                      {map(selected.events, (entry, _, es) => {
                         const selected =
                           findLast(es, (c) => c.step <= step)?.step ===
                           entry.step;
@@ -375,7 +425,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                                 )}`,
                               }}
                               onClick={() => {
-                                setMenuOpen(false);
+                                // setMenuOpen(false);
                                 stepTo(entry.step);
                               }}
                             >
@@ -408,11 +458,17 @@ export function TreePage({ template: Page }: PageContentProps) {
                             </Box>
                           </Stack>
                         );
-                      }
-                    )}
-                  </MenuList>
-                </Menu>
-              </>
+                      })}
+                    </MenuList>
+                  </Menu>
+                </>
+              ) : (
+                <Placeholder
+                  icon={<AccountTreeOutlined />}
+                  label="Tree"
+                  secondary={`${inferLayerName(layer)} is not a tree.`}
+                />
+              )
             ) : (
               <Flex
                 sx={{
@@ -463,7 +519,7 @@ export function TreePage({ template: Page }: PageContentProps) {
           }))}
           arrow
         /> */}
-        {/* {divider}
+        {divider}
         <FeaturePicker
           icon={<RotateIcon />}
           label="Orientation"
@@ -474,7 +530,7 @@ export function TreePage({ template: Page }: PageContentProps) {
             name: startCase(value.value),
           }))}
           arrow
-        /> */}
+        />
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

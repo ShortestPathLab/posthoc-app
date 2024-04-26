@@ -106,14 +106,16 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
   //     } else return { tree };
   //   }
 
-  const g = new graphlib.Graph();
+  const g = new graphlib.Graph<{ size: number }>();
 
   // Set an object for the graph label
   g.setGraph({});
   forEach(trace?.events, ({ id, pId, type }, i) => {
     if (id) {
       if (!g.hasNode(`${id}`)) {
-        g.setNode(`${id}`, { label: `${id}`, width: 1, height: 1 });
+        g.setNode(`${id}`, { label: `${id}`, width: 1, height: 1, size: 1 });
+      } else {
+        g.node(`${id}`).size += 1;
       }
     }
     if (pId) {
@@ -132,7 +134,7 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
     acyclicer: "greedy",
     ranksep: 100,
   });
-  return g.nodes().map((node) => pick(g.node(node), "x", "y", "label"));
+  return g.nodes().map((node) => pick(g.node(node), "x", "y", "label", "size"));
 }
 export type TreeWorkerParameters = {
   trace?: Trace;
@@ -141,7 +143,7 @@ export type TreeWorkerParameters = {
 };
 
 export type TreeWorkerReturnType =
-  | { x: string; y: string; label: string }[]
+  | { x: number; y: number; label: string; size: number }[]
   | undefined;
 
 onmessage = ({ data }: MessageEvent<TreeWorkerParameters>) => {

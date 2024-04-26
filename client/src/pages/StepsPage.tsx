@@ -22,7 +22,7 @@ import {
 import { EventInspector, Skeleton } from "components/inspector/EventInspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { getColorHex } from "components/renderer/colors";
+import { getColorHex, tint } from "components/renderer/colors";
 import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
@@ -42,6 +42,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
 import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
+import { grey } from "@mui/material/colors";
 
 function lerp(start: number, end: number, amount: number): number {
   return start + clamp(amount, 0, 1) * (end - start);
@@ -320,7 +321,12 @@ export function StepsPage({ template: Page }: PageContentProps) {
         <FeaturePicker
           icon={
             <FiberManualRecordOutlined
-              sx={{ color: getColorHex(selectedType) }}
+              sx={{
+                color:
+                  selectedType === SYMBOL_ALL || !selectedType
+                    ? grey[tint]
+                    : getColorHex(selectedType),
+              }}
             />
           }
           label="Event Type"

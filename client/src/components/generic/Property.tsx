@@ -29,7 +29,7 @@ export function renderProperty(obj: any, simple: boolean = false) {
           .toExponential(2)
           .split("e")
           .map((item) => +item);
-        return Math.abs(exp) > 4 ? (
+        return exp < -2 || exp > 4 ? (
           <span>
             {coefficient}x10<sup style={supProps}>{exp}</sup>
           </span>
