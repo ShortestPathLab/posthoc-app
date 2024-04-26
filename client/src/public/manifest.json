@@ -5,7 +5,8 @@
   "description": "Visualise pathfinding search and more",
   "version_name": "1.2.1; mid April 2024",
   "repository": "https://github.com/path-visualiser/app",
-  "docs": "https://github.com/path-visualiser/app/blob/master/docs",
+  "changelog": "https://github.com/path-visualiser/app/blob/master/docs",
+  "docs": "https://path-visualiser.github.io/docs/overview",
   "homepage": "https://path-visualiser.github.io/",
   "icons": [
     {

@@ -23,6 +23,7 @@ import {
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
+import { useFullscreenModalContext } from "components/inspector/FullscreenModalHost";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
@@ -46,7 +47,6 @@ import { textFieldProps, usePaper } from "theme";
 import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/Button";
 import { PageContentProps } from "./PageMeta";
-import { useFullscreenModalContext } from "components/inspector/FullscreenModalHost";
 const paths = import.meta.glob("/public/recipes/*.workspace", {
   as: "url",
 });
