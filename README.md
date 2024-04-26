@@ -6,7 +6,7 @@
 
 # Posthoc Visualiser
 
-[Open Posthoc](https://http://posthoc.pathfinding.ai/)
+[Open Posthoc](https://posthoc.pathfinding.ai/)
 
 **Posthoc** is a way to build quick-and-dirty visualisations ✨ for sequential decision-making algorithms, such as search algorithms 🚀.
 
