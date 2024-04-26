@@ -1,6 +1,6 @@
 {
-  "short_name": "Visualiser",
-  "name": "Visualiser",
+  "short_name": "Posthoc",
+  "name": "Posthoc",
   "version": "1.2.1",
   "description": "Visualise pathfinding search and more",
   "version_name": "1.2.1; mid April 2024",

@@ -21,7 +21,7 @@ const mainText = `Adapter started on ${chalk.blueBright(
   `http://localhost:${port}/`
 )}`;
 
-const hintText = chalk.dim(`(Hint: Add it to Visualiser's connections list)`);
+const hintText = chalk.dim(`(Hint: Add it to Posthoc's connections list)`);
 
 const server = createAdapter(port);
 

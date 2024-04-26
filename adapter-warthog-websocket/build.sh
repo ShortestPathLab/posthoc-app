@@ -32,10 +32,10 @@ npx --yes resedit-cli \
     --in dist/main-win.exe \
     --out dist/main-win.exe \
     --icon "1,icon.ico" \
-    --product-name "Visualiser" \
+    --product-name "Posthoc" \
     --product-version "0.1.0.0" \
     --file-version "0.1.0.0" \
-    --file-description "Visualiser Adapter Server"
+    --file-description "Posthoc Adapter"
 
 # Sign Windows executable
 
@@ -53,7 +53,7 @@ if which osslsigncode >/dev/null; then
             -in private/cert.pem
     fi
     osslsigncode sign -pkcs12 private/cert.p12 \
-        -n "Visualiser Adapter Server" \
+        -n "Posthoc Adapter" \
         -i "https://github.com/path-visualiser" \
         -in dist/main-win.exe \
         -out dist/main-win-signed.exe

@@ -49,8 +49,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./client/bin/Visualiser-linux-x64.zip
-          asset_name: Visualiser-linux-x64.zip
+          asset_path: ./client/bin/Posthoc-linux-x64.zip
+          asset_name: Posthoc-linux-x64.zip
           asset_content_type: application/zip
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
@@ -58,8 +58,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./client/bin/Visualiser-win32-x64.zip
-          asset_name: Visualiser-win32-x64.zip
+          asset_path: ./client/bin/Posthoc-win32-x64.zip
+          asset_name: Posthoc-win32-x64.zip
           asset_content_type: application/zip
       - name: Upload release asset
         uses: actions/upload-release-asset@v1

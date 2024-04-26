@@ -241,7 +241,7 @@ export function TreeGraph({
     });
     forEach(slice(trace?.events, 0, step + 1), ({ id, type, pId }, i) => {
       const color = getColorHex(type);
-      const finalColor = r(color)(max([1 - (step - i) / pastSteps, 0.1])!);
+      const finalColor = r(color)(max([1 - (step - i) / pastSteps, 0.2])!);
       if (graph.hasNode(`${id}`)) {
         graph.setNodeAttribute(`${id}`, "color", finalColor);
         graph.setNodeAttribute(

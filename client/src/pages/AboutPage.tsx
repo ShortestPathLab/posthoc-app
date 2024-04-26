@@ -14,7 +14,7 @@ import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { head } from "lodash";
 import logo from "public/logo512.png";
-import { name, version_name } from "public/manifest.json";
+import { name, version_name, repository } from "public/manifest.json";
 import { ReactNode } from "react";
 import { PageContentProps } from "./PageMeta";
 
@@ -67,17 +67,11 @@ export function AboutContent() {
         "Resources",
         <>
           <List sx={{ mx: -2 }}>
-            <ListItemButton
-              target="_blank"
-              href="https://github.com/path-visualiser"
-            >
+            <ListItemButton target="_blank" href={repository}>
               <ListItemIcon>
                 <GitHub />
               </ListItemIcon>
-              <ListItemText
-                primary="Repository"
-                secondary="https://github.com/path-visualiser"
-              />
+              <ListItemText primary="Repository" secondary={repository} />
             </ListItemButton>
           </List>
         </>

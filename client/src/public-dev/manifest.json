@@ -1,6 +1,6 @@
 {
-  "short_name": "Visualiser",
-  "name": "Visualiser",
+  "short_name": "Posthoc",
+  "name": "Posthoc",
   "version": "dev",
   "description": "Visualise pathfinding search and more",
   "version_name": "dev",
