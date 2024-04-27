@@ -98,7 +98,7 @@ export function EventInspector({
                 my: 0.5,
               }}
             >
-              {startCase(`${event?.type ?? "unsupported"} ${event?.id ?? "-"}`)}{" "}
+              {startCase(`${event?.type ?? "event"} ${event?.id ?? "-"}`)}{" "}
             </Box>
           }
           secondaryTypographyProps={{
