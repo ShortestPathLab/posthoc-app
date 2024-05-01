@@ -26,6 +26,8 @@ export type D2Polygon = D2Base & {
 
 export type D2Path = D2Polygon & {
   lineWidth: number;
+  /// version < 1.4.0 compat
+  "line-width": number;
 };
 
 export type D2InstrinsicComponents = {

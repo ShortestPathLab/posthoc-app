@@ -47,8 +47,8 @@ export const defaultD2RendererOptions: D2RendererOptions = {
   backgroundColor: "#ffffff",
   accentColor: "#333333",
   dynamicResolution: {
-    intervalMs: 5000,
-    increment: 0.25,
+    intervalMs: 500,
+    increment: 0.5,
     maxScale: 1.5,
     minScale: 1,
     dtMax: 1.5,

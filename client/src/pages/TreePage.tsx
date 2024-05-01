@@ -3,6 +3,7 @@ import {
   ChevronRightOutlined,
   DataObjectOutlined,
   LayersOutlined as LayersIcon,
+  ModeStandbyOutlined,
   FlipCameraAndroidOutlined as RotateIcon,
 } from "@mui/icons-material";
 import {
@@ -47,6 +48,7 @@ import { inferLayerName } from "layers/inferLayerName";
 import { getLayerHandler } from "layers/layerHandlers";
 import { TraceLayerData } from "layers/trace";
 import {
+  Dictionary,
   delay,
   entries,
   filter,
@@ -97,22 +99,17 @@ export function useCache<T>(result: T, loading: boolean = false) {
   return cache;
 }
 
-const radius2 = {
-  small: {
-    value: 0,
-    name: "Current",
-    description: "Show the current node and its parents",
+const graphMode = {
+  "directed-graph": {
+    value: "directed-graph",
+    name: "Directed Graph",
+    description: "",
   },
-  medium: {
-    value: 4,
-    name: "Nearby",
-    description: "Show nodes with ≤4 degrees of separation",
-  },
-  infinite: {
-    value: undefined,
-    name: "All",
-    description: "Show all nodes, may impact performance",
-  },
+  // tree: {
+  //   value: "tree",
+  //   name: "Tree",
+  //   description: "Force layout as a tree",
+  // },
 };
 
 const orientationOptions = {
@@ -126,7 +123,7 @@ const orientationOptions = {
 
 const ForceAtlas: FC = () => {
   const { start, kill } = useWorkerLayoutForceAtlas2({
-    settings: { slowDown: 10 },
+    settings: { slowDown: 10, gravity: 2, adjustSizes: true, linLogMode: true },
   });
 
   useEffect(() => {
@@ -204,6 +201,35 @@ export function TreeGraph({
         color: theme.palette.action.disabledBackground,
       });
     });
+
+    const numParents: Dictionary<Set<string | number>> = {};
+    forEach(trace?.events, ({ id, pId, type }, i) => {
+      if (id && pId) {
+        numParents[id] = numParents[id] ?? new Set();
+        numParents[id].add(pId);
+      }
+    });
+
+    // forEach(trace?.events, ({ id, pId }) => {
+    //   if (isDefined(pId) && graph.hasNode(`${pId}`)) {
+    //     const key = makeEdgeKey(id, pId);
+    //     if (!graph.hasEdge(key) && pId && numParents[id].size <= 1) {
+    //       graph.addDirectedEdgeWithKey(key, `${pId}`, `${id}`, {
+    //         label: "",
+    //         color: "white",
+    //         size: 2,
+    //       });
+    //     }
+    //     if (graph.hasEdge(key)) {
+    //       graph.updateEdgeAttribute(
+    //         key,
+    //         "size",
+    //         (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5
+    //       );
+    //     }
+    //   }
+    // });
+
     forEach(trace?.events, ({ id, pId }) => {
       if (isDefined(pId) && graph.hasNode(`${pId}`)) {
         const key = makeEdgeKey(id, pId);
@@ -221,6 +247,7 @@ export function TreeGraph({
         );
       }
     });
+    return graph;
     return graph;
   }, [load, trace, tree, orientation]);
   useEffect(() => {
@@ -250,7 +277,11 @@ export function TreeGraph({
           truncate(`${startCase(type)} ${id}`, { length: 15 })
         );
         graph.setNodeAttribute(`${id}`, "forceLabel", step === i);
-        if (isDefined(pId) && graph.hasNode(`${pId}`)) {
+        if (
+          isDefined(pId) &&
+          graph.hasNode(`${pId}`) &&
+          graph.hasEdge(makeEdgeKey(id, pId))
+        ) {
           graph.setEdgeAttribute(
             makeEdgeKey(id, pId),
             "forceLabel",
@@ -297,6 +328,8 @@ export function TreePage({ template: Page }: PageContentProps) {
   const [selection, setSelection] = useState<R>();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const [mode, setMode] = useState<"tree" | "directed-graph">("directed-graph");
+
   const selected = useMemo(() => {
     const events = filter(
       map(trace?.events, (c, i) => ({ event: c, step: i })),
@@ -306,7 +339,7 @@ export function TreePage({ template: Page }: PageContentProps) {
     return { events, current: findLast(events, (c) => c.step <= step) };
   }, [selection, step]);
 
-  const params = useMemo(() => ({ trace }), [trace]);
+  const params = useMemo(() => ({ trace, mode }), [trace, mode]);
 
   const { result: tree, loading } = useTreeMemo(params, [params]);
 
@@ -366,6 +399,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                             setMenuOpen(true);
                           }}
                         />
+                        {/* <ForceAtlas /> */}
                       </SigmaContainer>
                     )}
                   </AutoSize>
@@ -465,8 +499,8 @@ export function TreePage({ template: Page }: PageContentProps) {
               ) : (
                 <Placeholder
                   icon={<AccountTreeOutlined />}
-                  label="Tree"
-                  secondary={`${inferLayerName(layer)} is not a tree.`}
+                  label="Graph"
+                  secondary={`${inferLayerName(layer)} is not a graph.`}
                 />
               )
             ) : (
@@ -487,7 +521,7 @@ export function TreePage({ template: Page }: PageContentProps) {
           ) : (
             <Placeholder
               icon={<AccountTreeOutlined />}
-              label="Tree"
+              label="Graph"
               secondary="When you load a trace that has tree-like data, you'll see it here as a decision tree."
             />
           )}
@@ -507,18 +541,18 @@ export function TreePage({ template: Page }: PageContentProps) {
           arrow
           ellipsis={12}
         />
-        {/* {divider} */}
-        {/* <FeaturePicker
-          icon={<VisibilityOutlined />}
-          label="Radius"
-          value={radius}
-          onChange={(e) => setRadius(e as keyof typeof radius2)}
-          items={map(entries(radius2), ([k, v]) => ({
+        {divider}
+        <FeaturePicker
+          icon={<ModeStandbyOutlined />}
+          label="Layout"
+          value={mode}
+          onChange={setMode}
+          items={map(entries(graphMode), ([k, v]) => ({
             id: k,
             ...v,
           }))}
           arrow
-        /> */}
+        />
         {divider}
         <FeaturePicker
           icon={<RotateIcon />}
@@ -534,154 +568,5 @@ export function TreePage({ template: Page }: PageContentProps) {
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
     </Page>
-  );
-}
-
-const width = 16;
-const height = 4;
-
-function Node({
-  onClick,
-  node,
-  step = 0,
-  onStep,
-}: {
-  onClick?: () => void;
-  node?: EventTree;
-  step?: number;
-  onStep?: (s: number) => void;
-}) {
-  const { palette, spacing, shape } = useTheme();
-  const a = findLast(node?.events, (e) => e.step <= step);
-  const isSelected = !!find(node?.events, (e) => e.step === step);
-  const color = getColorHex(a?.data?.type);
-  return (
-    <PopupState variant="popover">
-      {(state) => (
-        <>
-          <Tooltip
-            title={`f: ${a?.data?.f ?? "unknown"}, g: ${
-              a?.data?.g ?? "unknown"
-            }`}
-          >
-            <g
-              onClick={(e) => {
-                state.open(e);
-              }}
-            >
-              <clipPath id="clipPath">
-                <rect
-                  y={spacing(-height / 2)}
-                  x={spacing(-0.25)}
-                  strokeWidth={0}
-                  width={spacing(width)}
-                  height={spacing(height)}
-                  rx={shape.borderRadius}
-                />
-              </clipPath>
-              <rect
-                y={spacing(-height / 2)}
-                x={spacing(-0.25)}
-                strokeWidth={0}
-                fill={palette.background.default}
-                width={spacing(width)}
-                height={spacing(height)}
-                clipPath="url(#clipPath)"
-              />
-              {isSelected && (
-                <rect
-                  y={spacing(-height / 2)}
-                  x={spacing(-0.25)}
-                  strokeWidth={0}
-                  fill={alpha(
-                    palette.primary.main,
-                    palette.action.selectedOpacity
-                  )}
-                  width={spacing(width)}
-                  height={spacing(height)}
-                  clipPath="url(#clipPath)"
-                />
-              )}
-              <rect
-                x={spacing(-0.25)}
-                y={spacing(-height / 2)}
-                height={spacing(height)}
-                width={spacing(0.5)}
-                fill={color}
-                strokeWidth={0}
-                clipPath="url(#clipPath)"
-              />
-              <text
-                strokeWidth={0}
-                height={spacing(4)}
-                fill={palette.text.primary}
-                y={0}
-                fontWeight={500}
-                fontSize="0.875rem"
-                x={spacing(2 - 0.25)}
-                alignmentBaseline="central"
-              >
-                {node?.name}
-              </text>
-              {!!node?.cumulativeChildCount && (
-                <>
-                  <text
-                    strokeWidth={0}
-                    height={spacing(4)}
-                    fill={palette.text.secondary}
-                    y={0}
-                    x={spacing(width - 2.25 - 1)}
-                    textAnchor="end"
-                    fontWeight={400}
-                    fontSize="0.875rem"
-                    alignmentBaseline="central"
-                  >
-                    {node?.cumulativeChildCount}
-                  </text>
-                  <ChevronRightOutlined
-                    width={spacing(2)}
-                    height={spacing(2)}
-                    x={spacing(width - 2 - 1)}
-                    y={spacing(-height / 2 + 1)}
-                    strokeWidth={0}
-                    fill={palette.text.primary}
-                    opacity={palette.action.disabledOpacity}
-                  />
-                </>
-              )}
-            </g>
-          </Tooltip>
-          <Menu
-            anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
-            transformOrigin={{
-              horizontal: "center",
-              vertical: "top",
-            }}
-            {...bindMenu(state)}
-          >
-            <MenuList dense sx={{ p: 0 }}>
-              {map(node?.events, (e) => (
-                <MenuItem
-                  selected={e.step === step}
-                  sx={{
-                    borderLeft: `4px solid ${getColorHex(e.data.type)}`,
-                  }}
-                  onClick={() => {
-                    state.close();
-                    onClick?.();
-                    delay(() => onStep?.(e.step), 150);
-                  }}
-                >
-                  <Label
-                    primary={startCase(e.data.type)}
-                    secondary={`Step ${e.step}`}
-                  />
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-        </>
-      )}
-    </PopupState>
   );
 }

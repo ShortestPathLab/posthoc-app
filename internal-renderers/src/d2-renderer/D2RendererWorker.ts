@@ -192,7 +192,7 @@ export class D2RendererWorker extends EventEmitter<
     if (b) {
       this.#errors[
         id
-      ] = `Component '${b.component.$}' is missing required properties`;
+      ] = `Component '${b.component.$}' is missing properties. Check these: width, height, x, y.`;
       return;
     }
     this.#system.load(bodies);

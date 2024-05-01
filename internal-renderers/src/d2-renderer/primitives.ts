@@ -157,7 +157,8 @@ export const path: Primitive<"path"> = {
     g.lineJoin = "round";
     g.strokeStyle = getStrokeStyle(c.fill, c.alpha);
     const { x, y, width } = transform(
-      { ...box, width: c.lineWidth, height: 0 },
+      /// version < 1.4.0 compat
+      { ...box, width: c["line-width"] ?? c.lineWidth, height: 0 },
       t
     );
     g.lineWidth = ceil(width);
@@ -169,11 +170,13 @@ export const path: Primitive<"path"> = {
     g.stroke();
   },
   test(c) {
+    /// version < 1.4.0 compat
+    const w = c["line-width"] ?? c.lineWidth;
     return {
-      left: (minBy(c.points, "x")?.x ?? 0 - c.lineWidth ?? 0) - 1,
-      right: (maxBy(c.points, "x")?.x ?? 0 + c.lineWidth ?? 0) + 1,
-      top: (minBy(c.points, "y")?.y ?? 0 - c.lineWidth ?? 0) - 1,
-      bottom: (maxBy(c.points, "y")?.y ?? 0 + c.lineWidth ?? 0) + 1,
+      left: (minBy(c.points, "x")?.x ?? 0 - w ?? 0) - 1,
+      right: (maxBy(c.points, "x")?.x ?? 0 + w ?? 0) + 1,
+      top: (minBy(c.points, "y")?.y ?? 0 - w ?? 0) - 1,
+      bottom: (maxBy(c.points, "y")?.y ?? 0 + w ?? 0) + 1,
     };
   },
   narrow(c, p) {

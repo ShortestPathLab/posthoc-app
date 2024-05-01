@@ -24,9 +24,10 @@ const shadow = `
 export const getShade = (
   color: AccentColor = "blue",
   mode: "light" | "dark" = "light",
-  shade?: Shade
+  shadeLight: Shade = "A700",
+  shadeDark: Shade = "A100"
 ) => {
-  return colors[color][shade ?? (mode === "dark" ? "A100" : "A700")];
+  return colors[color][mode === "dark" ? shadeDark : shadeLight];
 };
 
 const fontFamily = `"Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",

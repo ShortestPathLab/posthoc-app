@@ -93,15 +93,19 @@ export function SourcePage({ template: Page }: PageContentProps) {
           arrow
           ellipsis={12}
         />
-        {divider}
-        <Tabs
-          value={state?.source ?? first(source)?.id}
-          onChange={(_, v) => onChange?.({ source: v })}
-        >
-          {map(source, ({ name, id }) => (
-            <Tab label={name} value={id} />
-          ))}
-        </Tabs>
+        {source?.length && (
+          <>
+            {divider}
+            <Tabs
+              value={state?.source ?? first(source)?.id}
+              onChange={(_, v) => onChange?.({ source: v })}
+            >
+              {map(source, ({ name, id }) => (
+                <Tab label={name} value={id} />
+              ))}
+            </Tabs>
+          </>
+        )}
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

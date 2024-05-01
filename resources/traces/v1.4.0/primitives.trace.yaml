@@ -1,0 +1,59 @@
+version: 1.4.0
+
+views:
+  label:
+    - $: "rect"
+      fill: ${{ theme.background }}
+      x: 0
+      y: ${{ $.i * 16 - 3 }}
+      width: 10
+      height: 3
+      label: ${{ $.title }}
+      label-x: 0
+      label-y: 2
+      label-size: 1
+      label-color: ${{ theme.foreground }}
+  main:
+    # rect
+    - $: label
+      title: rect
+      i: 0
+    - $: rect
+      x: 0
+      y: 0
+      width: 10
+      height: 10
+      fill: ${{ color.blue }}
+    # circle
+    - $: label
+      title: circle
+      i: 1
+    - $: circle
+      x: 5
+      y: 21
+      radius: 5
+      fill: ${{ color.cyan }}
+    # path
+    - $: label
+      title: path
+      i: 2
+    - $: path
+      fill: ${{ color.green }}
+      line-width: 0.5
+      points:
+        - { x: 1.47, y: 32 }
+        - { x: 8.54, y: 37 }
+        - { x: 1.47, y: 42 }
+    # polygon
+    - $: label
+      title: polygon
+      i: 3
+    - $: polygon
+      fill: ${{ color.lime }}
+      points:
+        - { x: 1.47, y: 48 }
+        - { x: 8.54, y: 53 }
+        - { x: 1.47, y: 58 }
+events:
+  - type: primitives
+    comment: List of primitives provided by the built-in 2D renderer

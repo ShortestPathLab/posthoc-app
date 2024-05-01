@@ -1,9 +1,15 @@
-import { WidgetsOutlined } from "@mui/icons-material";
-import { Box, Divider } from "@mui/material";
+import {
+  ErrorOutlineOutlined,
+  SentimentDissatisfiedOutlined,
+  WidgetsOutlined,
+} from "@mui/icons-material";
+import { Box, Divider, Stack } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { Button } from "components/generic/Button";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
+import { Placeholder } from "components/inspector/Placeholder";
 import { values } from "lodash";
 import { pages } from "pages";
 import React, { ReactNode } from "react";
@@ -51,17 +57,48 @@ export const Page = withSlots<PageSlots, PageProps>(
     const acrylic = useAcrylic();
     return (
       <ErrorBoundary
-        fallback={
-          <Box
+        fallbackRender={(error) => (
+          <Stack
             sx={{
-              p: 6,
               background: (t) => t.palette.background.paper,
               height: "100%",
             }}
           >
-            This page encountered an error.
-          </Box>
-        }
+            <Stack
+              direction="row"
+              sx={{
+                height: (t) => t.spacing(6),
+                alignItems: "center",
+                pl: 1,
+                borderBottom: 1,
+                borderColor: "divider",
+              }}
+            >
+              {slotProps.Handle?.children}
+              <FeaturePicker
+                // showArrow
+                icon={<WidgetsOutlined />}
+                label="Choose View"
+                onChange={(type) =>
+                  onChange?.({
+                    ...stack,
+                    type,
+                  })
+                }
+                value={stack?.type}
+                items={values(pages)}
+                itemOrientation="vertical"
+              />
+              <Space sx={{ mx: "auto" }} />
+              {slotProps.Extras?.children}
+            </Stack>
+            <Placeholder
+              // label="Something went wrong"
+              secondary={`${error.error}`}
+              icon={<ErrorOutlineOutlined />}
+            />
+          </Stack>
+        )}
       >
         <Flex vertical>
           <Flex sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
@@ -75,7 +112,7 @@ export const Page = withSlots<PageSlots, PageProps>(
               {slotProps.Content?.children}
             </Box>
           </Flex>
-          <Flex sx={{ height: (t) => t.spacing(6) }}>
+          <Flex sx={{ height: (t) => t.spacing(6), alignItems: "center" }}>
             <Flex
               sx={{
                 p: 0,

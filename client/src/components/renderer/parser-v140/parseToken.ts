@@ -5,8 +5,11 @@ export const parseToken = (token: string): Prop<any> => {
   const f = Function(
     "$",
     `
-      const theme = $.theme;
-      const color = $.color;
+      const theme = $.__internal__?.context.theme;
+      const color = $.__internal__?.context.color;
+      const step = $.__internal__?.step;
+      const events = $.__internal__?.events;
+      const parent = $.__internal__?.parent;
       return ${token};
   `
   );

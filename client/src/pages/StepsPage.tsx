@@ -255,14 +255,14 @@ export function StepsPage({ template: Page }: PageContentProps) {
             ) : (
               <Placeholder
                 icon={<SegmentOutlined />}
-                label="Steps"
+                label="Events"
                 secondary={getStepsPageDescription(inferLayerName(layer))}
               />
             )
           ) : (
             <Placeholder
               icon={<SegmentOutlined />}
-              label="Steps"
+              label="Events"
               secondary={getStepsPageDescription()}
             />
           )}

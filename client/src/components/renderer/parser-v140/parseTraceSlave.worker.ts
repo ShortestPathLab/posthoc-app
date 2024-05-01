@@ -35,6 +35,7 @@ export type ParseTraceWorkerSlaveReturnType = {
   };
 }[];
 
+const GREY = "#808080";
 function parse({
   trace,
   context,
@@ -68,12 +69,15 @@ function parse({
           mergePrototype(
             {
               alpha: 1,
-              ...context,
-              step: i,
-              parent: !isNullish(e.pId)
-                ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
-                : undefined,
-              events: esx,
+              fill: GREY,
+              __internal__: {
+                context,
+                step: i,
+                parent: !isNullish(e.pId)
+                  ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
+                  : undefined,
+                events: esx,
+              },
             },
             e
           )

@@ -224,7 +224,7 @@ export const controller = {
         color: {
           ...colorsHex,
           ...mapValues(accentColors, (_, v: AccentColor) =>
-            getShade(v, palette.mode)
+            getShade(v, palette.mode, 500, 400)
           ),
         },
         themeAccent: palette.primary.main,
