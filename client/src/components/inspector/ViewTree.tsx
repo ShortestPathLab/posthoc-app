@@ -153,7 +153,19 @@ export function ViewLeaf<T>({
               closeDisabled={!depth}
               onSplitHorizontal={() => handleSplit("horizontal")}
               onSplitVertical={() => handleSplit("vertical")}
-              onPopOut={() => onPopOut?.(root)}
+              onPopOut={() => {
+                onPopOut?.(root);
+                onChange?.(
+                  transaction(root, (draft) => ({
+                    ...draft,
+                    key: nanoid(),
+                    type: "leaf",
+                    acceptDrop: true,
+                    //TODO: refactor
+                    content: { type: "" } as any,
+                  }))
+                );
+              }}
               popOutDisabled={!canPopOut?.(root)}
             />
           ),

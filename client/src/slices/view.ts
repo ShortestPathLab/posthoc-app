@@ -37,10 +37,36 @@ export function getDefaultViewTree(): ViewTreeState {
     ? {
         view: {
           key: id(),
-          type: "leaf",
-          size: 100,
-          acceptDrop: true,
-          content: { type: "explore" },
+          type: "branch",
+          orientation: "vertical",
+          children: [
+            {
+              type: "leaf",
+              size: 33,
+              acceptDrop: true,
+              content: { type: "viewport" },
+            },
+            {
+              key: id(),
+              type: "branch",
+              orientation: "vertical",
+              size: 67,
+              children: [
+                {
+                  type: "leaf",
+                  size: 50,
+                  acceptDrop: true,
+                  content: { type: "steps" },
+                },
+                {
+                  type: "leaf",
+                  size: 50,
+                  acceptDrop: true,
+                  content: { type: "explore" },
+                },
+              ],
+            },
+          ],
         },
       }
     : {

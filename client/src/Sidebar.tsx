@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import interpolate from "color-interpolate";
 import { ViewTree } from "components/inspector/ViewTree";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { get, set, values } from "lodash";
 import { nanoid } from "nanoid";
 import { pages } from "pages";
@@ -86,74 +87,77 @@ export function Sidebar({ children }: { children?: ReactNode }) {
   const { Content, produceRoot, root, setRoot, setOpen, tab, open } =
     useSidebarState();
   const bgcolor = useSidebarBackground();
+  const sm = useSmallDisplay();
   return (
     <TabContext value={tab}>
       <Stack direction="row" sx={{ width: "100%" }}>
-        <Stack
-          sx={{
-            width: 64,
-            alignItems: "center",
-            p: 1,
-            gap: 1,
-            bgcolor: bgcolor,
-            borderRight: open
-              ? (t) =>
-                  `1px solid ${
-                    t.palette.mode === "dark"
-                      ? t.palette.background.default
-                      : t.palette.divider
-                  }`
-              : "none",
-          }}
-        >
-          <TabList
-            TabIndicatorProps={{ sx: { left: 0, right: "auto" } }}
-            onChange={(_, t) => {
-              produceRoot(
-                (r) => void set(r, `children[${SIDEBAR}].content.type`, t)
-              );
-              setOpen(true);
+        {!sm && (
+          <Stack
+            sx={{
+              width: 64,
+              alignItems: "center",
+              p: 1,
+              gap: 1,
+              bgcolor: bgcolor,
+              borderRight: open
+                ? (t) =>
+                    `1px solid ${
+                      t.palette.mode === "dark"
+                        ? t.palette.background.default
+                        : t.palette.divider
+                    }`
+                : "none",
             }}
-            orientation="vertical"
-            sx={{ width: 64 }}
           >
-            {values(pages)
-              .filter((c) => c.showInSidebar)
-              .flatMap((c, i, cx) => [
-                !!i && c.color !== cx[i - 1].color && (
-                  <Divider sx={{ mx: 2, my: 1 }} />
-                ),
-                <Tab
-                  onClick={() =>
-                    tab === c.id ? setOpen(false) : setOpen(true)
-                  }
-                  key={c.id}
-                  value={c.id}
-                  sx={{
-                    minWidth: 0,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  label={
-                    <Tooltip key={c.id} title={c.name} placement="right">
-                      <Box
-                        sx={{
-                          alignItems: "center",
-                          display: "flex",
-                          "> svg > path": {
-                            strokeWidth: 0.5,
-                            stroke: bgcolor,
-                          },
-                        }}
-                      >
-                        {c.icon}
-                      </Box>
-                    </Tooltip>
-                  }
-                />,
-              ])}
-          </TabList>
-        </Stack>
+            <TabList
+              TabIndicatorProps={{ sx: { left: 0, right: "auto" } }}
+              onChange={(_, t) => {
+                produceRoot(
+                  (r) => void set(r, `children[${SIDEBAR}].content.type`, t)
+                );
+                setOpen(true);
+              }}
+              orientation="vertical"
+              sx={{ width: 64 }}
+            >
+              {values(pages)
+                .filter((c) => c.showInSidebar)
+                .flatMap((c, i, cx) => [
+                  !!i && c.color !== cx[i - 1].color && (
+                    <Divider sx={{ mx: 2, my: 1 }} />
+                  ),
+                  <Tab
+                    onClick={() =>
+                      tab === c.id ? setOpen(false) : setOpen(true)
+                    }
+                    key={c.id}
+                    value={c.id}
+                    sx={{
+                      minWidth: 0,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    label={
+                      <Tooltip key={c.id} title={c.name} placement="right">
+                        <Box
+                          sx={{
+                            alignItems: "center",
+                            display: "flex",
+                            "> svg > path": {
+                              strokeWidth: 0.5,
+                              stroke: bgcolor,
+                            },
+                          }}
+                        >
+                          {c.icon}
+                        </Box>
+                      </Tooltip>
+                    }
+                  />,
+                ])}
+            </TabList>
+          </Stack>
+        )}
         <Box sx={{ flex: 1 }}>
           <ViewTree
             onChange={setRoot}

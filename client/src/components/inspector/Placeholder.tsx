@@ -20,6 +20,8 @@ export function Placeholder({
       color="text.secondary"
       sx={{
         gap: 2,
+        p: 6,
+        pt: 12,
         background: (t) => `repeating-linear-gradient(
           45deg,
           ${t.palette.background.default},
@@ -30,7 +32,6 @@ export function Placeholder({
       }}
       textAlign="center"
       vertical
-      pt={6}
       {...rest}
     >
       {icon}

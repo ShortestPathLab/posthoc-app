@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Stack, Typography, alpha } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import Modal, { ModalAppBar } from "components/generic/Modal";
 import { Scroll } from "components/generic/Scrollbars";
@@ -17,6 +17,7 @@ import {
 import { withSlots } from "react-slot-component";
 import { useUIState } from "slices/UIState";
 import { PanelState } from "slices/view";
+import { useAcrylic } from "theme";
 import { wait } from "utils/timed";
 
 const FullscreenModalContext = createContext<{ close?: () => void }>({});
@@ -34,23 +35,32 @@ export type FullscreenPageProps = {
 export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
   ({ slotProps }) => {
     const sm = useSmallDisplay();
+    const acrylic = useAcrylic();
     return (
-      <Box sx={{ height: "100%" }}>
+      <Stack
+        sx={{ height: sm ? "calc(100%  - 56px)" : "100%", minHeight: "70vh" }}
+      >
         {!!slotProps.Options?.children && (
-          <Flex sx={{ height: (t) => t.spacing(6) }}>
-            <Flex
+          <Stack sx={{ minHeight: (t) => t.spacing(6), flex: 0 }}>
+            <Stack
+              direction="row"
               sx={{
                 p: 0,
                 zIndex: 1,
-                position: "absolute",
-                top: 0,
-                left: 0,
                 width: "100%",
                 borderBottom: 1,
                 borderColor: "divider",
                 alignItems: "center",
                 pr: 6,
-                background: (t) => t.palette.background.paper,
+                ...acrylic,
+                background: (t) =>
+                  sm
+                    ? `linear-gradient(to bottom, ${
+                        t.palette.background.default
+                      }, ${alpha(t.palette.background.default, 0.75)})`
+                    : `linear-gradient(to bottom, ${
+                        t.palette.background.paper
+                      }, ${alpha(t.palette.background.paper, 0.75)})`,
               }}
             >
               <Scroll x>
@@ -68,21 +78,22 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
                 </Flex>
               </Scroll>
               {slotProps.Extras?.children}
-            </Flex>
-          </Flex>
+            </Stack>
+          </Stack>
         )}
         <Box
           sx={{
-            bgcolor: "background.paper",
+            bgcolor: sm ? "background.default" : "background.paper",
             mt: -6,
-            height: "100%",
+            flex: 1,
+            position: "relative",
           }}
         >
-          <Scroll y style={{ height: sm ? "100%" : "70vh" }}>
+          <Scroll y style={{ height: "100%", position: "absolute" }}>
             {slotProps.Content?.children}
           </Scroll>
         </Box>
-      </Box>
+      </Stack>
     );
   }
 );

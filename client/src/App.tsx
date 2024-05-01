@@ -3,6 +3,7 @@ import { Flex } from "components/generic/Flex";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { Inspector } from "components/inspector";
 import { TitleBar } from "components/title-bar/TitleBar";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { useTitleBar } from "hooks/useTitleBar";
 import { useMemo } from "react";
 import { ConnectionsService } from "services/ConnectionsService";

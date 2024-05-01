@@ -188,7 +188,7 @@ export function FeatureCard({
                 width: 64,
                 height: 64,
                 backgroundImage: `url("${image}")`,
-                backgroundSize: "130%",
+                backgroundSize: "100%",
                 backgroundPosition: "center",
               }}
             ></Box>
@@ -245,7 +245,8 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
   const { close: closeModal } = useFullscreenModalContext();
-  const sm = useSmallDisplay() || isViewTree;
+  const sm = useSmallDisplay();
+  const narrow = sm || isViewTree;
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("explore");
 
@@ -299,7 +300,10 @@ export function ExplorePage({ template: Page }: PageContentProps) {
         <Page.Title>Explore</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
-          <TabList onChange={(_, v) => setTab(v)}>
+          <TabList
+            onChange={(_, v) => setTab(v)}
+            sx={{ mx: isViewTree ? 0 : -1 }}
+          >
             <Tab label="Examples" value="explore" />
             <Tab label="Guides" value="guides" />
           </TabList>
@@ -309,7 +313,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
             <Scroll y>
               <Box
                 sx={
-                  !sm
+                  !narrow
                     ? {
                         p: 4,
                         maxWidth: CONTENT_WIDTH,
@@ -320,16 +324,20 @@ export function ExplorePage({ template: Page }: PageContentProps) {
               >
                 <Box pt={6}>
                   <TabPanel value="explore" sx={{ p: 0 }}>
-                    <Box p={2}>
-                      <Type variant={sm ? "h6" : "h4"}>Examples</Type>
+                    <Box p={4} sx={{ textAlign: "center" }}>
+                      <Type variant={narrow ? "h6" : "h4"}>Examples</Type>
                       <Type variant="subtitle2" color="text.secondary">
                         Browse a library of included and community-made examples
                       </Type>
                     </Box>
-                    <Box px={2} py={1}>
+                    <Box
+                      px={2}
+                      pb={narrow ? 4 : 4}
+                      sx={{ textAlign: "center" }}
+                    >
                       <TextField
                         {...textFieldProps}
-                        size="small"
+                        size={narrow ? "small" : "medium"}
                         hiddenLabel
                         fullWidth
                         sx={{ maxWidth: 480 }}
@@ -396,19 +404,31 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                     )}
                   </TabPanel>
                   <TabPanel value="guides" sx={{ p: 0 }}>
-                    <Box p={2}>
-                      <Type variant={sm ? "h6" : "h4"}>Guides</Type>
+                    <Box p={4} sx={{ textAlign: "center" }}>
+                      <Type variant={narrow ? "h6" : "h4"}>Guides</Type>
                       <Type variant="subtitle2" color="text.secondary">
                         {`Learn how to use ${name} and explore ${name} features`}
                       </Type>
                     </Box>
-                    <Stack sx={{ p: 2 }} gap={2}>
+                    <Stack
+                      sx={{
+                        p: 4,
+                        maxWidth: 480,
+                        mx: "auto",
+                        textAlign: "center",
+                        alignItems: "center",
+                      }}
+                      gap={2}
+                    >
                       <Type>
                         We're still working on this feature. Check out our
                         documentation instead.
                       </Type>
                       <Button
                         onClick={() => window.open(docs, "_blank")}
+                        sx={{
+                          maxWidth: "min-content",
+                        }}
                         startIcon={<LaunchOutlined />}
                       >
                         Open Documentation
@@ -421,7 +441,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
           </Flex>
         </Page.Content>
         <Page.Extras>
-          {!sm && (
+          {!narrow && (
             <FormControlLabel
               label="Show on start-up"
               labelPlacement="start"

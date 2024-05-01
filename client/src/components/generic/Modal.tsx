@@ -260,7 +260,10 @@ export default function Modal({
           overflow: scrollable ? undefined : "hidden",
         }}
       >
-        <div ref={(e) => setContentRef(e)} style={{ width: "100%" }}>
+        <div
+          ref={(e) => setContentRef(e)}
+          style={{ width: "100%", height: sm ? "100%" : undefined }}
+        >
           {content}
         </div>
       </Scroll>
