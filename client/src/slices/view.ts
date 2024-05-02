@@ -25,7 +25,7 @@ export type PanelState = {
   type: string;
 };
 
-const isSm = once(() => window.innerWidth < 640);
+const isSm = () => window.innerWidth < 640;
 
 export const [useView, ViewProvider] = createSlice<
   ViewTreeState,
@@ -42,29 +42,15 @@ export function getDefaultViewTree(): ViewTreeState {
           children: [
             {
               type: "leaf",
-              size: 33,
+              size: 50,
               acceptDrop: true,
               content: { type: "viewport" },
             },
             {
-              key: id(),
-              type: "branch",
-              orientation: "vertical",
-              size: 67,
-              children: [
-                {
-                  type: "leaf",
-                  size: 50,
-                  acceptDrop: true,
-                  content: { type: "steps" },
-                },
-                {
-                  type: "leaf",
-                  size: 50,
-                  acceptDrop: true,
-                  content: { type: "explore" },
-                },
-              ],
+              type: "leaf",
+              size: 50,
+              acceptDrop: true,
+              content: { type: "steps" },
             },
           ],
         },

@@ -31,7 +31,7 @@ export const pages: Dictionary<PageMeta> = {
     icon: <RocketIcon />,
     content: ExplorePage,
     allowFullscreen: true,
-    showInSidebar: true,
+    showInSidebar: "always",
   },
   layers: {
     id: "layers",
@@ -41,6 +41,7 @@ export const pages: Dictionary<PageMeta> = {
     icon: <LayersIcon />,
     content: LayersPage,
     allowFullscreen: true,
+    showInSidebar: "mobile-only",
   },
   steps: {
     id: "steps",
@@ -77,6 +78,7 @@ export const pages: Dictionary<PageMeta> = {
     icon: <CodeOutlined />,
     content: SourcePage,
     allowFullscreen: true,
+    showInSidebar: "mobile-only",
   },
   debug: {
     id: "debug",
@@ -86,6 +88,7 @@ export const pages: Dictionary<PageMeta> = {
     icon: <DebuggerIcon />,
     content: DebugPage,
     allowFullscreen: true,
+    showInSidebar: "mobile-only",
   },
   info: {
     id: "info",
@@ -104,7 +107,7 @@ export const pages: Dictionary<PageMeta> = {
     icon: <SettingsIcon />,
     content: SettingsPage,
     allowFullscreen: true,
-    showInSidebar: true,
+    showInSidebar: "always",
   },
   // about: {
   //   id: "about",

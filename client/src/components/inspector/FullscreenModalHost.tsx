@@ -51,16 +51,12 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
                 borderBottom: 1,
                 borderColor: "divider",
                 alignItems: "center",
-                pr: 6,
+                pr: sm ? 0 : 6,
                 ...acrylic,
                 background: (t) =>
-                  sm
-                    ? `linear-gradient(to bottom, ${
-                        t.palette.background.default
-                      }, ${alpha(t.palette.background.default, 0.75)})`
-                    : `linear-gradient(to bottom, ${
-                        t.palette.background.paper
-                      }, ${alpha(t.palette.background.paper, 0.75)})`,
+                  `linear-gradient(to bottom, ${
+                    t.palette.background.paper
+                  }, ${alpha(t.palette.background.paper, 0.75)})`,
               }}
             >
               <Scroll x>
@@ -83,7 +79,7 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
         )}
         <Box
           sx={{
-            bgcolor: sm ? "background.default" : "background.paper",
+            bgcolor: "background.paper",
             mt: -6,
             flex: 1,
             position: "relative",

@@ -4,13 +4,16 @@ import {
   Box,
   BoxProps,
   Dialog,
+  duration,
   Fade,
+  Grow,
   IconButton,
   ModalProps,
   Popover,
   PopoverProps,
   Toolbar,
   Typography,
+  useForkRef,
   useTheme,
 } from "@mui/material";
 import { ResizeSensor } from "css-element-queries";
@@ -20,19 +23,23 @@ import PopupState, { bindPopover } from "material-ui-popup-state";
 import { usePanel } from "./ScrollPanel";
 
 import { useTitleBarVisible } from "components/title-bar/TitleBar";
-import { merge } from "lodash";
+import { get, merge } from "lodash";
 import {
   cloneElement,
   ComponentProps,
   CSSProperties,
+  forwardRef,
   ReactElement,
   ReactNode,
   SyntheticEvent,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { useAcrylic, usePaper } from "theme";
 import { Scroll } from "./Scrollbars";
+import Transition, { TransitionProps } from "react-transition-group/Transition";
+import Swipe from "./Swipe";
 
 export function AppBarTitle({ children }: { children?: ReactNode }) {
   return <Typography variant="h6">{children}</Typography>;
@@ -79,7 +86,7 @@ export function ModalAppBar({
   const styles = isAbsoluteTop
     ? {
         background: sm
-          ? theme.palette.background.default
+          ? theme.palette.background.paper
           : theme.palette.background.paper,
         ...(!simple && {
           boxShadow: theme.shadows[0],
@@ -88,7 +95,7 @@ export function ModalAppBar({
       }
     : {
         background: sm
-          ? theme.palette.background.default
+          ? theme.palette.background.paper
           : theme.palette.background.paper,
         ...(!simple && {
           boxShadow: theme.shadows[4],
@@ -169,6 +176,8 @@ export function ModalAppBar({
   );
 }
 
+let stack = 0;
+
 export default function Modal({
   children,
   actions,
@@ -189,7 +198,18 @@ export default function Modal({
   const [contentRef, setContentRef] = useState<HTMLElement | null>(null);
   const [hasOverflowingChildren, setHasOverflowingChildren] = useState(false);
   const [childHeight, setChildHeight] = useState(0);
-  const titleBarVisible = useTitleBarVisible();
+  const [depth, setDepth] = useState(0);
+  useEffect(() => {
+    if (sm && props.open) {
+      stack += 1;
+      setDepth(stack);
+      return () => {
+        stack -= 1;
+      };
+    }
+  }, [sm, setDepth, props.open]);
+
+  const mt = 95 - 5 * depth;
 
   useEffect(() => {
     if (target && contentRef && !sm && !height) {
@@ -216,7 +236,9 @@ export default function Modal({
     <Dialog
       fullScreen={sm}
       {...props}
+      open={sm ? props.open && !!depth : props.open}
       keepMounted={false}
+      TransitionComponent={sm ? Swipe : undefined}
       TransitionProps={{
         unmountOnExit: true,
         mountOnEnter: true,
@@ -230,22 +252,24 @@ export default function Modal({
       PaperProps={{
         ref: (e: HTMLElement | null) => setTarget(e),
         style: {
-          ...(useVariant && {
-            borderRadius: `${theme.shape.borderRadius}px ${theme.shape.borderRadius}px 0 0`,
+          ...(sm && {
+            borderRadius: `${theme.shape.borderRadius * 2}px ${
+              theme.shape.borderRadius * 2
+            }px 0 0`,
           }),
-          background: sm
-            ? theme.palette.background.default
-            : theme.palette.background.paper,
+          background: theme.palette.background.paper,
           overflow: "hidden",
           height:
             height && !sm
               ? height
-              : hasOverflowingChildren || sm
+              : sm
+              ? `${mt}vh`
+              : hasOverflowingChildren
               ? "100%"
               : childHeight || "fit-content",
           position: "relative",
           maxWidth: "none",
-          ...(sm && titleBarVisible && { paddingTop: 36 }),
+          marginTop: sm ? `${100 - mt}vh` : 0,
           ...props.PaperProps?.style,
         },
         ...props.PaperProps,
