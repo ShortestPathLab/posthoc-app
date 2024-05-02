@@ -3,15 +3,8 @@ import {
   LayersOutlined as LayersIcon,
   SegmentOutlined,
 } from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  Stack,
-  SxProps,
-  Theme,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Divider, Stack, SxProps, Theme, useTheme } from "@mui/material";
+import { grey } from "@mui/material/colors";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Playback, PlaybackLayerData } from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
@@ -42,7 +35,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
 import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
-import { grey } from "@mui/material/colors";
 
 function lerp(start: number, end: number, amount: number): number {
   return start + clamp(amount, 0, 1) * (end - start);
@@ -285,21 +277,6 @@ export function StepsPage({ template: Page }: PageContentProps) {
             }
           >
             <Playback layer={layer} />
-            {divider}
-            <Typography
-              component="div"
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                px: 1,
-                py: 0.25,
-                textAlign: "center",
-                ...paper(0),
-                borderRadius: 1,
-              }}
-            >
-              {step}
-            </Typography>
           </Stack>
         )}
       </Page.Content>

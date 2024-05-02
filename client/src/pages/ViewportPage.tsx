@@ -147,7 +147,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
           <FeaturePickerButton
             disabled={!rendererInstance}
             onClick={() => {
-              rendererInstance?.initialCamera();
+              rendererInstance?.initialCamera?.();
             }}
             icon={<CropFreeOutlined />}
           >

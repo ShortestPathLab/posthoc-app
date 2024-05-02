@@ -1,6 +1,14 @@
 import { graphlib, layout } from "dagre";
-import { Dictionary, forEach, forEachRight, pick, reverse, set } from "lodash";
+import { Dictionary, forEach, pick } from "lodash";
 import { Trace, TraceEvent } from "protocol";
+
+export function getFinalParents(trace: Trace | undefined) {
+  const finalParent: Dictionary<Key> = {};
+  forEach(trace?.events, ({ id, pId }) => {
+    finalParent[id] = pId;
+  });
+  return finalParent;
+}
 
 export type EventTree = {
   id: Key;
@@ -12,9 +20,9 @@ export type EventTree = {
   parent?: EventTree;
 };
 
-type Key = string | number | null | undefined;
+export type Key = string | number | null | undefined;
 
-function parse({ trace, mode }: TreeWorkerParameters) {
+function parse({ trace, mode, orientation }: TreeWorkerParameters) {
   const g = new graphlib.Graph<{ size: number }>();
 
   // Set an object for the graph label
@@ -48,13 +56,7 @@ function parse({ trace, mode }: TreeWorkerParameters) {
 
     case "tree":
       {
-        const numParents: Dictionary<Set<string | number>> = {};
-        forEach(trace?.events, ({ id, pId, type }, i) => {
-          if (id && pId) {
-            numParents[id] = numParents[id] ?? new Set();
-            numParents[id].add(pId);
-          }
-        });
+        const finalParent: Dictionary<Key> = getFinalParents(trace);
 
         forEach(trace?.events, ({ id, pId, type }, i) => {
           if (id) {
@@ -68,9 +70,10 @@ function parse({ trace, mode }: TreeWorkerParameters) {
             } else {
               g.node(`${id}`).size += 1;
             }
-            if (pId && numParents[id].size <= 1) {
-              if (g.hasNode(`${pId}`)) {
-                g.setEdge(`${id}`, `${pId}`, {
+            const parent = finalParent[id];
+            if (parent) {
+              if (g.hasNode(`${parent}`)) {
+                g.setEdge(`${id}`, `${parent}`, {
                   label: `${id}`,
                   width: 1,
                   height: 1,
@@ -82,13 +85,19 @@ function parse({ trace, mode }: TreeWorkerParameters) {
       }
       break;
   }
-  layout(g, { align: "U" });
+  g.setGraph({
+    ranksep: 100,
+    align: "UL",
+    rankdir: orientation === "horizontal" ? "LR" : "TB",
+  });
+  layout(g);
   return g.nodes().map((node) => pick(g.node(node), "x", "y", "label", "size"));
 }
 export type TreeWorkerParameters = {
   trace?: Trace;
   step?: number;
   mode?: "tree" | "directed-graph";
+  orientation?: "horizontal" | "vertical";
 };
 
 export type TreeWorkerReturnType =

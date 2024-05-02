@@ -1,6 +1,6 @@
 import {
   AccountTreeOutlined,
-  ChevronRightOutlined,
+  CenterFocusStrongOutlined,
   DataObjectOutlined,
   LayersOutlined as LayersIcon,
   ModeStandbyOutlined,
@@ -16,9 +16,10 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  SxProps,
+  Theme,
   Tooltip,
   Typography,
-  alpha,
   useTheme,
 } from "@mui/material";
 import {
@@ -32,8 +33,12 @@ import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
 import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
 import interpolate from "color-interpolate";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { PlaybackLayerData } from "components/app-bar/Playback";
+import {
+  MinimisedPlaybackControls,
+  PlaybackLayerData,
+} from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
+import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
 import { Label } from "components/generic/Label";
 import { Placeholder } from "components/inspector/Placeholder";
 import {
@@ -49,12 +54,12 @@ import { getLayerHandler } from "layers/layerHandlers";
 import { TraceLayerData } from "layers/trace";
 import {
   Dictionary,
-  delay,
   entries,
   filter,
   find,
   findLast,
   forEach,
+  forEachRight,
   isNull,
   isUndefined,
   map,
@@ -63,26 +68,24 @@ import {
   startCase,
   truncate,
 } from "lodash";
-import PopupState, { bindMenu } from "material-ui-popup-state";
 import memoizee from "memoizee";
 import { Trace } from "protocol";
 import { ComponentProps, FC, useEffect, useMemo, useState } from "react";
-import { TreeProps, Tree as _Tree } from "react-d3-tree";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { EdgeArrowProgram } from "sigma/rendering";
 import { Layer, useLayer } from "slices/layers";
 import { PanelState } from "slices/view";
+import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
 import { useTreeMemo } from "./TreeWorker";
-import { EventTree, TreeWorkerReturnType } from "./tree.worker";
-import { Property } from "components/generic/Property";
+import { Key, TreeWorkerReturnType } from "./tree.worker";
 
 const isDefined = (a: any) => !isUndefined(a) && !isNull(a);
 
-const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
-
-const Tree = _Tree as unknown as FC<TreeProps>;
+export const divider = (
+  <Divider orientation="vertical" flexItem sx={{ m: 1 }} />
+);
 
 type TreePageContext = PanelState;
 
@@ -99,17 +102,19 @@ export function useCache<T>(result: T, loading: boolean = false) {
   return cache;
 }
 
-const graphMode = {
+const layoutModes = {
   "directed-graph": {
     value: "directed-graph",
     name: "Directed Graph",
-    description: "",
+    description: "Show all edges",
+    showAllEdges: true,
   },
-  // tree: {
-  //   value: "tree",
-  //   name: "Tree",
-  //   description: "Force layout as a tree",
-  // },
+  tree: {
+    value: "tree",
+    name: "Tree",
+    description: "Show only edges between each node and their final parents",
+    showAllEdges: false,
+  },
 };
 
 const orientationOptions = {
@@ -175,19 +180,28 @@ export function TreeGraph({
   trace,
   tree,
   step = 0,
-  orientation = "vertical",
+  layer,
+  showAllEdges,
 }: {
   trace?: Trace;
   tree?: TreeWorkerReturnType;
   step?: number;
-  orientation?: keyof typeof orientationOptions;
+  layer?: Layer<PlaybackLayerData>;
+  showAllEdges?: boolean;
 }) {
+  const sigma = useSigma();
+  const [orientation, setOrientation] =
+    useState<keyof typeof orientationOptions>("vertical");
+  const paper = usePaper();
+  const acrylic = useAcrylic();
   const theme = useTheme();
   const gradient = interpolate([
     theme.palette.background.paper,
     theme.palette.text.primary,
   ]);
   const load = useLoadGraph();
+
+  const finalParents = useMemo(() => getFinalParents(trace), [trace]);
 
   const graph = useMemo(() => {
     const isVertical = orientation === "vertical";
@@ -210,26 +224,6 @@ export function TreeGraph({
       }
     });
 
-    // forEach(trace?.events, ({ id, pId }) => {
-    //   if (isDefined(pId) && graph.hasNode(`${pId}`)) {
-    //     const key = makeEdgeKey(id, pId);
-    //     if (!graph.hasEdge(key) && pId && numParents[id].size <= 1) {
-    //       graph.addDirectedEdgeWithKey(key, `${pId}`, `${id}`, {
-    //         label: "",
-    //         color: "white",
-    //         size: 2,
-    //       });
-    //     }
-    //     if (graph.hasEdge(key)) {
-    //       graph.updateEdgeAttribute(
-    //         key,
-    //         "size",
-    //         (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5
-    //       );
-    //     }
-    //   }
-    // });
-
     forEach(trace?.events, ({ id, pId }) => {
       if (isDefined(pId) && graph.hasNode(`${pId}`)) {
         const key = makeEdgeKey(id, pId);
@@ -238,6 +232,7 @@ export function TreeGraph({
             label: "",
             color: "white",
             size: 2,
+            final: finalParents[id] === pId,
           });
         }
         graph.updateEdgeAttribute(
@@ -248,8 +243,7 @@ export function TreeGraph({
       }
     });
     return graph;
-    return graph;
-  }, [load, trace, tree, orientation]);
+  }, [load, trace, tree, finalParents, orientation]);
   useEffect(() => {
     const r = memoizee((a: string) =>
       interpolate([theme.palette.background.paper, a])
@@ -262,45 +256,91 @@ export function TreeGraph({
       graph.setNodeAttribute(v, "label", truncate(v, { length: 15 }));
     });
     graph.forEachEdge((v) => {
+      const isFinal = graph.getEdgeAttribute(v, "final");
       graph.setEdgeAttribute(v, "color", n);
+      graph.setEdgeAttribute(v, "hidden", !showAllEdges && !isFinal);
       graph.setEdgeAttribute(v, "forceLabel", false);
       graph.setEdgeAttribute(v, "label", "");
     });
-    forEach(slice(trace?.events, 0, step + 1), ({ id, type, pId }, i) => {
-      const color = getColorHex(type);
-      const finalColor = r(color)(max([1 - (step - i) / pastSteps, 0.2])!);
-      if (graph.hasNode(`${id}`)) {
-        graph.setNodeAttribute(`${id}`, "color", finalColor);
-        graph.setNodeAttribute(
-          `${id}`,
-          "label",
-          truncate(`${startCase(type)} ${id}`, { length: 15 })
-        );
-        graph.setNodeAttribute(`${id}`, "forceLabel", step === i);
-        if (
-          isDefined(pId) &&
-          graph.hasNode(`${pId}`) &&
-          graph.hasEdge(makeEdgeKey(id, pId))
-        ) {
-          graph.setEdgeAttribute(
-            makeEdgeKey(id, pId),
-            "forceLabel",
-            step === i
+    const isSetNode: Dictionary<boolean> = {};
+    const isSet: Dictionary<boolean> = {};
+    (showAllEdges ? forEach : forEachRight)(
+      slice(trace?.events, 0, step + 1),
+      ({ id, type, pId }, i) => {
+        const color = getColorHex(type);
+        const finalColor = r(color)(max([1 - (step - i) / pastSteps, 0.2])!);
+        if (graph.hasNode(`${id}`) && !isSetNode[id]) {
+          graph.setNodeAttribute(`${id}`, "color", finalColor);
+          graph.setNodeAttribute(
+            `${id}`,
+            "label",
+            truncate(`${startCase(type)} ${id}`, { length: 15 })
           );
-          graph.setEdgeAttribute(makeEdgeKey(id, pId), "color", finalColor);
-          graph.setEdgeAttribute(makeEdgeKey(id, pId), "label", `Step ${i}`);
+          graph.setNodeAttribute(`${id}`, "forceLabel", step === i);
+          const a = makeEdgeKey(id, pId);
+          if (
+            isDefined(pId) &&
+            graph.hasNode(`${pId}`) &&
+            graph.hasEdge(a) &&
+            !isSet[a]
+          ) {
+            graph.setEdgeAttribute(a, "forceLabel", step === i);
+            graph.setEdgeAttribute(a, "color", finalColor);
+            graph.setEdgeAttribute(a, "label", `Step ${i}`);
+            graph.setEdgeAttribute(a, "hidden", false);
+            if (!showAllEdges) isSet[a] = true;
+          }
+          if (!showAllEdges) isSetNode[id] = true;
         }
       }
-    });
+    );
     load(graph);
-  }, [graph, step, trace]);
-  return null;
+  }, [graph, step, trace, showAllEdges]);
+  return (
+    <Stack sx={{ pt: 6, position: "absolute", top: 0, left: 0 }}>
+      <Stack
+        direction="row"
+        sx={
+          {
+            ...paper(1),
+            ...acrylic,
+            alignItems: "center",
+            height: (t) => t.spacing(6),
+            px: 1,
+            m: 1,
+          } as SxProps<Theme>
+        }
+      >
+        <IconButtonWithTooltip
+          color="primary"
+          onClick={() => {
+            setOrientation(
+              orientation === "vertical" ? "horizontal" : "vertical"
+            );
+          }}
+          label="Rotate"
+          icon={<RotateIcon />}
+        ></IconButtonWithTooltip>
+        {divider}
+        <IconButtonWithTooltip
+          color="primary"
+          onClick={() => {
+            sigma?.getCamera?.()?.animatedReset?.();
+          }}
+          label="Fit"
+          icon={<CenterFocusStrongOutlined />}
+        ></IconButtonWithTooltip>
+        {divider}
+        {<MinimisedPlaybackControls layer={layer} />}
+      </Stack>
+    </Stack>
+  );
 }
 
 function makeEdgeKey(
   id: string | number,
   pId: string | number | null | undefined
-): unknown {
+): string {
   return `${id}::${pId}`;
 }
 
@@ -325,6 +365,7 @@ export function TreePage({ template: Page }: PageContentProps) {
     useState<keyof typeof orientationOptions>("vertical");
 
   const trace = layer?.source?.trace?.content;
+
   const [selection, setSelection] = useState<R>();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -346,6 +387,7 @@ export function TreePage({ template: Page }: PageContentProps) {
   const settings = useMemo(
     () =>
       ({
+        stagePadding: 8 * 8,
         allowInvalidContainer: true,
         edgeLabelColor: { color: theme.palette.text.secondary },
         labelFont: "Inter",
@@ -390,7 +432,8 @@ export function TreePage({ template: Page }: PageContentProps) {
                           step={step}
                           tree={tree}
                           trace={trace}
-                          orientation={orientation}
+                          layer={layer}
+                          showAllEdges={layoutModes[mode].showAllEdges}
                         />
                         <GraphEvents
                           layer={key}
@@ -467,7 +510,11 @@ export function TreePage({ template: Page }: PageContentProps) {
                                 <Box sx={{ ml: -0.5, pr: 4 }}>
                                   <Label
                                     primary={startCase(entry.event.type)}
-                                    secondary={`Step ${entry.step}`}
+                                    secondary={
+                                      isDefined(entry.event.pId)
+                                        ? `Step ${entry.step}, from ${entry.event.pId}`
+                                        : `Step ${entry.step}`
+                                    }
                                   />
                                 </Box>
                               </Tooltip>
@@ -546,22 +593,10 @@ export function TreePage({ template: Page }: PageContentProps) {
           icon={<ModeStandbyOutlined />}
           label="Layout"
           value={mode}
-          onChange={setMode}
-          items={map(entries(graphMode), ([k, v]) => ({
+          onChange={setMode as any}
+          items={map(entries(layoutModes), ([k, v]) => ({
             id: k,
             ...v,
-          }))}
-          arrow
-        />
-        {divider}
-        <FeaturePicker
-          icon={<RotateIcon />}
-          label="Orientation"
-          value={orientation}
-          onChange={(e) => setOrientation(e as keyof typeof orientationOptions)}
-          items={entries(orientationOptions).map(([key, value]) => ({
-            id: key,
-            name: startCase(value.value),
           }))}
           arrow
         />
@@ -569,4 +604,11 @@ export function TreePage({ template: Page }: PageContentProps) {
       <Page.Extras>{controls}</Page.Extras>
     </Page>
   );
+}
+export function getFinalParents(trace: Trace | undefined) {
+  const finalParent: Dictionary<Key> = {};
+  forEach(trace?.events, ({ id, pId }) => {
+    finalParent[id] = pId;
+  });
+  return finalParent;
 }

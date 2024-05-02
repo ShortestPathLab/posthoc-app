@@ -398,7 +398,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                         )}
                       </Box>
                     ) : (
-                      <Box sx={{ p: 2 }}>
+                      <Box sx={{ p: 2, textAlign: "center" }}>
                         <CircularProgress />
                       </Box>
                     )}
