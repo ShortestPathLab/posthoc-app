@@ -66,6 +66,27 @@ import { Layer, useLayer } from "slices/layers";
 import { AccentColor, accentColors, getShade } from "theme";
 import { name } from "utils/path";
 
+const reuseCanvas = { canvas: document.createElement("canvas") };
+
+/**
+ * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
+ *
+ * @param {String} text The text to be rendered.
+ * @param {String} font The css font descriptor that text is to be rendered with (e.g. "bold 14px verdana").
+ *
+ * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
+ */
+function getTextWidth(text: string, font: string) {
+  // re-use canvas object for better performance
+  const canvas =
+    reuseCanvas.canvas ||
+    (reuseCanvas.canvas = document.createElement("canvas"));
+  const context = canvas.getContext("2d");
+  context!.font = font;
+  const metrics = context!.measureText(text);
+  return metrics.width;
+}
+
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
 
@@ -441,34 +462,14 @@ function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
       const events = map(getPath(step), (p) => trace?.events?.[p]);
 
       if (events.length) {
+        const label = `${startCase(head(events)?.type)} ${head(events)?.id}`;
         const primitive = [
           {
             $: "circle",
-            x: pivotX({ x: 0, y: 0, ...head(events) }),
-            y: pivotY({ x: 0, y: 0, ...head(events) }),
-            fill: palette.background.paper,
-            radius: 0.45 * scale,
-          },
-          {
-            $: "circle",
             x: pivotX({ x: 0, y: 0, ...last(events) }),
             y: pivotY({ x: 0, y: 0, ...last(events) }),
-            fill: palette.background.paper,
-            radius: 0.45 * scale,
-          },
-          {
-            $: "circle",
-            x: pivotX({ x: 0, y: 0, ...head(events) }),
-            y: pivotY({ x: 0, y: 0, ...head(events) }),
-            fill: getColorHex("destination"),
-            radius: 0.4 * scale,
-          },
-          {
-            $: "circle",
-            x: pivotX({ x: 0, y: 0, ...last(events) }),
-            y: pivotY({ x: 0, y: 0, ...last(events) }),
-            fill: getColorHex("source"),
-            radius: 0.4 * scale,
+            fill: palette.primary.main,
+            radius: 0.3 * scale,
           },
           {
             $: "path",
@@ -479,6 +480,64 @@ function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
             fill: palette.primary.main,
             alpha: 1,
             lineWidth: 0.3 * scale,
+          },
+          {
+            $: "circle",
+            x: pivotX({ x: 0, y: 0, ...head(events) }),
+            y: pivotY({ x: 0, y: 0, ...head(events) }),
+            fill: palette.primary.main,
+            radius: 0.3 * scale,
+          },
+          {
+            $: "rect",
+            alpha: 0.5,
+            fill: palette.background.paper,
+            x: pivotX({ x: 0, y: 0, ...head(events) }) - 0.3 * scale,
+            y: pivotY({ x: 0, y: 0, ...head(events) }) - 2 * scale,
+            width:
+              getTextWidth(label, `${0.875 * scale}px Inter`) +
+              (0.8 + 1) * scale,
+            height: 1.4 * scale,
+          },
+          {
+            $: "path",
+            points: [
+              {
+                x: pivotX({ x: 0, y: 0, ...head(events) }),
+                y: pivotY({ x: 0, y: 0, ...head(events) }),
+              },
+              {
+                x:
+                  pivotX({ x: 0, y: 0, ...head(events) }) +
+                  (-0.3 + 0.7) * scale,
+                y: pivotY({ x: 0, y: 0, ...head(events) }) + (-2 + 0.7) * scale,
+              },
+            ],
+            fill: getColorHex(head(events)?.type),
+            alpha: 1,
+            lineWidth: 0.1 * scale,
+          },
+          {
+            $: "circle",
+            x: pivotX({ x: 0, y: 0, ...head(events) }) + (-0.3 + 0.7) * scale,
+            y: pivotY({ x: 0, y: 0, ...head(events) }) + (-2 + 0.7) * scale,
+            fill: getColorHex(head(events)?.type),
+            radius: 0.2 * scale,
+          },
+          {
+            $: "rect",
+            alpha: 0,
+            fill: "rgba(255, 255, 255, 0)",
+            x: pivotX({ x: 0, y: 0, ...head(events) }) - 0.3 * scale,
+            y: pivotY({ x: 0, y: 0, ...head(events) }) - 2 * scale,
+            width:
+              getTextWidth(label, `${0.875 * scale}px Inter`) + 0.6 * scale,
+            height: 1 * scale,
+            label: label,
+            "label-size": 0.875 * scale,
+            "label-x": (0.3 + 1) * scale,
+            "label-y": 1 * scale,
+            "label-color": palette.text.primary,
           },
         ];
         return (

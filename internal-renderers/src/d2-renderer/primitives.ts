@@ -54,10 +54,7 @@ export const text: Primitive<any> = {
       });
       const box = transform(a, t);
       g.font = `${(c["label-size"] ?? c.fontSize ?? 4) * t.scale.x}px Inter`;
-      g.fillStyle = getFillStyle(
-        c["label-color"] ?? c.fontColor ?? "grey",
-        c.alpha
-      );
+      g.fillStyle = getFillStyle(c["label-color"] ?? c.fontColor ?? "grey", 1);
       g.fillText(_text, box.x, box.y);
     }
   },
