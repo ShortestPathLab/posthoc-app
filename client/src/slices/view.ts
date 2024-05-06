@@ -41,12 +41,14 @@ export function getDefaultViewTree(): ViewTreeState {
           orientation: "vertical",
           children: [
             {
+              key: id(),
               type: "leaf",
               size: 50,
               acceptDrop: true,
               content: { type: "viewport" },
             },
             {
+              key: id(),
               type: "leaf",
               size: 50,
               acceptDrop: true,

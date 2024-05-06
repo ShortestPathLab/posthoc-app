@@ -12,12 +12,13 @@ import {
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
-import { startCase } from "lodash";
+import { isBoolean, startCase } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { nanoid as id } from "nanoid";
 import logo from "public/logo512.png";
-import { changelog, repository, version, docs } from "public/manifest.json";
+import { changelog, docs, repository, version } from "public/manifest.json";
 import {
   ReactElement,
   ReactNode,
@@ -27,6 +28,7 @@ import {
 } from "react";
 import { getDefaultViewTree, useView } from "slices/view";
 import { ExportWorkspaceModal } from "./ExportWorkspaceModal";
+import { usePrevious } from "react-use";
 
 function MenuEntry({
   startIcon,
@@ -68,9 +70,26 @@ export function useTitleBarVisible() {
 }
 
 export const TitleBar = () => {
+  const push = useSnackbar();
   const { save, load } = useWorkspace();
   const visible = useTitleBarVisible();
   const [, setView] = useView();
+  const sm = useSmallDisplay();
+  const prevSm = usePrevious(sm);
+  useEffect(() => {
+    if (isBoolean(prevSm)) {
+      if (sm) {
+        push(
+          "Do you want to reset layout?",
+          "Window size changed significantly",
+          {
+            actionLabel: "Reset layout",
+            action: () => setView(getDefaultViewTree),
+          }
+        );
+      }
+    }
+  }, [sm, prevSm, setView]);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   function handleOpenPanel(orientation: "horizontal" | "vertical") {
     setView(({ view }) => {

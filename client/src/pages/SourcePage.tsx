@@ -93,7 +93,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
           arrow
           ellipsis={12}
         />
-        {source?.length && (
+        {!!source?.length && (
           <>
             {divider}
             <Tabs

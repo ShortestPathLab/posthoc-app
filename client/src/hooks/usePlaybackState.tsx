@@ -89,7 +89,7 @@ export function usePlaybackState(key?: string) {
         setPlaybackState({ playback: "playing", step: stepBy(1) });
       },
       pause,
-      stepTo: (n = 0) => setPlaybackState({ step: n }),
+      stepTo: (n = 0) => setPlaybackState({ step: clamp(n, start, end) }),
       stop: () => setPlaybackState({ step: start, playback: "paused" }),
       stepForward: () => setPlaybackState({ step: stepBy(1) }),
       stepBackward: () => setPlaybackState({ step: stepBy(-1) }),

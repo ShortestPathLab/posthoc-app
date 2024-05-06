@@ -11,9 +11,10 @@ import {
   CardHeader,
   CardProps,
   Checkbox,
-  CircularProgress,
+  Fade,
   FormControlLabel,
   InputAdornment,
+  Skeleton,
   Stack,
   SxProps,
   Tab,
@@ -27,19 +28,16 @@ import { useFullscreenModalContext } from "components/inspector/FullscreenModalH
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
-import {
-  chain as _,
-  entries,
-  filter,
-  first,
-  map,
-  round,
-  upperCase,
-} from "lodash";
-import { map as mapAsync } from "promise-tools";
+import { chain as _, entries, first, map, round, upperCase } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { docs, name } from "public/manifest.json";
-import { CSSProperties, ReactNode, useMemo, useState } from "react";
+import {
+  CSSProperties,
+  ComponentProps,
+  ReactNode,
+  useMemo,
+  useState,
+} from "react";
 import { useAsync } from "react-async-hook";
 import { useLoadingState } from "slices/loading";
 import { useSettings } from "slices/settings";
@@ -47,6 +45,8 @@ import { textFieldProps, usePaper } from "theme";
 import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/Button";
 import { PageContentProps } from "./PageMeta";
+import memoizee from "memoizee";
+import PopupState from "material-ui-popup-state";
 const paths = import.meta.glob("/public/recipes/*.workspace", {
   as: "url",
 });
@@ -72,13 +72,16 @@ async function getMeta(k: string) {
   }
 }
 
-async function getFileInfo(k: string, f: () => Promise<string>) {
-  return {
-    name: _(k).thru(basename).thru(stripExtension).startCase().value(),
-    path: await f(),
-    ...(await getMeta(k)),
-  };
-}
+const getFileInfo = memoizee(
+  async (k: string, f: () => Promise<string>) => {
+    return {
+      name: _(k).thru(basename).thru(stripExtension).startCase().value(),
+      path: await f(),
+      ...(await getMeta(k)),
+    };
+  },
+  { normalizer: ([k]) => k }
+);
 
 type ExampleDescriptor = FeatureDescriptor & {
   author?: string;
@@ -106,7 +109,13 @@ function getAuthor(s?: string): {
                 target="_blank"
                 rel="noreferrer"
               >
-                <Avatar sx={sx} src={`https://github.com/${pathname}.png`} />
+                <Avatar sx={sx}>
+                  <Image
+                    width="100%"
+                    height="100%"
+                    src={`https://github.com/${pathname}.png`}
+                  />
+                </Avatar>
               </a>
             ),
           };
@@ -121,11 +130,58 @@ function getAuthor(s?: string): {
   return { name: "No author", avatar: makeAvatar() };
 }
 
+export function Image(props: ComponentProps<"img">) {
+  return (
+    <PopupState variant="popover">
+      {({ open, isOpen }) => (
+        <>
+          <Fade in={isOpen}>
+            <img {...props} onLoad={open}></img>
+          </Fade>
+        </>
+      )}
+    </PopupState>
+  );
+}
+
 const ellipsisProps = {
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
   overflow: "hidden",
 } satisfies CSSProperties;
+
+export function FeatureCard2({
+  entry,
+  onOpenClick,
+  search,
+}: {
+  entry?: [string, () => Promise<string>];
+  onOpenClick?: (path: string) => void;
+  search?: string;
+}) {
+  const { result, loading } = useAsync(async () => {
+    if (entry) {
+      return await getFileInfo(...entry);
+    }
+  }, [entry]);
+  const { name, description, screenshots, author, path, size } = result ?? {};
+  const match = upperCase(stringify(result)).includes(upperCase(search));
+  return match ? (
+    <Box sx={{ p: 1 }}>
+      <FeatureCard
+        loading={loading}
+        name={name}
+        description={description ?? "No description"}
+        image={first(screenshots)}
+        author={author}
+        onOpenClick={() => {
+          onOpenClick?.(path);
+        }}
+        size={size}
+      />
+    </Box>
+  ) : undefined;
+}
 
 export function FeatureCard({
   name,
@@ -134,8 +190,10 @@ export function FeatureCard({
   author,
   size,
   onOpenClick,
+  loading,
   ...rest
-}: Partial<ExampleDescriptor> & CardProps & { onOpenClick?: () => void }) {
+}: Partial<ExampleDescriptor> &
+  CardProps & { onOpenClick?: () => void; loading?: boolean }) {
   const [{ "appearance/acrylic": acrylic }] = useSettings();
   const paper = usePaper();
 
@@ -151,93 +209,104 @@ export function FeatureCard({
       {...rest}
     >
       {acrylic && (
-        <Box
-          sx={{
-            zIndex: -1,
-            filter: "blur(48px)",
-            opacity: 0.1,
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            backgroundImage: `url("${image}")`,
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "-52px -52px",
-          }}
-        ></Box>
-      )}
-      <CardHeader
-        sx={{
-          alignItems: "flex-start",
-          "> .MuiCardHeader-content": { overflow: "hidden" },
-        }}
-        avatar={
+        <>
           <Box
             sx={{
-              ...paper(1),
-              border: "none",
-              borderRadius: 1,
-              width: 64,
-              height: 64,
-              overflow: "hidden",
+              zIndex: -1,
+              filter: "blur(48px)",
+              opacity: 0.1,
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              backgroundImage: `url("${image}")`,
+              backgroundSize: "contain",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "-52px -52px",
             }}
-          >
-            <Box
-              sx={{
-                imageRendering: "pixelated",
-                width: 64,
-                height: 64,
-                backgroundImage: `url("${image}")`,
-                backgroundSize: "100%",
-                backgroundPosition: "center",
-              }}
-            ></Box>
-          </Box>
-        }
-        titleTypeProps={ellipsisProps}
-        title={name || "Untitled"}
-        subheaderTypeProps={ellipsisProps}
-        subheader={
-          <Stack gap={2} sx={{ pt: 1, alignItems: "flex-start" }}>
-            <Type
-              sx={{
-                ...ellipsisProps,
-                maxWidth: "100%",
-                display: "-webkit-box",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 3,
-                whiteSpace: "break-spaces",
-                height: 60,
-              }}
-            >
-              {description || "No description"}
-            </Type>
-            <Stack direction="row" alignItems="center" gap={1}>
-              {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
-              <Type variant="caption">{authorName}</Type>
-            </Stack>
-            <Button
-              onClick={onOpenClick}
-              startIcon={<WorkspacesOutlined />}
-              sx={paper(2)}
-            >
-              <Stack direction="row" gap={1}>
-                <Type>Open</Type>
-                {!!size && (
-                  <Type color="text.secondary">
-                    {round(size / 1024 / 1024, 2)} MB
+          ></Box>
+          <CardHeader
+            sx={{
+              alignItems: "flex-start",
+              "> .MuiCardHeader-content": { overflow: "hidden" },
+            }}
+            avatar={
+              <Box
+                sx={{
+                  ...paper(1),
+                  border: "none",
+                  borderRadius: 1,
+                  width: 64,
+                  height: 64,
+                  overflow: "hidden",
+                }}
+              >
+                <Fade in={!!image}>
+                  <Box
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      backgroundImage: `url("${image}")`,
+                      backgroundSize: "100%",
+                      backgroundPosition: "center",
+                    }}
+                  ></Box>
+                </Fade>
+              </Box>
+            }
+            titleTypeProps={ellipsisProps}
+            title={loading ? <Skeleton /> : name || "Untitled"}
+            subheaderTypeProps={ellipsisProps}
+            subheader={
+              <Stack gap={2} sx={{ pt: 1, alignItems: "flex-start" }}>
+                <Type
+                  sx={{
+                    ...ellipsisProps,
+                    maxWidth: "100%",
+                    width: "100%",
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: 3,
+                    whiteSpace: "break-spaces",
+                    height: 60,
+                  }}
+                >
+                  {loading
+                    ? map([80, 30], (v) => <Skeleton width={`${v}%`} />)
+                    : description || "No description"}
+                </Type>
+                <Stack direction="row" alignItems="center" gap={1}>
+                  {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
+                  <Type variant="caption">
+                    {loading ? <Skeleton width={120} /> : authorName}
                   </Type>
-                )}
+                </Stack>
+                <Button
+                  disabled={loading}
+                  onClick={onOpenClick}
+                  startIcon={<WorkspacesOutlined />}
+                  sx={paper(2)}
+                >
+                  <Stack direction="row" gap={1}>
+                    <Type>Open</Type>
+                    {!!size && (
+                      <Type color="text.secondary">
+                        {round(size / 1024 / 1024, 2)} MB
+                      </Type>
+                    )}
+                  </Stack>
+                </Button>
               </Stack>
-            </Button>
-          </Stack>
-        }
-      />
+            }
+          />
+        </>
+      )}
     </Card>
   );
 }
 
 const CONTENT_WIDTH = 940;
+
+const entries2 = entries(paths);
 
 export function ExplorePage({ template: Page }: PageContentProps) {
   const [{ "behaviour/showOnStart": showOnStart }, setSettings] = useSettings();
@@ -252,10 +321,6 @@ export function ExplorePage({ template: Page }: PageContentProps) {
 
   const { load } = useWorkspace();
   const usingLoadingState = useLoadingState();
-
-  const { result: files, loading } = useAsync(async () => {
-    return await mapAsync(entries(paths), (entry) => getFileInfo(...entry));
-  }, []);
 
   const open = (path: string) =>
     usingLoadingState(async () => {
@@ -277,14 +342,6 @@ export function ExplorePage({ template: Page }: PageContentProps) {
         });
       }
     });
-
-  const filteredFiles = useMemo(
-    () =>
-      filter(files, (file) =>
-        upperCase(stringify(file)).includes(upperCase(search))
-      ),
-    [search, files]
-  );
 
   const showOnStartUpChecked = showOnStart === "explore";
 
@@ -352,56 +409,26 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                         placeholder="Search examples"
                       />
                     </Box>
-                    {!loading ? (
-                      <Box
-                        sx={{
-                          p: 1,
-                          display: "grid",
-                          gridAutoFlow: "row",
-                          gridTemplateColumns:
-                            "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
-                        }}
-                      >
-                        {filteredFiles.length ? (
-                          map(
-                            filteredFiles,
-                            (
-                              {
-                                name,
-                                path,
-                                description,
-                                screenshots,
-                                author,
-                                size,
-                              },
-                              i
-                            ) => (
-                              <Box key={i} sx={{ p: 1 }}>
-                                <FeatureCard
-                                  name={name}
-                                  description={description ?? "No description"}
-                                  image={first(screenshots)}
-                                  author={author}
-                                  onOpenClick={() => {
-                                    open(path);
-                                    closeModal?.();
-                                  }}
-                                  size={size}
-                                />
-                              </Box>
-                            )
-                          )
-                        ) : (
-                          <Type color="text.secondary" sx={{ p: 1 }}>
-                            No results match your search.
-                          </Type>
-                        )}
-                      </Box>
-                    ) : (
-                      <Box sx={{ p: 2, textAlign: "center" }}>
-                        <CircularProgress />
-                      </Box>
-                    )}
+                    <Box
+                      sx={{
+                        p: 1,
+                        display: "grid",
+                        gridAutoFlow: "row",
+                        gridTemplateColumns:
+                          "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
+                      }}
+                    >
+                      {map(entries2, (entry) => (
+                        <FeatureCard2
+                          key={entry[0]}
+                          search={search}
+                          entry={entry}
+                          onOpenClick={(p) => {
+                            open(p), closeModal?.();
+                          }}
+                        />
+                      ))}
+                    </Box>
                   </TabPanel>
                   <TabPanel value="guides" sx={{ p: 0 }}>
                     <Box p={4} sx={{ textAlign: "center" }}>

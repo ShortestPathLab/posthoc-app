@@ -90,7 +90,9 @@ export function Sidebar({ children }: { children?: ReactNode }) {
   const bgcolor = useSidebarBackground();
   const sm = useSmallDisplay();
   useEffect(() => {
-    if (sm) setOpen(false);
+    if (sm) {
+      setOpen(false);
+    }
   }, [sm, setOpen]);
   const [, setUIState] = useUIState();
   return (
@@ -182,7 +184,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
         <Box sx={{ flex: 1 }}>
           <ViewTree
             onChange={setRoot}
-            root={root}
+            root={sm ? get(root, "children[1]") : root}
             renderLeaf={(l) =>
               l.content ? (
                 <Stack direction="row" sx={{ width: "100%", bgcolor }}>

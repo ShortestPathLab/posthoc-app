@@ -1,5 +1,5 @@
 import { CloseOutlined as CloseIcon } from "@mui/icons-material";
-import { IconButton, Snackbar } from "@mui/material";
+import { Button, IconButton, Snackbar } from "@mui/material";
 import { filter, noop } from "lodash";
 import { Label } from "./Label";
 import { useLog } from "slices/log";
@@ -17,6 +17,8 @@ type A = (
   secondary?: string,
   options?: {
     error?: boolean;
+    action?: () => void;
+    actionLabel?: string;
   }
 ) => () => void;
 
@@ -24,6 +26,8 @@ const SnackbarContext = createContext<A>(() => noop);
 
 export interface SnackbarMessage {
   message?: ReactNode;
+  action?: () => void;
+  actionLabel?: ReactNode;
   key: number;
 }
 
@@ -62,6 +66,8 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         ...prev,
         {
           message: <Label primary={message} secondary={secondary} />,
+          action: options.action,
+          actionLabel: options.actionLabel,
           key: new Date().getTime(),
         },
       ]);
@@ -92,6 +98,12 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         {children}
       </SnackbarContext.Provider>
       <Snackbar
+        sx={{
+          "> .MuiPaper-root": {
+            bgcolor: "background.paper",
+            color: "text.primary",
+          },
+        }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         key={current?.key}
         open={open}
@@ -101,6 +113,18 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         message={current?.message}
         action={
           <>
+            {current?.action && (
+              <Button
+                variant="text"
+                onClick={(e) => {
+                  current?.action?.();
+                  handleClose?.(e);
+                }}
+                color="primary"
+              >
+                {current?.actionLabel}
+              </Button>
+            )}
             <IconButton
               aria-label="close"
               color="inherit"
