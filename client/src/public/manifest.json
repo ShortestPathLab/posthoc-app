@@ -5,7 +5,7 @@
   "description": "Understand sequential decision-making through visualisation.",
   "version_name": "1.2.4; early May 2024",
   "repository": "https://github.com/path-visualiser/app",
-  "changelog": "https://github.com/path-visualiser/app/blob/master/docs",
+  "changelog": "http://localhost:3000/blog",
   "docs": "https://path-visualiser.github.io/docs/overview",
   "homepage": "https://path-visualiser.github.io",
   "icons": [
