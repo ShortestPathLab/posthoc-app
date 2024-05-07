@@ -11,14 +11,19 @@ import { makeTemplate } from "components/script-editor/makeTemplate";
 import { templates } from "components/script-editor/templates";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { inferLayerName } from "layers/inferLayerName";
-import { map, set, values } from "lodash";
+import { find, map, set, values } from "lodash";
 import { produce } from "produce";
 import { ReactNode, useState } from "react";
-import { useLayer } from "slices/layers";
+import { Layer, useLayer } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { PageContentProps } from "./PageMeta";
 import { Placeholder } from "components/inspector/Placeholder";
 import { Scroll } from "components/generic/Scrollbars";
+import { PlaybackLayerData } from "components/app-bar/Playback";
+import { getLayerHandler } from "layers/layerHandlers";
+
+const stepsLayerGuard = (l: Layer): l is Layer<DebugLayerData> =>
+  !!getLayerHandler(l).steps;
 
 const divider = (
   <Divider
@@ -32,7 +37,10 @@ export function DebugPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
 
   const [tab, setTab] = useState("standard");
-  const { key, setKey, layers, layer, setLayer } = useLayer<DebugLayerData>();
+  const { key, setKey, layers, layer, setLayer, allLayers } = useLayer(
+    undefined,
+    stepsLayerGuard
+  );
   const { code } = layer?.source ?? {};
   function renderHeading(label: ReactNode) {
     return (
@@ -51,8 +59,9 @@ export function DebugPage({ template: Page }: PageContentProps) {
             icon={<LayersIcon />}
             label="Layer"
             value={key}
-            items={map(layers, (l) => ({
+            items={map(allLayers, (l) => ({
               id: l.key,
+              hidden: !find(layers, { key: l.key }),
               name: inferLayerName(l),
             }))}
             onChange={setKey}

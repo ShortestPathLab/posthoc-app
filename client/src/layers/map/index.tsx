@@ -75,7 +75,8 @@ export const controller = {
         }
       : { claimed: false },
   editor: withProduce(({ value, produce }) => {
-    const { result: Editor } = useMapOptions(value?.source?.map);
+    const { result: mapContent } = useMapContent(value?.source?.map);
+    const { result: Editor } = useMapOptions(mapContent);
     return (
       <>
         <Option
@@ -196,13 +197,14 @@ export const controller = {
   },
   getSources: (layer) => {
     const map = layer?.source?.map;
+    const parsedMap = layer?.source?.parsedMap;
     if (map) {
       return [
         {
           id: "trace",
           name: `(Source) ${map.name}`,
           language: "txt",
-          content: map.content,
+          content: parsedMap?.content,
         },
       ];
     } else return [];

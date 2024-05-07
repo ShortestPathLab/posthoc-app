@@ -84,6 +84,7 @@ type Props<T = any> = {
   icon?: ReactElement | null;
   orderable?: boolean;
   editable?: boolean;
+  addable?: boolean;
   variant?: "outlined" | "default";
   placeholder?: ReactNode;
   cardStyle?: CSSProperties;
@@ -226,7 +227,10 @@ export function ListEditorField({
                     </IconButton>
                   )}
                   {deletable && (
-                    <IconButton onClick={() => onDeleteItem(id ?? i)}>
+                    <IconButton
+                      onClick={() => onDeleteItem(id ?? i)}
+                      sx={{ color: (t) => t.palette.text.secondary }}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   )}
@@ -264,6 +268,7 @@ export default function Editor<T>(props: Props<T>) {
     order: getOrder,
     onChange,
     addItemExtras: extras,
+    addable = true,
   } = props;
   const paper = usePaper();
   const isInitialRender = useInitialRender();
@@ -414,20 +419,31 @@ export default function Editor<T>(props: Props<T>) {
           </Box>
         </Collapse>
         <Stack p={2} pt={2} gap={2} direction="row">
-          <Button
-            disableElevation
-            variant="outlined"
-            startIcon={<Add />}
-            onClick={() => {
-              onAddItem();
-              setNewIndex(items.length);
-            }}
-            sx={{
-              ...paper(1),
-            }}
-          >
-            <Box sx={{ color: "text.primary" }}>{addItemLabel}</Box>
-          </Button>
+          {addable && (
+            <Button
+              disableElevation
+              variant="outlined"
+              startIcon={<Add />}
+              onClick={() => {
+                onAddItem();
+                setNewIndex(items.length);
+              }}
+              sx={{
+                ...paper(1),
+              }}
+            >
+              <Box
+                sx={{
+                  color: "text.primary",
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {addItemLabel}
+              </Box>
+            </Button>
+          )}
           {extras}
         </Stack>
       </List>
@@ -469,14 +485,14 @@ export function ListEditor<T extends { key: string }>({
   return (
     <Box>
       <Editor
+        deletable
+        editable={false}
         {...props}
         items={state.map((c) => ({
           id: c.key,
           value: c,
           editor: editor?.(c),
         }))}
-        deletable
-        editable={false}
         onAddItem={() => {
           const _id = id();
           handleChange?.([...state, { key: _id, ...create?.() } as T]);

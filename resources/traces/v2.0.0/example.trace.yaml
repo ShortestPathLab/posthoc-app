@@ -1,0 +1,21 @@
+version: 2.0.0
+---
+# Renderer
+example:
+  - $: rect
+    x: ${{ x }}
+    y: ${{ y }}
+(expanding, generating): # Main component
+  - $: example # Introduce defaults for most variables, like width, height = 1 (need LSP to help with visibility/discoverability)
+    x: ${{ x }}
+    y: ${{ y }}
+    color: ${{ palette[type] }}
+    persist: { $until: closing } # Show this until the node does the closing event
+  - $: pivot # Enforce max 1 instance
+    x: ${{ x + 0.5 }}
+    y: ${{ y + 0.5 }}
+    scale: 0.75
+---
+# Allow specification of component (optional)
+- { type: expanding, id: 1736, x: 8, y: 15, f: 0.2, g: 22 } # Optional flow style
+- { type: generating, id: 1736, x: 8, y: 15, f: 0.2, g: 22 } # Optional flow style

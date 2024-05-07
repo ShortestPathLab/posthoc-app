@@ -4,16 +4,13 @@ import {
   Box,
   BoxProps,
   Dialog,
-  duration,
   Fade,
-  Grow,
   IconButton,
   ModalProps,
   Popover,
   PopoverProps,
   Toolbar,
   Typography,
-  useForkRef,
   useTheme,
 } from "@mui/material";
 import { ResizeSensor } from "css-element-queries";
@@ -22,24 +19,21 @@ import { useSmallDisplay } from "hooks/useSmallDisplay";
 import PopupState, { bindPopover } from "material-ui-popup-state";
 import { usePanel } from "./ScrollPanel";
 
-import { useTitleBarVisible } from "components/title-bar/TitleBar";
-import { get, merge } from "lodash";
+import { merge } from "lodash";
 import {
   cloneElement,
   ComponentProps,
   CSSProperties,
-  forwardRef,
   ReactElement,
   ReactNode,
   SyntheticEvent,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { useAcrylic, usePaper } from "theme";
 import { Scroll } from "./Scrollbars";
-import Transition, { TransitionProps } from "react-transition-group/Transition";
 import Swipe from "./Swipe";
+import { PopupState as State } from "material-ui-popup-state/hooks";
 
 export function AppBarTitle({ children }: { children?: ReactNode }) {
   return <Typography variant="h6">{children}</Typography>;
@@ -309,7 +303,7 @@ export function ManagedModal({
     isOpen: boolean
   ) => ReactElement;
   appBar?: ModalAppBarProps;
-  children?: ReactNode;
+  children?: ((state: State) => ReactNode) | ReactNode;
   popover?: boolean;
   slotProps?: {
     popover?: Partial<PopoverProps>;
@@ -321,15 +315,23 @@ export function ManagedModal({
   const acrylic = useAcrylic();
   const sm = useSmallDisplay();
   const shouldDisplayPopover = popover && !sm;
+  const chi = children ?? slotProps?.modal?.children;
   return (
     <PopupState variant="popover">
       {(state) => {
         const { open, close, isOpen } = state;
+        const chi2 = typeof chi === "function" ? chi(state) : chi;
         return (
           <>
             {cloneElement(trigger(open, isOpen))}
             {shouldDisplayPopover ? (
               <Popover
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onTouchStart={(e) => {
+                  e.stopPropagation();
+                }}
                 {...merge(
                   bindPopover(state),
                   {
@@ -346,17 +348,17 @@ export function ManagedModal({
               >
                 <Box
                   {...merge(
-                    { sx: { width: 360, ...paper(1) } },
+                    { sx: { width: 360, ...acrylic, ...paper(1) } },
                     slotProps?.paper
                   )}
                 >
-                  {children ?? slotProps?.modal?.children}
+                  {chi2}
                 </Box>
               </Popover>
             ) : (
               <Modal open={isOpen} onClose={close} {...slotProps?.modal}>
                 <ModalAppBar onClose={close} {...ModalAppBarProps} />
-                {children ?? slotProps?.modal?.children}
+                {chi2}
               </Modal>
             )}
           </>

@@ -12,6 +12,7 @@ export type MapEditor<Options> = (
 ) => Promise<FC<EditorSetterProps<Options>>>;
 
 export type ParsedMap = {
+  content?: string;
   log: string[];
   bounds: Bounds;
   nodes: ComponentEntry<CompiledComponent<string, Record<string, any>>>[];

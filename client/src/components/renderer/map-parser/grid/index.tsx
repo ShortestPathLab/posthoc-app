@@ -33,6 +33,7 @@ function between(v: number, min: number, max: number) {
 export const parse: MapParser = memo(
   async (m = "", options: Options) => {
     return {
+      content: m,
       ...(await parseGridAsync({
         map: m,
         options,

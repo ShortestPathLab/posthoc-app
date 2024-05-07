@@ -28,11 +28,17 @@ import {
   startCase,
 } from "lodash";
 
-export const OMIT_PROPS = ["type", "id"];
+export const COMMON_PROPS = ["type"];
 
-export const ESSENTIAL_PROPS = ["f", "g", "pId"];
+export const OMIT_PROPS = [...COMMON_PROPS, "id"];
 
-const ALL_PROPS = [...OMIT_PROPS, ...ESSENTIAL_PROPS];
+export const ESSENTIAL_PROPS = ["id"];
+
+export const GRAPH_PROPS = [...ESSENTIAL_PROPS, "pId"];
+
+export const HEURISTIC_PROPS = ["f", "g"];
+
+const ALL_PROPS = [...OMIT_PROPS, ...GRAPH_PROPS, ...HEURISTIC_PROPS];
 
 const sortEventKeys = (e: PropertyListProps["event"]) =>
   _(e)
@@ -88,11 +94,15 @@ export function PropertyDialog({
       {[
         {
           name: "common",
-          props: filter(sorted, ([k]) => OMIT_PROPS.includes(k)),
+          props: filter(sorted, ([k]) => COMMON_PROPS.includes(k)),
         },
         {
-          name: "search",
-          props: filter(sorted, ([k]) => ESSENTIAL_PROPS.includes(k)),
+          name: "Graph",
+          props: filter(sorted, ([k]) => GRAPH_PROPS.includes(k)),
+        },
+        {
+          name: "Heuristic",
+          props: filter(sorted, ([k]) => HEURISTIC_PROPS.includes(k)),
         },
         {
           name: "other",

@@ -1,16 +1,22 @@
+import { RestartAltOutlined } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Box,
-  List,
-  ListItem,
+  Divider,
   ListItemText,
   Slider,
+  Stack,
   Switch,
   Tab,
   Typography as Type,
+  Typography,
 } from "@mui/material";
+import { ColorTranslator } from "colortranslator";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { Button } from "components/generic/Button";
 import { Flex } from "components/generic/Flex";
+import { ListEditor } from "components/generic/ListEditor";
+import { AppBarTitle, ManagedModal } from "components/generic/Modal";
 import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
 import { useViewTreeContext } from "components/inspector/ViewTree";
@@ -19,16 +25,23 @@ import { RendererListEditor } from "components/settings-editor/RendererListEdito
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
 import { keys, map, sortBy, startCase } from "lodash";
 import { ReactNode, useState } from "react";
-import { defaultPlaybackRate as baseRate, useSettings } from "slices/settings";
+import { useBusyState } from "slices/busy";
+import {
+  defaultPlaybackRate as baseRate,
+  defaults,
+  useSettings,
+} from "slices/settings";
 import { AccentColor, accentColors, getShade } from "theme";
+import { wait } from "utils/timed";
 import { AboutContent } from "./AboutPage";
 import { PageContentProps } from "./PageMeta";
-import { ColorTranslator } from "colortranslator";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
-
+  const sm = useSmallDisplay();
+  const usingBusyState = useBusyState("reset");
   const [
     {
       "playback/playbackRate": playbackRate = 1,
@@ -70,9 +83,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
         <Page.Options>
           <TabList onChange={(_, v) => setTab(v)}>
             <Tab label="General" value="general" />
-            <Tab label="Connections" value="connections" />
-            <Tab label="Renderers" value="renderers" />
-            <Tab label="Map Parsers" value="map-parsers" />
+            <Tab label="Extensions" value="connections" />
             <Tab label="About" value="about" />
           </TabList>
         </Page.Options>
@@ -84,7 +95,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                   <Box>
                     {renderHeading("Playback")}
                     <Flex alignItems="center" justifyContent="space-between">
-                      {renderLabel("Playback Rate")}
+                      {renderLabel("Playback rate")}
                       <Slider
                         sx={{ maxWidth: 320, mr: 2 }}
                         marks={[1, 2, 5, 10].map((v) => ({
@@ -115,7 +126,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       />
                     </Flex>
                     <Flex alignItems="center" justifyContent="space-between">
-                      {renderLabel("Dark Mode")}
+                      {renderLabel("Dark mode")}
                       <Space flex={1} />
                       <Switch
                         defaultChecked={theme === "dark"}
@@ -144,6 +155,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                                 <Box>
                                   <Box
                                     sx={{
+                                      ml: 0.5,
                                       width: 12,
                                       height: 12,
                                       backgroundColor: getShade(c, theme),
@@ -165,7 +177,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     </Flex>
                     {renderHeading("Behaviour")}
                     <Flex alignItems="center" justifyContent="space-between">
-                      {renderLabel("Show Explore Panel on Start-up")}
+                      {renderLabel("Show explore on start-up")}
                       <Switch
                         defaultChecked={!!showOnStart}
                         onChange={(_, v) =>
@@ -175,23 +187,83 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                         }
                       />
                     </Flex>
+                    {renderHeading("Advanced")}
+                    <Flex alignItems="center" justifyContent="space-between">
+                      {renderLabel("Reset settings and extensions")}
+                      <ManagedModal
+                        trigger={(onClick) => (
+                          <Button
+                            sx={{ mx: 1 }}
+                            color="error"
+                            startIcon={<RestartAltOutlined />}
+                            {...{ onClick }}
+                          >
+                            Reset now
+                          </Button>
+                        )}
+                        appBar={{
+                          children: (
+                            <AppBarTitle>
+                              Reset settings and extensions
+                            </AppBarTitle>
+                          ),
+                        }}
+                      >
+                        {({ close }) => (
+                          <Stack sx={{ p: sm ? 2 : 3, pt: 2, gap: 4 }}>
+                            <Typography color="text.secondary">
+                              If something's not working correctly, you can try
+                              to reset all settings and extensions. This cannot
+                              be undone.
+                            </Typography>
+                            <Stack
+                              direction="row"
+                              justifyContent="flex-end"
+                              gap={2}
+                            >
+                              <Button
+                                variant="text"
+                                onClick={() => {
+                                  close();
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  usingBusyState(async () => {
+                                    await wait(300);
+                                    setSettings(() => defaults);
+                                    close();
+                                    location.reload();
+                                    await wait(Number.MAX_SAFE_INTEGER);
+                                  }, "Resetting settings and extensions");
+                                }}
+                                color="error"
+                                startIcon={<RestartAltOutlined />}
+                              >
+                                Reset settings and extensions
+                              </Button>
+                            </Stack>
+                          </Stack>
+                        )}
+                      </ManagedModal>
+                    </Flex>
                   </Box>
                 </TabPanel>
                 <TabPanel value="connections" sx={{ p: 2 }}>
                   <Box>
-                    {renderHeading("Solvers")}
+                    {renderHeading("Adapters")}
                     <ServerListEditor />
                   </Box>
-                </TabPanel>
-                <TabPanel value="renderers" sx={{ p: 2 }}>
                   <Box>
+                    <Divider sx={{ mb: 2 }} />
                     {renderHeading("Renderers")}
                     <RendererListEditor />
                   </Box>
-                </TabPanel>
-                <TabPanel value="map-parsers" sx={{ p: 2 }}>
                   <Box>
-                    {renderHeading("Map Parsers")}
+                    <Divider sx={{ mb: 2 }} />
+                    {renderHeading("Map support")}
                     <MapParserListEditor />
                   </Box>
                 </TabPanel>
@@ -210,14 +282,39 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   );
 }
 
+const a = keys(mapParsers).map((c) => ({ key: c }));
+type A = (typeof a)[number];
+
 export function MapParserListEditor() {
   return (
-    <List>
-      {keys(mapParsers).map((c) => (
-        <ListItem key={c}>
-          <ListItemText primary={c} secondary={"Internal"} />
-        </ListItem>
-      ))}
-    </List>
+    <Box sx={{ mx: -2 }}>
+      <ListEditor<A>
+        button={false}
+        sortable
+        addable={false}
+        deletable={false}
+        editor={(v) => (
+          <Box key={v.key}>
+            <ListItemText
+              primary={startCase(v.key)}
+              secondary={`Support for *.${v.key} maps`}
+            />
+          </Box>
+        )}
+        icon={null}
+        value={a}
+        // onChange={debounce((v) => setSettings(() => ({ remote: v })), 300)}
+        create={() => ({
+          key: "",
+        })}
+      />
+    </Box>
+    // <List>
+    //   {keys(mapParsers).map((c) => (
+    //     <ListItem key={c}>
+    //       <ListItemText primary={c} secondary={"Internal"} />
+    //     </ListItem>
+    //   ))}
+    // </List>
   );
 }

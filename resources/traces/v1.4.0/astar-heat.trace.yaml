@@ -5,8 +5,8 @@ views:
     - $: rect
       width: 1
       height: 1
-      fill: ${{ color.green }}
-      alpha: ${{ 1 - ($.value / 4) }}
+      fill: "#ffff00"
+      alpha: 1
       x: ${{ $.x }}
       y: ${{ $.y }}
     - $: rect
@@ -14,10 +14,8 @@ views:
       height: 1
       x: ${{ $.x }}
       y: ${{ $.y }}
-      alpha: ${{ $.value / 4 }}
-      fill: ${{ color.red }}
-      $info:
-        heat: ${{ $.value }}
+      alpha: ${{ ($.value / 4) ** 2.2 }} # Gamma correction
+      fill: "#ff0000"
   main:
     - $: cell
       value: ${{ events.slice(0, step).filter(c=>c.id === $.id).length }}

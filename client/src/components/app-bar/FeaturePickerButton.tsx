@@ -21,7 +21,7 @@ export function FeaturePickerButton({
           <KeyboardArrowDownOutlined
             sx={{
               ml: -0.5,
-              color: "text.primary",
+              color: "text.secondary",
               opacity: (t) =>
                 props.disabled ? t.palette.action.disabledOpacity : 1,
             }}

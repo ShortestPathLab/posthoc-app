@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { ListEditor } from "components/generic/ListEditor";
-import { debounce } from "lodash";
+import { debounce, head } from "lodash";
 import { defaultRemotes, Remote, useSettings } from "slices/settings";
 import { ServerEditor } from "./ServerEditor";
 
@@ -13,12 +13,11 @@ export function ServerListEditor() {
     <Box sx={{ mx: -2 }}>
       <ListEditor<Remote>
         sortable
-        button={false}
         editor={(v) => <ServerEditor value={v} />}
         icon={null}
         value={remote}
         onChange={debounce((v) => setSettings(() => ({ remote: v })), 300)}
-        addItemLabel="Add Solver"
+        addItemLabel="Add adapter"
         create={() => ({
           transport: defaultTransport,
           url: "",
@@ -29,9 +28,19 @@ export function ServerListEditor() {
             icon={<ResetIcon />}
             onClick={() => setSettings(() => ({ remote: defaultRemotes }))}
           >
-            Reset to Defaults
+            Reset
           </FeaturePickerButton>
         }
+        onFocus={(key) => {
+          const element = head(document.getElementsByClassName(key));
+          if (
+            element &&
+            "click" in element &&
+            typeof element.click === "function"
+          ) {
+            element.click();
+          }
+        }}
       />
     </Box>
   );

@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { ListEditor } from "components/generic/ListEditor";
-import { debounce } from "lodash";
+import { debounce, head } from "lodash";
 import { Renderer, defaultRenderers, useSettings } from "slices/settings";
 import { RendererEditor } from "./RendererEditor";
 
@@ -13,12 +13,11 @@ export function RendererListEditor() {
     <Box sx={{ mx: -2 }}>
       <ListEditor<Renderer>
         sortable
-        button={false}
         editor={(v) => <RendererEditor value={v} />}
         icon={null}
         value={renderer}
         onChange={debounce((v) => setSettings(() => ({ renderer: v })), 300)}
-        addItemLabel="Add Renderer"
+        addItemLabel="Add renderer"
         create={() => ({
           transport: defaultTransport,
           url: "",
@@ -29,9 +28,19 @@ export function RendererListEditor() {
             icon={<ResetIcon />}
             onClick={() => setSettings(() => ({ renderer: defaultRenderers }))}
           >
-            Reset to Defaults
+            Reset
           </FeaturePickerButton>
         }
+        onFocus={(key) => {
+          const element = head(document.getElementsByClassName(key));
+          if (
+            element &&
+            "click" in element &&
+            typeof element.click === "function"
+          ) {
+            element.click();
+          }
+        }}
       />
     </Box>
   );

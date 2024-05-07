@@ -12,10 +12,25 @@ import { Heading, Option } from "components/layer-editor/Option";
 import { TracePreview } from "components/layer-editor/TracePreview";
 import { getParser } from "components/renderer";
 import { useEffectWhenAsync } from "hooks/useEffectWhen";
+import { useMapContent } from "hooks/useMapContent";
+import { dump } from "js-yaml";
 import { LayerController, inferLayerName } from "layers";
 import { MapLayer, MapLayerData } from "layers/map";
 import { TraceLayerData, controller as traceController } from "layers/trace";
-import { filter, find, map, merge, omit, reduce, set } from "lodash";
+import {
+  each,
+  filter,
+  find,
+  isArray,
+  isObject,
+  map,
+  mapValues,
+  merge,
+  omit,
+  reduce,
+  set,
+  truncate,
+} from "lodash";
 import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";
 import { useMemo } from "react";
@@ -23,6 +38,12 @@ import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { Layer, useLayer, useLayers } from "slices/layers";
 
+const mapValuesDeep = (v: any, callback: (t: any) => any): any =>
+  isArray(v)
+    ? map(v, (v) => mapValuesDeep(v, callback))
+    : isObject(v)
+    ? mapValues(v, (v) => mapValuesDeep(v, callback))
+    : callback(v);
 async function findConnection(
   connections: Connection[],
   algorithm: string,
@@ -39,11 +60,13 @@ async function findConnection(
 
 export type QueryLayerData = {
   mapLayerKey?: string;
+  query?: any;
   start?: number;
   end?: number;
   algorithm?: string;
 } & TraceLayerData;
 
+const maxStringPropLength = 40;
 export const controller = {
   ...omit(traceController, "claimImportedFile"),
   key: "query",
@@ -131,10 +154,12 @@ export const controller = {
         }) as MapLayer;
       }
     }, [mapLayerKey, algorithm, layers]);
+    const { result: mapContent } = useMapContent(mapLayer?.source?.map);
     useEffectWhenAsync(
       async (signal) => {
-        if (mapLayer && algorithm) {
-          const { format, content } = mapLayer?.source?.map ?? {};
+        if (mapLayer && mapContent && algorithm) {
+          const { format } = mapLayer?.source?.map ?? {};
+          const { content } = mapContent ?? {};
           if (format && content) {
             const connection = await findConnection(
               connections,
@@ -146,28 +171,30 @@ export const controller = {
               notify(
                 `Executing ${inferLayerName(value)} using ${connection.name}...`
               );
+              const args = {
+                format,
+                instances: [
+                  {
+                    start: start ?? 0,
+                    end: end ?? 0,
+                  },
+                ],
+                mapURI: `map:${encodeURIComponent(content)}` as const,
+                algorithm,
+              };
               const result = await connection
                 .transport()
-                .call("solve/pathfinding", {
-                  format,
-                  instances: [
-                    {
-                      start: start ?? 0,
-                      end: end ?? 0,
-                    },
-                  ],
-                  mapURI: `map:${encodeURIComponent(content)}`,
-                  algorithm,
-                });
+                .call("solve/pathfinding", args);
               if (!signal.aborted) {
-                produce((v) =>
+                produce((v) => {
                   set(v, "source.trace", {
                     name: `${algorithmInfo?.name}`,
                     content: result,
                     key: id(),
                     id: id(),
-                  })
-                );
+                  });
+                  set(v, "source.query", args);
+                });
               } else {
                 notify("Canceled");
               }
@@ -186,7 +213,7 @@ export const controller = {
         value,
         algorithms,
       ],
-      [mapLayer, connections, algorithm, start, end]
+      [mapLayer, mapContent, connections, algorithm, start, end]
     );
     return <>{<TraceLayerService value={value} onChange={onChange} />}</>;
   }),
@@ -274,5 +301,35 @@ export const controller = {
         {(menuB) => children?.(merge(menuB, menu))}
       </TraceLayerSelectionInfoProvider>
     );
+  },
+  getSources: (layer) => {
+    const { algorithm = null, start = 0, end = 0, query } = layer?.source ?? {};
+
+    return [
+      {
+        id: "params",
+        name: "Query",
+        language: "yaml",
+        content: dump(
+          {
+            algorithm,
+            instances: [{ start, end }],
+            mapURI: "(...)",
+            format: "(...)",
+            ...mapValuesDeep(query, (t) =>
+              typeof t === "string"
+                ? t.length > maxStringPropLength
+                  ? `${truncate(t, { length: maxStringPropLength })} (${
+                      t.length
+                    } characters)`
+                  : t
+                : t
+            ),
+          },
+          { noCompatMode: true }
+        ),
+      },
+      ...traceController.getSources(layer),
+    ];
   },
 } satisfies LayerController<"query", QueryLayerData>;

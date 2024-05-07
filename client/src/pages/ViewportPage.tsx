@@ -1,14 +1,14 @@
 import {
   BlurCircularOutlined,
-  CenterFocusStrongOutlined,
-  CropFreeOutlined,
+  CenterFocusWeakOutlined,
   LayersOutlined,
+  TimesOneMobiledataOutlined,
 } from "@mui/icons-material";
-import { Box, Divider, Stack } from "@mui/material";
+import { Box, Divider, Stack, SxProps, Theme, useTheme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 import { Flex } from "components/generic/Flex";
+import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { inferLayerName } from "layers/inferLayerName";
@@ -28,6 +28,7 @@ import { Renderer as RendererInstance } from "renderer";
 import { useLayers } from "slices/layers";
 import { Renderer, useRenderers } from "slices/renderers";
 import { PanelState } from "slices/view";
+import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
 import { useRendererResolver } from "./useRendererResolver";
 
@@ -52,7 +53,9 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();
-
+  const paper = usePaper();
+  const acrylic = useAcrylic();
+  const theme = useTheme();
   const [{ layers }] = useLayers();
   const [layerSet, setLayerSet] = useState<Dictionary<boolean | undefined>>({});
   const selectedLayers = useMemo(
@@ -95,6 +98,41 @@ export function ViewportPage({ template: Page }: PageContentProps) {
                   renderer={selected}
                   rendererRef={setRendererInstance}
                 />
+                <Stack sx={{ pt: 6, position: "absolute", top: 0, left: 0 }}>
+                  <Stack
+                    direction="row"
+                    sx={
+                      {
+                        ...paper(1),
+                        ...acrylic,
+                        alignItems: "center",
+                        height: (t) => t.spacing(6),
+                        px: 1,
+                        m: 1,
+                      } as SxProps<Theme>
+                    }
+                  >
+                    <IconButtonWithTooltip
+                      color="primary"
+                      disabled={!rendererInstance}
+                      onClick={() => {
+                        rendererInstance?.fitCamera();
+                      }}
+                      label="Fit"
+                      icon={<CenterFocusWeakOutlined />}
+                    />
+                    {divider}
+                    <IconButtonWithTooltip
+                      color="primary"
+                      disabled={!rendererInstance}
+                      onClick={() => {
+                        rendererInstance?.initialCamera?.();
+                      }}
+                      icon={<TimesOneMobiledataOutlined />}
+                      label="1 to 1"
+                    />
+                  </Stack>
+                </Stack>
               </Box>
             )}
           </AutoSize>
@@ -134,25 +172,6 @@ export function ViewportPage({ template: Page }: PageContentProps) {
             showArrow
             ellipsis={12}
           />
-          {divider}
-          <FeaturePickerButton
-            disabled={!rendererInstance}
-            onClick={() => {
-              rendererInstance?.fitCamera();
-            }}
-            icon={<CenterFocusStrongOutlined />}
-          >
-            Fit
-          </FeaturePickerButton>
-          <FeaturePickerButton
-            disabled={!rendererInstance}
-            onClick={() => {
-              rendererInstance?.initialCamera?.();
-            }}
-            icon={<CropFreeOutlined />}
-          >
-            1:1
-          </FeaturePickerButton>
         </Stack>
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>

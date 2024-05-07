@@ -10,9 +10,9 @@ type TransportEntry = {
 };
 
 export const transports: Dictionary<TransportEntry> = {
+  native: { name: "Internal", constructor: NativeTransport },
   socketio: { name: "socket.io", constructor: SocketIOTransport },
   ipc: { name: "Web Worker", constructor: IPCTransport },
-  native: { name: "Internal", constructor: NativeTransport },
 };
 
 export function getTransport(key: string) {

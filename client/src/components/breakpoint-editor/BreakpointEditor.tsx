@@ -49,7 +49,7 @@ export function BreakpointEditor({
                 color="text.secondary"
                 variant="body2"
                 component="span"
-              >{`event.${c}`}</Type>
+              >{`$.${c}`}</Type>
             </>
           ),
         }))}

@@ -436,8 +436,8 @@ class D2Renderer
 export default makeRenderer(D2Renderer, {
   components: ["rect", "circle", "path", "polygon"],
   id: "d2-renderer",
-  name: "Pixi",
-  description: "Provides 2D Visualisation Support",
+  name: "Pixel",
+  description: "Comfortably performant 2D renderer",
   version: "1.0.0",
 });
 

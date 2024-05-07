@@ -6,7 +6,7 @@ import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { useWorkspace } from "hooks/useWorkspace";
-import { ceil, delay, kebabCase, omit } from "lodash";
+import { ceil, delay, entries, kebabCase, omit, reduce } from "lodash";
 import { map } from "promise-tools";
 import { ComponentProps, useMemo } from "react";
 import { useMap } from "react-use";
@@ -17,8 +17,25 @@ import { Jimp } from "utils/Jimp";
 import { Gallery } from "./Gallery";
 import { nanoid as id } from "nanoid";
 
-function getFilename(s: string = "") {
-  return kebabCase(s.replace("*", " star ")) || "untitled";
+const replacements = {
+  "*": "star",
+  "/": "slash",
+  "+": "plus",
+  "@": "at",
+  "%": "percent",
+  "&": "and",
+};
+
+function getFilename(name: string = "") {
+  return (
+    kebabCase(
+      reduce(
+        entries(replacements),
+        (prev, [a, b]) => prev.replace(a, ` ${b} `),
+        name
+      )
+    ) || "untitled"
+  );
 }
 
 const imageSize = 64;

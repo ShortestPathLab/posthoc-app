@@ -1,7 +1,9 @@
 import { EditOutlined as EditIcon } from "@mui/icons-material";
 import {
   Box,
+  ButtonBase,
   Chip,
+  Stack,
   Switch,
   TextField,
   Tooltip,
@@ -51,58 +53,80 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
 
   return (
     <>
-      <Flex alignItems="center" py={0.5}>
-        <Box
-          flex={1}
-          sx={{
-            width: 0,
-            overflow: "hidden",
-            "> *": {
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
+      <Flex alignItems="center">
+        <Dialog
+          slotProps={{
+            paper: { sx: { width: 480 } },
+            popover: {
+              anchorOrigin: { horizontal: -18, vertical: "bottom" },
             },
           }}
-        >
-          <Type>
-            {connection
-              ? `${connection.name} ${connection.version}`
-              : startCase(status)}
-          </Type>
-          <Type variant="body2" color="text.secondary">
-            {connection?.description ?? (value?.url || "No URL")}
-          </Type>
-        </Box>
-        <Chip
-          sx={{
-            mx: 1,
-            color: statusColor[status],
-            ...omit(paper(1), "borderRadius"),
-          }}
-          size="small"
-          label={startCase(status)}
-        />
-        <Tooltip title={`${value.disabled ? "Enable" : "Disable"} Connection`}>
-          <Box>
-            <Switch
-              defaultChecked={!value.disabled}
-              onChange={(_, v) => handleChange({ disabled: !v })}
-            />
-          </Box>
-        </Tooltip>
-        <Dialog
+          popover
           trigger={(onClick) => (
-            <IconButton
-              icon={<EditIcon />}
-              label="Edit Connection"
-              sx={{ mr: -3 }}
-              {...{ onClick }}
-            />
+            <Stack
+              direction="row"
+              flex={1}
+              alignItems="center"
+              sx={{ py: 1, mr: -3 }}
+            >
+              <Stack
+                className={value.key}
+                direction="row"
+                flex={1}
+                alignItems="center"
+                {...{ onClick }}
+              >
+                <Box
+                  flex={1}
+                  sx={{
+                    width: 0,
+                    overflow: "hidden",
+                    "> *": {
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                    },
+                  }}
+                >
+                  <Type>
+                    {connection
+                      ? `${connection.name} ${connection.version}`
+                      : startCase(status)}
+                  </Type>
+                  <Type variant="body2" color="text.secondary">
+                    {connection?.description ?? (value?.url || "No URL")}
+                  </Type>
+                </Box>
+                <Chip
+                  sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    maxWidth: "fit-content",
+                    mx: 1,
+                    color: statusColor[status],
+                    ...omit(paper(1), "borderRadius"),
+                  }}
+                  size="small"
+                  label={startCase(status)}
+                />
+              </Stack>
+              <Tooltip
+                title={`${value.disabled ? "Enable" : "Disable"} adapter`}
+              >
+                <Box>
+                  <Switch
+                    defaultChecked={!value.disabled}
+                    onChange={(_, v) => handleChange({ disabled: !v })}
+                  />
+                </Box>
+              </Tooltip>
+            </Stack>
           )}
-          appBar={{ children: <Title>Edit Connection</Title> }}
+          appBar={{ children: <Title>Edit Adapter</Title> }}
         >
           <Box p={2.5}>
             <TextField
+              autoFocus
               defaultValue={value.url}
               onChange={(e) => handleChange({ url: e.target.value })}
               fullWidth

@@ -1,0 +1,22 @@
+version: 1.1.0
+
+render:
+  main: # Main component
+    - $: rect # Type of component
+      x: ${{ x }}
+      y: ${{ y }}
+      width: 1
+      height: 1
+      fill: ${{ palette[type] }} # Color, in this case from predefined palette
+
+pivot: # Per event pivot (might be different from simply x and y)
+  x: ${{ x + 0.5 }}
+  y: ${{ y + 0.5 }}
+  scale: 0.75
+
+events:
+  - { type: source, id: 1736, x: 8, y: 15 }
+  - { type: destination, id: 4419, x: 3, y: 43 }
+  - { type: generating, id: 1736, g: 0, f: 0.000300711, pId: null, x: 8, y: 15 }
+  - { type: expanding, id: 1736, g: 0, f: 0.000300711, pId: null, x: 8, y: 15 }
+  - { type: closing, id: 1736, g: 0, f: 0.000300711, pId: null, x: 8, y: 15 }

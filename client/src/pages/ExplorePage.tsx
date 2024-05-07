@@ -20,6 +20,7 @@ import {
   Tab,
   TextField,
   Typography as Type,
+  useTheme,
 } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
@@ -196,6 +197,7 @@ export function FeatureCard({
   CardProps & { onOpenClick?: () => void; loading?: boolean }) {
   const [{ "appearance/acrylic": acrylic }] = useSettings();
   const paper = usePaper();
+  const theme = useTheme();
 
   const { name: authorName, avatar } = useMemo(
     () => getAuthor(author),
@@ -210,20 +212,24 @@ export function FeatureCard({
     >
       {acrylic && (
         <>
-          <Box
-            sx={{
-              zIndex: -1,
-              filter: "blur(48px)",
-              opacity: 0.1,
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-              backgroundImage: `url("${image}")`,
-              backgroundSize: "contain",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "-52px -52px",
-            }}
-          ></Box>
+          <Fade in={!loading} timeout={theme.transitions.duration.complex}>
+            <Box>
+              <Box
+                sx={{
+                  zIndex: -1,
+                  filter: "blur(48px)",
+                  opacity: 0.1,
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  backgroundImage: `url("${image}")`,
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "-52px -52px",
+                }}
+              />
+            </Box>
+          </Fade>
           <CardHeader
             sx={{
               alignItems: "flex-start",

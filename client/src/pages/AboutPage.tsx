@@ -12,9 +12,9 @@ import {
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { head } from "lodash";
+import { head, trimEnd } from "lodash";
 import logo from "public/logo512.png";
-import { name, version_name, repository } from "public/manifest.json";
+import { name, version_name, repository, homepage } from "public/manifest.json";
 import { ReactNode } from "react";
 import { PageContentProps } from "./PageMeta";
 
@@ -29,6 +29,10 @@ const contacts = [
   { name: "Can Wang", email: "camwang@outlook.com" },
   { name: "Rory Tobin-Underwood", email: "rorytu@gmail.com" },
 ];
+function parseUrl(path: string) {
+  const url = new URL(path);
+  return trimEnd(`${url.hostname}${url.pathname}`, "/");
+}
 
 export function AboutContent() {
   function renderSection(label: ReactNode, content: ReactNode) {
@@ -41,6 +45,7 @@ export function AboutContent() {
       </Box>
     );
   }
+
   return (
     <Box>
       <Box sx={{ pt: 0, pb: 2 }}>
@@ -67,11 +72,20 @@ export function AboutContent() {
         "Resources",
         <>
           <List sx={{ mx: -2 }}>
+            <ListItemButton target="_blank" href={homepage}>
+              <ListItemAvatar>
+                <Avatar sx={{ width: 24, height: 24 }} src={logo}></Avatar>
+              </ListItemAvatar>
+              <ListItemText primary="Home" secondary={parseUrl(homepage)} />
+            </ListItemButton>
             <ListItemButton target="_blank" href={repository}>
               <ListItemIcon>
                 <GitHub />
               </ListItemIcon>
-              <ListItemText primary="Repository" secondary={repository} />
+              <ListItemText
+                primary="Repository"
+                secondary={parseUrl(repository)}
+              />
             </ListItemButton>
           </List>
         </>

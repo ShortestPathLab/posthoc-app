@@ -1,10 +1,11 @@
 import {
   AccountTreeOutlined,
-  CenterFocusStrongOutlined,
+  CenterFocusWeakOutlined,
   DataObjectOutlined,
   LayersOutlined as LayersIcon,
   ModeStandbyOutlined,
   FlipCameraAndroidOutlined as RotateIcon,
+  TimelineOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -54,16 +55,20 @@ import { getLayerHandler } from "layers/layerHandlers";
 import { TraceLayerData } from "layers/trace";
 import {
   Dictionary,
+  chain as _,
   entries,
   filter,
   find,
   findLast,
   forEach,
   forEachRight,
+  get,
   isNull,
   isUndefined,
+  keys,
   map,
   max,
+  min,
   slice,
   startCase,
   truncate,
@@ -86,6 +91,7 @@ const isDefined = (a: any) => !isUndefined(a) && !isNull(a);
 export const divider = (
   <Divider orientation="vertical" flexItem sx={{ m: 1 }} />
 );
+export const space = <Box sx={{ p: 0.5 }} />;
 
 type TreePageContext = PanelState;
 
@@ -176,18 +182,33 @@ export function GraphEvents({
   return null;
 }
 
+/**
+ * @see https://colorbrewer2.org/#type=sequential&scheme=GnBu&n=9
+ */
+const SEVEN_CLASS_GNBU = [
+  "#ccebc5",
+  "#a8ddb5",
+  "#7bccc4",
+  "#4eb3d3",
+  "#2b8cbe",
+  "#0868ac",
+  "#084081",
+];
+
 export function TreeGraph({
   trace,
   tree,
   step = 0,
   layer,
   showAllEdges,
+  trackedProperty,
 }: {
   trace?: Trace;
   tree?: TreeWorkerReturnType;
   step?: number;
   layer?: Layer<PlaybackLayerData>;
   showAllEdges?: boolean;
+  trackedProperty?: string;
 }) {
   const sigma = useSigma();
   const [orientation, setOrientation] =
@@ -227,7 +248,7 @@ export function TreeGraph({
     forEach(trace?.events, ({ id, pId }) => {
       if (isDefined(pId) && graph.hasNode(`${pId}`)) {
         const key = makeEdgeKey(id, pId);
-        if (!graph.hasEdge(key)) {
+        if (!graph.hasEdge(key) && graph.hasNode(`${id}`)) {
           graph.addDirectedEdgeWithKey(key, `${pId}`, `${id}`, {
             label: "",
             color: "white",
@@ -235,11 +256,13 @@ export function TreeGraph({
             final: finalParents[id] === pId,
           });
         }
-        graph.updateEdgeAttribute(
-          key,
-          "size",
-          (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5
-        );
+        if (graph.hasDirectedEdge(key)) {
+          graph.updateEdgeAttribute(
+            key,
+            "size",
+            (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5
+          );
+        }
       }
     });
     return graph;
@@ -294,8 +317,30 @@ export function TreeGraph({
         }
       }
     );
+    if (trackedProperty) {
+      const minVal = min(map(trace?.events, (e) => get(e, trackedProperty)));
+      const maxVal = max(map(trace?.events, (e) => get(e, trackedProperty)));
+      const f = (x: number) => {
+        if (isNaN(minVal) || isNaN(maxVal) || isNaN(x)) {
+          return 0;
+        } else return (x - minVal) / (maxVal - minVal);
+      };
+      const scale = interpolate(SEVEN_CLASS_GNBU);
+      forEach(slice(trace?.events, 0, step + 1), (e) => {
+        if (graph.hasNode(`${e.id}`)) {
+          const s = scale(f(get(e, trackedProperty)));
+          graph.setNodeAttribute(`${e.id}`, "color", s);
+          if (isDefined(e.pId)) {
+            const a = makeEdgeKey(`${e.id}`, `${e.pId}`);
+            if (graph.hasDirectedEdge(a)) {
+              graph.setEdgeAttribute(a, "color", s);
+            }
+          }
+        }
+      });
+    }
     load(graph);
-  }, [graph, step, trace, showAllEdges]);
+  }, [graph, step, trace, showAllEdges, trackedProperty, theme]);
   return (
     <Stack sx={{ pt: 6, position: "absolute", top: 0, left: 0 }}>
       <Stack
@@ -314,21 +359,21 @@ export function TreeGraph({
         <IconButtonWithTooltip
           color="primary"
           onClick={() => {
+            sigma?.getCamera?.()?.animatedReset?.();
+          }}
+          label="Fit"
+          icon={<CenterFocusWeakOutlined />}
+        ></IconButtonWithTooltip>
+        {divider}
+        <IconButtonWithTooltip
+          color="primary"
+          onClick={() => {
             setOrientation(
               orientation === "vertical" ? "horizontal" : "vertical"
             );
           }}
           label="Rotate"
           icon={<RotateIcon />}
-        ></IconButtonWithTooltip>
-        {divider}
-        <IconButtonWithTooltip
-          color="primary"
-          onClick={() => {
-            sigma?.getCamera?.()?.animatedReset?.();
-          }}
-          label="Fit"
-          icon={<CenterFocusStrongOutlined />}
         ></IconButtonWithTooltip>
         {divider}
         {<MinimisedPlaybackControls layer={layer} />}
@@ -361,15 +406,29 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const { stepTo } = usePlaybackState(key);
 
-  const [orientation, setOrientation] =
-    useState<keyof typeof orientationOptions>("vertical");
+  const properties = useMemo(
+    () =>
+      _(layer?.source?.trace?.content?.events)
+        .flatMap(keys)
+        .uniq()
+        .filter((p) => p !== "type")
+        .value(),
+    [layer?.source?.trace?.content?.events]
+  );
+
+  const [trackedProperty, setTrackedProperty] = useState<string>("");
 
   const trace = layer?.source?.trace?.content;
+
+  // Reset tracked property
+  useEffect(() => {
+    setTrackedProperty("");
+  }, [trace, setTrackedProperty]);
 
   const [selection, setSelection] = useState<R>();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const [mode, setMode] = useState<"tree" | "directed-graph">("directed-graph");
+  const [mode, setMode] = useState<"tree" | "directed-graph">("tree");
 
   const selected = useMemo(() => {
     const events = filter(
@@ -434,6 +493,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                           trace={trace}
                           layer={layer}
                           showAllEdges={layoutModes[mode].showAllEdges}
+                          trackedProperty={trackedProperty}
                         />
                         <GraphEvents
                           layer={key}
@@ -598,6 +658,21 @@ export function TreePage({ template: Page }: PageContentProps) {
             id: k,
             ...v,
           }))}
+          arrow
+        />
+        {divider}
+        <FeaturePicker
+          icon={<TimelineOutlined />}
+          label="Tracked Property"
+          value={trackedProperty}
+          onChange={setTrackedProperty}
+          items={[
+            { id: "", name: "Off" },
+            ...map(properties, (k) => ({
+              id: k,
+              name: `$.${k}`,
+            })),
+          ]}
           arrow
         />
       </Page.Options>

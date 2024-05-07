@@ -1,8 +1,8 @@
 import { call } from "components/script-editor/call";
 import { get, toLower as lower, startCase } from "lodash";
 import memo from "memoizee";
-import { useTreeMemo } from "pages/TreeWorker";
-import { EventTree } from "pages/tree.worker";
+import { useTreeMemo } from "pages/TreeWorkerLegacy";
+import { EventTree } from "pages/treeLegacy.worker";
 import { TraceEvent, TraceEventType } from "protocol";
 import { useMemo } from "react";
 import { UploadedTrace } from "slices/UIState";

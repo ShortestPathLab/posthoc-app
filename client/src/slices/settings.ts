@@ -28,6 +28,11 @@ type Settings = {
 
 export const defaultRemotes = [
   {
+    url: `internal://basic-maps`,
+    transport: "native",
+    key: "default-internal",
+  },
+  {
     url: `https://cdn.jsdelivr.net/gh/path-visualiser/app@adapter-warthog-wasm-dist/warthog-wasm.mjs`,
     transport: "ipc",
     key: "default-ipc",
@@ -44,7 +49,7 @@ export const defaultRenderers = [
 
 export const defaultPlaybackRate = 1;
 
-const defaults = {
+export const defaults = {
   renderer: defaultRenderers,
   remote: defaultRemotes,
   "playback/playbackRate": defaultPlaybackRate,

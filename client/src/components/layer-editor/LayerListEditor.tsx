@@ -24,7 +24,17 @@ export function LayerListEditor() {
             <PopupState variant="popover">
               {(state) => (
                 <>
-                  <Menu {...bindMenu(state)}>
+                  <Menu
+                    {...bindMenu(state)}
+                    transformOrigin={{
+                      horizontal: "right",
+                      vertical: "top",
+                    }}
+                    anchorOrigin={{
+                      horizontal: "right",
+                      vertical: "bottom",
+                    }}
+                  >
                     <MenuList dense sx={{ p: 0 }}>
                       {[
                         {
@@ -51,7 +61,10 @@ export function LayerListEditor() {
                       ))}
                     </MenuList>
                   </Menu>
-                  <IconButton {...bindTrigger(state)}>
+                  <IconButton
+                    {...bindTrigger(state)}
+                    sx={{ color: (t) => t.palette.text.secondary }}
+                  >
                     <MoreVertOutlined />
                   </IconButton>
                 </>
