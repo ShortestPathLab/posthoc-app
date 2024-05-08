@@ -30,6 +30,8 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
 import { chain as _, entries, first, map, round, upperCase } from "lodash";
+import PopupState from "material-ui-popup-state";
+import memoizee from "memoizee";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { docs, name } from "public/manifest.json";
 import {
@@ -46,8 +48,7 @@ import { textFieldProps, usePaper } from "theme";
 import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/Button";
 import { PageContentProps } from "./PageMeta";
-import memoizee from "memoizee";
-import PopupState from "material-ui-popup-state";
+import { ColorTranslator } from "colortranslator";
 const paths = import.meta.glob("/public/recipes/*.workspace", {
   as: "url",
 });
@@ -210,8 +211,8 @@ export function FeatureCard({
       sx={{ ...paper(1), position: "relative", height: "100%" }}
       {...rest}
     >
-      {acrylic && (
-        <>
+      <>
+        {acrylic && (
           <Fade in={!loading} timeout={theme.transitions.duration.complex}>
             <Box>
               <Box
@@ -230,82 +231,82 @@ export function FeatureCard({
               />
             </Box>
           </Fade>
-          <CardHeader
-            sx={{
-              alignItems: "flex-start",
-              "> .MuiCardHeader-content": { overflow: "hidden" },
-            }}
-            avatar={
-              <Box
+        )}
+        <CardHeader
+          sx={{
+            alignItems: "flex-start",
+            "> .MuiCardHeader-content": { overflow: "hidden" },
+          }}
+          avatar={
+            <Box
+              sx={{
+                ...paper(1),
+                border: "none",
+                borderRadius: 1,
+                width: 64,
+                height: 64,
+                overflow: "hidden",
+              }}
+            >
+              <Fade in={!!image}>
+                <Box
+                  sx={{
+                    width: 64,
+                    height: 64,
+                    backgroundImage: `url("${image}")`,
+                    backgroundSize: "100%",
+                    backgroundPosition: "center",
+                  }}
+                ></Box>
+              </Fade>
+            </Box>
+          }
+          titleTypeProps={ellipsisProps}
+          title={loading ? <Skeleton /> : name || "Untitled"}
+          subheaderTypeProps={ellipsisProps}
+          subheader={
+            <Stack gap={2} sx={{ pt: 1, alignItems: "flex-start" }}>
+              <Type
                 sx={{
-                  ...paper(1),
-                  border: "none",
-                  borderRadius: 1,
-                  width: 64,
-                  height: 64,
-                  overflow: "hidden",
+                  ...ellipsisProps,
+                  maxWidth: "100%",
+                  width: "100%",
+                  display: "-webkit-box",
+                  WebkitBoxOrient: "vertical",
+                  WebkitLineClamp: 3,
+                  whiteSpace: "break-spaces",
+                  height: 60,
                 }}
               >
-                <Fade in={!!image}>
-                  <Box
-                    sx={{
-                      width: 64,
-                      height: 64,
-                      backgroundImage: `url("${image}")`,
-                      backgroundSize: "100%",
-                      backgroundPosition: "center",
-                    }}
-                  ></Box>
-                </Fade>
-              </Box>
-            }
-            titleTypeProps={ellipsisProps}
-            title={loading ? <Skeleton /> : name || "Untitled"}
-            subheaderTypeProps={ellipsisProps}
-            subheader={
-              <Stack gap={2} sx={{ pt: 1, alignItems: "flex-start" }}>
-                <Type
-                  sx={{
-                    ...ellipsisProps,
-                    maxWidth: "100%",
-                    width: "100%",
-                    display: "-webkit-box",
-                    WebkitBoxOrient: "vertical",
-                    WebkitLineClamp: 3,
-                    whiteSpace: "break-spaces",
-                    height: 60,
-                  }}
-                >
-                  {loading
-                    ? map([80, 30], (v) => <Skeleton width={`${v}%`} />)
-                    : description || "No description"}
+                {loading
+                  ? map([80, 30], (v) => <Skeleton width={`${v}%`} />)
+                  : description || "No description"}
+              </Type>
+              <Stack direction="row" alignItems="center" gap={1}>
+                {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
+                <Type variant="caption">
+                  {loading ? <Skeleton width={120} /> : authorName}
                 </Type>
-                <Stack direction="row" alignItems="center" gap={1}>
-                  {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
-                  <Type variant="caption">
-                    {loading ? <Skeleton width={120} /> : authorName}
-                  </Type>
-                </Stack>
-                <Button
-                  disabled={loading}
-                  onClick={onOpenClick}
-                  startIcon={<WorkspacesOutlined />}
-                  sx={paper(2)}
-                >
-                  <Stack direction="row" gap={1}>
-                    <Type>Open</Type>
-                    {!!size && (
-                      <Type color="text.secondary">
-                        {round(size / 1024 / 1024, 2)} MB
-                      </Type>
-                    )}
-                  </Stack>
-                </Button>
               </Stack>
-            }
-          />
-        </>
-      )}
+              <Button
+                disabled={loading}
+                onClick={onOpenClick}
+                startIcon={<WorkspacesOutlined />}
+                sx={paper(2)}
+              >
+                <Stack direction="row" gap={1}>
+                  <Type>Open</Type>
+                  {!!size && (
+                    <Type color="text.secondary">
+                      {round(size / 1024 / 1024, 2)} MB
+                    </Type>
+                  )}
+                </Stack>
+              </Button>
+            </Stack>
+          }
+        />
+      </>
     </Card>
   );
 }
@@ -315,6 +316,7 @@ const CONTENT_WIDTH = 940;
 const entries2 = entries(paths);
 
 export function ExplorePage({ template: Page }: PageContentProps) {
+  const theme = useTheme();
   const [{ "behaviour/showOnStart": showOnStart }, setSettings] = useSettings();
   const notify = useSnackbar();
   const { controls, onChange, state, dragHandle, isViewTree } =
@@ -357,6 +359,29 @@ export function ExplorePage({ template: Page }: PageContentProps) {
     }));
   }
 
+  function blur() {
+    const accent = new ColorTranslator(theme.palette.primary.main).H;
+    const blue = new ColorTranslator("rgba(0,50,255,.2)").H;
+
+    return (
+      <Box
+        sx={{
+          position: "absolute",
+          top: "-50%",
+          left: "calc(50%)",
+          width: "100%",
+          zIndex: -1,
+          transform: "translateX(-50%) rotate(180deg)",
+          height: "100%",
+          filter: `hue-rotate(${accent - blue}deg)`,
+          minWidth: 640,
+          opacity: 0.75,
+          background: `radial-gradient(46.56% 45.08% at 56.04% 55.33%,rgba(0,50,255,.2) 0,transparent 100%),radial-gradient(46.69% 41.74% at 69.64% 60.81%,rgba(192,59,196,.2) 0,transparent 100%),radial-gradient(59.78% 45.73% at 30.42% 58.68%,rgba(0,120,212,.2) 0,transparent 100%),radial-gradient(32.53% 31.57% at 50% 66.82%,rgba(70,54,104,.2) 0,transparent 100%)`,
+        }}
+      ></Box>
+    );
+  }
+
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
@@ -393,6 +418,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                         Browse a library of included and community-made examples
                       </Type>
                     </Box>
+                    {theme.palette.mode === "dark" && blur()}
                     <Box
                       px={2}
                       pb={narrow ? 4 : 4}
