@@ -17,6 +17,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
+import { isMobile } from "mobile-device-detect";
 
 type ViewControlsProps = {
   splitVerticalDisabled?: boolean;
@@ -89,7 +90,7 @@ export function ViewControls({
             {!popOutDisabled && (
               <Box>
                 <MenuItem
-                  disabled={closeDisabled || popOutDisabled}
+                  disabled={closeDisabled || popOutDisabled || isMobile}
                   onClick={() => {
                     onPopOut?.();
                     onClose?.();
@@ -102,7 +103,7 @@ export function ViewControls({
                   <ListItemText>Move to new window</ListItemText>
                 </MenuItem>
                 <MenuItem
-                  disabled={popOutDisabled}
+                  disabled={popOutDisabled || isMobile}
                   onClick={() => {
                     onPopOut?.();
                     state.close();
