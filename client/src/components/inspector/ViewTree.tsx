@@ -60,6 +60,7 @@ type ViewTreeProps<T> = {
   onClose?: () => void;
   depth?: number;
   onPopOut?: (leaf: Leaf<T>) => void;
+  onMaximise?: (leaf: Leaf<T>) => void;
   canPopOut?: (leaf: Leaf<T>) => boolean;
   onDrop?: (leaf: Leaf<any>, root: Leaf<T>) => void;
 };
@@ -103,6 +104,7 @@ export function ViewLeaf<T>({
   onChange,
   onClose,
   onPopOut,
+  onMaximise,
   canPopOut,
   depth = 0,
   onSwap,
@@ -155,16 +157,9 @@ export function ViewLeaf<T>({
               onSplitVertical={() => handleSplit("vertical")}
               onPopOut={() => {
                 onPopOut?.(root);
-                onChange?.(
-                  transaction(root, (draft) => ({
-                    ...draft,
-                    key: nanoid(),
-                    type: "leaf",
-                    acceptDrop: true,
-                    //TODO: refactor
-                    content: { type: "" } as any,
-                  }))
-                );
+              }}
+              onMaximise={() => {
+                onMaximise?.(root);
               }}
               popOutDisabled={!canPopOut?.(root)}
             />

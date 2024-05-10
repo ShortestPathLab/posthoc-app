@@ -91,8 +91,6 @@ async function parse({
     out.push({ transient, persistent });
   }
 
-  console.log(JSON.stringify(out));
-
   return {
     stepsPersistent: map(out, "persistent").map((c) => filter(c, isVisible)),
     stepsTransient: map(out, "transient").map((c) => filter(c, isVisible)),

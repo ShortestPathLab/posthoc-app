@@ -4,7 +4,7 @@ import {
   LayersOutlined,
   TimesOneMobiledataOutlined,
 } from "@mui/icons-material";
-import { Box, Divider, Stack, SxProps, Theme, useTheme } from "@mui/material";
+import { Box, Divider, Stack, SxProps, Theme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 import { Flex } from "components/generic/Flex";
@@ -55,12 +55,11 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   const [renderers] = useRenderers();
   const paper = usePaper();
   const acrylic = useAcrylic();
-  const theme = useTheme();
   const [{ layers }] = useLayers();
   const [layerSet, setLayerSet] = useState<Dictionary<boolean | undefined>>({});
   const selectedLayers = useMemo(
     () => filter(layers, (l) => layerSet?.[l.key] ?? true),
-    [layerSet, layers]
+    [layerSet, layers, layers?.length]
   );
 
   const [rendererInstance, setRendererInstance] =
@@ -85,6 +84,8 @@ export function ViewportPage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Key>viewport</Page.Key>
+
       <Page.Title>Viewport</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>

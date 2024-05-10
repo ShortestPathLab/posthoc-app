@@ -47,7 +47,7 @@ export function ConnectionsService() {
       aborted = true;
       cs.map((c) => c.transport().disconnect());
     };
-  }, [remote, setConnections, notify, usingLoadingState]);
+  }, [JSON.stringify(remote), setConnections, notify, usingLoadingState]);
 
   return <></>;
 }

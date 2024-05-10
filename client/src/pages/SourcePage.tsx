@@ -53,6 +53,8 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Key>source</Page.Key>
+
       <Page.Title>Source</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>

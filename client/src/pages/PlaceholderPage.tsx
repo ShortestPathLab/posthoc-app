@@ -7,12 +7,11 @@ export function PlaceholderPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Key>{""}</Page.Key>
+
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Placeholder
-          label="Empty Panel"
-          secondary="Choose a view to populate this panel."
-        />
+        <Placeholder label="Empty view" />
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

@@ -1,16 +1,19 @@
+import { FullscreenOutlined } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
 import { useSidebarBackground } from "Sidebar";
 import { Flex } from "components/generic/Flex";
+import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
 import { Scroll } from "components/generic/Scrollbars";
-import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { withSlots } from "react-slot-component";
 import { useAcrylic } from "theme";
-import { PageSlots, PageProps, divider } from "./Page";
+import { PageProps, PageSlots, divider } from "./Page";
+import { useUIState } from "slices/UIState";
 
 export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
   const bg = useSidebarBackground();
   const acrylic = useAcrylic(bg);
+  const [, setUIState] = useUIState();
   return (
     <ErrorBoundary
       fallback={
@@ -72,6 +75,23 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
                 )}
               </Flex>
             </Scroll>
+            <IconButtonWithTooltip
+              onClick={() => {
+                setUIState(() => ({
+                  fullscreenModal: slotProps.Key?.children,
+                  sidebarOpen: false,
+                }));
+              }}
+              size="small"
+              sx={{ m: 1 }}
+              icon={
+                <FullscreenOutlined
+                  sx={{ color: "text.secondary" }}
+                  fontSize="small"
+                />
+              }
+              label="Maximise"
+            ></IconButtonWithTooltip>
           </Flex>
         </Flex>
       </Flex>

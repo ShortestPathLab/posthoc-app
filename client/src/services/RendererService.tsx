@@ -53,7 +53,7 @@ export function RendererService() {
       }
     }
     setRenderers(() => rs);
-  }, [renderer, setRenderers]);
+  }, [JSON.stringify(renderer), setRenderers]);
 
   return <></>;
 }

@@ -20,6 +20,7 @@ import PopupState, { bindPopover } from "material-ui-popup-state";
 import { usePanel } from "./ScrollPanel";
 
 import { merge } from "lodash";
+import { PopupState as State } from "material-ui-popup-state/hooks";
 import {
   cloneElement,
   ComponentProps,
@@ -30,10 +31,10 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useUIState } from "slices/UIState";
 import { useAcrylic, usePaper } from "theme";
 import { Scroll } from "./Scrollbars";
 import Swipe from "./Swipe";
-import { PopupState as State } from "material-ui-popup-state/hooks";
 
 export function AppBarTitle({ children }: { children?: ReactNode }) {
   return <Typography variant="h6">{children}</Typography>;
@@ -170,8 +171,6 @@ export function ModalAppBar({
   );
 }
 
-let stack = 0;
-
 export default function Modal({
   children,
   actions,
@@ -181,6 +180,7 @@ export default function Modal({
   scrollable = true,
   ...props
 }: Props & ComponentProps<typeof Dialog>) {
+  const [uiState, setUIState] = useUIState();
   const [content, setContent] = useState<ReactNode | undefined>(undefined);
   useEffect(() => {
     if (children) setContent(children);
@@ -194,14 +194,19 @@ export default function Modal({
   const [childHeight, setChildHeight] = useState(0);
   const [depth, setDepth] = useState(0);
   useEffect(() => {
-    if (sm && props.open) {
-      stack += 1;
-      setDepth(stack);
+    if (props.open) {
+      let depth = 0;
+      setUIState((prev) => {
+        //TODO: Fix side effect
+        depth = prev.depth!;
+        return { depth: prev.depth! + 1 };
+      });
+      setDepth(depth + 1);
       return () => {
-        stack -= 1;
+        setUIState((prev) => ({ depth: prev.depth! - 1 }));
       };
     }
-  }, [sm, setDepth, props.open]);
+  }, [setUIState, setDepth, props.open]);
 
   const mt = 95 - 5 * depth;
 

@@ -35,6 +35,7 @@ export type PageProps = {
 };
 
 export type PageSlots = {
+  Key: { children: string };
   Title: {
     children: React.ReactNode;
   };

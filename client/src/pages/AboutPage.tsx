@@ -109,6 +109,8 @@ export function AboutPage({ template: Page }: PageContentProps) {
   }
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Key>about</Page.Key>
+
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex>

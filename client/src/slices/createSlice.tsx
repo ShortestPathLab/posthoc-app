@@ -5,12 +5,19 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useReducer,
   useState,
 } from "react";
 import { useAsync, useGetSet } from "react-use";
 import { Reducer, merge } from "./reducers";
+import { nanoid } from "nanoid";
 
-type Slice<T, U = T> = [T, (next: (prev: T) => U) => void, boolean];
+type Slice<T, U = T> = [
+  T,
+  (next: (prev: T) => U, dontCommit?: boolean) => void,
+  boolean,
+  string
+];
 
 type Options<T, U> = {
   init?: () => Promise<U | undefined>;
@@ -22,7 +29,12 @@ export function createSlice<T, U = T>(
   initialState: T,
   { init, effect, reduce = merge }: Options<T, U> = {}
 ) {
-  const Store = createContext<Slice<T, U>>([initialState, noop, false]);
+  const Store = createContext<Slice<T, U>>([
+    initialState,
+    noop,
+    false,
+    nanoid(),
+  ]);
   return [
     // Hook
     () => useContext(Store),
@@ -30,17 +42,19 @@ export function createSlice<T, U = T>(
     ({ children }: { children?: ReactNode }) => {
       const [initialised, setInitialised] = useState(false);
       const [get, set] = useGetSet(initialState);
+      const [commit, reduceCommit] = useReducer(() => nanoid(), nanoid());
       const reduceSlice = useCallback(
-        (n: (prev: T) => U) => {
+        (n: (prev: T) => U, c?: boolean) => {
           const next = reduce(get(), n(get()));
           effect?.({ prev: get(), next });
+          if (!c) reduceCommit?.();
           set(next);
         },
-        [get]
+        [get, reduceCommit]
       );
       const slice = useMemo<Slice<T, U>>(
-        () => [get(), reduceSlice, initialised],
-        [get(), reduceSlice, initialised]
+        () => [get(), reduceSlice, initialised, commit],
+        [get(), reduceSlice, initialised, commit]
       );
       useAsync(async () => {
         const r = await init?.();

@@ -10,13 +10,14 @@ import {
 } from "@mui/material";
 import interpolate from "color-interpolate";
 import { ViewTree } from "components/inspector/ViewTree";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { get, set, values } from "lodash";
+import { isMobile } from "mobile-device-detect";
 import { nanoid } from "nanoid";
 import { pages } from "pages";
 import { SidebarPage } from "pages/SidebarPage";
 import { produce } from "produce";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useSyncStatus } from "services/SyncService";
 import { useUIState } from "slices/UIState";
 import { PanelState, Root } from "slices/view";
 
@@ -39,7 +40,11 @@ const SIDEBAR = 0;
 const CONTENT = 1;
 
 export function useSidebarState() {
-  const [open, setOpen] = useState(false);
+  const [{ sidebarOpen: open }, setUIState] = useUIState();
+  const setOpen = useCallback(
+    (e: boolean) => setUIState(() => ({ sidebarOpen: e })),
+    [setUIState]
+  );
   const [root, setRoot] = useState(defaultRoot);
   const produceRoot = (f: (obj: Root<PanelState | undefined>) => void) =>
     setRoot(produce(root, f));
@@ -85,21 +90,24 @@ export function useSidebarBackground() {
 }
 
 export function Sidebar({ children }: { children?: ReactNode }) {
+  const { isPrimary } = useSyncStatus();
   const { Content, produceRoot, root, setRoot, setOpen, tab, open } =
     useSidebarState();
   const bgcolor = useSidebarBackground();
-  const sm = useSmallDisplay();
+  const sm2 = isMobile;
   useEffect(() => {
-    if (sm) {
+    if (sm2) {
       setOpen(false);
     }
-  }, [sm, setOpen]);
+  }, [sm2, setOpen]);
+  const sm = !isPrimary || sm2;
   const [, setUIState] = useUIState();
   return (
     <TabContext value={tab}>
       <Stack direction={sm ? "column-reverse" : "row"} sx={{ width: "100%" }}>
         <Stack
           sx={{
+            display: isPrimary ? "flex" : "none",
             direction: sm ? "row" : "column",
             width: sm ? "100%" : 64,
             height: sm ? 64 : "100%",

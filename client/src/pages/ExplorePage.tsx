@@ -30,17 +30,10 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
 import { chain as _, entries, first, map, round, upperCase } from "lodash";
-import PopupState from "material-ui-popup-state";
 import memoizee from "memoizee";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { docs, name } from "public/manifest.json";
-import {
-  CSSProperties,
-  ComponentProps,
-  ReactNode,
-  useMemo,
-  useState,
-} from "react";
+import { CSSProperties, ReactNode, useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useLoadingState } from "slices/loading";
 import { useSettings } from "slices/settings";
@@ -49,6 +42,7 @@ import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/Button";
 import { PageContentProps } from "./PageMeta";
 import { ColorTranslator } from "colortranslator";
+import { Image } from "./Image";
 const paths = import.meta.glob("/public/recipes/*.workspace", {
   as: "url",
 });
@@ -130,20 +124,6 @@ function getAuthor(s?: string): {
     return { name: s, avatar: makeAvatar(s[0]) };
   }
   return { name: "No author", avatar: makeAvatar() };
-}
-
-export function Image(props: ComponentProps<"img">) {
-  return (
-    <PopupState variant="popover">
-      {({ open, isOpen }) => (
-        <>
-          <Fade in={isOpen}>
-            <img {...props} onLoad={open}></img>
-          </Fade>
-        </>
-      )}
-    </PopupState>
-  );
 }
 
 const ellipsisProps = {
@@ -279,7 +259,7 @@ export function FeatureCard({
                 }}
               >
                 {loading
-                  ? map([80, 30], (v) => <Skeleton width={`${v}%`} />)
+                  ? map([80, 30], (v) => <Skeleton key={v} width={`${v}%`} />)
                   : description || "No description"}
               </Type>
               <Stack direction="row" alignItems="center" gap={1}>
@@ -386,6 +366,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
         <Page.Title>Explore</Page.Title>
+        <Page.Key>explore</Page.Key>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
           <TabList

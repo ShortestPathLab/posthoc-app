@@ -52,6 +52,8 @@ export function DebugPage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
+        <Page.Key>debug</Page.Key>
+
         <Page.Title>Debugger</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>

@@ -11,7 +11,6 @@ import {
   Typography as Type,
   Typography,
 } from "@mui/material";
-import { ColorTranslator } from "colortranslator";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Button } from "components/generic/Button";
 import { Flex } from "components/generic/Flex";
@@ -20,10 +19,12 @@ import { AppBarTitle, ManagedModal } from "components/generic/Modal";
 import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
 import { useViewTreeContext } from "components/inspector/ViewTree";
+import { shades } from "components/renderer/colors";
 import { mapParsers } from "components/renderer/map-parser";
 import { RendererListEditor } from "components/settings-editor/RendererListEditor";
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
-import { keys, map, sortBy, startCase } from "lodash";
+import { useSmallDisplay } from "hooks/useSmallDisplay";
+import { keys, map, startCase } from "lodash";
 import { ReactNode, useState } from "react";
 import { useBusyState } from "slices/busy";
 import {
@@ -31,16 +32,19 @@ import {
   defaults,
   useSettings,
 } from "slices/settings";
-import { AccentColor, accentColors, getShade } from "theme";
+import { AccentColor, getShade } from "theme";
 import { wait } from "utils/timed";
 import { AboutContent } from "./AboutPage";
 import { PageContentProps } from "./PageMeta";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
+import { useUIState } from "slices/UIState";
+import { useSnackbar } from "components/generic/Snackbar";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
   const sm = useSmallDisplay();
+  const [UIState, setUIState] = useUIState();
+  const push = useSnackbar();
   const usingBusyState = useBusyState("reset");
   const [
     {
@@ -78,6 +82,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
+        <Page.Key>settings</Page.Key>
+
         <Page.Title>Settings</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
@@ -143,29 +149,23 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                         <FeaturePicker
                           paper
                           value={accentColor}
-                          items={map(
-                            sortBy(
-                              keys(accentColors) as AccentColor[],
-                              (c) => new ColorTranslator(getShade(c, theme)).H
+                          items={map(shades, (c) => ({
+                            id: c,
+                            name: startCase(c),
+                            icon: (
+                              <Box>
+                                <Box
+                                  sx={{
+                                    ml: 0.5,
+                                    width: 12,
+                                    height: 12,
+                                    backgroundColor: getShade(c, theme),
+                                    borderRadius: 4,
+                                  }}
+                                />
+                              </Box>
                             ),
-                            (c) => ({
-                              id: c,
-                              name: startCase(c),
-                              icon: (
-                                <Box>
-                                  <Box
-                                    sx={{
-                                      ml: 0.5,
-                                      width: 12,
-                                      height: 12,
-                                      backgroundColor: getShade(c, theme),
-                                      borderRadius: 4,
-                                    }}
-                                  />
-                                </Box>
-                              ),
-                            })
-                          )}
+                          }))}
                           arrow
                           onChange={(v) =>
                             setSettings(() => ({
@@ -235,8 +235,11 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                                     await wait(300);
                                     setSettings(() => defaults);
                                     close();
-                                    location.reload();
-                                    await wait(Number.MAX_SAFE_INTEGER);
+                                    setUIState(() => ({
+                                      sidebarOpen: false,
+                                      fullscreenModal: undefined,
+                                    }));
+                                    push("Reset complete");
                                   }, "Resetting settings and extensions");
                                 }}
                                 color="error"

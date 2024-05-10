@@ -16,7 +16,7 @@ export type Renderer = {
   disabled?: boolean;
 };
 
-type Settings = {
+export type Settings = {
   remote?: Remote[];
   renderer?: Renderer[];
   "playback/playbackRate"?: number;

@@ -1,28 +1,29 @@
 import {
+  amber,
+  blue,
+  deepPurple,
+  green,
+  orange,
+  pink,
+  red,
+} from "@mui/material/colors";
+import { ColorTranslator } from "colortranslator";
+import {
   Dictionary,
   entries,
+  keys,
   lowerCase,
   mapValues,
+  sortBy,
   thru,
   values,
 } from "lodash";
 import { EventTypeColors } from "protocol";
 import { TraceEventType } from "protocol/Trace";
-import {
-  blue,
-  deepPurple,
-  green,
-  grey,
-  orange,
-  pink,
-  red,
-  amber,
-} from "@mui/material/colors";
-import { accentColors } from "theme";
-import md5 from "md5";
+import { AccentColor, accentColors, getShade } from "theme";
 
 function hash(str: string) {
-  var hash = 5381,
+  let hash = 5381,
     i = str.length;
 
   while (i) {
@@ -73,6 +74,11 @@ export const colorsHex: EventTypeColors = {
 export const colors: { [K in TraceEventType]: number } = mapValues(
   colorsHex,
   hex
+);
+
+export const shades = sortBy(
+  keys(accentColors) as AccentColor[],
+  (c) => new ColorTranslator(getShade(c, "dark")).H
 );
 
 export function getColor(key?: TraceEventType) {

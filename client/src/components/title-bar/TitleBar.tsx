@@ -1,21 +1,33 @@
-import { OpenInNewOutlined, SearchOutlined } from "@mui/icons-material";
+import {
+  OpenInNewOutlined,
+  SearchOutlined,
+  WorkspacesOutlined,
+} from "@mui/icons-material";
 import {
   Box,
   ButtonBase,
+  Chip,
+  Collapse,
   Divider,
   Menu,
   MenuItem,
   MenuList,
   Stack,
+  Tooltip,
   Typography as Type,
+  alpha,
+  useTheme,
 } from "@mui/material";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
+import { shades } from "components/renderer/colors";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
+import { useTitleBar } from "hooks/useTitleBar";
 import { useWorkspace } from "hooks/useWorkspace";
-import { isBoolean, startCase } from "lodash";
+import { get, startCase } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
+import { isMobile } from "mobile-device-detect";
 import { nanoid as id } from "nanoid";
 import logo from "public/logo512.png";
 import { changelog, docs, repository, version } from "public/manifest.json";
@@ -26,9 +38,15 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useSyncStatus } from "services/SyncService";
 import { getDefaultViewTree, useView } from "slices/view";
+import { getShade } from "theme";
 import { ExportWorkspaceModal } from "./ExportWorkspaceModal";
-import { usePrevious } from "react-use";
+import { openWindow } from "./window";
+
+const canOpenWindows = !isMobile;
+
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 function MenuEntry({
   startIcon,
@@ -69,27 +87,77 @@ export function useTitleBarVisible() {
   return visible;
 }
 
+const WorkspaceChip = () => {
+  const theme = useTheme();
+  const { index, isPrimary, participants, peers } = useSyncStatus();
+  const shade = shades[((index + 1) * 2) % shades.length];
+  const a = alphabet[index];
+  const color = getShade(shade, theme.palette.mode);
+  return (
+    <Tooltip
+      title={`${isPrimary ? "Primary" : "Secondary"} window, ${
+        participants.length + 1
+      } in group`}
+    >
+      <Collapse
+        in={!!peers.length}
+        orientation="horizontal"
+        sx={{ ml: "0px !important", overflow: "hidden" }}
+      >
+        <Chip
+          size="small"
+          icon={<WorkspacesOutlined sx={{ color: `${color} !important` }} />}
+          sx={{
+            ml: 1,
+            flex: 0,
+            WebkitAppRegion: "no-drag",
+            color: color,
+            background: alpha(color, 0.08),
+          }}
+          label={`Group ${a}`}
+        />
+      </Collapse>
+    </Tooltip>
+  );
+};
+
+export const TitleBarPlaceholder = () => {
+  const visible = useTitleBarVisible();
+  const { palette } = useTheme();
+  const color = palette.background.default;
+  useTitleBar(color);
+  return (
+    <Box
+      sx={{
+        bgcolor: "background.default",
+        minHeight: 36,
+        width: "100%",
+        height: visible ? "env(titlebar-area-height, 50px)" : 0,
+      }}
+    />
+  );
+};
+
 export const TitleBar = () => {
-  const push = useSnackbar();
+  const { palette } = useTheme();
+  const color = palette.background.default;
+  useTitleBar(color);
+  // const push = useSnackbar();
   const { save, load } = useWorkspace();
   const visible = useTitleBarVisible();
   const [, setView] = useView();
-  const sm = useSmallDisplay();
-  const prevSm = usePrevious(sm);
-  useEffect(() => {
-    if (isBoolean(prevSm)) {
-      if (sm) {
-        push(
-          "Do you want to reset layout?",
-          "Window size changed significantly",
-          {
-            actionLabel: "Reset layout",
-            action: () => setView(getDefaultViewTree),
-          }
-        );
-      }
-    }
-  }, [sm, prevSm, setView]);
+  // const sm = useSmallDisplay();
+  // const prevSm = usePrevious(sm);
+  // useEffect(() => {
+  //   if (isBoolean(prevSm)) {
+  //     if (sm) {
+  //       push("Do you want to reset layout?", "Window size is small", {
+  //         actionLabel: "Reset layout",
+  //         action: () => setView(getDefaultViewTree),
+  //       });
+  //     }
+  //   }
+  // }, [sm, prevSm, setView]);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   function handleOpenPanel(orientation: "horizontal" | "vertical") {
     setView(({ view }) => {
@@ -112,6 +180,7 @@ export const TitleBar = () => {
       };
     });
   }
+
   return (
     <>
       <Box
@@ -145,20 +214,29 @@ export const TitleBar = () => {
               >
                 <img src={logo} style={{ height: "100%" }} />
               </Box>
+              {<WorkspaceChip />}
               {[
                 {
                   key: "view",
                   items: [
                     {
+                      disabled: !canOpenWindows,
+                      key: "panel-new-window",
+                      type: "action",
+                      name: "New window",
+                      action: () => openWindow(),
+                    },
+                    { type: "divider" },
+                    {
                       type: "action",
                       key: `panel-new-right`,
-                      name: "Add panel to the right",
+                      name: "Add view to the right",
                       action: () => handleOpenPanel("horizontal"),
                     },
                     {
                       type: "action",
                       key: `panel-new-bottom`,
-                      name: "Add panel below",
+                      name: "Add view below",
                       action: () => handleOpenPanel("vertical"),
                     },
                     { type: "divider" },
@@ -168,6 +246,18 @@ export const TitleBar = () => {
                       key: "panel-reset",
                       action: () => setView(getDefaultViewTree),
                     },
+                    {
+                      type: "action",
+                      name: "Reload window",
+                      key: "panel-reload",
+                      action: () => location.reload(),
+                    },
+                    // {
+                    //   type: "action",
+                    //   name: "New workspace",
+                    //   action: () =>
+                    //     openWindow({ linked: false, minimal: false }),
+                    // },
                   ],
                 },
                 {
@@ -185,6 +275,7 @@ export const TitleBar = () => {
                       key: "workspace-save",
                       action: save,
                     },
+                    { type: "divider" },
                     {
                       type: "action",
                       name: (
@@ -232,6 +323,7 @@ export const TitleBar = () => {
                               const { name, key, action } = item;
                               return (
                                 <MenuItem
+                                  disabled={get(item, "disabled")}
                                   key={key}
                                   onClick={() => {
                                     action?.();
@@ -248,6 +340,7 @@ export const TitleBar = () => {
                         </MenuList>
                       </Menu>
                       <FeaturePickerButton
+                        key={key}
                         {...bindTrigger(state)}
                         sx={{
                           WebkitAppRegion: "no-drag",

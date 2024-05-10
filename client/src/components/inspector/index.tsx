@@ -1,6 +1,7 @@
 import { Box, Fade, LinearProgress } from "@mui/material";
 import { Sidebar } from "Sidebar";
 import { Flex, FlexProps } from "components/generic/Flex";
+import { openWindow } from "components/title-bar/window";
 import { pages } from "pages";
 import { Page } from "pages/Page";
 import { PlaceholderPage } from "pages/PlaceholderPage";
@@ -10,7 +11,6 @@ import { PanelState, useView } from "slices/view";
 import { FileDropZone } from "./FileDropZone";
 import { FullscreenModalHost } from "./FullscreenModalHost";
 import { FullscreenProgress } from "./FullscreenProgress";
-import { Placeholder } from "./Placeholder";
 import { ViewTree } from "./ViewTree";
 
 type SpecimenInspectorProps = Record<string, any> & FlexProps;
@@ -19,15 +19,19 @@ export function Inspector(props: SpecimenInspectorProps) {
   const loading = useAnyLoading();
   const [{ view }, setView] = useView();
   const [, setUIState] = useUIState();
-
   return (
     <>
       <Flex {...props}>
         <Sidebar>
           <ViewTree<PanelState>
-            onPopOut={(leaf) =>
-              setUIState(() => ({ fullscreenModal: leaf.content?.type }))
-            }
+            onPopOut={(leaf) => {
+              openWindow({
+                page: leaf.content?.type,
+              });
+            }}
+            onMaximise={(leaf) => {
+              setUIState(() => ({ fullscreenModal: leaf.content?.type }));
+            }}
             canPopOut={(leaf) => !!pages[leaf.content!.type!]?.allowFullscreen}
             root={view}
             onChange={(v) => setView(() => ({ view: v }))}

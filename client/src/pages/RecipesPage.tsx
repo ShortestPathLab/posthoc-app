@@ -63,6 +63,8 @@ export function RecipesPage({ template: Page }: PageContentProps) {
 
   return (
     <Page onChange={onChange} stack={state}>
+      <Page.Key>recipes</Page.Key>
+
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Flex vertical>

@@ -1,20 +1,19 @@
-import { CssBaseline } from "@mui/material";
 import App from "App";
 import "index.css";
 import "overlayscrollbars/overlayscrollbars.css";
 import { createRoot } from "react-dom/client";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { UIStateProvider } from "slices/UIState";
+import { BusyProvider } from "slices/busy";
 import { ConnectionsProvider } from "slices/connections";
 import { FeaturesProvider } from "slices/features";
+import { LayersProvider } from "slices/layers";
 import { LoadingProvider } from "slices/loading";
 import { LogProvider } from "slices/log";
 import { RendererProvider } from "slices/renderers";
-import { SettingsProvider } from "slices/settings";
-import { LayersProvider } from "slices/layers";
-import { ViewProvider } from "slices/view";
-import { BusyProvider } from "slices/busy";
 import { ScreenshotsProvider } from "slices/screenshots";
+import { SettingsProvider } from "slices/settings";
+import { ViewProvider } from "slices/view";
 
 const root = createRoot(document.getElementById("root")!);
 
@@ -33,9 +32,7 @@ const slices = [
 ];
 
 root.render(
-  <CssBaseline>
-    <EnvironmentProvider slices={slices}>
-      <App />
-    </EnvironmentProvider>
-  </CssBaseline>
+  <EnvironmentProvider slices={slices}>
+    <App />
+  </EnvironmentProvider>
 );

@@ -42,17 +42,27 @@ type WorkspaceMetaState = {
   workspaceMeta: WorkspaceMeta;
 };
 
-type FullscreenModalState = {
-  fullscreenModal?: keyof typeof pages;
+type SidebarState = {
+  sidebarOpen: boolean;
 };
 
-export type UIState = BusyState & WorkspaceMetaState & FullscreenModalState;
+type FullscreenModalState = {
+  fullscreenModal?: keyof typeof pages;
+  depth?: number;
+};
+
+export type UIState = BusyState &
+  WorkspaceMetaState &
+  FullscreenModalState &
+  SidebarState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
   Partial<UIState>
 >({
+  sidebarOpen: false,
   busy: {},
+  depth: 0,
   fullscreenModal: undefined,
   workspaceMeta: {
     id: id(),

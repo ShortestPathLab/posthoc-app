@@ -1,8 +1,9 @@
 import {
   CloseOutlined,
+  FullscreenOutlined,
   MoreVertOutlined as MoreIcon,
-  ViewAgendaOutlined as SplitIcon,
   OpenInNewOutlined as PopOutIcon,
+  ViewAgendaOutlined as SplitIcon,
 } from "@mui/icons-material";
 import {
   Box,
@@ -25,6 +26,7 @@ type ViewControlsProps = {
   onSplitVertical?: () => void;
   onSplitHorizontal?: () => void;
   onClose?: () => void;
+  onMaximise?: () => void;
   onPopOut?: () => void;
 };
 
@@ -36,6 +38,7 @@ export function ViewControls({
   splitHorizontalDisabled,
   splitVerticalDisabled,
   onPopOut,
+  onMaximise,
   popOutDisabled,
 }: ViewControlsProps) {
   return (
@@ -45,7 +48,7 @@ export function ViewControls({
           <MuiStack sx={{ m: 1 }}>
             <Tooltip title="Panel Options">
               <IconButton size="small" {...bindTrigger(state)}>
-                <MoreIcon fontSize="small" />
+                <MoreIcon fontSize="small" sx={{ color: "text.secondary" }} />
               </IconButton>
             </Tooltip>
           </MuiStack>
@@ -65,7 +68,7 @@ export function ViewControls({
               <ListItemIcon>
                 <SplitIcon fontSize="small" />
               </ListItemIcon>
-              <ListItemText>Split Vertical</ListItemText>
+              <ListItemText>Split vertical</ListItemText>
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -80,25 +83,49 @@ export function ViewControls({
                   sx={{ transform: "rotate(90deg)" }}
                 />
               </ListItemIcon>
-              <ListItemText>Split Horizontal</ListItemText>
+              <ListItemText>Split horizontal</ListItemText>
             </MenuItem>
             <Divider />
             {!popOutDisabled && (
               <Box>
                 <MenuItem
+                  disabled={closeDisabled || popOutDisabled}
                   onClick={() => {
                     onPopOut?.();
+                    onClose?.();
                     state.close();
                   }}
                 >
                   <ListItemIcon>
                     <PopOutIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText>Pop Out</ListItemText>
+                  <ListItemText>Move to new window</ListItemText>
+                </MenuItem>
+                <MenuItem
+                  disabled={popOutDisabled}
+                  onClick={() => {
+                    onPopOut?.();
+                    state.close();
+                  }}
+                >
+                  <ListItemIcon></ListItemIcon>
+                  <ListItemText>Duplicate to new window</ListItemText>
                 </MenuItem>
                 <Divider />
               </Box>
             )}
+            <MenuItem
+              onClick={() => {
+                onMaximise?.();
+                state.close();
+              }}
+            >
+              <ListItemIcon>
+                <FullscreenOutlined />
+              </ListItemIcon>
+              <ListItemText>Maximise</ListItemText>
+            </MenuItem>
+            <Divider />
             <MenuItem
               onClick={() => {
                 onClose?.();
@@ -109,7 +136,7 @@ export function ViewControls({
               <ListItemIcon>
                 <CloseOutlined fontSize="small" />
               </ListItemIcon>
-              <ListItemText>Close Panel</ListItemText>
+              <ListItemText>Close</ListItemText>
             </MenuItem>
           </Menu>
         </>

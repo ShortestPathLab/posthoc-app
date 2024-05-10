@@ -3,10 +3,12 @@ import { useSnackbar } from "components/generic/Snackbar";
 import { join, truncate } from "lodash";
 import { useEffect } from "react";
 
+const captureOn = false;
+
 export function LogCaptureService() {
   const notify = useSnackbar();
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (captureOn && import.meta.env.DEV) {
       const cc = new CaptureConsole();
       cc.start(true);
       const interval = setInterval(() => {

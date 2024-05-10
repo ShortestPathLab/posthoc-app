@@ -1,6 +1,7 @@
 import { nanoid as id } from "nanoid";
 import { createSlice } from "./createSlice";
 import { once } from "lodash";
+import { minimal, page } from "services/SyncParticipant";
 
 export type Node = { size?: number; key: string; hidden?: boolean };
 
@@ -30,7 +31,19 @@ const isSm = () => window.innerWidth < 640;
 export const [useView, ViewProvider] = createSlice<
   ViewTreeState,
   Partial<ViewTreeState>
->(getDefaultViewTree());
+>(
+  minimal
+    ? {
+        view: {
+          key: id(),
+          type: "leaf",
+          size: 100,
+          acceptDrop: true,
+          content: { type: page },
+        },
+      }
+    : getDefaultViewTree()
+);
 
 export function getDefaultViewTree(): ViewTreeState {
   return isSm()
