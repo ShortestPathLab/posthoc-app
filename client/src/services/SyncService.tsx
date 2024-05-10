@@ -1,11 +1,11 @@
 import { useEffectWhen } from "hooks/useEffectWhen";
-import { useEffect, useSyncExternalStore } from "react";
+import { throttle } from "lodash";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { usePrevious } from "react-use";
 import { Layers, useLayers } from "slices/layers";
 import { Settings, useSettings } from "slices/settings";
 import sysend from "sysend";
 import { instance, participant } from "./SyncParticipant";
-import { usePrevious } from "react-use";
-import { merge } from "lodash";
 
 export function useSyncStatus() {
   return useSyncExternalStore(
@@ -30,7 +30,6 @@ export function SyncService() {
   const {
     isPrimary,
     isOnly,
-    loading,
     participants: participants,
     peers,
   } = useSyncStatus();
@@ -50,7 +49,7 @@ export function SyncService() {
         participants.includes(initiator) &&
         c3 !== c2
       )
-        setLayers((prev) => merge(prev, state.layers ?? prev), true);
+        setLayers((prev) => state.layers ?? prev, true);
     });
     return () => {
       sysend.off("settings");
@@ -72,11 +71,20 @@ export function SyncService() {
     [c1, peers.length]
   );
   const previous = usePrevious(c2);
+  const broadCastLayers = useMemo(
+    () =>
+      throttle(
+        (...args: Parameters<typeof sysend.broadcast<SyncedData>>) =>
+          sysend.broadcast(...args),
+        300
+      ),
+    []
+  );
   // Any changes
   useEffectWhen(
     () => {
       if (previous && participants.length) {
-        sysend.broadcast<SyncedData>("layers", {
+        broadCastLayers("layers", {
           initiator: instance,
           state: { layers },
           commit: c2,
@@ -90,7 +98,7 @@ export function SyncService() {
   useEffectWhen(
     () => {
       if (!isOnly && isPrimary) {
-        sysend.broadcast<SyncedData>("layers", {
+        broadCastLayers("layers", {
           initiator: instance,
           state: { layers },
           commit: c2,

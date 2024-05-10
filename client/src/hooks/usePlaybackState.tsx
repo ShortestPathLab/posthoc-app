@@ -51,6 +51,8 @@ export function usePlaybackState(key?: string) {
       canStepBackward: ready && !playing && step > 0,
     };
 
+    console.log(layer);
+
     const pause = (n = 0) => {
       // notify("Playback paused");
       setPlaybackState({ playback: "paused", step: stepBy(n) });

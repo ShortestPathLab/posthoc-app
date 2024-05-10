@@ -62,6 +62,7 @@ function App() {
         <Fade in>
           <Stack
             sx={{
+              WebkitAppRegion: "drag",
               background: (t) => t.palette.background.paper,
               width: "100vw",
               height: "100vh",

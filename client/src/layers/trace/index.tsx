@@ -258,10 +258,11 @@ export const controller = {
       view: "main",
     });
     useEffect(() => {
-      produce((l) =>
-        set(l, "source.playbackTo", trace?.content?.events?.length ?? 0)
-      );
-    }, [trace?.content?.events?.length]);
+      produce((l) => {
+        console.log(trace?.content?.events?.length);
+        return set(l, "source.playbackTo", trace?.content?.events?.length ?? 0);
+      });
+    }, [trace?.key, trace?.lastModified]);
     useEffectWhen(
       async () => {
         const parsedTrace = await parseTrace();
