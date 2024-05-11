@@ -219,7 +219,19 @@ export class D2RendererWorker extends EventEmitter<
     this.#getRenderQueue()();
   }
 
+  loadFont = once(async () => {
+    const fontFace = new FontFace(
+      "Inter",
+      "local('Inter'), local('Inter UI'), url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2) format('woff2')"
+    );
+    // add it to the list of fonts our worker supports
+    self.fonts.add(fontFace);
+    // load the font
+    await fontFace.load();
+  });
+
   async render() {
+    await this.loadFont();
     for (const { tile, bounds } of getTiles(
       this.#frustum,
       this.#options.tileSubdivision

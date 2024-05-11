@@ -259,7 +259,6 @@ export const controller = {
     });
     useEffect(() => {
       produce((l) => {
-        console.log(trace?.content?.events?.length);
         return set(l, "source.playbackTo", trace?.content?.events?.length ?? 0);
       });
     }, [trace?.key, trace?.lastModified]);
