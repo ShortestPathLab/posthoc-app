@@ -2,7 +2,7 @@
 
 <br></br>
 
-![logo64](./docs/assets/22-09-2023/logo64.png)
+![logo64](./client/src/public/logo64.png)
 
 # Posthoc Visualiser
 
@@ -10,7 +10,7 @@
 
 **Posthoc** is a way to build quick-and-dirty visualisations ✨ for sequential decision-making algorithms, such as search algorithms 🚀.
 
-![Alt text](./docs/assets/screenshot.png)
+![Alt text](./client/src/public/screenshots/0.png)
 
 It's easy to get started.
 
