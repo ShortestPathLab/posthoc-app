@@ -3,7 +3,6 @@ import {
   clamp,
   constant,
   debounce,
-  defer,
   find,
   floor,
   forEach,
@@ -33,8 +32,8 @@ import {
 import {
   Body,
   D2WorkerEvent,
-  getTiles,
   defaultBounds,
+  getTiles,
   isValue,
 } from "./D2RendererWorker";
 import { D2RendererWorkerAdapter } from "./D2RendererWorkerAdapter";
@@ -151,8 +150,7 @@ class D2Renderer
 
   add(components: ComponentEntry<CompiledD2IntrinsicComponent>[]) {
     const id = nanoid();
-    map(this.#workers, (w) => w.call("add", [components, id]));
-    const bodies = map(components, ({ component, meta }) => ({
+    const bodies = components.map(({ component, meta }) => ({
       ...defaultBounds,
       ...pickBy(primitives[component.$].test(component), isValue),
       component,
@@ -160,12 +158,38 @@ class D2Renderer
       index: this.#next(),
     }));
     this.#system.load(bodies);
+    this.#workers?.forEach?.((w) => w.call("add", [components, id]));
     return () =>
-      defer(() => {
-        for (const c of bodies) this.#system.remove(c);
-        map(this.#workers, (w) => w.call("remove", [id]));
-      });
+      requestIdleCallback(
+        () => {
+          for (const c of bodies) this.#system.remove(c);
+          this.#workers?.forEach?.((w) => w.call("remove", [id]));
+        },
+        { timeout: this.#options.animationDuration }
+      );
   }
+
+  // add(components: ComponentEntry<CompiledD2IntrinsicComponent>[]) {
+  //   const id = nanoid();
+  //   const bodies = new Promise<any>((res) =>
+  //     requestIdleCallback(() => {
+  //       const bodies = components.map(this.getBounds);
+  //       this.#system.load(bodies);
+  //       map(this.#workers, (w) => w.call("add", [components, id]));
+  //       res(bodies);
+  //     })
+  //   );
+  //   return () =>
+  //     bodies.then((bodies) =>
+  //       requestIdleCallback(
+  //         () => {
+  //           for (const c of bodies) this.#system.remove(c);
+  //           map(this.#workers, (w) => w.call("remove", [id]));
+  //         },
+  //         { timeout: 300 }
+  //       )
+  //     );
+  // }
 
   setOptions(o: D2RendererOptions) {
     const options = { ...this.#options, ...o };

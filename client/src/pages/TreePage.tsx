@@ -420,6 +420,7 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const trace = layer?.source?.trace?.content;
   const lastModified = layer?.source?.trace?.lastModified;
+  const id = layer?.source?.trace?.key;
 
   // Reset tracked property
   useEffect(() => {
@@ -440,7 +441,10 @@ export function TreePage({ template: Page }: PageContentProps) {
     return { events, current: findLast(events, (c) => c.step <= step) };
   }, [selection, step]);
 
-  const params = useMemo(() => ({ trace, mode }), [lastModified, mode]);
+  const params = useMemo(
+    () => ({ trace, mode }),
+    [trace, id, lastModified, mode]
+  );
 
   const { result: tree, loading } = useTreeMemo(params, [params]);
 

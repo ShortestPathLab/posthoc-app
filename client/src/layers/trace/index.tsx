@@ -11,6 +11,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import interpolate from "color-interpolate";
 import { TracePicker } from "components/app-bar/Input";
 import {
   PlaybackLayerData,
@@ -30,8 +31,8 @@ import { TracePreview } from "components/layer-editor/TracePreview";
 import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { colorsHex, getColorHex } from "components/renderer/colors";
 import { parseProperty } from "components/renderer/parser-v140/parseProperty";
-import { parseProperty as parsePropertyLegacy } from "components/renderer/parser/parseProperty";
 import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
+import { parseProperty as parsePropertyLegacy } from "components/renderer/parser/parseProperty";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTraceSlave.worker";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { useEffectWhen } from "hooks/useEffectWhen";
@@ -59,13 +60,12 @@ import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";
 import { TraceEvent, Trace as TraceLegacy } from "protocol";
 import { Trace } from "protocol/Trace-v140";
-import { useEffect, useMemo } from "react";
+import { useDeferredValue, useEffect, useMemo } from "react";
 import { useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
 import { AccentColor, accentColors, getShade } from "theme";
 import { name } from "utils/path";
-import interpolate from "color-interpolate";
 
 const labelScale = 1.25;
 
@@ -284,7 +284,7 @@ export const controller = {
     const step = useThrottle(layer?.source?.step ?? 0, 1000 / 60);
 
     const path = use2DPath(layer, index, step);
-    const steps = useMemo(
+    const persistentSteps = useMemo(
       () =>
         map(parsedTrace?.stepsPersistent, (c) =>
           map(c, (d) =>
@@ -328,11 +328,11 @@ export const controller = {
         index,
       ]
     );
-    const steps2 = useMemo(() => [steps1[step] ?? []], [steps1, step]);
+    const transientSteps = useMemo(() => [steps1[step] ?? []], [steps1, step]);
     return (
       <>
-        <LazyNodeList step={step} nodes={steps} />
-        <NodeList nodes={steps2} />
+        <LazyNodeList end={step} nodes={persistentSteps} />
+        <NodeList nodes={transientSteps} />
         {path}
       </>
     );

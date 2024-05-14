@@ -26,7 +26,6 @@ import {
   startCase,
   truncate,
 } from "lodash";
-import { produce } from "produce";
 import {
   ForwardedRef,
   ReactNode,
@@ -82,7 +81,9 @@ function useDraft<T>(
   const [state, setState] = useState(initial);
   useEffect(() => {
     if (initial) {
-      setState(merge(state, omit(initial, ...stayDraft)));
+      requestIdleCallback(() =>
+        setState(merge(state, omit(initial, ...stayDraft)))
+      );
     }
   }, [setState, initial]);
   const handleChange = useMemo(
@@ -91,9 +92,10 @@ function useDraft<T>(
   );
   return [
     state,
-    (value: T) => {
-      setState(value);
-      handleChange(value);
+    (value: (prev: T) => T) => {
+      const next = value(state);
+      setState(next);
+      handleChange(next);
     },
   ] as const;
 }
@@ -221,19 +223,13 @@ function Component(
             variant="filled"
             label="Layer Name"
             defaultValue={draft.name ?? ""}
-            onChange={(e) =>
-              setDraft?.(produce(draft, (d) => set(d, "name", e.target.value)))
-            }
+            onChange={(e) => setDraft?.((d) => set(d, "name", e.target.value))}
           />
           <Box sx={{ mx: -2, pb: 1 }}>
             <Tabs
               variant="fullWidth"
               onChange={(_, v) =>
-                setDraft?.(
-                  produce(draft, (d) => {
-                    set(d, "source", { type: v });
-                  })
-                )
+                setDraft?.((d) => set(d, "source", { type: v }))
               }
               value={draft.source?.type ?? first(keys(layerHandlers)) ?? ""}
             >
@@ -247,7 +243,7 @@ function Component(
           {renderHeading("Source Options")}
           {draft.source?.type &&
             createElement(layerHandlers[draft.source.type].editor, {
-              onChange: (e) => setDraft(e(draft)),
+              onChange: setDraft,
               value: draft,
             })}
           {renderHeading("Layer Options")}
@@ -261,9 +257,7 @@ function Component(
               }))}
               value={draft.transparency ?? "0"}
               arrow
-              onChange={(e) =>
-                setDraft?.(produce(draft, (d) => set(d, "transparency", e)))
-              }
+              onChange={(e) => setDraft?.((d) => set(d, "transparency", e))}
             />
           )}
           {renderOption(
@@ -273,9 +267,7 @@ function Component(
               label="Display Mode"
               value={draft.displayMode ?? "source-over"}
               items={options(compositeOperations)}
-              onChange={(e) =>
-                setDraft?.(produce(draft, (d) => set(d, "displayMode", e)))
-              }
+              onChange={(e) => setDraft?.((d) => set(d, "displayMode", e))}
             />
           )}
         </Box>

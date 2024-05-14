@@ -6,7 +6,7 @@ import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { RenderLayer } from "layers/RenderLayer";
-import { clamp, find, map } from "lodash";
+import { clamp, find, floor, map } from "lodash";
 import { nanoid } from "nanoid";
 import { Size } from "protocol";
 import {
@@ -32,7 +32,8 @@ const tileSize = (playing: boolean = false) =>
 
 const rendererOptions = {
   tileSubdivision: 2,
-  workerCount: clamp(navigator.hardwareConcurrency - 1, 1, 12),
+  // Use 50% of available CPUs
+  workerCount: clamp(floor((navigator.hardwareConcurrency - 1) / 2), 1, 12),
   tileResolution: {
     width: tileSize(),
     height: tileSize(),

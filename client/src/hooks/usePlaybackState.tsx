@@ -46,7 +46,7 @@ export function usePlaybackState(key?: string) {
       step,
       canPlay: ready && !playing && step < end,
       canPause: ready && playing,
-      canStop: ready,
+      canStop: ready && step,
       canStepForward: ready && !playing && step < end,
       canStepBackward: ready && !playing && step > 0,
     };
@@ -81,6 +81,14 @@ export function usePlaybackState(key?: string) {
         }
       );
 
+    const findBreakpoint = (direction: 1 | -1 = 1) => {
+      let i;
+      for (i = step + direction; i <= end && i >= 0; i += direction) {
+        if (shouldBreak(i)?.result) break;
+      }
+      return i;
+    };
+
     const stepBy = (n: number) => clamp(step + n, start, end);
 
     const callbacks = {
@@ -94,6 +102,7 @@ export function usePlaybackState(key?: string) {
       stepForward: () => setPlaybackState({ step: stepBy(1) }),
       stepBackward: () => setPlaybackState({ step: stepBy(-1) }),
       tick,
+      findBreakpoint,
       stepWithBreakpointCheck,
     };
 

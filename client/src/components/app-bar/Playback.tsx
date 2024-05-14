@@ -6,7 +6,7 @@ import {
   PlayArrowOutlined as PlayIcon,
   ChevronLeftOutlined as PreviousIcon,
   SkipNextOutlined as SkipIcon,
-  StopOutlined as StopIcon,
+  SkipPreviousOutlined as StopIcon,
 } from "@mui/icons-material";
 import {
   Button,
@@ -91,10 +91,8 @@ export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
     play,
     stepBackward,
     stepForward,
-    stop,
-    stepWithBreakpointCheck,
+    findBreakpoint,
     step,
-    end,
     stepTo,
   } = usePlaybackState(layer?.key);
   const [stepInput, setStepInput] = useState("");
@@ -102,6 +100,14 @@ export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
   const parsedStepInputValid = !isNaN(parsedStepInput);
   return (
     <>
+      <IconButton
+        label="previous-breakpoint"
+        icon={<StopIcon />}
+        onClick={() => {
+          stepTo(findBreakpoint(-1));
+        }}
+        disabled={!canStop}
+      />
       <IconButton
         label="step-backward"
         icon={<PreviousIcon />}
@@ -131,16 +137,10 @@ export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
         disabled={!canStepForward}
       />
       <IconButton
-        label="stop"
-        icon={<StopIcon />}
-        onClick={stop}
-        disabled={!canStop}
-      />
-      <IconButton
-        label="step-to-next-breakpoint"
+        label="next-breakpoint"
         icon={<SkipIcon />}
         onClick={() => {
-          stepWithBreakpointCheck(end - step, 1);
+          stepTo(findBreakpoint());
         }}
         disabled={!canStepForward}
       />

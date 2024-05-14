@@ -1,5 +1,6 @@
 import App from "App";
 import "index.css";
+import { defer, set } from "lodash";
 import "overlayscrollbars/overlayscrollbars.css";
 import { createRoot } from "react-dom/client";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
@@ -14,6 +15,10 @@ import { RendererProvider } from "slices/renderers";
 import { ScreenshotsProvider } from "slices/screenshots";
 import { SettingsProvider } from "slices/settings";
 import { ViewProvider } from "slices/view";
+
+if (!("requestIdleCallback" in window)) {
+  set(window, "requestIdleCallback", (f: () => void) => defer(f));
+}
 
 const root = createRoot(document.getElementById("root")!);
 
