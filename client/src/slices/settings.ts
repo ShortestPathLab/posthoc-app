@@ -33,7 +33,7 @@ export const defaultRemotes = [
     key: "default-internal",
   },
   {
-    url: `https://cdn.jsdelivr.net/gh/path-visualiser/app@adapter-warthog-wasm-dist/warthog-wasm.mjs`,
+    url: `https://cdn.jsdelivr.net/gh/ShortestPathLab/posthoc-app@adapter-warthog-wasm-dist/warthog-wasm.mjs`,
     transport: "ipc",
     key: "default-ipc",
   },

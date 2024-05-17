@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/path-visualiser/app.git"
+    "url": "git+https://github.com/ShortestPathLab/posthoc-app.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/path-visualiser/app/issues"
+    "url": "https://github.com/ShortestPathLab/posthoc-app/issues"
   },
-  "homepage": "https://path-visualiser.github.io/app",
+  "homepage": "posthoc.pathfinding.ai",
   "dependencies": {},
   "type": "module"
 }

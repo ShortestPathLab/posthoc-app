@@ -347,12 +347,12 @@ export function ExplorePage({ template: Page }: PageContentProps) {
       <Box
         sx={{
           position: "absolute",
-          top: "-50%",
+          top: "-100%",
           left: "calc(50%)",
           width: "100%",
           zIndex: -1,
           transform: "translateX(-50%) rotate(180deg)",
-          height: "100%",
+          height: "150%",
           filter: `hue-rotate(${accent - blue}deg)`,
           minWidth: 640,
           opacity: 0.75,

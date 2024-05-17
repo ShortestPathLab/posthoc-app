@@ -1,4 +1,4 @@
-![main](https://github.com/path-visualiser/app/actions/workflows/main.yml/badge.svg)
+![main](https://github.com/ShortestPathLab/posthoc-app/actions/workflows/main.yml/badge.svg)
 
 <br></br>
 
@@ -14,13 +14,13 @@
 
 It's easy to get started.
 
-1. Print logs as [search traces](https://path-visualiser.github.io/docs/search-trace)
-2. Load those into the [Posthoc visualiser](https://path-visualiser.github.io/docs/category/posthoc-visualiser)
+1. Print logs as [search traces](https://posthoc.pathfinding.ai/docs/search-trace)
+2. Load those into the [Posthoc visualiser](https://posthoc.pathfinding.ai/docs/category/posthoc-visualiser)
 3. Voila!
 
 ## Documentation
 
-[View documentation](https://path-visualiser.github.io)
+[View documentation](https://posthoc.pathfinding.ai)
 
 ## Changelog
 
@@ -28,4 +28,4 @@ It's easy to get started.
 
 ## Releases
 
-[View releases](https://github.com/path-visualiser/app/releases)
+[View releases](https://github.com/ShortestPathLab/posthoc-app/releases)

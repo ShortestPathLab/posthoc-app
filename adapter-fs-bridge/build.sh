@@ -54,7 +54,7 @@ if which osslsigncode >/dev/null; then
     fi
     osslsigncode sign -pkcs12 private/cert.p12 \
         -n "Posthoc Adapter" \
-        -i "https://github.com/path-visualiser" \
+        -i "https://github.com/ShortestPathLab" \
         -in dist/main-win.exe \
         -out dist/main-win-signed.exe
     rm dist/main-win.exe

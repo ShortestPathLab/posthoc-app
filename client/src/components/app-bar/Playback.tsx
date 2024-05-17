@@ -106,7 +106,7 @@ export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
         onClick={() => {
           stepTo(findBreakpoint(-1));
         }}
-        disabled={!canStop}
+        disabled={!canStop || !canStepBackward}
       />
       <IconButton
         label="step-backward"

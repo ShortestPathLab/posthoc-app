@@ -4,8 +4,8 @@
   "version": "dev",
   "description": "Visualise pathfinding search and more",
   "version_name": "dev",
-  "repository": "https://github.com/path-visualiser/app",
-  "docs": "https://github.com/path-visualiser/app/blob/master/docs",
+  "repository": "https://github.com/ShortestPathLab/posthoc-app",
+  "docs": "https://github.com/ShortestPathLab/posthoc-app/blob/master/docs",
   "icons": [
     {
       "src": "./favicon.png",

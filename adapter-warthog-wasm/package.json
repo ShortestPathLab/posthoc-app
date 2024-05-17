@@ -19,7 +19,7 @@
     "nanoid": "^5.0.1",
     "protocol": "file:../protocol",
     "typescript": "^4.4.4",
-    "warthog-bin": "github:path-visualiser/pathfinding#wasm-bin"
+    "warthog-bin": "github:ShortestPathLab/posthoc-adapter-warthog#wasm-bin"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.5",

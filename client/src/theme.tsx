@@ -32,6 +32,8 @@ export const getShade = (
 
 const fontFamily = `"Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
         "Droid Sans", "Helvetica Neue", "Arial", sans-serif`;
+const headingFamily = `"Inter Tight", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+        "Droid Sans", "Helvetica Neue", "Arial", sans-serif`;
 
 export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   createTheme({
@@ -48,6 +50,12 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
       allVariants: {
         fontFamily,
       },
+      h1: { fontFamily: headingFamily },
+      h2: { fontFamily: headingFamily },
+      h3: { fontFamily: headingFamily },
+      h4: { fontFamily: headingFamily },
+      h5: { fontFamily: headingFamily },
+      h6: { fontFamily: headingFamily },
       button: {
         textTransform: "none",
         fontWeight: 400,
@@ -93,7 +101,6 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
           },
           h6: {
             fontWeight: 500,
-            letterSpacing: -0.4,
           },
         },
       },
