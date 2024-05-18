@@ -1,7 +1,4 @@
-![main](https://github.com/ShortestPathLab/posthoc-app/actions/workflows/main.yml/badge.svg)
-
-<br></br>
-
+![image](https://github.com/ShortestPathLab/posthoc-app/assets/15244945/7ed341b8-1415-4572-9103-5d103bdd7835)
 ![logo64](./client/src/public/logo64.png)
 
 # Posthoc Visualiser
