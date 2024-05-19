@@ -1,6 +1,6 @@
 ![image](https://github.com/ShortestPathLab/posthoc-app/assets/15244945/7ed341b8-1415-4572-9103-5d103bdd7835)
 
-**Posthoc** is a way to build quick-and-dirty visualisations ✨ for sequential decision-making algorithms, such as search algorithms 🚀.
+**Posthoc** is a way to build simple and effective visualisations ✨ for sequential decision-making algorithms, such as search algorithms 🚀.
 
 [Open Posthoc](https://posthoc.pathfinding.ai/)
 
