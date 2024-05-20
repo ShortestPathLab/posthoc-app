@@ -12,7 +12,7 @@ Here's how it works:
 2. Drop those into the [Posthoc visualiser](https://posthoc.pathfinding.ai/docs/category/posthoc-visualiser)
 3. Voila!
 
-Interested? [Get started now](https://posthoc.pathfinding.ai).
+Interested? [Get started here](https://posthoc.pathfinding.ai).
 
 ## Documentation
 
