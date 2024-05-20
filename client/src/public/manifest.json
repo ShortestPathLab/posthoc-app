@@ -5,7 +5,7 @@
   "description": "Understand sequential decision-making through visualisation.",
   "version_name": "1.2.4; early May 2024",
   "repository": "https://github.com/ShortestPathLab/posthoc-app",
-  "changelog": "http://localhost:3000/blog",
+  "changelog": "http://posthoc.pathfinding.ai/blog",
   "docs": "https://posthoc.pathfinding.ai/docs/overview",
   "homepage": "https://posthoc.pathfinding.ai",
   "icons": [
