@@ -6,13 +6,13 @@ Hey researchers, developers and problem-solvers!
 
 ![Alt text](./client/src/public/screenshots/0.png)
 
-It's very easy to use **Posthoc**.
+Here's how it works:
 
 1. Print logs as [search traces](https://posthoc.pathfinding.ai/docs/search-trace)
 2. Drop those into the [Posthoc visualiser](https://posthoc.pathfinding.ai/docs/category/posthoc-visualiser)
 3. Voila!
 
-Interested? [Get started here](https://posthoc.pathfinding.ai).
+Interested? [Get started now](https://posthoc.pathfinding.ai).
 
 ## Documentation
 
