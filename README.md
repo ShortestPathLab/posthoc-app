@@ -2,7 +2,7 @@
 
 Hey researchers, developers and problem-solvers!
 
-**Posthoc** is a way to build simple and effective visualisations ✨ for sequential decision-making algorithms, like search 🚀. If you're looking for a quick way to analyse, debug or understand your algorithm, give Posthoc a try!
+**Posthoc** is a way to build simple and effective visualisations ✨ for sequential decision-making algorithms, like search. If you're looking for a quick way to analyse, debug or understand your algorithm, give Posthoc a try!
 
 ![Alt text](./client/src/public/screenshots/0.png)
 
