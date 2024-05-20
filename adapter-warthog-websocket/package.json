@@ -22,7 +22,7 @@
     "lru-cache": "^6.0.0",
     "md5": "^2.3.0",
     "node-emoji": "^2.1.0",
-    "pathfinding-binaries": "github:ShortestPathLab/posthoc-adapter-warthog#binaries",
+    "pathfinding-binaries": "github:ShortestPathLab/posthoc-adapter-warthog#bin",
     "protocol": "file:../protocol",
     "socket.io": "^4.1.3",
     "socket.io-client": "^4.1.3",
