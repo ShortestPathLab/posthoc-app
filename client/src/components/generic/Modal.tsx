@@ -37,7 +37,11 @@ import { Scroll } from "./Scrollbars";
 import Swipe from "./Swipe";
 
 export function AppBarTitle({ children }: { children?: ReactNode }) {
-  return <Typography variant="h6">{children}</Typography>;
+  return (
+    <Typography component="div" variant="h6">
+      {children}
+    </Typography>
+  );
 }
 
 export type Props = {

@@ -72,12 +72,12 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
                   },
                 }}
               >
-                <Type>
+                <Type component="div">
                   {current
                     ? `${current.renderer.meta.name} ${current.renderer.meta.version}`
                     : startCase(status)}
                 </Type>
-                <Type variant="body2" color="text.secondary">
+                <Type component="div" variant="body2" color="text.secondary">
                   {current ? (
                     <>
                       <span>{current.renderer.meta.description}</span>

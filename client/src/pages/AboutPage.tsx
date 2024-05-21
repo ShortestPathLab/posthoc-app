@@ -38,10 +38,12 @@ export function AboutContent() {
   function renderSection(label: ReactNode, content: ReactNode) {
     return (
       <Box sx={{ pt: 2 }}>
-        <Type variant="overline" color="text.secondary">
+        <Type component="div" variant="overline" color="text.secondary">
           {label}
         </Type>
-        <Type variant="body2">{content}</Type>
+        <Type component="div" variant="body2">
+          {content}
+        </Type>
       </Box>
     );
   }
@@ -51,7 +53,9 @@ export function AboutContent() {
       <Box sx={{ pt: 0, pb: 2 }}>
         <img src={logo} height="64" />
       </Box>
-      <Type variant="h6">{name}</Type>
+      <Type component="div" variant="h6">
+        {name}
+      </Type>
       {renderSection("Build Info", <>{version_name}</>)}
       {renderSection(
         "Team",
@@ -100,10 +104,12 @@ export function AboutPage({ template: Page }: PageContentProps) {
   function renderSection(label: ReactNode, content: ReactNode) {
     return (
       <Box sx={{ pt: 2 }}>
-        <Type variant="overline" color="text.secondary">
+        <Type component="div" variant="overline" color="text.secondary">
           {label}
         </Type>
-        <Type variant="body2">{content}</Type>
+        <Type component="div" variant="body2">
+          {content}
+        </Type>
       </Box>
     );
   }

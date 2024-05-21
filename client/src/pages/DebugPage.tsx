@@ -44,7 +44,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
   const { code } = layer?.source ?? {};
   function renderHeading(label: ReactNode) {
     return (
-      <Type variant="overline" color="text.secondary">
+      <Type component="div" variant="overline" color="text.secondary">
         {label}
       </Type>
     );

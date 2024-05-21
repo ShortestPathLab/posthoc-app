@@ -27,6 +27,7 @@ import {
   merge,
   startCase,
 } from "lodash";
+import { Fragment } from "react";
 
 export const COMMON_PROPS = ["type"];
 
@@ -109,12 +110,12 @@ export function PropertyDialog({
           props: filter(sorted, ([k]) => !ALL_PROPS.includes(k)),
         },
       ].map(({ name, props }, i) => (
-        <>
+        <Fragment key={name}>
           {!!i && <Divider sx={{ mb: 1 }} />}
           <Typography
+            component="div"
             variant="overline"
             color="text.secondary"
-            component="div"
             sx={{ px: 3 }}
           >
             {startCase(name)}
@@ -135,7 +136,7 @@ export function PropertyDialog({
               </ListItem>
             ))}
           </Box>
-        </>
+        </Fragment>
       ))}
     </Dialog>
   );

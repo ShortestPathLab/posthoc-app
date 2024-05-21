@@ -30,7 +30,6 @@ import {
   useSigma,
 } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
-import { useWorkerLayoutForceAtlas2 } from "@react-sigma/layout-forceatlas2";
 import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
 import interpolate from "color-interpolate";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
@@ -75,7 +74,7 @@ import {
 } from "lodash";
 import memoizee from "memoizee";
 import { Trace } from "protocol";
-import { ComponentProps, FC, useEffect, useMemo, useState } from "react";
+import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { EdgeArrowProgram } from "sigma/rendering";
@@ -130,24 +129,6 @@ const orientationOptions = {
   vertical: {
     value: "vertical",
   },
-};
-
-const ForceAtlas: FC = () => {
-  const { start, kill } = useWorkerLayoutForceAtlas2({
-    settings: { slowDown: 10, gravity: 2, adjustSizes: true, linLogMode: true },
-  });
-
-  useEffect(() => {
-    // start FA2
-    start();
-
-    // Kill FA2 on unmount
-    return () => {
-      kill();
-    };
-  }, [start, kill]);
-
-  return null;
 };
 
 type R = {
@@ -531,6 +512,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                         <>
                           <ListItem sx={{ py: 0 }}>
                             <Typography
+                              component="div"
                               color="text.secondary"
                               variant="overline"
                             >
@@ -549,7 +531,11 @@ export function TreePage({ template: Page }: PageContentProps) {
                         </>
                       )}
                       <ListItem sx={{ py: 0 }}>
-                        <Typography color="text.secondary" variant="overline">
+                        <Typography
+                          component="div"
+                          color="text.secondary"
+                          variant="overline"
+                        >
                           Events at {selection?.node}
                         </Typography>
                       </ListItem>
@@ -627,7 +613,11 @@ export function TreePage({ template: Page }: PageContentProps) {
                 }}
               >
                 <CircularProgress />
-                <Typography variant="body2" sx={{ px: 8, maxWidth: 480 }}>
+                <Typography
+                  component="div"
+                  variant="body2"
+                  sx={{ px: 8, maxWidth: 480 }}
+                >
                   Generating layout
                 </Typography>
               </Flex>

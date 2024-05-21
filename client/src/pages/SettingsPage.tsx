@@ -59,7 +59,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   const [tab, setTab] = useState("general");
   function renderHeading(label: ReactNode) {
     return (
-      <Type variant="overline" color="text.secondary">
+      <Type component="div" variant="overline" color="text.secondary">
         {label}
       </Type>
     );
@@ -67,6 +67,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   function renderLabel(label: ReactNode) {
     return (
       <Type
+        component="div"
         variant="body1"
         sx={{
           mr: 4,
@@ -211,7 +212,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       >
                         {({ close }) => (
                           <Stack sx={{ p: sm ? 2 : 3, pt: 2, gap: 4 }}>
-                            <Typography color="text.secondary">
+                            <Typography component="div" color="text.secondary">
                               If something's not working correctly, you can try
                               to reset all settings and extensions. This cannot
                               be undone.

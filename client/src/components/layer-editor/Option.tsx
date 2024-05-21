@@ -4,13 +4,20 @@ import { Flex } from "components/generic/Flex";
 import { Space } from "components/generic/Space";
 
 export const Heading = ({ label }: { label?: Node }) => (
-  <Type variant="overline" color="text.secondary" sx={{ pt: 1 }} component="p">
+  <Type
+    component="div"
+    variant="overline"
+    color="text.secondary"
+    sx={{ pt: 1 }}
+  >
     {label}
   </Type>
 );
 
 export const Label = ({ label }: { label?: Node }) => (
-  <Type variant="body1">{label}</Type>
+  <Type component="div" variant="body1">
+    {label}
+  </Type>
 );
 
 export const Option = ({

@@ -68,7 +68,11 @@ export function SelectionMenu({ selection, onClose }: Props) {
                       {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
                       {primary && (
                         <ListItem sx={{ py: 0 }}>
-                          <Typography color="text.secondary" variant="overline">
+                          <Typography
+                            component="div"
+                            color="text.secondary"
+                            variant="overline"
+                          >
                             {primary}
                           </Typography>
                         </ListItem>
@@ -99,6 +103,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
                                       sx={{ mr: 4 }}
                                     />
                                     <Typography
+                                      component="div"
                                       variant="body2"
                                       color="text.secondary"
                                     >
@@ -115,6 +120,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
                                       sx={{ mr: 4 }}
                                     />
                                     <Typography
+                                      component="div"
                                       variant="body2"
                                       color="text.secondary"
                                     >
@@ -133,7 +139,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
               ) : (
                 <>
                   <ListItem>
-                    <Typography>No info to show.</Typography>
+                    <Typography component="div">No info to show.</Typography>
                   </ListItem>
                 </>
               );

@@ -88,12 +88,12 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
                     },
                   }}
                 >
-                  <Type>
+                  <Type component="div">
                     {connection
                       ? `${connection.name} ${connection.version}`
                       : startCase(status)}
                   </Type>
-                  <Type variant="body2" color="text.secondary">
+                  <Type component="div" variant="body2" color="text.secondary">
                     {connection?.description ?? (value?.url || "No URL")}
                   </Type>
                 </Box>

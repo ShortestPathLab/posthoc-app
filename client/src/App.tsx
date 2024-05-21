@@ -15,6 +15,7 @@ import { useTitleBar } from "hooks/useTitleBar";
 import { Image } from "pages/Image";
 import logo from "public/logo192.png";
 import { useMemo } from "react";
+import { BootstrapService } from "services/BootstrapService";
 import { ConnectionsService } from "services/ConnectionsService";
 import { FeaturesService } from "services/FeaturesService";
 import { LayerService } from "services/LayerService";
@@ -35,6 +36,7 @@ const services = [
   LayerService,
   LogCaptureService,
   SettingsService,
+  BootstrapService
 ];
 
 function App() {

@@ -82,7 +82,9 @@ export function EventInspector({
         }}
       >
         <ListItemIcon sx={{ alignItems: "center" }}>
-          <Type variant="body2">{index}</Type>
+          <Type component="div" variant="body2">
+            {index}
+          </Type>
           {label && <Dot label={label} />}
         </ListItemIcon>
 

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "cd client && npm start",
     "build:all": "cd client && npm run build",
-    "postinstall": "(cd client && npm install) && (cd internal-renderers && npm install)"
+    "postinstall": "(cd client && npm install --force) && (cd internal-renderers && npm install)"
   },
   "repository": {
     "type": "git",

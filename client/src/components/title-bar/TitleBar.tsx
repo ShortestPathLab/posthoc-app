@@ -394,7 +394,9 @@ export function CommandsButton() {
       }}
     >
       <SearchOutlined fontSize="small" color="disabled" />{" "}
-      <Type sx={{ mt: 0 }}>Commands</Type>
+      <Type component="div" sx={{ mt: 0 }}>
+        Commands
+      </Type>
     </ButtonBase>
   );
 }

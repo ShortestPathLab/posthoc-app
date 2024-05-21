@@ -14,7 +14,7 @@ import { values } from "lodash";
 import { pages } from "pages";
 import React, { ReactNode } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { withSlots } from "react-slot-component";
+import { withSlots } from "components/withSlots";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
 

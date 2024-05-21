@@ -92,5 +92,9 @@ function isCompressedFile(f: File) {
 }
 
 export function isWorkspaceFile(f: File) {
-  return find(acceptedFormats, (format) => f.name.endsWith(format));
+  return !!find(acceptedFormats, (format) => f.name.endsWith(format));
+}
+
+export function isWorkspace(name: string) {
+  return !!find(acceptedFormats, (format) => name.endsWith(format));
 }

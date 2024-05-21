@@ -35,9 +35,9 @@ export function Placeholder({
       {...rest}
     >
       {icon}
-      <Type>{label}</Type>
+      <Type component="div">{label}</Type>
       {!!secondary && (
-        <Type variant="caption" sx={{ px: 8, maxWidth: 480 }}>
+        <Type component="div" variant="caption" sx={{ px: 8, maxWidth: 480 }}>
           {secondary}
         </Type>
       )}

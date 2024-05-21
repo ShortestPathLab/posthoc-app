@@ -113,16 +113,18 @@ function Component(
 
   const renderHeading = (label: ReactNode) => (
     <Type
+      component="div"
       variant="overline"
       color="text.secondary"
       sx={{ pt: 1 }}
-      component="p"
     >
       {label}
     </Type>
   );
   const renderLabel = (label: ReactNode) => (
-    <Type variant="body1">{label}</Type>
+    <Type component="div" variant="body1">
+      {label}
+    </Type>
   );
   const renderOption = (label: ReactNode, option: ReactNode) => (
     <Flex alignItems="center">
@@ -190,8 +192,8 @@ function Component(
                   },
                 }}
               >
-                <Type>{name}</Type>
-                <Type variant="body2" color="text.secondary">
+                <Type component="div">{name}</Type>
+                <Type component="div" variant="body2" color="text.secondary">
                   {startCase(value.source?.type)}
                 </Type>
               </Box>

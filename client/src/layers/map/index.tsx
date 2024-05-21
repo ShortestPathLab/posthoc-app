@@ -90,6 +90,7 @@ export const controller = {
         />
         {value?.source?.parsedMap?.error && (
           <Typography
+            component="div"
             variant="body2"
             color={(t) => t.palette.error.main}
             sx={{
@@ -201,12 +202,20 @@ export const controller = {
     if (map) {
       return [
         {
-          id: "trace",
+          id: "map",
           name: `(Source) ${map.name}`,
           language: "txt",
           content: parsedMap?.content,
         },
       ];
     } else return [];
+  },
+  onEditSource: (layer, id, content) => {
+    switch (id) {
+      case "map":
+        // Object.assign(layer?.source?.map.)
+        break;
+    }
+    return layer;
   },
 } satisfies LayerController<"map", MapLayerData>;

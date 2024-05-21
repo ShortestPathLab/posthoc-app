@@ -241,12 +241,13 @@ export function FeatureCard({
               </Fade>
             </Box>
           }
-          titleTypeProps={ellipsisProps}
+          titleTypographyProps={ellipsisProps}
           title={loading ? <Skeleton /> : name || "Untitled"}
-          subheaderTypeProps={ellipsisProps}
+          subheaderTypographyProps={ellipsisProps}
           subheader={
             <Stack gap={2} sx={{ pt: 1, alignItems: "flex-start" }}>
               <Type
+                component="div"
                 sx={{
                   ...ellipsisProps,
                   maxWidth: "100%",
@@ -264,7 +265,7 @@ export function FeatureCard({
               </Type>
               <Stack direction="row" alignItems="center" gap={1}>
                 {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
-                <Type variant="caption">
+                <Type component="div" variant="caption">
                   {loading ? <Skeleton width={120} /> : authorName}
                 </Type>
               </Stack>
@@ -275,9 +276,9 @@ export function FeatureCard({
                 sx={paper(2)}
               >
                 <Stack direction="row" gap={1}>
-                  <Type>Open</Type>
+                  <Type component="div">Open</Type>
                   {!!size && (
-                    <Type color="text.secondary">
+                    <Type component="div" color="text.secondary">
                       {round(size / 1024 / 1024, 2)} MB
                     </Type>
                   )}
@@ -394,8 +395,14 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                 <Box pt={6}>
                   <TabPanel value="explore" sx={{ p: 0 }}>
                     <Box p={4} sx={{ textAlign: "center" }}>
-                      <Type variant={narrow ? "h6" : "h4"}>Examples</Type>
-                      <Type variant="subtitle2" color="text.secondary">
+                      <Type component="div" variant={narrow ? "h6" : "h4"}>
+                        Examples
+                      </Type>
+                      <Type
+                        component="div"
+                        variant="subtitle2"
+                        color="text.secondary"
+                      >
                         Browse a library of included and community-made examples
                       </Type>
                     </Box>
@@ -445,8 +452,14 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                   </TabPanel>
                   <TabPanel value="guides" sx={{ p: 0 }}>
                     <Box p={4} sx={{ textAlign: "center" }}>
-                      <Type variant={narrow ? "h6" : "h4"}>Guides</Type>
-                      <Type variant="subtitle2" color="text.secondary">
+                      <Type component="div" variant={narrow ? "h6" : "h4"}>
+                        Guides
+                      </Type>
+                      <Type
+                        component="div"
+                        variant="subtitle2"
+                        color="text.secondary"
+                      >
                         {`Learn how to use ${name} and explore ${name} features`}
                       </Type>
                     </Box>
@@ -460,7 +473,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       }}
                       gap={2}
                     >
-                      <Type>
+                      <Type component="div">
                         We're still working on this feature. Check out our
                         documentation instead.
                       </Type>

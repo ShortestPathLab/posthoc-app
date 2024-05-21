@@ -71,11 +71,11 @@ export function FeaturePicker({
         value: id,
         label: (
           <Flex vertical={itemOrientation === "vertical"}>
-            <Type>
+            <Type component="div">
               {name}
               <Space />
             </Type>
-            <Type variant="body2" color="text.secondary">
+            <Type component="div" variant="body2" color="text.secondary">
               {description}
             </Type>
           </Flex>

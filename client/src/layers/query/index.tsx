@@ -103,7 +103,12 @@ export const controller = {
           }
         />
         {!algorithms?.length && (
-          <Type variant="body2" color="warning.main" sx={{ mb: 1 }}>
+          <Type
+            component="div"
+            variant="body2"
+            color="warning.main"
+            sx={{ mb: 1 }}
+          >
             No connected solver has declared support for running algorithms
           </Type>
         )}
@@ -128,7 +133,12 @@ export const controller = {
           }
         />
         {selectedLayer && (
-          <Type variant="body2" color="text.secondary" sx={{ mb: 1, mt: 1 }}>
+          <Type
+            component="div"
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 1, mt: 1 }}
+          >
             Define source and destination nodes by clicking on valid regions on{" "}
             {inferLayerName(selectedLayer)}
           </Type>

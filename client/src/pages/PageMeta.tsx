@@ -1,5 +1,5 @@
 import { ReactElement, ReactNode } from "react";
-import { withSlots } from "react-slot-component";
+import { withSlots } from "components/withSlots";
 import { AccentColor } from "theme";
 import { PageProps, PageSlots } from "./Page";
 

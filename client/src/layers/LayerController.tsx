@@ -30,4 +30,9 @@ export type LayerController<K extends string, T> = {
     | { claimed: false }
   >;
   getSources?: (layer?: Layer<T>) => (Feature & { language?: string })[];
+  onEditSource?: (
+    layer?: Layer<T>,
+    id?: string,
+    content?: string
+  ) => Layer<T> | undefined;
 };

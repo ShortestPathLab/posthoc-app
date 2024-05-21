@@ -355,12 +355,18 @@ export default function Editor<T>(props: Props<T>) {
             <>
               <ListSubheader disableSticky>
                 {label && (
-                  <Typography variant="body1" gutterBottom color="textPrimary">
+                  <Typography
+                    component="div"
+                    variant="body1"
+                    gutterBottom
+                    color="textPrimary"
+                  >
                     {label}
                   </Typography>
                 )}
                 {text && (
                   <Typography
+                    component="div"
                     variant="body2"
                     color="text.secondary"
                     gutterBottom
@@ -393,6 +399,7 @@ export default function Editor<T>(props: Props<T>) {
                         >
                           <Box pl={2} pb={2} pt={1}>
                             <Typography
+                              component="div"
                               variant="overline"
                               color="text.secondary"
                             >

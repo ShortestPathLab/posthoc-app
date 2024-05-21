@@ -138,10 +138,10 @@ export function A() {
           >
             <Stack sx={{ ml: 1 }} alignItems="baseline">
               {fields.name || "Untitled"}
-              <Typography color="text.secondary">
+              <Typography component="div" color="text.secondary">
                 {getFilename(fields.name)}.workspace
               </Typography>
-              <Typography color="text.secondary">
+              <Typography component="div" color="text.secondary">
                 {ceil(workspaceSize / 1024 / 1024, 2)} MB
               </Typography>
             </Stack>
@@ -156,7 +156,9 @@ export function ExportWorkspaceModal(props: ComponentProps<typeof Modal>) {
   return (
     <Modal {...props}>
       <ModalAppBar onClose={() => props?.onClose?.({}, "backdropClick")}>
-        <Typography variant="h6">Publish Workspace</Typography>
+        <Typography component="div" variant="h6">
+          Publish Workspace
+        </Typography>
       </ModalAppBar>
       <A />
     </Modal>

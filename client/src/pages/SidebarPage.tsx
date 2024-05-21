@@ -5,7 +5,7 @@ import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
 import { Scroll } from "components/generic/Scrollbars";
 import { ErrorBoundary } from "react-error-boundary";
-import { withSlots } from "react-slot-component";
+import { withSlots } from "components/withSlots";
 import { useAcrylic } from "theme";
 import { PageProps, PageSlots, divider } from "./Page";
 import { useUIState } from "slices/UIState";
@@ -64,7 +64,10 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
                 }}
               >
                 {/* {slotProps.Handle?.children} */}
-                <Typography sx={{ p: 1, color: "text.secondary" }}>
+                <Typography
+                  component="div"
+                  sx={{ p: 1, color: "text.secondary" }}
+                >
                   {slotProps.Title?.children}
                 </Typography>
                 {slotProps.Options?.children && (

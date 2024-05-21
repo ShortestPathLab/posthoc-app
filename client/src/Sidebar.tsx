@@ -103,7 +103,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
   const sm = !isPrimary || sm2;
   const [, setUIState] = useUIState();
   return (
-    <TabContext value={tab}>
+    <TabContext value={(tab || false) as any}>
       <Stack direction={sm ? "column-reverse" : "row"} sx={{ width: "100%" }}>
         <Stack
           sx={{
@@ -150,7 +150,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
               )
               .flatMap((c, i, cx) => [
                 !sm && !!i && c.color !== cx[i - 1].color && (
-                  <Divider sx={{ mx: 2, my: 1 }} />
+                  <Divider key={`divider-${i}`} sx={{ mx: 2, my: 1 }} />
                 ),
                 <Tab
                   onClick={() => {

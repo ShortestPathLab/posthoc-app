@@ -5,13 +5,20 @@ import path from "path";
 import { defineConfig } from "vite";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 
+const ReactCompilerConfig = {
+  /* ... */
+};
 export default defineConfig(({ mode }) => ({
   root: path.join(process.cwd(), "./src"),
   publicDir: mode === "development" ? "public-dev" : "public",
   base: "./",
   build: { outDir: path.join(process.cwd(), "./dist") },
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
+      },
+    }),
     viteTsconfigPaths(),
     {
       name: "configure-response-headers",

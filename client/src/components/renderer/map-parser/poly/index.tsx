@@ -26,7 +26,12 @@ export const hydrate: ParsedMapHydrator = (result: ParsedMap) => ({
 export const editor: MapEditor<unknown> = async () => () =>
   (
     <>
-      <Type variant="body2" color="text.secondary" sx={{ mb: 1, mt: 1 }}>
+      <Type
+        component="div"
+        variant="body2"
+        color="text.secondary"
+        sx={{ mb: 1, mt: 1 }}
+      >
         No options available.
       </Type>
     </>

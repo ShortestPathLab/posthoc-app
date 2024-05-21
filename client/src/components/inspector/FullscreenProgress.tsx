@@ -25,7 +25,12 @@ export function FullscreenProgress() {
       <Stack alignItems="center" spacing={4}>
         <CircularProgress />
         {messages.map((v, message) => (
-          <Type key={message} variant="body2" color="textSecondary">
+          <Type
+            component="div"
+            key={message}
+            variant="body2"
+            color="textSecondary"
+          >
             {v}
           </Type>
         ))}

@@ -203,6 +203,7 @@ export const controller = {
         />
         {value?.source?.trace?.error && (
           <Typography
+            component="div"
             variant="body2"
             color={(t) => t.palette.error.main}
             sx={{
@@ -216,6 +217,7 @@ export const controller = {
         )}
         {value?.source?.parsedTrace?.error && (
           <Typography
+            component="div"
             variant="body2"
             color={(t) => t.palette.error.main}
             sx={{
@@ -392,7 +394,11 @@ export const controller = {
                           <ListItemText sx={{ mr: 4 }}>
                             See properties
                           </ListItemText>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography
+                            component="div"
+                            variant="body2"
+                            color="text.secondary"
+                          >
                             Step {step}
                           </Typography>
                         </MenuItem>

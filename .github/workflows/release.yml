@@ -20,7 +20,7 @@ jobs:
           sudo apt install --install-recommends winehq-stable
       - name: Build client
         run: |
-          npm install
+          npm install --force
           cd client && npm run build && npm run package
       - name: Build adapter (Filesystem Sync)
         run: |

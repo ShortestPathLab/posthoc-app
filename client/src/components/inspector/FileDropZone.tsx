@@ -72,7 +72,7 @@ export function FileDropZone() {
         >
           <Stack alignItems="center" spacing={4}>
             <WorkspacesOutlined />
-            <Type variant="body2" color="text.secondary">
+            <Type component="div" variant="body2" color="text.secondary">
               {itemCount ? `Import ${pluralize("item", itemCount, true)}` : ""}
             </Type>
           </Stack>

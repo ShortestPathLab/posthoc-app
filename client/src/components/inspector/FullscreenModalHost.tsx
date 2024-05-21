@@ -2,6 +2,7 @@ import { Box, Stack, Typography, alpha } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import Modal, { ModalAppBar } from "components/generic/Modal";
 import { Scroll } from "components/generic/Scrollbars";
+import { withSlots } from "components/withSlots";
 import { useConnection } from "hooks/useConnectionResolver";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { pages } from "pages";
@@ -14,7 +15,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { withSlots } from "react-slot-component";
 import { useUIState } from "slices/UIState";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
@@ -140,7 +140,9 @@ export function FullscreenModalHost() {
       {!!page && (
         <Modal open={!closing} onClose={handleClose} width="70vw">
           <ModalAppBar onClose={handleClose}>
-            <Typography variant="h6">{page.name}</Typography>
+            <Typography component="div" variant="h6">
+              {page.name}
+            </Typography>
           </ModalAppBar>
           {content}
         </Modal>

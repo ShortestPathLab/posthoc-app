@@ -21,6 +21,7 @@ type Props = {
 export function Overline({ children, ...props }: Props) {
   return (
     <Type
+      component="div"
       variant="overline"
       sx={{ my: -0.75, display: "block", ...props.sx }}
       {...props}
