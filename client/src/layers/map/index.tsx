@@ -88,7 +88,7 @@ export const controller = {
             />
           }
         />
-        {value?.source?.parsedMap?.error && (
+        {parsedMap?.error && (
           <Typography
             component="div"
             variant="body2"
@@ -99,10 +99,10 @@ export const controller = {
               mt: 1,
             }}
           >
-            <code>{value?.source?.parsedMap?.error}</code>
+            <code>{parsedMap?.error}</code>
           </Typography>
         )}
-        {!!value?.source?.map && (
+        {!!parsedMap && (
           <>
             <Heading label="Map Options" />
             {Editor ? (
