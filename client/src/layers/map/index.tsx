@@ -75,8 +75,8 @@ export const controller = {
         }
       : { claimed: false },
   editor: withProduce(({ value, produce }) => {
-    const { result: mapContent } = useMapContent(value?.source?.map);
-    const { result: Editor } = useMapOptions(mapContent);
+    const parsedMap = value?.source?.parsedMap;
+    const { result: Editor } = useMapOptions(parsedMap);
     return (
       <>
         <Option
@@ -143,17 +143,20 @@ export const controller = {
   },
   service: withProduce(({ value, produce }) => {
     const { result: mapContent } = useMapContent(value?.source?.map);
-    const { result: parsedMap } = useParsedMap(
+    const { result: parsedMap, loading } = useParsedMap(
       mapContent,
       value?.source?.options
     );
     useEffectWhen(
-      () =>
-        void produce((v) => {
-          set(v, "source.parsedMap", parsedMap);
-          set(v, "viewKey", id());
-        }),
-      [parsedMap, produce],
+      () => {
+        if (!loading) {
+          void produce((v) => {
+            set(v, "source.parsedMap", parsedMap);
+            set(v, "viewKey", id());
+          });
+        }
+      },
+      [parsedMap, produce, loading],
       [parsedMap]
     );
     return <></>;

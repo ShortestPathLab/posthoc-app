@@ -29,7 +29,7 @@ export function useParsedMap(map?: Map, options?: Record<string, any>) {
               "Map loaded",
               `${parsedMap.nodes.length} elements, ${parsedMap.log.join(", ")}`
             );
-            return parsedMap;
+            return { ...map, ...parsedMap };
           } catch (e) {
             console.error(e);
             notify("Error parsing", get(e, "message"));

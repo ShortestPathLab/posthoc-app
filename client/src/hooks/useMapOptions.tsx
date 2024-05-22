@@ -8,5 +8,5 @@ export function useMapOptions(map?: Map) {
   const { format } = map ?? {};
   return useAsync(async () => {
     return (await getParser(format)?.editor?.(map?.content)) ?? noop;
-  }, [map]);
+  }, [format, map?.content]);
 }
