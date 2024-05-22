@@ -237,39 +237,47 @@ export const controller = {
   }),
   service: withProduce(({ value, produce }) => {
     const { palette } = useTheme();
-    const { result: trace } = useTraceContent(value?.source?.trace);
-    const parseTrace = useTraceParser({
-      trace: trace?.content,
-      context: {
-        theme: {
-          foreground: palette.text.primary,
-          background: palette.background.paper,
-          accent: palette.primary.main,
-        },
-        color: {
-          ...colorsHex,
-          ...mapValues(accentColors, (_, v: AccentColor) =>
-            getShade(v, palette.mode, 500, 400)
-          ),
-        },
-        themeAccent: palette.primary.main,
-        themeTextPrimary: palette.text.primary,
-        themeBackground: palette.background.paper,
-      },
-      view: "main",
-    });
+    const { result: trace, loading } = useTraceContent(value?.source?.trace);
+    // Set playback
     useEffect(() => {
       produce((l) => {
         return set(l, "source.playbackTo", trace?.content?.events?.length ?? 0);
       });
-    }, [trace?.key, trace?.lastModified]);
+    }, [trace?.key]);
+    // Make the trace parser
+    const parseTrace = useTraceParser(
+      {
+        trace: trace?.content,
+        context: {
+          theme: {
+            foreground: palette.text.primary,
+            background: palette.background.paper,
+            accent: palette.primary.main,
+          },
+          color: {
+            ...colorsHex,
+            ...mapValues(accentColors, (_, v: AccentColor) =>
+              getShade(v, palette.mode, 500, 400)
+            ),
+          },
+          themeAccent: palette.primary.main,
+          themeTextPrimary: palette.text.primary,
+          themeBackground: palette.background.paper,
+        },
+        view: "main",
+      },
+      [trace?.key, palette.mode]
+    );
+    // Parse the trace
     useAsync(async () => {
-      const parsedTrace = await parseTrace();
-      produce((l) => {
-        set(l, "source.parsedTrace", parsedTrace);
-        set(l, "viewKey", id());
-      });
-    }, [trace?.key, palette.mode]);
+      if (parseTrace && !loading) {
+        const parsedTrace = await parseTrace();
+        produce((l) => {
+          set(l, "source.parsedTrace", parsedTrace);
+          // set(l, "viewKey", id());
+        });
+      }
+    }, [loading, parseTrace]);
     return (
       <>
         <PlaybackService value={value} />

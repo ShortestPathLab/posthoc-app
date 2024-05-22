@@ -1,7 +1,7 @@
 import { useSnackbar } from "components/generic/Snackbar";
 import { get } from "lodash";
 import pluralize from "pluralize";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import parseTraceWorkerLegacyUrl from "../parser/parseTrace.worker.ts?worker&url";
@@ -37,14 +37,15 @@ export const parseTraceLegacyAsync = usingMemoizedWorkerTask<
 >(ParseTraceWorkerLegacy);
 
 export function useTraceParser(
-  params: ParseTraceWorkerParameters | ParseTraceWorkerLegacyParameters
+  params: ParseTraceWorkerParameters | ParseTraceWorkerLegacyParameters,
+  deps: any[]
 ) {
   const push = useSnackbar();
   const usingLoadingState = useLoadingState("specimen");
-  return useCallback(
-    () =>
-      usingLoadingState(async () => {
-        if (params?.trace) {
+  return useMemo(() => {
+    if (params.trace) {
+      return () =>
+        usingLoadingState(async () => {
           push("Processing trace...");
           try {
             const output =
@@ -63,8 +64,9 @@ export function useTraceParser(
             push("Error parsing", get(e, "message"));
             return { error: get(e, "message") };
           }
-        }
-      }),
-    [params]
-  );
+        });
+    } else {
+      return undefined;
+    }
+  }, deps);
 }

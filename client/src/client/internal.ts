@@ -76,7 +76,6 @@ export const internal: Dictionary<Transport["call"]> = {
         const map = find(maps, { id: params?.id });
         if (map) {
           const file = await fetch(map.path);
-          console.log(map);
           return {
             ...map,
             content: await file.text(),

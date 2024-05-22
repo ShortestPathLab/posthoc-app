@@ -79,7 +79,7 @@ export function SyncService() {
   // Any changes
   useEffectWhen(
     () => {
-      if (previous && participants.length) {
+      if (previous && participants.length && c2 !== previous) {
         broadCastLayers("layers", {
           initiator: instance,
           state: { layers },
@@ -87,7 +87,7 @@ export function SyncService() {
         });
       }
     },
-    [c2, participants.length],
+    [layers, c2, participants.length],
     [previous, c2]
   );
   // Primary broadcasts to new
@@ -101,7 +101,7 @@ export function SyncService() {
         });
       }
     },
-    [c2, participants.length, isOnly, isPrimary],
+    [layers, c2, participants.length, isOnly, isPrimary],
     [participants.length]
   );
 

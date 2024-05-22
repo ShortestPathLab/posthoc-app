@@ -52,6 +52,7 @@ export class SyncParticipant extends EventEmitter<"sync"> {
   constructor() {
     super();
     const checkChannels = throttle(async () => {
+      // TODO: Fix subtle race condition issues
       const getChannel = async (peer: string) => {
         if (peer !== instance) {
           try {

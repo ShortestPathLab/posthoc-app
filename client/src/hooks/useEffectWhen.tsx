@@ -1,26 +1,22 @@
 import { zip } from "lodash";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAsyncAbortable } from "react-async-hook";
+import { usePrevious } from "react-use";
 
 export const useEffectWhen = (
   effect: () => void,
   deps: any[],
-  whenDeps: any[]
+  watch: any[]
 ) => {
-  const whenRef = useRef(whenDeps || []);
-  const initial = whenRef.current === whenDeps;
-  const whenDepsChanged =
-    initial || !whenRef.current.every((w, i) => w === whenDeps[i]);
-  whenRef.current = whenDeps;
-  const nullDeps = deps.map(() => null);
-
-  return useEffect(
-    whenDepsChanged ? () => void effect() : () => {},
-    whenDepsChanged ? deps : nullDeps
-  );
+  const prev = usePrevious(watch);
+  return useEffect(() => {
+    if (!allSame(watch, prev)) {
+      effect();
+    }
+  }, [deps]);
 };
 
-function allSame(a: any[], b: any[]) {
+function allSame(a?: any[], b?: any[]) {
   return zip(a, b).every(([x, y]) => x === y);
 }
 

@@ -1,12 +1,12 @@
 import { useSnackbar } from "components/generic/Snackbar";
+import { find } from "lodash";
 import memo from "memoizee";
 import { useMemo } from "react";
 import { useAsync } from "react-async-hook";
 import { UploadedTrace } from "slices/UIState";
+import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { useConnectionResolver } from "./useConnectionResolver";
-import { find } from "lodash";
-import { useFeatures } from "slices/features";
 
 export function useTraceContent(trace?: UploadedTrace) {
   const notify = useSnackbar();
@@ -34,7 +34,7 @@ export function useTraceContent(trace?: UploadedTrace) {
     [resolve, notify]
   );
 
-  const { content, source, id } = trace ?? {};
+  const { content, source, id, key } = trace ?? {};
   const { lastModified } = find(traces, { id, source }) ?? {};
 
   return useAsync(
@@ -48,6 +48,6 @@ export function useTraceContent(trace?: UploadedTrace) {
               : await getTrace({ source, id, lastModified }),
           };
       }),
-    [getTrace, content, source, id, lastModified]
+    [getTrace, !!content, key, source, id, lastModified]
   );
 }
