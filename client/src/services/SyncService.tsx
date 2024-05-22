@@ -57,19 +57,15 @@ export function SyncService() {
     };
   }, [c1, c2, setSettings, setLayers, participants]);
   // Broadcast
-  useEffectWhen(
-    () => {
-      if (peers.length) {
-        sysend.broadcast<SyncedData>("settings", {
-          initiator: instance,
-          state: { settings },
-          commit: c1,
-        });
-      }
-    },
-    [settings, c1, peers.length],
-    [c1, peers.length]
-  );
+  useEffect(() => {
+    if (peers.length) {
+      sysend.broadcast<SyncedData>("settings", {
+        initiator: instance,
+        state: { settings },
+        commit: c1,
+      });
+    }
+  }, [c1, peers.length]);
   const previous = usePrevious(c2);
   const broadCastLayers = useMemo(
     () =>
@@ -91,7 +87,7 @@ export function SyncService() {
         });
       }
     },
-    [layers, c2, participants.length],
+    [c2, participants.length],
     [previous, c2]
   );
   // Primary broadcasts to new
@@ -105,7 +101,7 @@ export function SyncService() {
         });
       }
     },
-    [layers, c2, participants.length, isOnly, isPrimary],
+    [c2, participants.length, isOnly, isPrimary],
     [participants.length]
   );
 

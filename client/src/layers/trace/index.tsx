@@ -35,7 +35,6 @@ import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
 import { parseProperty as parsePropertyLegacy } from "components/renderer/parser/parseProperty";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTraceSlave.worker";
 import { DebugLayerData } from "hooks/useBreakpoints";
-import { useEffectWhen } from "hooks/useEffectWhen";
 import { useTraceContent } from "hooks/useTraceContent";
 import { dump } from "js-yaml";
 import { LayerController, inferLayerName } from "layers";
@@ -60,8 +59,8 @@ import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";
 import { TraceEvent, Trace as TraceLegacy } from "protocol";
 import { Trace } from "protocol/Trace-v140";
-import { useDeferredValue, useEffect, useMemo } from "react";
-import { useThrottle } from "react-use";
+import { useEffect, useMemo } from "react";
+import { useAsync, useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
 import { AccentColor, accentColors, getShade } from "theme";
@@ -264,17 +263,13 @@ export const controller = {
         return set(l, "source.playbackTo", trace?.content?.events?.length ?? 0);
       });
     }, [trace?.key, trace?.lastModified]);
-    useEffectWhen(
-      async () => {
-        const parsedTrace = await parseTrace();
-        produce((l) => {
-          set(l, "source.parsedTrace", parsedTrace);
-          set(l, "viewKey", id());
-        });
-      },
-      [parseTrace],
-      [trace?.key, palette.mode]
-    );
+    useAsync(async () => {
+      const parsedTrace = await parseTrace();
+      produce((l) => {
+        set(l, "source.parsedTrace", parsedTrace);
+        set(l, "viewKey", id());
+      });
+    }, [trace?.key, palette.mode]);
     return (
       <>
         <PlaybackService value={value} />

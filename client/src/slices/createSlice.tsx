@@ -45,6 +45,7 @@ export function createSlice<T, U = T>(
       const [commit, reduceCommit] = useReducer(() => nanoid(), nanoid());
       const reduceSlice = useCallback(
         (n: (prev: T) => U, c?: boolean) => {
+          // console.log(n);
           const next = reduce(get(), n(get()));
           effect?.({ prev: get(), next });
           if (!c) reduceCommit?.();

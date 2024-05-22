@@ -2,6 +2,9 @@ import { Method, Namespace, Response } from "./Message";
 import { Trace } from "./Trace";
 
 export interface FeatureDescriptor {
+  /**
+   * Uniquely identifies this entity.
+   */
   id: string;
   name?: string;
   description?: string;

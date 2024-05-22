@@ -4,18 +4,19 @@ import { Button } from "components/generic/Button";
 import Modal, { ModalAppBar } from "components/generic/Modal";
 import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
-import { useEffectWhen } from "hooks/useEffectWhen";
+import { useDebouncedState2 } from "hooks/useDebouncedState";
 import { useWorkspace } from "hooks/useWorkspace";
-import { ceil, delay, entries, kebabCase, omit, reduce } from "lodash";
+import { ceil, entries, kebabCase, reduce } from "lodash";
+import { nanoid as id } from "nanoid";
+import { producify } from "produce";
 import { map } from "promise-tools";
 import { ComponentProps, useMemo } from "react";
-import { useMap } from "react-use";
 import { WorkspaceMeta, useUIState } from "slices/UIState";
 import { useLoadingState } from "slices/loading";
 import { textFieldProps, usePaper } from "theme";
 import { Jimp } from "utils/Jimp";
+import { set } from "utils/set";
 import { Gallery } from "./Gallery";
-import { nanoid as id } from "nanoid";
 
 const replacements = {
   "*": "star",
@@ -58,20 +59,14 @@ async function resizeImage(s: string) {
 
 export function A() {
   const paper = usePaper();
-  const [{ workspaceMeta }, setUIState] = useUIState();
-  const [fields, { set }] = useMap<WorkspaceMeta>(
-    omit(workspaceMeta, "screenshots", "size")
+  const [_uiState, _setUIState] = useUIState();
+  const [{ workspaceMeta: fields }, setUIState] = useDebouncedState2(
+    _uiState,
+    _setUIState
   );
-  useEffectWhen(
-    () => {
-      const timeout = delay(() => {
-        setUIState((prev) => ({ ...prev, workspaceMeta: fields }));
-      }, 300);
-      return () => clearTimeout(timeout);
-    },
-    [fields, setUIState],
-    [fields]
-  );
+  function set2(k: keyof WorkspaceMeta, v: any) {
+    setUIState(producify((prev) => set(prev, `workspaceMeta.${k}`, v)));
+  }
   const { save, estimateWorkspaceSize } = useWorkspace();
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();
@@ -90,13 +85,13 @@ export function A() {
   return (
     <>
       <Box>
-        <Gallery onChange={(v) => set("screenshots", v)} />
+        <Gallery onChange={(v) => set2("screenshots", v)} />
       </Box>
       <Stack p={2} gap={2}>
         <TextField
           {...textFieldProps}
           defaultValue={fields.name}
-          onChange={(e) => set("name", e.target.value)}
+          onChange={(e) => set2("name", e.target.value)}
           label="Name"
           fullWidth
         />
@@ -105,7 +100,7 @@ export function A() {
           minRows={3}
           defaultValue={fields.description}
           size="small"
-          onChange={(e) => set("description", e.target.value)}
+          onChange={(e) => set2("description", e.target.value)}
           label="Description"
           fullWidth
           multiline
@@ -114,7 +109,7 @@ export function A() {
           {...textFieldProps}
           defaultValue={fields.author}
           size="small"
-          onChange={(e) => set("author", e.target.value)}
+          onChange={(e) => set2("author", e.target.value)}
           label="Author"
           fullWidth
           multiline

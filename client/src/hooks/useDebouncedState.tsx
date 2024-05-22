@@ -1,6 +1,5 @@
-import { delay, noop, now } from "lodash";
+import { noop, now } from "lodash";
 import { useRef, useState } from "react";
-import { useEffectWhen } from "./useEffectWhen";
 
 export function useDebouncedState<T>(
   defaultValue: T,
@@ -11,7 +10,7 @@ export function useDebouncedState<T>(
   const head = useRef(now());
   return [
     state,
-    (a: any) => {
+    (a: T) => {
       const commit = now();
       requestIdleCallback(
         () => {
@@ -20,9 +19,33 @@ export function useDebouncedState<T>(
             head.current = commit;
           }
         },
-        { timeout: 300 }
+        { timeout: wait }
       );
       setState(a);
+    },
+  ] as const;
+}
+export function useDebouncedState2<T>(
+  defaultValue: T,
+  onChange: (v: (prev: T) => T) => void = noop,
+  wait: number = 300
+) {
+  const [state, setState] = useState(defaultValue);
+  const head = useRef(now());
+  return [
+    state,
+    (a: (prev: T) => T) => {
+      const commit = now();
+      requestIdleCallback(
+        () => {
+          if (commit > head.current) {
+            onChange?.(a);
+            head.current = commit;
+          }
+        },
+        { timeout: wait }
+      );
+      setState(a(state));
     },
   ] as const;
 }

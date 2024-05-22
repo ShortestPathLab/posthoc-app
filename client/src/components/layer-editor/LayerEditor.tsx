@@ -100,12 +100,8 @@ function useDraft<T>(
   ] as const;
 }
 
-function Component(
-  { value, onValueChange: onChange }: LayerEditorProps,
-  _ref: ForwardedRef<HTMLElement>
-) {
+function Component({ value, onValueChange: onChange }: LayerEditorProps) {
   const paper = usePaper();
-  const acrylic = useAcrylic();
   const [draft, setDraft] = useDraft(value, onChange, 300, [
     "name",
     "source.type",

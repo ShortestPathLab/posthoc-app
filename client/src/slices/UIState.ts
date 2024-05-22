@@ -28,6 +28,8 @@ export type UploadedTrace = FeatureDescriptor & {
   source?: string;
   /**
    * Uniquely identifies a trace.
+   * The difference between this and `id` is that `key` changes whenever
+   * the contents of the trace change, but `id` stays the same.
    */
   key?: string;
 };

@@ -15,7 +15,7 @@ export function transaction<T, U>(obj: T, f: (obj: T) => U) {
 export const producify =
   <T>(f: (obj: T) => void) =>
   (obj: T) => {
-    const b = structuredClone(obj);
+    const b = clone(obj);
     f(b);
     return b;
   };
@@ -30,6 +30,6 @@ export function withProduce<T>(
   return (props: EditorSetterProps<T>) =>
     createElement(component, {
       ...props,
-      produce: (f) => props?.onChange?.((prev) => produce(prev, f)),
+      produce: (f) => props?.onChange?.(producify(f)),
     });
 }
