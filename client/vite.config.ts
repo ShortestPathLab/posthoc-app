@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react({
       babel: {
-        plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
+        // plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
       },
     }),
     viteTsconfigPaths(),

@@ -3,7 +3,6 @@ import {
   ClearOutlined as DeleteIcon,
   DragHandleOutlined,
   EditOutlined as EditIcon,
-  LabelOutlined as LabelIcon,
 } from "@mui/icons-material";
 import {
   Box,
@@ -19,12 +18,11 @@ import {
   SxProps,
   Theme,
   Typography,
-  alpha,
   useTheme,
 } from "@mui/material";
 import { defer, filter, map, sortBy, uniqBy } from "lodash";
 import { nanoid as id } from "nanoid";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 
 import {
   CSSProperties,
@@ -41,7 +39,10 @@ import { useAcrylic, usePaper } from "theme";
 import { Flex } from "./Flex";
 
 export const DefaultListEditorInput = forwardRef(function StyledInputBase(
-  props: ComponentProps<typeof InputBase>,
+  {
+    onValueChange,
+    ...props
+  }: ComponentProps<typeof InputBase> & { onValueChange?: (v: string) => void },
   ref
 ) {
   return (
@@ -381,7 +382,12 @@ export default function Editor<T>(props: Props<T>) {
         }
       >
         <Box mt={getCategory ? -1 : 0}>
-          <Droppable droppableId="list">
+          <Droppable
+            droppableId="list"
+            isDropDisabled={false}
+            isCombineEnabled={false}
+            ignoreContainerClipping={true}
+          >
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {(() => {

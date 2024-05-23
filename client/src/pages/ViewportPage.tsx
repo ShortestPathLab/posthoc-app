@@ -1,5 +1,6 @@
 import {
   BlurCircularOutlined,
+  CameraOutlined,
   CenterFocusWeakOutlined,
   LayersOutlined,
   TimesOneMobiledataOutlined,
@@ -11,6 +12,7 @@ import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
+import download from "downloadjs";
 import { inferLayerName } from "layers/inferLayerName";
 import {
   Dictionary,
@@ -29,6 +31,7 @@ import { useLayers } from "slices/layers";
 import { Renderer, useRenderers } from "slices/renderers";
 import { PanelState } from "slices/view";
 import { useAcrylic, usePaper } from "theme";
+import { generateUsername as id } from "unique-username-generator";
 import { PageContentProps } from "./PageMeta";
 import { useRendererResolver } from "./useRendererResolver";
 
@@ -122,7 +125,6 @@ export function ViewportPage({ template: Page }: PageContentProps) {
                       label="Fit"
                       icon={<CenterFocusWeakOutlined />}
                     />
-                    {divider}
                     <IconButtonWithTooltip
                       color="primary"
                       disabled={!rendererInstance}
@@ -131,6 +133,19 @@ export function ViewportPage({ template: Page }: PageContentProps) {
                       }}
                       icon={<TimesOneMobiledataOutlined />}
                       label="1 to 1"
+                    />
+                    {divider}
+                    <IconButtonWithTooltip
+                      color="primary"
+                      disabled={!rendererInstance}
+                      onClick={async () => {
+                        const a = await rendererInstance?.toDataUrl();
+                        if (a) {
+                          download(a, id("-"));
+                        }
+                      }}
+                      icon={<CameraOutlined />}
+                      label="capture-screenshot"
                     />
                   </Stack>
                 </Stack>

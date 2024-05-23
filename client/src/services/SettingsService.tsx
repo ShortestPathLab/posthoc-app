@@ -8,7 +8,8 @@ export function SettingsService() {
     useSettings();
   const [, setUIState] = useUIState();
   useEffect(() => {
-    if (!minimal && showOnStart && initialised) {
+    const workspace = new URLSearchParams(location.search).get("workspace");
+    if (!minimal && showOnStart && initialised && !workspace) {
       setUIState(() => ({ fullscreenModal: showOnStart }));
     }
   }, [initialised, minimal]);

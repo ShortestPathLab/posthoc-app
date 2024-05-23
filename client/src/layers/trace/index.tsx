@@ -172,7 +172,7 @@ export const controller = {
             notify("Opening trace...");
             try {
               const output = readUploadedTrace(file);
-              return { trace: { ...(await output.read()) } };
+              return { trace: await output.read() };
             } catch (e) {
               console.error(e);
               notify(`Error opening, ${get(e, "message")}`);
@@ -274,7 +274,7 @@ export const controller = {
         const parsedTrace = await parseTrace();
         produce((l) => {
           set(l, "source.parsedTrace", parsedTrace);
-          // set(l, "viewKey", id());
+          set(l, "viewKey", id());
         });
       }
     }, [loading, parseTrace]);

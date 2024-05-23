@@ -6,7 +6,7 @@ import { useSyncStatus } from "./SyncService";
 
 function useLayerServices() {
   const { isPrimary } = useSyncStatus();
-  const [{ layers }, setLayers] = useLayers();
+  const [{ layers }, setLayers, , c1] = useLayers();
   return useMemo(() => {
     return !isPrimary
       ? []
@@ -23,7 +23,7 @@ function useLayerServices() {
             });
           }
         });
-  }, [layers, setLayers, isPrimary]);
+  }, [c1, setLayers, isPrimary]);
 }
 
 export function LayerService() {

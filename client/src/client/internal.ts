@@ -1,8 +1,8 @@
 import { Dictionary, chain as _, entries, find, map } from "lodash";
-import { PathfindingTask, Scheme } from "protocol/SolveTask";
+import memoizee from "memoizee";
+import { Scheme } from "protocol/SolveTask";
 import url from "url-parse";
 import { Transport } from "./Transport";
-import memoizee from "memoizee";
 
 const paths = import.meta.glob("/public/maps/*.grid", {
   as: "url",

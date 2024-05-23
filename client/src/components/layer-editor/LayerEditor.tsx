@@ -26,17 +26,9 @@ import {
   startCase,
   truncate,
 } from "lodash";
-import {
-  ForwardedRef,
-  ReactNode,
-  createElement,
-  forwardRef,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
 import { Layer } from "slices/layers";
-import { useAcrylic, usePaper } from "theme";
+import { usePaper } from "theme";
 
 const compositeOperations = [
   "color",
@@ -100,7 +92,10 @@ function useDraft<T>(
   ] as const;
 }
 
-function Component({ value, onValueChange: onChange }: LayerEditorProps) {
+export function LayerEditor({
+  value,
+  onValueChange: onChange,
+}: LayerEditorProps) {
   const paper = usePaper();
   const [draft, setDraft] = useDraft(value, onChange, 300, [
     "name",
@@ -273,5 +268,3 @@ function Component({ value, onValueChange: onChange }: LayerEditorProps) {
     </>
   );
 }
-
-export const LayerEditor = forwardRef(Component);

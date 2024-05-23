@@ -6,9 +6,8 @@ export function BootstrapService() {
   const { load } = useWorkspace();
   useAsync(async () => {
     try {
-      const param = new URLSearchParams(location.search).get("workspace");
-      if (param) {
-        const workspace = decodeURIComponent(param);
+      const workspace = new URLSearchParams(location.search).get("workspace");
+      if (workspace && isWorkspace(workspace)) {
         if (isWorkspace(workspace)) {
           const name = workspace.split("/").pop() ?? workspace;
           const a = await fetch(workspace);

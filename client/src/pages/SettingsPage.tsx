@@ -289,6 +289,10 @@ export function SettingsPage({ template: Page }: PageContentProps) {
 const a = keys(mapParsers).map((c) => ({ key: c }));
 type A = (typeof a)[number];
 
+function Sink({ children }: { children?: ReactNode }) {
+  return children;
+}
+
 export function MapParserListEditor() {
   return (
     <Box sx={{ mx: -2 }}>
@@ -298,12 +302,12 @@ export function MapParserListEditor() {
         addable={false}
         deletable={false}
         editor={(v) => (
-          <Box key={v.key}>
+          <Sink key={v.key}>
             <ListItemText
               primary={startCase(v.key)}
               secondary={`Support for *.${v.key} maps`}
             />
-          </Box>
+          </Sink>
         )}
         icon={null}
         value={a}

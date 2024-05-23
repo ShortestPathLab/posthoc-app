@@ -219,7 +219,7 @@ export function TreeGraph({
     });
 
     const numParents: Dictionary<Set<string | number>> = {};
-    forEach(trace?.events, ({ id, pId, type }, i) => {
+    forEach(trace?.events, ({ id, pId }) => {
       if (id && pId) {
         numParents[id] = numParents[id] ?? new Set();
         numParents[id].add(pId);
@@ -400,8 +400,6 @@ export function TreePage({ template: Page }: PageContentProps) {
   const [trackedProperty, setTrackedProperty] = useState<string>("");
 
   const trace = layer?.source?.trace?.content;
-  const lastModified = layer?.source?.trace?.lastModified;
-  const id = layer?.source?.trace?.key;
 
   // Reset tracked property
   useEffect(() => {
@@ -422,12 +420,7 @@ export function TreePage({ template: Page }: PageContentProps) {
     return { events, current: findLast(events, (c) => c.step <= step) };
   }, [selection, step]);
 
-  const params = useMemo(
-    () => ({ trace, mode }),
-    [trace, id, lastModified, mode]
-  );
-
-  const { result: tree, loading } = useTreeMemo(params, [params]);
+  const { result: tree, loading } = useTreeMemo({ trace, mode }, [key, mode]);
 
   const settings = useMemo(
     () =>

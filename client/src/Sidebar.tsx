@@ -89,6 +89,10 @@ export function useSidebarBackground() {
   );
 }
 
+function Divider2() {
+  return <Divider sx={{ mx: 2, my: 1 }} />;
+}
+
 export function Sidebar({ children }: { children?: ReactNode }) {
   const { isPrimary } = useSyncStatus();
   const { Content, produceRoot, root, setRoot, setOpen, tab, open } =
@@ -150,7 +154,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
               )
               .flatMap((c, i, cx) => [
                 !sm && !!i && c.color !== cx[i - 1].color && (
-                  <Divider key={`divider-${i}`} sx={{ mx: 2, my: 1 }} />
+                  <Divider2 key={`divider-${i}`} />
                 ),
                 <Tab
                   onClick={() => {
