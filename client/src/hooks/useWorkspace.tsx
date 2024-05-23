@@ -1,9 +1,10 @@
 import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
 import { fileDialog as file } from "file-select-dialog";
-import sizeOf from "object-sizeof";
-import { find } from "lodash";
+import { getLayerHandler } from "layers/layerHandlers";
+import { find, pick } from "lodash";
 import memo from "memoizee";
+import sizeOf from "object-sizeof";
 import { useMemo } from "react";
 import { UIState, useUIState } from "slices/UIState";
 import { formatByte, useBusyState } from "slices/busy";
@@ -27,6 +28,26 @@ type Workspace = {
   UIState: UIState;
   layers: Layers;
 };
+
+const compressUIState = (state: UIState) => pick(state, "workspaceMeta");
+
+function minimise(ui: UIState, layers: Layers) {
+  return {
+    UIState: compressUIState(ui),
+    layers: {
+      layers: layers?.layers?.map((l) => {
+        const handler = getLayerHandler(l);
+        return {
+          ...l,
+          source: {
+            type: l.source?.type,
+            ...handler?.compress?.(l.source),
+          },
+        };
+      }),
+    },
+  };
+}
 
 export function useWorkspace() {
   const notify = useSnackbar();
@@ -63,7 +84,7 @@ export function useWorkspace() {
       },
       save: async (raw?: boolean, name?: string) => {
         notify("Saving workspace...");
-        const content = JSON.stringify({ layers, UIState });
+        const content = JSON.stringify(minimise(UIState, layers));
         const filename = name ?? id("-");
         if (raw) {
           const name = `${filename}.workspace.json`;
@@ -79,7 +100,7 @@ export function useWorkspace() {
         }
       },
       estimateWorkspaceSize: memo((raw?: boolean) => {
-        const size = sizeOf({ layers, UIState });
+        const size = sizeOf(minimise(UIState, layers));
         return size * (raw ? 1 : LZ_COMPRESSION_RATIO);
       }),
     }),

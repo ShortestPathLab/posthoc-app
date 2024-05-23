@@ -18,7 +18,6 @@ import { LayerController, inferLayerName } from "layers";
 import { MapLayer, MapLayerData } from "layers/map";
 import { TraceLayerData, controller as traceController } from "layers/trace";
 import {
-  each,
   filter,
   find,
   isArray,
@@ -27,9 +26,10 @@ import {
   mapValues,
   merge,
   omit,
+  pick,
   reduce,
   set,
-  truncate,
+  truncate
 } from "lodash";
 import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";
@@ -71,6 +71,18 @@ export const controller = {
   ...omit(traceController, "claimImportedFile"),
   key: "query",
   icon: <RouteTwoTone />,
+  compress: (layer) =>
+    pick(layer, [
+      "mapLayerKey",
+      "query",
+      "start",
+      "end",
+      "algorithm",
+      "onion",
+      "step",
+      "code",
+      "breakpoints",
+    ]),
   editor: withProduce(({ value, produce }) => {
     const { algorithm } = value?.source ?? {};
     const {

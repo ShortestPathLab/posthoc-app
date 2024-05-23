@@ -18,6 +18,7 @@ import {
   isUndefined,
   keys,
   map,
+  pick,
   round,
   set,
   startCase,
@@ -45,6 +46,7 @@ export const controller = {
       ? `${layer.source.map.name} (${startCase(layer.source.map.format)})`
       : "Untitled Map",
   error: (layer) => layer?.source?.parsedMap?.error,
+  compress: (layer) => pick(layer, ["map", "options"]),
   claimImportedFile: async (file) =>
     keys(mapParsers).includes(ext(file.name))
       ? {

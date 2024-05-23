@@ -52,6 +52,7 @@ import {
   mapValues,
   merge,
   negate,
+  pick,
   set,
   startCase,
 } from "lodash";
@@ -164,6 +165,8 @@ export const controller = {
   inferName: (layer) => layer.source?.trace?.name ?? "Untitled Trace",
   error: (layer) =>
     layer?.source?.trace?.error || layer?.source?.parsedTrace?.error,
+  compress: (layer) =>
+    pick(layer, ["trace", "onion", "step", "code", "breakpoints"]),
   claimImportedFile: async (file) =>
     isTraceFormat(file)
       ? {
