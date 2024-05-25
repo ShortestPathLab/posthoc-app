@@ -70,10 +70,12 @@ function MenuEntry({
 
 export function useTitleBarVisible() {
   const [visible, setVisible] = useState(false);
+  const [rect, setRect] = useState<DOMRect>(new DOMRect());
   useEffect(() => {
     if ("windowControlsOverlay" in navigator) {
       const f = () => {
         setVisible(!!navigator.windowControlsOverlay.visible);
+        setRect(navigator.windowControlsOverlay.getTitlebarAreaRect());
       };
       navigator.windowControlsOverlay.addEventListener("geometrychange", f);
       f();
@@ -84,7 +86,7 @@ export function useTitleBarVisible() {
         );
     }
   }, [setVisible]);
-  return visible;
+  return { visible, rect };
 }
 
 const WorkspaceChip = () => {
@@ -144,7 +146,7 @@ export const TitleBar = () => {
   useTitleBar(color);
   // const push = useSnackbar();
   const { save, load } = useWorkspace();
-  const visible = useTitleBarVisible();
+  const { visible, rect } = useTitleBarVisible();
   const [, setView] = useView();
   // const sm = useSmallDisplay();
   // const prevSm = usePrevious(sm);
@@ -188,6 +190,7 @@ export const TitleBar = () => {
           mx: 0.5,
           borderBottom: (t) => `1px solid ${t.palette.background.default}`,
           minHeight: 36,
+          paddingLeft: "env(titlebar-area-x, 0px)",
           height: visible ? "env(titlebar-area-height, 50px)" : 0,
           width: "env(titlebar-area-width, 100%)",
           WebkitAppRegion: "drag",
@@ -203,17 +206,20 @@ export const TitleBar = () => {
               alignItems="center"
               justifyContent="flex-start"
             >
-              <Box
-                sx={{
-                  p: 1,
-                  height: "100%",
-                  // Firefox fix
-                  maxWidth: "min-content",
-                  aspectRatio: 1,
-                }}
-              >
-                <img src={logo} style={{ height: "100%" }} />
-              </Box>
+              {visible && rect.x >= 0 && (
+                // Hide for macos style windows
+                <Box
+                  sx={{
+                    p: 1,
+                    height: "100%",
+                    // Firefox fix
+                    maxWidth: "min-content",
+                    aspectRatio: 1,
+                  }}
+                >
+                  <img src={logo} style={{ height: "100%" }} />
+                </Box>
+              )}
               {<WorkspaceChip />}
               {[
                 {

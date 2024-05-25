@@ -15,7 +15,7 @@ import { Flex } from "components/generic/Flex";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { inferLayerName } from "layers/inferLayerName";
-import { getLayerHandler } from "layers/layerHandlers";
+import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
 import { useMemo } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
@@ -27,7 +27,7 @@ import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 type SourceLayer = Layer;
 
 const isSourceLayer = (l: Layer): l is SourceLayer =>
-  !!getLayerHandler(l)?.getSources;
+  !!getController(l)?.getSources;
 
 type SourceLayerState = { source?: string };
 
@@ -45,7 +45,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
     useViewTreeContext<SourceLayerState>();
 
   const source = useMemo(
-    () => getLayerHandler(layer)?.getSources?.(layer),
+    () => getController(layer)?.getSources?.(layer),
     [layer]
   );
 

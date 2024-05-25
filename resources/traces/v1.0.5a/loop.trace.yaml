@@ -14,7 +14,7 @@ render:
         height: 1
         x: "{{$.event.x + $.i}}"
         y: "{{$.event.y + 5}}"
-        fill: "{{$.color[$.event.type]}}"
+        fill: "blue"
         text: "i: {{$.i}}"
         textX: 0.1
         textY: 0.9

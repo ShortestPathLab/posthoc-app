@@ -20,10 +20,10 @@ import { PageContentProps } from "./PageMeta";
 import { Placeholder } from "components/inspector/Placeholder";
 import { Scroll } from "components/generic/Scrollbars";
 import { PlaybackLayerData } from "components/app-bar/Playback";
-import { getLayerHandler } from "layers/layerHandlers";
+import { getController } from "layers/layerControllers";
 
 const stepsLayerGuard = (l: Layer): l is Layer<DebugLayerData> =>
-  !!getLayerHandler(l).steps;
+  !!getController(l).steps;
 
 const divider = (
   <Divider

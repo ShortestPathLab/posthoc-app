@@ -1,7 +1,5 @@
-import { EditOutlined as EditIcon } from "@mui/icons-material";
 import {
   Box,
-  ButtonBase,
   Chip,
   Stack,
   Switch,
@@ -12,7 +10,6 @@ import {
 } from "@mui/material";
 import { transports } from "client";
 import { Flex } from "components/generic/Flex";
-import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
 import {
   ManagedModal as Dialog,
   AppBarTitle as Title,
@@ -93,8 +90,19 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
                       ? `${connection.name} ${connection.version}`
                       : startCase(status)}
                   </Type>
+                  {!!connection?.description && (
+                    <Type
+                      component="div"
+                      variant="body2"
+                      color="text.secondary"
+                    >
+                      {connection.description}
+                    </Type>
+                  )}
                   <Type component="div" variant="body2" color="text.secondary">
-                    {connection?.description ?? (value?.url || "No URL")}
+                    {transports[value?.transport]?.name}
+                    {": "}
+                    {value?.url || "No URL"}
                   </Type>
                 </Box>
                 <Chip

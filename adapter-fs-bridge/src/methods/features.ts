@@ -36,6 +36,7 @@ export async function getTraceDescriptor(path: string) {
     format: file.ext.slice(1),
     description: relative(root, path),
     lastModified: mtime.valueOf(),
+    key: `${mtime.valueOf()}`,
   };
 }
 

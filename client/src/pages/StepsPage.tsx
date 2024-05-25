@@ -19,7 +19,7 @@ import { getColorHex, tint } from "components/renderer/colors";
 import { useBreakpoints } from "hooks/useBreakpoints";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
-import { getLayerHandler } from "layers/layerHandlers";
+import { getController } from "layers/layerControllers";
 import {
   chain as _,
   clamp,
@@ -51,7 +51,7 @@ const pxToInt = (s: string) => Number(s.replace(/px$/, ""));
 const SYMBOL_ALL = id();
 
 const stepsLayerGuard = (l: Layer): l is Layer<PlaybackLayerData> =>
-  !!getLayerHandler(l).steps;
+  !!getController(l).steps;
 
 type StepsPageState = {
   layer?: string;
@@ -123,7 +123,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
 
   const rawSteps = useMemo(() => {
     if (layer) {
-      const { steps: getSteps } = getLayerHandler(layer)!;
+      const { steps: getSteps } = getController(layer)!;
       return getSteps!(layer);
     }
   }, [layer]);

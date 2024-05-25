@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { SelectionInfoProvider } from "layers/LayerController";
-import { getLayerHandler } from "layers/layerHandlers";
+import { getController } from "layers/layerControllers";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { chain, Dictionary, entries, merge } from "lodash";
 import { useCache } from "pages/TreePage";
@@ -163,7 +163,7 @@ function useSelectionMenu() {
     () =>
       chain(layers)
         .reduce((A, l) => {
-          const B = getLayerHandler(l)?.provideSelectionInfo ?? identity;
+          const B = getController(l)?.provideSelectionInfo ?? identity;
           return ({ children, event }: SelectionInfoProviderProps) => (
             <B layer={l.key} event={event}>
               {(a) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}

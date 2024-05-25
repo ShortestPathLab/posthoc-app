@@ -15,7 +15,7 @@ import { Flex } from "components/generic/Flex";
 import { ManagedModal as Dialog } from "components/generic/Modal";
 import { Space } from "components/generic/Space";
 import { inferLayerName } from "layers/inferLayerName";
-import { getLayerHandler, layerHandlers } from "layers/layerHandlers";
+import { getController, getControllers } from "layers/layerControllers";
 import {
   debounce,
   first,
@@ -133,7 +133,7 @@ export function LayerEditor({
 
   const name = draft.name || inferLayerName(value);
 
-  const error = getLayerHandler(value)?.error?.(value);
+  const error = getController(value)?.error?.(value);
 
   return (
     <>
@@ -167,7 +167,7 @@ export function LayerEditor({
                   color: "action.disabled",
                 }}
               >
-                {getLayerHandler(value).icon}
+                {getController(value).icon}
               </Stack>
               <Box
                 sx={{
@@ -224,9 +224,9 @@ export function LayerEditor({
               onChange={(_, v) =>
                 setDraft?.((d) => set(d, "source", { type: v }))
               }
-              value={draft.source?.type ?? first(keys(layerHandlers)) ?? ""}
+              value={draft.source?.type ?? first(keys(getControllers())) ?? ""}
             >
-              {keys(layerHandlers).map((s) => (
+              {keys(getControllers()).map((s) => (
                 <Tab label={startCase(s)} value={s} key={s} />
               ))}
             </Tabs>
@@ -235,7 +235,7 @@ export function LayerEditor({
 
           {renderHeading("Source Options")}
           {draft.source?.type &&
-            createElement(layerHandlers[draft.source.type].editor, {
+            createElement(getController(draft).editor, {
               onChange: setDraft,
               value: draft,
             })}

@@ -1,7 +1,7 @@
 import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
 import { fileDialog as file } from "file-select-dialog";
-import { getLayerHandler } from "layers/layerHandlers";
+import { getController } from "layers/layerControllers";
 import { find, pick } from "lodash";
 import memo from "memoizee";
 import sizeOf from "object-sizeof";
@@ -36,7 +36,7 @@ function minimise(ui: UIState, layers: Layers) {
     UIState: compressUIState(ui),
     layers: {
       layers: layers?.layers?.map((l) => {
-        const handler = getLayerHandler(l);
+        const handler = getController(l);
         return {
           ...l,
           source: {

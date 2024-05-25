@@ -25,6 +25,7 @@ export function useTraceContent(trace?: UploadedTrace) {
               const result = await connection
                 .transport()
                 .call("features/trace", { id });
+              console.log(result?.content);
               return result?.content;
             }
           }
@@ -40,13 +41,17 @@ export function useTraceContent(trace?: UploadedTrace) {
   return useAsync(
     () =>
       usingLoadingState(async () => {
-        if (id)
-          return {
-            ...trace,
-            content: content
-              ? content
-              : await getTrace({ source, id, lastModified }),
-          };
+        if (id) {
+          if (content) {
+            return { ...trace, content };
+          } else {
+            const a = await getTrace({ source, id, lastModified });
+            return {
+              ...trace,
+              content: a,
+            };
+          }
+        }
       }),
     [getTrace, !!content, key, source, id, lastModified]
   );

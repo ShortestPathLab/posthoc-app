@@ -77,19 +77,22 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
                     ? `${current.renderer.meta.name} ${current.renderer.meta.version}`
                     : startCase(status)}
                 </Type>
-                <Type component="div" variant="body2" color="text.secondary">
-                  {current ? (
+                {!!current && (
+                  <Type component="div" variant="body2" color="text.secondary">
                     <>
                       <span>{current.renderer.meta.description}</span>
                       <br />
                       <span>
-                        Contributes:{" "}
+                        Contributes{" "}
                         {join(current.renderer.meta.components, ", ")}
                       </span>
                     </>
-                  ) : (
-                    value?.url || "No URL"
-                  )}
+                  </Type>
+                )}
+                <Type component="div" variant="body2" color="text.secondary">
+                  {transports[value?.transport]?.name}
+                  {": "}
+                  {value?.url || "No URL"}
                 </Type>
               </Box>
               <Chip

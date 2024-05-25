@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import { Layer } from "slices/layers";
-import { layerHandlers } from "./layerHandlers";
+import { getController } from "./layerControllers";
 
 export function RenderLayer({
   layer,
@@ -12,7 +12,7 @@ export function RenderLayer({
   return (
     <>
       {layer &&
-        createElement(layerHandlers[layer?.source?.type ?? ""]?.renderer, {
+        createElement(getController(layer)?.renderer, {
           layer,
           index,
         })}

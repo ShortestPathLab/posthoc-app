@@ -2,7 +2,7 @@ import { WorkspacesOutlined } from "@mui/icons-material";
 import { Backdrop, Stack, Typography as Type } from "@mui/material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useWorkspace } from "hooks/useWorkspace";
-import { layerHandlers } from "layers/layerHandlers";
+import { getControllers } from "layers/layerControllers";
 import { entries, head } from "lodash";
 import { nanoid as id } from "nanoid";
 import pluralize from "pluralize";
@@ -24,7 +24,7 @@ export function FileDropZone() {
   async function importFiles(fs: File[]) {
     let totalClaimed = 0;
     for (const [file, i] of fs.map((...args) => args)) {
-      for (const [type, { claimImportedFile }] of entries(layerHandlers)) {
+      for (const [type, { claimImportedFile }] of entries(getControllers())) {
         const outcome = await claimImportedFile?.(file);
         if (outcome?.claimed) {
           await usingBusyState(async () => {

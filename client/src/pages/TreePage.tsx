@@ -50,7 +50,7 @@ import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
-import { getLayerHandler } from "layers/layerHandlers";
+import { getController } from "layers/layerControllers";
 import { TraceLayerData } from "layers/trace";
 import {
   Dictionary,
@@ -372,7 +372,7 @@ function makeEdgeKey(
 
 const stepsLayerGuard = (
   l: Layer
-): l is Layer<PlaybackLayerData & TraceLayerData> => !!getLayerHandler(l).steps;
+): l is Layer<PlaybackLayerData & TraceLayerData> => !!getController(l).steps;
 
 export function TreePage({ template: Page }: PageContentProps) {
   const { key, setKey, layer, layers, allLayers } = useLayer(

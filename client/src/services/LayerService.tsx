@@ -1,4 +1,4 @@
-import { getLayerHandler } from "layers/layerHandlers";
+import { getController } from "layers/layerControllers";
 import { map } from "lodash";
 import { createElement, useMemo } from "react";
 import { useLayers } from "slices/layers";
@@ -11,7 +11,7 @@ function useLayerServices() {
     return !isPrimary
       ? []
       : map(layers, (layer) => {
-          const service = getLayerHandler(layer).service;
+          const service = getController(layer).service;
           if (service) {
             return createElement(service, {
               key: layer.key,
