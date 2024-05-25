@@ -1,6 +1,7 @@
 import { chain } from "lodash";
 import { getValue } from "./gradient";
 import { ParseGridWorkerParameters } from "./parseGrid.worker";
+import { usingMessageHandler } from "../../../../workers/usingWorker";
 
 export type GetGridSymbolsReturnType = {
   symbols: { symbol: string; value: number }[];
@@ -27,6 +28,7 @@ export function getGridSymbols({
   };
 }
 
-onmessage = ({ data }: MessageEvent<GetGridSymbolsParameters>) => {
-  postMessage(getGridSymbols(data));
-};
+onmessage = usingMessageHandler(
+  async ({ data }: MessageEvent<GetGridSymbolsParameters>) =>
+    getGridSymbols(data)
+);

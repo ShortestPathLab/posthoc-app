@@ -10,12 +10,15 @@ import {
 } from "lodash";
 import { CompiledComponent } from "protocol";
 import { ComponentEntry } from "renderer";
-import { usingWorkerTask } from "../../../workers/usingWorker";
+import {
+  usingMessageHandler,
+  usingWorkerTask,
+} from "../../../workers/usingWorker";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
   ParseTraceWorkerSlaveReturnType,
-} from "./parseTraceSlave.worker";
+} from "./ParseTraceSlaveWorker";
 import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";
 
 type C = CompiledComponent<string, Record<string, any>>;
@@ -39,16 +42,16 @@ const { min } = Math;
 
 const SLAVE_COUNT = navigator.hardwareConcurrency ?? 8;
 
-export class ParseTraceWorker extends Worker {
-  constructor() {
-    super(parseTraceWorkerUrl, { type: "module" });
-  }
-}
-
 const parseTraceWorker = usingWorkerTask<
   ParseTraceWorkerParameters,
   ParseTraceWorkerSlaveReturnType
->(ParseTraceWorker);
+>(
+  class ParseTraceWorker extends Worker {
+    constructor() {
+      super(parseTraceWorkerUrl, { type: "module" });
+    }
+  }
+);
 
 async function parse({
   trace,
@@ -57,6 +60,7 @@ async function parse({
 }: ParseTraceWorkerParameters): Promise<ParseTraceWorkerReturnType> {
   const chunkSize = ceil((trace?.events?.length ?? 0) / SLAVE_COUNT);
   const chunks = range(0, trace?.events?.length, chunkSize);
+
   const outs = flatten(
     await Promise.all(
       map(chunks, (i) =>
@@ -97,6 +101,7 @@ async function parse({
   };
 }
 
-onmessage = async ({ data }: MessageEvent<ParseTraceWorkerParameters>) => {
-  postMessage(await parse(data));
-};
+onmessage = usingMessageHandler(
+  async ({ data }: MessageEvent<ParseTraceWorkerParameters>) =>
+    await parse(data)
+);

@@ -220,9 +220,10 @@ export class D2RendererWorker extends EventEmitter<
   }
 
   loadFont = once(async () => {
+    // Don't force font
     const fontFace = new FontFace(
       "Inter",
-      "local('Inter'), local('Inter UI'), url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2) format('woff2')"
+      "local('Inter'), local('Inter UI'), url('/public/fonts/inter.woff2') format('woff2'), url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2) format('woff2'), local('Arial'), local('Helvetica'), local('sans-serif')"
     );
     // add it to the list of fonts our worker supports
     self.fonts.add(fontFace);

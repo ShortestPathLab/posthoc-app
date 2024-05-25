@@ -2,6 +2,7 @@ import { Dictionary, identity, maxBy, minBy } from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
+import { usingMessageHandler } from "../../../../workers/usingWorker";
 
 export type Options = {
   color?: string;
@@ -72,6 +73,6 @@ function parseMesh({
   };
 }
 
-onmessage = ({ data }: MessageEvent<ParseMeshWorkerParameters>) => {
-  postMessage(parseMesh(data));
-};
+onmessage = usingMessageHandler(
+  async ({ data }: MessageEvent<ParseMeshWorkerParameters>) => parseMesh(data)
+);

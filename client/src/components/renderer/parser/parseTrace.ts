@@ -1,3 +1,4 @@
+// import "nested-worker/window";
 import { useSnackbar } from "components/generic/Snackbar";
 import { get } from "lodash";
 import pluralize from "pluralize";
@@ -8,7 +9,7 @@ import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
-} from "./parseTraceSlave.worker";
+} from "./ParseTraceSlaveWorker";
 
 export class ParseTraceWorker extends Worker {
   constructor() {

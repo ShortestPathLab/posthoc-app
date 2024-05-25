@@ -1,19 +1,20 @@
+// import "nested-worker/window";
 import { useSnackbar } from "components/generic/Snackbar";
 import { get } from "lodash";
 import pluralize from "pluralize";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import parseTraceWorkerLegacyUrl from "../parser/parseTrace.worker.ts?worker&url";
 import {
   ParseTraceWorkerParameters as ParseTraceWorkerLegacyParameters,
   ParseTraceWorkerReturnType as ParseTraceWorkerLegacyReturnType,
-} from "../parser/parseTraceSlave.worker";
+} from "../parser/ParseTraceSlaveWorker";
 import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
-} from "./parseTraceSlave.worker";
+} from "./ParseTraceSlaveWorker";
 
 export class ParseTraceWorker extends Worker {
   constructor() {
@@ -49,7 +50,7 @@ export function useTraceParser(
           push("Processing trace...");
           try {
             const output =
-              params.trace.version === "1.4.0"
+              params.trace?.version === "1.4.0"
                 ? await parseTraceAsync(params as ParseTraceWorkerParameters)
                 : await parseTraceLegacyAsync(
                     params as ParseTraceWorkerLegacyParameters

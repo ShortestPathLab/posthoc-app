@@ -1,9 +1,12 @@
 import { ceil, flatMap, flatten, map, range } from "lodash";
-import { usingWorkerTask } from "../../../workers/usingWorker";
+import {
+  usingMessageHandler,
+  usingWorkerTask,
+} from "../../../workers/usingWorker";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
-} from "./parseTraceSlave.worker";
+} from "./ParseTraceSlaveWorker";
 import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";
 
 const { min } = Math;
@@ -48,6 +51,7 @@ async function parse({
   };
 }
 
-onmessage = async ({ data }: MessageEvent<ParseTraceWorkerParameters>) => {
-  postMessage(await parse(data));
-};
+onmessage = usingMessageHandler(
+  async ({ data }: MessageEvent<ParseTraceWorkerParameters>) =>
+    await parse(data)
+);

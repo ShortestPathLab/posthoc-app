@@ -33,7 +33,7 @@ export async function uploadTrace(): Promise<
   FileHandle<UploadedTrace | undefined> | undefined
 > {
   const f = await file({
-    accept: FORMATS,
+    accept: EXTENSIONS.map((c) => `.${c}`),
     strict: true,
   });
   if (f) {
@@ -57,7 +57,9 @@ export function readUploadedTrace(f: File) {
           key: id(),
         };
       } else {
-        throw new Error(`The format (${ext(f.name)}) is unsupported.`);
+        throw new Error(
+          `The file should have one of these extensions: ${FORMATS.join(", ")}`
+        );
       }
     },
   };

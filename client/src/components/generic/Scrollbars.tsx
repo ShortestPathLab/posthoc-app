@@ -1,11 +1,11 @@
 import { useTheme } from "@mui/material";
+import { OverlayScrollbars } from "overlayscrollbars";
 import {
   OverlayScrollbarsComponent,
   OverlayScrollbarsComponentProps,
 } from "overlayscrollbars-react";
-import { OverlayScrollbars } from "overlayscrollbars";
+import { ForwardedRef, ReactNode, forwardRef, useCallback } from "react";
 import { useCss } from "react-use";
-import { ForwardedRef, forwardRef, ReactNode, useCallback } from "react";
 
 type ScrollProps = {
   children?: ReactNode;
@@ -56,7 +56,7 @@ export const Scroll = forwardRef(
             const viewport = instance.elements().viewport;
             if (viewport) {
               if (typeof ref === "function") {
-                ref(viewport as HTMLDivElement);
+                ref?.(viewport as HTMLDivElement);
               } else {
                 ref.current = viewport as HTMLDivElement;
               }

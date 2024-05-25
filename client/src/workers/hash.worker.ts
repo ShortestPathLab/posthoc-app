@@ -1,2 +1,5 @@
 import md5 from "md5";
-onmessage = (str: MessageEvent<string>) => postMessage(md5(str.data));
+import { usingMessageHandler } from "./usingWorker";
+onmessage = usingMessageHandler(async (str: MessageEvent<string>) =>
+  md5(str.data)
+);

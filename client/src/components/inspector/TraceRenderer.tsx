@@ -6,7 +6,7 @@ import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { RenderLayer } from "layers/RenderLayer";
-import { clamp, find, floor, map } from "lodash";
+import { clamp, find, floor, get, map } from "lodash";
 import { nanoid } from "nanoid";
 import { Size } from "protocol";
 import {
@@ -54,32 +54,37 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
   const [instance, setInstance] = useState<Renderer>();
 
   useEffect(() => {
-    setError("");
     if (ref.current && width && height && renderer) {
       const entry = find(renderers, (r) => r.renderer.meta.id === renderer);
       if (entry) {
-        const instance = new entry.renderer.constructor();
-        instance.setup({
-          ...rendererOptions,
-          screenSize: {
-            width,
-            height,
-          },
-          backgroundColor: theme.palette.background.paper,
-          accentColor: theme.palette.primary.main,
-        });
-        ref.current.append(instance.getView()!);
-        setInstance(instance);
-        return () => {
-          try {
-            ref.current?.removeChild?.(instance.getView()!);
-            setInstance(undefined);
-          } catch (e) {
-            console.warn(e);
-          } finally {
-            instance.destroy();
-          }
-        };
+        try {
+          const instance = new entry.renderer.constructor();
+          instance.setup({
+            ...rendererOptions,
+            screenSize: {
+              width,
+              height,
+            },
+            backgroundColor: theme.palette.background.paper,
+            accentColor: theme.palette.primary.main,
+          });
+          ref.current.append(instance.getView()!);
+          setInstance(instance);
+          setError("");
+          return () => {
+            try {
+              ref.current?.removeChild?.(instance.getView()!);
+              setInstance(undefined);
+            } catch (e) {
+              console.warn(e);
+            } finally {
+              instance.destroy();
+            }
+          };
+        } catch (e) {
+          setError(`${entry.renderer.meta.name}: ${get(e, "message")}`);
+          setInstance(undefined);
+        }
       }
     }
   }, [ref.current, map, renderer, renderers, theme, setError, setInstance]);

@@ -33,7 +33,7 @@ import { colorsHex, getColorHex } from "components/renderer/colors";
 import { parseProperty } from "components/renderer/parser-v140/parseProperty";
 import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
 import { parseProperty as parsePropertyLegacy } from "components/renderer/parser/parseProperty";
-import { ParseTraceWorkerReturnType } from "components/renderer/parser/parseTraceSlave.worker";
+import { ParseTraceWorkerReturnType } from "components/renderer/parser/ParseTraceSlaveWorker";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { useTraceContent } from "hooks/useTraceContent";
 import { dump } from "js-yaml";

@@ -2,6 +2,7 @@ import { chunk, Dictionary, flatten, identity, maxBy, minBy } from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
+import { usingMessageHandler } from "../../../../workers/usingWorker";
 
 export type Options = {
   color?: string;
@@ -70,6 +71,6 @@ function parsePoly({
   };
 }
 
-onmessage = ({ data }: MessageEvent<ParsePolyWorkerParameters>) => {
-  postMessage(parsePoly(data));
-};
+onmessage = usingMessageHandler(
+  async ({ data }: MessageEvent<ParsePolyWorkerParameters>) => parsePoly(data)
+);

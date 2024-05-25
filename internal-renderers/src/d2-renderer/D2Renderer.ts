@@ -137,6 +137,9 @@ class D2Renderer
   }
 
   setup(options: Partial<D2RendererOptions>) {
+    if (this.#featureError()) {
+      throw new Error(this.#featureError());
+    }
     const o = { ...defaultD2RendererOptions, ...options };
     this.#setupPixi(o);
     this.setOptions(o);
@@ -272,6 +275,12 @@ class D2Renderer
       this.#options.refreshInterval
     )
   );
+
+  #featureError = once(() => {
+    if (typeof OffscreenCanvas === "undefined") {
+      return "OffscreenCanvas API is not supported by your system.";
+    }
+  });
 
   #startDynamicResolution() {
     const { dynamicResolution } = this.#options;

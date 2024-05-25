@@ -12,6 +12,7 @@ import {
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
+import { usingMessageHandler } from "../../../../workers/usingWorker";
 
 export type Options = {
   color?: string;
@@ -149,6 +150,7 @@ function parseNetwork({
   };
 }
 
-onmessage = ({ data }: MessageEvent<ParseNetworkWorkerParameters>) => {
-  postMessage(parseNetwork(data));
-};
+onmessage = usingMessageHandler(
+  async ({ data }: MessageEvent<ParseNetworkWorkerParameters>) =>
+    parseNetwork(data)
+);

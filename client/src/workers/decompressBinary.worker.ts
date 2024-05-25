@@ -1,3 +1,5 @@
 import { decompressFromUint8Array as decompress } from "lz-string";
-onmessage = (str: MessageEvent<Uint8Array>) =>
-  postMessage(decompress(str.data));
+import { usingMessageHandler } from "./usingWorker";
+onmessage = usingMessageHandler(async (str: MessageEvent<Uint8Array>) =>
+  decompress(str.data)
+);

@@ -1,3 +1,6 @@
 import { load } from "js-yaml";
+import { usingMessageHandler } from "./usingWorker";
 
-onmessage = (str: MessageEvent<string>) => postMessage(load(str.data));
+onmessage = usingMessageHandler(async (str: MessageEvent<string>) =>
+  load(str.data)
+);

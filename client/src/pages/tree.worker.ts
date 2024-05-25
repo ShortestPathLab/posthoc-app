@@ -1,6 +1,7 @@
 import { graphlib, layout } from "dagre";
 import { Dictionary, forEach, pick } from "lodash";
 import { Trace, TraceEvent } from "protocol";
+import { usingMessageHandler } from "../workers/usingWorker";
 
 export function getFinalParents(trace: Trace | undefined) {
   const finalParent: Dictionary<Key> = {};
@@ -104,6 +105,6 @@ export type TreeWorkerReturnType =
   | { x: number; y: number; label: string; size: number }[]
   | undefined;
 
-onmessage = ({ data }: MessageEvent<TreeWorkerParameters>) => {
-  postMessage(parse(data));
-};
+onmessage = usingMessageHandler(
+  async ({ data }: MessageEvent<TreeWorkerParameters>) => parse(data)
+);

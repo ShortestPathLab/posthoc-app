@@ -1,2 +1,5 @@
 import { compressToBase64 as compress } from "lz-string";
-onmessage = (str: MessageEvent<string>) => postMessage(compress(str.data));
+import { usingMessageHandler } from "./usingWorker";
+onmessage = usingMessageHandler(async (str: MessageEvent<string>) =>
+  compress(str.data)
+);

@@ -4,7 +4,7 @@ import {
   TreeWorkerParameters,
   TreeWorkerReturnType,
 } from "./treeLegacy.worker";
-import { usingMemoizedWorkerTask } from "workers/usingWorker";
+import { usingMemoizedWorkerTask } from "../workers/usingWorker";
 import treeWorkerUrl from "./treeLegacy.worker.ts?worker&url";
 
 export class TreeWorkerUrl extends Worker {
