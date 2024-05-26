@@ -3,6 +3,11 @@ npx electron-packager . Posthoc --dir dist --platform=linux --arch=x64 --electro
 npx electron-packager . Posthoc --dir dist --platform=darwin --arch=arm64 --electronVersion=26.2.1 --ignore node_modules --ignore src --overwrite --icon ./dist/favicon --out bin
 npx electron-packager . Posthoc --dir dist --platform=darwin --arch=x64 --electronVersion=26.2.1 --ignore node_modules --ignore src --overwrite --icon ./dist/favicon --out bin
 
+mkdir -p ./bin/Posthoc-darwin-x64/resources/app
+mkdir -p ./bin/Posthoc-darwin-arm64/resources/app
+cp -r ./dist ./bin/Posthoc-darwin-x64/resources/app
+cp -r ./dist ./bin/Posthoc-darwin-arm64/resources/app
+
 cd bin
 
 zip -r Posthoc-linux-x64.zip Posthoc-linux-x64
