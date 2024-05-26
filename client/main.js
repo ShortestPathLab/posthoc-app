@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
     : `./${
         url.parse(
           path.join(
-            electron.app.isPackaged ? "resource/app/dist" : "dist",
+            electron.app.isPackaged ? "resources/app/dist" : "dist",
             req.url
           )
         ).pathname
