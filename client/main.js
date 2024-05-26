@@ -17,16 +17,28 @@ const map = {
 
 const server = http.createServer((req, res) => {
   // extract URL path
-
   let pathname1 = `./${
     url.parse(
       path.join(
-        electron.app.isPackaged ? "resources/app/dist" : "dist",
+        electron.app.isPackaged
+          ? path.join(electron.app.getAppPath(), "dist")
+          : "dist",
         req.url
       )
     ).pathname
   }`;
-  // Try again for macos
+  pathname1 = fs.existsSync(pathname1)
+    ? pathname1
+    : fs.existsSync(path.resolve(__dirname, pathname1))
+    ? path.resolve(__dirname, pathname1)
+    : `./${
+        url.parse(
+          path.join(
+            electron.app.isPackaged ? "resource/app/dist" : "dist",
+            req.url
+          )
+        ).pathname
+      }`;
   let pathname = fs.existsSync(pathname1)
     ? pathname1
     : path.resolve(__dirname, pathname1);
