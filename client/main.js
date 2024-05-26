@@ -46,24 +46,31 @@ const server = http.createServer((req, res) => {
     res.end(`File ${pathname} not found!`);
   }
 });
+
+/**
+ * @type import("electron").BrowserWindowConstructorOptions
+ */
+const a = {
+  autoHideMenuBar: true,
+  center: true,
+  titleBarStyle: "hidden",
+  titleBarOverlay: {
+    height: 32,
+    color: "#00000000",
+    symbolColor: "#00000000",
+  },
+
+  webPreferences: {
+    zoomFactor: 0.9,
+    preload: path.resolve(__dirname, "preload.js"),
+  },
+};
 server.listen(0, () => {
   const port = server.address().port;
   console.log("Listening on port:", port);
   const createWindow = () => {
-    const win = new electron.BrowserWindow({
-      autoHideMenuBar: true,
-      center: true,
-      show: false,
-      titleBarStyle: "hidden",
-      titleBarOverlay: {
-        height: 32,
-        color: "#00000000",
-        symbolColor: "#00000000",
-      },
-      webPreferences: {
-        preload: path.resolve(__dirname, "preload.js"),
-      },
-    });
+    const win = new electron.BrowserWindow({ ...a, show: false });
+    win.webContents.setWindowOpenHandler(makeWindowOpenHandler(port));
     win.loadURL(`http://localhost:${port}/index.html`);
     win.maximize();
     win.show();
@@ -71,16 +78,40 @@ server.listen(0, () => {
       win.webContents.setZoomFactor(0.9);
     });
     electron.ipcMain.handle("title-bar", (_e, background, foreground) => {
-      win.setTitleBarOverlay({
-        color: background,
-        symbolColor: foreground,
-      });
+      const win2 = electron.BrowserWindow.getAllWindows().find(
+        (c) => c.webContents.id === _e.sender.id
+      );
+      if (win2) {
+        win2.setTitleBarOverlay({
+          color: background,
+          symbolColor: foreground,
+        });
+      }
     });
   };
   electron.app.whenReady().then(() => {
     createWindow();
   });
+  electron.app.on("browser-window-created", (e, w) => {
+    w.webContents.setWindowOpenHandler(makeWindowOpenHandler(port));
+  });
   electron.app.on("window-all-closed", () => {
     electron.app.quit();
   });
 });
+
+function makeWindowOpenHandler(port) {
+  return ({ url }) => {
+    const { host } = new URL(url);
+    if (host === `localhost:${port}`) {
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: a,
+        outlivesOpener: true,
+      };
+    } else {
+      electron.shell.openExternal(url);
+      return { action: "deny" };
+    }
+  };
+}
