@@ -49,6 +49,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./client/bin/Posthoc-darwin-arm64.zip
+          asset_name: Posthoc-darwin-arm64.zip
+          asset_content_type: application/zip
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./client/bin/Posthoc-linux-x64.zip
           asset_name: Posthoc-linux-x64.zip
           asset_content_type: application/zip
