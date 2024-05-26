@@ -266,13 +266,13 @@ export default function Modal({
             height && !sm
               ? height
               : sm
-              ? `${mt}vh`
+              ? `${mt}dvh`
               : hasOverflowingChildren
               ? "100%"
               : childHeight || "fit-content",
           position: "relative",
           maxWidth: "none",
-          marginTop: sm ? `${100 - mt}vh` : 0,
+          marginTop: sm ? `${100 - mt}dvh` : 0,
           ...props.PaperProps?.style,
         },
         ...props.PaperProps,

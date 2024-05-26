@@ -206,7 +206,7 @@ export const TitleBar = () => {
               alignItems="center"
               justifyContent="flex-start"
             >
-              {visible && rect.x >= 0 && (
+              {(!visible || rect.x === 0) && (
                 // Hide for macos style windows
                 <Box
                   sx={{

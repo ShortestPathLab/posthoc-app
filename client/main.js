@@ -17,7 +17,8 @@ const map = {
 
 const server = http.createServer((req, res) => {
   // extract URL path
-  let pathname = `./${
+
+  let pathname1 = `./${
     url.parse(
       path.join(
         electron.app.isPackaged ? "resources/app/dist" : "dist",
@@ -25,6 +26,10 @@ const server = http.createServer((req, res) => {
       )
     ).pathname
   }`;
+  // Try again for macos
+  let pathname = fs.existsSync(pathname1)
+    ? pathname1
+    : path.resolve(__dirname, pathname1);
   // based on the URL path, extract the file extension. e.g. .js, .doc, ...
   const ext = path.parse(pathname).ext;
 
@@ -59,7 +64,7 @@ const a = {
     color: "#00000000",
     symbolColor: "#00000000",
   },
-
+  resizable: true,
   webPreferences: {
     zoomFactor: 0.9,
     preload: path.resolve(__dirname, "preload.js"),
@@ -81,7 +86,7 @@ server.listen(0, () => {
       const win2 = electron.BrowserWindow.getAllWindows().find(
         (c) => c.webContents.id === _e.sender.id
       );
-      if (win2) {
+      if (win2 && "setTitleBarOverlay" in win2) {
         win2.setTitleBarOverlay({
           color: background,
           symbolColor: foreground,

@@ -3,7 +3,6 @@ import { Flex } from "components/generic/Flex";
 import Modal, { ModalAppBar } from "components/generic/Modal";
 import { Scroll } from "components/generic/Scrollbars";
 import { withSlots } from "components/withSlots";
-import { useConnection } from "hooks/useConnectionResolver";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
 import { pages } from "pages";
 import { PageSlots } from "pages/Page";
@@ -38,7 +37,7 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
     const acrylic = useAcrylic();
     return (
       <Stack
-        sx={{ height: sm ? "calc(100%  - 56px)" : "100%", minHeight: "70vh" }}
+        sx={{ height: sm ? "calc(100%  - 56px)" : "100%", minHeight: "70dvh" }}
       >
         {!!slotProps.Options?.children && (
           <Stack sx={{ minHeight: (t) => t.spacing(6), flex: 0 }}>

@@ -36,7 +36,7 @@ const services = [
   LayerService,
   LogCaptureService,
   SettingsService,
-  BootstrapService
+  BootstrapService,
 ];
 
 function App() {
@@ -67,7 +67,7 @@ function App() {
               WebkitAppRegion: "drag",
               background: (t) => t.palette.background.paper,
               width: "100vw",
-              height: "100vh",
+              height: "100dvh",
             }}
           >
             <TitleBarPlaceholder />
@@ -80,7 +80,7 @@ function App() {
             sx={{
               WebkitAppRegion: "drag",
               width: "100vw",
-              height: "100vh",
+              height: "100dvh",
               alignItems: "center",
               justifyContent: "center",
               gap: 6,
