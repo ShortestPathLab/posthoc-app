@@ -2,6 +2,10 @@ import type { pages } from "pages";
 import { createSlice, withLocalStorage } from "./createSlice";
 import { AccentColor } from "theme";
 
+export type Sources = {
+  trustedOrigins?: string[];
+};
+
 export type Remote = {
   url: string;
   transport: string;
@@ -24,7 +28,7 @@ export type Settings = {
   "appearance/theme"?: "dark" | "light";
   "appearance/accentColor"?: AccentColor;
   "behaviour/showOnStart"?: keyof typeof pages;
-};
+} & Sources;
 
 export const defaultRemotes = [
   {
@@ -52,6 +56,7 @@ export const defaultPlaybackRate = 1;
 export const defaults = {
   renderer: defaultRenderers,
   remote: defaultRemotes,
+  trustedOrigins: [],
   "playback/playbackRate": defaultPlaybackRate,
   "appearance/theme": "dark",
   "appearance/acrylic": true,

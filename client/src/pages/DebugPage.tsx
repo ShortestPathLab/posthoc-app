@@ -5,22 +5,22 @@ import {
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Divider, Tab, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { Scroll } from "components/generic/Scrollbars";
+import { Placeholder } from "components/inspector/Placeholder";
+import { TrustedContent } from "components/inspector/TrustedContent";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { makeTemplate } from "components/script-editor/makeTemplate";
 import { templates } from "components/script-editor/templates";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { inferLayerName } from "layers/inferLayerName";
+import { getController } from "layers/layerControllers";
 import { find, map, set, values } from "lodash";
 import { produce } from "produce";
 import { ReactNode, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { PageContentProps } from "./PageMeta";
-import { Placeholder } from "components/inspector/Placeholder";
-import { Scroll } from "components/generic/Scrollbars";
-import { PlaybackLayerData } from "components/app-bar/Playback";
-import { getController } from "layers/layerControllers";
 
 const stepsLayerGuard = (l: Layer): l is Layer<DebugLayerData> =>
   !!getController(l).steps;
@@ -87,15 +87,19 @@ export function DebugPage({ template: Page }: PageContentProps) {
                   </Box>
                 </TabPanel>
                 <TabPanel value="advanced" sx={{ p: 0, height: "100%" }}>
-                  <ScriptEditor
-                    code={code ?? makeTemplate(values(templates))}
-                    onChange={(v) =>
-                      layer &&
-                      setLayer(
-                        produce(layer, (layer) => set(layer, "source.code", v))
-                      )
-                    }
-                  />
+                  <TrustedContent>
+                    <ScriptEditor
+                      code={code ?? makeTemplate(values(templates))}
+                      onChange={(v) =>
+                        layer &&
+                        setLayer(
+                          produce(layer, (layer) =>
+                            set(layer, "source.code", v)
+                          )
+                        )
+                      }
+                    />
+                  </TrustedContent>
                 </TabPanel>
               </Box>
             </Scroll>

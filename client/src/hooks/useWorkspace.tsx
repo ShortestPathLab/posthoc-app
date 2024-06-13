@@ -1,6 +1,7 @@
 import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
 import { fileDialog as file } from "file-select-dialog";
+import { setLayerSource } from "layers/TrustedLayerData";
 import { getController } from "layers/layerControllers";
 import { find, pick } from "lodash";
 import memo from "memoizee";
@@ -49,20 +50,31 @@ function minimise(ui: UIState, layers: Layers) {
   };
 }
 
+export const ORIGIN_FILESYSTEM = "internal://file-system";
+export const ORIGIN_UNKNOWN = "unknown";
+
 export function useWorkspace() {
   const notify = useSnackbar();
-  const [layers, setLayers] = useLayers();
-  const [UIState, setUIState] = useUIState();
+  const [layersStore, setLayers] = useLayers();
+  const [UIStateStore, setUIState] = useUIState();
   const usingBusyState = useBusyState("workspace");
-  return useMemo(
-    () => ({
-      load: async (selectedFile?: File) => {
-        const f =
-          selectedFile ??
-          (await file({
-            accept: acceptedFormats,
-            strict: true,
-          }));
+  return useMemo(() => {
+    const pickFile = async (origin?: string) => {
+      const f = await file({
+        accept: acceptedFormats,
+        strict: true,
+      });
+      return {
+        f,
+        origin,
+      };
+    };
+    return {
+      load: async (selectedFile?: File, origin2?: string) => {
+        const { origin, f } = selectedFile
+          ? { f: selectedFile, origin: origin2 }
+          : await pickFile(origin2);
+
         if (f) {
           if (isWorkspaceFile(f)) {
             await usingBusyState(async () => {
@@ -73,8 +85,14 @@ export function useWorkspace() {
                 | Workspace
                 | undefined;
               if (parsed) {
-                setLayers(() => parsed.layers);
+                setLayers(() => {
+                  for (const l of parsed.layers?.layers ?? []) {
+                    setLayerSource(l, origin);
+                  }
+                  return parsed.layers;
+                });
                 setUIState(() => parsed.UIState);
+                setUIState(() => ({ isTrusted: false }));
               }
             }, `Opening workspace (${formatByte(f.size)})`);
             return true;
@@ -84,7 +102,7 @@ export function useWorkspace() {
       },
       save: async (raw?: boolean, name?: string) => {
         notify("Saving workspace...");
-        const content = JSON.stringify(minimise(UIState, layers));
+        const content = JSON.stringify(minimise(UIStateStore, layersStore));
         const filename = name ?? id("-");
         if (raw) {
           const name = `${filename}.workspace.json`;
@@ -100,12 +118,11 @@ export function useWorkspace() {
         }
       },
       estimateWorkspaceSize: memo((raw?: boolean) => {
-        const size = sizeOf(minimise(UIState, layers));
+        const size = sizeOf(minimise(UIStateStore, layersStore));
         return size * (raw ? 1 : LZ_COMPRESSION_RATIO);
       }),
-    }),
-    [layers, UIState]
-  );
+    };
+  }, [layersStore, UIStateStore]);
 }
 
 function isCompressedFile(f: File) {

@@ -1,10 +1,9 @@
 import Editor, { useMonaco } from "@monaco-editor/react";
 import { CircularProgress, Theme, useTheme } from "@mui/material";
-import { debounce } from "lodash";
-import AutoSize from "react-virtualized-auto-sizer";
 import { Flex } from "components/generic/Flex";
-import { useUIState } from "slices/UIState";
+import { debounce } from "lodash";
 import { ComponentProps } from "react";
+import AutoSize from "react-virtualized-auto-sizer";
 
 const DELAY = 2500;
 

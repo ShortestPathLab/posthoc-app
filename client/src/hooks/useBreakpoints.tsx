@@ -1,3 +1,4 @@
+import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { call } from "components/script-editor/call";
 import { get, toLower as lower, startCase } from "lodash";
 import memo from "memoizee";
@@ -44,6 +45,7 @@ export type DebugLayerData = {
 
 export function useBreakpoints(key?: string) {
   const { layer } = useLayer<DebugLayerData>(key);
+  const { isTrusted } = useUntrustedLayers();
   const { monotonicF, monotonicG, breakpoints, code, trace } =
     layer?.source ?? {};
   const content = trace?.content;
@@ -98,6 +100,7 @@ export function useBreakpoints(key?: string) {
           }
           // Check breakpoints in the script editor section
           if (
+            isTrusted &&
             call(code ?? "", "shouldBreak", [
               step,
               event,
@@ -114,7 +117,7 @@ export function useBreakpoints(key?: string) {
       }
       return { result: "" };
     });
-  }, [code, content, breakpoints, monotonicF, monotonicG, result]);
+  }, [isTrusted, code, content, breakpoints, monotonicF, monotonicG, result]);
 }
 
 type TreeDict = {

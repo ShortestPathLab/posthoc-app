@@ -72,7 +72,7 @@ export const pages: Dictionary<PageMeta> = {
   },
   source: {
     id: "source",
-    name: "Source",
+    name: "Sources",
     description: "",
     color: "deepPurple",
     icon: <CodeOutlined />,

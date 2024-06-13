@@ -29,7 +29,7 @@ import {
   pick,
   reduce,
   set,
-  truncate
+  truncate,
 } from "lodash";
 import { nanoid as id } from "nanoid";
 import { produce, withProduce } from "produce";

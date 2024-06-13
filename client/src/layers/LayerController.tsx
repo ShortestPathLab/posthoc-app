@@ -12,6 +12,10 @@ export type SelectionInfoProvider = FC<{
   children?: (menu: SelectionMenuContent) => ReactNode;
 }>;
 
+export type LayerSource = Feature & {
+  language?: string;
+};
+
 export type LayerController<K extends string, T> = {
   key: K;
   icon: ReactElement;
@@ -29,7 +33,7 @@ export type LayerController<K extends string, T> = {
       }
     | { claimed: false }
   >;
-  getSources?: (layer?: Layer<T>) => (Feature & { language?: string })[];
+  getSources?: (layer?: Layer<T>) => LayerSource[];
   compress?: (t?: T) => any;
   onEditSource?: (
     layer?: Layer<T>,

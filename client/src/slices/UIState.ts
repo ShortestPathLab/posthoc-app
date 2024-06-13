@@ -34,6 +34,11 @@ export type UploadedTrace = FeatureDescriptor & {
   key?: string;
 };
 
+export type TrustedState = {
+  isTrusted?: boolean;
+  origin?: string;
+};
+
 export type WorkspaceMeta = {
   screenshots?: string[];
   size?: number;
@@ -56,7 +61,8 @@ type FullscreenModalState = {
 export type UIState = BusyState &
   WorkspaceMetaState &
   FullscreenModalState &
-  SidebarState;
+  SidebarState &
+  TrustedState;
 
 export const [useUIState, UIStateProvider] = createSlice<
   UIState,
@@ -74,4 +80,6 @@ export const [useUIState, UIStateProvider] = createSlice<
     author: "",
     size: 0,
   },
+  isTrusted: false,
+  origin: undefined,
 });

@@ -1,5 +1,5 @@
 import { WidgetsOutlined } from "@mui/icons-material";
-import { Typography as Type } from "@mui/material";
+import { Box, Typography as Type } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { ReactElement, ReactNode } from "react";
 
@@ -7,11 +7,13 @@ export function Placeholder({
   label,
   icon = <WidgetsOutlined />,
   secondary,
+  action,
   ...rest
 }: {
   label?: ReactNode;
   icon?: ReactElement;
   secondary?: ReactNode;
+  action?: ReactNode;
 } & FlexProps) {
   return (
     <Flex
@@ -41,6 +43,7 @@ export function Placeholder({
           {secondary}
         </Type>
       )}
+      {!!action && <Box pt={2}>{action}</Box>}
     </Flex>
   );
 }

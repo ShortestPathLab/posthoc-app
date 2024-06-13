@@ -1,55 +1,57 @@
 import { Editor } from "@monaco-editor/react";
-import {
-  CodeOutlined,
-  LayersOutlined as LayersIcon,
-} from "@mui/icons-material";
-import {
-  CircularProgress,
-  Tab,
-  Tabs,
-  useTheme,
-  useThemeProps,
-} from "@mui/material";
-import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { CodeOutlined } from "@mui/icons-material";
+import { CircularProgress, Tab, Tabs, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { inferLayerName } from "layers/inferLayerName";
+import { useMonacoTheme } from "components/script-editor/ScriptEditor";
+import { LayerSource } from "layers";
 import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
-import { useMemo } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Layer, useLayer } from "slices/layers";
 import { divider } from "./Page";
 import { PageContentProps } from "./PageMeta";
-import { useMonacoTheme } from "components/script-editor/ScriptEditor";
+import { useMemo } from "react";
 
 type SourceLayer = Layer;
 
 const isSourceLayer = (l: Layer): l is SourceLayer =>
   !!getController(l)?.getSources;
 
-type SourceLayerState = { source?: string };
+type SourceLayerState = { source?: string; layer?: string };
 
 export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
 
   useMonacoTheme(theme);
 
-  const { key, setKey, layer, layers, allLayers } = useLayer(
-    undefined,
-    isSourceLayer
+  const { layers } = useLayer(undefined, isSourceLayer);
+
+  const sources = useMemo(
+    () =>
+      layers?.flatMap?.((l) =>
+        getController(l)
+          ?.getSources?.(l)
+          ?.map?.((c) => ({
+            layer: l.key,
+            source: c,
+          }))
+      ) as { layer: string; source: LayerSource }[],
+    [layers]
   );
 
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<SourceLayerState>();
 
-  const source = useMemo(
-    () => getController(layer)?.getSources?.(layer),
-    [layer]
+  const selected = useMemo(
+    () =>
+      find(
+        sources,
+        (c) => c && c.source.id === state?.source && c.layer === state?.layer
+      ) ?? first(sources),
+    [sources, state?.source, state?.layer]
   );
-
-  const selected = find(source, { id: state?.source }) ?? first(source);
 
   return (
     <Page onChange={onChange} stack={state}>
@@ -58,7 +60,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
       <Page.Title>Source</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        {source?.length ? (
+        {sources?.length ? (
           <Flex pt={6}>
             <AutoSize>
               {(size) => (
@@ -69,10 +71,10 @@ export function SourcePage({ template: Page }: PageContentProps) {
                   options={{
                     readOnly: true,
                   }}
-                  language={selected?.language}
+                  language={selected?.source?.language}
                   loading={<CircularProgress variant="indeterminate" />}
                   {...size}
-                  value={selected?.content}
+                  value={selected?.source?.content}
                 />
               )}
             </AutoSize>
@@ -82,28 +84,17 @@ export function SourcePage({ template: Page }: PageContentProps) {
         )}
       </Page.Content>
       <Page.Options>
-        <FeaturePicker
-          icon={<LayersIcon />}
-          label="Layer"
-          value={key}
-          items={map(allLayers, (l) => ({
-            id: l.key,
-            hidden: !find(layers, { key: l.key }),
-            name: inferLayerName(l),
-          }))}
-          onChange={setKey}
-          arrow
-          ellipsis={12}
-        />
-        {!!source?.length && (
+        {!!sources?.length && (
           <>
-            {divider}
             <Tabs
-              value={state?.source ?? first(source)?.id}
-              onChange={(_, v) => onChange?.({ source: v })}
+              value={`${selected?.source.id}::${selected?.layer}`}
+              onChange={(_, v: string) => {
+                const [a, b] = v.split("::");
+                onChange?.({ source: a, layer: b });
+              }}
             >
-              {map(source, ({ name, id }) => (
-                <Tab label={name} value={id} />
+              {map(sources, ({ source, layer }) => (
+                <Tab label={source.name} value={`${source.id}::${layer}`} />
               ))}
             </Tabs>
           </>

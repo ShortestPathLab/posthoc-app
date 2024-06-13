@@ -1,7 +1,7 @@
 import { WorkspacesOutlined } from "@mui/icons-material";
 import { Backdrop, Stack, Typography as Type } from "@mui/material";
 import { useSnackbar } from "components/generic/Snackbar";
-import { useWorkspace } from "hooks/useWorkspace";
+import { ORIGIN_FILESYSTEM, useWorkspace } from "hooks/useWorkspace";
 import { getControllers } from "layers/layerControllers";
 import { entries, head } from "lodash";
 import { nanoid as id } from "nanoid";

@@ -11,7 +11,10 @@ export function BootstrapService() {
         if (isWorkspace(workspace)) {
           const name = workspace.split("/").pop() ?? workspace;
           const a = await fetch(workspace);
-          load(new File([await a.blob()], name, { lastModified: now() }));
+          load(
+            new File([await a.blob()], name, { lastModified: now() }),
+            new URL(workspace).origin
+          );
         }
       }
     } catch (e) {

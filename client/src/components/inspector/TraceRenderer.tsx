@@ -24,6 +24,7 @@ import { useRenderers } from "slices/renderers";
 import { useScreenshots } from "slices/screenshots";
 import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
+import { TrustedContent } from "./TrustedContent";
 
 const TILE_RESOLUTION = 128;
 
@@ -71,9 +72,10 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
           ref.current.append(instance.getView()!);
           setInstance(instance);
           setError("");
+          const storedRef = ref.current;
           return () => {
             try {
-              ref.current?.removeChild?.(instance.getView()!);
+              storedRef.removeChild(instance.getView()!);
               setInstance(undefined);
             } catch (e) {
               console.warn(e);
@@ -129,7 +131,6 @@ export function TraceRenderer({
   const key = useMemo(nanoid, []);
   const { instance, error, ref } = useRenderer(renderer, { width, height });
   const { playing } = usePlaybackState();
-
   const [, setScreenshots] = useScreenshots();
 
   const [selection, setSelection] = useState<SelectEvent>();
@@ -175,40 +176,44 @@ export function TraceRenderer({
     <>
       <TraceRendererCircularProgress />
       <TraceRendererContext.Provider value={context}>
-        {layers?.length ? (
-          error ? (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                width,
-                height,
-                alignItems: "center",
-                justifyContent: "center",
-                color: "text.secondary",
-              }}
-            >
-              <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
-              {error}
-            </Box>
+        <Box sx={{ width, height }}>
+          {layers?.length ? (
+            <TrustedContent>
+              {error ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width,
+                    height,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "text.secondary",
+                  }}
+                >
+                  <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
+                  {error}
+                </Box>
+              ) : (
+                <>
+                  <Box ref={ref}>
+                    {layers.map((l, i) => (
+                      <RenderLayer index={i} key={l.key} layer={l} />
+                    ))}
+                  </Box>
+                </>
+              )}
+            </TrustedContent>
           ) : (
-            <>
-              <Box ref={ref}>
-                {layers.map((l, i) => (
-                  <RenderLayer index={i} key={l.key} layer={l} />
-                ))}
-              </Box>
-            </>
-          )
-        ) : (
-          <Placeholder
-            icon={<ViewInArOutlined />}
-            label="Viewport"
-            width={width}
-            height={height}
-            secondary={VIEWPORT_PAGE_DESCRIPTION}
-          />
-        )}
+            <Placeholder
+              icon={<ViewInArOutlined />}
+              label="Viewport"
+              width={width}
+              height={height}
+              secondary={VIEWPORT_PAGE_DESCRIPTION}
+            />
+          )}
+        </Box>
       </TraceRendererContext.Provider>
       <SelectionMenu
         selection={selection}

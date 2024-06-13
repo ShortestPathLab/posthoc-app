@@ -208,7 +208,7 @@ export const controller = {
       return [
         {
           id: "map",
-          name: `(Source) ${map.name}`,
+          name: `${map.name}`,
           language: "txt",
           content: parsedMap?.content,
         },

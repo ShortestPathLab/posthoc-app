@@ -26,14 +26,15 @@ import {
   PropertyDialog,
   PropertyList,
 } from "components/inspector/PropertyList";
+import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { Heading, Option } from "components/layer-editor/Option";
 import { TracePreview } from "components/layer-editor/TracePreview";
 import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { colorsHex, getColorHex } from "components/renderer/colors";
 import { parseProperty } from "components/renderer/parser-v140/parseProperty";
 import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
-import { parseProperty as parsePropertyLegacy } from "components/renderer/parser/parseProperty";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/ParseTraceSlaveWorker";
+import { parseProperty as parsePropertyLegacy } from "components/renderer/parser/parseProperty";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { useTraceContent } from "hooks/useTraceContent";
 import { dump } from "js-yaml";
@@ -64,8 +65,10 @@ import { useEffect, useMemo } from "react";
 import { useAsync, useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
+import { useSettings } from "slices/settings";
 import { AccentColor, accentColors, getShade } from "theme";
 import { name } from "utils/path";
+import { TrustedLayerData } from "../TrustedLayerData";
 
 const labelScale = 1.25;
 
@@ -155,7 +158,8 @@ export type TraceLayerData = {
   };
   onion?: "off" | "transparent" | "solid";
 } & PlaybackLayerData &
-  DebugLayerData;
+  DebugLayerData &
+  TrustedLayerData;
 
 export type TraceLayer = Layer<TraceLayerData>;
 
@@ -247,6 +251,7 @@ export const controller = {
         return set(l, "source.playbackTo", trace?.content?.events?.length ?? 0);
       });
     }, [trace?.key]);
+    const { isTrusted } = useUntrustedLayers();
     // Make the trace parser
     const parseTrace = useTraceParser(
       {
@@ -269,7 +274,8 @@ export const controller = {
         },
         view: "main",
       },
-      [trace?.key, palette.mode]
+      isTrusted,
+      [trace?.key, palette.mode, isTrusted]
     );
     // Parse the trace
     useAsync(async () => {
@@ -438,7 +444,7 @@ export const controller = {
       return [
         {
           id: "trace",
-          name: `(Source) ${trace.name}`,
+          name: `${trace.name}`,
           language: "yaml",
           content: dump(trace.content, { noCompatMode: true }),
         },

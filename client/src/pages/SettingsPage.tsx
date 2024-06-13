@@ -24,8 +24,8 @@ import { mapParsers } from "components/renderer/map-parser";
 import { RendererListEditor } from "components/settings-editor/RendererListEditor";
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
 import { useSmallDisplay } from "hooks/useSmallDisplay";
-import { keys, map, startCase } from "lodash";
-import { ReactNode, useState } from "react";
+import { debounce, keys, map, startCase } from "lodash";
+import { ReactNode, useMemo, useState } from "react";
 import { useBusyState } from "slices/busy";
 import {
   defaultPlaybackRate as baseRate,
@@ -91,6 +91,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
           <TabList onChange={(_, v) => setTab(v)}>
             <Tab label="General" value="general" />
             <Tab label="Extensions" value="connections" />
+            <Tab label="Security" value="security" />
             <Tab label="About" value="about" />
           </TabList>
         </Page.Options>
@@ -271,6 +272,33 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     <MapParserListEditor />
                   </Box>
                 </TabPanel>
+                <TabPanel value="security" sx={{ p: 2 }}>
+                  {renderHeading("Trusted origins")}
+                  <Box sx={{ maxWidth: 480 }}>
+                    <Typography
+                      component="div"
+                      color="text.secondary"
+                      variant="caption"
+                      sx={{ pt: 2 }}
+                    >
+                      Rendering traces in the viewport and using advanced
+                      debugger features sometimes requires running third-party
+                      code.
+                    </Typography>
+                    <Typography
+                      component="div"
+                      color="text.secondary"
+                      variant="caption"
+                      sx={{ pt: 2 }}
+                    >
+                      You'll be prompted to add origins when necessary, and you
+                      can stop trusting origins by removing them from this list.
+                    </Typography>
+                  </Box>
+                  <Box sx={{ pt: 2 }}>
+                    <TrustedOriginListEditor />
+                  </Box>
+                </TabPanel>
                 <TabPanel value="about" sx={{ p: 2 }}>
                   <Box>
                     <AboutContent />
@@ -293,6 +321,50 @@ function Sink({ children }: { children?: ReactNode }) {
   return children;
 }
 
+export function TrustedOriginListEditor() {
+  const [{ trustedOrigins }, setSettings] = useSettings();
+  const b = useMemo(
+    () =>
+      map(trustedOrigins, (t) => ({
+        key: t,
+      })),
+    [trustedOrigins]
+  );
+  return (
+    <Box sx={{ mx: -2 }}>
+      <ListEditor
+        button={false}
+        sortable
+        addable={false}
+        deletable
+        editor={(v) => (
+          <Sink key={v.key}>
+            <ListItemText primary={v.key} />
+          </Sink>
+        )}
+        icon={null}
+        value={b}
+        onChange={debounce(
+          (v) =>
+            setSettings(() => ({
+              trustedOrigins: map(v, "key"),
+            })),
+          300
+        )}
+        create={() => ({
+          key: "",
+        })}
+      />
+    </Box>
+    // <List>
+    //   {keys(mapParsers).map((c) => (
+    //     <ListItem key={c}>
+    //       <ListItemText primary={c} secondary={"Internal"} />
+    //     </ListItem>
+    //   ))}
+    // </List>
+  );
+}
 export function MapParserListEditor() {
   return (
     <Box sx={{ mx: -2 }}>

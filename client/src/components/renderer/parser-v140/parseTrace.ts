@@ -39,33 +39,44 @@ export const parseTraceLegacyAsync = usingMemoizedWorkerTask<
 
 export function useTraceParser(
   params: ParseTraceWorkerParameters | ParseTraceWorkerLegacyParameters,
+  trusted: boolean,
   deps: any[]
 ) {
   const push = useSnackbar();
   const usingLoadingState = useLoadingState("specimen");
   return useMemo(() => {
     if (params.trace) {
-      return () =>
-        usingLoadingState(async () => {
-          push("Processing trace...");
-          try {
-            const output =
-              params.trace?.version === "1.4.0"
-                ? await parseTraceAsync(params as ParseTraceWorkerParameters)
-                : await parseTraceLegacyAsync(
-                    params as ParseTraceWorkerLegacyParameters
-                  );
+      if (trusted)
+        return () =>
+          usingLoadingState(async () => {
+            push("Processing trace...");
+            try {
+              const output =
+                params.trace?.version === "1.4.0"
+                  ? await parseTraceAsync(params as ParseTraceWorkerParameters)
+                  : await parseTraceLegacyAsync(
+                      params as ParseTraceWorkerLegacyParameters
+                    );
+              push(
+                "Trace loaded",
+                pluralize("step", output?.stepsPersistent?.length ?? 0, true)
+              );
+              return { components: output, content: params.trace };
+            } catch (e) {
+              console.error(e);
+              push("Error parsing", get(e, "message"));
+              return { error: get(e, "message") };
+            }
+          });
+      else
+        return () =>
+          usingLoadingState(async () => {
             push(
               "Trace loaded",
-              pluralize("step", output?.stepsPersistent?.length ?? 0, true)
+              pluralize("step", params.trace?.events?.length ?? 0, true)
             );
-            return { components: output, content: params.trace };
-          } catch (e) {
-            console.error(e);
-            push("Error parsing", get(e, "message"));
-            return { error: get(e, "message") };
-          }
-        });
+            return { content: params.trace, components: [] };
+          });
     } else {
       return undefined;
     }

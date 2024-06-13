@@ -324,7 +324,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
         const blob = await response.blob();
         const file = new File([blob], basename(path), { type: blob.type });
         // It is correct to not wait for this promise
-        load(file);
+        load(file, new URL(location.href).origin);
       } catch (e) {
         notify(`Couldn't load ${basename(path)}`, `${e}`, {
           error: true,
