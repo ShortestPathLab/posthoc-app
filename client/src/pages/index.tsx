@@ -3,7 +3,6 @@ import {
   BugReportOutlined as DebuggerIcon,
   LayersOutlined as LayersIcon,
   ListOutlined,
-  CodeOutlined as LogsIcon,
   RocketLaunchOutlined as RocketIcon,
   SettingsOutlined as SettingsIcon,
   SegmentOutlined as StepsIcon,
@@ -17,10 +16,10 @@ import { InfoPage } from "./InfoPage";
 import { LayersPage } from "./LayersPage";
 import { PageMeta } from "./PageMeta";
 import { SettingsPage } from "./SettingsPage";
+import { SourcePage } from "./SourcePage";
 import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
-import { SourcePage } from "./SourcePage";
 
 export const pages: Dictionary<PageMeta> = {
   explore: {

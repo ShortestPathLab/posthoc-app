@@ -65,7 +65,6 @@ import { useEffect, useMemo } from "react";
 import { useAsync, useThrottle } from "react-use";
 import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { useSettings } from "slices/settings";
 import { AccentColor, accentColors, getShade } from "theme";
 import { name } from "utils/path";
 import { TrustedLayerData } from "../TrustedLayerData";

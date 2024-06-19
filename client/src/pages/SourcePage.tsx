@@ -8,11 +8,10 @@ import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 import { LayerSource } from "layers";
 import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
+import { useMemo } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Layer, useLayer } from "slices/layers";
-import { divider } from "./Page";
 import { PageContentProps } from "./PageMeta";
-import { useMemo } from "react";
 
 type SourceLayer = Layer;
 
