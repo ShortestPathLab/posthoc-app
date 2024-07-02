@@ -88,7 +88,7 @@ export function getColor(key?: TraceEventType) {
 export function getColorHex(key: TraceEventType = "", fallback?: string) {
   const builtIn = searchEventAliases[lowerCase(key)];
   if (builtIn) {
-    return colorsHex[key];
+    return colorsHex[builtIn];
   } else if (fallback) {
     return fallback;
   } else {
