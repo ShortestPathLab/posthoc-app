@@ -1,4 +1,4 @@
-import { clamp, debounce, once, round } from "lodash";
+import { ceil, clamp, debounce, once, round } from "lodash";
 import * as PIXI from "pixi.js";
 import { Bounds } from "protocol";
 import { ComponentEntry, makeRenderer, RemoveElementCallback } from "renderer";
@@ -10,13 +10,13 @@ import { intersect } from "../d2-renderer/intersect";
 
 const { max, min } = Math;
 
-const CANVAS_MAXSIZE = 4096;
+const CANVAS_MAXSIZE = 4096 - 1;
 const canvas = new OffscreenCanvas(1, 1);
 
 const getCanvas = (w: number, h: number) => {
-  canvas.width = w;
-  canvas.height = h;
-  canvas.getContext("2d")?.clearRect?.(0, 0, w, h);
+  canvas.width = max(1, ceil(w));
+  canvas.height = max(1, ceil(h));
+  canvas.getContext("2d")?.clearRect?.(0, 0, canvas.width, canvas.height);
   return canvas;
 };
 
@@ -35,15 +35,20 @@ class Elem extends PIXI.Sprite {
       CANVAS_MAXSIZE /
       max(bounds.right - bounds.left, bounds.bottom - bounds.top, 1);
     super(getTexture(bounds, bodies, getClampedScale(scale, maxScale)));
+    this.rerender(scale, bounds, bodies, maxScale);
     this.#maxScale = maxScale;
-    this.rerender(scale);
   }
-  rerender(size: number) {
-    const scale = getClampedScale(size, this.#maxScale);
+  rerender(
+    size: number,
+    bounds = this.bounds,
+    bodies = this.bodies,
+    maxScale = this.#maxScale
+  ) {
+    const scale = getClampedScale(size, maxScale);
     if (scale === this.#scale) return;
-    const texture = getTexture(this.bounds, this.bodies, scale);
+    const texture = getTexture(bounds, bodies, scale);
     this.texture = texture;
-    this.setTransform(this.bounds.left, this.bounds.top, 1 / scale, 1 / scale);
+    this.setTransform(bounds.left, bounds.top, 1 / scale, 1 / scale);
     this.#scale = scale;
   }
 }
