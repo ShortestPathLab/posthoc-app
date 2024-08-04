@@ -1,9 +1,9 @@
 {
   "short_name": "Posthoc",
   "name": "Posthoc",
-  "version": "1.2.5-1",
+  "version": "1.2.5-2",
   "description": "Understand sequential decision-making through visualisation.",
-  "version_name": "1.2.5-1; early August 2024",
+  "version_name": "1.2.5-2; early August 2024",
   "repository": "https://github.com/ShortestPathLab/posthoc-app",
   "changelog": "http://posthoc.pathfinding.ai/blog",
   "docs": "https://posthoc.pathfinding.ai/docs/overview",
