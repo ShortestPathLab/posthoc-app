@@ -1,20 +1,15 @@
+import { D2RendererBase } from "../d2-renderer-base/D2RendererBase";
 import {
   ceil,
   clamp,
-  constant,
-  debounce,
   find,
   floor,
   forEach,
   isEqual,
-  isNaN,
   map,
   once,
-  pickBy,
-  reduce,
   throttle,
   times,
-  values,
 } from "lodash";
 import { nanoid } from "nanoid";
 import { Viewport } from "pixi-viewport";
@@ -24,24 +19,13 @@ import { ComponentEntry, makeRenderer } from "renderer";
 import { Bush } from "./Bush";
 import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 import {
-  D2RendererEvents,
-  D2RendererInterface,
   D2RendererOptions,
   defaultD2RendererOptions,
 } from "./D2RendererOptions";
-import {
-  Body,
-  D2WorkerEvent,
-  defaultBounds,
-  getTiles,
-  isValue,
-} from "./D2RendererWorker";
+import { D2WorkerEvent, getTiles } from "./D2RendererWorker";
 import { D2RendererWorkerAdapter } from "./D2RendererWorkerAdapter";
-import { EventEmitter } from "./EventEmitter";
 import { intersect } from "./intersect";
 import { primitives } from "./primitives";
-
-const { max, min } = Math;
 
 class Tile extends PIXI.Sprite {
   static age: number = 0;
@@ -53,245 +37,90 @@ class Tile extends PIXI.Sprite {
   }
 }
 
-function handleNaN<T>(obj: T, def: T) {
-  return isNaN(obj) ? def : obj;
-}
+export class D2Renderer extends D2RendererBase {
+  protected app?: PIXI.Application<HTMLCanvasElement>;
+  protected options: D2RendererOptions = defaultD2RendererOptions;
+  protected system: Bush<CompiledD2IntrinsicComponent> = new Bush(16);
+  protected viewport?: Viewport;
+  protected overlay?: PIXI.Graphics;
 
-class D2Renderer
-  extends EventEmitter<D2RendererEvents>
-  implements D2RendererInterface
-{
-  #app?: PIXI.Application<HTMLCanvasElement>;
-  #viewport?: Viewport;
-  #world?: PIXI.Container<Tile>;
-  #grid?: PIXI.Graphics;
-  #options: D2RendererOptions = defaultD2RendererOptions;
+  #tiles?: PIXI.Container<Tile>;
   #workers: D2RendererWorkerAdapter[] = [];
-  #system: Bush<CompiledD2IntrinsicComponent> = new Bush(16);
-  #overlay?: PIXI.Graphics;
+  #grid?: PIXI.Graphics;
 
-  #count: number = 0;
+  protected override setupPixi(o: D2RendererOptions) {
+    super.setupPixi(o);
+    if (!this.viewport) return;
 
-  #next() {
-    return this.#count++;
+    this.#tiles = new PIXI.Container();
+    this.viewport.addChild(this.#tiles);
+
+    this.#grid = new PIXI.Graphics();
+    this.viewport.addChild(this.#grid);
+
+    this.#startDynamicResolution();
   }
-
-  getInstance() {
-    return { app: this.#app, viewport: this.#viewport };
-  }
-
-  fitCamera(
-    fn: (body: Body<CompiledD2IntrinsicComponent>) => boolean = constant(true)
-  ) {
-    const bounds = values(this.#system.all()).flat().filter(fn);
-    if (bounds.length) {
-      const out = reduce(
-        bounds,
-        (a, b) => ({
-          top: handleNaN(min(a.top, b.top), a.top),
-          left: handleNaN(min(a.left, b.left), a.left),
-          bottom: handleNaN(max(a.bottom, b.bottom), a.bottom),
-          right: handleNaN(max(a.right, b.right), a.right),
-        }),
-        {
-          bottom: -Infinity,
-          top: Infinity,
-          left: Infinity,
-          right: -Infinity,
-        }
-      );
-
-      this.#viewport?.animate?.({
-        position: new PIXI.Point(
-          (out.left + out.right) / 2,
-          (out.top + out.bottom) / 2
-        ),
-        scale:
-          this.#viewport?.findFit?.(
-            out.right - out.left,
-            out.bottom - out.top
-          ) * 0.8,
-        ease: "easeOutExpo",
-        time: this.#options.animationDuration * 1.5,
-        callbackOnComplete: () => this.#getFrustumChangeQueue()(),
-      });
-    }
-  }
-
-  initialCamera() {
-    this.#viewport?.animate?.({
-      scale: 1,
-      ease: "easeOutExpo",
-      time: this.#options.animationDuration * 1.5,
-      callbackOnComplete: () => this.#getFrustumChangeQueue()(),
-    });
-  }
-
-  getView(): HTMLElement | undefined {
-    return this.#app?.view;
-  }
-
-  async toDataUrl(): Promise<string | undefined> {
-    this.#app?.render?.();
-    return this.#app?.view?.toDataURL?.();
-  }
-
   setup(options: Partial<D2RendererOptions>) {
-    if (this.#featureError()) {
-      throw new Error(this.#featureError());
-    }
-    const o = { ...defaultD2RendererOptions, ...options };
-    this.#setupPixi(o);
-    this.setOptions(o);
-    this.#handleWorkerChange(o);
+    super.setup(options);
+    this.#handleWorkerChange(this.options);
   }
 
   destroy(): void {
     map(this.#workers, (w) => w.terminate());
-    this.#app!.destroy();
+    super.destroy();
   }
 
   add(components: ComponentEntry<CompiledD2IntrinsicComponent>[]) {
     const id = nanoid();
-    const bodies = components.map(({ component, meta }) => ({
-      ...defaultBounds,
-      ...pickBy(primitives[component.$].test(component), isValue),
-      component,
-      meta,
-      index: this.#next(),
-    }));
-    this.#system.load(bodies);
+    const remove = super.add(components);
     this.#workers?.forEach?.((w) => w.call("add", [components, id]));
-    return () =>
+    return () => {
       requestIdleCallback(
         () => {
-          for (const c of bodies) this.#system.remove(c);
+          remove();
           this.#workers?.forEach?.((w) => w.call("remove", [id]));
         },
-        { timeout: this.#options.animationDuration }
+        { timeout: this.options.animationDuration }
       );
+    };
   }
 
-  // add(components: ComponentEntry<CompiledD2IntrinsicComponent>[]) {
-  //   const id = nanoid();
-  //   const bodies = new Promise<any>((res) =>
-  //     requestIdleCallback(() => {
-  //       const bodies = components.map(this.getBounds);
-  //       this.#system.load(bodies);
-  //       map(this.#workers, (w) => w.call("add", [components, id]));
-  //       res(bodies);
-  //     })
-  //   );
-  //   return () =>
-  //     bodies.then((bodies) =>
-  //       requestIdleCallback(
-  //         () => {
-  //           for (const c of bodies) this.#system.remove(c);
-  //           map(this.#workers, (w) => w.call("remove", [id]));
-  //         },
-  //         { timeout: 300 }
-  //       )
-  //     );
-  // }
-
   setOptions(o: D2RendererOptions) {
-    const options = { ...this.#options, ...o };
-    this.#handleWindowSizeChange(options);
-    this.#options = options;
-    this.#handleFrustumChange();
+    super.setOptions(o);
     this.#updateGrid();
   }
 
-  #setupPixi(options: D2RendererOptions) {
-    this.#app = new PIXI.Application({
-      backgroundAlpha: 0,
-      width: options.screenSize.width,
-      height: options.screenSize.height,
-      autoDensity: true,
-      resolution: 2,
-    });
-
-    this.#viewport = new Viewport({
-      stopPropagation: true,
-      screenWidth: options.screenSize.width,
-      screenHeight: options.screenSize.height,
-      events: this.#app.renderer.events,
-      passiveWheel: false,
-    });
-    this.#viewport.on("clicked", (e) => {
-      const { x, y } = e.world;
-      const bodies = this.#system
-        .search({
-          minX: x,
-          minY: y,
-          maxX: x + Number.MIN_VALUE,
-          maxY: y + Number.MIN_VALUE,
-        })
-        .filter((c) => primitives[c.component.$].narrow(c.component, { x, y }));
-      this.emit("click", e.event, {
-        world: e.world,
-        components: bodies,
-      });
-    });
-
-    this.#app.stage.addChild(this.#viewport);
-
-    this.#viewport
-      .drag()
-      .pinch()
-      .wheel()
-      .decelerate({ friction: 0.98 })
-      .clampZoom({ maxScale: 300, minScale: 0.00001 });
-
-    this.#viewport.on("moved", () => {
-      this.#getFrustumChangeQueue()();
-      this.#getUpdateGridQueue()();
-    });
-
-    this.#viewport.on("mousemove", (e) => this.#getUpdateOverlayQueue()(e));
-
-    this.#world = new PIXI.Container();
-    this.#viewport.addChild(this.#world);
-
-    this.#grid = new PIXI.Graphics();
-    this.#viewport.addChild(this.#grid);
-
-    this.#overlay = new PIXI.Graphics();
-    this.#viewport.addChild(this.#overlay);
-
-    this.#startDynamicResolution();
-  }
-
-  #getFrustumChangeQueue = once(() =>
-    debounce(() => this.#handleFrustumChange(), this.#options.debounceInterval)
-  );
-
   #getUpdateGridQueue = once(() =>
-    throttle(() => this.#updateGrid(), this.#options.refreshInterval)
+    throttle(() => this.#updateGrid(), this.options.refreshInterval)
   );
   #getUpdateOverlayQueue = once(() =>
     throttle(
       (e: PIXI.FederatedPointerEvent) => this.#updateHover(e),
-      this.#options.refreshInterval
+      this.options.refreshInterval
     )
   );
 
-  #featureError = once(() => {
-    if (typeof OffscreenCanvas === "undefined") {
-      return "OffscreenCanvas API is not supported by your system.";
-    }
-  });
+  protected override setupViewport(options: D2RendererOptions) {
+    super.setupViewport(options);
+    if (!this.viewport) return;
+
+    this.viewport.on("moved", () => {
+      this.#getUpdateGridQueue()();
+    });
+
+    this.viewport.on("mousemove", (e) => this.#getUpdateOverlayQueue()(e));
+  }
 
   #startDynamicResolution() {
-    const { dynamicResolution } = this.#options;
+    const { dynamicResolution } = this.options;
     const { dtMax, dtMin, increment, intervalMs, maxScale, minScale } =
       dynamicResolution;
     const targetFrames = floor(PIXI.Ticker.targetFPMS * intervalMs);
     let frames = 0;
     let cdt = 0;
     let scale = 1;
-    this.#app!.ticker.add((dt) => {
-      const { tileResolution } = this.#options;
+    this.app!.ticker.add((dt) => {
+      const { tileResolution } = this.options;
       if (!(frames % targetFrames)) {
         const adt = cdt / targetFrames;
         scale = clamp(
@@ -331,10 +160,8 @@ class D2Renderer
     });
   }
 
-  #handleWindowSizeChange(options: D2RendererOptions) {
-    const { width, height } = options.screenSize;
-    this.#app?.renderer?.resize?.(width, height);
-    this.#viewport?.resize(width, height);
+  protected override handleWindowSizeChange(options: D2RendererOptions) {
+    super.handleWindowSizeChange(options);
     map(this.#workers, (w) => {
       w.call("setTileResolution", [
         {
@@ -350,32 +177,34 @@ class D2Renderer
     this.#addToWorld(texture, bounds);
   }
 
-  #handleFrustumChange() {
-    const { top, bottom, left, right } = this.#viewport!;
+  protected override handleFrustumChange() {
+    if (!this.viewport) return;
+    const { top, bottom, left, right } = this.viewport;
     map(this.#workers, (w) =>
       w.call("setFrustum", [{ top, bottom, left, right }])
     );
   }
 
   #updateGrid() {
-    const { tileSubdivision, accentColor } = this.#options;
-    const { tiles } = getTiles(this.#viewport!, tileSubdivision);
-    const px = this.#getPx();
+    if (!this.viewport) return;
+    const { tileSubdivision, accentColor } = this.options;
+    const { tiles } = getTiles(this.viewport, tileSubdivision);
+    const px = this.getPx();
     this.#grid?.clear();
     this.#grid?.lineStyle(1 * px, accentColor, 0.5);
     this.#grid?.beginFill(accentColor, 0.05);
     for (const { bounds: b } of tiles) {
-      if (!find(this.#world?.children, (c) => isEqual(c.bounds, b))) {
+      if (!find(this.#tiles?.children, (c) => isEqual(c.bounds, b))) {
         this.#grid?.drawRect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       }
     }
   }
 
   #updateHover(e: PIXI.FederatedPointerEvent) {
-    const { accentColor } = this.#options;
-    const px = this.#getPx();
-    const { x, y } = this.#viewport!.toWorld(e.globalX, e.globalY);
-    const bodies = this.#system
+    const { accentColor } = this.options;
+    const px = this.getPx();
+    const { x, y } = this.viewport!.toWorld(e.globalX, e.globalY);
+    const bodies = this.system
       .search({
         minX: x,
         minY: y,
@@ -383,62 +212,51 @@ class D2Renderer
         maxY: y + Number.MIN_VALUE,
       })
       .filter((c) => primitives[c.component.$].narrow(c.component, { x, y }));
-    this.#overlay!.clear();
+    this.overlay!.clear();
     for (const b of bodies) {
-      this.#overlay!.lineStyle(
+      this.overlay!.lineStyle(
         2 * px,
         accentColor,
         "$info" in b.component ? 1 : 0.02
       );
-      this.#overlay?.drawRect(
-        b.left,
-        b.top,
-        b.right - b.left,
-        b.bottom - b.top
-      );
+      this.overlay?.drawRect(b.left, b.top, b.right - b.left, b.bottom - b.top);
     }
-  }
-
-  #getPx() {
-    const { right, left } = this.#viewport!;
-    const { width } = this.#options.screenSize;
-    return (right - left) / width;
   }
 
   async #addToWorld(texture: PIXI.Texture, bounds: Bounds) {
-    const { tileSubdivision } = this.#options;
-    const { tiles } = getTiles(this.#viewport!, tileSubdivision);
-    if (find(tiles, (t) => isEqual(t.bounds, bounds))) {
-      const scale = {
-        x: (bounds.right - bounds.left) / texture.width,
-        y: (bounds.bottom - bounds.top) / texture.height,
-      };
-      const tile = new Tile(texture, bounds);
-      this.#world
-        ?.addChild(tile)
-        .setTransform(bounds.left, bounds.top, scale.x, scale.y);
-      this.#getUpdateGridQueue()();
-      await this.#show(tile);
-      forEach(this.#world?.children, async (c) => {
-        if (intersect(c.bounds!, bounds) && c.age < tile.age) {
-          if (!c.destroying) {
-            c.destroying = true;
-            await this.#hide(c);
-            if (!c.destroyed) {
-              c.destroy({ texture: true, baseTexture: true });
-            }
-          }
-        }
-      });
-    }
+    if (!this.viewport) return;
+    const { tileSubdivision } = this.options;
+    const { tiles } = getTiles(this.viewport, tileSubdivision);
+
+    if (!find(tiles, (t) => isEqual(t.bounds, bounds))) return;
+
+    const scale = {
+      x: (bounds.right - bounds.left) / texture.width,
+      y: (bounds.bottom - bounds.top) / texture.height,
+    };
+    const tile = new Tile(texture, bounds);
+    this.#tiles
+      ?.addChild(tile)
+      .setTransform(bounds.left, bounds.top, scale.x, scale.y);
+    this.#getUpdateGridQueue()();
+    await this.#show(tile);
+    forEach(this.#tiles?.children, async (c) => {
+      if (!(intersect(c.bounds!, bounds) && c.age < tile.age && !c.destroying))
+        return;
+      c.destroying = true;
+      await this.#hide(c);
+      if (!c.destroyed) {
+        c.destroy({ texture: true, baseTexture: true });
+      }
+    });
   }
 
   #show(tile: Tile) {
-    const ticker = this.#app!.ticker;
+    const ticker = this.app!.ticker;
     return new Promise<void>((res) => {
       const f = (dt: number) => {
         tile.alpha +=
-          dt / PIXI.Ticker.targetFPMS / this.#options.animationDuration;
+          dt / PIXI.Ticker.targetFPMS / this.options.animationDuration;
         if (tile.alpha > 1) {
           ticker.remove(f);
           res();
@@ -450,11 +268,11 @@ class D2Renderer
   }
 
   #hide(tile: Tile) {
-    const ticker = this.#app!.ticker;
+    const ticker = this.app!.ticker;
     return new Promise<void>((res) => {
       const f = (dt: number) => {
         tile.alpha -=
-          dt / PIXI.Ticker.targetFPMS / this.#options.animationDuration;
+          dt / PIXI.Ticker.targetFPMS / this.options.animationDuration;
         if (tile.alpha < 0) {
           ticker.remove(f);
           res();

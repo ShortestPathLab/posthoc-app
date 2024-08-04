@@ -50,7 +50,7 @@ export const searchEventAliases = thru(
     expanding: ["expanding", "expanding"],
     generating: ["generate", "generating", "open", "opening"],
     closing: ["close", "closing"],
-    end: ["finish", "end"],
+    end: ["finish", "end", "solution"],
   },
   (dict) => {
     const out: Dictionary<string> = {};

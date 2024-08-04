@@ -88,7 +88,6 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>viewport</Page.Key>
-
       <Page.Title>Viewport</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
