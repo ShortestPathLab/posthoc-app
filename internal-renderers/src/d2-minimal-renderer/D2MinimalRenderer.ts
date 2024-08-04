@@ -1,4 +1,4 @@
-import { debounce, once, round } from "lodash";
+import { clamp, debounce, once, round } from "lodash";
 import * as PIXI from "pixi.js";
 import { Bounds } from "protocol";
 import { ComponentEntry, makeRenderer, RemoveElementCallback } from "renderer";
@@ -9,7 +9,7 @@ import { draw } from "../d2-renderer/draw";
 import { intersect } from "../d2-renderer/intersect";
 
 const { max } = Math;
-
+const CANVAS_MAXSIZE = 4096;
 const canvas = new OffscreenCanvas(1, 1);
 const getCanvas = (w: number, h: number) => {
   canvas.width = w;
@@ -20,16 +20,20 @@ const getCanvas = (w: number, h: number) => {
 
 class Elem extends PIXI.Sprite {
   #scale: number = 1;
+  #maxSize: number = 1;
   constructor(
     public bounds: Bounds,
     private bodies: ReturnType<D2RendererBase["makeBodies"]>,
     scale: number
   ) {
     super(getTexture(bounds, bodies, scale));
+    this.#maxSize =
+      CANVAS_MAXSIZE /
+      max(bounds.right - bounds.left, bounds.bottom - bounds.top, 1);
     this.rerender(scale);
   }
   rerender(size: number) {
-    const scale = max(round(size) / devicePixelRatio, 1);
+    const scale = clamp(round(size) / devicePixelRatio, 1, this.#maxSize);
     if (scale === this.#scale) return;
     const texture = getTexture(this.bounds, this.bodies, scale);
     this.texture = texture;
