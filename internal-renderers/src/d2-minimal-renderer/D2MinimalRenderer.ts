@@ -8,9 +8,11 @@ import { D2RendererOptions } from "../d2-renderer/D2RendererOptions";
 import { draw } from "../d2-renderer/draw";
 import { intersect } from "../d2-renderer/intersect";
 
-const { max } = Math;
+const { max, min } = Math;
+
 const CANVAS_MAXSIZE = 4096;
 const canvas = new OffscreenCanvas(1, 1);
+
 const getCanvas = (w: number, h: number) => {
   canvas.width = w;
   canvas.height = h;
@@ -18,22 +20,26 @@ const getCanvas = (w: number, h: number) => {
   return canvas;
 };
 
+const getClampedScale = (size: number, maxScale: number) =>
+  min(max(round(size) / devicePixelRatio, 1), maxScale);
+
 class Elem extends PIXI.Sprite {
   #scale: number = 1;
-  #maxSize: number = 1;
+  #maxScale: number = 1;
   constructor(
     public bounds: Bounds,
     private bodies: ReturnType<D2RendererBase["makeBodies"]>,
     scale: number
   ) {
-    super(getTexture(bounds, bodies, scale));
-    this.#maxSize =
+    const maxScale =
       CANVAS_MAXSIZE /
       max(bounds.right - bounds.left, bounds.bottom - bounds.top, 1);
+    super(getTexture(bounds, bodies, getClampedScale(scale, maxScale)));
+    this.#maxScale = maxScale;
     this.rerender(scale);
   }
   rerender(size: number) {
-    const scale = clamp(round(size) / devicePixelRatio, 1, this.#maxSize);
+    const scale = getClampedScale(size, this.#maxScale);
     if (scale === this.#scale) return;
     const texture = getTexture(this.bounds, this.bodies, scale);
     this.texture = texture;
