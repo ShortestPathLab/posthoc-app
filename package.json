@@ -3,10 +3,20 @@
   "version": "1.0.5",
   "description": "",
   "scripts": {
-    "start": "cd client && npm start",
-    "build:all": "cd client && npm run build",
-    "postinstall": "(cd client && npm install --force) && (cd internal-renderers && npm install)"
+    "start": "cd client && bun start",
+    "build:all": "cd client && bun run build"
   },
+  "workspaces": [
+    "protocol",
+    "renderer",
+    "internal-renderers",
+    "client",
+    "adapter-fs-bridge",
+    "adapter-warthog-wasm",
+    "adapter-warthog-websocket",
+    "adapter-iron-harvest",
+    "resources"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ShortestPathLab/posthoc-app.git"
@@ -17,5 +27,13 @@
     "url": "https://github.com/ShortestPathLab/posthoc-app/issues"
   },
   "homepage": "posthoc.pathfinding.ai",
-  "type": "module"
+  "type": "module",
+  "trustedDependencies": [
+    "bufferutil",
+    "canvas",
+    "electron",
+    "es5-ext",
+    "esbuild",
+    "pathfinding-binaries"
+  ]
 }

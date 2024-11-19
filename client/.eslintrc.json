@@ -13,10 +13,16 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "react", "only-warn"],
+  "plugins": [
+    "@typescript-eslint",
+    "eslint-plugin-react-compiler",
+    "react",
+    "only-warn"
+  ],
   "rules": {
     "react/react-in-jsx-scope": 0,
     "react/display-name": 0,
-    "@typescript-eslint/no-explicit-any": 0
+    "@typescript-eslint/no-explicit-any": 0,
+    "react-compiler/react-compiler": "error"
   }
 }

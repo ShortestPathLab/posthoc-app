@@ -25,3 +25,41 @@ Interested? [Get started here](https://posthoc.pathfinding.ai).
 ## Releases
 
 [View releases](https://github.com/ShortestPathLab/posthoc-app/releases)
+
+## Contributing
+
+### Setting up a local development environment
+
+#### Install Bun
+
+This project uses [Bun](https://bun.sh) instead of NodeJS.
+
+Set up Bun with:
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+### Clone the repo
+
+Clone the repo with:
+
+```bash
+git clone https://github.com/ShortestPathLab/posthoc-app.git
+cd posthoc-app
+```
+
+### Install dependencies
+
+Make sure run `bun i` in the root directory instead of any sub-folders.
+
+```bash
+bun i
+```
+
+### Start the dev server
+
+```bash
+cd client
+bun start
+```

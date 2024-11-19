@@ -18,19 +18,22 @@ jobs:
           sudo add-apt-repository ppa:cybermax-dexter/sdl2-backport
           sudo apt-add-repository "deb https://dl.winehq.org/wine-builds/ubuntu $(lsb_release -cs) main"
           sudo apt install --install-recommends winehq-stable
-      - name: Build client
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install and Build
         run: |
-          npm install --force
-          cd client && npm run build && npm run package
+          bun i
+          cd client && bun run build
       - name: Build adapter (Filesystem Sync)
         run: |
-          cd adapter-fs-bridge && npm i && npm run build && zip -r dist.zip dist
+          cd adapter-fs-bridge && bun i && bun run build && zip -r dist.zip dist
       - name: Build adapter (Iron Harvest)
         run: |
-          cd adapter-iron-harvest && npm i && npm run build && zip -r dist.zip dist
+          cd adapter-iron-harvest && bun i && bun run build && zip -r dist.zip dist
       - name: Build adapter (Warthog Websocket)
         run: |
-          cd adapter-warthog-websocket && npm i && npm run build && zip -r dist.zip dist
+          cd adapter-warthog-websocket && bun i && bun run build && zip -r dist.zip dist
       - name: Create release
         uses: actions/create-release@v1
         id: create_release

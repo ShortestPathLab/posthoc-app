@@ -4,19 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "convert": "vite-node convert.ts --"
+    "convert": "bun convert.ts --"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "glob": "^10.3.10",
+    "glob": "^10.4.5",
     "json-beautify": "^1.1.1",
     "lodash": "^4.17.21",
-    "make-dir": "^4.0.0",
-    "vite-node": "^0.34.6"
+    "make-dir": "^4.0.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.199",
-    "@types/node": "^20.8.6"
+    "@types/lodash": "^4.17.13",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.6.3"
   }
 }

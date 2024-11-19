@@ -1,11 +1,18 @@
 import { D2RendererWorker } from "./D2RendererWorker";
 
-const instance = new D2RendererWorker();
+export const url = import.meta.url;
 
-instance.on("message", (m, t) => self.postMessage(m, t));
+if (
+  typeof WorkerGlobalScope !== "undefined" &&
+  self instanceof WorkerGlobalScope
+) {
+  const instance = new D2RendererWorker();
 
-self.onmessage = (e: MessageEvent) => {
-  const { action, payload } = e.data;
-  ///@ts-ignore
-  instance[action](...payload);
-};
+  instance.on("message", (m, t) => self.postMessage(m, t));
+
+  self.onmessage = (e: MessageEvent) => {
+    const { action, payload } = e.data;
+    ///@ts-ignore
+    instance[action](...payload);
+  };
+}

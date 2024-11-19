@@ -4,7 +4,10 @@ import {
   D2WorkerEvents,
   D2WorkerRequest,
 } from "./D2RendererWorker";
-import d2RendererWorkerUrl from "./D2Renderer.worker.ts?worker&url";
+import viteUrl from "./D2Renderer.worker.ts?worker&url";
+import { url as BunUrl } from "./D2Renderer.worker";
+
+const d2RendererWorkerUrl = viteUrl ?? BunUrl;
 
 export class D2RendererWorkerAdapter extends Worker {
   constructor() {
