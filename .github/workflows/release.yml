@@ -24,7 +24,7 @@ jobs:
       - name: Install and Build
         run: |
           bun i
-          cd client && bun run build
+          cd client && bun run build && npm run package
       - name: Build adapter (Filesystem Sync)
         run: |
           cd adapter-fs-bridge && bun i && bun run build && zip -r dist.zip dist
