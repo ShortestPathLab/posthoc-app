@@ -261,7 +261,7 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
       .map((c) => (isUndefined(c.size) || isNaN(c.size) ? 0 : c.size))
       .sum()
       .value();
-    return !isUndefined(n) ? n : 100 - all ?? inferSize(root);
+    return !isUndefined(n) ? n : 100 - all || inferSize(root);
   }
 
   return (

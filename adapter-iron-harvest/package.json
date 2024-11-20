@@ -23,7 +23,7 @@
     "lru-cache": "^6.0.0",
     "md5": "^2.3.0",
     "node-emoji": "^2.1.0",
-    "protocol": "file:../protocol",
+    "protocol": "workspace:*",
     "socket.io": "^4.1.3",
     "socket.io-client": "^4.1.3",
     "tempy": "^1.0.1",
@@ -39,9 +39,9 @@
     "@types/socket.io-client": "^3.0.0",
     "nodemon": "^2.0.12",
     "pkg": "^5.8.1",
-    "vite": "^4.4.7",
+    "vite": "^5.4.11",
     "vite-node": "^0.33.0",
-    "vite-tsconfig-paths": "^4.2.0",
+    "vite-tsconfig-paths": "^5.1.3",
     "vitest": "^0.29.8"
   }
 }

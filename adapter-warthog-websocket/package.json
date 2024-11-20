@@ -23,7 +23,7 @@
     "md5": "^2.3.0",
     "node-emoji": "^2.1.0",
     "pathfinding-binaries": "github:ShortestPathLab/posthoc-adapter-warthog#bin",
-    "protocol": "file:../protocol",
+    "protocol": "workspace:*",
     "socket.io": "^4.1.3",
     "socket.io-client": "^4.1.3",
     "tempy": "^1.0.1",
@@ -42,8 +42,8 @@
     "@types/js-yaml": "^4.0.9",
     "@types/lodash": "^4.14.202",
     "vite-node": "^0.34.4",
-    "vite-tsconfig-paths": "^4.2.1",
+    "vite-tsconfig-paths": "^5.1.3",
     "pkg": "^5.8.1",
-    "vite": "^4.4.7"
+    "vite": "^5.4.11"
   }
 }

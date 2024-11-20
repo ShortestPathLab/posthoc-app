@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "protocol": "file:../protocol",
+    "protocol": "workspace:*",
     "typed-emitter": "^2.1.0"
   }
 }

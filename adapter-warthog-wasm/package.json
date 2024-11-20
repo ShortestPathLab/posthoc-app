@@ -17,7 +17,7 @@
     "lru-cache": "^6.0.0",
     "md5": "^2.3.0",
     "nanoid": "^5.0.1",
-    "protocol": "file:../protocol",
+    "protocol": "workspace:*",
     "typescript": "^4.4.4",
     "warthog-bin": "github:ShortestPathLab/posthoc-adapter-warthog#wasm-bin"
   },
@@ -26,7 +26,7 @@
     "@types/lru-cache": "^5.1.1",
     "@types/md5": "^2.3.1",
     "gh-pages": "^6.0.0",
-    "vite": "^4.4.9",
+    "vite": "^5.4.11",
     "vite-tsconfig-paths": "^4.2.1"
   }
 }

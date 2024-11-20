@@ -4,8 +4,9 @@ import { Scheme } from "protocol/SolveTask";
 import url from "url-parse";
 import { Transport } from "./Transport";
 
-const paths = import.meta.glob("/public/maps/*.grid", {
-  as: "url",
+const paths = import.meta.glob<boolean, string, string>("/public/maps/*.grid", {
+  query: "?url",
+  import: "default",
 });
 
 function ext(path: string) {

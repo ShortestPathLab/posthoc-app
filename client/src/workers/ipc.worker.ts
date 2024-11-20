@@ -13,7 +13,7 @@ async function timed<T>(task: () => Promise<T>, ms: number = 500) {
 }
 
 const init = once(async (url: string = "") => {
-  const { result } = await timed(() => import(url /* @vite-ignore */));
+  const { result } = await timed(() => import(/* @vite-ignore */ url));
   if (result) {
     const fn = (...args: any[]) => result.call(...args);
     return fn as Transport["call"];

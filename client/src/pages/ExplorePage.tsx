@@ -22,6 +22,7 @@ import {
   Typography as Type,
   useTheme,
 } from "@mui/material";
+import { ColorTranslator } from "colortranslator";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
@@ -40,16 +41,24 @@ import { useSettings } from "slices/settings";
 import { textFieldProps, usePaper } from "theme";
 import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/Button";
-import { PageContentProps } from "./PageMeta";
-import { ColorTranslator } from "colortranslator";
 import { Image } from "./Image";
-const paths = import.meta.glob("/public/recipes/*.workspace", {
-  as: "url",
-});
+import { PageContentProps } from "./PageMeta";
 
-const metaPaths = import.meta.glob("/public/recipes/*.workspace.meta", {
-  as: "url",
-});
+const paths = import.meta.glob<boolean, string, string>(
+  "/public/recipes/*.workspace",
+  {
+    query: "?url",
+    import: "default",
+  }
+);
+
+const metaPaths = import.meta.glob<boolean, string, string>(
+  "/public/recipes/*.workspace.meta",
+  {
+    query: "?url",
+    import: "default",
+  }
+);
 
 function stripExtension(path: string) {
   return path.split(".")[0];

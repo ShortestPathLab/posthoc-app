@@ -32,9 +32,13 @@ export function RecipesPage({ template: Page }: PageContentProps) {
   const usingLoadingState = useLoadingState();
 
   const { result: files, loading } = useAsync(async () => {
-    const paths = import.meta.glob("/public/recipes/*.workspace", {
-      as: "url",
-    });
+    const paths = import.meta.glob<boolean, string, string>(
+      "/public/recipes/*.workspace",
+      {
+        query: "?url",
+        import: "default",
+      }
+    );
     return await Promise.all(
       entries(paths).map((entry) => getFileInfo(...entry))
     );
