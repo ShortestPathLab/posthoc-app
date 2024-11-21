@@ -9,6 +9,8 @@
     "@emotion/styled": "^11.13.5",
     "@hello-pangea/dnd": "^17.0.0",
     "@monaco-editor/react": "^4.6.0",
+    "@mui-symbols-material/w300": "^0.3.3",
+    "@mui-symbols-material/w400": "^0.3.3",
     "@mui/icons-material": "^6.1.8",
     "@mui/lab": "^6.0.0-beta.16",
     "@mui/material": "^6.1.8",

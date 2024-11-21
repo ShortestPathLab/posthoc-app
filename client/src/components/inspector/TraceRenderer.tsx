@@ -1,7 +1,7 @@
 import {
   BlurOnOutlined as DisabledIcon,
   ViewInArOutlined,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w400";
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { usePlaybackState } from "hooks/usePlaybackState";

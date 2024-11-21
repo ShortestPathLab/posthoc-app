@@ -2,7 +2,7 @@ import {
   FiberManualRecordOutlined,
   LayersOutlined as LayersIcon,
   SegmentOutlined,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w400";
 import { Box, Divider, Stack, SxProps, Theme, useTheme } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";

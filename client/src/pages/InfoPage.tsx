@@ -1,4 +1,4 @@
-import { CloseOutlined, ListOutlined } from "@mui/icons-material";
+import { CloseOutlined, ListOutlined } from "@mui-symbols-material/w400";
 import { Divider, List, ListItem, ListItemText } from "@mui/material";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Flex } from "components/generic/Flex";

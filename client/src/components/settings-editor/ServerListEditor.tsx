@@ -1,4 +1,4 @@
-import { ReplayOutlined as ResetIcon } from "@mui/icons-material";
+import { ReplayOutlined as ResetIcon } from "@mui-symbols-material/w400";
 import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";

@@ -11,6 +11,7 @@ export type PageMeta = {
   id: string;
   name: string;
   icon: ReactElement;
+  iconThin?: ReactElement;
   color?: AccentColor;
   description?: string;
   content: (props: PageContentProps) => ReactNode;

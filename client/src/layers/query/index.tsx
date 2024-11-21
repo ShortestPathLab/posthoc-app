@@ -1,10 +1,10 @@
 import {
   CodeOutlined,
-  PlaceOutlined as DestinationIcon,
+  LocationOnOutlined as DestinationIcon,
   LayersOutlined,
-  RouteTwoTone,
+  RouteOutlined,
   TripOriginOutlined as StartIcon,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w400";
 import { Box, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useSnackbar } from "components/generic/Snackbar";
@@ -70,7 +70,7 @@ const maxStringPropLength = 40;
 export const controller = {
   ...omit(traceController, "claimImportedFile"),
   key: "query",
-  icon: <RouteTwoTone />,
+  icon: <RouteOutlined />,
   compress: (layer) =>
     pick(layer, [
       "mapLayerKey",

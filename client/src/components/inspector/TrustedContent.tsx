@@ -2,7 +2,7 @@ import {
   CheckOutlined,
   DoneAllOutlined,
   ShieldOutlined,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w400";
 import { Link, Stack } from "@mui/material";
 import { ReactNode } from "react";
 import { Placeholder } from "./Placeholder";

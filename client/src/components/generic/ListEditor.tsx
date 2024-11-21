@@ -1,9 +1,9 @@
 import {
-  Add,
-  ClearOutlined as DeleteIcon,
+  AddOutlined as Add,
+  CloseOutlined as DeleteIcon,
   DragHandleOutlined,
   EditOutlined as EditIcon,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w400";
 import {
   Box,
   Button,

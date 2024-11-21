@@ -1,4 +1,4 @@
-import { FiberManualRecord as Dot } from "@mui/icons-material";
+import { FiberManualRecordOutlined as Dot } from "@mui-symbols-material/w400";
 import { Typography as Type, TypographyProps } from "@mui/material";
 import { ComponentProps, ReactNode } from "react";
 

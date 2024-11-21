@@ -1,4 +1,4 @@
-import { RestartAltOutlined } from "@mui/icons-material";
+import { RestartAltOutlined } from "@mui-symbols-material/w400";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Box,
@@ -338,7 +338,7 @@ export function TrustedOriginListEditor() {
     //     </ListItem>
     //   ))}
     // </List>
-    (<Box sx={{ mx: -2 }}>
+    <Box sx={{ mx: -2 }}>
       <ListEditor
         button={false}
         sortable
@@ -362,7 +362,7 @@ export function TrustedOriginListEditor() {
           key: "",
         })}
       />
-    </Box>)
+    </Box>
   );
 }
 export function MapParserListEditor() {
@@ -374,7 +374,7 @@ export function MapParserListEditor() {
     //     </ListItem>
     //   ))}
     // </List>
-    (<Box sx={{ mx: -2 }}>
+    <Box sx={{ mx: -2 }}>
       <ListEditor<A>
         button={false}
         sortable
@@ -395,6 +395,6 @@ export function MapParserListEditor() {
           key: "",
         })}
       />
-    </Box>)
+    </Box>
   );
 }

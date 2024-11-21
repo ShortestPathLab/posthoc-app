@@ -1,8 +1,8 @@
 import {
   ArrowOutwardRounded,
   DataObjectOutlined,
-  RouteTwoTone,
-} from "@mui/icons-material";
+  RouteOutlined,
+} from "@mui-symbols-material/w400";
 import {
   Box,
   ListItemIcon,
@@ -165,7 +165,7 @@ export type TraceLayer = Layer<TraceLayerData>;
 
 export const controller = {
   key: "trace",
-  icon: <RouteTwoTone />,
+  icon: <RouteOutlined />,
   inferName: (layer) => layer.source?.trace?.name ?? "Untitled Trace",
   error: (layer) =>
     layer?.source?.trace?.error || layer?.source?.parsedTrace?.error,

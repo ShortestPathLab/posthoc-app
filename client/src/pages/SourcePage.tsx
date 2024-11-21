@@ -1,5 +1,5 @@
 import { Editor } from "@monaco-editor/react";
-import { CodeOutlined } from "@mui/icons-material";
+import { CodeOutlined } from "@mui-symbols-material/w400";
 import { CircularProgress, Tab, Tabs, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import { Placeholder } from "components/inspector/Placeholder";

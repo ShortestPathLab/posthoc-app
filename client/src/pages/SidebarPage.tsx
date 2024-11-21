@@ -1,4 +1,4 @@
-import { FullscreenOutlined } from "@mui/icons-material";
+import { FullscreenOutlined } from "@mui-symbols-material/w400";
 import { Box, Typography } from "@mui/material";
 import { useSidebarBackground } from "Sidebar";
 import { Flex } from "components/generic/Flex";

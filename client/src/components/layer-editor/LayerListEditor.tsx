@@ -1,4 +1,4 @@
-import { MoreVertOutlined } from "@mui/icons-material";
+import { MoreVertOutlined } from "@mui-symbols-material/w400";
 import { Box, IconButton, Menu, MenuItem, MenuList } from "@mui/material";
 import { ListEditor } from "components/generic/ListEditor";
 import { head, map } from "lodash";

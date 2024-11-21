@@ -1,5 +1,5 @@
 import Split, { SplitDirection } from "@devbookhq/splitter";
-import { DragIndicatorOutlined } from "@mui/icons-material";
+import { DragIndicatorOutlined } from "@mui-symbols-material/w400";
 import { Box, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
 import {

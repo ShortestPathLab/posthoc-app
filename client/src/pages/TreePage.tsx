@@ -1,12 +1,14 @@
 import {
   AccountTreeOutlined,
-  CenterFocusWeakOutlined,
   DataObjectOutlined,
   LayersOutlined as LayersIcon,
   ModeStandbyOutlined,
-  FlipCameraAndroidOutlined as RotateIcon,
   TimelineOutlined,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w400";
+import {
+  CenterFocusWeakOutlined,
+  FlipCameraAndroidOutlined as RotateIcon,
+} from "@mui-symbols-material/w300";
 import {
   Box,
   CircularProgress,

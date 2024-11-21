@@ -1,4 +1,4 @@
-import { MapTwoTone } from "@mui/icons-material";
+import { MapOutlined } from "@mui-symbols-material/w400";
 import { CircularProgress, Typography } from "@mui/material";
 import { MapPicker } from "components/app-bar/Input";
 import { custom, readUploadedMap } from "components/app-bar/upload";
@@ -40,7 +40,7 @@ export type MapLayer = Layer<MapLayerData>;
 
 export const controller = {
   key: "map",
-  icon: <MapTwoTone />,
+  icon: <MapOutlined />,
   inferName: (layer) =>
     layer?.source?.map
       ? `${layer.source.map.name} (${startCase(layer.source.map.format)})`

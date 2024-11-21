@@ -1,20 +1,15 @@
-import {
-  ErrorOutlineOutlined,
-  SentimentDissatisfiedOutlined,
-  WidgetsOutlined,
-} from "@mui/icons-material";
+import { ErrorOutlined, WidgetsOutlined } from "@mui-symbols-material/w400";
 import { Box, Divider, Stack } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Button } from "components/generic/Button";
 import { Flex } from "components/generic/Flex";
 import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
 import { Placeholder } from "components/inspector/Placeholder";
+import { withSlots } from "components/withSlots";
 import { values } from "lodash";
 import { pages } from "pages";
 import React, { ReactNode } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { withSlots } from "components/withSlots";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
 
@@ -96,7 +91,7 @@ export const Page = withSlots<PageSlots, PageProps>(
             <Placeholder
               // label="Something went wrong"
               secondary={`${error.error}`}
-              icon={<ErrorOutlineOutlined />}
+              icon={<ErrorOutlined />}
             />
           </Stack>
         )}

@@ -1,4 +1,7 @@
-import { DataObjectOutlined, FiberManualRecord } from "@mui/icons-material";
+import {
+  DataObjectOutlined,
+  FiberManualRecordFilledOutlined as FiberManualRecord,
+} from "@mui-symbols-material/w400";
 import {
   Box,
   Divider,

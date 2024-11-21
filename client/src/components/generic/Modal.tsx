@@ -1,4 +1,4 @@
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBackOutlined as ArrowBack } from "@mui-symbols-material/w400";
 import {
   AppBar,
   Box,

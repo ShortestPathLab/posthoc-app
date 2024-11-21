@@ -1,4 +1,4 @@
-import { EditOutlined as EditIcon } from "@mui/icons-material";
+import { EditOutlined as EditIcon } from "@mui-symbols-material/w400";
 import {
   Box,
   Chip,

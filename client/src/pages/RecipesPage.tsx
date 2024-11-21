@@ -1,4 +1,4 @@
-import { WorkspacesOutlined } from "@mui/icons-material";
+import { WorkspacesOutlined } from "@mui-symbols-material/w400";
 import {
   Box,
   CircularProgress,

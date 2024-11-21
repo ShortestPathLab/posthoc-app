@@ -1,8 +1,8 @@
 import {
-  LaunchOutlined,
+  RocketLaunchOutlined as LaunchOutlined,
   SearchOutlined,
   WorkspacesOutlined,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w400";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Avatar,
@@ -373,7 +373,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   }
 
   return (
-    (<TabContext value={tab}>
+    <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
         <Page.Title>Explore</Page.Title>
         <Page.Key>explore</Page.Key>
@@ -436,7 +436,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                                 <SearchOutlined />
                               </InputAdornment>
                             ),
-                          }
+                          },
                         }}
                       />
                     </Box>
@@ -521,6 +521,6 @@ export function ExplorePage({ template: Page }: PageContentProps) {
           {controls}
         </Page.Extras>
       </Page>
-    </TabContext>)
+    </TabContext>
   );
 }

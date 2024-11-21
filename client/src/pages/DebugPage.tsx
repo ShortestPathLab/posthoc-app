@@ -1,7 +1,7 @@
 import {
   BugReportOutlined,
   LayersOutlined as LayersIcon,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w400";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Divider, Tab, Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";

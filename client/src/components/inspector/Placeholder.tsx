@@ -1,4 +1,4 @@
-import { WidgetsOutlined } from "@mui/icons-material";
+import { WidgetsOutlined } from "@mui-symbols-material/w400";
 import { Box, Typography as Type } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
 import { ReactElement, ReactNode } from "react";

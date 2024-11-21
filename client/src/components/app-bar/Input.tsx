@@ -1,4 +1,4 @@
-import { FileOpenOutlined } from "@mui/icons-material";
+import { FileOpenOutlined } from "@mui-symbols-material/w400";
 import { useSnackbar } from "components/generic/Snackbar";
 import { find, get, startCase } from "lodash";
 import { Map, UploadedTrace } from "slices/UIState";

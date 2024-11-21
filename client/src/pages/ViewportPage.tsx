@@ -1,10 +1,12 @@
 import {
   BlurCircularOutlined,
+  LayersOutlined,
+} from "@mui-symbols-material/w400";
+import {
   CameraOutlined,
   CenterFocusWeakOutlined,
-  LayersOutlined,
   TimesOneMobiledataOutlined,
-} from "@mui/icons-material";
+} from "@mui-symbols-material/w300";
 import { Box, Divider, Stack, SxProps, Theme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";

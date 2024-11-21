@@ -1,4 +1,4 @@
-import { DownloadOutlined } from "@mui/icons-material";
+import { DownloadOutlined } from "@mui-symbols-material/w400";
 import { Box, Stack, TextField, Typography } from "@mui/material";
 import { Button } from "components/generic/Button";
 import Modal, { ModalAppBar } from "components/generic/Modal";

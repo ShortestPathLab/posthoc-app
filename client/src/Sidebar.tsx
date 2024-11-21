@@ -180,12 +180,12 @@ export function Sidebar({ children }: { children?: ReactNode }) {
                           alignItems: "center",
                           display: "flex",
                           "> svg > path": {
-                            strokeWidth: 0.5,
+                            strokeWidth: 1,
                             stroke: bgcolor,
                           },
                         }}
                       >
-                        {c.icon}
+                        {c.iconThin ?? c.icon}
                       </Box>
                     </Tooltip>
                   }
