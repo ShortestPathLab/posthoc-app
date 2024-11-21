@@ -106,7 +106,7 @@ export function useBreakpoints(key?: string) {
               event,
               events,
               trees[step]?.parent,
-              trees[step]?.children,
+              trees[step]?.children ?? [],
             ])
           ) {
             return { result: "Script editor" };

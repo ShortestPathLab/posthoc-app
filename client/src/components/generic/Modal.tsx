@@ -365,7 +365,11 @@ export function ManagedModal({
                 </Box>
               </Popover>
             ) : (
-              <Modal open={isOpen} onClose={close} {...slotProps?.modal}>
+              <Modal
+                open={isOpen}
+                onClose={close as () => void}
+                {...slotProps?.modal}
+              >
                 <ModalAppBar onClose={close} {...ModalAppBarProps} />
                 {chi2}
               </Modal>

@@ -132,7 +132,7 @@ const orientationOptions = {
 };
 
 type R = {
-  event: MouseEvent;
+  event: MouseEvent | TouchEvent;
   node: string;
 };
 
@@ -407,6 +407,19 @@ export function TreePage({ template: Page }: PageContentProps) {
   }, [trace, setTrackedProperty]);
 
   const [selection, setSelection] = useState<R>();
+
+  const { x, y } = selection
+    ? selection.event instanceof MouseEvent
+      ? {
+          x: selection.event.clientX,
+          y: selection.event.clientY,
+        }
+      : {
+          x: selection.event.touches?.[0]?.clientX,
+          y: selection.event.touches?.[0]?.clientY,
+        }
+    : { x: 0, y: 0 };
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [mode, setMode] = useState<"tree" | "directed-graph">("tree");
@@ -491,8 +504,8 @@ export function TreePage({ template: Page }: PageContentProps) {
                     onClose={() => setMenuOpen(false)}
                     anchorReference="anchorPosition"
                     anchorPosition={{
-                      left: selection?.event.clientX ?? 0,
-                      top: selection?.event.clientY ?? 0,
+                      left: x,
+                      top: y,
                     }}
                     transformOrigin={{
                       horizontal: "left",

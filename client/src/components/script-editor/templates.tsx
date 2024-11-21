@@ -1,8 +1,9 @@
 import { TraceEvent } from "protocol/Trace";
 import { FunctionTemplate } from "./FunctionTemplate";
+import { EventTree } from "pages/tree.worker";
 
 export type ShouldBreak = FunctionTemplate<
-  [number, TraceEvent, TraceEvent[], TraceEvent, TraceEvent[]],
+  [number, TraceEvent, TraceEvent[], EventTree | void, EventTree[] | void],
   boolean
 >;
 
