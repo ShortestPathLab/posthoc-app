@@ -98,83 +98,84 @@ export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
   const [stepInput, setStepInput] = useState("");
   const parsedStepInput = parseInt(stepInput);
   const parsedStepInputValid = !isNaN(parsedStepInput);
-  return (
-    <>
-      <IconButton
-        label="previous-breakpoint"
-        icon={<StopIcon />}
-        onClick={() => {
-          stepTo(findBreakpoint(-1));
-        }}
-        disabled={!canStop || !canStepBackward}
-      />
-      <IconButton
-        label="step-backward"
-        icon={<PreviousIcon />}
-        onClick={stepBackward}
-        disabled={!canStepBackward}
-      />
-      <IconButton
-        {...(playing
-          ? {
-              label: "pause",
-              icon: <PauseIcon />,
-              onClick: () => pause(),
-              disabled: !canPause,
-            }
-          : {
-              label: "play",
-              icon: <PlayIcon />,
-              onClick: () => play(),
-              disabled: !canPlay,
-              color: "primary",
-            })}
-      />
-      <IconButton
-        label="step-forward"
-        icon={<NextIcon />}
-        onClick={stepForward}
-        disabled={!canStepForward}
-      />
-      <IconButton
-        label="next-breakpoint"
-        icon={<SkipIcon />}
-        onClick={() => {
-          stepTo(findBreakpoint());
-        }}
-        disabled={!canStepForward}
-      />
-      {divider}
-      <PopupState variant="popover">
-        {(state) => (
-          <>
-            <Button sx={{ minWidth: 0 }} {...bindTrigger(state)}>
-              <Typography
-                component="div"
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  px: 0.25,
-                  py: 0.25,
-                  textAlign: "center",
-                  ...paper(0),
-                  borderRadius: 1,
-                }}
-              >
-                {step}
-              </Typography>
-            </Button>
-            <Popover
-              {...bindPopover(state)}
-              anchorOrigin={centered}
-              transformOrigin={centered}
+  return (<>
+    <IconButton
+      label="previous-breakpoint"
+      icon={<StopIcon />}
+      onClick={() => {
+        stepTo(findBreakpoint(-1));
+      }}
+      disabled={!canStop || !canStepBackward}
+    />
+    <IconButton
+      label="step-backward"
+      icon={<PreviousIcon />}
+      onClick={stepBackward}
+      disabled={!canStepBackward}
+    />
+    <IconButton
+      {...(playing
+        ? {
+            label: "pause",
+            icon: <PauseIcon />,
+            onClick: () => pause(),
+            disabled: !canPause,
+          }
+        : {
+            label: "play",
+            icon: <PlayIcon />,
+            onClick: () => play(),
+            disabled: !canPlay,
+            color: "primary",
+          })}
+    />
+    <IconButton
+      label="step-forward"
+      icon={<NextIcon />}
+      onClick={stepForward}
+      disabled={!canStepForward}
+    />
+    <IconButton
+      label="next-breakpoint"
+      icon={<SkipIcon />}
+      onClick={() => {
+        stepTo(findBreakpoint());
+      }}
+      disabled={!canStepForward}
+    />
+    {divider}
+    <PopupState variant="popover">
+      {(state) => (
+        <>
+          <Button sx={{ minWidth: 0 }} {...bindTrigger(state)}>
+            <Typography
+              component="div"
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                px: 0.25,
+                py: 0.25,
+                textAlign: "center",
+                ...paper(0),
+                borderRadius: 1,
+              }}
             >
-              <TextField
-                autoFocus
-                onChange={(e) => setStepInput(e.target.value)}
-                defaultValue={step}
-                placeholder="0"
-                InputProps={{
+              {step}
+            </Typography>
+          </Button>
+          <Popover
+            {...bindPopover(state)}
+            anchorOrigin={centered}
+            transformOrigin={centered}
+          >
+            <TextField
+              autoFocus
+              onChange={(e) => setStepInput(e.target.value)}
+              defaultValue={step}
+              placeholder="0"
+              sx={{ width: 180, border: "none" }}
+              slotProps={{
+                input: {
                   sx: { fontSize: "0.875rem" },
                   startAdornment: (
                     <InputAdornment position="start">Step</InputAdornment>
@@ -196,15 +197,14 @@ export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
                       />
                     </InputAdornment>
                   ),
-                }}
-                sx={{ width: 180, border: "none" }}
-              />
-            </Popover>
-          </>
-        )}
-      </PopupState>
-    </>
-  );
+                }
+              }}
+            />
+          </Popover>
+        </>
+      )}
+    </PopupState>
+  </>);
 }
 export function MinimisedPlaybackControls({
   layer,

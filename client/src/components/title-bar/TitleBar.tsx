@@ -183,197 +183,195 @@ export const TitleBar = () => {
     });
   }
 
-  return (
-    <>
-      <Box
-        sx={{
-          mx: 0.5,
-          borderBottom: (t) => `1px solid ${t.palette.background.default}`,
-          minHeight: 36,
-          paddingLeft: "env(titlebar-area-x, 0px)",
-          height: visible ? "env(titlebar-area-height, 50px)" : 0,
-          width: "env(titlebar-area-width, 100%)",
-          WebkitAppRegion: "drag",
-          overflowX: "auto",
-        }}
-      >
-        <Scroll x style={{ height: "100%" }}>
-          <Box sx={{ height: "100%" }}>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ height: "100%" }}
-              alignItems="center"
-              justifyContent="flex-start"
-            >
-              {(!visible || rect.x === 0) && (
-                // Hide for macos style windows
-                <Box
-                  sx={{
-                    p: 1,
-                    height: "100%",
-                    // Firefox fix
-                    maxWidth: "min-content",
-                    aspectRatio: 1,
-                  }}
-                >
-                  <img src={logo} style={{ height: "100%" }} />
-                </Box>
-              )}
-              {<WorkspaceChip />}
-              {[
-                {
-                  key: "view",
-                  items: [
-                    {
-                      disabled: !canOpenWindows,
-                      key: "panel-new-window",
-                      type: "action",
-                      name: "New window",
-                      action: () => openWindow(),
-                    },
-                    { type: "divider" },
-                    {
-                      type: "action",
-                      key: `panel-new-right`,
-                      name: "Add view to the right",
-                      action: () => handleOpenPanel("horizontal"),
-                    },
-                    {
-                      type: "action",
-                      key: `panel-new-bottom`,
-                      name: "Add view below",
-                      action: () => handleOpenPanel("vertical"),
-                    },
-                    { type: "divider" },
-                    {
-                      type: "action",
-                      name: "Reset layout",
-                      key: "panel-reset",
-                      action: () => setView(getDefaultViewTree),
-                    },
-                    {
-                      type: "action",
-                      name: "Reload window",
-                      key: "panel-reload",
-                      action: () => location.reload(),
-                    },
-                    // {
-                    //   type: "action",
-                    //   name: "New workspace",
-                    //   action: () =>
-                    //     openWindow({ linked: false, minimal: false }),
-                    // },
-                  ],
-                },
-                {
-                  key: "workspace",
-                  items: [
-                    {
-                      type: "action",
-                      name: "Open workspace",
-                      key: "workspace-load",
-                      action: load,
-                    },
-                    {
-                      type: "action",
-                      name: "Save workspace",
-                      key: "workspace-save",
-                      action: save,
-                    },
-                    { type: "divider" },
-                    {
-                      type: "action",
-                      name: (
-                        <MenuEntry
-                          label="Publish workspace"
-                          endIcon={<OpenInNewOutlined />}
-                        />
-                      ),
-                      key: "workspace-save-metadata",
-                      action: () => setExportModalOpen(true),
-                    },
-                  ],
-                },
-                {
-                  key: "help",
-                  items: [
-                    {
-                      type: "action",
-                      name: "Open repository in GitHub",
-                      key: "github",
-                      action: () => open(repository, "_blank"),
-                    },
-                    {
-                      type: "action",
-                      name: "Changelog",
-                      key: "changelog",
-                      action: () => open(`${changelog}/${version}`, "_blank"),
-                    },
-                    {
-                      type: "action",
-                      name: "Documentation",
-                      key: "documentation",
-                      action: () => open(docs, "_blank"),
-                    },
-                  ],
-                },
-              ].map(({ key, items }) => (
-                <PopupState key={key} variant="popover">
-                  {(state) => (
-                    <>
-                      <Menu {...bindMenu(state)}>
-                        <MenuList dense sx={{ p: 0 }}>
-                          {items.map((item, i) => {
-                            if (item.type === "action") {
-                              const { name, key, action } = item;
-                              return (
-                                <MenuItem
-                                  disabled={get(item, "disabled")}
-                                  key={key}
-                                  onClick={() => {
-                                    action?.();
-                                    state.close();
-                                  }}
-                                >
-                                  {name}
-                                </MenuItem>
-                              );
-                            } else {
-                              return <Divider key={i} />;
-                            }
-                          })}
-                        </MenuList>
-                      </Menu>
-                      <FeaturePickerButton
-                        key={key}
-                        {...bindTrigger(state)}
-                        sx={{
-                          WebkitAppRegion: "no-drag",
-                          minWidth: "fit-content",
-                          p: 0.5,
-                          px: 1,
-                        }}
-                      >
-                        {startCase(key)}
-                      </FeaturePickerButton>
-                    </>
-                  )}
-                </PopupState>
-              ))}
-              {/* <Box sx={{ p: 0.75, height: "100%" }}>
-                <CommandsButton />
-              </Box> */}
-            </Stack>
-          </Box>
-        </Scroll>
-      </Box>
-      <ExportWorkspaceModal
-        open={exportModalOpen}
-        onClose={() => setExportModalOpen(false)}
-      />
-    </>
-  );
+  return (<>
+    <Box
+      sx={{
+        mx: 0.5,
+        borderBottom: (t) => `1px solid ${t.palette.background.default}`,
+        minHeight: 36,
+        paddingLeft: "env(titlebar-area-x, 0px)",
+        height: visible ? "env(titlebar-area-height, 50px)" : 0,
+        width: "env(titlebar-area-width, 100%)",
+        WebkitAppRegion: "drag",
+        overflowX: "auto",
+      }}
+    >
+      <Scroll x style={{ height: "100%" }}>
+        <Box sx={{ height: "100%" }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ height: "100%" }}
+            alignItems="center"
+            justifyContent="flex-start"
+          >
+            {(!visible || rect.x === 0) && (
+              // Hide for macos style windows
+              (<Box
+                sx={{
+                  p: 1,
+                  height: "100%",
+                  // Firefox fix
+                  maxWidth: "min-content",
+                  aspectRatio: 1,
+                }}
+              >
+                <img src={logo} style={{ height: "100%" }} />
+              </Box>)
+            )}
+            {<WorkspaceChip />}
+            {[
+              {
+                key: "view",
+                items: [
+                  {
+                    disabled: !canOpenWindows,
+                    key: "panel-new-window",
+                    type: "action",
+                    name: "New window",
+                    action: () => openWindow(),
+                  },
+                  { type: "divider" },
+                  {
+                    type: "action",
+                    key: `panel-new-right`,
+                    name: "Add view to the right",
+                    action: () => handleOpenPanel("horizontal"),
+                  },
+                  {
+                    type: "action",
+                    key: `panel-new-bottom`,
+                    name: "Add view below",
+                    action: () => handleOpenPanel("vertical"),
+                  },
+                  { type: "divider" },
+                  {
+                    type: "action",
+                    name: "Reset layout",
+                    key: "panel-reset",
+                    action: () => setView(getDefaultViewTree),
+                  },
+                  {
+                    type: "action",
+                    name: "Reload window",
+                    key: "panel-reload",
+                    action: () => location.reload(),
+                  },
+                  // {
+                  //   type: "action",
+                  //   name: "New workspace",
+                  //   action: () =>
+                  //     openWindow({ linked: false, minimal: false }),
+                  // },
+                ],
+              },
+              {
+                key: "workspace",
+                items: [
+                  {
+                    type: "action",
+                    name: "Open workspace",
+                    key: "workspace-load",
+                    action: load,
+                  },
+                  {
+                    type: "action",
+                    name: "Save workspace",
+                    key: "workspace-save",
+                    action: save,
+                  },
+                  { type: "divider" },
+                  {
+                    type: "action",
+                    name: (
+                      <MenuEntry
+                        label="Publish workspace"
+                        endIcon={<OpenInNewOutlined />}
+                      />
+                    ),
+                    key: "workspace-save-metadata",
+                    action: () => setExportModalOpen(true),
+                  },
+                ],
+              },
+              {
+                key: "help",
+                items: [
+                  {
+                    type: "action",
+                    name: "Open repository in GitHub",
+                    key: "github",
+                    action: () => open(repository, "_blank"),
+                  },
+                  {
+                    type: "action",
+                    name: "Changelog",
+                    key: "changelog",
+                    action: () => open(`${changelog}/${version}`, "_blank"),
+                  },
+                  {
+                    type: "action",
+                    name: "Documentation",
+                    key: "documentation",
+                    action: () => open(docs, "_blank"),
+                  },
+                ],
+              },
+            ].map(({ key, items }) => (
+              <PopupState key={key} variant="popover">
+                {(state) => (
+                  <>
+                    <Menu {...bindMenu(state)}>
+                      <MenuList dense sx={{ p: 0 }}>
+                        {items.map((item, i) => {
+                          if (item.type === "action") {
+                            const { name, key, action } = item;
+                            return (
+                              <MenuItem
+                                disabled={get(item, "disabled")}
+                                key={key}
+                                onClick={() => {
+                                  action?.();
+                                  state.close();
+                                }}
+                              >
+                                {name}
+                              </MenuItem>
+                            );
+                          } else {
+                            return <Divider key={i} />;
+                          }
+                        })}
+                      </MenuList>
+                    </Menu>
+                    <FeaturePickerButton
+                      key={key}
+                      {...bindTrigger(state)}
+                      sx={{
+                        WebkitAppRegion: "no-drag",
+                        minWidth: "fit-content",
+                        p: 0.5,
+                        px: 1,
+                      }}
+                    >
+                      {startCase(key)}
+                    </FeaturePickerButton>
+                  </>
+                )}
+              </PopupState>
+            ))}
+            {/* <Box sx={{ p: 0.75, height: "100%" }}>
+              <CommandsButton />
+            </Box> */}
+          </Stack>
+        </Box>
+      </Scroll>
+    </Box>
+    <ExportWorkspaceModal
+      open={exportModalOpen}
+      onClose={() => setExportModalOpen(false)}
+    />
+  </>);
 };
 
 export function CommandsButton() {

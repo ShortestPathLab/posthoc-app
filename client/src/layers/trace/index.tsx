@@ -211,7 +211,7 @@ export const controller = {
           <Typography
             component="div"
             variant="body2"
-            color={(t) => t.palette.error.main}
+            color="error"
             sx={{
               whiteSpace: "pre-wrap",
               mb: 1,
@@ -225,7 +225,7 @@ export const controller = {
           <Typography
             component="div"
             variant="body2"
-            color={(t) => t.palette.error.main}
+            color="error"
             sx={{
               whiteSpace: "pre-wrap",
               mb: 1,

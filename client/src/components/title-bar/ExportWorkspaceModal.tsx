@@ -14,7 +14,7 @@ import { ComponentProps, useMemo } from "react";
 import { WorkspaceMeta, useUIState } from "slices/UIState";
 import { useLoadingState } from "slices/loading";
 import { textFieldProps, usePaper } from "theme";
-import { Jimp } from "utils/Jimp";
+import { Jimp, ResizeStrategy } from "jimp";
 import { set } from "utils/set";
 import { Gallery } from "./Gallery";
 
@@ -44,17 +44,17 @@ const imageSize = 64;
 async function resizeImage(s: string) {
   const a = await Jimp.read(Buffer.from(s.split(",")[1], "base64"));
   const b =
-    a.getWidth() < a.getHeight()
-      ? a.resize(imageSize, Jimp.AUTO)
-      : a.resize(Jimp.AUTO, imageSize);
+    a.width < a.height
+      ? a.resize({ w: imageSize })
+      : a.resize({ h: imageSize });
   return await b
-    .crop(
-      (b.getWidth() - imageSize) / 2,
-      (b.getHeight() - imageSize) / 2,
-      imageSize,
-      imageSize
-    )
-    .getBase64Async("image/jpeg");
+    .crop({
+      x: (b.width - imageSize) / 2,
+      y: (b.height - imageSize) / 2,
+      w: imageSize,
+      h: imageSize,
+    })
+    .getBase64("image/jpeg");
 }
 
 export function A() {

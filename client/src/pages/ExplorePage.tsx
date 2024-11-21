@@ -373,7 +373,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   }
 
   return (
-    <TabContext value={tab}>
+    (<TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
         <Page.Title>Explore</Page.Title>
         <Page.Key>explore</Page.Key>
@@ -427,15 +427,17 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                         hiddenLabel
                         fullWidth
                         sx={{ maxWidth: 480 }}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchOutlined />
-                            </InputAdornment>
-                          ),
-                        }}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search examples"
+                        slotProps={{
+                          input: {
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchOutlined />
+                              </InputAdornment>
+                            ),
+                          }
+                        }}
                       />
                     </Box>
                     <Box
@@ -519,6 +521,6 @@ export function ExplorePage({ template: Page }: PageContentProps) {
           {controls}
         </Page.Extras>
       </Page>
-    </TabContext>
+    </TabContext>)
   );
 }

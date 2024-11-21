@@ -23,7 +23,7 @@ export function BreakpointEditor({
     onChange?.({ ...value, ...next });
   }
   return (
-    <Flex sx={{ py: 1 }}>
+    (<Flex sx={{ py: 1 }}>
       <Select
         placeholder="Event"
         sx={{ minWidth: 160 }}
@@ -69,16 +69,17 @@ export function BreakpointEditor({
         }
       />
       <Space />
-
       <TextField
         label="Reference"
         fullWidth
         defaultValue={`${value.reference ?? 0}`}
         variant="filled"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
         onChange={(v) => handleChange({ reference: +v.target.value })}
         type="number"
         disabled={!value.condition?.needsReference}
+        slotProps={{
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+        }}
       />
       <Space sx={{ px: 2 }} />
       <Switch
@@ -86,6 +87,6 @@ export function BreakpointEditor({
         onChange={(_, v) => handleChange({ active: v })}
         sx={{ mr: -4 }}
       />
-    </Flex>
+    </Flex>)
   );
 }

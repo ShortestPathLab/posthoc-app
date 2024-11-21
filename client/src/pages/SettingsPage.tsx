@@ -331,7 +331,14 @@ export function TrustedOriginListEditor() {
     [trustedOrigins]
   );
   return (
-    <Box sx={{ mx: -2 }}>
+    // <List>
+    //   {keys(mapParsers).map((c) => (
+    //     <ListItem key={c}>
+    //       <ListItemText primary={c} secondary={"Internal"} />
+    //     </ListItem>
+    //   ))}
+    // </List>
+    (<Box sx={{ mx: -2 }}>
       <ListEditor
         button={false}
         sortable
@@ -355,7 +362,11 @@ export function TrustedOriginListEditor() {
           key: "",
         })}
       />
-    </Box>
+    </Box>)
+  );
+}
+export function MapParserListEditor() {
+  return (
     // <List>
     //   {keys(mapParsers).map((c) => (
     //     <ListItem key={c}>
@@ -363,11 +374,7 @@ export function TrustedOriginListEditor() {
     //     </ListItem>
     //   ))}
     // </List>
-  );
-}
-export function MapParserListEditor() {
-  return (
-    <Box sx={{ mx: -2 }}>
+    (<Box sx={{ mx: -2 }}>
       <ListEditor<A>
         button={false}
         sortable
@@ -388,13 +395,6 @@ export function MapParserListEditor() {
           key: "",
         })}
       />
-    </Box>
-    // <List>
-    //   {keys(mapParsers).map((c) => (
-    //     <ListItem key={c}>
-    //       <ListItemText primary={c} secondary={"Internal"} />
-    //     </ListItem>
-    //   ))}
-    // </List>
+    </Box>)
   );
 }
