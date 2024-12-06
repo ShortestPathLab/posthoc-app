@@ -167,11 +167,14 @@ export function ViewportPage({ template: Page }: PageContentProps) {
                 id: "internal:auto",
                 name: `Auto (${auto?.renderer?.meta?.name ?? "None"})`,
               },
-              ...map(renderers, ({ renderer }) => ({
-                id: renderer.meta.id,
-                name: renderer.meta.name,
-                description: renderer.meta.id,
-              })),
+              ...map(
+                filter(renderers, (r) => !!r.renderer),
+                ({ renderer }) => ({
+                  id: renderer?.meta?.id,
+                  name: renderer?.meta?.name,
+                  description: renderer?.meta?.id,
+                })
+              ),
             ]}
             arrow
           />
@@ -183,7 +186,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
             value={layerSet}
             onChange={setLayerSet}
             items={map(layers, (c) => ({
-              id: c.key,
+              id: c?.key,
               name: inferLayerName(c),
             }))}
             showArrow

@@ -43,107 +43,109 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
     onValueChange?.(merge(value, next));
   }
 
-  const status = value?.disabled ? "disabled" : current ? "connected" : "error";
+  const status = value?.disabled
+    ? "disabled"
+    : current?.renderer
+    ? "connected"
+    : "error";
 
   return (
-    <>
-      <Flex alignItems="center" py={1}>
-        <Dialog
-          slotProps={{
-            paper: { sx: { width: 480 } },
-            popover: {
-              anchorOrigin: { horizontal: -18, vertical: "bottom" },
-            },
-          }}
-          popover
-          trigger={(onClick) => (
-            <>
-              <Box
-                className={value.key}
-                {...{ onClick }}
-                flex={1}
-                sx={{
-                  width: 0,
+    <Flex alignItems="center" py={1}>
+      <Dialog
+        slotProps={{
+          paper: { sx: { width: 480 } },
+          popover: {
+            anchorOrigin: { horizontal: -18, vertical: "bottom" },
+          },
+        }}
+        popover
+        trigger={(onClick) => (
+          <>
+            <Box
+              className={value.key}
+              {...{ onClick }}
+              flex={1}
+              sx={{
+                width: 0,
+                overflow: "hidden",
+                "> *": {
                   overflow: "hidden",
-                  "> *": {
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  },
-                }}
-              >
-                <Type component="div">
-                  {current
-                    ? `${current.renderer.meta.name} ${current.renderer.meta.version}`
-                    : startCase(status)}
-                </Type>
-                {!!current && (
-                  <Type component="div" variant="body2" color="text.secondary">
-                    <>
-                      <span>{current.renderer.meta.description}</span>
-                      <br />
-                      <span>
-                        Contributes{" "}
-                        {join(current.renderer.meta.components, ", ")}
-                      </span>
-                    </>
-                  </Type>
-                )}
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                },
+              }}
+            >
+              <Type component="div">
+                {current?.renderer
+                  ? `${current?.renderer?.meta?.name} ${current.renderer?.meta?.version}`
+                  : startCase(status)}
+              </Type>
+              {!!current?.renderer && (
                 <Type component="div" variant="body2" color="text.secondary">
-                  {transports[value?.transport]?.name}
-                  {": "}
-                  {value?.url || "No URL"}
+                  <>
+                    <span>{current.renderer?.meta?.description}</span>
+                    <br />
+                    <span>
+                      Contributes{" "}
+                      {join(current.renderer?.meta?.components, ", ")}
+                    </span>
+                  </>
                 </Type>
+              )}
+              <Type component="div" variant="body2" color="text.secondary">
+                {transports[value?.transport]?.name}
+                {": "}
+                {value?.url || "No URL"}
+              </Type>
+            </Box>
+            <Chip
+              sx={{
+                minWidth: 0,
+                maxWidth: "fit-content",
+                flex: 1,
+                mx: 1,
+                color: statusColor[status],
+                ...omit(paper(1), "borderRadius"),
+              }}
+              size="small"
+              label={startCase(status)}
+            />
+            <Tooltip
+              title={`${value.disabled ? "Enable" : "Disable"} Renderer`}
+            >
+              <Box mr={-3}>
+                <Switch
+                  checked={!value.disabled}
+                  onChange={(_, v) => handleChange({ disabled: !v })}
+                />
               </Box>
-              <Chip
-                sx={{
-                  minWidth: 0,
-                  maxWidth: "fit-content",
-                  flex: 1,
-                  mx: 1,
-                  color: statusColor[status],
-                  ...omit(paper(1), "borderRadius"),
-                }}
-                size="small"
-                label={startCase(status)}
-              />
-              <Tooltip
-                title={`${value.disabled ? "Enable" : "Disable"} Renderer`}
-              >
-                <Box mr={-3}>
-                  <Switch
-                    checked={!value.disabled}
-                    onChange={(_, v) => handleChange({ disabled: !v })}
-                  />
-                </Box>
-              </Tooltip>
-            </>
-          )}
-          appBar={{ children: <Title>Edit Renderer</Title> }}
-        >
-          <Box p={2.5}>
-            <TextField
-              autoFocus
-              defaultValue={value.url}
-              onChange={(e) => handleChange({ url: e.target.value })}
-              fullWidth
-              variant="filled"
-              label="URL"
-              sx={{ mb: 2 }}
-            />
-            <Select
-              placeholder="Renderer Type"
-              items={entries(transports).map(([k, { name }]) => ({
-                value: k,
-                label: name,
-              }))}
-              fullWidth
-              value={value.transport}
-              onChange={(v) => handleChange({ transport: v })}
-            />
-          </Box>
-        </Dialog>
-      </Flex>
-    </>
+            </Tooltip>
+          </>
+        )}
+        appBar={{ children: <Title>Edit Renderer</Title> }}
+      >
+        <Box p={2.5}>
+          <TextField
+            autoFocus
+            defaultValue={value.url}
+            onChange={(e) => handleChange({ url: e.target.value })}
+            fullWidth
+            variant="filled"
+            label="URL"
+            sx={{ mb: 2 }}
+          />
+          <Select
+            placeholder="Renderer Type"
+            items={entries(transports).map(([k, { name }]) => ({
+              value: k,
+              label: name,
+            }))}
+            fullWidth
+            value={value.transport}
+            onChange={(v) => handleChange({ transport: v })}
+          />
+        </Box>
+      </Dialog>
+    </Flex>
   );
 }
