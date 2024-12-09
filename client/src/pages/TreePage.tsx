@@ -63,6 +63,7 @@ import {
   findLast,
   forEach,
   forEachRight,
+  forOwn,
   get,
   isNull,
   isUndefined,
@@ -86,6 +87,12 @@ import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
 import { useTreeMemo } from "./TreeWorker";
 import { Key, TreeWorkerReturnType } from "./tree.worker";
+import {
+  highlightLayerType,
+  useHighlightNodes,
+  HighlightNodes,
+  Subtree,
+} from "hooks/useHighlight";
 
 const isDefined = (a: any) => !isUndefined(a) && !isNull(a);
 
@@ -185,6 +192,7 @@ export function TreeGraph({
   layer,
   showAllEdges,
   trackedProperty,
+  highlightEdges,
 }: {
   trace?: Trace;
   tree?: TreeWorkerReturnType;
@@ -192,6 +200,9 @@ export function TreeGraph({
   layer?: Layer<PlaybackLayerData>;
   showAllEdges?: boolean;
   trackedProperty?: string;
+  highlightEdges?:
+    | Pick<highlightLayerType["BackTracking"], "type" | "path">
+    | Pick<highlightLayerType["SubTree"], "type" | "path">;
 }) {
   const sigma = useSigma();
   const [orientation, setOrientation] =
@@ -250,6 +261,7 @@ export function TreeGraph({
     });
     return graph;
   }, [load, trace, tree, finalParents, orientation]);
+
   useEffect(() => {
     const r = memoizee((a: string) =>
       interpolate([theme.palette.background.paper, a])
@@ -261,6 +273,7 @@ export function TreeGraph({
       graph.setNodeAttribute(v, "forceLabel", false);
       graph.setNodeAttribute(v, "label", truncate(v, { length: 15 }));
     });
+
     graph.forEachEdge((v) => {
       const isFinal = graph.getEdgeAttribute(v, "final");
       graph.setEdgeAttribute(v, "color", n);
@@ -270,6 +283,7 @@ export function TreeGraph({
     });
     const isSetNode: Dictionary<boolean> = {};
     const isSet: Dictionary<boolean> = {};
+
     (showAllEdges ? forEach : forEachRight)(
       slice(trace?.events, 0, step + 1),
       ({ id, type, pId }, i) => {
@@ -300,7 +314,64 @@ export function TreeGraph({
         }
       }
     );
+
+    // highlight edges: backtracking
+    if (
+      highlightEdges?.type === "BackTracking" &&
+      Array.isArray(highlightEdges.path)
+    ) {
+      let prev =
+        trace?.events?.[highlightEdges?.path[highlightEdges?.path.length - 1]]
+          .id;
+      forEachRight(highlightEdges.path, (step) => {
+        const node = trace?.events?.[step].id;
+        const c = HighlightNodes.find((t) => t.type === highlightEdges.type);
+        if (graph.hasNode(`${node}`)) {
+          graph.setNodeAttribute(`${node}`, "color", c?.color);
+          if (node != prev) {
+            const edge = makeEdgeKey(`${node}`, `${prev}`);
+            if (graph.hasEdge(edge)) {
+              graph.setEdgeAttribute(edge, "color", c?.color);
+            }
+          }
+          prev = node;
+        }
+      });
+    }
+
+    // highlight edges: SubTree
+    if (
+      highlightEdges?.type === "SubTree" &&
+      typeof highlightEdges?.path === "object" &&
+      !Array.isArray(highlightEdges?.path)
+    ) {
+      const c = HighlightNodes.find((t) => t.type === highlightEdges.type);
+
+      function iterateSubtree(subtree: Subtree) {
+        forOwn(subtree, (childs: Subtree, parent: string | number) => {
+          const pNode = trace?.events?.[Number(parent)].id;
+          if (graph.hasNode(`${pNode}`)) {
+            graph.setNodeAttribute(`${pNode}`, "color", c?.color);
+          }
+          forOwn(childs, (v, child) => {
+            const cNode = trace?.events?.[Number(child)].id;
+            if (graph.hasNode(`${cNode}`)) {
+              graph.setNodeAttribute(`${cNode}`, "color", c?.color);
+              const edge = makeEdgeKey(`${cNode}`, `${pNode}`);
+              if (graph.hasEdge(edge)) {
+                graph.setEdgeAttribute(edge, "color", c?.color);
+                graph.setEdgeAttribute(edge, "hidden", false);
+              }
+            }
+          });
+          iterateSubtree(childs);
+        });
+      }
+      iterateSubtree(highlightEdges?.path);
+    }
+
     if (trackedProperty) {
+      console.log(trackedProperty);
       const minVal = min(map(trace?.events, (e) => get(e, trackedProperty)));
       const maxVal = max(map(trace?.events, (e) => get(e, trackedProperty)));
       const f = (x: number) => {
@@ -323,7 +394,15 @@ export function TreeGraph({
       });
     }
     load(graph);
-  }, [graph, step, trace, showAllEdges, trackedProperty, theme]);
+  }, [
+    graph,
+    step,
+    trace,
+    showAllEdges,
+    highlightEdges,
+    trackedProperty,
+    theme,
+  ]);
   return (
     <Stack sx={{ pt: 6, position: "absolute", top: 0, left: 0 }}>
       <Stack
@@ -374,7 +453,8 @@ function makeEdgeKey(
 
 const stepsLayerGuard = (
   l: Layer
-): l is Layer<PlaybackLayerData & TraceLayerData> => !!getController(l).steps;
+): l is Layer<PlaybackLayerData & TraceLayerData & highlightLayerType> =>
+  !!getController(l).steps;
 
 export function TreePage({ template: Page }: PageContentProps) {
   const { key, setKey, layer, layers, allLayers } = useLayer(
@@ -431,9 +511,10 @@ export function TreePage({ template: Page }: PageContentProps) {
       map(trace?.events, (c, i) => ({ event: c, step: i })),
       (c) => `${c.event.id}` === selection?.node
     );
-
     return { events, current: findLast(events, (c) => c.step <= step) };
   }, [selection, step]);
+
+  const showHighlight = useHighlightNodes(key);
 
   const { result: tree, loading } = useTreeMemo({ trace, mode }, [key, mode]);
 
@@ -490,6 +571,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                           layer={layer}
                           showAllEdges={layoutModes[mode].showAllEdges}
                           trackedProperty={trackedProperty}
+                          highlightEdges={layer.source?.highlighting}
                         />
                         <GraphEvents
                           layer={key}
@@ -535,6 +617,47 @@ export function TreePage({ template: Page }: PageContentProps) {
                               primitives
                             />
                           </Box>
+                          <Divider sx={{ my: 1, mx: 2 }} />
+                        </>
+                      )}
+                      {!!selected.current && (
+                        <>
+                          <ListItem sx={{ py: 0 }}>
+                            <Typography
+                              component="div"
+                              color="text.secondary"
+                              variant="overline"
+                            >
+                              Highlight Nodes
+                            </Typography>
+                          </ListItem>
+                          {map(HighlightNodes, (highlight) => {
+                            return (
+                              <Stack direction="row">
+                                <MenuItem
+                                  sx={{
+                                    height: 32,
+                                    flex: 1,
+                                    borderLeft: `4px solid ${highlight.color}`,
+                                  }}
+                                  onClick={() => {
+                                    showHighlight[highlight.type](
+                                      selected?.current?.step!
+                                    );
+                                  }}
+                                >
+                                  {/* todo: description for each feature */}
+                                  <Tooltip title="">
+                                    <Box sx={{ ml: -0.5, pr: 4 }}>
+                                      <Label
+                                        primary={startCase(highlight.type)}
+                                      />
+                                    </Box>
+                                  </Tooltip>
+                                </MenuItem>
+                              </Stack>
+                            );
+                          })}
                           <Divider sx={{ my: 1, mx: 2 }} />
                         </>
                       )}

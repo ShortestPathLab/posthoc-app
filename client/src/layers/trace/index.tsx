@@ -100,7 +100,7 @@ type Key = string | number;
 
 type KeyRef = Key | null | undefined;
 
-function makePathIndex(trace: Trace) {
+export function makePathIndex(trace: Trace) {
   type A = {
     id: Key;
     pId?: KeyRef;
