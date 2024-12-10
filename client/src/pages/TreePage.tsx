@@ -200,9 +200,7 @@ export function TreeGraph({
   layer?: Layer<PlaybackLayerData>;
   showAllEdges?: boolean;
   trackedProperty?: string;
-  highlightEdges?:
-    | Pick<highlightLayerType["BackTracking"], "type" | "path">
-    | Pick<highlightLayerType["SubTree"], "type" | "path">;
+  highlightEdges?: Pick<highlightLayerType["highlighting"], "type" | "path">;
 }) {
   const sigma = useSigma();
   const [orientation, setOrientation] =
@@ -315,7 +313,7 @@ export function TreeGraph({
       }
     );
 
-    // highlight edges: backtracking
+    // highlight nodes: backtracking
     if (
       highlightEdges?.type === "BackTracking" &&
       Array.isArray(highlightEdges.path)
@@ -339,7 +337,7 @@ export function TreeGraph({
       });
     }
 
-    // highlight edges: SubTree
+    // highlight nodes: SubTree
     if (
       highlightEdges?.type === "SubTree" &&
       typeof highlightEdges?.path === "object" &&
@@ -349,12 +347,12 @@ export function TreeGraph({
 
       function iterateSubtree(subtree: Subtree) {
         forOwn(subtree, (childs: Subtree, parent: string | number) => {
-          const pNode = trace?.events?.[Number(parent)].id;
+          const pNode = parent;
           if (graph.hasNode(`${pNode}`)) {
             graph.setNodeAttribute(`${pNode}`, "color", c?.color);
           }
           forOwn(childs, (v, child) => {
-            const cNode = trace?.events?.[Number(child)].id;
+            const cNode = child;
             if (graph.hasNode(`${cNode}`)) {
               graph.setNodeAttribute(`${cNode}`, "color", c?.color);
               const edge = makeEdgeKey(`${cNode}`, `${pNode}`);
@@ -371,7 +369,6 @@ export function TreeGraph({
     }
 
     if (trackedProperty) {
-      console.log(trackedProperty);
       const minVal = min(map(trace?.events, (e) => get(e, trackedProperty)));
       const maxVal = max(map(trace?.events, (e) => get(e, trackedProperty)));
       const f = (x: number) => {
@@ -545,7 +542,6 @@ export function TreePage({ template: Page }: PageContentProps) {
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>tree</Page.Key>
-
       <Page.Title>Tree</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
