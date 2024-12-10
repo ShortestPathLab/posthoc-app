@@ -19,6 +19,7 @@ import {
   SegmentOutlined as StepsIcon,
   AccountTreeOutlined as TreeIcon,
   ViewInArOutlined as ViewportIcon,
+  CloudUploadOutlined as SaveIcon,
 } from "@mui-symbols-material/w400";
 import { Dictionary } from "lodash";
 import { DebugPage } from "./DebugPage";
@@ -31,6 +32,7 @@ import { SourcePage } from "./SourcePage";
 import { StepsPage } from "./StepsPage";
 import { TreePage } from "./TreePage";
 import { ViewportPage } from "./ViewportPage";
+import { SavedLogsPage } from "./SavedLogsPage";
 
 export const pages: Dictionary<PageMeta> = {
   explore: {
@@ -126,6 +128,17 @@ export const pages: Dictionary<PageMeta> = {
     iconThin: <SettingsIconThin />,
     content: SettingsPage,
     allowFullscreen: true,
+    showInSidebar: "always",
+  },
+  savedLogs: {
+    id: "savedLogs",
+    name: "SavedLogs",
+    description:
+      "Contains all saved logs and enables user to get shareable link",
+    color: "grey",
+    icon: <SaveIcon />,
+    content: SavedLogsPage,
+    allowFullscreen: false,
     showInSidebar: "always",
   },
   // about: {
