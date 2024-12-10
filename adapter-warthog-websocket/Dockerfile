@@ -5,7 +5,7 @@ USER root
 WORKDIR /usr/src/app/
 
 COPY package.json .
-RUN npm i
+RUN bun i
 
 COPY . .
 
