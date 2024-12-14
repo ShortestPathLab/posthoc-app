@@ -347,12 +347,12 @@ export function TreeGraph({
 
       function iterateSubtree(subtree: Subtree) {
         forOwn(subtree, (childs: Subtree, parent: string | number) => {
-          const pNode = parent;
+          const pNode = trace?.events?.[Number(parent)].id;
           if (graph.hasNode(`${pNode}`)) {
             graph.setNodeAttribute(`${pNode}`, "color", c?.color);
           }
           forOwn(childs, (v, child) => {
-            const cNode = child;
+            const cNode = trace?.events?.[Number(child)].id;
             if (graph.hasNode(`${cNode}`)) {
               graph.setNodeAttribute(`${cNode}`, "color", c?.color);
               const edge = makeEdgeKey(`${cNode}`, `${pNode}`);
@@ -642,8 +642,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                                     );
                                   }}
                                 >
-                                  {/* todo: description for each feature */}
-                                  <Tooltip title="">
+                                  <Tooltip title={highlight.desciption}>
                                     <Box sx={{ ml: -0.5, pr: 4 }}>
                                       <Label
                                         primary={startCase(highlight.type)}

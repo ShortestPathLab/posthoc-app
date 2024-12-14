@@ -3,7 +3,16 @@ import {
   LayersOutlined as LayersIcon,
   SegmentOutlined,
 } from "@mui-symbols-material/w400";
-import { Box, Divider, Stack, SxProps, Theme, useTheme } from "@mui/material";
+import StarOutlineOutlinedIcon from "@mui/icons-material/StarOutlineOutlined";
+import {
+  Box,
+  Divider,
+  Stack,
+  Switch,
+  SxProps,
+  Theme,
+  useTheme,
+} from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Playback, PlaybackLayerData } from "components/app-bar/Playback";
@@ -25,6 +34,8 @@ import {
   clamp,
   find,
   findIndex,
+  flatMapDeep,
+  forOwn,
   isUndefined,
   map,
   reduce,
@@ -35,6 +46,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
 import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
+import { highlightLayerType, flattenSubtree } from "hooks/useHighlight";
+import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 
 function lerp(start: number, end: number, amount: number): number {
   return start + clamp(amount, 0, 1) * (end - start);
@@ -50,12 +63,15 @@ const pxToInt = (s: string) => Number(s.replace(/px$/, ""));
 
 const SYMBOL_ALL = id();
 
-const stepsLayerGuard = (l: Layer): l is Layer<PlaybackLayerData> =>
+const stepsLayerGuard = (
+  l: Layer
+): l is Layer<PlaybackLayerData & highlightLayerType> =>
   !!getController(l).steps;
 
 type StepsPageState = {
   layer?: string;
   selectedType?: string;
+  showHighlighting?: boolean;
 };
 
 function useStepsPageState(
@@ -72,6 +88,10 @@ function useStepsPageState(
 
   const [selectedType, setLocalSelectedType] = useState(state?.selectedType);
 
+  const [showHighlighting, setLocalShowHighlighting] = useState(
+    state?.showHighlighting
+  );
+
   function setKey(k: string) {
     onChange?.({ layer: k });
     setLocalKey(k);
@@ -81,10 +101,20 @@ function useStepsPageState(
     onChange?.({ selectedType: t });
     setLocalSelectedType(t);
   }
+
+  function setShowHighlighting(
+    event: React.ChangeEvent<HTMLInputElement>,
+    t: boolean
+  ) {
+    onChange?.({ showHighlighting: t });
+    setLocalShowHighlighting(t);
+  }
   return {
     setSelectedType,
     setKey,
     selectedType,
+    showHighlighting,
+    setShowHighlighting,
     layers,
     allLayers,
     key,
@@ -116,6 +146,8 @@ export function StepsPage({ template: Page }: PageContentProps) {
     selectedType: _selectedType,
     setKey,
     setSelectedType,
+    showHighlighting,
+    setShowHighlighting,
     layer,
   } = useStepsPageState(state, onChange);
 
@@ -130,16 +162,35 @@ export function StepsPage({ template: Page }: PageContentProps) {
 
   const { steps, types, stepToFilteredStep, selectedType } = useMemo(() => {
     if (rawSteps) {
-      const steps = rawSteps.map((a, b) => [a, b] as const);
+      let steps = rawSteps.map((a, b) => [a, b] as const);
       const stepTypes = _(steps)
         .map(([e]) => e.type)
         .filter()
         .uniq()
         .value();
       const allSelected = !stepTypes.includes(_selectedType);
+
+      if (layer?.source?.highlighting && showHighlighting) {
+        const highlightData = layer?.source?.highlighting;
+        let highlightStepsRaw: number[] = [];
+        if (
+          highlightData?.type === "SubTree" &&
+          !Array.isArray(highlightData.path)
+        ) {
+          highlightStepsRaw = flattenSubtree(highlightData.path);
+        } else if (
+          highlightData?.type === "BackTracking" &&
+          Array.isArray(highlightData.path)
+        ) {
+          highlightStepsRaw = highlightData.path;
+        }
+        steps = highlightStepsRaw.map((index) => steps[index]);
+      }
+
       const filtered = allSelected
         ? steps
         : steps.filter(([a]) => a.type === _selectedType);
+
       const { stepMap } = reduce(
         steps,
         (prev, [, i]) => {
@@ -151,6 +202,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
         },
         { from: 0, stepMap: [] as number[] }
       );
+
       return {
         steps: filtered,
         types: stepTypes,
@@ -159,7 +211,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
       };
     }
     return {};
-  }, [rawSteps, _selectedType]);
+  }, [rawSteps, _selectedType, layer?.source?.highlighting, showHighlighting]);
 
   const shouldBreak = useBreakpoints(key);
 
@@ -319,6 +371,13 @@ export function StepsPage({ template: Page }: PageContentProps) {
           arrow
           ellipsis={12}
         />
+        {divider}
+
+        <FeaturePickerButton
+          children="Show Highlighting"
+          icon={<StarOutlineOutlinedIcon />}
+        />
+        <Switch checked={showHighlighting} onChange={setShowHighlighting} />
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

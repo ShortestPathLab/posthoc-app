@@ -1,13 +1,23 @@
-import { set, find, chain, forEach, forEachRight, findLast } from "lodash";
+import { set, find, chain, forEach } from "lodash";
 import { useLayer } from "slices/layers";
 import { useCallback } from "react";
 import { produce } from "produce";
 import { makePathIndex } from "layers/trace";
 
 export const HighlightNodes = [
-  { type: "BackTracking", color: "#00ffd9" },
-  { type: "SubTree", color: "#32a852" },
-  { type: "Bounds Relevant", color: "#6932a8" },
+  {
+    type: "BackTracking",
+    color: "#00ffd9",
+    desciption:
+      "An event is path relevant if it appears on a path from the root to the currently selected event.",
+  },
+  {
+    type: "SubTree",
+    color: "#32a852",
+    desciption:
+      "A node is prefix relevant if it is a descendant of the currently selected node.",
+  },
+  { type: "Bounds Relevant", color: "#6932a8", desciption: "" },
 ];
 
 export type highlightLayerType = {
@@ -56,7 +66,7 @@ export function useHighlightNodes(key?: string): {
     .groupBy("pId")
     .value();
 
-  // use id
+  // use step
   const getAllSubtreeNodes = (
     root: Node,
     visited = new Set<number | string>()
@@ -78,8 +88,8 @@ export function useHighlightNodes(key?: string): {
 
       forEach(groupedChildren, (child) => {
         const event = find(child, (c) => c.step >= root!.step);
-        if (event && !subtree[event.id]) {
-          subtree[event.id] = getAllSubtreeNodes(event, visited);
+        if (event && !subtree[event.step]) {
+          subtree[event.step] = getAllSubtreeNodes(event, visited);
         }
       });
     }
@@ -90,9 +100,9 @@ export function useHighlightNodes(key?: string): {
     (step: number) => {
       let current: Node = { ...(trace?.events ?? [])[step], step };
       const path = {
-        [current.id]: getAllSubtreeNodes(current, new Set<number>()),
+        [current.step]: getAllSubtreeNodes(current, new Set<number>()),
       };
-      if (Object.keys(path[current.id]).length > 0) {
+      if (Object.keys(path[current.step]).length > 0) {
         setLayer(
           produce(layer, (l) =>
             set(l?.source!, "highlighting", { type: "SubTree", path })
@@ -108,4 +118,21 @@ export function useHighlightNodes(key?: string): {
     BackTracking: showBackTracking,
     SubTree: showSubTree,
   };
+}
+
+export function flattenSubtree(subtree: Subtree) {
+  let result: number[] = [];
+
+  function traverse(tree: Subtree, path: number[]) {
+    for (const key in tree) {
+      const numericKey = Number(key);
+      result.push(numericKey);
+      if (typeof tree[key] === "object" && tree[key] !== null) {
+        traverse(tree[key], path.concat(numericKey));
+      }
+    }
+  }
+
+  traverse(subtree, []);
+  return result;
 }
