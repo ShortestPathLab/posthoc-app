@@ -1,14 +1,14 @@
 import {
+  CenterFocusWeakOutlined,
+  FlipCameraAndroidOutlined as RotateIcon,
+} from "@mui-symbols-material/w300";
+import {
   AccountTreeOutlined,
   DataObjectOutlined,
   LayersOutlined as LayersIcon,
   ModeStandbyOutlined,
   TimelineOutlined,
 } from "@mui-symbols-material/w400";
-import {
-  CenterFocusWeakOutlined,
-  FlipCameraAndroidOutlined as RotateIcon,
-} from "@mui-symbols-material/w300";
 import {
   Box,
   CircularProgress,
@@ -50,19 +50,26 @@ import {
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
+import {
+  HighlightLayerData,
+  highlightNodesOptions,
+  Subtree,
+  useHighlightNodes,
+} from "hooks/useHighlight";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
 import { TraceLayerData } from "layers/trace";
 import {
-  Dictionary,
   chain as _,
+  Dictionary,
   entries,
   filter,
   find,
   findLast,
   forEach,
   forEachRight,
+  forOwn,
   get,
   isNull,
   isUndefined,
@@ -75,17 +82,17 @@ import {
   truncate,
 } from "lodash";
 import memoizee from "memoizee";
-import { Trace } from "protocol";
+import { Size, Trace } from "protocol";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { EdgeArrowProgram } from "sigma/rendering";
 import { Layer, useLayer } from "slices/layers";
 import { PanelState } from "slices/view";
-import { useAcrylic, usePaper } from "theme";
+import { AccentColor, getShade, useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
-import { useTreeMemo } from "./TreeWorker";
 import { Key, TreeWorkerReturnType } from "./tree.worker";
+import { useTreeMemo } from "./TreeWorker";
 
 const isDefined = (a: any) => !isUndefined(a) && !isNull(a);
 
@@ -185,6 +192,7 @@ export function TreeGraph({
   layer,
   showAllEdges,
   trackedProperty,
+  highlightEdges,
 }: {
   trace?: Trace;
   tree?: TreeWorkerReturnType;
@@ -192,6 +200,7 @@ export function TreeGraph({
   layer?: Layer<PlaybackLayerData>;
   showAllEdges?: boolean;
   trackedProperty?: string;
+  highlightEdges?: HighlightLayerData["highlighting"];
 }) {
   const sigma = useSigma();
   const [orientation, setOrientation] =
@@ -250,6 +259,7 @@ export function TreeGraph({
     });
     return graph;
   }, [load, trace, tree, finalParents, orientation]);
+
   useEffect(() => {
     const r = memoizee((a: string) =>
       interpolate([theme.palette.background.paper, a])
@@ -261,6 +271,7 @@ export function TreeGraph({
       graph.setNodeAttribute(v, "forceLabel", false);
       graph.setNodeAttribute(v, "label", truncate(v, { length: 15 }));
     });
+
     graph.forEachEdge((v) => {
       const isFinal = graph.getEdgeAttribute(v, "final");
       graph.setEdgeAttribute(v, "color", n);
@@ -270,6 +281,7 @@ export function TreeGraph({
     });
     const isSetNode: Dictionary<boolean> = {};
     const isSet: Dictionary<boolean> = {};
+
     (showAllEdges ? forEach : forEachRight)(
       slice(trace?.events, 0, step + 1),
       ({ id, type, pId }, i) => {
@@ -300,6 +312,96 @@ export function TreeGraph({
         }
       }
     );
+
+    /**
+     * Get a high-contrast shade of a theme color for use on the graph
+     */
+    const getThemeColor = (c: AccentColor = "grey") =>
+      getShade(c, theme.palette.mode);
+
+    // Force show a label for the current highlighted node
+    if (highlightEdges) {
+      const current = trace?.events?.[highlightEdges?.step];
+      graph.setNodeAttribute(current?.id, "forceLabel", "true");
+      graph.setNodeAttribute(
+        current?.id,
+        "label",
+        `${graph.getNodeAttribute(current?.id, "label")} (${startCase(
+          highlightEdges.type
+        )})`
+      );
+    }
+
+    // highlight nodes: backtracking
+    if (
+      highlightEdges?.type === "backtracking" &&
+      Array.isArray(highlightEdges.path)
+    ) {
+      let prev =
+        trace?.events?.[highlightEdges?.path?.[highlightEdges?.path.length - 1]]
+          ?.id;
+      console.log(highlightEdges.path)
+      forEachRight(highlightEdges.path, (step) => {
+        const node = trace?.events?.[step].id;
+        const c = highlightNodesOptions.find(
+          (t) => t.type === highlightEdges.type
+        );
+        if (graph.hasNode(`${node}`)) {
+          graph.setNodeAttribute(`${node}`, "color", getThemeColor(c?.color));
+          if (node != prev) {
+            const edge = makeEdgeKey(`${node}`, `${prev}`);
+            if (graph.hasEdge(edge)) {
+              graph.setEdgeAttribute(edge, "color", getThemeColor(c?.color));
+            }
+          }
+          prev = node;
+        }
+      });
+    }
+
+    // highlight nodes: SubTree
+    if (
+      (highlightEdges?.type === "subtree" ||  highlightEdges?.type === "precedent")&&
+      typeof highlightEdges?.path === "object" &&
+      !Array.isArray(highlightEdges?.path)
+    ) {
+      const c = highlightNodesOptions.find(
+        (t) => t.type === highlightEdges.type
+      );
+
+      const isSubtree = highlightEdges?.type === "subtree";
+
+      function iterateSubtree(subtree: Subtree) {
+        forOwn(subtree, (childs: Subtree, parent: string | number) => {
+          const pNode = trace?.events?.[Number(parent)].id;
+          if (graph.hasNode(`${pNode}`)) {
+            graph.setNodeAttribute(
+              `${pNode}`,
+              "color",
+              getThemeColor(c?.color)
+            );
+          }
+          forOwn(childs, (v, child) => {
+            const cNode = trace?.events?.[Number(child)].id;
+            if (graph.hasNode(`${cNode}`)) {
+              graph.setNodeAttribute(
+                `${cNode}`,
+                "color",
+                getThemeColor(c?.color)
+              );
+              const edge = isSubtree ? makeEdgeKey(`${cNode}`, `${pNode}`) :  makeEdgeKey(`${pNode}`, `${cNode}`) ;
+              if (graph.hasEdge(edge)) {
+                graph.setEdgeAttribute(edge, "color", getThemeColor(c?.color));
+                graph.setEdgeAttribute(edge, "hidden", false);
+              }
+            }
+          });
+          iterateSubtree(childs);
+        });
+      }
+      iterateSubtree(highlightEdges?.path);
+    }
+
     if (trackedProperty) {
       const minVal = min(map(trace?.events, (e) => get(e, trackedProperty)));
       const maxVal = max(map(trace?.events, (e) => get(e, trackedProperty)));
@@ -323,7 +425,15 @@ export function TreeGraph({
       });
     }
     load(graph);
-  }, [graph, step, trace, showAllEdges, trackedProperty, theme]);
+  }, [
+    graph,
+    step,
+    trace,
+    showAllEdges,
+    highlightEdges,
+    trackedProperty,
+    theme,
+  ]);
   return (
     <Stack sx={{ pt: 6, position: "absolute", top: 0, left: 0 }}>
       <Stack
@@ -346,7 +456,7 @@ export function TreeGraph({
           }}
           label="Fit"
           icon={<CenterFocusWeakOutlined />}
-        ></IconButtonWithTooltip>
+        />
         {divider}
         <IconButtonWithTooltip
           color="primary"
@@ -357,7 +467,7 @@ export function TreeGraph({
           }}
           label="Rotate"
           icon={<RotateIcon />}
-        ></IconButtonWithTooltip>
+        />
         {divider}
         {<MinimisedPlaybackControls layer={layer} />}
       </Stack>
@@ -374,7 +484,8 @@ function makeEdgeKey(
 
 const stepsLayerGuard = (
   l: Layer
-): l is Layer<PlaybackLayerData & TraceLayerData> => !!getController(l).steps;
+): l is Layer<PlaybackLayerData & TraceLayerData & HighlightLayerData> =>
+  !!getController(l).steps;
 
 export function TreePage({ template: Page }: PageContentProps) {
   const { key, setKey, layer, layers, allLayers } = useLayer(
@@ -431,9 +542,10 @@ export function TreePage({ template: Page }: PageContentProps) {
       map(trace?.events, (c, i) => ({ event: c, step: i })),
       (c) => `${c.event.id}` === selection?.node
     );
-
     return { events, current: findLast(events, (c) => c.step <= step) };
   }, [selection, step]);
+
+  const showHighlight = useHighlightNodes(key);
 
   const { result: tree, loading } = useTreeMemo({ trace, mode }, [key, mode]);
 
@@ -464,7 +576,6 @@ export function TreePage({ template: Page }: PageContentProps) {
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>tree</Page.Key>
-
       <Page.Title>Tree</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
@@ -474,7 +585,7 @@ export function TreePage({ template: Page }: PageContentProps) {
               tree?.length ? (
                 <>
                   <AutoSize>
-                    {(size) => (
+                    {(size: Size) => (
                       <SigmaContainer
                         style={{
                           ...size,
@@ -490,6 +601,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                           layer={layer}
                           showAllEdges={layoutModes[mode].showAllEdges}
                           trackedProperty={trackedProperty}
+                          highlightEdges={layer.source?.highlighting}
                         />
                         <GraphEvents
                           layer={key}
@@ -538,6 +650,61 @@ export function TreePage({ template: Page }: PageContentProps) {
                           <Divider sx={{ my: 1, mx: 2 }} />
                         </>
                       )}
+                      {!!selected.current && (
+                        <>
+                          <ListItem sx={{ py: 0 }}>
+                            <Typography
+                              component="div"
+                              color="text.secondary"
+                              variant="overline"
+                            >
+                              Highlight Associated
+                            </Typography>
+                          </ListItem>
+                          {map(highlightNodesOptions, (highlight) => {
+                            const highlightColor = getShade(
+                              highlight.color,
+                              theme.palette.mode,
+                              500,
+                              400
+                            );
+                            return (
+                              <Stack direction="row">
+                                <Tooltip
+                                  title={highlight.description}
+                                  placement="left"
+                                >
+                                  <MenuItem
+                                    selected={
+                                      layer.source?.highlighting?.type ===
+                                        highlight.type &&
+                                      layer.source?.highlighting?.step ===
+                                        selected?.current?.step
+                                    }
+                                    sx={{
+                                      height: 32,
+                                      flex: 1,
+                                      borderLeft: `4px solid ${highlightColor}`,
+                                    }}
+                                    onClick={() => {
+                                      showHighlight[highlight.type](
+                                        selected?.current?.step!
+                                      );
+                                    }}
+                                  >
+                                    <Box sx={{ ml: -0.5, pr: 4 }}>
+                                      <Label
+                                        primary={startCase(highlight.type)}
+                                      />
+                                    </Box>
+                                  </MenuItem>
+                                </Tooltip>
+                              </Stack>
+                            );
+                          })}
+                          <Divider sx={{ my: 1, mx: 2 }} />
+                        </>
+                      )}
                       <ListItem sx={{ py: 0 }}>
                         <Typography
                           component="div"
@@ -553,21 +720,24 @@ export function TreePage({ template: Page }: PageContentProps) {
                           entry.step;
                         return (
                           <Stack direction="row">
-                            <MenuItem
-                              selected={selected}
-                              sx={{
-                                height: 32,
-                                flex: 1,
-                                borderLeft: `4px solid ${getColorHex(
-                                  entry.event.type
-                                )}`,
-                              }}
-                              onClick={() => {
-                                // setMenuOpen(false);
-                                stepTo(entry.step);
-                              }}
+                            <Tooltip
+                              title={`Go to step ${entry.step}`}
+                              placement="left"
                             >
-                              <Tooltip title={`Go to step ${entry.step}`}>
+                              <MenuItem
+                                selected={selected}
+                                sx={{
+                                  height: 32,
+                                  flex: 1,
+                                  borderLeft: `4px solid ${getColorHex(
+                                    entry.event.type
+                                  )}`,
+                                }}
+                                onClick={() => {
+                                  // setMenuOpen(false);
+                                  stepTo(entry.step);
+                                }}
+                              >
                                 <Box sx={{ ml: -0.5, pr: 4 }}>
                                   <Label
                                     primary={startCase(entry.event.type)}
@@ -578,23 +748,26 @@ export function TreePage({ template: Page }: PageContentProps) {
                                     }
                                   />
                                 </Box>
-                              </Tooltip>
-                            </MenuItem>
+                              </MenuItem>
+                            </Tooltip>
                             <Box sx={{ flex: 0 }}>
                               <PropertyDialog
                                 {...{ event: entry.event }}
                                 trigger={(onClick) => (
-                                  <MenuItem
-                                    selected={selected}
-                                    {...{ onClick }}
-                                    sx={{ pr: 0 }}
+                                  <Tooltip
+                                    title="See all properties"
+                                    placement="right"
                                   >
-                                    <Tooltip title="See all properties">
+                                    <MenuItem
+                                      selected={selected}
+                                      {...{ onClick }}
+                                      sx={{ pr: 0 }}
+                                    >
                                       <ListItemIcon>
                                         <DataObjectOutlined />
                                       </ListItemIcon>
-                                    </Tooltip>
-                                  </MenuItem>
+                                    </MenuItem>
+                                  </Tooltip>
                                 )}
                               />
                             </Box>
