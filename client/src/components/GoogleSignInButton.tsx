@@ -1,9 +1,19 @@
 /// <reference types="google.accounts" />
-import { IconButton, Input, Typography } from "@mui/material";
-import { Service, useSavedLogsService } from "services/SaveLogsService";
+import {
+  CircularProgress,
+  IconButton,
+  Input,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  SavedLogsServiceHook,
+  Service,
+  useSavedLogsService,
+} from "services/SaveLogsService";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Button } from "./generic/Button";
-import { useRef, useState } from "react";
+import { MouseEventHandler, useRef, useState } from "react";
 import { result } from "lodash";
 
 class GoogleCloudService implements Service {
@@ -11,6 +21,8 @@ class GoogleCloudService implements Service {
   private clientId = import.meta.env.VITE_CLIENT_ID;
   private scope = "https://www.googleapis.com/auth/drive.file";
   private authLink = "https://accounts.google.com/o/oauth2/v2/auth";
+  private googleDriveAPI = "https://www.googleapis.com/drive/v3/files";
+  private googleDriveMultiPartUploadLink = "https://www.googleapis.com/upload/drive/v3/files"
   private accessToken: string | null = null;
 
   // ? switch to arrow functions?
@@ -55,7 +67,7 @@ class GoogleCloudService implements Service {
     url.searchParams.append("client_id", this.clientId);
     window.location.href = url.toString();
 
-    // * using oauth lib
+    // * using oauth lib (to debug)
     // this.initClient()
   }
 
@@ -66,20 +78,17 @@ class GoogleCloudService implements Service {
       const accessToken = hashParams.get("access_token");
 
       if (accessToken) {
-        console.log("Access Token:", accessToken);
         this.accessToken = accessToken;
-        console.log(this.accessToken);
         window.history.replaceState(null, "", window.location.origin);
       } else {
         console.log("Access token not found in URL.");
       }
     }
-    console.log(this.accessToken);
     return this.accessToken === null ? false : true;
   }
   async changeVisibility(fileId: string) {
     try {
-      const permissionsAPI = `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`;
+      const permissionsAPI = `${this.googleDriveAPI}/${fileId}/permissions`;
       const permissions = {
         role: "reader",
         type: "anyone",
@@ -106,14 +115,74 @@ class GoogleCloudService implements Service {
       throw new Error("Error while setting permssions");
     }
   }
+  private async checkParentFolderExists(parentName: string) {
+    const folderMimeType = "application/vnd.google-apps.folder";
+    const query = `name = '${parentName}' and mimeType = '${folderMimeType}' and trashed = false`;
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(
+          query
+        )}&fields=files(id,name)`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${this.accessToken}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.files && data.files.length > 0) {
+        console.log("Folder exists:", data.files[0].name);
+        return data.files[0].id;
+      } else {
+        console.log("Folder does not exist");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error checking folder existence:", error);
+      return "";
+    }
+  }
+  private async createParentFolder() {
+    // todo: better way to confirm parent folder existence
+    const parentName = "posthoc-trace-files";
+    const id = await this.checkParentFolderExists(parentName);
+    if (id !== "") {
+      return id;
+    }
+    try {
+      const folderMetaData = {
+        name: parentName,
+        mimeType: "application/vnd.google-apps.folder",
+      };
+      const response = await fetch(`${this.googleDriveAPI}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+        body: JSON.stringify(folderMetaData),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create parent folder.");
+      }
+
+      const data = await response.json();
+      const res = this.changeVisibility(data.id);
+
+      return data.id;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error while creating a new folder");
+    }
+  }
   async sendFile(file: File) {
     try {
+      const parentId = await this.createParentFolder();
       const fileMetaData = {
         name: file.name,
-        permissions: {
-          role: "reader",
-          type: "anyone",
-        },
+        parents: [parentId],
       };
       const form = new FormData();
       form.append(
@@ -122,7 +191,7 @@ class GoogleCloudService implements Service {
       );
       form.append("file", file);
       const response = await fetch(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+        `${this.googleDriveMultiPartUploadLink}?uploadType=multipart`,
         {
           method: "POST",
           headers: {
@@ -133,40 +202,32 @@ class GoogleCloudService implements Service {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to create file: ${response.statusText}`);
+        throw new Error(`Failed to create file: ${await response.text()}`);
       }
 
       const data = await response.json();
       console.log("File created successfully:", data);
 
-      // const publicURL = `https://drive.google.com/file/d/${data.id}/view?usp=sharing`;
-      const publicURL = await this.changeVisibility(data.id);
-      console.log(publicURL);
-      return data;
+      const publicURL = `https://drive.google.com/file/d/${data.id}/view?usp=sharing`;
+      return publicURL;
+      // const publicURL = await this.changeVisibility(data.id);
     } catch (error) {
       console.log("Error uploading file: ", error);
+      return "";
     }
-    return true;
   }
 }
 
-const GoogleSignInButton = () => {
-  const gService = new GoogleCloudService();
-  const { auth, authenticate, sendFile } = useSavedLogsService(gService);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+const FileComponent = ({
+  sendFile,
+  uploading,
+}: {
+  uploading: SavedLogsServiceHook["uploading"];
+  sendFile: SavedLogsServiceHook["sendFile"];
+}) => {
   const [fileName, setFileName] = useState<string>("");
-  console.log(auth);
-  const handleUpload = async () => {
-    try {
-      if (selectedFile) {
-        const res = await sendFile(selectedFile);
-      } else {
-        alert("Please select a file first");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [link, setLink] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -175,6 +236,92 @@ const GoogleSignInButton = () => {
       setFileName(file.name);
     }
   };
+  const handleUpload = async () => {
+    try {
+      if (selectedFile) {
+        const res = await sendFile(selectedFile);
+        setLink(
+          res === ""
+            ? res
+            : `${window.location.origin}/#fetch-gdrive-file?link=${res}`
+        );
+      } else {
+        alert("Please select a file first");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCopy: MouseEventHandler<HTMLButtonElement> = (e) => {
+    console.log(link);
+  };
+
+  return (
+    <>
+      <Typography variant="h6" gutterBottom>
+        File Upload
+      </Typography>
+
+      <Input
+        type="file"
+        inputProps={{
+          accept: ".yaml",
+        }}
+        id="file-input"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+
+      <label htmlFor="file-input">
+        <Button disabled={uploading} variant="contained" component="span">
+          Choose File
+        </Button>
+      </label>
+
+      {fileName && (
+        <Typography variant="body1" style={{ marginTop: "10px" }}>
+          Selected file: {fileName}
+        </Typography>
+      )}
+
+      <div style={{ marginTop: "20px" }}>
+        <Button
+          disabled={uploading}
+          variant="contained"
+          onClick={handleUpload}
+          color="primary"
+        >
+          {uploading ? <CircularProgress size={"25px"} /> : "Upload"}
+        </Button>
+      </div>
+      {link !== "" && (
+        <div style={{ margin: "20px" }}>
+          <TextField
+            value={link}
+            fullWidth
+            variant="outlined"
+            margin="normal"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCopy}
+            style={{ marginTop: "10px" }}
+          >
+            Copy Text
+          </Button>
+        </div>
+      )}
+    </>
+  );
+};
+
+const GoogleSignInButton = () => {
+  const gService = new GoogleCloudService();
+  const { auth, authenticate, sendFile, uploading } =
+    useSavedLogsService(gService);
+
   return (
     <>
       <Typography variant="body2" align="center" color="text.secondary">
@@ -205,37 +352,7 @@ const GoogleSignInButton = () => {
         </IconButton>
       ) : (
         <div style={{ padding: "20px" }}>
-          <Typography variant="h6" gutterBottom>
-            File Upload
-          </Typography>
-
-          <Input
-            type="file"
-            inputProps={{
-              accept: ".yaml",
-            }}
-            id="file-input"
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-          />
-
-          <label htmlFor="file-input">
-            <Button variant="contained" component="span">
-              Choose File
-            </Button>
-          </label>
-
-          {fileName && (
-            <Typography variant="body1" style={{ marginTop: "10px" }}>
-              Selected file: {fileName}
-            </Typography>
-          )}
-
-          <div style={{ marginTop: "20px" }}>
-            <Button variant="contained" onClick={handleUpload} color="primary">
-              Upload
-            </Button>
-          </div>
+          <FileComponent sendFile={sendFile} uploading={uploading} />
         </div>
       )}
     </>
