@@ -4,7 +4,7 @@ rm -rf dist
 
 # Build
 
-bunx --yes vite@4.5.2 build
+bunx --yes vite@4.5.5 build
 
 # Copy files
 
@@ -19,7 +19,7 @@ bunx --yes pkg \
     --out-path dist \
     --compress GZip \
     --target node18-windows,node18-linux \
-    dist/main.js
+    dist/main.cjs
 
 # Compress executables
 
@@ -61,7 +61,7 @@ if which osslsigncode >/dev/null; then
     mv dist/main-win-signed.exe dist/main-win.exe
 fi
 
-rm dist/main.js
+rm dist/main.cjs
 
 mv dist/main-win.exe dist/adapter-win.exe
 mv dist/main-linux dist/adapter-linux
