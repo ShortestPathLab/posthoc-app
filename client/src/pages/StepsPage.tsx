@@ -3,7 +3,6 @@ import {
   LayersOutlined as LayersIcon,
   SegmentOutlined,
 } from "@mui-symbols-material/w400";
-import StarOutlineOutlinedIcon from "@mui/icons-material/StarOutlineOutlined";
 import {
   Box,
   Divider,
@@ -15,6 +14,7 @@ import {
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Playback, PlaybackLayerData } from "components/app-bar/Playback";
 import { Flex } from "components/generic/Flex";
 import {
@@ -26,6 +26,7 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex, tint } from "components/renderer/colors";
 import { useBreakpoints } from "hooks/useBreakpoints";
+import { flattenSubtree, HighlightLayerData } from "hooks/useHighlight";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
@@ -34,8 +35,6 @@ import {
   clamp,
   find,
   findIndex,
-  flatMapDeep,
-  forOwn,
   isUndefined,
   map,
   reduce,
@@ -46,8 +45,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
 import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
-import { highlightLayerType, flattenSubtree } from "hooks/useHighlight";
-import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 
 function lerp(start: number, end: number, amount: number): number {
   return start + clamp(amount, 0, 1) * (end - start);
@@ -65,7 +62,7 @@ const SYMBOL_ALL = id();
 
 const stepsLayerGuard = (
   l: Layer
-): l is Layer<PlaybackLayerData & highlightLayerType> =>
+): l is Layer<PlaybackLayerData & HighlightLayerData> =>
   !!getController(l).steps;
 
 type StepsPageState = {
@@ -174,12 +171,12 @@ export function StepsPage({ template: Page }: PageContentProps) {
         const highlightData = layer?.source?.highlighting;
         let highlightStepsRaw: number[] = [];
         if (
-          highlightData?.type === "SubTree" &&
+          highlightData?.type === "subtree" &&
           !Array.isArray(highlightData.path)
         ) {
           highlightStepsRaw = flattenSubtree(highlightData.path);
         } else if (
-          highlightData?.type === "BackTracking" &&
+          highlightData?.type === "backtracking" &&
           Array.isArray(highlightData.path)
         ) {
           highlightStepsRaw = highlightData.path;
@@ -373,10 +370,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
         />
         {divider}
 
-        <FeaturePickerButton
-          children="Show Highlighting"
-          icon={<StarOutlineOutlinedIcon />}
-        />
+        <FeaturePickerButton children="Show Highlighting" />
         <Switch checked={showHighlighting} onChange={setShowHighlighting} />
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>

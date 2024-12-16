@@ -1,27 +1,33 @@
-import { set, find, chain, forEach } from "lodash";
-import { useLayer } from "slices/layers";
-import { useCallback } from "react";
+import { TraceLayerData } from "layers/trace";
+import { isTraceLayer } from "layers/trace/isTraceLayer";
+import { makePathIndex, Node } from "layers/trace/makePathIndex";
+import { chain, find, forEach, noop, set } from "lodash";
 import { produce } from "produce";
-import { makePathIndex } from "layers/trace";
-
-export const HighlightNodes = [
+import { useCallback } from "react";
+import { Layer, useLayer } from "slices/layers";
+import { AccentColor } from "theme";
+export const highlightNodesOptions = [
   {
-    type: "BackTracking",
-    color: "#00ffd9",
-    desciption:
-      "An event is path relevant if it appears on a path from the root to the currently selected event.",
+    type: "backtracking",
+    color: "cyan" satisfies AccentColor,
+    description:
+      "Show all events from the root to the currently selected event",
   },
   {
-    type: "SubTree",
-    color: "#32a852",
-    desciption:
-      "A node is prefix relevant if it is a descendant of the currently selected node.",
+    type: "subtree",
+    color: "green" satisfies AccentColor,
+    description: "Show all consequences of the currently selected node",
   },
-  { type: "Bounds Relevant", color: "#6932a8", desciption: "" },
-];
+  {
+    type: "bounds-relevant",
+    color: "deepPurple" satisfies AccentColor,
+    description: "",
+  },
+] as const;
 
-export type highlightLayerType = {
-  highlighting: {
+export type HighlightLayerData = {
+  highlighting?: {
+    step: number;
     type: string;
     path: number[] | Subtree;
   };
@@ -31,31 +37,37 @@ export interface Subtree {
   [key: number]: Subtree;
 }
 
-type Node = {
-  id: string | number;
-  pId?: string | number | null | undefined;
-  step: number;
-  prev?: Node;
-};
+export const isHighlightLayer = (
+  layer: Layer
+): layer is Layer<HighlightLayerData & TraceLayerData> =>
+  // For now, we'll define highlighting layers as any search trace layer.
+  // It could be better to decouple this "highlight-able" idea from search traces.
+  isTraceLayer(layer);
 
 export function useHighlightNodes(key?: string): {
-  [key: string]: Function;
+  [K in (typeof highlightNodesOptions)[number]["type"]]: (step: number) => void;
 } {
-  const { layer, setLayer } = useLayer(key);
+  const { layer, setLayer } = useLayer(key, isHighlightLayer);
   const trace = layer?.source?.trace?.content;
 
-  const showBackTracking = useCallback(
+  const showBacktracking = useCallback(
     (step: number) => {
-      const { getPath } = makePathIndex(trace);
-      const path: number[] = getPath(step);
-      if (path.length > 1) {
-        setLayer(
-          produce(layer, (l) =>
-            set(l?.source!, "highlighting", { type: "BackTracking", path })
-          )!
-        );
-      } else {
-        setLayer(produce(layer, (l) => set(l?.source!, "highlighting", {}))!);
+      if (trace) {
+        const { getPath } = makePathIndex(trace);
+        const path: number[] = getPath(step);
+        if (path.length > 1) {
+          setLayer(
+            produce(layer, (l) =>
+              set(l?.source!, "highlighting", {
+                type: "backtracking",
+                step,
+                path,
+              })
+            )!
+          );
+        } else {
+          setLayer(produce(layer, (l) => set(l?.source!, "highlighting", {}))!);
+        }
       }
     },
     [layer?.source?.highlighting, trace]
@@ -96,16 +108,16 @@ export function useHighlightNodes(key?: string): {
     return subtree;
   };
 
-  const showSubTree = useCallback(
+  const showSubtree = useCallback(
     (step: number) => {
-      let current: Node = { ...(trace?.events ?? [])[step], step };
+      const current: Node = { ...(trace?.events ?? [])[step], step };
       const path = {
         [current.step]: getAllSubtreeNodes(current, new Set<number>()),
       };
       if (Object.keys(path[current.step]).length > 0) {
         setLayer(
           produce(layer, (l) =>
-            set(l?.source!, "highlighting", { type: "SubTree", path })
+            set(l?.source!, "highlighting", { type: "subtree", step, path })
           )!
         );
       } else {
@@ -115,8 +127,9 @@ export function useHighlightNodes(key?: string): {
     [layer?.source?.highlighting, trace]
   );
   return {
-    BackTracking: showBackTracking,
-    SubTree: showSubTree,
+    backtracking: showBacktracking,
+    subtree: showSubtree,
+    ["bounds-relevant"]: noop,
   };
 }
 
