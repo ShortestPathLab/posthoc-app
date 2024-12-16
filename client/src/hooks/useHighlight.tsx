@@ -1,7 +1,16 @@
 import { TraceLayerData } from "layers/trace";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { makePathIndex, Node } from "layers/trace/makePathIndex";
-import { chain, find, forEach, forOwn, isUndefined, noop, set } from "lodash";
+import {
+  chain,
+  find,
+  findLastIndex,
+  forEach,
+  forOwn,
+  isUndefined,
+  noop,
+  set,
+} from "lodash";
 import { produce } from "produce";
 import { useCallback } from "react";
 import { Layer, useLayer } from "slices/layers";
@@ -106,11 +115,13 @@ export function useHighlightNodes(key?: string): {
       forOwn(groupedParents, (parent, key) => {
         const event = find(parent, (c) => c.step <= root!.step);
         if (event && !precedentTree[event.step]) {
-          const index = trace?.events?.findLastIndex(
+          // Use lodash findLastIndex to make TypeScript happy
+          const index = findLastIndex(
+            trace?.events,
             (e) => e?.id === event.pId
           );
           if (!isUndefined(index) && index >= 0) {
-            const pEvent = { ...trace?.events?.[index], step: index };
+            const pEvent = { ...trace?.events?.[index], step: index } as Node;
             precedentTree[pEvent.step] = getPrecedentEvents(pEvent, visited);
           }
         }
