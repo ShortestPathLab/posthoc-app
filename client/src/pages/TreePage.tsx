@@ -340,7 +340,7 @@ export function TreeGraph({
       let prev =
         trace?.events?.[highlightEdges?.path?.[highlightEdges?.path.length - 1]]
           ?.id;
-
+      console.log(highlightEdges.path)
       forEachRight(highlightEdges.path, (step) => {
         const node = trace?.events?.[step].id;
         const c = highlightNodesOptions.find(
@@ -361,13 +361,15 @@ export function TreeGraph({
 
     // highlight nodes: SubTree
     if (
-      highlightEdges?.type === "subtree" &&
+      (highlightEdges?.type === "subtree" ||  highlightEdges?.type === "precedent")&&
       typeof highlightEdges?.path === "object" &&
       !Array.isArray(highlightEdges?.path)
     ) {
       const c = highlightNodesOptions.find(
         (t) => t.type === highlightEdges.type
       );
+
+      const isSubtree = highlightEdges?.type === "subtree";
 
       function iterateSubtree(subtree: Subtree) {
         forOwn(subtree, (childs: Subtree, parent: string | number) => {
@@ -387,7 +389,7 @@ export function TreeGraph({
                 "color",
                 getThemeColor(c?.color)
               );
-              const edge = makeEdgeKey(`${cNode}`, `${pNode}`);
+              const edge = isSubtree ? makeEdgeKey(`${cNode}`, `${pNode}`) :  makeEdgeKey(`${pNode}`, `${cNode}`) ;
               if (graph.hasEdge(edge)) {
                 graph.setEdgeAttribute(edge, "color", getThemeColor(c?.color));
                 graph.setEdgeAttribute(edge, "hidden", false);

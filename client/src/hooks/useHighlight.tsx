@@ -1,7 +1,7 @@
 import { TraceLayerData } from "layers/trace";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { makePathIndex, Node } from "layers/trace/makePathIndex";
-import { chain, find, forEach, noop, set } from "lodash";
+import { chain, find, forEach, forOwn, isUndefined, noop, set } from "lodash";
 import { produce } from "produce";
 import { useCallback } from "react";
 import { Layer, useLayer } from "slices/layers";
@@ -12,6 +12,11 @@ export const highlightNodesOptions = [
     color: "cyan" satisfies AccentColor,
     description:
       "Show all events from the root to the currently selected event",
+  },
+  {
+    type: "precedent",
+    color: "lime" satisfies AccentColor,
+    description: "Show all precedents of the currently selected node",
   },
   {
     type: "subtree",
@@ -73,12 +78,78 @@ export function useHighlightNodes(key?: string): {
     [layer?.source?.highlighting, trace]
   );
 
-  const groupedTrace = chain(trace?.events)
+  const groupedTraceById = chain(trace?.events)
+    .map((c, i) => ({ step: i, id: c.id, pId: c.pId }))
+    .groupBy("id")
+    .value();
+
+  const getPrecedentEvents = (
+    root: Node,
+    visited = new Set<number | string>()
+  ) => {
+    if (visited.has(root.step)) {
+      return {};
+    }
+    visited.add(root?.step);
+
+    // get all the parent nodes of current node (different events)
+    const parentEvents = groupedTraceById[root.id];
+    if (!parentEvents || parentEvents?.length < 1) return {};
+    const precedentTree: Subtree = {};
+
+    if (parentEvents) {
+      const groupedParents = chain(parentEvents)
+        .map((c, i) => ({ step: c.step, id: c.id, pId: c.pId }))
+        .groupBy("pId")
+        .value();
+
+      forOwn(groupedParents, (parent, key) => {
+        const event = find(parent, (c) => c.step <= root!.step);
+        if (event && !precedentTree[event.step]) {
+          const index = trace?.events?.findLastIndex(
+            (e) => e?.id === event.pId
+          );
+          if (!isUndefined(index) && index >= 0) {
+            const pEvent = { ...trace?.events?.[index], step: index };
+            precedentTree[pEvent.step] = getPrecedentEvents(pEvent, visited);
+          }
+        }
+      });
+    }
+    return precedentTree;
+  };
+
+  const showPrecedent = useCallback(
+    (step: number) => {
+      if (trace) {
+        const current: Node = { ...(trace?.events ?? [])[step], step };
+        const path = {
+          [current.step]: getPrecedentEvents(current, new Set<number>()),
+        };
+        console.log(path);
+        if (Object.keys(path[current.step]).length > 0) {
+          setLayer(
+            produce(layer, (l) =>
+              set(l?.source!, "highlighting", {
+                type: "precedent",
+                step,
+                path,
+              })
+            )!
+          );
+        } else {
+          setLayer(produce(layer, (l) => set(l?.source!, "highlighting", {}))!);
+        }
+      }
+    },
+    [layer?.source?.highlighting, trace]
+  );
+
+  const groupedTraceBypId = chain(trace?.events)
     .map((c, i) => ({ step: i, id: c.id, pId: c.pId }))
     .groupBy("pId")
     .value();
 
-  // use step
   const getAllSubtreeNodes = (
     root: Node,
     visited = new Set<number | string>()
@@ -88,7 +159,7 @@ export function useHighlightNodes(key?: string): {
     }
     visited.add(root.id);
     // get all the child nodes of current node
-    const children = groupedTrace[root.id];
+    const children = groupedTraceBypId[root.id];
     if (!children || children.length < 1) return {};
     const subtree: Subtree = {};
 
@@ -126,9 +197,11 @@ export function useHighlightNodes(key?: string): {
     },
     [layer?.source?.highlighting, trace]
   );
+
   return {
     backtracking: showBacktracking,
     subtree: showSubtree,
+    precedent: showPrecedent,
     ["bounds-relevant"]: noop,
   };
 }
@@ -139,7 +212,9 @@ export function flattenSubtree(subtree: Subtree) {
   function traverse(tree: Subtree, path: number[]) {
     for (const key in tree) {
       const numericKey = Number(key);
-      result.push(numericKey);
+      if (!result.includes(numericKey)) {
+        result.push(numericKey);
+      }
       if (typeof tree[key] === "object" && tree[key] !== null) {
         traverse(tree[key], path.concat(numericKey));
       }
