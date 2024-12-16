@@ -93,6 +93,8 @@
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/downloadjs": "^1.4.6",
+    "@types/gapi": "^0.0.47",
+    "@types/google.accounts": "^0.0.15",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash": "^4.17.13",
     "@types/md5": "^2.3.5",
