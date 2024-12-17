@@ -138,7 +138,7 @@ class GoogleCloudService implements Service {
         return data.files[0].id;
       } else {
         console.log("Folder does not exist");
-        return false;
+        return "";
       }
     } catch (error) {
       console.error("Error checking folder existence:", error);
