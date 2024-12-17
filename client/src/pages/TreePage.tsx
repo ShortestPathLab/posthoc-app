@@ -1,6 +1,7 @@
 import {
   CenterFocusWeakOutlined,
   FlipCameraAndroidOutlined as RotateIcon,
+  ExitToAppFilledOutlined,
 } from "@mui-symbols-material/w300";
 import {
   AccountTreeOutlined,
@@ -71,12 +72,14 @@ import {
   forEachRight,
   forOwn,
   get,
+  isEmpty,
   isNull,
   isUndefined,
   keys,
   map,
   max,
   min,
+  set,
   slice,
   startCase,
   truncate,
@@ -93,6 +96,7 @@ import { AccentColor, getShade, useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
 import { Key, TreeWorkerReturnType } from "./tree.worker";
 import { useTreeMemo } from "./TreeWorker";
+import { produce } from "produce";
 
 const isDefined = (a: any) => !isUndefined(a) && !isNull(a);
 
@@ -193,6 +197,7 @@ export function TreeGraph({
   showAllEdges,
   trackedProperty,
   highlightEdges,
+  onExit,
 }: {
   trace?: Trace;
   tree?: TreeWorkerReturnType;
@@ -201,6 +206,7 @@ export function TreeGraph({
   showAllEdges?: boolean;
   trackedProperty?: string;
   highlightEdges?: HighlightLayerData["highlighting"];
+  onExit?: () => void;
 }) {
   const sigma = useSigma();
   const [orientation, setOrientation] =
@@ -260,6 +266,20 @@ export function TreeGraph({
     return graph;
   }, [load, trace, tree, finalParents, orientation]);
 
+  const isHighlightEdges = useMemo(
+    () => !isEmpty(highlightEdges),
+    [highlightEdges]
+  );
+
+  const highlightingViewBgColor = getShade(
+    highlightNodesOptions.find(
+      (highlight) => highlight.type === highlightEdges?.type
+    )?.color,
+    theme.palette.mode,
+    500,
+    400
+  );
+
   useEffect(() => {
     const r = memoizee((a: string) =>
       interpolate([theme.palette.background.paper, a])
@@ -316,11 +336,12 @@ export function TreeGraph({
     /**
      * Get a high-contrast shade of a theme color for use on the graph
      */
+
     const getThemeColor = (c: AccentColor = "grey") =>
       getShade(c, theme.palette.mode);
 
     // Force show a label for the current highlighted node
-    if (highlightEdges) {
+    if (highlightEdges && isHighlightEdges) {
       const current = trace?.events?.[highlightEdges?.step];
       graph.setNodeAttribute(current?.id, "forceLabel", "true");
       graph.setNodeAttribute(
@@ -340,7 +361,7 @@ export function TreeGraph({
       let prev =
         trace?.events?.[highlightEdges?.path?.[highlightEdges?.path.length - 1]]
           ?.id;
-      console.log(highlightEdges.path)
+
       forEachRight(highlightEdges.path, (step) => {
         const node = trace?.events?.[step].id;
         const c = highlightNodesOptions.find(
@@ -361,7 +382,8 @@ export function TreeGraph({
 
     // highlight nodes: SubTree
     if (
-      (highlightEdges?.type === "subtree" ||  highlightEdges?.type === "precedent")&&
+      (highlightEdges?.type === "subtree" ||
+        highlightEdges?.type === "precedent") &&
       typeof highlightEdges?.path === "object" &&
       !Array.isArray(highlightEdges?.path)
     ) {
@@ -389,7 +411,9 @@ export function TreeGraph({
                 "color",
                 getThemeColor(c?.color)
               );
-              const edge = isSubtree ? makeEdgeKey(`${cNode}`, `${pNode}`) :  makeEdgeKey(`${pNode}`, `${cNode}`) ;
+              const edge = isSubtree
+                ? makeEdgeKey(`${cNode}`, `${pNode}`)
+                : makeEdgeKey(`${pNode}`, `${cNode}`);
               if (graph.hasEdge(edge)) {
                 graph.setEdgeAttribute(edge, "color", getThemeColor(c?.color));
                 graph.setEdgeAttribute(edge, "hidden", false);
@@ -435,42 +459,69 @@ export function TreeGraph({
     theme,
   ]);
   return (
-    <Stack sx={{ pt: 6, position: "absolute", top: 0, left: 0 }}>
-      <Stack
-        direction="row"
-        sx={
-          {
-            ...paper(1),
-            ...acrylic,
-            alignItems: "center",
-            height: (t) => t.spacing(6),
-            px: 1,
-            m: 1,
-          } as SxProps<Theme>
-        }
-      >
-        <IconButtonWithTooltip
-          color="primary"
-          onClick={() => {
-            sigma?.getCamera?.()?.animatedReset?.();
+    <Stack
+      sx={{
+        pt: 6,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        minWidth: isHighlightEdges ? 1 : "auto",
+      }}
+    >
+      {isHighlightEdges ? (
+        <Box
+          sx={{
+            bgcolor: highlightingViewBgColor || "info.main",
+            boxShadow: 1,
+            display: "flex",
+            justifyContent: "space-between",
           }}
-          label="Fit"
-          icon={<CenterFocusWeakOutlined />}
-        />
-        {divider}
-        <IconButtonWithTooltip
-          color="primary"
-          onClick={() => {
-            setOrientation(
-              orientation === "vertical" ? "horizontal" : "vertical"
-            );
-          }}
-          label="Rotate"
-          icon={<RotateIcon />}
-        />
-        {divider}
-        {<MinimisedPlaybackControls layer={layer} />}
-      </Stack>
+        >
+          <ListItem />
+          <ListItem> {highlightEdges?.type}</ListItem>
+          <IconButtonWithTooltip
+            label="exit"
+            icon={<ExitToAppFilledOutlined />}
+            onClick={onExit}
+          />
+        </Box>
+      ) : (
+        <Stack
+          direction="row"
+          sx={
+            {
+              ...paper(1),
+              ...acrylic,
+              alignItems: "center",
+              height: (t) => t.spacing(6),
+              px: 1,
+              m: 1,
+            } as SxProps<Theme>
+          }
+        >
+          <IconButtonWithTooltip
+            color="primary"
+            onClick={() => {
+              sigma?.getCamera?.()?.animatedReset?.();
+            }}
+            label="Fit"
+            icon={<CenterFocusWeakOutlined />}
+          />
+          {divider}
+          <IconButtonWithTooltip
+            color="primary"
+            onClick={() => {
+              setOrientation(
+                orientation === "vertical" ? "horizontal" : "vertical"
+              );
+            }}
+            label="Rotate"
+            icon={<RotateIcon />}
+          />
+          {divider}
+          {<MinimisedPlaybackControls layer={layer} />}
+        </Stack>
+      )}
     </Stack>
   );
 }
@@ -488,7 +539,7 @@ const stepsLayerGuard = (
   !!getController(l).steps;
 
 export function TreePage({ template: Page }: PageContentProps) {
-  const { key, setKey, layer, layers, allLayers } = useLayer(
+  const { key, setKey, setLayer, layer, layers, allLayers } = useLayer(
     undefined,
     stepsLayerGuard
   );
@@ -547,6 +598,12 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const showHighlight = useHighlightNodes(key);
 
+  function exitHighlighView() {
+    if (!isEmpty(layer?.source?.highlighting)) {
+      setLayer(produce(layer, (l) => set(l?.source!, "highlighting", {}))!);
+    }
+  }
+
   const { result: tree, loading } = useTreeMemo({ trace, mode }, [key, mode]);
 
   const settings = useMemo(
@@ -602,6 +659,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                           showAllEdges={layoutModes[mode].showAllEdges}
                           trackedProperty={trackedProperty}
                           highlightEdges={layer.source?.highlighting}
+                          onExit={exitHighlighView}
                         />
                         <GraphEvents
                           layer={key}
