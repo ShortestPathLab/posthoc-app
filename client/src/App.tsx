@@ -12,9 +12,11 @@ import { Inspector } from "components/inspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { TitleBar, TitleBarPlaceholder } from "components/title-bar/TitleBar";
 import { useTitleBar } from "hooks/useTitleBar";
+import { useWorkspace } from "hooks/useWorkspace";
+import { setLayerSource } from "layers/TrustedLayerData";
 import { Image } from "pages/Image";
 import logo from "public/logo192.png";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { BootstrapService } from "services/BootstrapService";
 import { ConnectionsService } from "services/ConnectionsService";
 import { FeaturesService } from "services/FeaturesService";
@@ -25,8 +27,11 @@ import { SettingsService } from "services/SettingsService";
 import { minimal } from "services/SyncParticipant";
 import { SyncService, useSyncStatus } from "services/SyncService";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
+import { useUIState } from "slices/UIState";
+import { useLayers } from "slices/layers";
 import { useSettings } from "slices/settings";
 import { makeTheme } from "theme";
+import { parseYamlAsync } from "workers/async";
 
 const services = [
   SyncService,
@@ -43,7 +48,58 @@ function App() {
   const { palette } = useTheme();
   const color = palette.background.default;
   const { loading } = useSyncStatus();
+  const [UIStateStore, setUIState] = useUIState();
 
+  const [layersStore, setLayers] = useLayers();
+
+  // useEffect(() => {
+  //   console.log("checking use effect run");
+  //   const checkFileLink = async () => {
+  //     if (window.location.hash) {
+  //       const hashStart = window.location.hash.substring(1).split("?").at(0);
+  //       if (hashStart === "fetch-gdrive-file") {
+  //         const hashParams = new URLSearchParams(
+  //           window.location.hash.substring(1).split("?").at(1)
+  //         );
+  //         console.log(hashParams.entries);
+  //         const fileId = hashParams.get("fileId");
+  //         console.log(fileId);
+  //         if (!fileId) {
+  //           console.log("missing fileId");
+  //           return;
+  //         }
+  //         const apiKey = import.meta.env.VITE_API_KEY;
+  //         try {
+  //           const response = await fetch(
+  //             `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`
+  //           );
+  //           // const dataJson = await response.json();
+  //           // console.log(dataJson);
+  //           if (!response.ok) {
+  //             console.log("Unable to get file");
+  //             return;
+  //           }
+  //           const data = await response.blob();
+  //           console.log(data.type);
+  //           const file = new File([data], "test.yaml", { type: "text/yaml" });
+  //           console.log(await file.text())
+  //           // const parsed = await parseYamlAsync(await file.text());
+  //           // if (parsed) {
+  //           //   setLayers(() => {
+  //           //     return parsed.layers;
+  //           //   });
+  //           //   setUIState(() => parsed.UIState);
+  //           //   setUIState(() => ({ isTrusted: false }));
+  //           // }
+  //         } catch (error) {
+  //           console.log(error);
+  //         }
+  //         window.history.replaceState(null, "", window.location.origin);
+  //       }
+  //     }
+  //   };
+  //   checkFileLink();
+  // }, []);
   return (
     <Flex
       vertical

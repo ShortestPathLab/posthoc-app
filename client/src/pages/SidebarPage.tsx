@@ -9,6 +9,7 @@ import { withSlots } from "components/withSlots";
 import { useAcrylic } from "theme";
 import { PageProps, PageSlots, divider } from "./Page";
 import { useUIState } from "slices/UIState";
+import { useEffect } from "react";
 
 export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
   const bg = useSidebarBackground();
