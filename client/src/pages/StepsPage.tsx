@@ -35,6 +35,7 @@ import {
   clamp,
   find,
   findIndex,
+  isEmpty,
   isUndefined,
   map,
   reduce,
@@ -106,12 +107,18 @@ function useStepsPageState(
     onChange?.({ showHighlighting: t });
     setLocalShowHighlighting(t);
   }
+
+  function setExitShowHighlighting(t: boolean) {
+    onChange?.({ showHighlighting: t });
+    setLocalShowHighlighting(t);
+  }
   return {
     setSelectedType,
     setKey,
     selectedType,
     showHighlighting,
     setShowHighlighting,
+    setExitShowHighlighting,
     layers,
     allLayers,
     key,
@@ -145,6 +152,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
     setSelectedType,
     showHighlighting,
     setShowHighlighting,
+    setExitShowHighlighting,
     layer,
   } = useStepsPageState(state, onChange);
 
@@ -167,11 +175,12 @@ export function StepsPage({ template: Page }: PageContentProps) {
         .value();
       const allSelected = !stepTypes.includes(_selectedType);
 
-      if (layer?.source?.highlighting && showHighlighting) {
+      if (!isEmpty(layer?.source?.highlighting) && showHighlighting) {
         const highlightData = layer?.source?.highlighting;
         let highlightStepsRaw: number[] = [];
         if (
-          (highlightData?.type === "subtree" ||  highlightData?.type === "precedent" )&&
+          (highlightData?.type === "subtree" ||
+            highlightData?.type === "precedent") &&
           !Array.isArray(highlightData.path)
         ) {
           highlightStepsRaw = flattenSubtree(highlightData.path);
@@ -182,6 +191,8 @@ export function StepsPage({ template: Page }: PageContentProps) {
           highlightStepsRaw = highlightData.path;
         }
         steps = highlightStepsRaw.map((index) => steps[index]);
+      } else if (isEmpty(layer?.source?.highlighting) && showHighlighting) {
+        setExitShowHighlighting(false);
       }
 
       const filtered = allSelected
@@ -371,7 +382,11 @@ export function StepsPage({ template: Page }: PageContentProps) {
         {divider}
 
         <FeaturePickerButton children="Show Highlighting" />
-        <Switch checked={showHighlighting} onChange={setShowHighlighting} />
+        <Switch
+          checked={showHighlighting}
+          onChange={setShowHighlighting}
+          disabled={isEmpty(layer?.source?.highlighting)}
+        />
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
     </Page>
