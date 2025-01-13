@@ -234,9 +234,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
 
   useEffectWhen(
     () => {
-      if (isHighlighting) {
-        setSelectedType(SYMBOL_HIGHLIGHTED);
-      }
+      setSelectedType(isHighlighting ? SYMBOL_HIGHLIGHTED : SYMBOL_ALL);
     },
     [isHighlighting, setSelectedType],
     [isHighlighting]
