@@ -1,6 +1,6 @@
 import { TraceEvent } from "protocol/Trace";
 import { FunctionTemplate } from "./FunctionTemplate";
-import { EventTree } from "pages/tree.worker";
+import { EventTree } from "pages/tree/tree.worker";
 
 export type ShouldBreak = FunctionTemplate<
   [number, TraceEvent, TraceEvent[], EventTree | void, EventTree[] | void],
