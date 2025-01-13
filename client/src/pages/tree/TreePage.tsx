@@ -307,7 +307,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                               color="text.secondary"
                               variant="overline"
                             >
-                              Highlight Associated
+                              Focus on
                             </Typography>
                           </ListItem>
                           {map(highlightNodesOptions, (highlight) => {
@@ -339,6 +339,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                                       showHighlight[highlight.type](
                                         selected?.current?.step!
                                       );
+                                      setMenuOpen(false);
                                     }}
                                   >
                                     <Box sx={{ ml: -0.5, pr: 4 }}>

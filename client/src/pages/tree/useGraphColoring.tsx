@@ -45,12 +45,9 @@ export function useGraphColoring(
     theme.palette.text.primary,
   ]);
 
-  const isHighlightEdges = !isEmpty(highlightEdges);
-
   return useMemo(() => {
-    const r = memoizee((a: string) =>
-      interpolate([theme.palette.background.paper, a])
-    );
+    const isHighlightEdges = !isEmpty(highlightEdges);
+    const r = memoizee((a: string) => interpolate([gradient(0.1), a]));
     const pastSteps = 400;
     const n = gradient(0.1);
     graph.forEachNode((v) => {
@@ -76,7 +73,9 @@ export function useGraphColoring(
       slice(trace?.events, 0, step + 1),
       ({ id, type, pId }, i) => {
         const color = getColorHex(type);
-        const finalColor = r(color)(max([1 - (step - i) / pastSteps, 0.2])!);
+        const finalColor = r(color)(
+          isHighlightEdges ? 0.1 : max([1 - (step - i) / pastSteps, 0.3])!
+        );
         if (graph.hasNode(`${id}`) && !isSetNode[id]) {
           setAttributes(graph, `${id}`, "node", {
             color: finalColor,

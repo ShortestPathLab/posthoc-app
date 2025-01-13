@@ -21,6 +21,7 @@ import {
 } from "components/app-bar/Playback";
 import { Button } from "components/generic/Button";
 import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
+import { Scroll } from "components/generic/Scrollbars";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
 import { HighlightLayerData, highlightNodesOptions } from "hooks/useHighlight";
@@ -202,39 +203,43 @@ export function TreeGraph(props: TreeGraphProps) {
           }}
         >
           {isHighlightingEnabled && (
-            <Box
-              sx={{
-                ...pick(acrylic as any, "backdropFilter"),
-                transition: (t) => t.transitions.create("background-color"),
-                pointerEvents: "all",
-                alignItems: "center",
-                p: 2,
-                height: theme.spacing(5),
-                bgcolor: alpha(bg, 0.05) || "info.main",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography variant="overline">
-                {startCase(highlightEdges?.type)}{" "}
-                <Box sx={{ opacity: 0.7 }} component="span">
-                  <Dot color={getColorHex(event?.type)} />{" "}
-                  {startCase(event?.type)} {event?.id}
-                  {", "}
-                  Step {highlightEdges?.step}{" "}
-                </Box>
-              </Typography>
-              <Button
-                onClick={onExit}
-                variant="outlined"
+            <Scroll x style={{ height: theme.spacing(5) }}>
+              <Box
                 sx={{
-                  mr: -1,
-                  height: theme.spacing(4),
+                  ...pick(acrylic as any, "backdropFilter"),
+                  transition: (t) => t.transitions.create("background-color"),
+                  pointerEvents: "all",
+                  alignItems: "center",
+                  p: 2,
+                  height: "100%",
+                  bgcolor: alpha(bg, 0.05) || "info.main",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  minWidth: "max-content",
+                  gap: 2,
                 }}
               >
-                Exit highlighted view
-              </Button>
-            </Box>
+                <Typography variant="overline">
+                  {startCase(highlightEdges?.type)}{" "}
+                  <Box sx={{ opacity: 0.7 }} component="span">
+                    <Dot color={getColorHex(event?.type)} />{" "}
+                    {startCase(event?.type)} {event?.id}
+                    {", "}
+                    Step {highlightEdges?.step}{" "}
+                  </Box>
+                </Typography>
+                <Button
+                  onClick={onExit}
+                  variant="outlined"
+                  sx={{
+                    mr: -1,
+                    height: theme.spacing(4),
+                  }}
+                >
+                  Exit focused view
+                </Button>
+              </Box>
+            </Scroll>
           )}
         </Stack>
       </Stack>
