@@ -141,7 +141,7 @@ const ellipsisProps = {
   overflow: "hidden",
 } satisfies CSSProperties;
 
-export function FeatureCard2({
+export function FeatureCardLoader({
   entry,
   onOpenClick,
   search,
@@ -171,7 +171,9 @@ export function FeatureCard2({
         size={size}
       />
     </Box>
-  ) : undefined;
+  ) : (
+    <></>
+  );
 }
 
 export function FeatureCard({
@@ -215,7 +217,7 @@ export function FeatureCard({
                   backgroundImage: `url("${image}")`,
                   backgroundSize: "contain",
                   backgroundRepeat: "no-repeat",
-                  backgroundPosition: "-52px -52px",
+                  backgroundPosition: "center -52px",
                 }}
               />
             </Box>
@@ -223,7 +225,7 @@ export function FeatureCard({
         )}
         <CardHeader
           sx={{
-            alignItems: "flex-start",
+            flexDirection: "column",
             "> .MuiCardHeader-content": { overflow: "hidden" },
           }}
           avatar={
@@ -232,16 +234,17 @@ export function FeatureCard({
                 ...paper(1),
                 border: "none",
                 borderRadius: 1,
-                width: 64,
-                height: 64,
+                width: 86,
+                height: 86,
                 overflow: "hidden",
+                mb: 4,
               }}
             >
               <Fade in={!!image}>
                 <Box
                   sx={{
-                    width: 64,
-                    height: 64,
+                    width: 86,
+                    height: 86,
                     backgroundImage: `url("${image}")`,
                     backgroundSize: "100%",
                     backgroundPosition: "center",
@@ -254,7 +257,7 @@ export function FeatureCard({
           title={loading ? <Skeleton /> : name || "Untitled"}
           subheaderTypographyProps={ellipsisProps}
           subheader={
-            <Stack gap={2} sx={{ pt: 1, alignItems: "flex-start" }}>
+            <Stack gap={2} sx={{ pt: 1 }}>
               <Type
                 component="div"
                 sx={{
@@ -301,7 +304,7 @@ export function FeatureCard({
   );
 }
 
-const CONTENT_WIDTH = 940;
+const CONTENT_WIDTH = 740;
 
 const entries2 = entries(paths);
 
@@ -450,7 +453,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       }}
                     >
                       {map(entries2, (entry) => (
-                        <FeatureCard2
+                        <FeatureCardLoader
                           key={entry[0]}
                           search={search}
                           entry={entry}
