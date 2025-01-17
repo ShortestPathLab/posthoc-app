@@ -118,21 +118,16 @@ export function useWorkspace() {
           return { name, size: compressed.byteLength };
         }
       },
-
-      generateWorkspaceFile: async () => {
+      generateWorkspaceFile: async (name?: string) => {
         const content = JSON.stringify(minimise(UIStateStore, layersStore));
-        const layerData = JSON.stringify(layersStore);
-        const layerDataBlob = new Blob([layerData], {
-          type: "application/json",
+        const filename = `${name ?? id("-")}.workspace`;
+        const fileType = "application/octet-stream";
+        const compressed = await compress(content);
+        const blob = new Blob([compressed], {
+          type: fileType
         });
-        const compressWithCompressionStream = (blob: Blob) => {
-          const compressionStream = new CompressionStream("gzip");
-          const readableStream = blob.stream().pipeThrough(compressionStream);
-
-          return new Response(readableStream).blob();
-        };
-
-        return compressWithCompressionStream(layerDataBlob);
+        const file = new File([blob], filename, { type: fileType });
+        return { filename, compressedFile: file, size: compressed.byteLength };
       },
       estimateWorkspaceSize: memo((raw?: boolean) => {
         const size = sizeOf(minimise(UIStateStore, layersStore));

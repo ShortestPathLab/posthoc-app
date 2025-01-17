@@ -1,28 +1,31 @@
-/// <reference types="google.accounts" />
 import {
   CircularProgress,
   IconButton,
-  Input,
+  InputAdornment,
   TextField,
   Typography,
 } from "@mui/material";
-import { Service, useSavedLogsService } from "services/SaveLogsService";
+import { CloudStorageService } from "services/CloudStorageService";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Button } from "./generic/Button";
-import { MouseEventHandler, useRef, useState } from "react";
-import { result } from "lodash";
-
+import { MouseEventHandler, useState } from "react";
+import { useAuth } from "slices/auth";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { useCloudStorageService } from "slices/cloudStorage";
+import copy from "clipboard-copy";
+import { useWorkspace } from "hooks/useWorkspace";
 const FileComponent = ({
-  sendFile,
+  saveFile,
   uploading,
 }: {
-  uploading: ;
-  sendFile: SavedLogsServiceHook["sendFile"];
+  uploading: boolean;
+  saveFile?: CloudStorageService["saveFile"];
 }) => {
+  const [authState, setAuthState] = useAuth();
   const [fileName, setFileName] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [link, setLink] = useState<string>("");
-
+  const { generateWorkspaceFile } = useWorkspace();
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -32,8 +35,11 @@ const FileComponent = ({
   };
   const handleUpload = async () => {
     try {
-      if (selectedFile) {
-        const res = await sendFile(selectedFile);
+      setAuthState(() => ({}));
+      const { compressedFile } = await generateWorkspaceFile();
+      if (compressedFile) {
+        const res = await saveFile?.(compressedFile);
+        // todo: handle file not being saved
         setLink(
           res === ""
             ? res
@@ -47,64 +53,49 @@ const FileComponent = ({
     }
   };
 
-  const handleCopy: MouseEventHandler<HTMLButtonElement> = (e) => {
-    console.log(link);
+  const handleCopy: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    try {
+      await copy(link);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <>
-      <Typography variant="h6" gutterBottom>
-        File Upload
-      </Typography>
+      <Button
+        disabled={uploading}
+        variant="contained"
+        onClick={handleUpload}
+        color="primary"
+      >
+        {uploading ? <CircularProgress size={"25px"} /> : "Upload"}
+      </Button>
 
-      <Input
-        type="file"
-        inputProps={{
-          accept: ".yaml",
-        }}
-        id="file-input"
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-      />
-
-      <label htmlFor="file-input">
-        <Button disabled={uploading} variant="contained" component="span">
-          Choose File
-        </Button>
-      </label>
-
-      {fileName && (
-        <Typography variant="body1" style={{ marginTop: "10px" }}>
-          Selected file: {fileName}
-        </Typography>
-      )}
-
-      <div style={{ marginTop: "20px" }}>
-        <Button
-          disabled={uploading}
-          variant="contained"
-          onClick={handleUpload}
-          color="primary"
-        >
-          {uploading ? <CircularProgress size={"25px"} /> : "Upload"}
-        </Button>
-      </div>
       {link !== "" && (
         <div style={{ margin: "20px" }}>
           <TextField
             value={link}
             fullWidth
+            disabled
             variant="outlined"
             margin="normal"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="copy-link"
+                      color="primary"
+                      onClick={handleCopy}
+                    >
+                      <ContentCopyIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCopy}
-            style={{ marginTop: "10px" }}
-          >
-            Copy Text
-          </Button>
         </div>
       )}
     </>
@@ -112,16 +103,27 @@ const FileComponent = ({
 };
 
 const GoogleSignInButton = () => {
-  const { auth, cloudService } = useSavedLogsService("google");
-
+  // const { cloudService } = useSavedLogsService("google");
+  const [authState] = useAuth();
+  const [{ instance: cloudService }] = useCloudStorageService();
+  const [uploading, setUploading] = useState<boolean>(false);
+  if (authState == undefined) {
+    return (
+      <Typography variant="body2" align="center" color="text.secondary">
+        Checking Authentication...
+      </Typography>
+    );
+  }
+  const loginMessage = "Login with Google to save and share your search traces";
+  const loggedInMessage = "You are logged in with your google account.";
   return (
     <>
       <Typography variant="body2" align="center" color="text.secondary">
-        Login with Google to save and share your search traces
+        {authState?.authenticated ? loggedInMessage : loginMessage}
       </Typography>
-      {!auth ? (
+      {!authState?.authenticated ? (
         <IconButton
-          onClick={cloudService.authenticate}
+          onClick={cloudService?.authenticate}
           sx={{
             display: "flex",
             flexDirection: "row",
@@ -145,7 +147,10 @@ const GoogleSignInButton = () => {
       ) : (
         <div style={{ padding: "20px" }}>
           {/* how to handle uploading? */}
-          <FileComponent sendFile={cloudService.sendFile} uploading={uploading} />
+          <FileComponent
+            saveFile={cloudService?.saveFile}
+            uploading={uploading}
+          />
         </div>
       )}
     </>

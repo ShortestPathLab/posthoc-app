@@ -1,6 +1,7 @@
 import type { pages } from "pages";
 import { createSlice, withLocalStorage } from "./createSlice";
 import { AccentColor } from "theme";
+import { providers } from "services/CloudStorageService";
 
 export type Sources = {
   trustedOrigins?: string[];
@@ -20,9 +21,15 @@ export type Renderer = {
   disabled?: boolean;
 };
 
+
+
+// todo: change to keys if cloudservicees obj
+export type CloudServiceType = "google" | "github";
+
 export type Settings = {
   remote?: Remote[];
   renderer?: Renderer[];
+  cloudStorageType?: keyof typeof providers;
   "playback/playbackRate"?: number;
   "appearance/acrylic"?: boolean;
   "appearance/theme"?: "dark" | "light";
@@ -53,10 +60,18 @@ export const defaultRenderers = [
 
 export const defaultPlaybackRate = 1;
 
+// export const defaultAuthState = {
+//   accessToken: null,
+//   createdTimestamp: null,
+//   expiresIn: null,
+// };
+
+export const defaultCloudStorage = "google";
 export const defaults = {
   renderer: defaultRenderers,
   remote: defaultRemotes,
   trustedOrigins: [],
+  cloudStorageType: defaultCloudStorage,
   "playback/playbackRate": defaultPlaybackRate,
   "appearance/theme": "dark",
   "appearance/acrylic": true,

@@ -130,17 +130,17 @@ export const pages: Dictionary<PageMeta> = {
     allowFullscreen: true,
     showInSidebar: "always",
   },
-  // savedLogs: {
-  //   id: "savedLogs",
-  //   name: "SavedLogs",
-  //   description:
-  //     "Contains all saved logs and enables user to get shareable link",
-  //   color: "grey",
-  //   icon: <SaveIcon />,
-  //   content: SavedLogsPage,
-  //   allowFullscreen: false,
-  //   showInSidebar: "always",
-  // },
+  savedLogs: {
+    id: "savedLogs",
+    name: "SavedLogs",
+    description:
+      "Contains all saved logs and enables user to get shareable link",
+    color: "grey",
+    icon: <SaveIcon />,
+    content: SavedLogsPage,
+    allowFullscreen: false,
+    showInSidebar: "always",
+  },
   // about: {
   //   id: "about",
   //   name: "About",
