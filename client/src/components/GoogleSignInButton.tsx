@@ -1,11 +1,20 @@
 import {
   CircularProgress,
+  Divider,
   IconButton,
   InputAdornment,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { CloudStorageService } from "services/CloudStorageService";
+import {
+  CloudStorageService,
+  FileMetaData,
+} from "services/CloudStorageService";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Button } from "./generic/Button";
 import { MouseEventHandler, useState } from "react";
@@ -14,6 +23,74 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useCloudStorageService } from "slices/cloudStorage";
 import copy from "clipboard-copy";
 import { useWorkspace } from "hooks/useWorkspace";
+import { useAsync } from "react-async-hook";
+import DescriptionIcon from "@mui/icons-material/Description";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+
+const FileList = ({
+  fileMetaDataList,
+}: {
+  fileMetaDataList: FileMetaData[];
+}) => {
+  const formatSize = (size: string) => {
+    let sizeNum = parseInt(size);
+    if (sizeNum < 1024) return `${sizeNum} bytes`;
+    if (sizeNum < 1024 * 1024) return `${(sizeNum / 1024).toFixed(2)} KB`;
+    return `${(sizeNum / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const handleView = (fileId: string) => { };
+
+  const handleShare = (fileId: string) => { };
+  return (
+    <List>
+      {fileMetaDataList.map((file, index) => (
+        <div key={file.id}>
+          <ListItem>
+            <ListItemIcon>
+              <DescriptionIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={file.name}
+              secondary={
+                <>
+                  <Typography variant="body2" color="textSecondary">
+                    Type: {file.mimeType}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Size: {formatSize(file.size)}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Modified: {new Date(file.modifiedTime).toLocaleString()}
+                  </Typography>
+                </>
+              }
+            />
+            <Stack direction="column" spacing={1} sx={{ mx: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => handleView(file.id)}
+              >
+                View
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                size="small"
+                onClick={() => handleShare(file.id)}
+              >
+                Share
+              </Button>
+            </Stack>
+          </ListItem>
+          {index < fileMetaDataList.length - 1 && <Divider />}
+        </div>
+      ))}
+    </List>
+  );
+};
 const FileComponent = ({
   saveFile,
   uploading,
@@ -43,7 +120,7 @@ const FileComponent = ({
         setLink(
           res === ""
             ? res
-            : `${window.location.origin}/#fetch-gdrive-file?fileId=${res}`
+            : `${window.location.origin}/#fetch-gdrive-file?fileId=${res}`,
         );
       } else {
         alert("Please select a file first");
@@ -69,7 +146,7 @@ const FileComponent = ({
         onClick={handleUpload}
         color="primary"
       >
-        {uploading ? <CircularProgress size={"25px"} /> : "Upload"}
+        {uploading ? <CircularProgress size={"25px"} /> : "Upload Workspace"}
       </Button>
 
       {link !== "" && (
@@ -107,6 +184,18 @@ const GoogleSignInButton = () => {
   const [authState] = useAuth();
   const [{ instance: cloudService }] = useCloudStorageService();
   const [uploading, setUploading] = useState<boolean>(false);
+  const [list, setList] = useState<FileMetaData[]>([]);
+  useAsync(async () => {
+    if (authState.authenticated) {
+      try {
+        const res = await cloudService?.getSavedFilesMetaData();
+        if (res) setList(res);
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, [cloudService, authState.authenticated]);
   if (authState == undefined) {
     return (
       <Typography variant="body2" align="center" color="text.secondary">
@@ -151,6 +240,8 @@ const GoogleSignInButton = () => {
             saveFile={cloudService?.saveFile}
             uploading={uploading}
           />
+          <Divider />
+          <FileList fileMetaDataList={list} />
         </div>
       )}
     </>
