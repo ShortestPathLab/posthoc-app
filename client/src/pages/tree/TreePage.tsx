@@ -49,7 +49,7 @@ import { Size } from "protocol";
 import { ComponentProps, useMemo, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
-import { EdgeArrowProgram } from "sigma/rendering";
+import { EdgeArrowProgram, NodePointProgram } from "sigma/rendering";
 import { Layer, useLayer } from "slices/layers";
 import { PanelState } from "slices/view";
 import { getShade } from "theme";
@@ -59,6 +59,8 @@ import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeMemo } from "./TreeWorker";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
+import { TreeAxis } from "./TreeAxis";
+import { CameraState } from "sigma/types";
 
 type TreePageContext = PanelState;
 
@@ -91,6 +93,7 @@ export function TreePage({ template: Page }: PageContentProps) {
     undefined,
     stepsLayerGuard
   );
+
   const trace = layer?.source?.trace?.content;
 
   const step = useThrottle(layer?.source?.step ?? 0, 1000 / 24);
@@ -145,6 +148,30 @@ export function TreePage({ template: Page }: PageContentProps) {
     [theme]
   );
 
+  const axisSettings = useMemo(
+    () =>
+      ({
+        allowInvalidContainer: true,
+        edgeLabelColor: { color: theme.palette.text.secondary },
+        labelFont: "Inter",
+        labelSize: 14,
+        edgeLabelFont: "Inter",
+        edgeLabelSize: 12,
+        defaultDrawNodeHover: () => {},
+        labelColor: { color: theme.palette.text.primary },
+        edgeLabelWeight: "500",
+        defaultEdgeType: "line",
+        autoCenter: true,
+        // defaultNodeType: "point",
+        // nodeProgramClasses: {
+        //   point: NodePointProgram,
+        // },
+      } as ComponentProps<typeof SigmaContainer>["settings"]),
+    [theme]
+  );
+
+  const [cameraPosition, setCameraPosition] = useState<CameraState>();
+
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>tree</Page.Key>
@@ -156,42 +183,62 @@ export function TreePage({ template: Page }: PageContentProps) {
             !loading ? (
               tree?.length ? (
                 <>
+                  {(!!selected.current || step) && (
+                    <SigmaContainer
+                      style={{
+                        width: "3%",
+                      }}
+                      settings={axisSettings}
+                    >
+                      <TreeAxis
+                        tree={tree}
+                        trace={trace}
+                        key={key}
+                        selectedNode={selected.current?.step || step}
+                        cameraStatus={cameraPosition}
+                      />
+                      {/* <TreeScaleEvents /> */}
+                    </SigmaContainer>
+                  )}
                   <AutoSize>
                     {(size: Size) => (
-                      <SigmaContainer
-                        style={{
-                          ...size,
-                          background: theme.palette.background.paper,
-                        }}
-                        graph={MultiDirectedGraph}
-                        settings={graphSettings}
-                      >
-                        <TreeGraph
-                          step={step}
-                          tree={tree}
-                          trace={trace}
-                          layer={layer}
-                          showAllEdges={layoutModes[mode].showAllEdges}
-                          trackedProperty={trackedProperty}
-                          highlightEdges={layer.source?.highlighting}
-                          onExit={() => {
-                            if (!isEmpty(layer?.source?.highlighting)) {
-                              setLayer(
-                                produce(layer, (l) =>
-                                  set(l?.source!, "highlighting", {})
-                                )!
-                              );
-                            }
+                      <>
+                        <SigmaContainer
+                          style={{
+                            ...size,
+                            background: theme.palette.background.paper,
                           }}
-                        />
-                        <GraphEvents
-                          layer={key}
-                          onSelection={(e) => {
-                            setSelection(e);
-                            setMenuOpen(true);
-                          }}
-                        />
-                      </SigmaContainer>
+                          graph={MultiDirectedGraph}
+                          settings={graphSettings}
+                        >
+                          <TreeGraph
+                            step={step}
+                            tree={tree}
+                            trace={trace}
+                            layer={layer}
+                            showAllEdges={layoutModes[mode].showAllEdges}
+                            trackedProperty={trackedProperty}
+                            highlightEdges={layer.source?.highlighting}
+                            onExit={() => {
+                              if (!isEmpty(layer?.source?.highlighting)) {
+                                setLayer(
+                                  produce(layer, (l) =>
+                                    set(l?.source!, "highlighting", {})
+                                  )!
+                                );
+                              }
+                            }}
+                          />
+                          <GraphEvents
+                            key={key}
+                            onSelection={(e) => {
+                              setSelection(e);
+                              setMenuOpen(true);
+                            }}
+                            onRerender={setCameraPosition}
+                          />
+                        </SigmaContainer>
+                      </>
                     )}
                   </AutoSize>
                   <Menu

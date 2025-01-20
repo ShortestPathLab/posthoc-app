@@ -99,6 +99,9 @@ export type TreeGraphProps = {
   onExit?: () => void;
 };
 
+export type NodeType = { x: number; y: number; label: string; size: number };
+export type EdgeType = { label: string };
+
 export function TreeGraph(props: TreeGraphProps) {
   const { trace, tree, layer, highlightEdges, onExit } = props;
 
@@ -119,7 +122,9 @@ export function TreeGraph(props: TreeGraphProps) {
 
   const graph = useGraphColoring(baseGraph, props);
 
-  useEffect(() => load?.(graph.graph), [graph, load]);
+  useEffect(() => {
+    load?.(graph.graph);
+  }, [graph, load]);
 
   const isHighlightingEnabled = !isEmpty(highlightEdges);
 
