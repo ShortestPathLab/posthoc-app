@@ -79,7 +79,6 @@ export const [useUIState, UIStateProvider] = createSlice<
     screenshots: [],
     author: "",
     size: 0,
-    uploaded: false,
   },
   isTrusted: false,
   origin: undefined,

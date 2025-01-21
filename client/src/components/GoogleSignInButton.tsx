@@ -120,13 +120,9 @@ const UploadWorkspace = () => {
   const [{ instance: cloudService }] = useCloudStorageService();
   const [link, setLink] = useState<string>("");
   const { generateWorkspaceFile } = useWorkspace();
-  const [uiState, setUiState] = useUIState();
   const handleUpload = async () => {
     try {
       setUploading(true);
-      setUiState((prev) => ({
-        workspaceMeta: { ...prev.workspaceMeta, uploaded: true },
-      }));
       const { compressedFile } = await generateWorkspaceFile();
       if (authState.authenticated && compressedFile) {
         const res = await cloudService?.saveFile(compressedFile);
