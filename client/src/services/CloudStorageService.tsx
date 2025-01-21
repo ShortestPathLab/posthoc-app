@@ -32,6 +32,7 @@ export interface CloudStorageService<K extends string> {
     fileId?: string,
   ) => Promise<string>;
   getFile: (fileId: string) => Promise<File>;
+  deleteFile: (fileId: string) => Promise<File>;
   generateLink: (fileId: string) => string;
   getSavedFilesMetaData: () => Promise<FileMetaData[]>;
 }
