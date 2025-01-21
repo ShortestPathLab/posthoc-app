@@ -43,9 +43,9 @@ const services = [
   LayerService,
   LogCaptureService,
   SettingsService,
+  BootstrapService,
   CloudStorageService,
   FetchDriveFileService,
-  BootstrapService,
 ];
 
 function App() {

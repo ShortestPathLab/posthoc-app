@@ -1,7 +1,8 @@
-import { CloudStorageService } from "services/CloudStorageService";
+import { CloudStorageService, providers } from "services/CloudStorageService";
 import { createSlice } from "./createSlice";
 
-type CloudStorageServiceSliceType = {instance?: CloudStorageService} 
-export const [useCloudStorageService, CloudStorageServiceProvider] = createSlice<CloudStorageServiceSliceType>(
-  {},
-);
+type CloudStorageServiceSliceType = {
+  instance?: CloudStorageService<keyof typeof providers>;
+};
+export const [useCloudStorageService, CloudStorageServiceProvider] =
+  createSlice<CloudStorageServiceSliceType>({});

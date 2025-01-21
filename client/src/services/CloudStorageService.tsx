@@ -20,7 +20,8 @@ export type FileMetaData = {
   size: string;
 };
 
-export interface CloudStorageService {
+export interface CloudStorageService<K extends string> {
+  id: K;
   checkAuth: () => Promise<AuthState>;
   authenticate: () => Promise<void>;
   logout: () => Promise<void>;
@@ -28,7 +29,7 @@ export interface CloudStorageService {
   saveFile: (
     searchTrace: File,
     fileMetaData?: FileMetaDataType,
-    fileId?: string
+    fileId?: string,
   ) => Promise<string>;
   getFile: (fileId: string) => Promise<File>;
   generateLink: (fileId: string) => string;
@@ -37,8 +38,8 @@ export interface CloudStorageService {
 
 function createGoogleStorageService(
   storedToken: string,
-  updateState: (newState: AuthState) => Promise<boolean>
-): CloudStorageService {
+  updateState: (newState: AuthState) => Promise<boolean>,
+): CloudStorageService<"google"> {
   const scope = "https://www.googleapis.com/auth/drive.file";
   const authLink = "https://accounts.google.com/o/oauth2/v2/auth";
   const googleDriveAPI = "https://www.googleapis.com/drive/v3/files";
@@ -47,6 +48,7 @@ function createGoogleStorageService(
   const googleFolderMimeType = "application/vnd.google-apps.folder";
   const clientId = import.meta.env.VITE_CLIENT_ID;
   const apiKey = import.meta.env.VITE_API_KEY;
+  const id = "google";
 
   const authenticate = async () => {
     const url = new URL(authLink);
@@ -64,7 +66,7 @@ function createGoogleStorageService(
     return new Promise<AuthState>((resolve, reject) => {
       if (window.location.hash) {
         const hashParams = new URLSearchParams(
-          window.location.hash.substring(1)
+          window.location.hash.substring(1),
         );
 
         const accessToken = hashParams.get("access_token");
@@ -121,21 +123,21 @@ function createGoogleStorageService(
   };
 
   const checkParentFolderExists = async (
-    parentName: string
+    parentName: string,
   ): Promise<string | null> => {
     const folderMimeType = googleFolderMimeType;
     const query = `name = '${parentName}' and mimeType = '${folderMimeType}' and trashed = false`;
     try {
       const response = await fetch(
         `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(
-          query
+          query,
         )}&fields=files(id,name)`,
         {
           method: "GET",
           headers: {
             Authorization: `Bearer ${await getAccessToken()}`,
           },
-        }
+        },
       );
 
       const data = await response.json();
@@ -195,10 +197,10 @@ function createGoogleStorageService(
     try {
       const [metadataResponse, mediaResponse] = await Promise.all([
         fetch(
-          `https://www.googleapis.com/drive/v3/files/${fileId}?key=${apiKey}`
+          `https://www.googleapis.com/drive/v3/files/${fileId}?key=${apiKey}`,
         ),
         fetch(
-          `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`
+          `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`,
         ),
       ]);
       const metadata = await metadataResponse.json();
@@ -228,7 +230,7 @@ function createGoogleStorageService(
       const form = new FormData();
       form.append(
         "metadata",
-        new Blob([JSON.stringify(fileMetaData)], { type: "application/json" })
+        new Blob([JSON.stringify(fileMetaData)], { type: "application/json" }),
       );
       form.append("file", file);
       const response = await fetch(
@@ -239,7 +241,7 @@ function createGoogleStorageService(
             Authorization: `Bearer ${await getAccessToken()}`,
           },
           body: form,
-        }
+        },
       );
 
       if (!response.ok) {
@@ -252,7 +254,7 @@ function createGoogleStorageService(
       return publicURL;
     } catch (error) {
       console.log("Error uploading file: ", error);
-      throw new Error("Failed to save file")
+      throw new Error("Failed to save file");
     }
   };
 
@@ -263,7 +265,7 @@ function createGoogleStorageService(
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`, // Pass the access token here
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -290,7 +292,7 @@ function createGoogleStorageService(
           headers: {
             Authorization: `Bearer ${await getAccessToken()}`, // Pass the access token here
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -305,11 +307,13 @@ function createGoogleStorageService(
   };
 
   const generateLink = (fileId: string) => {
-    return `${window.location.origin}/#fetch-gdrive-file?fileId=${fileId}`;
+    return `${window.location.origin}?workspaceFile=${id}:${fileId}`;
   };
-  const logout = async () => {};
+
+  const logout = async () => { };
 
   return {
+    id,
     checkAuth,
     authenticate,
     logout,
@@ -320,15 +324,15 @@ function createGoogleStorageService(
   };
 }
 
-type ProviderFactory<A extends AccessToken = unknown> = (
+type ProviderFactory<K extends string, A extends AccessToken = unknown> = (
   accessToken: A,
-  updateState: (newState: AuthState) => Promise<boolean>
-) => CloudStorageService;
+  updateState: (newState: AuthState) => Promise<boolean>,
+) => CloudStorageService<K>;
 
 export const providers = {
   google: createGoogleStorageService,
   // github: createGoogleStorageService,
-} satisfies Dictionary<ProviderFactory<any>>;
+} satisfies { [K in string]: ProviderFactory<K, any> };
 
 export function CloudStorageService() {
   const [, setCloudStorageService] = useCloudStorageService();

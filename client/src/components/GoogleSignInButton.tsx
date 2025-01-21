@@ -24,7 +24,6 @@ import { useAsync } from "react-async-hook";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { useLoadingState } from "slices/loading";
 import { useSnackbar } from "./generic/Snackbar";
-import { useUIState } from "slices/UIState";
 
 const FileList = ({
   fileMetaDataList,

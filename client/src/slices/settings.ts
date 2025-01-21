@@ -2,6 +2,7 @@ import type { pages } from "pages";
 import { createSlice, withLocalStorage } from "./createSlice";
 import { AccentColor } from "theme";
 import { providers } from "services/CloudStorageService";
+import { keys } from "lodash";
 
 export type Sources = {
   trustedOrigins?: string[];
@@ -20,11 +21,6 @@ export type Renderer = {
   transport: string;
   disabled?: boolean;
 };
-
-
-
-// todo: change to keys if cloudservicees obj
-export type CloudServiceType = "google" | "github";
 
 export type Settings = {
   remote?: Remote[];
@@ -66,7 +62,8 @@ export const defaultPlaybackRate = 1;
 //   expiresIn: null,
 // };
 
-export const defaultCloudStorage = "google";
+export const defaultCloudStorage = keys(providers)[0] as keyof typeof providers;
+
 export const defaults = {
   renderer: defaultRenderers,
   remote: defaultRemotes,
@@ -81,5 +78,5 @@ export const defaults = {
 
 export const [useSettings, SettingsProvider] = createSlice<Settings>(
   {},
-  withLocalStorage("settings", defaults)
+  withLocalStorage("settings", defaults),
 );
