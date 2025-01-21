@@ -11,10 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import {
-  CloudStorageService,
-  FileMetaData,
-} from "services/CloudStorageService";
+import { FileMetaData } from "services/CloudStorageService";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Button } from "./generic/Button";
 import { MouseEventHandler, useState } from "react";
@@ -25,13 +22,19 @@ import copy from "clipboard-copy";
 import { useWorkspace } from "hooks/useWorkspace";
 import { useAsync } from "react-async-hook";
 import DescriptionIcon from "@mui/icons-material/Description";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import { useLoadingState } from "slices/loading";
+import { useSnackbar } from "./generic/Snackbar";
+import { useUIState } from "slices/UIState";
 
 const FileList = ({
   fileMetaDataList,
 }: {
   fileMetaDataList: FileMetaData[];
 }) => {
+  const usingLoadingState = useLoadingState();
+  const [{ instance: cloudService }] = useCloudStorageService();
+  const notify = useSnackbar();
+  const { load } = useWorkspace();
   const formatSize = (size: string) => {
     let sizeNum = parseInt(size);
     if (sizeNum < 1024) return `${sizeNum} bytes`;
@@ -39,9 +42,28 @@ const FileList = ({
     return `${(sizeNum / (1024 * 1024)).toFixed(2)} MB`;
   };
 
-  const handleView = (fileId: string) => { };
+  const handleView = async (fileId: string) => {
+    usingLoadingState(async () => {
+      try {
+        const file = await cloudService?.getFile(fileId);
+        load(file);
+      } catch (error) {
+        notify("Failed to fetch file from source");
+      }
+    });
+  };
 
-  const handleShare = (fileId: string) => { };
+  const handleShare = async (fileId: string) => {
+    try {
+      const link = cloudService?.generateLink(fileId);
+      if (link) await copy(link);
+      else {
+        throw new Error("Unable to generate link");
+      }
+    } catch (error) {
+      notify("Unable to generate link");
+    }
+  };
   return (
     <List>
       {fileMetaDataList.map((file, index) => (
@@ -91,55 +113,46 @@ const FileList = ({
     </List>
   );
 };
-const FileComponent = ({
-  saveFile,
-  uploading,
-}: {
-  uploading: boolean;
-  saveFile?: CloudStorageService["saveFile"];
-}) => {
-  const [authState, setAuthState] = useAuth();
-  const [fileName, setFileName] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+const UploadWorkspace = () => {
+  const [uploading, setUploading] = useState(false);
+  const notify = useSnackbar();
+  const [authState] = useAuth();
+  const [{ instance: cloudService }] = useCloudStorageService();
   const [link, setLink] = useState<string>("");
   const { generateWorkspaceFile } = useWorkspace();
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setFileName(file.name);
-    }
-  };
+  const [uiState, setUiState] = useUIState();
   const handleUpload = async () => {
     try {
-      setAuthState(() => ({}));
+      setUploading(true);
+      setUiState((prev) => ({
+        workspaceMeta: { ...prev.workspaceMeta, uploaded: true },
+      }));
       const { compressedFile } = await generateWorkspaceFile();
-      if (compressedFile) {
-        const res = await saveFile?.(compressedFile);
-        // todo: handle file not being saved
-        setLink(
-          res === ""
-            ? res
-            : `${window.location.origin}/#fetch-gdrive-file?fileId=${res}`,
-        );
+      if (authState.authenticated && compressedFile) {
+        const res = await cloudService?.saveFile(compressedFile);
+        setLink(res ? (cloudService?.generateLink(res) ?? "") : "");
       } else {
-        alert("Please select a file first");
+        // ? allow empty workspace upload?
+        notify("Please start a workspace first");
       }
     } catch (error) {
       console.log(error);
+      notify("Unable to upload workspace right now");
+    } finally {
+      setUploading(false);
     }
   };
 
-  const handleCopy: MouseEventHandler<HTMLButtonElement> = async (e) => {
+  const handleCopy: MouseEventHandler<HTMLButtonElement> = async () => {
     try {
       await copy(link);
     } catch (error) {
-      console.log(error);
+      notify("Unable to copy url, pls copy manually");
     }
   };
 
   return (
-    <>
+    <div style={{ margin: "1em auto" }}>
       <Button
         disabled={uploading}
         variant="contained"
@@ -175,7 +188,7 @@ const FileComponent = ({
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 
@@ -183,16 +196,19 @@ const GoogleSignInButton = () => {
   // const { cloudService } = useSavedLogsService("google");
   const [authState] = useAuth();
   const [{ instance: cloudService }] = useCloudStorageService();
-  const [uploading, setUploading] = useState<boolean>(false);
   const [list, setList] = useState<FileMetaData[]>([]);
+  const [loadingSavedFilesMetaData, setSavedFilesMetaData] = useState(false);
   useAsync(async () => {
     if (authState.authenticated) {
       try {
+        setSavedFilesMetaData(true);
         const res = await cloudService?.getSavedFilesMetaData();
         if (res) setList(res);
         console.log(res);
       } catch (error) {
         console.log(error);
+      } finally {
+        setSavedFilesMetaData(false);
       }
     }
   }, [cloudService, authState.authenticated]);
@@ -234,14 +250,24 @@ const GoogleSignInButton = () => {
           </Typography>
         </IconButton>
       ) : (
-        <div style={{ padding: "20px" }}>
+        <div
+          style={{
+            padding: "20px",
+            display: "flex",
+            flexDirection: "column",
+            rowGap: "1em",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
           {/* how to handle uploading? */}
-          <FileComponent
-            saveFile={cloudService?.saveFile}
-            uploading={uploading}
-          />
-          <Divider />
-          <FileList fileMetaDataList={list} />
+          <UploadWorkspace />
+          {loadingSavedFilesMetaData ? (
+            <CircularProgress size={30} />
+          ) : (
+            <FileList fileMetaDataList={list} />
+          )}
         </div>
       )}
     </>
