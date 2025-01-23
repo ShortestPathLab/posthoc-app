@@ -49,7 +49,7 @@ import { Size } from "protocol";
 import { ComponentProps, useMemo, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
-import { EdgeArrowProgram, NodePointProgram } from "sigma/rendering";
+import { EdgeArrowProgram } from "sigma/rendering";
 import { Layer, useLayer } from "slices/layers";
 import { PanelState } from "slices/view";
 import { getShade } from "theme";
@@ -60,7 +60,6 @@ import { useTreeMemo } from "./TreeWorker";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
 import { TreeAxis } from "./TreeAxis";
-import { CameraState } from "sigma/types";
 
 type TreePageContext = PanelState;
 
@@ -148,30 +147,6 @@ export function TreePage({ template: Page }: PageContentProps) {
     [theme]
   );
 
-  const axisSettings = useMemo(
-    () =>
-      ({
-        allowInvalidContainer: true,
-        edgeLabelColor: { color: theme.palette.text.secondary },
-        labelFont: "Inter",
-        labelSize: 14,
-        edgeLabelFont: "Inter",
-        edgeLabelSize: 12,
-        defaultDrawNodeHover: () => {},
-        labelColor: { color: theme.palette.text.primary },
-        edgeLabelWeight: "500",
-        defaultEdgeType: "line",
-        autoCenter: true,
-        // defaultNodeType: "point",
-        // nodeProgramClasses: {
-        //   point: NodePointProgram,
-        // },
-      } as ComponentProps<typeof SigmaContainer>["settings"]),
-    [theme]
-  );
-
-  const [cameraPosition, setCameraPosition] = useState<CameraState>();
-
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>tree</Page.Key>
@@ -183,23 +158,6 @@ export function TreePage({ template: Page }: PageContentProps) {
             !loading ? (
               tree?.length ? (
                 <>
-                  {(!!selected.current || step) && (
-                    <SigmaContainer
-                      style={{
-                        width: "3%",
-                      }}
-                      settings={axisSettings}
-                    >
-                      <TreeAxis
-                        tree={tree}
-                        trace={trace}
-                        key={key}
-                        selectedNode={selected.current?.step || step}
-                        cameraStatus={cameraPosition}
-                      />
-                      {/* <TreeScaleEvents /> */}
-                    </SigmaContainer>
-                  )}
                   <AutoSize>
                     {(size: Size) => (
                       <>
@@ -230,13 +188,19 @@ export function TreePage({ template: Page }: PageContentProps) {
                             }}
                           />
                           <GraphEvents
-                            key={key}
+                            layerKey={key}
                             onSelection={(e) => {
                               setSelection(e);
                               setMenuOpen(true);
                             }}
-                            onRerender={setCameraPosition}
                           />
+                          <TreeAxis
+                            tree={tree}
+                            trace={trace}
+                            key={key}
+                            height={size.height}
+                            width={size.width}
+                          ></TreeAxis>
                         </SigmaContainer>
                       </>
                     )}

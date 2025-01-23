@@ -1,6 +1,5 @@
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
 import { useEffect } from "react";
-import { CameraState } from "sigma/types";
 
 export type Selection = {
   event: MouseEvent | TouchEvent;
@@ -8,13 +7,11 @@ export type Selection = {
 };
 
 export function GraphEvents({
-  key,
+  layerKey,
   onSelection,
-  onRerender,
 }: {
-  key?: string;
+  layerKey?: string;
   onSelection?: (e: Selection) => void;
-  onRerender?: (cameraPosition: CameraState) => void;
 }) {
   const sigma = useSigma();
   const registerEvents = useRegisterEvents();
@@ -31,11 +28,7 @@ export function GraphEvents({
       leaveNode: () => {
         document.body.style.cursor = "";
       },
-      beforeRender: () => {
-        const cameraStatus = sigma.getCamera().getState();
-        onRerender?.(cameraStatus);
-      },
     });
-  }, [key, registerEvents, sigma]);
+  }, [layerKey, registerEvents, sigma]);
   return null;
 }
