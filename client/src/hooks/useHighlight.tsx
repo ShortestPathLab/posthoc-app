@@ -137,7 +137,6 @@ export function useHighlightNodes(key?: string): {
         const path = {
           [current.step]: getPrecedentEvents(current, new Set<number>()),
         };
-        console.log(path);
         if (Object.keys(path[current.step]).length > 0) {
           setLayer(
             produce(layer, (l) =>
