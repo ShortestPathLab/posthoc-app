@@ -21,6 +21,7 @@ import {
   isTraceFormat,
   readUploadedTrace,
 } from "components/app-bar/upload";
+import Editor from "components/generic/ListEditor";
 import {
   PropertyDialog,
   PropertyList,
@@ -28,14 +29,14 @@ import {
 import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { Heading, Option } from "components/layer-editor/Option";
 import { TracePreview } from "components/layer-editor/TracePreview";
-import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { colorsHex } from "components/renderer/colors";
+import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/ParseTraceSlaveWorker";
 import { DebugLayerData } from "hooks/useBreakpoints";
 import { useTraceContent } from "hooks/useTraceContent";
 import { dump } from "js-yaml";
-import { LayerController, inferLayerName } from "layers";
+import { inferLayerName, LayerController } from "layers";
 import {
   chain,
   get,
@@ -47,30 +48,28 @@ import {
   merge,
   negate,
   pick,
-  set,
   startCase,
 } from "lodash";
-import { nanoid as id } from "nanoid";
+import { nanoid } from "nanoid";
 import { produce, withProduce } from "produce";
 import { Trace as TraceLegacy } from "protocol";
 import { Trace } from "protocol/Trace-v140";
 import { useEffect, useMemo } from "react";
 import { useAsync, useThrottle } from "react-use";
-import { UploadedTrace } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
-import { useSettings } from "slices/settings";
+import { UploadedTrace } from "slices/UIState";
 import { AccentColor, accentColors, getShade } from "theme";
 import { name } from "utils/path";
+import { set } from "utils/set";
+import { parseYamlAsync } from "workers/async";
 import { TrustedLayerData } from "../TrustedLayerData";
 import { use2DPath } from "./use2DPath";
-import Editor from "components/generic/ListEditor";
-import { parseYamlAsync } from "workers/async";
 
 export type TraceLayerData = {
   trace?: UploadedTrace & { error?: string };
   parsedTrace?: {
-    components: ParseTraceWorkerReturnType;
-    content: Trace & TraceLegacy;
+    components?: ParseTraceWorkerReturnType;
+    content?: Trace | TraceLegacy;
     error?: string;
   };
   onion?: "off" | "transparent" | "solid";
@@ -102,7 +101,7 @@ export const controller = {
               notify(`Error opening, ${get(e, "message")}`);
               return {
                 trace: {
-                  key: id(),
+                  key: nanoid(),
                   id: custom().id,
                   error: get(e, "message"),
                   name: startCase(name(file.name)),
@@ -182,7 +181,7 @@ export const controller = {
           color: {
             ...colorsHex,
             ...mapValues(accentColors, (_, v: AccentColor) =>
-              getShade(v, palette.mode, 500, 400),
+              getShade(v, palette.mode, 500, 400)
             ),
           },
           themeAccent: palette.primary.main,
@@ -192,7 +191,7 @@ export const controller = {
         view: "main",
       },
       isTrusted,
-      [trace?.key, palette.mode, isTrusted],
+      [trace?.key, palette.mode, isTrusted]
     );
     // Parse the trace
     useAsync(async () => {
@@ -200,7 +199,7 @@ export const controller = {
         const parsedTrace = await parseTrace();
         produce((l) => {
           set(l, "source.parsedTrace", parsedTrace);
-          set(l, "viewKey", id());
+          set(l, "viewKey", nanoid());
         });
       }
     }, [loading, parseTrace]);
@@ -226,8 +225,8 @@ export const controller = {
                 sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
                 sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
               },
-            }),
-          ),
+            })
+          )
         ),
       [
         parsedTrace?.stepsPersistent,
@@ -235,7 +234,7 @@ export const controller = {
         layer?.transparency,
         layer?.displayMode,
         index,
-      ],
+      ]
     );
     const steps1 = useMemo(
       () =>
@@ -248,8 +247,8 @@ export const controller = {
                 sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
                 sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
               },
-            }),
-          ),
+            })
+          )
         ),
       [
         parsedTrace?.stepsTransient,
@@ -257,7 +256,7 @@ export const controller = {
         layer?.transparency,
         layer?.displayMode,
         index,
-      ],
+      ]
     );
     const transientSteps = useMemo(() => [steps1[step] ?? []], [steps1, step]);
     return (
@@ -299,7 +298,7 @@ export const controller = {
                   },
                 },
               })),
-              "key",
+              "key"
             ),
             [layer.key]: {
               primary: inferLayerName(layer),
@@ -342,7 +341,7 @@ export const controller = {
                     setLayer(
                       produce(layer, (l) => {
                         set(l, "source.step", step);
-                      }),
+                      })
                     ),
                   icon: <ArrowOutwardRounded />,
                 },
@@ -371,23 +370,20 @@ export const controller = {
     } else return [];
   },
   onEditSource: async (layer, id, content) => {
-    if (id !== "trace") {
-      // throw new Error("Invalid layer type");
-      console.log(id);
-    }
+    try {
+      if (id !== "trace") throw { error: "id not trace", id };
+      if (!layer || !content)
+        throw { error: "layer or content is undefined", layer, content };
 
-    if (layer && content) {
-      try {
-        const updatedLayerSource = await parseYamlAsync(content);
-        console.log(updatedLayerSource);
-        layer.source = updatedLayerSource;
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      console.log("layer or content is undefined", layer, content);
+      const updatedLayerSource = await parseYamlAsync(content);
+      // Set the trace content
+      set(layer, "source.trace.content", updatedLayerSource);
+      // To get things to change, we also need to change the trace key
+      set(layer, "source.trace.key", nanoid());
+      console.log(layer);
+      return layer;
+    } catch (error) {
+      console.error(error);
     }
-
-    return layer;
   },
 } satisfies LayerController<"trace", TraceLayerData>;

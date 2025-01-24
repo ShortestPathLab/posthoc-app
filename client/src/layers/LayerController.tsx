@@ -14,6 +14,7 @@ export type SelectionInfoProvider = FC<{
 
 export type LayerSource = Feature & {
   language?: string;
+  readonly?: boolean;
 };
 
 export type LayerController<K extends string, T> = {
@@ -38,6 +39,6 @@ export type LayerController<K extends string, T> = {
   onEditSource?: (
     layer?: Layer<T>,
     id?: string,
-    content?: string,
+    content?: string
   ) => Promise<Layer<T> | undefined>;
 };

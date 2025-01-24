@@ -8,12 +8,13 @@ import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 import { LayerSource } from "layers";
 import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
+import { transactionAsync } from "produce";
+import { useEffect, useMemo } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Layer, useLayer } from "slices/layers";
-import { divider } from "./Page";
+import { useLoadingState } from "slices/loading";
+import { debounceLifo } from "utils/debounceLifo";
 import { PageContentProps } from "./PageMeta";
-import { useMemo } from "react";
-import { produce } from "produce";
 
 type SourceLayer = Layer;
 
@@ -26,7 +27,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
   useMonacoTheme(theme);
 
-  const { layers, setLayer, layer, key } = useLayer(undefined, isSourceLayer);
+  const { layers, setLayer, setKey } = useLayer(undefined, isSourceLayer);
 
   const sources = useMemo(
     () =>
@@ -37,22 +38,50 @@ export function SourcePage({ template: Page }: PageContentProps) {
             ?.map?.((c) => ({
               layer: l.key,
               source: c,
-            })),
+            }))
         // why is layer string here?
+        // layer is only the layer id
       ) as { layer: string; source: LayerSource }[],
-    [layers],
+    [layers]
   );
 
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<SourceLayerState>();
 
+  const usingLoading = useLoadingState("layers");
+
   const selected = useMemo(
     () =>
       find(
         sources,
-        (c) => c && c.source.id === state?.source && c.layer === state?.layer,
+        (c) => c && c.source.id === state?.source && c.layer === state?.layer
       ) ?? first(sources),
-    [sources, state?.source, state?.layer],
+    [sources, state?.source, state?.layer]
+  );
+  useEffect(
+    () => void (selected?.layer && setKey(selected?.layer)),
+    [setKey, selected?.layer]
+  );
+
+  const handleEditorContentChange = useMemo(
+    () =>
+      debounceLifo((value) =>
+        usingLoading(() =>
+          setLayer(
+            async (l) =>
+              (await transactionAsync(
+                l,
+                async (l) =>
+                  await getController(l)?.onEditSource?.(
+                    l,
+                    selected?.source?.id,
+                    value
+                  )
+              )) ?? l
+          )
+        )
+      ),
+    [usingLoading, selected?.source?.id, setLayer]
   );
 
   return (
@@ -65,31 +94,27 @@ export function SourcePage({ template: Page }: PageContentProps) {
         {sources?.length ? (
           <Flex pt={6}>
             <AutoSize>
-              {(size) => (
+              {(size: { width: number; height: number }) => (
                 <Editor
+                  // Refresh the editor when the id changes
+                  key={selected?.source?.id}
                   theme={
                     theme.palette.mode === "dark" ? "posthoc-dark" : "light"
                   }
                   options={{
-                    readOnly: false,
+                    readOnly: !!selected?.source?.readonly,
                   }}
                   language={selected?.source?.language}
                   loading={<CircularProgress variant="indeterminate" />}
                   {...size}
-                  value={selected?.source?.content}
-                  onChange={async (value) => {
-                    console.log(value);
-                    const modifiedLayer = produce(layer, async (layer) => {
-                      console.log(getController(layer)?.onEditSource);
-                      return await getController(layer)?.onEditSource?.(
-                        layer,
-                        key,
-                        value,
-                      );
-                    });
-                    console.log(modifiedLayer);
-                    if (modifiedLayer) setLayer(modifiedLayer);
+                  // If source is readonly, use value, so the value updates the editor.
+                  // Otherwise, don't update the editor when value changes
+                  // for better editing experience
+                  {...{
+                    [selected?.source?.readonly ? "value" : "defaultValue"]:
+                      selected?.source?.content,
                   }}
+                  onChange={handleEditorContentChange}
                 />
               )}
             </AutoSize>

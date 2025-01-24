@@ -332,6 +332,7 @@ export const controller = {
         id: "params",
         name: "Query",
         language: "yaml",
+        readonly: true,
         content: dump(
           {
             algorithm,
