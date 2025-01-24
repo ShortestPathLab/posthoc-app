@@ -104,18 +104,16 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
 }
 
 function TraceRendererCircularProgress() {
-  const [{ map, specimen }] = useLoading();
-  return (
-    !!(map || specimen) && (
-      <CircularProgress
-        sx={{
-          position: "absolute",
-          top: (t) => t.spacing(6 + 2),
-          right: (t) => t.spacing(2),
-        }}
-      />
-    )
-  );
+  const [{ layers }] = useLoading();
+  return layers ? (
+    <CircularProgress
+      sx={{
+        position: "absolute",
+        top: (t) => t.spacing(6 + 2),
+        right: (t) => t.spacing(2),
+      }}
+    />
+  ) : null;
 }
 
 const VIEWPORT_PAGE_DESCRIPTION =
