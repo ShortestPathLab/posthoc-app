@@ -38,6 +38,6 @@ export type LayerController<K extends string, T> = {
   onEditSource?: (
     layer?: Layer<T>,
     id?: string,
-    content?: string
-  ) => Layer<T> | undefined;
+    content?: string,
+  ) => Promise<Layer<T> | undefined>;
 };

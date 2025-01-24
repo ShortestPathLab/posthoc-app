@@ -1,4 +1,5 @@
 import { MapOutlined } from "@mui-symbols-material/w400";
+import { Source } from "@mui/icons-material";
 import { CircularProgress, Typography } from "@mui/material";
 import { MapPicker } from "components/app-bar/Input";
 import { custom, readUploadedMap } from "components/app-bar/upload";
@@ -29,6 +30,7 @@ import { useMemo } from "react";
 import { Map } from "slices/UIState";
 import { Layer, useLayer } from "slices/layers";
 import { ext, name } from "utils/path";
+import { parseYamlAsync } from "workers/async";
 
 export type MapLayerData = {
   map?: Map;
@@ -58,7 +60,7 @@ export const controller = {
                 file,
                 entries(mapParsers).map(([k]) => ({
                   id: k,
-                }))
+                })),
               );
               return { map: { ...(await output.read()) } };
             } catch (e) {
@@ -139,7 +141,7 @@ export const controller = {
           },
         })),
       ],
-      [nodes, index, layer?.transparency, layer?.displayMode]
+      [nodes, index, layer?.transparency, layer?.displayMode],
     );
     return <NodeList nodes={nodes2} />;
   },
@@ -147,7 +149,7 @@ export const controller = {
     const { result: mapContent } = useMapContent(value?.source?.map);
     const { result: parsedMap, loading } = useParsedMap(
       mapContent,
-      value?.source?.options
+      value?.source?.options,
     );
     useEffectWhen(
       () => {
@@ -159,7 +161,7 @@ export const controller = {
         }
       },
       [parsedMap, produce, loading],
-      [parsedMap]
+      [parsedMap],
     );
     return <></>;
   }),
@@ -169,7 +171,7 @@ export const controller = {
     const { point, node } = useMemo(() => {
       if (parsedMap && event) {
         const hydratedMap = getParser(layer?.source?.map?.format)?.hydrate?.(
-          parsedMap
+          parsedMap,
         );
         if (hydratedMap) {
           const point = event?.world && hydratedMap.snap(event.world);
@@ -197,7 +199,7 @@ export const controller = {
             },
           }),
       }),
-      [point, node, layer, layers, setLayer]
+      [point, node, layer, layers, setLayer],
     );
     return <>{children?.(menu)}</>;
   },
@@ -215,12 +217,19 @@ export const controller = {
       ];
     } else return [];
   },
-  onEditSource: (layer, id, content) => {
-    switch (id) {
-      case "map":
-        // Object.assign(layer?.source?.map.)
-        break;
+  onEditSource: async (layer, id, content) => {
+    if (layer && content) {
+      try {
+        const updatedLayerSource = await parseYamlAsync(content);
+        console.log(updatedLayerSource);
+        layer.source = updatedLayerSource;
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log("layer or content is undefined", layer, content);
     }
+
     return layer;
   },
 } satisfies LayerController<"map", MapLayerData>;

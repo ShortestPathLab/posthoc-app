@@ -63,6 +63,8 @@ import { AccentColor, accentColors, getShade } from "theme";
 import { name } from "utils/path";
 import { TrustedLayerData } from "../TrustedLayerData";
 import { use2DPath } from "./use2DPath";
+import Editor from "components/generic/ListEditor";
+import { parseYamlAsync } from "workers/async";
 
 export type TraceLayerData = {
   trace?: UploadedTrace & { error?: string };
@@ -180,7 +182,7 @@ export const controller = {
           color: {
             ...colorsHex,
             ...mapValues(accentColors, (_, v: AccentColor) =>
-              getShade(v, palette.mode, 500, 400)
+              getShade(v, palette.mode, 500, 400),
             ),
           },
           themeAccent: palette.primary.main,
@@ -190,7 +192,7 @@ export const controller = {
         view: "main",
       },
       isTrusted,
-      [trace?.key, palette.mode, isTrusted]
+      [trace?.key, palette.mode, isTrusted],
     );
     // Parse the trace
     useAsync(async () => {
@@ -224,8 +226,8 @@ export const controller = {
                 sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
                 sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
               },
-            })
-          )
+            }),
+          ),
         ),
       [
         parsedTrace?.stepsPersistent,
@@ -233,7 +235,7 @@ export const controller = {
         layer?.transparency,
         layer?.displayMode,
         index,
-      ]
+      ],
     );
     const steps1 = useMemo(
       () =>
@@ -246,8 +248,8 @@ export const controller = {
                 sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
                 sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
               },
-            })
-          )
+            }),
+          ),
         ),
       [
         parsedTrace?.stepsTransient,
@@ -255,7 +257,7 @@ export const controller = {
         layer?.transparency,
         layer?.displayMode,
         index,
-      ]
+      ],
     );
     const transientSteps = useMemo(() => [steps1[step] ?? []], [steps1, step]);
     return (
@@ -297,7 +299,7 @@ export const controller = {
                   },
                 },
               })),
-              "key"
+              "key",
             ),
             [layer.key]: {
               primary: inferLayerName(layer),
@@ -340,7 +342,7 @@ export const controller = {
                     setLayer(
                       produce(layer, (l) => {
                         set(l, "source.step", step);
-                      })
+                      }),
                     ),
                   icon: <ArrowOutwardRounded />,
                 },
@@ -353,6 +355,7 @@ export const controller = {
     }, [layer, event]);
     return <>{children?.(menu)}</>;
   },
+
   getSources: (layer) => {
     const trace = layer?.source?.trace;
     if (trace) {
@@ -362,8 +365,29 @@ export const controller = {
           name: `${trace.name}`,
           language: "yaml",
           content: dump(trace.content, { noCompatMode: true }),
+          editor: Editor,
         },
       ];
     } else return [];
+  },
+  onEditSource: async (layer, id, content) => {
+    if (id !== "trace") {
+      // throw new Error("Invalid layer type");
+      console.log(id);
+    }
+
+    if (layer && content) {
+      try {
+        const updatedLayerSource = await parseYamlAsync(content);
+        console.log(updatedLayerSource);
+        layer.source = updatedLayerSource;
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log("layer or content is undefined", layer, content);
+    }
+
+    return layer;
   },
 } satisfies LayerController<"trace", TraceLayerData>;

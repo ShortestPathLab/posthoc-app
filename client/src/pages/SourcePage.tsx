@@ -13,6 +13,7 @@ import { Layer, useLayer } from "slices/layers";
 import { divider } from "./Page";
 import { PageContentProps } from "./PageMeta";
 import { useMemo } from "react";
+import { produce } from "produce";
 
 type SourceLayer = Layer;
 
@@ -23,22 +24,23 @@ type SourceLayerState = { source?: string; layer?: string };
 
 export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
-
   useMonacoTheme(theme);
 
-  const { layers } = useLayer(undefined, isSourceLayer);
+  const { layers, setLayer, layer, key } = useLayer(undefined, isSourceLayer);
 
   const sources = useMemo(
     () =>
-      layers?.flatMap?.((l) =>
-        getController(l)
-          ?.getSources?.(l)
-          ?.map?.((c) => ({
-            layer: l.key,
-            source: c,
-          }))
+      layers?.flatMap?.(
+        (l) =>
+          getController(l)
+            ?.getSources?.(l)
+            ?.map?.((c) => ({
+              layer: l.key,
+              source: c,
+            })),
+        // why is layer string here?
       ) as { layer: string; source: LayerSource }[],
-    [layers]
+    [layers],
   );
 
   const { controls, onChange, state, dragHandle } =
@@ -48,9 +50,9 @@ export function SourcePage({ template: Page }: PageContentProps) {
     () =>
       find(
         sources,
-        (c) => c && c.source.id === state?.source && c.layer === state?.layer
+        (c) => c && c.source.id === state?.source && c.layer === state?.layer,
       ) ?? first(sources),
-    [sources, state?.source, state?.layer]
+    [sources, state?.source, state?.layer],
   );
 
   return (
@@ -69,12 +71,25 @@ export function SourcePage({ template: Page }: PageContentProps) {
                     theme.palette.mode === "dark" ? "posthoc-dark" : "light"
                   }
                   options={{
-                    readOnly: true,
+                    readOnly: false,
                   }}
                   language={selected?.source?.language}
                   loading={<CircularProgress variant="indeterminate" />}
                   {...size}
                   value={selected?.source?.content}
+                  onChange={async (value) => {
+                    console.log(value);
+                    const modifiedLayer = produce(layer, async (layer) => {
+                      console.log(getController(layer)?.onEditSource);
+                      return await getController(layer)?.onEditSource?.(
+                        layer,
+                        key,
+                        value,
+                      );
+                    });
+                    console.log(modifiedLayer);
+                    if (modifiedLayer) setLayer(modifiedLayer);
+                  }}
                 />
               )}
             </AutoSize>
