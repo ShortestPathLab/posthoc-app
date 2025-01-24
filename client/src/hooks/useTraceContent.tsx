@@ -10,7 +10,7 @@ import { useConnectionResolver } from "./useConnectionResolver";
 
 export function useTraceContent(trace?: UploadedTrace) {
   const notify = useSnackbar();
-  const usingLoadingState = useLoadingState("specimen");
+  const usingLoadingState = useLoadingState("layers");
   const resolve = useConnectionResolver();
   const [{ traces }] = useFeatures();
 

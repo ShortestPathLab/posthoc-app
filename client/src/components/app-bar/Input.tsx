@@ -18,10 +18,10 @@ export const mapDefaults = { start: undefined, end: undefined };
 
 export function MapPicker({ onChange, value }: EditorProps<Map>) {
   const notify = useSnackbar();
-  const usingLoadingState = useLoadingState("map");
+  const usingLoadingState = useLoadingState("layers");
   const [{ features: featuresLoading, connections: connectionsLoading }] =
     useLoading();
-  const usingBusyState = useBusyState("map");
+  const usingBusyState = useBusyState("layers");
   const [connections] = useConnections();
   const [{ maps, formats }] = useFeatures();
   return (
@@ -79,8 +79,8 @@ export function TracePicker({
   value,
 }: EditorProps<UploadedTrace & { error?: string }>) {
   const notify = useSnackbar();
-  const usingLoadingState = useLoadingState("specimen");
-  const usingBusyState = useBusyState("specimen");
+  const usingLoadingState = useLoadingState("layers");
+  const usingBusyState = useBusyState("layers");
   const [connections] = useConnections();
   const [{ features: featuresLoading, connections: connectionsLoading }] =
     useLoading();

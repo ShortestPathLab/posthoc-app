@@ -4,8 +4,7 @@ import { createSlice } from "./createSlice";
 import { produce } from "produce";
 
 type Loading = {
-  specimen: number;
-  map: number;
+  layers: number;
   connections: number;
   features: number;
   general: number;
@@ -15,10 +14,9 @@ type A = { action: "start" | "end"; key: keyof Loading };
 
 export const [useLoading, LoadingProvider] = createSlice<Loading, A>(
   {
-    specimen: 0,
+    layers: 0,
     connections: 0,
     features: 0,
-    map: 0,
     general: 0,
   },
   {

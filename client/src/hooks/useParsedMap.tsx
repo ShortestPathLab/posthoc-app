@@ -9,7 +9,7 @@ import { useLoadingState } from "slices/loading";
 export function useParsedMap(map?: Map, options?: Record<string, any>) {
   const notify = useSnackbar();
   const theme = useTheme();
-  const usingLoadingState = useLoadingState("map");
+  const usingLoadingState = useLoadingState("layers");
 
   const { format, content } = map ?? {};
 

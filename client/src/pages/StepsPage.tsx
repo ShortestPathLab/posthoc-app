@@ -171,7 +171,8 @@ export function StepsPage({ template: Page }: PageContentProps) {
         const highlightData = layer?.source?.highlighting;
         let highlightStepsRaw: number[] = [];
         if (
-          (highlightData?.type === "subtree" ||  highlightData?.type === "precedent" )&&
+          (highlightData?.type === "subtree" ||
+            highlightData?.type === "precedent") &&
           !Array.isArray(highlightData.path)
         ) {
           highlightStepsRaw = flattenSubtree(highlightData.path);
