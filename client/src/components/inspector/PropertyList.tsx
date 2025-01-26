@@ -7,7 +7,7 @@ import {
   Typography,
   TypographyVariant,
 } from "@mui/material";
-import { Flex, FlexProps } from "components/generic/Flex";
+import { Block, BlockProps } from "components/generic/Block";
 import { Property, renderProperty } from "components/generic/Property";
 import { Surface, SurfaceProps } from "components/generic/surface";
 import {
@@ -144,10 +144,10 @@ export function PropertyList({
   simple,
   primitives,
   ...rest
-}: PropertyListProps & FlexProps) {
+}: PropertyListProps & BlockProps) {
   const sorted = sortEventKeys(event);
   return (
-    <Flex {...rest}>
+    <Block {...rest}>
       {_(sorted)
         .filter(primitives ? ([, v]) => isPrimitive(v) : constant(true))
         .slice(0, max)
@@ -164,7 +164,7 @@ export function PropertyList({
       {sorted.length > max && !simple && (
         <PropertyDialog event={event} max={max} />
       )}
-    </Flex>
+    </Block>
   );
 }
 

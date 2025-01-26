@@ -1,7 +1,7 @@
 import Split, { SplitDirection } from "@devbookhq/splitter";
 import { DragIndicatorOutlined } from "@mui-symbols-material/w400";
 import { Box, useTheme } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import {
   chain as _,
   filter,
@@ -186,7 +186,7 @@ export function ViewLeaf<T>({
 
   return (
     <>
-      <Flex
+      <Block
         ref={drop}
         sx={{
           overflow: "hidden",
@@ -210,7 +210,7 @@ export function ViewLeaf<T>({
         <ViewTreeContext.Provider value={context}>
           {renderLeaf?.(root)}
         </ViewTreeContext.Provider>
-      </Flex>
+      </Block>
     </>
   );
 }

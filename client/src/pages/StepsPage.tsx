@@ -7,7 +7,7 @@ import { Box, Divider, Stack, SxProps, Theme, useTheme } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Playback, PlaybackLayerData } from "components/app-bar/Playback";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import {
   LazyList as List,
   LazyListHandle as ListHandle,
@@ -276,7 +276,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
       <Page.Title>Steps</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Flex vertical alignItems="center">
+        <Block vertical alignItems="center">
           {steps ? (
             steps.length ? (
               <List
@@ -344,7 +344,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
               secondary={getStepsPageDescription()}
             />
           )}
-        </Flex>
+        </Block>
         {!!steps?.length && (
           <Stack
             direction="row"

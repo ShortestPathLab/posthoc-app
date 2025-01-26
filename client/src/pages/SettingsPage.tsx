@@ -12,9 +12,9 @@ import {
   Typography,
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Button } from "components/generic/Button";
-import { Flex } from "components/generic/Flex";
-import { ListEditor } from "components/generic/ListEditor";
+import { Button } from "components/generic/inputs/Button";
+import { Block } from "components/generic/Block";
+import { ListEditor } from "components/generic/list-editor/ListEditor";
 import { Surface } from "components/generic/surface";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
@@ -102,13 +102,13 @@ export function SettingsPage({ template: Page }: PageContentProps) {
           </TabList>
         </Page.Options>
         <Page.Content>
-          <Flex vertical>
+          <Block vertical>
             <Scroll y>
-              <Flex vertical pt={6}>
+              <Block vertical pt={6}>
                 <TabPanel value="general" sx={{ p: 2 }}>
                   <Box>
                     {renderHeading("Playback")}
-                    <Flex alignItems="center" justifyContent="space-between">
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Playback rate")}
                       <Slider
                         sx={{ maxWidth: 320, mr: 2 }}
@@ -128,9 +128,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           }))
                         }
                       />
-                    </Flex>
+                    </Block>
                     {renderHeading("Appearance")}
-                    <Flex alignItems="center" justifyContent="space-between">
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Acrylic")}
                       <Switch
                         defaultChecked={!!acrylic}
@@ -138,8 +138,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           setSettings(() => ({ "appearance/acrylic": v }))
                         }
                       />
-                    </Flex>
-                    <Flex alignItems="center" justifyContent="space-between">
+                    </Block>
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Dark mode")}
                       <Space flex={1} />
                       <Switch
@@ -150,8 +150,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           }))
                         }
                       />
-                    </Flex>
-                    <Flex alignItems="center" justifyContent="space-between">
+                    </Block>
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Accent")}
                       <Box sx={{ p: 1 }}>
                         <FeaturePicker
@@ -182,9 +182,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           }
                         />
                       </Box>
-                    </Flex>
+                    </Block>
                     {renderHeading("Behaviour")}
-                    <Flex alignItems="center" justifyContent="space-between">
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Show explore on start-up")}
                       <Switch
                         defaultChecked={!!showOnStart}
@@ -194,9 +194,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           }))
                         }
                       />
-                    </Flex>
+                    </Block>
                     {renderHeading("Advanced")}
-                    <Flex alignItems="center" justifyContent="space-between">
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Reset settings and extensions")}
                       <Surface
                         trigger={({ open }) => (
@@ -253,7 +253,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           </Stack>
                         )}
                       </Surface>
-                    </Flex>
+                    </Block>
                   </Box>
                 </TabPanel>
                 <TabPanel value="connections" sx={{ p: 2 }}>
@@ -305,9 +305,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     <AboutContent />
                   </Box>
                 </TabPanel>
-              </Flex>
+              </Block>
             </Scroll>
-          </Flex>
+          </Block>
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>
       </Page>

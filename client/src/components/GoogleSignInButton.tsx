@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { FileMetaData } from "services/CloudStorageService";
 import GoogleIcon from "@mui/icons-material/Google";
-import { Button } from "./generic/Button";
+import { Button } from "./generic/inputs/Button";
 import { MouseEventHandler, useState } from "react";
 import { useAuth } from "slices/auth";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";

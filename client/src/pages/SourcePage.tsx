@@ -1,7 +1,7 @@
 import { Editor } from "@monaco-editor/react";
 import { CodeOutlined } from "@mui-symbols-material/w400";
 import { CircularProgress, Tab, Tabs, useTheme } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useMonacoTheme } from "components/script-editor/ScriptEditor";
@@ -92,7 +92,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         {sources?.length ? (
-          <Flex pt={6}>
+          <Block pt={6}>
             <AutoSize>
               {(size: { width: number; height: number }) => (
                 <Editor
@@ -118,7 +118,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
                 />
               )}
             </AutoSize>
-          </Flex>
+          </Block>
         ) : (
           <Placeholder icon={<CodeOutlined />} label="Source" />
         )}

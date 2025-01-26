@@ -23,7 +23,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { ColorTranslator } from "colortranslator";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useFullscreenModalContext } from "components/inspector/FullscreenModalHost";
@@ -40,7 +40,7 @@ import { useLoadingState } from "slices/loading";
 import { useSettings } from "slices/settings";
 import { textFieldProps, usePaper } from "theme";
 import { parse, stringify } from "yaml";
-import { Button } from "../components/generic/Button";
+import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
 
@@ -392,7 +392,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
           </TabList>
         </Page.Options>
         <Page.Content>
-          <Flex vertical>
+          <Block vertical>
             <Scroll y>
               <Box
                 sx={
@@ -507,7 +507,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                 </Box>
               </Box>
             </Scroll>
-          </Flex>
+          </Block>
         </Page.Content>
         <Page.Extras>
           {!narrow && (

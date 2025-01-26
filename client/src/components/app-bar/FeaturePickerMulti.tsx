@@ -1,5 +1,5 @@
 import { Typography as Type } from "@mui/material";
-import { SelectMulti } from "components/generic/SelectMulti";
+import { SelectMulti } from "components/generic/inputs/SelectMulti";
 import { Space } from "components/generic/Space";
 import { filter, head, map, startCase, truncate } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";

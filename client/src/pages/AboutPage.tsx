@@ -9,7 +9,7 @@ import {
   ListItemText,
   Typography as Type,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { head, trimEnd } from "lodash";
@@ -107,11 +107,11 @@ export function AboutPage({ template: Page }: PageContentProps) {
 
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Flex>
+        <Block>
           <Scroll y>
             <AboutContent />
           </Scroll>
-        </Flex>
+        </Block>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

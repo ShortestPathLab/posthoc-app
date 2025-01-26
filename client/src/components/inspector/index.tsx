@@ -1,6 +1,6 @@
 import { Box, Fade, LinearProgress } from "@mui/material";
 import { Sidebar } from "Sidebar";
-import { Flex, FlexProps } from "components/generic/Flex";
+import { Block, BlockProps } from "components/generic/Block";
 import { openWindow } from "components/title-bar/window";
 import { pages } from "pages";
 import { Page } from "pages/Page";
@@ -13,13 +13,13 @@ import { FullscreenModalHost } from "./FullscreenModalHost";
 import { FullscreenProgress } from "./FullscreenProgress";
 import { ViewTree } from "./ViewTree";
 
-export function Inspector(props: FlexProps) {
+export function Inspector(props: BlockProps) {
   const loading = useAnyLoading();
   const [{ view }, setView] = useView();
   const [, setUIState] = useUIState();
   return (
     <>
-      <Flex {...props}>
+      <Block {...props}>
         <Sidebar>
           <ViewTree<PanelState>
             onPopOut={(leaf) => {
@@ -44,7 +44,7 @@ export function Inspector(props: FlexProps) {
             }}
           />
         </Sidebar>
-      </Flex>
+      </Block>
       <Fade in={loading}>
         <LinearProgress
           variant="indeterminate"

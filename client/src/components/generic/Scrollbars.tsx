@@ -17,10 +17,15 @@ type Props = {
 
 export type ScrollProps = Props & OverlayScrollbarsComponentProps;
 
-export function Scroll(
-  { children, x, y, px = 6, py = 0, ...rest }: ScrollProps,
-  ref: ForwardedRef<HTMLDivElement>
-) {
+export function Scroll({
+  children,
+  x,
+  y,
+  px = 6,
+  py = 0,
+  ref,
+  ...rest
+}: Omit<ScrollProps, "ref"> & { ref?: ForwardedRef<HTMLDivElement> }) {
   const { palette, spacing } = useTheme();
   const cls = useCss({
     "--os-padding-perpendicular": "2px",

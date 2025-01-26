@@ -1,5 +1,5 @@
 import { alpha, Box, Stack, Typography } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { SurfaceBase } from "components/generic/surface";
 import { withSlots } from "components/withSlots";
@@ -68,7 +68,7 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
               }}
             >
               <Scroll x>
-                <Flex
+                <Block
                   sx={{
                     width: "max-content",
                     height: (t) => t.spacing(6),
@@ -79,7 +79,7 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
                   {slotProps.Options?.children && (
                     <>{slotProps.Options.children}</>
                   )}
-                </Flex>
+                </Block>
               </Scroll>
               {slotProps.Extras?.children}
             </Stack>

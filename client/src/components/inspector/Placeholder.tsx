@@ -1,6 +1,6 @@
 import { WidgetsOutlined } from "@mui-symbols-material/w400";
 import { Box, Typography as Type } from "@mui/material";
-import { Flex, FlexProps } from "components/generic/Flex";
+import { Block, BlockProps } from "components/generic/Block";
 import { ReactElement, ReactNode } from "react";
 
 export function Placeholder({
@@ -14,9 +14,9 @@ export function Placeholder({
   icon?: ReactElement;
   secondary?: ReactNode;
   action?: ReactNode;
-} & FlexProps) {
+} & BlockProps) {
   return (
-    <Flex
+    <Block
       justifyContent="center"
       alignItems="center"
       color="text.secondary"
@@ -44,6 +44,6 @@ export function Placeholder({
         </Type>
       )}
       {!!action && <Box pt={2}>{action}</Box>}
-    </Flex>
+    </Block>
   );
 }

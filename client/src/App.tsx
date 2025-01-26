@@ -6,7 +6,7 @@ import {
   ThemeProvider,
   useTheme,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { Inspector } from "components/inspector";
 import { Placeholder } from "components/inspector/Placeholder";
@@ -47,7 +47,7 @@ function App() {
   const color = palette.background.default;
   const { loading } = useSyncStatus();
   return (
-    <Flex
+    <Block
       vertical
       sx={{
         bgcolor: color,
@@ -58,9 +58,9 @@ function App() {
       {!loading ? (
         <>
           <TitleBar />
-          <Flex flex={1}>
+          <Block flex={1}>
             <Inspector flex={1} />
-          </Flex>
+          </Block>
         </>
       ) : minimal ? (
         <Fade in>
@@ -93,7 +93,7 @@ function App() {
           </Stack>
         </Fade>
       )}
-    </Flex>
+    </Block>
   );
 }
 

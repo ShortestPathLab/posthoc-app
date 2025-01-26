@@ -1,6 +1,6 @@
 import { ButtonProps, Typography as Type, useTheme } from "@mui/material";
-import { Flex } from "components/generic/Flex";
-import { Select } from "components/generic/Select";
+import { Block } from "components/generic/Block";
+import { Select } from "components/generic/inputs/Select";
 import { Space } from "components/generic/Space";
 import { filter, find, map, startCase, truncate } from "lodash";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
@@ -70,7 +70,7 @@ export function FeaturePicker({
       items={map(items, ({ id, name, description, hidden, icon, color }) => ({
         value: id,
         label: (
-          <Flex vertical={itemOrientation === "vertical"}>
+          <Block vertical={itemOrientation === "vertical"}>
             <Type component="div">
               {name}
               <Space />
@@ -78,7 +78,7 @@ export function FeaturePicker({
             <Type component="div" variant="body2" color="text.secondary">
               {description}
             </Type>
-          </Flex>
+          </Block>
         ),
         icon: getIcon(icon, color),
         disabled: hidden,

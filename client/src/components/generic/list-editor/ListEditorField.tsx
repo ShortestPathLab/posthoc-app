@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { cloneElement, useState } from "react";
 import { useAcrylic, usePaper } from "theme";
-import { Flex } from "./Flex";
+import { Block } from "../Block";
 import { Item, Props } from "./ListEditor";
 
 import { ComponentProps, forwardRef } from "react";
@@ -102,7 +102,7 @@ export function ListEditorField<T>({
               value,
               onValueChange: (e: T) => onChangeItem(id ?? i, e, enabled),
               handle: sortable && (
-                <Flex
+                <Block
                   {...provided.dragHandleProps}
                   color="text.secondary"
                   sx={{
@@ -111,7 +111,7 @@ export function ListEditorField<T>({
                   }}
                 >
                   <DragHandleOutlined />
-                </Flex>
+                </Block>
               ),
               content: (
                 <ListElement
@@ -135,7 +135,7 @@ export function ListEditorField<T>({
                 </ListElement>
               ),
               extras: (
-                <Flex sx={{ flex: 0, px: 1 }}>
+                <Block sx={{ flex: 0, px: 1 }}>
                   {toggleable && (
                     <Switch
                       color="primary"
@@ -165,7 +165,7 @@ export function ListEditorField<T>({
                     </IconButton>
                   )}
                   {getExtras && getExtras(value)}
-                </Flex>
+                </Block>
               ),
             })}
           </Stack>

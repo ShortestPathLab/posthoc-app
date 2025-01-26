@@ -13,5 +13,5 @@ export type SlotProps = {
   popover?: Partial<PopoverProps>;
   paper?: Partial<BoxProps>;
   modal?: Partial<ModalProps>;
-  scroll?: Partial<ScrollProps>;
+  scroll?: Omit<Partial<ScrollProps>, "ref">;
 };

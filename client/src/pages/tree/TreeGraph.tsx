@@ -19,8 +19,8 @@ import {
   MinimisedPlaybackControls,
   PlaybackLayerData,
 } from "components/app-bar/Playback";
-import { Button } from "components/generic/Button";
-import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
+import { Button } from "components/generic/inputs/Button";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Scroll } from "components/generic/Scrollbars";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";

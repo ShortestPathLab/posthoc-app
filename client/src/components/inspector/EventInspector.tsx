@@ -16,7 +16,7 @@ import {
   Typography as Type,
   useTheme,
 } from "@mui/material";
-import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
+import { IconButtonWithTooltip as IconButton } from "components/generic/inputs/IconButtonWithTooltip";
 import { getColorHex } from "components/renderer/colors";
 import { omit, pick, startCase } from "lodash";
 import { TraceEvent } from "protocol/Trace";

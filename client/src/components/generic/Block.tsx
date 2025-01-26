@@ -1,16 +1,11 @@
 import { Box, BoxProps } from "@mui/material";
-import { Ref } from "react";
 
-export type FlexProps = {
+export type BlockProps = {
   vertical?: boolean;
 } & BoxProps;
 
-export const Flex = (
-  { vertical, ...props }: FlexProps,
-  ref: Ref<HTMLDivElement>
-) => (
+export const Block = ({ vertical, ...props }: BlockProps) => (
   <Box
-    ref={ref}
     position="relative"
     height="100%"
     width="100%"

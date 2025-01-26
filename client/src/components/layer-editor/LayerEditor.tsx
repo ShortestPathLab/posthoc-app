@@ -11,7 +11,7 @@ import {
   Typography as Type,
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Surface } from "components/generic/surface";
 import { Space } from "components/generic/Space";
 import { inferLayerName } from "layers/inferLayerName";
@@ -118,11 +118,11 @@ export function LayerEditor({
     </Type>
   );
   const renderOption = (label: ReactNode, option: ReactNode) => (
-    <Flex alignItems="center">
+    <Block alignItems="center">
       {renderLabel(label)}
       <Space flex={1} />
       {option}
-    </Flex>
+    </Block>
   );
 
   const options = (a: string[]) =>

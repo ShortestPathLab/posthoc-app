@@ -21,7 +21,7 @@ import {
   isTraceFormat,
   readUploadedTrace,
 } from "components/app-bar/upload";
-import Editor from "components/generic/ListEditor";
+import Editor from "components/generic/list-editor/ListEditor";
 import {
   PropertyDialog,
   PropertyList,

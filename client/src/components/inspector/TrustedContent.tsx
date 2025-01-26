@@ -4,7 +4,7 @@ import {
   ShieldOutlined,
 } from "@mui-symbols-material/w400";
 import { Link, Stack } from "@mui/material";
-import { Button } from "components/generic/Button";
+import { Button } from "components/generic/inputs/Button";
 import { producify } from "produce";
 import { ReactNode } from "react";
 import { useSettings } from "slices/settings";

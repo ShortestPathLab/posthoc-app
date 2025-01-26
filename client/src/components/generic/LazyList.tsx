@@ -1,7 +1,6 @@
 import { Box, BoxProps, useTheme } from "@mui/material";
 import {
   ComponentProps,
-  ForwardedRef,
   ReactElement,
   ReactNode,
   Ref,
@@ -18,6 +17,7 @@ import {
   VirtuosoProps as ListProps,
   VirtuosoHandle,
 } from "react-virtuoso";
+import { set } from "lodash";
 
 // const Scroller = forwardRef<HTMLDivElement, ScrollerProps>(
 //   ({ style, ...props }, ref) => {
@@ -39,10 +39,7 @@ import {
 //   }
 // );
 
-function Scroller(
-  { style, children, ...rest }: ComponentProps<"div">,
-  ref: ForwardedRef<HTMLDivElement>
-) {
+function Scroller({ style, children, ref, ...rest }: ComponentProps<"div">) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { palette, spacing } = useTheme();
   const cls = useCss({
@@ -77,7 +74,12 @@ function Scroller(
   });
 
   useEffect(() => {
-    if (typeof ref !== "function" && ref?.current && containerRef?.current) {
+    if (
+      typeof ref !== "function" &&
+      typeof ref !== "string" &&
+      ref?.current &&
+      containerRef?.current
+    ) {
       initialize({
         target: containerRef.current,
         elements: {
@@ -92,8 +94,8 @@ function Scroller(
       if (node && ref) {
         if (typeof ref === "function") {
           ref(node);
-        } else {
-          ref.current = node;
+        } else if (typeof ref !== "string") {
+          set(ref, "current", node);
         }
       }
     },

@@ -1,13 +1,9 @@
 import { useForkRef, useTheme } from "@mui/material";
+import { TransitionProps as MuiTransitionProps } from "@mui/material/transitions";
 import { get } from "lodash";
-import * as React from "react";
-import { cloneElement, isValidElement } from "react";
+import { cloneElement, ElementType, isValidElement, Ref, useRef } from "react";
 import { Transition } from "react-transition-group";
-import {
-  EnterHandler,
-  ExitHandler,
-  TransitionProps as T1,
-} from "react-transition-group/Transition";
+import { EnterHandler, ExitHandler } from "react-transition-group/Transition";
 
 export const reflow = (node: Element) => node.scrollTop;
 
@@ -58,7 +54,12 @@ const styles = {
   unmounted: {},
 };
 
-const Swipe = (props: T1<undefined>) => {
+const Swipe = (
+  props: MuiTransitionProps & {
+    TransitionComponent?: ElementType;
+    ref?: Ref<HTMLElement>;
+  }
+) => {
   const theme = useTheme();
   const defaultTimeout = {
     enter: theme.transitions.duration.enteringScreen,
@@ -85,16 +86,14 @@ const Swipe = (props: T1<undefined>) => {
   } = props;
 
   const enableStrictModeCompat = true;
-  const nodeRef = React.useRef<HTMLElement>(null);
+  const nodeRef = useRef<HTMLElement>(null);
   const handleRef = useForkRef(nodeRef, get(children, "ref"), ref);
 
   const normalizedTransitionCallback =
     (
       callback?:
-        | EnterHandler<HTMLElement>
-        | EnterHandler<undefined>
-        | ExitHandler<undefined>
-        | ExitHandler<HTMLElement>
+        | EnterHandler<HTMLElement | undefined>
+        | ExitHandler<HTMLElement | undefined>
     ) =>
     (maybeIsAppearing: boolean) => {
       if (callback) {

@@ -9,9 +9,9 @@ import {
   debounce,
 } from "@mui/material";
 import { transports } from "client";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Surface } from "components/generic/surface";
-import { SelectField as Select } from "components/generic/Select";
+import { SelectField as Select } from "components/generic/inputs/Select";
 import { useConnection } from "hooks/useConnectionResolver";
 import { useConnectionStatus } from "hooks/useConnectionStatus";
 import { entries, omit, startCase } from "lodash";
@@ -47,7 +47,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
 
   return (
     <>
-      <Flex alignItems="center">
+      <Block alignItems="center">
         <Surface
           slotProps={{
             paper: { sx: { width: 480 } },
@@ -151,7 +151,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
             />
           </Box>
         </Surface>
-      </Flex>
+      </Block>
     </>
   );
 }

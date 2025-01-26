@@ -106,6 +106,12 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
           "> .MuiPaper-root": {
             bgcolor: "background.paper",
             color: "text.primary",
+            overflow: "hidden",
+            "& .MuiSnackbarContent-message": {
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "normal",
+            },
           },
         }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}

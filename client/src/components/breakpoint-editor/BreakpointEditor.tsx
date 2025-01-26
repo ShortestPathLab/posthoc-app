@@ -2,10 +2,10 @@ import { Divider, TextField, Typography as Type } from "@mui/material";
 import { find, last, map, startCase } from "lodash";
 import { comparators } from "./comparators";
 import { eventTypes } from "./eventTypes";
-import { Flex } from "components/generic/Flex";
-import { SelectField as Select } from "components/generic/Select";
+import { Block } from "components/generic/Block";
+import { SelectField as Select } from "components/generic/inputs/Select";
 import { Space } from "components/generic/Space";
-import { Switch } from "components/generic/Switch";
+import { Switch } from "components/generic/inputs/Switch";
 import { Breakpoint } from "hooks/useBreakpoints";
 
 type BreakpointEditorProps = {
@@ -23,7 +23,7 @@ export function BreakpointEditor({
     onChange?.({ ...value, ...next });
   }
   return (
-    (<Flex sx={{ py: 1 }}>
+    <Block sx={{ py: 1 }}>
       <Select
         placeholder="Event"
         sx={{ minWidth: 160 }}
@@ -78,7 +78,7 @@ export function BreakpointEditor({
         type="number"
         disabled={!value.condition?.needsReference}
         slotProps={{
-          htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
         }}
       />
       <Space sx={{ px: 2 }} />
@@ -87,6 +87,6 @@ export function BreakpointEditor({
         onChange={(_, v) => handleChange({ active: v })}
         sx={{ mr: -4 }}
       />
-    </Flex>)
+    </Block>
   );
 }

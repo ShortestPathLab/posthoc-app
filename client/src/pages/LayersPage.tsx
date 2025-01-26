@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { LayerListEditor } from "components/layer-editor/LayerListEditor";
@@ -15,7 +15,7 @@ export function LayersPage({ template: Page }: PageContentProps) {
       <Page.Title>Layers</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Flex
+        <Block
           sx={{
             mt: isViewTree ? 0 : -6,
           }}
@@ -25,7 +25,7 @@ export function LayersPage({ template: Page }: PageContentProps) {
               <LayerListEditor />
             </Box>
           </Scroll>
-        </Flex>
+        </Block>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

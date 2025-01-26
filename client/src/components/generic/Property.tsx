@@ -5,7 +5,7 @@ import {
 import beautify from "json-beautify";
 import { get, isNull, round, truncate } from "lodash";
 import { CSSProperties, ReactNode } from "react";
-import { Flex } from "./Flex";
+import { Block } from "./Block";
 import { Space } from "./Space";
 
 type Props = {
@@ -61,7 +61,7 @@ export function renderProperty(obj: unknown, simple: boolean = false) {
 
 export function Property({ label, value, type, simple }: Props) {
   return (
-    <Flex
+    <Block
       width="auto"
       mr={2}
       mb={0.5}
@@ -80,6 +80,6 @@ export function Property({ label, value, type, simple }: Props) {
       <Type component="div" variant="body2" {...type}>
         {renderProperty(value, simple) ?? "none"}
       </Type>
-    </Flex>
+    </Block>
   );
 }

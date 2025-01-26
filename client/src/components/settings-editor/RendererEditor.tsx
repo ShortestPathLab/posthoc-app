@@ -6,9 +6,9 @@ import {
   Tooltip,
   Typography as Type,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Surface } from "components/generic/surface";
-import { SelectField as Select } from "components/generic/Select";
+import { SelectField as Select } from "components/generic/inputs/Select";
 import { entries, find, join, omit, startCase } from "lodash";
 import { transports } from "services/RendererService";
 import { merge } from "slices/reducers";
@@ -45,7 +45,7 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
     : "error";
 
   return (
-    <Flex alignItems="center" py={1}>
+    <Block alignItems="center" py={1}>
       <Surface
         slotProps={{
           paper: { sx: { width: 480 } },
@@ -141,6 +141,6 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
           />
         </Box>
       </Surface>
-    </Flex>
+    </Block>
   );
 }
