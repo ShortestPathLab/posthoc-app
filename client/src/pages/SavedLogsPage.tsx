@@ -25,7 +25,7 @@ export function SavedLogsPage({ template: Page }: PageContentProps) {
                 rowGap: "1rem",
               }}
             >
-              <SavedLogsButton type="google"/>
+              <SavedLogsButton type="google" />
             </Box>
           </Scroll>
         </Flex>

@@ -15,7 +15,7 @@ async function timed<T>(task: () => Promise<T>, ms: number = 500) {
 const init = once(async (url: string = "") => {
   const { result } = await timed(() => import(/* @vite-ignore */ url));
   if (result) {
-    const fn = (...args: any[]) => result.call(...args);
+    const fn = (...args: unknown[]) => result.call(...args);
     return fn as Transport["call"];
   }
 });
@@ -26,11 +26,9 @@ const process = async ({
 }: Request): Promise<Partial<Response>> => {
   try {
     const call = await init();
-    if (call) {
-      return { result: await call(method, params) };
-    } else {
-      return { error: { code: 500, message: "Could not connect." } };
-    }
+    return call
+      ? { result: await call(method, params) }
+      : { error: { code: 500, message: "Could not connect." } };
   } catch (e) {
     return { error: { code: 500, message: `${e}` } };
   }

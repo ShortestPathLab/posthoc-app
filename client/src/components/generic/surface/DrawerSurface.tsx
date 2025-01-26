@@ -1,0 +1,128 @@
+import {
+  Box,
+  ModalProps,
+  PaperProps,
+  Stack,
+  StackProps,
+  SwipeableDrawer,
+  useTheme,
+} from "@mui/material";
+import { merge, noop } from "lodash";
+import { bindDialog, PopupState as State } from "material-ui-popup-state/hooks";
+import { ReactNode } from "react";
+import { Scroll } from "../Scrollbars";
+import { SlotProps } from "./SlotProps";
+import { stopPropagation } from "./stopPropagation";
+import { useDrawerHandle } from "./useDrawerHandle";
+import { useModalDepth } from "./useModalDepth";
+
+function Handle(props: StackProps) {
+  return (
+    <Stack
+      sx={{
+        height: 32,
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        cursor: "grab",
+        "&:active": { cursor: "grabbing" },
+        "&:hover > div": { opacity: 0.54 },
+      }}
+      {...props}
+    >
+      <Box
+        sx={{
+          mx: "auto",
+          minWidth: 32,
+          minHeight: 4,
+          width: 32,
+          height: 4,
+          borderRadius: 1,
+          bgcolor: "action.active",
+          opacity: (t) => t.palette.action.disabledOpacity,
+          my: 2,
+        }}
+      />
+    </Stack>
+  );
+}
+
+export function DrawerSurface({
+  state,
+  slotProps,
+  children,
+}: {
+  state: State;
+  children: ReactNode;
+  slotProps?: Pick<SlotProps, "drawer" | "paper" | "scroll">;
+}) {
+  const { depth, maxDepth = 1 } = useModalDepth(state.isOpen);
+  const gap = slotProps?.drawer?.gap ?? depth * 16 + 16;
+  const theme = useTheme();
+  const { setHandle, setPaper } = useDrawerHandle(state.close);
+  return (
+    <SwipeableDrawer
+      transitionDuration={{ enter: 500, exit: 500 }}
+      SlideProps={{
+        easing: {
+          enter: theme.transitions.easing.easeOut,
+          exit: theme.transitions.easing.easeOut,
+        },
+      }}
+      anchor="bottom"
+      disableSwipeToOpen
+      disableDiscovery
+      onOpen={noop}
+      {...bindDialog(state)}
+      {...merge(
+        {
+          ModalProps: {
+            keepMounted: false,
+            sx: {
+              transition: (t) =>
+                t.transitions.create("transform", {
+                  duration: 500,
+                  easing: t.transitions.easing.easeOut,
+                }),
+              transform: `translateY(${
+                -16 * ((maxDepth - depth) / maxDepth)
+              }px)`,
+            },
+          } as ModalProps,
+        },
+        { BackdropProps: { sx: { transform: "scale(2)" } } },
+        {
+          PaperProps: {
+            ref: setPaper,
+            sx: {
+              overflow: "hidden",
+              maxWidth: 640,
+              mx: "auto",
+              bgcolor: "background.paper",
+              "--Paper-overlay": "none !important",
+              borderTopLeftRadius: (t) => t.shape.borderRadius * 4,
+              borderTopRightRadius: (t) => t.shape.borderRadius * 4,
+              maxHeight: `calc(100dvh - ${gap}px)`,
+            },
+          } as PaperProps,
+        },
+        { PaperProps: slotProps?.paper },
+        slotProps?.drawer
+      )}
+    >
+      <Handle ref={setHandle} />
+      <Box onTouchStart={stopPropagation}>
+        <Scroll
+          y
+          px={0}
+          style={{
+            maxHeight: `calc(100dvh - ${gap + 32}px)`,
+          }}
+          {...slotProps?.scroll}
+        >
+          {children}
+        </Scroll>
+      </Box>
+    </SwipeableDrawer>
+  );
+}

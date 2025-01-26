@@ -2,7 +2,7 @@ import { filter, flow, isUndefined, keys, omit } from "lodash";
 import { createSlice } from "./createSlice";
 import { merge } from "./reducers";
 
-const removeUndefinedValues = <T extends Record<string, any>>(obj: T) =>
+const removeUndefinedValues = <T extends Record<string, unknown>>(obj: T) =>
   omit(
     obj,
     filter(keys(obj), (key) => isUndefined(obj[key]))

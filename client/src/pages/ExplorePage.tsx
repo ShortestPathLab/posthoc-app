@@ -28,7 +28,7 @@ import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useFullscreenModalContext } from "components/inspector/FullscreenModalHost";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
+import { useSm } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
 import { chain as _, entries, first, map, round, upperCase } from "lodash";
 import memoizee from "memoizee";
@@ -94,6 +94,7 @@ type ExampleDescriptor = FeatureDescriptor & {
   size?: number;
 };
 
+// eslint-disable-next-line react/display-name
 const makeAvatar = (children?: ReactNode) => (sx: SxProps) =>
   <Avatar sx={sx}>{children}</Avatar>;
 
@@ -127,7 +128,7 @@ function getAuthor(s?: string): {
         default:
           break;
       }
-    } catch (e) {
+    } catch {
       /* empty */
     }
     return { name: s, avatar: makeAvatar(s[0]) };
@@ -315,7 +316,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
   const { close: closeModal } = useFullscreenModalContext();
-  const sm = useSmallDisplay();
+  const sm = useSm();
   const narrow = sm || isViewTree;
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("explore");
@@ -378,7 +379,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
-        <Page.Title>Explore</Page.Title>
+        <Page.Title>Explore Posthoc</Page.Title>
         <Page.Key>explore</Page.Key>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
@@ -458,7 +459,8 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                           search={search}
                           entry={entry}
                           onOpenClick={(p) => {
-                            open(p), closeModal?.();
+                            open(p);
+                            closeModal?.();
                           }}
                         />
                       ))}
@@ -488,7 +490,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       gap={2}
                     >
                       <Type component="div">
-                        We're still working on this feature. Check out our
+                        We&apos;re still working on this feature. Check out our
                         documentation instead.
                       </Type>
                       <Button

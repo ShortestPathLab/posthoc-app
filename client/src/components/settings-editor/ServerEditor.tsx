@@ -10,10 +10,7 @@ import {
 } from "@mui/material";
 import { transports } from "client";
 import { Flex } from "components/generic/Flex";
-import {
-  ManagedModal as Dialog,
-  AppBarTitle as Title,
-} from "components/generic/Modal";
+import { Surface } from "components/generic/surface";
 import { SelectField as Select } from "components/generic/Select";
 import { useConnection } from "hooks/useConnectionResolver";
 import { useConnectionStatus } from "hooks/useConnectionStatus";
@@ -51,7 +48,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
   return (
     <>
       <Flex alignItems="center">
-        <Dialog
+        <Surface
           slotProps={{
             paper: { sx: { width: 480 } },
             popover: {
@@ -59,7 +56,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
             },
           }}
           popover
-          trigger={(onClick) => (
+          trigger={({ open }) => (
             <Stack
               direction="row"
               flex={1}
@@ -71,7 +68,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
                 direction="row"
                 flex={1}
                 alignItems="center"
-                {...{ onClick }}
+                onClick={open}
               >
                 <Box
                   flex={1}
@@ -130,7 +127,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
               </Tooltip>
             </Stack>
           )}
-          appBar={{ children: <Title>Edit Adapter</Title> }}
+          title="Edit Adapter"
         >
           <Box p={2.5}>
             <TextField
@@ -153,7 +150,7 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
               onChange={(v) => handleChange({ transport: v })}
             />
           </Box>
-        </Dialog>
+        </Surface>
       </Flex>
     </>
   );

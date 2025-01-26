@@ -11,29 +11,23 @@ import { SnackbarProvider } from "components/generic/Snackbar";
 import { Inspector } from "components/inspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { TitleBar, TitleBarPlaceholder } from "components/title-bar/TitleBar";
-import { useTitleBar } from "hooks/useTitleBar";
-import { useWorkspace } from "hooks/useWorkspace";
-import { setLayerSource } from "layers/TrustedLayerData";
 import { Image } from "pages/Image";
 import logo from "public/logo192.png";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { BootstrapService } from "services/BootstrapService";
+import { CloudStorageService } from "services/CloudStorageService";
 import { ConnectionsService } from "services/ConnectionsService";
 import { FeaturesService } from "services/FeaturesService";
+import { FetchDriveFileService } from "services/FetchDriveFileService";
 import { LayerService } from "services/LayerService";
 import { LogCaptureService } from "services/LogCaptureService";
 import { RendererService } from "services/RendererService";
-import { CloudStorageService } from "services/CloudStorageService";
 import { SettingsService } from "services/SettingsService";
 import { minimal } from "services/SyncParticipant";
 import { SyncService, useSyncStatus } from "services/SyncService";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
-import { useUIState } from "slices/UIState";
-import { useLayers } from "slices/layers";
 import { useSettings } from "slices/settings";
 import { makeTheme } from "theme";
-import { parseYamlAsync } from "workers/async";
-import { FetchDriveFileService } from "services/FetchDriveFileService";
 
 const services = [
   SyncService,
@@ -52,9 +46,6 @@ function App() {
   const { palette } = useTheme();
   const color = palette.background.default;
   const { loading } = useSyncStatus();
-  const [UIStateStore, setUIState] = useUIState();
-
-  const [layersStore, setLayers] = useLayers();
   return (
     <Flex
       vertical

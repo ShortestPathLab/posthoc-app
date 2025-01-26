@@ -1,6 +1,5 @@
 import { Checkbox, ListItemIcon, Menu, MenuItem, Tooltip } from "@mui/material";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
-import { findIndex, map, max } from "lodash";
+import { map } from "lodash";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { ReactElement, ReactNode } from "react";
 
@@ -15,9 +14,6 @@ export type SelectProps<T extends Key> = {
   defaultChecked?: boolean;
 };
 
-const itemHeight = (sm: boolean) => (sm ? 48 : 36);
-const padding = 8;
-
 export function SelectMulti<T extends string>({
   trigger,
   items,
@@ -26,8 +22,6 @@ export function SelectMulti<T extends string>({
   placeholder = "Select Options",
   defaultChecked,
 }: SelectProps<T>) {
-  const sm = useSmallDisplay();
-  const index = max([findIndex(items, ({ value: v }) => !!value?.[v]), 0]) ?? 0;
   return (
     <State variant="popover">
       {(state) => (
@@ -52,9 +46,9 @@ export function SelectMulti<T extends string>({
                 key={v}
                 onClick={() => {
                   onChange?.({
-                    ...value,
+                    ...value!,
                     [v]: !(value?.[v] ?? defaultChecked),
-                  } as any);
+                  });
                 }}
               >
                 <ListItemIcon>
@@ -72,30 +66,3 @@ export function SelectMulti<T extends string>({
     </State>
   );
 }
-
-// export type SelectFieldProps<T extends string> = Pick<
-//   SelectProps<T>,
-//   "items" | "onChange"
-// > &
-//   Omit<TextFieldProps, "onChange">;
-
-// export function SelectField<T extends string>(props: SelectFieldProps<T>) {
-//   const { placeholder, value, items = [], onChange } = props;
-//   return (
-//     <TextField
-//       sx={{ minWidth: 120 }}
-//       select
-//       label={placeholder}
-//       value={value}
-//       variant="filled"
-//       {...props}
-//       onChange={(e) => onChange?.(e.target.value as T)}
-//     >
-//       {map(items, (item) => (
-//         <MenuItem key={item.value} value={item.value}>
-//           {item.label}
-//         </MenuItem>
-//       ))}
-//     </TextField>
-//   );
-// }

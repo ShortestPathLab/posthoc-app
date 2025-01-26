@@ -13,9 +13,7 @@ import { FullscreenModalHost } from "./FullscreenModalHost";
 import { FullscreenProgress } from "./FullscreenProgress";
 import { ViewTree } from "./ViewTree";
 
-type SpecimenInspectorProps = Record<string, any> & FlexProps;
-
-export function Inspector(props: SpecimenInspectorProps) {
+export function Inspector(props: FlexProps) {
   const loading = useAnyLoading();
   const [{ view }, setView] = useView();
   const [, setUIState] = useUIState();

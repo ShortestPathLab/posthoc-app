@@ -16,7 +16,6 @@ export function InfoPage({ template: Page }: PageContentProps) {
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>info</Page.Key>
-
       <Page.Title>Logs</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Options>

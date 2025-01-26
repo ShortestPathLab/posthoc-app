@@ -10,7 +10,7 @@ import { Space } from "./Space";
 
 type Props = {
   label?: ReactNode;
-  value?: any;
+  value?: unknown;
   type?: TypeProps<"div">;
   simple?: boolean;
 };
@@ -21,7 +21,7 @@ const supProps: CSSProperties = {
   top: 0,
 };
 
-export function renderProperty(obj: any, simple: boolean = false) {
+export function renderProperty(obj: unknown, simple: boolean = false) {
   switch (typeof obj) {
     case "number": {
       if (simple) {
@@ -51,7 +51,7 @@ export function renderProperty(obj: any, simple: boolean = false) {
         </code>
       ) : (
         <code style={{ whiteSpace: "pre" }}>
-          {truncate(beautify(obj, undefined as any, 2), {
+          {truncate(beautify(obj, undefined as unknown as object, 2), {
             length: 100,
           })}
         </code>

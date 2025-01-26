@@ -1,5 +1,9 @@
 export type Reducer<T, U = T> = (prev: T, next: U) => T;
 
-export const replace = (_: any, next: any) => next;
+export function replace<T>(_: unknown, next: T) {
+  return next;
+}
 
-export const merge = (prev: any, next: any) => ({ ...prev, ...next });
+export function merge<T, U>(prev: T, next: U) {
+  return { ...prev, ...next };
+}

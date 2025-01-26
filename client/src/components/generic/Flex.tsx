@@ -1,11 +1,14 @@
 import { Box, BoxProps } from "@mui/material";
-import { forwardRef } from "react";
+import { Ref } from "react";
 
 export type FlexProps = {
   vertical?: boolean;
 } & BoxProps;
 
-export const Flex = forwardRef(({ vertical, ...props }: FlexProps, ref) => (
+export const Flex = (
+  { vertical, ...props }: FlexProps,
+  ref: Ref<HTMLDivElement>
+) => (
   <Box
     ref={ref}
     position="relative"
@@ -15,4 +18,4 @@ export const Flex = forwardRef(({ vertical, ...props }: FlexProps, ref) => (
     flexDirection={vertical ? "column" : "row"}
     {...props}
   />
-));
+);

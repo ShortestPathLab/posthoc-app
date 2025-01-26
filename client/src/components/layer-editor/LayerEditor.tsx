@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Flex } from "components/generic/Flex";
-import { ManagedModal as Dialog } from "components/generic/Modal";
+import { Surface } from "components/generic/surface";
 import { Space } from "components/generic/Space";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController, getControllers } from "layers/layerControllers";
@@ -137,17 +137,16 @@ export function LayerEditor({
 
   return (
     <>
-      <Dialog
+      <Surface
         popover
         slotProps={{
           popover: {
             anchorOrigin: { horizontal: -12, vertical: -12 },
           },
         }}
-        appBar={{ children: "Edit Layer" }}
-        trigger={(onClick) => (
+        trigger={({ open }) => (
           <ButtonBase
-            onClick={onClick}
+            onClick={open}
             className={draft.key}
             sx={{
               flex: 1,
@@ -264,7 +263,7 @@ export function LayerEditor({
             />
           )}
         </Box>
-      </Dialog>
+      </Surface>
     </>
   );
 }

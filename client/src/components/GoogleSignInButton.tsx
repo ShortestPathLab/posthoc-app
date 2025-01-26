@@ -59,7 +59,7 @@ const FileList = ({
       else {
         throw new Error("Unable to generate link");
       }
-    } catch (error) {
+    } catch {
       notify("Unable to generate link");
     }
   };
@@ -125,7 +125,7 @@ const UploadWorkspace = () => {
       const { compressedFile } = await generateWorkspaceFile();
       if (authState.authenticated && compressedFile) {
         const res = await cloudService?.saveFile(compressedFile);
-        setLink(res ? (cloudService?.generateLink(res) ?? "") : "");
+        setLink(res ? cloudService?.generateLink(res) ?? "" : "");
       } else {
         // ? allow empty workspace upload?
         notify("Please start a workspace first");
@@ -141,7 +141,7 @@ const UploadWorkspace = () => {
   const handleCopy: MouseEventHandler<HTMLButtonElement> = async () => {
     try {
       await copy(link);
-    } catch (error) {
+    } catch {
       notify("Unable to copy url, pls copy manually");
     }
   };

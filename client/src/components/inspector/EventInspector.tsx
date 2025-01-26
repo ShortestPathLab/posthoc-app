@@ -140,13 +140,13 @@ export function EventInspector({
       >
         <PropertyDialog
           {...{ event }}
-          trigger={(onClick) => (
+          trigger={({ open }) => (
             <IconButton
-              {...{ onClick }}
+              onClick={open}
               sx={{ p: 1.5, color: "text.secondary" }}
               label="See All Properties"
               icon={<DataObjectOutlined fontSize="small" />}
-            ></IconButton>
+            />
           )}
         />
       </Stack>

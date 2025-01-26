@@ -281,7 +281,7 @@ export const controller = {
       const info = chain(event?.info?.components)
         .filter((c) => c.meta?.sourceLayer === layer?.key)
         .filter((c) => c.meta?.info)
-        .value() as any[];
+        .value();
       if (steps.length && layer) {
         const step = last(steps)!;
         const event = events[step];
@@ -294,7 +294,7 @@ export const controller = {
                 items: {
                   info: {
                     index: -1,
-                    primary: <PropertyList event={x.meta.info} vertical />,
+                    primary: <PropertyList event={x.meta?.info} vertical />,
                   },
                 },
               })),
@@ -314,8 +314,8 @@ export const controller = {
                   extras: (
                     <PropertyDialog
                       {...{ event }}
-                      trigger={(onClick) => (
-                        <MenuItem {...{ onClick }}>
+                      trigger={({ open }) => (
+                        <MenuItem onClick={open}>
                           <ListItemIcon>
                             <DataObjectOutlined />
                           </ListItemIcon>
@@ -375,7 +375,7 @@ export const controller = {
       if (!layer || !content)
         throw { error: "layer or content is undefined", layer, content };
 
-      const updatedLayerSource = await parseYamlAsync(content);
+      const updatedLayerSource = (await parseYamlAsync(content)) as Trace;
       // Set the trace content
       set(layer, "source.trace.content", updatedLayerSource);
       // To get things to change, we also need to change the trace key

@@ -8,12 +8,8 @@ import {
   TypographyVariant,
 } from "@mui/material";
 import { Flex, FlexProps } from "components/generic/Flex";
-import {
-  ManagedModal as Dialog,
-  ManagedModalProps as DialogProps,
-  AppBarTitle as Title,
-} from "components/generic/Modal";
 import { Property, renderProperty } from "components/generic/Property";
+import { Surface, SurfaceProps } from "components/generic/surface";
 import {
   Dictionary,
   chain as _,
@@ -37,7 +33,7 @@ export const ESSENTIAL_PROPS = ["id"];
 
 export const GRAPH_PROPS = [...ESSENTIAL_PROPS, "pId"];
 
-export const HEURISTIC_PROPS = ["f", "g"];
+export const HEURISTIC_PROPS = ["f", "g", "h"];
 
 const ALL_PROPS = [...OMIT_PROPS, ...GRAPH_PROPS, ...HEURISTIC_PROPS];
 
@@ -49,27 +45,26 @@ const sortEventKeys = (e: PropertyListProps["event"]) =>
     .value();
 
 type PropertyListProps = {
-  event?: Dictionary<any>;
-  variant?: TypographyVariant;
+  event?: Dictionary<unknown>;
   max?: number;
   simple?: boolean;
   primitives?: boolean;
+  variant?: TypographyVariant;
 };
 
 export function PropertyDialog({
   event,
   max = 10,
-  simple: _simple,
-  variant: _variant,
   ...rest
-}: PropertyListProps & DialogProps) {
+}: Omit<PropertyListProps, "variant" | "simple" | "primitives"> &
+  Partial<SurfaceProps>) {
   const sorted = sortEventKeys(event);
   return (
-    <Dialog
+    <Surface
       {...merge(
         {
-          appBar: { children: <Title>Event Properties</Title> },
-          trigger: (onClick) => (
+          title: "Event Properties",
+          trigger: ({ open }) => (
             <Button
               variant="text"
               sx={{
@@ -82,13 +77,13 @@ export function PropertyDialog({
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                onClick(e);
+                open(e);
               }}
             >
               {sorted.length - max} more
             </Button>
           ),
-        } as DialogProps,
+        } as SurfaceProps,
         rest
       )}
     >
@@ -138,43 +133,41 @@ export function PropertyDialog({
           </Box>
         </Fragment>
       ))}
-    </Dialog>
+    </Surface>
   );
 }
 
-export function PropertyList(props: PropertyListProps & FlexProps) {
-  const {
-    event,
-    variant = "body2",
-    max = 10,
-    simple,
-    primitives,
-    ...rest
-  } = props;
-
+export function PropertyList({
+  event,
+  variant = "body2",
+  max = 10,
+  simple,
+  primitives,
+  ...rest
+}: PropertyListProps & FlexProps) {
   const sorted = sortEventKeys(event);
   return (
-    <>
-      <Flex {...rest}>
-        {_(sorted)
-          .filter(primitives ? ([, v]) => isPrimitive(v) : constant(true))
-          .slice(0, max)
-          .map(([k, v], i) => (
-            <Property
-              label={k}
-              value={v}
-              key={i}
-              type={{ variant }}
-              simple={simple}
-            />
-          ))
-          .value()}
-        {sorted.length > max && !simple && <PropertyDialog {...props} />}
-      </Flex>
-    </>
+    <Flex {...rest}>
+      {_(sorted)
+        .filter(primitives ? ([, v]) => isPrimitive(v) : constant(true))
+        .slice(0, max)
+        .map(([k, v], i) => (
+          <Property
+            label={k}
+            value={v}
+            key={i}
+            type={{ variant }}
+            simple={simple}
+          />
+        ))
+        .value()}
+      {sorted.length > max && !simple && (
+        <PropertyDialog event={event} max={max} />
+      )}
+    </Flex>
   );
 }
 
-function isPrimitive(v: any): boolean {
+function isPrimitive(v: unknown): boolean {
   return isString(v) || isNumber(v);
 }

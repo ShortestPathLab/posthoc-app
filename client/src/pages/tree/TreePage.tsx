@@ -267,14 +267,14 @@ export function TreePage({ template: Page }: PageContentProps) {
                             <Box sx={{ flex: 0 }}>
                               <PropertyDialog
                                 {...{ event: entry.event }}
-                                trigger={(onClick) => (
+                                trigger={({ open }) => (
                                   <Tooltip
                                     title="See all properties"
                                     placement="right"
                                   >
                                     <MenuItem
                                       selected={selected}
-                                      {...{ onClick }}
+                                      onClick={open}
                                       sx={{ pr: 0 }}
                                     >
                                       <ListItemIcon>

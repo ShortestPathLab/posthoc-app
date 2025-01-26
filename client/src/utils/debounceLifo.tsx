@@ -11,10 +11,9 @@ import { debounce } from "lodash";
  * @param {T} f - The asynchronous function to debounce.
  * @returns {T} - A debounced version of the function.
  */
-export function debounceLifo<T extends (...args: any[]) => Promise<any>>(
-  f: T,
-  wait: number = 1000
-): T {
+export function debounceLifo<
+  T extends (...args: unknown[]) => Promise<unknown>
+>(f: T, wait: number = 1000): T {
   let isRunning = false;
   let scheduledArgs: Parameters<T> | null = null;
 

@@ -120,7 +120,8 @@ export function ViewLeaf<T>({
           !!root.acceptDrop,
       }),
       drop: (item) => {
-        onDrop?.(item, root), onSwap?.(item.key, root.key);
+        onDrop?.(item, root);
+        onSwap?.(item.key, root.key);
       },
     })
   );
