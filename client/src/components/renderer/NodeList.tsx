@@ -3,27 +3,6 @@ import { floor, slice } from "lodash";
 import { useEffect, useMemo } from "react";
 import { ComponentEntry } from "renderer";
 
-function generateNumberArray(n: number) {
-  const numberArray = [0];
-  const digits = n.toString(2).split("").map(Number);
-
-  for (let i = 0; i < digits.length; i++) {
-    const power = digits.length - i - 1;
-    const newNumber = digits.slice(0, i + 1).join("") + "0".repeat(power);
-    numberArray.push(parseInt(newNumber, 2));
-  }
-
-  return numberArray;
-}
-
-function pairwise<T, U>(arr: T[], func: (x: T, y: T) => U) {
-  const out: U[] = [];
-  for (let i = 0; i < arr.length - 1; i++) {
-    out.push(func(arr[i], arr[i + 1]));
-  }
-  return out;
-}
-
 export type NodeListProps = {
   nodes?: ComponentEntry[][];
   start?: number;

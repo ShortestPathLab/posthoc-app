@@ -38,7 +38,7 @@ export function setAttributes(
   graph: MultiDirectedGraph,
   id: string,
   type: "edge" | "node",
-  values: { [K in string]: any }
+  values: { [K in string]: string | number }
 ) {
   const a = {
     node: "setNodeAttribute" as const,
@@ -58,7 +58,7 @@ export const orientationOptions = {
   },
 };
 
-export const isDefined = (a: any) => !isUndefined(a) && !isNull(a);
+export const isDefined = (a: unknown) => !isUndefined(a) && !isNull(a);
 
 export const divider = (
   <Divider orientation="vertical" flexItem sx={{ m: 1 }} />
@@ -211,7 +211,7 @@ export function TreeGraph(props: TreeGraphProps) {
             <Scroll x style={{ height: theme.spacing(5) }}>
               <Box
                 sx={{
-                  ...pick(acrylic as any, "backdropFilter"),
+                  ...pick(acrylic, "backdropFilter"),
                   transition: (t) => t.transitions.create("background-color"),
                   pointerEvents: "all",
                   alignItems: "center",

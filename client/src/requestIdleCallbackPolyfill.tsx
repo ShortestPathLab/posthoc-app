@@ -1,10 +1,8 @@
 if (!("requestIdleCallback" in window)) {
-  ///@ts-ignore
-  window.requestIdleCallback = (f: () => void) => setTimeout(f);
+  (window as Window).requestIdleCallback = (f) => setTimeout(f);
 }
 if (!("cancelIdleCallback" in window)) {
-  ///@ts-ignore
-  window.cancelIdleCallback = (c) => {
+  (window as Window).cancelIdleCallback = (c) => {
     try {
       window.cancelAnimationFrame?.(c);
       window.clearTimeout?.(c);

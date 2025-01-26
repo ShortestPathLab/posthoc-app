@@ -40,9 +40,10 @@ export function withProduce<T>(
     }
   ) => ReactElement
 ) {
-  return (props: EditorSetterProps<T>) =>
-    createElement(component, {
+  return function WithProduce(props: EditorSetterProps<T>) {
+    return createElement(component, {
       ...props,
       produce: (f) => props?.onChange?.(producify(f)),
     });
+  };
 }

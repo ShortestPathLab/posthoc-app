@@ -22,5 +22,6 @@ export default [
   {
     rules: { "react/react-in-jsx-scope": "off" },
   },
+  { rules: { "@typescript-eslint/no-explicit-any": "warn" } },
   { settings: { react: { version: "detect" } } },
 ];

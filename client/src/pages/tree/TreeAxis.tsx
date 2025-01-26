@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import { TreeWorkerReturnType } from "./tree.worker";
-import { Trace } from "protocol";
-import { CameraState, Coordinates } from "sigma/types";
+import { useRegisterEvents, useSigma } from "@react-sigma/core";
 import { chain, isUndefined, List, map } from "lodash";
 import { sort } from "moderndash";
-import { useRegisterEvents, useSigma } from "@react-sigma/core";
+import { Trace } from "protocol";
+import { useEffect, useRef, useState } from "react";
+import { Coordinates } from "sigma/types";
+import { TreeWorkerReturnType } from "./tree.worker";
 
 type TreeAxisProps = {
   tree?: TreeWorkerReturnType;
@@ -15,8 +15,7 @@ type TreeAxisProps = {
 
 export function TreeAxis(props: TreeAxisProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { width = 0, height = 0, trace } = props;
-  const events = trace?.events;
+  const { width = 0, height = 0 } = props;
   const sigma = useSigma();
   const registerEvents = useRegisterEvents();
 

@@ -100,5 +100,6 @@ export function useTraceParser(
     } else {
       return undefined;
     }
+    // eslint-disable-next-line react-compiler/react-compiler
   }, deps);
 }

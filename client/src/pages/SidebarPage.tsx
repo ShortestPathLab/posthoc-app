@@ -4,12 +4,11 @@ import { useSidebarBackground } from "Sidebar";
 import { Flex } from "components/generic/Flex";
 import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
 import { Scroll } from "components/generic/Scrollbars";
-import { ErrorBoundary } from "react-error-boundary";
 import { withSlots } from "components/withSlots";
+import { ErrorBoundary } from "react-error-boundary";
+import { useUIState } from "slices/UIState";
 import { useAcrylic } from "theme";
 import { PageProps, PageSlots, divider } from "./Page";
-import { useUIState } from "slices/UIState";
-import { useEffect } from "react";
 
 export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
   const bg = useSidebarBackground();

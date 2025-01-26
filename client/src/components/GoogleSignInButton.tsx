@@ -35,7 +35,7 @@ const FileList = ({
   const notify = useSnackbar();
   const { load } = useWorkspace();
   const formatSize = (size: string) => {
-    let sizeNum = parseInt(size);
+    const sizeNum = parseInt(size);
     if (sizeNum < 1024) return `${sizeNum} bytes`;
     if (sizeNum < 1024 * 1024) return `${(sizeNum / 1024).toFixed(2)} KB`;
     return `${(sizeNum / (1024 * 1024)).toFixed(2)} MB`;
@@ -46,7 +46,7 @@ const FileList = ({
       try {
         const file = await cloudService?.getFile(fileId);
         load(file);
-      } catch (error) {
+      } catch {
         notify("Failed to fetch file from source");
       }
     });

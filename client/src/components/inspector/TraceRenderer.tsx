@@ -126,7 +126,7 @@ export function TraceRenderer({
   rendererRef,
   layers,
 }: RendererProps) {
-  const key = useMemo(nanoid, []);
+  const key = useMemo(() => nanoid(), []);
   const { instance, error, ref } = useRenderer(renderer, { width, height });
   const { playing } = usePlaybackState();
   const [, setScreenshots] = useScreenshots();

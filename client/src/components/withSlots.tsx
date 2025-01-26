@@ -1,10 +1,13 @@
+/* eslint-disable react/display-name */
+/* eslint-disable react/prop-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  Children,
   ComponentType,
   createElement,
-  Children,
   isValidElement,
-  useMemo,
   memo,
+  useMemo,
 } from "react";
 
 // Extendable type
@@ -64,15 +67,13 @@ const EXCLUDED_NAMES = [
 /**
  * Helpers
  */
-const getSlotProps = (children: any, slotKeys: string[]) =>
+const getSlotProps = (children: any) =>
   Children.toArray(children).reduce<SlotPropsExtends>((curr, child) => {
     // console.log(child, isValidElement(child));
     if (isValidElement(child)) {
       const tag: string = (child.type as any).displayName;
 
-      if (true || slotKeys?.includes(tag)) {
-        curr[tag] = child.props;
-      }
+      curr[tag] = child.props;
     }
     return curr;
   }, {});
@@ -106,7 +107,7 @@ const createResultComponent = (
 
     // Find and get out all childProps
     const slotProps = useMemo(
-      () => getSlotProps(children, slotKeys),
+      () => getSlotProps(children),
       [slotKeys, children]
     );
     // Clean children from childProps components

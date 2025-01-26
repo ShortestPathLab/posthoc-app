@@ -46,6 +46,7 @@ type ViewportPageContext = PanelState & {
 export function autoSelectRenderer(
   renderers: Renderer[],
   //TODO:
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   components: string[]
 ) {
   return find(renderers, (r) => {

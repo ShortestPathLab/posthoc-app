@@ -12,17 +12,21 @@ import {
   useState,
 } from "react";
 
-type A = (
+type Options = {
+  error?: boolean;
+  action?: () => void;
+  actionLabel?: string;
+};
+
+type ClearSnackbarCallback = () => void;
+
+type SnackbarCallback = (
   message?: string,
   secondary?: string,
-  options?: {
-    error?: boolean;
-    action?: () => void;
-    actionLabel?: string;
-  }
-) => () => void;
+  options?: Options
+) => ClearSnackbarCallback;
 
-const SnackbarContext = createContext<A>(() => noop);
+const SnackbarContext = createContext<SnackbarCallback>(() => noop);
 
 export interface SnackbarMessage {
   message?: ReactNode;
@@ -61,7 +65,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
   }, [snackPack, current, open]);
 
   const handleMessage = useCallback(
-    ((message?: string, secondary?: string, options = {}) => {
+    (message?: string, secondary?: string, options: Options = {}) => {
       setSnackPack((prev) => [
         ...prev,
         {
@@ -82,12 +86,12 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         console.error(`${message}, ${secondary}`);
       }
       return () => handleClose("");
-    }) as A,
+    },
     [setSnackPack]
   );
 
-  const handleClose = (_: any, reason?: string) => {
-    reason !== "clickaway" && setOpen(false);
+  const handleClose = (_: unknown, reason?: string) => {
+    if (reason !== "clickaway") setOpen(false);
   };
 
   const handleExited = () => setCurrent(undefined);

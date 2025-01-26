@@ -181,7 +181,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                               if (!isEmpty(layer?.source?.highlighting)) {
                                 setLayer(
                                   produce(layer, (l) =>
-                                    set(l?.source!, "highlighting", {})
+                                    set(l?.source ?? {}, "highlighting", {})
                                   )!
                                 );
                               }
@@ -348,7 +348,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                                     }}
                                     onClick={() => {
                                       showHighlight[highlight.type](
-                                        selected?.current?.step!
+                                        selected!.current!.step!
                                       );
                                       setMenuOpen(false);
                                     }}
@@ -421,7 +421,7 @@ export function TreePage({ template: Page }: PageContentProps) {
               icon: <ModeStandbyOutlined />,
               label: "Layout",
               value: mode,
-              onChange: setMode as any,
+              onChange: setMode,
               items: map(entries(layoutModes), ([k, v]) => ({
                 id: k,
                 ...v,
@@ -446,6 +446,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 label={label}
                 value={value}
                 items={items}
+                /// @ts-expect-error poor type inference
                 onChange={onChange}
                 arrow
               />

@@ -2,7 +2,7 @@ import { Box, Dialog, useTheme } from "@mui/material";
 import { useSm } from "hooks/useSmallDisplay";
 import { ComponentProps, ReactNode } from "react";
 import { Scroll } from "components/generic/Scrollbars";
-import Swipe from "components/generic/Swipe";
+import Swipe from "components/generic/transitions/Swipe";
 import { useCache } from "hooks/useCache";
 import { useModalOverflow } from "./useModalOverflow";
 import { useModalDepth } from "./useModalDepth";
