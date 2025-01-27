@@ -4,6 +4,30 @@ type WorkerConstructor = new () => Worker;
 
 type WorkerResult = { result: any } | { error: any };
 
+export type OutErrorDetails = {
+  name: string;
+  reason: string;
+  mark: {
+    name: null | string;
+    buffer: string;
+    position: number;
+    line: number;
+    column: number;
+    snippet: string;
+    message: string;
+  };
+};
+
+export class OutError extends Error {
+  details: OutErrorDetails;
+  constructor(message: string, details: any) {
+    super(message);
+    this.name = "OutError";
+    this.details = details;
+    Object.setPrototypeOf(this, OutError.prototype);
+  }
+}
+
 export const usingWorker =
   <R>(w: WorkerConstructor) =>
   async (task: (w: Worker) => Promise<R>) => {
@@ -11,7 +35,7 @@ export const usingWorker =
     const out = (await task(worker)) as WorkerResult;
     if ("error" in out) {
       console.error(out.error);
-      throw new Error(out.error);
+      throw new OutError("Yaml parsing error", out.error);
     }
     worker.terminate();
     return out.result as R;
@@ -38,7 +62,7 @@ export const usingMemoizedWorkerTask = <T, R>(
   o: memoize.Options<(t: T) => Promise<R>> = {
     async: true,
     length: 1,
-  }
+  },
 ) => memoize(usingWorkerTask(w), o);
 
 export const usingMessageHandler =

@@ -1,4 +1,4 @@
-import { Editor } from "@monaco-editor/react";
+import { Editor, Monaco, useMonaco } from "@monaco-editor/react";
 import { CodeOutlined } from "@mui-symbols-material/w400";
 import { CircularProgress, Tab, Tabs, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
@@ -9,13 +9,14 @@ import { LayerSource } from "layers";
 import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
 import { transactionAsync } from "produce";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Layer, useLayer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
 import { debounceLifo } from "utils/debounceLifo";
 import { PageContentProps } from "./PageMeta";
-
+import { OutError, OutErrorDetails } from "workers/usingWorker";
+import * as monaco from "monaco-editor";
 type SourceLayer = Layer;
 
 const isSourceLayer = (l: Layer): l is SourceLayer =>
@@ -26,27 +27,27 @@ type SourceLayerState = { source?: string; layer?: string };
 export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
   useMonacoTheme(theme);
-
+  const [editorError, setEditorError] = useState<null | OutErrorDetails>(null);
   const { layers, setLayer, setKey } = useLayer(undefined, isSourceLayer);
 
   const sources = useMemo(
     () =>
-      layers?.flatMap?.(
-        (l) =>
-          getController(l)
-            ?.getSources?.(l)
-            ?.map?.((c) => ({
-              layer: l.key,
-              source: c,
-            }))
-        // why is layer string here?
-        // layer is only the layer id
+      layers?.flatMap?.((l) =>
+        getController(l)
+          ?.getSources?.(l)
+          ?.map?.((c) => ({
+            layer: l.key,
+            source: c,
+          })),
       ) as { layer: string; source: LayerSource }[],
-    [layers]
+    [layers],
   );
 
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<SourceLayerState>();
+
+  const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
+  const monacoRef = useRef<null | Monaco>(null);
 
   const usingLoading = useLoadingState("layers");
 
@@ -54,14 +55,31 @@ export function SourcePage({ template: Page }: PageContentProps) {
     () =>
       find(
         sources,
-        (c) => c && c.source.id === state?.source && c.layer === state?.layer
+        (c) => c && c.source.id === state?.source && c.layer === state?.layer,
       ) ?? first(sources),
-    [sources, state?.source, state?.layer]
+    [sources, state?.source, state?.layer],
   );
   useEffect(
     () => void (selected?.layer && setKey(selected?.layer)),
-    [setKey, selected?.layer]
+    [setKey, selected?.layer],
   );
+  const handleEditorMount = (
+    editor: monaco.editor.IStandaloneCodeEditor,
+    monacoInstance: Monaco,
+  ) => {
+    editorRef.current = editor;
+    monacoRef.current = monaco;
+  };
+  const addEditorModelMarker = ({}: {
+    startLineNumber: number;
+    startColumn: number;
+    endLineNumber: number;
+    endColumn: number;
+    message: string;
+    severity: Monaco["MarkerSeverity"];
+  }) => {
+    // editor;
+  };
 
   const handleEditorContentChange = useMemo(
     () =>
@@ -69,19 +87,49 @@ export function SourcePage({ template: Page }: PageContentProps) {
         usingLoading(() =>
           setLayer(
             async (l) =>
-              (await transactionAsync(
-                l,
-                async (l) =>
-                  await getController(l)?.onEditSource?.(
+              (await transactionAsync(l, async (l) => {
+                try {
+                  const modifiedLayer = await getController(l)?.onEditSource?.(
                     l,
                     selected?.source?.id,
-                    value
-                  )
-              )) ?? l
-          )
-        )
+                    value,
+                  );
+                  setEditorError(null);
+                  return modifiedLayer;
+                } catch (error) {
+                  if (error instanceof OutError) {
+                    console.log(error.details);
+                    if (editorRef.current && monacoRef.current) {
+                      const model = editorRef.current.getModel();
+                      if (model) {
+                        monacoRef.current.editor.setModelMarkers(
+                          model,
+                          "owner",
+                          [
+                            {
+                              startLineNumber: error.details.mark.line,
+                              startColumn: error.details.mark.column,
+                              message: error.details.mark.message,
+                              endLineNumber: error.details.mark.line,
+                              endColumn: error.details.mark.column,
+                              severity: monacoRef.current.MarkerSeverity.Error,
+                            },
+                          ],
+                        );
+                      } else {
+                        console.log("model undefined");
+                      }
+                      // setEditorError(error.details);
+                    } else {
+                      console.log("undefinedjj w");
+                    }
+                  }
+                }
+              })) ?? l,
+          ),
+        ),
       ),
-    [usingLoading, selected?.source?.id, setLayer]
+    [usingLoading, selected?.source?.id, setLayer],
   );
 
   return (
@@ -96,6 +144,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
             <AutoSize>
               {(size: { width: number; height: number }) => (
                 <Editor
+                  onMount={handleEditorMount}
                   // Refresh the editor when the id changes
                   key={selected?.source?.id}
                   theme={

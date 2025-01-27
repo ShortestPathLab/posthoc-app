@@ -64,6 +64,7 @@ import { set } from "utils/set";
 import { parseYamlAsync } from "workers/async";
 import { TrustedLayerData } from "../TrustedLayerData";
 import { use2DPath } from "./use2DPath";
+import { OutError } from "workers/usingWorker";
 
 export type TraceLayerData = {
   trace?: UploadedTrace & { error?: string };
@@ -181,7 +182,7 @@ export const controller = {
           color: {
             ...colorsHex,
             ...mapValues(accentColors, (_, v: AccentColor) =>
-              getShade(v, palette.mode, 500, 400)
+              getShade(v, palette.mode, 500, 400),
             ),
           },
           themeAccent: palette.primary.main,
@@ -191,7 +192,7 @@ export const controller = {
         view: "main",
       },
       isTrusted,
-      [trace?.key, palette.mode, isTrusted]
+      [trace?.key, palette.mode, isTrusted],
     );
     // Parse the trace
     useAsync(async () => {
@@ -225,8 +226,8 @@ export const controller = {
                 sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
                 sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
               },
-            })
-          )
+            }),
+          ),
         ),
       [
         parsedTrace?.stepsPersistent,
@@ -234,7 +235,7 @@ export const controller = {
         layer?.transparency,
         layer?.displayMode,
         index,
-      ]
+      ],
     );
     const steps1 = useMemo(
       () =>
@@ -247,8 +248,8 @@ export const controller = {
                 sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
                 sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
               },
-            })
-          )
+            }),
+          ),
         ),
       [
         parsedTrace?.stepsTransient,
@@ -256,7 +257,7 @@ export const controller = {
         layer?.transparency,
         layer?.displayMode,
         index,
-      ]
+      ],
     );
     const transientSteps = useMemo(() => [steps1[step] ?? []], [steps1, step]);
     return (
@@ -298,7 +299,7 @@ export const controller = {
                   },
                 },
               })),
-              "key"
+              "key",
             ),
             [layer.key]: {
               primary: inferLayerName(layer),
@@ -341,7 +342,7 @@ export const controller = {
                     setLayer(
                       produce(layer, (l) => {
                         set(l, "source.step", step);
-                      })
+                      }),
                     ),
                   icon: <ArrowOutwardRounded />,
                 },
@@ -374,15 +375,18 @@ export const controller = {
       if (id !== "trace") throw { error: "id not trace", id };
       if (!layer || !content)
         throw { error: "layer or content is undefined", layer, content };
-
       const updatedLayerSource = await parseYamlAsync(content);
       // Set the trace content
       set(layer, "source.trace.content", updatedLayerSource);
       // To get things to change, we also need to change the trace key
       set(layer, "source.trace.key", nanoid());
-      console.log(layer);
+
       return layer;
     } catch (error) {
+      if (error instanceof OutError) {
+        console.log(error.details);
+        throw error;
+      }
       console.error(error);
     }
   },
