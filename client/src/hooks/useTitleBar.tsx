@@ -1,10 +1,11 @@
-import { getContrastRatio, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import interpolate from "color-interpolate";
 import { times } from "lodash";
 import memoizee from "memoizee";
 import { name } from "public/manifest.json";
 import { useEffect, useState } from "react";
 import { useUIState } from "slices/UIState";
+import { getForegroundColor } from "./getForegroundColor";
 
 const stackColors = memoizee(
   (base, layer, count = 0) => {
@@ -28,11 +29,6 @@ const stackColors = memoizee(
   },
   { normalizer: JSON.stringify }
 );
-
-const getForegroundColor = (bg: string) =>
-  getContrastRatio(bg, "#ffffff") > getContrastRatio(bg, "#000000")
-    ? "#ffffff"
-    : "#000000";
 
 export function useTitleBar(color: string) {
   const { palette } = useTheme();

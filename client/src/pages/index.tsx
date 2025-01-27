@@ -30,7 +30,7 @@ import { PageMeta } from "./PageMeta";
 import { SettingsPage } from "./SettingsPage";
 import { SourcePage } from "./SourcePage";
 import { StepsPage } from "./StepsPage";
-import { TreePage } from "./TreePage";
+import { TreePage } from "./tree/TreePage";
 import { ViewportPage } from "./ViewportPage";
 import { SavedLogsPage } from "./SavedLogsPage";
 
