@@ -1,9 +1,13 @@
 import { useForkRef, useTheme } from "@mui/material";
-import * as React from "react";
+import { TransitionProps as MuiTransitionProps } from "@mui/material/transitions";
+import { get } from "lodash";
+import { cloneElement, ElementType, isValidElement, Ref, useRef } from "react";
 import { Transition } from "react-transition-group";
+import { EnterHandler, ExitHandler } from "react-transition-group/Transition";
+
 export const reflow = (node: Element) => node.scrollTop;
 
-interface ComponentProps {
+interface ComponentProps1 {
   easing: string | { enter?: string; exit?: string } | undefined;
   style: React.CSSProperties | undefined;
   timeout: number | { enter?: number; exit?: number };
@@ -20,7 +24,7 @@ interface TransitionProps {
 }
 
 export function getTransitionProps(
-  props: ComponentProps,
+  props: ComponentProps1,
   options: Options
 ): TransitionProps {
   const { timeout, easing, style = {} } = props;
@@ -48,13 +52,14 @@ const styles = {
   exiting: {},
   exited: {},
   unmounted: {},
-} as any;
+};
 
-/**
- * The Fade transition is used by the [Modal](/material-ui/react-modal/) component.
- * It uses [react-transition-group](https://github.com/reactjs/react-transition-group) internally.
- */
-const Swipe = React.forwardRef<any, any>((props, ref) => {
+const Swipe = (
+  props: MuiTransitionProps & {
+    TransitionComponent?: ElementType;
+    ref?: Ref<HTMLElement>;
+  }
+) => {
   const theme = useTheme();
   const defaultTimeout = {
     enter: theme.transitions.duration.enteringScreen,
@@ -75,25 +80,31 @@ const Swipe = React.forwardRef<any, any>((props, ref) => {
     onExiting,
     style,
     timeout = defaultTimeout,
-    // eslint-disable-next-line react/prop-types
     TransitionComponent = Transition,
+    ref,
     ...other
   } = props;
 
   const enableStrictModeCompat = true;
-  const nodeRef = React.useRef(null);
-  const handleRef = useForkRef(nodeRef, children.ref, ref);
+  const nodeRef = useRef<HTMLElement>(null);
+  const handleRef = useForkRef(nodeRef, get(children, "ref"), ref);
 
   const normalizedTransitionCallback =
-    (callback: any) => (maybeIsAppearing: any) => {
+    (
+      callback?:
+        | EnterHandler<HTMLElement | undefined>
+        | ExitHandler<HTMLElement | undefined>
+    ) =>
+    (maybeIsAppearing: boolean) => {
       if (callback) {
         const node = nodeRef.current;
-
-        // onEnterXxx and onExitXxx callbacks have a different arguments.length value.
-        if (maybeIsAppearing === undefined) {
-          callback(node);
-        } else {
-          callback(node, maybeIsAppearing);
+        if (node) {
+          // onEnterXxx and onExitXxx callbacks have a different arguments.length value.
+          if (maybeIsAppearing === undefined) {
+            (callback as ExitHandler<undefined>)?.(node);
+          } else {
+            (callback as EnterHandler<undefined>)?.(node, maybeIsAppearing);
+          }
         }
       }
     };
@@ -101,9 +112,8 @@ const Swipe = React.forwardRef<any, any>((props, ref) => {
   const handleEntering = normalizedTransitionCallback(onEntering);
 
   const handleEnter = normalizedTransitionCallback(
-    (node: any, isAppearing: any) => {
+    (node: HTMLElement, isAppearing: boolean) => {
       reflow(node); // So the animation always start from the start.
-
       const transitionProps = getTransitionProps(
         { style, timeout, easing },
         {
@@ -111,10 +121,6 @@ const Swipe = React.forwardRef<any, any>((props, ref) => {
         }
       );
 
-      node.style.webkitTransition = theme.transitions.create(
-        ["opacity", "transform"],
-        transitionProps
-      );
       node.style.transition = theme.transitions.create(
         ["opacity", "transform"],
         transitionProps
@@ -130,7 +136,7 @@ const Swipe = React.forwardRef<any, any>((props, ref) => {
 
   const handleExiting = normalizedTransitionCallback(onExiting);
 
-  const handleExit = normalizedTransitionCallback((node: any) => {
+  const handleExit = normalizedTransitionCallback((node: HTMLElement) => {
     const transitionProps = getTransitionProps(
       { style, timeout, easing },
       {
@@ -138,10 +144,6 @@ const Swipe = React.forwardRef<any, any>((props, ref) => {
       }
     );
 
-    node.style.webkitTransition = theme.transitions.create(
-      ["opacity", "transform"],
-      transitionProps
-    );
     node.style.transition = theme.transitions.create(
       ["opacity", "transform"],
       transitionProps
@@ -154,10 +156,10 @@ const Swipe = React.forwardRef<any, any>((props, ref) => {
 
   const handleExited = normalizedTransitionCallback(onExited);
 
-  const handleAddEndListener = (next: any) => {
+  const handleAddEndListener = (next: () => void) => {
     if (addEndListener) {
       // Old call signature before `react-transition-group` implemented `nodeRef`
-      addEndListener(nodeRef.current, next);
+      addEndListener(nodeRef.current!, next);
     }
   };
 
@@ -176,22 +178,26 @@ const Swipe = React.forwardRef<any, any>((props, ref) => {
       timeout={timeout}
       {...other}
     >
-      {(state: any, childProps: any) => {
-        return React.cloneElement(children, {
-          style: {
-            transform: "translateY(16px)",
-            opacity: 0,
-            visibility: state === "exited" && !inProp ? "hidden" : undefined,
-            ...styles[state],
-            ...style,
-            ...children.props.style,
-          },
-          ref: handleRef,
-          ...childProps,
-        });
+      {(state: keyof typeof styles, childProps: Record<string, unknown>) => {
+        return (
+          children &&
+          isValidElement(children) &&
+          cloneElement(children, {
+            style: {
+              transform: "translateY(16px)",
+              opacity: 0,
+              visibility: state === "exited" && !inProp ? "hidden" : undefined,
+              ...styles[state],
+              ...style,
+              ...children.props.style,
+            },
+            ref: handleRef,
+            ...childProps,
+          } as Record<string, unknown>)
+        );
       }}
     </TransitionComponent>
   );
-});
+};
 
 export default Swipe;

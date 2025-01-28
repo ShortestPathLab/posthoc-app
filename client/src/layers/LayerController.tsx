@@ -14,6 +14,7 @@ export type SelectionInfoProvider = FC<{
 
 export type LayerSource = Feature & {
   language?: string;
+  readonly?: boolean;
 };
 
 export type LayerController<K extends string, T> = {
@@ -39,5 +40,5 @@ export type LayerController<K extends string, T> = {
     layer?: Layer<T>,
     id?: string,
     content?: string
-  ) => Layer<T> | undefined;
+  ) => Promise<Layer<T> | undefined>;
 };

@@ -1,18 +1,20 @@
 import { Editor } from "@monaco-editor/react";
 import { CodeOutlined } from "@mui-symbols-material/w400";
 import { CircularProgress, Tab, Tabs, useTheme } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 import { LayerSource } from "layers";
 import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
+import { transactionAsync } from "produce";
+import { useEffect, useMemo } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Layer, useLayer } from "slices/layers";
-import { divider } from "./Page";
+import { useLoadingState } from "slices/loading";
+import { debounceLifo } from "utils/debounceLifo";
 import { PageContentProps } from "./PageMeta";
-import { useMemo } from "react";
 
 type SourceLayer = Layer;
 
@@ -23,26 +25,30 @@ type SourceLayerState = { source?: string; layer?: string };
 
 export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
-
   useMonacoTheme(theme);
 
-  const { layers } = useLayer(undefined, isSourceLayer);
+  const { layers, setLayer, setKey } = useLayer(undefined, isSourceLayer);
 
   const sources = useMemo(
     () =>
-      layers?.flatMap?.((l) =>
-        getController(l)
-          ?.getSources?.(l)
-          ?.map?.((c) => ({
-            layer: l.key,
-            source: c,
-          }))
+      layers?.flatMap?.(
+        (l) =>
+          getController(l)
+            ?.getSources?.(l)
+            ?.map?.((c) => ({
+              layer: l.key,
+              source: c,
+            }))
+        // why is layer string here?
+        // layer is only the layer id
       ) as { layer: string; source: LayerSource }[],
     [layers]
   );
 
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<SourceLayerState>();
+
+  const usingLoading = useLoadingState("layers");
 
   const selected = useMemo(
     () =>
@@ -51,6 +57,31 @@ export function SourcePage({ template: Page }: PageContentProps) {
         (c) => c && c.source.id === state?.source && c.layer === state?.layer
       ) ?? first(sources),
     [sources, state?.source, state?.layer]
+  );
+  useEffect(
+    () => void (selected?.layer && setKey(selected?.layer)),
+    [setKey, selected?.layer]
+  );
+
+  const handleEditorContentChange = useMemo(
+    () =>
+      debounceLifo((value) =>
+        usingLoading(() =>
+          setLayer(
+            async (l) =>
+              (await transactionAsync(
+                l,
+                async (l) =>
+                  await getController(l)?.onEditSource?.(
+                    l,
+                    selected?.source?.id,
+                    value
+                  )
+              )) ?? l
+          )
+        )
+      ),
+    [usingLoading, selected?.source?.id, setLayer]
   );
 
   return (
@@ -61,24 +92,33 @@ export function SourcePage({ template: Page }: PageContentProps) {
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         {sources?.length ? (
-          <Flex pt={6}>
+          <Block pt={6}>
             <AutoSize>
-              {(size) => (
+              {(size: { width: number; height: number }) => (
                 <Editor
+                  // Refresh the editor when the id changes
+                  key={selected?.source?.id}
                   theme={
                     theme.palette.mode === "dark" ? "posthoc-dark" : "light"
                   }
                   options={{
-                    readOnly: true,
+                    readOnly: !!selected?.source?.readonly,
                   }}
                   language={selected?.source?.language}
                   loading={<CircularProgress variant="indeterminate" />}
                   {...size}
-                  value={selected?.source?.content}
+                  // If source is readonly, use value, so the value updates the editor.
+                  // Otherwise, don't update the editor when value changes
+                  // for better editing experience
+                  {...{
+                    [selected?.source?.readonly ? "value" : "defaultValue"]:
+                      selected?.source?.content,
+                  }}
+                  onChange={handleEditorContentChange}
                 />
               )}
             </AutoSize>
-          </Flex>
+          </Block>
         ) : (
           <Placeholder icon={<CodeOutlined />} label="Source" />
         )}

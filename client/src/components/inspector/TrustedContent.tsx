@@ -4,13 +4,13 @@ import {
   ShieldOutlined,
 } from "@mui-symbols-material/w400";
 import { Link, Stack } from "@mui/material";
-import { ReactNode } from "react";
-import { Placeholder } from "./Placeholder";
-import { useSettings } from "slices/settings";
-import { Button } from "components/generic/Button";
+import { Button } from "components/generic/inputs/Button";
 import { producify } from "produce";
-import { useUntrustedLayers as useUntrustedLayer } from "./useUntrustedLayers";
+import { ReactNode } from "react";
+import { useSettings } from "slices/settings";
 import { useUIState } from "slices/UIState";
+import { Placeholder } from "./Placeholder";
+import { useUntrustedLayers as useUntrustedLayer } from "./useUntrustedLayers";
 
 export function TrustedContent({ children }: { children?: ReactNode }) {
   const { isTrusted, untrustedLayerOrigin } = useUntrustedLayer();
@@ -18,7 +18,7 @@ export function TrustedContent({ children }: { children?: ReactNode }) {
   const [, setSettings] = useSettings();
   const [, setUIState] = useUIState();
   return isTrusted ? (
-    children
+    <>{children}</>
   ) : (
     <Placeholder
       icon={<ShieldOutlined />}

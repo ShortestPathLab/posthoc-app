@@ -30,14 +30,14 @@ import { PageMeta } from "./PageMeta";
 import { SettingsPage } from "./SettingsPage";
 import { SourcePage } from "./SourcePage";
 import { StepsPage } from "./StepsPage";
-import { TreePage } from "./TreePage";
+import { TreePage } from "./tree/TreePage";
 import { ViewportPage } from "./ViewportPage";
 import { SavedLogsPage } from "./SavedLogsPage";
 
 export const pages: Dictionary<PageMeta> = {
   explore: {
     id: "explore",
-    name: "Explore",
+    name: "Explore Posthoc",
     color: "deepOrange",
     description: "Browse examples and guides",
     icon: <RocketIcon />,
@@ -130,9 +130,9 @@ export const pages: Dictionary<PageMeta> = {
     allowFullscreen: true,
     showInSidebar: "always",
   },
-  savedLogs: {
-    id: "savedLogs",
-    name: "SavedLogs",
+  remote: {
+    id: "remote",
+    name: "Saved logs",
     description:
       "Contains all saved logs and enables user to get shareable link",
     color: "grey",
@@ -141,12 +141,4 @@ export const pages: Dictionary<PageMeta> = {
     allowFullscreen: false,
     showInSidebar: "always",
   },
-  // about: {
-  //   id: "about",
-  //   name: "About",
-  //   description: "",
-  //   color: "grey",
-  //   icon: <AboutIcon />,
-  //   content: AboutPage,
-  // },
 };

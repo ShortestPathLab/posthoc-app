@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { FileMetaData } from "services/CloudStorageService";
 import GoogleIcon from "@mui/icons-material/Google";
-import { Button } from "./generic/Button";
+import { Button } from "./generic/inputs/Button";
 import { MouseEventHandler, useState } from "react";
 import { useAuth } from "slices/auth";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -35,7 +35,7 @@ const FileList = ({
   const notify = useSnackbar();
   const { load } = useWorkspace();
   const formatSize = (size: string) => {
-    let sizeNum = parseInt(size);
+    const sizeNum = parseInt(size);
     if (sizeNum < 1024) return `${sizeNum} bytes`;
     if (sizeNum < 1024 * 1024) return `${(sizeNum / 1024).toFixed(2)} KB`;
     return `${(sizeNum / (1024 * 1024)).toFixed(2)} MB`;
@@ -46,7 +46,7 @@ const FileList = ({
       try {
         const file = await cloudService?.getFile(fileId);
         load(file);
-      } catch (error) {
+      } catch {
         notify("Failed to fetch file from source");
       }
     });
@@ -59,7 +59,7 @@ const FileList = ({
       else {
         throw new Error("Unable to generate link");
       }
-    } catch (error) {
+    } catch {
       notify("Unable to generate link");
     }
   };
@@ -125,7 +125,7 @@ const UploadWorkspace = () => {
       const { compressedFile } = await generateWorkspaceFile();
       if (authState.authenticated && compressedFile) {
         const res = await cloudService?.saveFile(compressedFile);
-        setLink(res ? (cloudService?.generateLink(res) ?? "") : "");
+        setLink(res ? cloudService?.generateLink(res) ?? "" : "");
       } else {
         // ? allow empty workspace upload?
         notify("Please start a workspace first");
@@ -141,7 +141,7 @@ const UploadWorkspace = () => {
   const handleCopy: MouseEventHandler<HTMLButtonElement> = async () => {
     try {
       await copy(link);
-    } catch (error) {
+    } catch {
       notify("Unable to copy url, pls copy manually");
     }
   };

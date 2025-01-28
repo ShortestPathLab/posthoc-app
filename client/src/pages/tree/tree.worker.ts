@@ -1,7 +1,7 @@
 import { graphlib, layout } from "@dagrejs/dagre";
 import { Dictionary, forEach, pick } from "lodash";
 import { Trace, TraceEvent } from "protocol";
-import { usingMessageHandler } from "../workers/usingWorker";
+import { usingMessageHandler } from "../../workers/usingWorker";
 
 export function getFinalParents(trace: Trace | undefined) {
   const finalParent: Dictionary<Key> = {};
@@ -30,7 +30,7 @@ function parse({ trace, mode, orientation }: TreeWorkerParameters) {
   g.setGraph({});
   switch (mode) {
     case "directed-graph":
-      forEach(trace?.events, ({ id, pId, type }, i) => {
+      forEach(trace?.events, ({ id, pId }) => {
         if (id) {
           if (!g.hasNode(`${id}`)) {
             g.setNode(`${id}`, {
@@ -59,7 +59,7 @@ function parse({ trace, mode, orientation }: TreeWorkerParameters) {
       {
         const finalParent: Dictionary<Key> = getFinalParents(trace);
 
-        forEach(trace?.events, ({ id, pId, type }, i) => {
+        forEach(trace?.events, ({ id }) => {
           if (id) {
             if (!g.hasNode(`${id}`)) {
               g.setNode(`${id}`, {

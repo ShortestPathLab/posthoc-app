@@ -1,8 +1,11 @@
-import { constant, filter, find, head, map } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { filter, find, head } from "lodash";
+import { map } from "promise-tools";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSlice } from "./createSlice";
 
-export const defaultGuard = constant(true) as any;
+type LayerGuard<T> = (l: Layer<any>) => l is Layer<T>;
+
+export const defaultGuard = ((l) => !!l) as LayerGuard<never>;
 
 export type Layer<T = Record<string, any>> = {
   key: string;
@@ -23,9 +26,9 @@ export const [useLayers, LayersProvider] = createSlice<Layers, Partial<Layers>>(
   }
 );
 
-export function useLayer<T extends Record<string, any> = Record<string, any>>(
+export function useLayer<T>(
   defaultKey?: string,
-  guard: (l: Layer) => l is Layer<T> = defaultGuard
+  guard: LayerGuard<T> = defaultGuard
 ) {
   const [key, setKey] = useState(defaultKey);
   const [{ layers }, setLayers] = useLayers();
@@ -41,23 +44,42 @@ export function useLayer<T extends Record<string, any> = Record<string, any>>(
       setKey(layer.key);
     }
   }, [layer, key, setKey]);
+
+  const setLayer = useCallback(
+    async (
+      newLayer:
+        | Layer<T>
+        | ((layer: Layer<T>) => Layer<T>)
+        | ((layer: Layer<T>) => Promise<Layer<T>>)
+    ) => {
+      setLayers(async ({ layers: prev }) => {
+        return {
+          layers: await map(prev, async (l) =>
+            l.key === layer?.key
+              ? {
+                  ...l,
+                  ...(typeof newLayer === "function"
+                    ? await newLayer(l as Layer<T>)
+                    : newLayer),
+                }
+              : l
+          ),
+        };
+      });
+    },
+    [setLayers, layer?.key]
+  );
+
   return useMemo(
     () =>
       ({
         key: layer?.key,
         setKey,
         layer,
-        setLayer: (newLayer: Layer<T>) => {
-          const mergedLayer = { ...layer, ...newLayer };
-          setLayers(({ layers: prev }) => ({
-            layers: map(prev, (l) =>
-              l.key === mergedLayer.key ? mergedLayer : l
-            ),
-          }));
-        },
+        setLayer,
         layers: filtered,
         allLayers: layers,
       } as const),
-    [layers, layer, setLayers, filtered]
+    [layers, layer, setLayer, filtered]
   );
 }

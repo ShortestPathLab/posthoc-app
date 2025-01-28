@@ -5,12 +5,12 @@ import {
 import beautify from "json-beautify";
 import { get, isNull, round, truncate } from "lodash";
 import { CSSProperties, ReactNode } from "react";
-import { Flex } from "./Flex";
+import { Block } from "./Block";
 import { Space } from "./Space";
 
 type Props = {
   label?: ReactNode;
-  value?: any;
+  value?: unknown;
   type?: TypeProps<"div">;
   simple?: boolean;
 };
@@ -21,7 +21,7 @@ const supProps: CSSProperties = {
   top: 0,
 };
 
-export function renderProperty(obj: any, simple: boolean = false) {
+export function renderProperty(obj: unknown, simple: boolean = false) {
   switch (typeof obj) {
     case "number": {
       if (simple) {
@@ -51,7 +51,7 @@ export function renderProperty(obj: any, simple: boolean = false) {
         </code>
       ) : (
         <code style={{ whiteSpace: "pre" }}>
-          {truncate(beautify(obj, undefined as any, 2), {
+          {truncate(beautify(obj, undefined as unknown as object, 2), {
             length: 100,
           })}
         </code>
@@ -61,7 +61,7 @@ export function renderProperty(obj: any, simple: boolean = false) {
 
 export function Property({ label, value, type, simple }: Props) {
   return (
-    <Flex
+    <Block
       width="auto"
       mr={2}
       mb={0.5}
@@ -80,6 +80,6 @@ export function Property({ label, value, type, simple }: Props) {
       <Type component="div" variant="body2" {...type}>
         {renderProperty(value, simple) ?? "none"}
       </Type>
-    </Flex>
+    </Block>
   );
 }

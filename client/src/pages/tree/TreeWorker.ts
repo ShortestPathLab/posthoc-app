@@ -1,11 +1,8 @@
 import { useAsync } from "react-async-hook";
 import { useMemo } from "react";
-import {
-  TreeWorkerParameters,
-  TreeWorkerReturnType,
-} from "./treeLegacy.worker";
-import { usingMemoizedWorkerTask } from "../workers/usingWorker";
-import treeWorkerUrl from "./treeLegacy.worker.ts?worker&url";
+import { TreeWorkerParameters, TreeWorkerReturnType } from "./tree.worker";
+import { usingMemoizedWorkerTask } from "workers/usingWorker";
+import treeWorkerUrl from "./tree.worker.ts?worker&url";
 
 export class TreeWorkerUrl extends Worker {
   constructor() {
@@ -22,7 +19,8 @@ export function useTree(trace: TreeWorkerParameters) {
   return useAsync(async () => await treeAsync(trace), [trace]);
 }
 
-export function useTreeMemo(trace: TreeWorkerParameters, deps: any[]) {
+export function useTreeMemo(trace: TreeWorkerParameters, deps: unknown[]) {
+  // eslint-disable-next-line react-compiler/react-compiler
   const params = useMemo(() => trace, deps);
 
   return useTree(params);

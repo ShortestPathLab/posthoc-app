@@ -18,7 +18,7 @@ export type KeywordOf<T> =
   | "any";
 
 export type FunctionTemplate<
-  Params extends [...any] = [],
+  Params extends [...any[]] = [],
   ReturnType = void
 > = {
   name: string;

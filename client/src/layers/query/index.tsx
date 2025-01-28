@@ -38,12 +38,14 @@ import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { Layer, useLayer, useLayers } from "slices/layers";
 
-const mapValuesDeep = (v: any, callback: (t: any) => any): any =>
-  isArray(v)
-    ? map(v, (v) => mapValuesDeep(v, callback))
+function mapValuesDeep<T, U>(v: T, callback: (t: unknown) => any): U {
+  return isArray(v)
+    ? (map(v, (v) => mapValuesDeep(v, callback)) as U)
     : isObject(v)
-    ? mapValues(v, (v) => mapValuesDeep(v, callback))
-    : callback(v);
+    ? (mapValues(v, (v) => mapValuesDeep(v, callback)) as U)
+    : (callback(v) as U);
+}
+
 async function findConnection(
   connections: Connection[],
   algorithm: string,
@@ -332,6 +334,7 @@ export const controller = {
         id: "params",
         name: "Query",
         language: "yaml",
+        readonly: true,
         content: dump(
           {
             algorithm,

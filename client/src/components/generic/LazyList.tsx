@@ -4,7 +4,6 @@ import {
   ReactElement,
   ReactNode,
   Ref,
-  forwardRef,
   useCallback,
   useEffect,
   useRef,
@@ -18,6 +17,7 @@ import {
   VirtuosoProps as ListProps,
   VirtuosoHandle,
 } from "react-virtuoso";
+import { set } from "lodash";
 
 // const Scroller = forwardRef<HTMLDivElement, ScrollerProps>(
 //   ({ style, ...props }, ref) => {
@@ -39,81 +39,83 @@ import {
 //   }
 // );
 
-const Scroller = forwardRef<HTMLDivElement, ComponentProps<"div">>(
-  ({ style, children, ...rest }, ref) => {
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const { palette, spacing } = useTheme();
-    const cls = useCss({
-      "--os-padding-perpendicular": "2px",
-      ".os-scrollbar": { visibility: "visible", opacity: 1 },
-      ".os-scrollbar-vertical > .os-scrollbar-track > .os-scrollbar-handle": {
-        "min-height": spacing(12),
+function Scroller({ style, children, ref, ...rest }: ComponentProps<"div">) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const { palette, spacing } = useTheme();
+  const cls = useCss({
+    "--os-padding-perpendicular": "2px",
+    ".os-scrollbar": { visibility: "visible", opacity: 1 },
+    ".os-scrollbar-vertical > .os-scrollbar-track > .os-scrollbar-handle": {
+      "min-height": spacing(12),
+    },
+    "div.os-scrollbar-vertical > div.os-scrollbar-track": {
+      height: `calc(100% - ${spacing(6)})`,
+      marginTop: spacing(6),
+    },
+    "div > div.os-scrollbar-track": {
+      "--os-handle-perpendicular-size": "2px",
+      "--os-handle-perpendicular-size-hover": "6px",
+      "--os-handle-perpendicular-size-active": "6px",
+      "> div.os-scrollbar-handle": {
+        borderRadius: 0,
+        opacity: 0.5,
+        "&:hover": { opacity: 0.8 },
       },
-      "div.os-scrollbar-vertical > div.os-scrollbar-track": {
-        height: `calc(100% - ${spacing(6)})`,
-        marginTop: spacing(6),
+    },
+  });
+  const [initialize] = useOverlayScrollbars({
+    options: {
+      overflow: { x: "hidden", y: "scroll" },
+      scrollbars: {
+        autoHide: "move",
+        theme: palette.mode === "dark" ? "os-theme-light" : "os-theme-dark",
       },
-      "div > div.os-scrollbar-track": {
-        "--os-handle-perpendicular-size": "2px",
-        "--os-handle-perpendicular-size-hover": "6px",
-        "--os-handle-perpendicular-size-active": "6px",
-        "> div.os-scrollbar-handle": {
-          borderRadius: 0,
-          opacity: 0.5,
-          "&:hover": { opacity: 0.8 },
-        },
-      },
-    });
-    const [initialize] = useOverlayScrollbars({
-      options: {
-        overflow: { x: "hidden", y: "scroll" },
-        scrollbars: {
-          autoHide: "move",
-          theme: palette.mode === "dark" ? "os-theme-light" : "os-theme-dark",
-        },
-      },
-    });
+    },
+  });
 
-    useEffect(() => {
-      if (typeof ref !== "function" && ref?.current && containerRef?.current) {
-        initialize({
-          target: containerRef.current,
-          elements: {
-            viewport: ref.current,
-          },
-        });
-      }
-    }, [initialize]);
+  useEffect(() => {
+    if (
+      typeof ref !== "function" &&
+      typeof ref !== "string" &&
+      ref?.current &&
+      containerRef?.current
+    ) {
+      initialize({
+        target: containerRef.current,
+        elements: {
+          viewport: ref.current,
+        },
+      });
+    }
+  }, [initialize]);
 
-    const refSetter = useCallback(
-      (node: HTMLDivElement | null) => {
-        if (node && ref) {
-          if (typeof ref === "function") {
-            ref(node);
-          } else {
-            ref.current = node;
-          }
+  const refSetter = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (node && ref) {
+        if (typeof ref === "function") {
+          ref(node);
+        } else if (typeof ref !== "string") {
+          set(ref, "current", node);
         }
-      },
-      [ref]
-    );
+      }
+    },
+    [ref]
+  );
 
-    return (
-      <div ref={containerRef} style={style} className={cls}>
-        <div ref={refSetter} {...rest}>
-          {children}
-        </div>
+  return (
+    <div ref={containerRef} style={style} className={cls}>
+      <div ref={refSetter} {...rest}>
+        {children}
       </div>
-    );
-  }
-);
-
+    </div>
+  );
+}
 export type LazyListHandle = Handle;
 
 export type LazyListProps<T> = {
   items?: T[];
   renderItem?: (item: T, index: number) => ReactElement;
-  listOptions?: Partial<ListProps<T, Record<string, any>>> & {
+  listOptions?: Partial<ListProps<T, Record<string, unknown>>> & {
     ref?: Ref<VirtuosoHandle>;
   };
   placeholder?: ReactNode;
@@ -123,7 +125,6 @@ export function LazyList<T>({
   items = [],
   renderItem,
   listOptions: options,
-  placeholder,
   ...props
 }: LazyListProps<T>) {
   return (

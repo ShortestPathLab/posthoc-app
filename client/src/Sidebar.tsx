@@ -56,9 +56,9 @@ export function useSidebarState() {
         r.locked = !open;
         r.children[SIDEBAR].hidden = !open;
         const size = open
-          ? !r.children[SIDEBAR].size
-            ? 20
-            : r.children[SIDEBAR].size ?? 20
+          ? r.children[SIDEBAR].size
+            ? r.children[SIDEBAR].size ?? 20
+            : 20
           : 0;
         r.children[SIDEBAR].size = size;
         r.children[CONTENT].size = 100 - size;
@@ -81,10 +81,7 @@ export function useSidebarState() {
 export function useSidebarBackground() {
   const { palette } = useTheme();
   return useMemo(
-    () =>
-      interpolate([palette.background.paper, palette.text.primary])(
-        palette.mode === "dark" ? 0.025 : 0.025
-      ),
+    () => interpolate([palette.background.paper, palette.text.primary])(0.025),
     [palette]
   );
 }
@@ -107,7 +104,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
   const sm = !isPrimary || sm2;
   const [, setUIState] = useUIState();
   return (
-    <TabContext value={(tab || false) as any}>
+    <TabContext value={(tab || false) as unknown as string}>
       <Stack direction={sm ? "column-reverse" : "row"} sx={{ width: "100%" }}>
         <Stack
           sx={{
@@ -159,7 +156,11 @@ export function Sidebar({ children }: { children?: ReactNode }) {
                 <Tab
                   onClick={() => {
                     if (!sm) {
-                      tab === c.id ? setOpen(false) : setOpen(true);
+                      if (tab === c.id) {
+                        setOpen(false);
+                      } else {
+                        setOpen(true);
+                      }
                     }
                   }}
                   key={c.id}

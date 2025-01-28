@@ -7,7 +7,7 @@ type TemplateMap = typeof templates;
 type Key = keyof TemplateMap;
 
 type ReturnTypeOf<T extends Key> = TemplateMap[T] extends FunctionTemplate<
-  [...any],
+  [...never],
   infer R
 >
   ? R
@@ -15,14 +15,13 @@ type ReturnTypeOf<T extends Key> = TemplateMap[T] extends FunctionTemplate<
 
 type ParamsOf<T extends Key> = TemplateMap[T] extends FunctionTemplate<
   infer R,
-  any
+  never
 >
   ? R
   : [];
 
 const fn = memo(
   (script: string, method: string) =>
-    // eslint-disable-next-line no-new-func
     new Function(
       "params",
       `${script}; return ${method}.apply(null, params);`

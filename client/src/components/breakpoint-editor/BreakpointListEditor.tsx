@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { ListEditor } from "components/generic/ListEditor";
+import { ListEditor } from "components/generic/list-editor/ListEditor";
 import { Breakpoint, DebugLayerData } from "hooks/useBreakpoints";
 import { chain as _, keys, set } from "lodash";
 import { produce } from "produce";

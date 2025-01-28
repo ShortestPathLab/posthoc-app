@@ -1,4 +1,5 @@
 import { noop } from "lodash";
+import { nanoid } from "nanoid";
 import {
   ReactNode,
   createContext,
@@ -10,11 +11,13 @@ import {
 } from "react";
 import { useAsync, useGetSet } from "react-use";
 import { Reducer, merge } from "./reducers";
-import { nanoid } from "nanoid";
 
 type Slice<T, U = T> = [
   T,
-  (next: (prev: T) => U, dontCommit?: boolean) => void,
+  (
+    next: ((prev: T) => U) | ((prev: T) => Promise<U>),
+    dontCommit?: boolean
+  ) => void,
   boolean,
   string
 ];
@@ -44,12 +47,18 @@ export function createSlice<T, U = T>(
       const [get, set] = useGetSet(initialState);
       const [commit, reduceCommit] = useReducer(() => nanoid(), nanoid());
       const reduceSlice = useCallback(
-        (n: (prev: T) => U, c?: boolean) => {
-          // console.log(n);
-          const next = reduce(get(), n(get()));
-          effect?.({ prev: get(), next });
-          if (!c) reduceCommit?.();
-          set(next);
+        (n: ((prev: T) => U) | ((prev: T) => Promise<U>), c?: boolean) => {
+          const x = n(get());
+          if (x instanceof Promise) {
+            // TODO: Could have a race condition issue where the
+            // current value of the slice has changed when the promise resolves
+            x.then((x) => reduceSlice(() => x, c));
+          } else {
+            const next = reduce(get(), x);
+            effect?.({ prev: get(), next });
+            if (!c) reduceCommit?.();
+            set(next);
+          }
         },
         [get, reduceCommit]
       );

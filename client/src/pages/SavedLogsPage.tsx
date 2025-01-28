@@ -1,6 +1,6 @@
 import { PageContentProps } from "./PageMeta";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { Box } from "@mui/material";
 import SavedLogsButton from "components/SavedLogsButton";
@@ -13,7 +13,7 @@ export function SavedLogsPage({ template: Page }: PageContentProps) {
       <Page.Title>Saved Logs</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Flex vertical>
+        <Block vertical>
           <Scroll y>
             <Box
               sx={{
@@ -25,10 +25,10 @@ export function SavedLogsPage({ template: Page }: PageContentProps) {
                 rowGap: "1rem",
               }}
             >
-              <SavedLogsButton type="google"/>
+              <SavedLogsButton type="google" />
             </Box>
           </Scroll>
-        </Flex>
+        </Block>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

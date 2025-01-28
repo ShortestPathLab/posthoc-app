@@ -1,7 +1,7 @@
 import { WorkspacesOutlined } from "@mui-symbols-material/w400";
 import { Backdrop, Stack, Typography as Type } from "@mui/material";
 import { useSnackbar } from "components/generic/Snackbar";
-import { ORIGIN_FILESYSTEM, useWorkspace } from "hooks/useWorkspace";
+import { useWorkspace } from "hooks/useWorkspace";
 import { getControllers } from "layers/layerControllers";
 import { entries, head } from "lodash";
 import { nanoid as id } from "nanoid";
@@ -14,7 +14,7 @@ import { useLayers } from "slices/layers";
 import { useAcrylic } from "theme";
 
 export function FileDropZone() {
-  const acrylic = useAcrylic() as any;
+  const acrylic = useAcrylic();
   const { load: loadWorkspace } = useWorkspace();
   const [itemCount, setItemCount] = useState<number>(0);
   const [, setLayers] = useLayers();
@@ -38,7 +38,7 @@ export function FileDropZone() {
               )
             );
           }, `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`);
-          totalClaimed += 1;
+          totalClaimed++;
           continue;
         }
       }
@@ -53,31 +53,27 @@ export function FileDropZone() {
   }
 
   return (
-    <>
-      <FileDrop
-        onFrameDragLeave={() => setItemCount(0)}
-        onFrameDragEnter={(e) =>
-          setItemCount(e?.dataTransfer?.items.length ?? 0)
-        }
-        onFrameDrop={() => setItemCount(0)}
-        onDragLeave={() => setItemCount(0)}
-        onDrop={(f) => f && importFiles(Array.from(f as any))}
+    <FileDrop
+      onFrameDragLeave={() => setItemCount(0)}
+      onFrameDragEnter={(e) => setItemCount(e?.dataTransfer?.items.length ?? 0)}
+      onFrameDrop={() => setItemCount(0)}
+      onDragLeave={() => setItemCount(0)}
+      onDrop={(f) => f && importFiles(Array.from(f))}
+    >
+      <Backdrop
+        sx={{
+          ...acrylic,
+          zIndex: (t) => t.zIndex.tooltip + 1,
+        }}
+        open={!!itemCount}
       >
-        <Backdrop
-          sx={{
-            ...acrylic,
-            zIndex: (t) => t.zIndex.tooltip + 1,
-          }}
-          open={!!itemCount}
-        >
-          <Stack alignItems="center" spacing={4}>
-            <WorkspacesOutlined />
-            <Type component="div" variant="body2" color="text.secondary">
-              {itemCount ? `Import ${pluralize("item", itemCount, true)}` : ""}
-            </Type>
-          </Stack>
-        </Backdrop>
-      </FileDrop>
-    </>
+        <Stack alignItems="center" spacing={4}>
+          <WorkspacesOutlined />
+          <Type component="div" variant="body2" color="text.secondary">
+            {itemCount ? `Import ${pluralize("item", itemCount, true)}` : ""}
+          </Type>
+        </Stack>
+      </Backdrop>
+    </FileDrop>
   );
 }

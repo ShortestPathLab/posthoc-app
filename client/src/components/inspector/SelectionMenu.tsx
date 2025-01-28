@@ -12,7 +12,7 @@ import { SelectionInfoProvider } from "layers/LayerController";
 import { getController } from "layers/layerControllers";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { chain, Dictionary, entries, merge } from "lodash";
-import { useCache } from "pages/TreePage";
+import { useCache } from "hooks/useCache";
 import { ComponentProps, ReactNode, useMemo } from "react";
 import { useLayers } from "slices/layers";
 
@@ -164,6 +164,7 @@ function useSelectionMenu() {
       chain(layers)
         .reduce((A, l) => {
           const B = getController(l)?.provideSelectionInfo ?? identity;
+          // eslint-disable-next-line react/display-name
           return ({ children, event }: SelectionInfoProviderProps) => (
             <B layer={l.key} event={event}>
               {(a) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}

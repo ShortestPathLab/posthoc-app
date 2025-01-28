@@ -1,5 +1,5 @@
 import { useWorkspace } from "hooks/useWorkspace";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useCloudStorageService } from "slices/cloudStorage";
 import { providers } from "./CloudStorageService";
 
@@ -17,7 +17,7 @@ export function FetchDriveFileService() {
       if (providerType && fileId) {
         const cloudService = providers[providerType as keyof typeof providers](
           "",
-          async () => true,
+          async () => true
         );
         if (!fileId) {
           return;
@@ -27,7 +27,7 @@ export function FetchDriveFileService() {
           const file = await cloudService.getFile(fileId);
 
           load(file);
-        } catch (error) {
+        } catch {
           // console.log(error)
         }
         window.history.replaceState(null, "", window.location.origin);

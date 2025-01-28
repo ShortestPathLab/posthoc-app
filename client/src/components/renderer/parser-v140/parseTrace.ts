@@ -2,6 +2,8 @@
 import { useSnackbar } from "components/generic/Snackbar";
 import { get } from "lodash";
 import pluralize from "pluralize";
+import { Trace } from "protocol";
+import { Trace as TraceLegacy } from "protocol/Trace-v140";
 import { useMemo } from "react";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
@@ -41,9 +43,21 @@ export function useTraceParser(
   params: ParseTraceWorkerParameters | ParseTraceWorkerLegacyParameters,
   trusted: boolean,
   deps: any[]
-) {
+):
+  | (() => Promise<
+      | {
+          components?: ParseTraceWorkerReturnType;
+          content?: Trace;
+        }
+      | {
+          components?: ParseTraceWorkerLegacyReturnType;
+          content?: TraceLegacy;
+        }
+      | { error: string }
+    >)
+  | undefined {
   const push = useSnackbar();
-  const usingLoadingState = useLoadingState("specimen");
+  const usingLoadingState = useLoadingState("layers");
   return useMemo(() => {
     if (params.trace) {
       if (trusted)
@@ -75,10 +89,17 @@ export function useTraceParser(
               "Trace loaded",
               pluralize("step", params.trace?.events?.length ?? 0, true)
             );
-            return { content: params.trace, components: [] };
+            return {
+              content: params.trace,
+              components: {
+                stepsPersistent: [],
+                stepsTransient: [],
+              },
+            };
           });
     } else {
       return undefined;
     }
+    // eslint-disable-next-line react-compiler/react-compiler
   }, deps);
 }

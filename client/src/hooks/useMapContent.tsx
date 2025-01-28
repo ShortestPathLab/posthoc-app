@@ -8,7 +8,7 @@ import { Map } from "slices/UIState";
 
 export function useMapContent(map?: Map) {
   const notify = useSnackbar();
-  const usingLoadingState = useLoadingState("map");
+  const usingLoadingState = useLoadingState("layers");
   const resolve = useConnectionResolver();
 
   const getMap = useMemo(

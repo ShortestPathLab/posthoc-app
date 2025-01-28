@@ -24,7 +24,7 @@ export const parseTraceAsync = usingMemoizedWorkerTask<
 
 export function useTraceParser(params: ParseTraceWorkerParameters) {
   const push = useSnackbar();
-  const usingLoadingState = useLoadingState("specimen");
+  const usingLoadingState = useLoadingState("layers");
   return useCallback(
     () =>
       usingLoadingState(async () => {

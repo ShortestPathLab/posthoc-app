@@ -1,7 +1,7 @@
 import { chain, Dictionary, find, forEach, sumBy, times } from "lodash";
 import { arrayToTree } from "performant-array-to-tree";
 import { Trace, TraceEvent } from "protocol";
-import { usingMessageHandler } from "../workers/usingWorker";
+import { usingMessageHandler } from "../../workers/usingWorker";
 
 export type EventTree = {
   id: Key;

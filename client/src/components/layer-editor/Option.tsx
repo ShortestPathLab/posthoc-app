@@ -1,6 +1,6 @@
 import { Typography as Type } from "@mui/material";
 import { ReactNode as Node } from "react";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Space } from "components/generic/Space";
 
 export const Heading = ({ label }: { label?: Node }) => (
@@ -27,9 +27,9 @@ export const Option = ({
   label?: Node;
   content?: Node;
 }) => (
-  <Flex alignItems="center">
+  <Block alignItems="center">
     <Label label={label} />
     <Space flex={1} />
     {content}
-  </Flex>
+  </Block>
 );

@@ -12,18 +12,19 @@ import {
   Typography,
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Button } from "components/generic/Button";
-import { Flex } from "components/generic/Flex";
-import { ListEditor } from "components/generic/ListEditor";
-import { AppBarTitle, ManagedModal } from "components/generic/Modal";
+import { Button } from "components/generic/inputs/Button";
+import { Block } from "components/generic/Block";
+import { ListEditor } from "components/generic/list-editor/ListEditor";
+import { Surface } from "components/generic/surface";
 import { Scroll } from "components/generic/Scrollbars";
+import { useSnackbar } from "components/generic/Snackbar";
 import { Space } from "components/generic/Space";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { shades } from "components/renderer/colors";
 import { mapParsers } from "components/renderer/map-parser";
 import { RendererListEditor } from "components/settings-editor/RendererListEditor";
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
+import { useSm } from "hooks/useSmallDisplay";
 import { debounce, keys, map, startCase } from "lodash";
 import { ReactNode, useMemo, useState } from "react";
 import { useBusyState } from "slices/busy";
@@ -32,18 +33,18 @@ import {
   defaults,
   useSettings,
 } from "slices/settings";
+import { useUIState } from "slices/UIState";
 import { AccentColor, getShade } from "theme";
 import { wait } from "utils/timed";
 import { AboutContent } from "./AboutPage";
 import { PageContentProps } from "./PageMeta";
-import { useUIState } from "slices/UIState";
-import { useSnackbar } from "components/generic/Snackbar";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state, dragHandle } = useViewTreeContext();
-  const sm = useSmallDisplay();
-  const [UIState, setUIState] = useUIState();
+  const { controls, onChange, state, dragHandle, isViewTree } =
+    useViewTreeContext();
+  const sm = useSm();
+  const [, setUIState] = useUIState();
   const push = useSnackbar();
   const usingBusyState = useBusyState("reset");
   const [
@@ -84,11 +85,16 @@ export function SettingsPage({ template: Page }: PageContentProps) {
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
         <Page.Key>settings</Page.Key>
-
         <Page.Title>Settings</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
-          <TabList onChange={(_, v) => setTab(v)}>
+          <TabList
+            onChange={(_, v) => setTab(v)}
+            sx={{
+              mx: isViewTree ? 0 : -1,
+              "& button": { minWidth: 0 },
+            }}
+          >
             <Tab label="General" value="general" />
             <Tab label="Extensions" value="connections" />
             <Tab label="Security" value="security" />
@@ -96,13 +102,13 @@ export function SettingsPage({ template: Page }: PageContentProps) {
           </TabList>
         </Page.Options>
         <Page.Content>
-          <Flex vertical>
+          <Block vertical>
             <Scroll y>
-              <Flex vertical pt={6}>
+              <Block vertical pt={6}>
                 <TabPanel value="general" sx={{ p: 2 }}>
                   <Box>
                     {renderHeading("Playback")}
-                    <Flex alignItems="center" justifyContent="space-between">
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Playback rate")}
                       <Slider
                         sx={{ maxWidth: 320, mr: 2 }}
@@ -122,9 +128,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           }))
                         }
                       />
-                    </Flex>
+                    </Block>
                     {renderHeading("Appearance")}
-                    <Flex alignItems="center" justifyContent="space-between">
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Acrylic")}
                       <Switch
                         defaultChecked={!!acrylic}
@@ -132,8 +138,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           setSettings(() => ({ "appearance/acrylic": v }))
                         }
                       />
-                    </Flex>
-                    <Flex alignItems="center" justifyContent="space-between">
+                    </Block>
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Dark mode")}
                       <Space flex={1} />
                       <Switch
@@ -144,8 +150,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           }))
                         }
                       />
-                    </Flex>
-                    <Flex alignItems="center" justifyContent="space-between">
+                    </Block>
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Accent")}
                       <Box sx={{ p: 1 }}>
                         <FeaturePicker
@@ -176,9 +182,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           }
                         />
                       </Box>
-                    </Flex>
+                    </Block>
                     {renderHeading("Behaviour")}
-                    <Flex alignItems="center" justifyContent="space-between">
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Show explore on start-up")}
                       <Switch
                         defaultChecked={!!showOnStart}
@@ -188,35 +194,29 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           }))
                         }
                       />
-                    </Flex>
+                    </Block>
                     {renderHeading("Advanced")}
-                    <Flex alignItems="center" justifyContent="space-between">
+                    <Block alignItems="center" justifyContent="space-between">
                       {renderLabel("Reset settings and extensions")}
-                      <ManagedModal
-                        trigger={(onClick) => (
+                      <Surface
+                        trigger={({ open }) => (
                           <Button
                             sx={{ mx: 1 }}
                             color="error"
                             startIcon={<RestartAltOutlined />}
-                            {...{ onClick }}
+                            onClick={open}
                           >
                             Reset now
                           </Button>
                         )}
-                        appBar={{
-                          children: (
-                            <AppBarTitle>
-                              Reset settings and extensions
-                            </AppBarTitle>
-                          ),
-                        }}
+                        title="Reset settings and extensions"
                       >
                         {({ close }) => (
                           <Stack sx={{ p: sm ? 2 : 3, pt: 2, gap: 4 }}>
                             <Typography component="div" color="text.secondary">
-                              If something's not working correctly, you can try
-                              to reset all settings and extensions. This cannot
-                              be undone.
+                              If something&apos;s not working correctly, you can
+                              try to reset all settings and extensions. This
+                              cannot be undone.
                             </Typography>
                             <Stack
                               direction="row"
@@ -252,8 +252,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                             </Stack>
                           </Stack>
                         )}
-                      </ManagedModal>
-                    </Flex>
+                      </Surface>
+                    </Block>
                   </Box>
                 </TabPanel>
                 <TabPanel value="connections" sx={{ p: 2 }}>
@@ -291,8 +291,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       variant="caption"
                       sx={{ pt: 2 }}
                     >
-                      You'll be prompted to add origins when necessary, and you
-                      can stop trusting origins by removing them from this list.
+                      You&apos;ll be prompted to add origins when necessary, and
+                      you can stop trusting origins by removing them from this
+                      list.
                     </Typography>
                   </Box>
                   <Box sx={{ pt: 2 }}>
@@ -304,9 +305,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     <AboutContent />
                   </Box>
                 </TabPanel>
-              </Flex>
+              </Block>
             </Scroll>
-          </Flex>
+          </Block>
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>
       </Page>
@@ -318,7 +319,7 @@ const a = keys(mapParsers).map((c) => ({ key: c }));
 type A = (typeof a)[number];
 
 function Sink({ children }: { children?: ReactNode }) {
-  return children;
+  return <>{children}</>;
 }
 
 export function TrustedOriginListEditor() {

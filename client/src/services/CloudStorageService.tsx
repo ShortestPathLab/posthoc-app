@@ -1,5 +1,5 @@
 import { Dictionary, once } from "lodash";
-import React, { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useAsync } from "react-async-hook";
 import { AuthState, defaultAuthState, useAuth } from "slices/auth";
 import { useCloudStorageService } from "slices/cloudStorage";
@@ -10,7 +10,7 @@ export type FileMetaDataType = {
   description?: string;
 };
 
-export type AccessToken = unknown;
+export type AccessToken = object | string | number;
 
 export type FileMetaData = {
   id: string;
@@ -29,16 +29,17 @@ export interface CloudStorageService<K extends string> {
   saveFile: (
     searchTrace: File,
     fileMetaData?: FileMetaDataType,
-    fileId?: string,
+    fileId?: string
   ) => Promise<string>;
   getFile: (fileId: string) => Promise<File>;
+  deleteFile: (fileId: string) => Promise<File>;
   generateLink: (fileId: string) => string;
   getSavedFilesMetaData: () => Promise<FileMetaData[]>;
 }
 
 function createGoogleStorageService(
   storedToken: string,
-  updateState: (newState: AuthState) => Promise<boolean>,
+  updateState: (newState: AuthState) => Promise<boolean>
 ): CloudStorageService<"google"> {
   const scope = "https://www.googleapis.com/auth/drive.file";
   const authLink = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -63,10 +64,10 @@ function createGoogleStorageService(
   };
 
   const checkAuth = once(() => {
-    return new Promise<AuthState>((resolve, reject) => {
+    return new Promise<AuthState>((resolve) => {
       if (window.location.hash) {
         const hashParams = new URLSearchParams(
-          window.location.hash.substring(1),
+          window.location.hash.substring(1)
         );
 
         const accessToken = hashParams.get("access_token");
@@ -123,21 +124,21 @@ function createGoogleStorageService(
   };
 
   const checkParentFolderExists = async (
-    parentName: string,
+    parentName: string
   ): Promise<string | null> => {
     const folderMimeType = googleFolderMimeType;
     const query = `name = '${parentName}' and mimeType = '${folderMimeType}' and trashed = false`;
     try {
       const response = await fetch(
         `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(
-          query,
+          query
         )}&fields=files(id,name)`,
         {
           method: "GET",
           headers: {
             Authorization: `Bearer ${await getAccessToken()}`,
           },
-        },
+        }
       );
 
       const data = await response.json();
@@ -149,7 +150,7 @@ function createGoogleStorageService(
         // console.log("Folder does not exist");
         return null;
       }
-    } catch (error) {
+    } catch {
       // console.error("Error checking folder existence:", error);
       return null;
     }
@@ -197,10 +198,10 @@ function createGoogleStorageService(
     try {
       const [metadataResponse, mediaResponse] = await Promise.all([
         fetch(
-          `https://www.googleapis.com/drive/v3/files/${fileId}?key=${apiKey}`,
+          `https://www.googleapis.com/drive/v3/files/${fileId}?key=${apiKey}`
         ),
         fetch(
-          `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`,
+          `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`
         ),
       ]);
       const metadata = await metadataResponse.json();
@@ -230,7 +231,7 @@ function createGoogleStorageService(
       const form = new FormData();
       form.append(
         "metadata",
-        new Blob([JSON.stringify(fileMetaData)], { type: "application/json" }),
+        new Blob([JSON.stringify(fileMetaData)], { type: "application/json" })
       );
       form.append("file", file);
       const response = await fetch(
@@ -241,7 +242,7 @@ function createGoogleStorageService(
             Authorization: `Bearer ${await getAccessToken()}`,
           },
           body: form,
-        },
+        }
       );
 
       if (!response.ok) {
@@ -265,7 +266,7 @@ function createGoogleStorageService(
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`, // Pass the access token here
         },
-      },
+      }
     );
 
     if (!response.ok) {
@@ -292,7 +293,7 @@ function createGoogleStorageService(
           headers: {
             Authorization: `Bearer ${await getAccessToken()}`, // Pass the access token here
           },
-        },
+        }
       );
 
       if (!response.ok) {
@@ -310,7 +311,7 @@ function createGoogleStorageService(
     return `${window.location.origin}?workspaceFile=${id}:${fileId}`;
   };
 
-  const logout = async () => { };
+  const logout = async () => {};
 
   return {
     id,
@@ -321,18 +322,23 @@ function createGoogleStorageService(
     getFile,
     getSavedFilesMetaData,
     generateLink,
+    ///@ts-expect-error TODO: fix this
+    deleteFile: async () => {},
   };
 }
 
-type ProviderFactory<K extends string, A extends AccessToken = unknown> = (
+type ProviderFactory<K extends string, A extends AccessToken> = (
   accessToken: A,
-  updateState: (newState: AuthState) => Promise<boolean>,
+  updateState: (newState: AuthState) => Promise<boolean>
 ) => CloudStorageService<K>;
 
 export const providers = {
   google: createGoogleStorageService,
   // github: createGoogleStorageService,
-} satisfies { [K in string]: ProviderFactory<K, any> };
+} satisfies Dictionary<ProviderFactory<string, any>>;
+
+type TokenTypeOf<K extends keyof typeof providers> =
+  (typeof providers)[K] extends ProviderFactory<string, infer A> ? A : never;
 
 export function CloudStorageService() {
   const [, setCloudStorageService] = useCloudStorageService();
@@ -342,19 +348,16 @@ export function CloudStorageService() {
     if (!(cloudStorageType in providers)) {
       throw new Error("Invalid Provider");
     }
-
-    const token = authState.accessToken;
+    const token = authState.accessToken as TokenTypeOf<typeof cloudStorageType>;
     const update = async (newState: AuthState) => {
       try {
         setAuthState(() => newState);
         return true;
-      } catch (error) {
-        // * handle errors here
-        // console.log(error);
+      } catch {
         return false;
       }
     };
-    return providers[cloudStorageType](token as any, update);
+    return providers[cloudStorageType](token, update);
   }, [cloudStorageType, authState.accessToken]);
 
   useAsync(async () => {

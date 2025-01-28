@@ -1,4 +1,3 @@
-import { EditOutlined as EditIcon } from "@mui-symbols-material/w400";
 import {
   Box,
   Chip,
@@ -7,13 +6,9 @@ import {
   Tooltip,
   Typography as Type,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
-import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
-import {
-  ManagedModal as Dialog,
-  AppBarTitle as Title,
-} from "components/generic/Modal";
-import { SelectField as Select } from "components/generic/Select";
+import { Block } from "components/generic/Block";
+import { Surface } from "components/generic/surface";
+import { SelectField as Select } from "components/generic/inputs/Select";
 import { entries, find, join, omit, startCase } from "lodash";
 import { transports } from "services/RendererService";
 import { merge } from "slices/reducers";
@@ -50,8 +45,8 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
     : "error";
 
   return (
-    <Flex alignItems="center" py={1}>
-      <Dialog
+    <Block alignItems="center" py={1}>
+      <Surface
         slotProps={{
           paper: { sx: { width: 480 } },
           popover: {
@@ -59,11 +54,11 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
           },
         }}
         popover
-        trigger={(onClick) => (
+        trigger={({ open }) => (
           <>
             <Box
               className={value.key}
-              {...{ onClick }}
+              onClick={open}
               flex={1}
               sx={{
                 width: 0,
@@ -122,7 +117,7 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
             </Tooltip>
           </>
         )}
-        appBar={{ children: <Title>Edit Renderer</Title> }}
+        title="Edit Renderer"
       >
         <Box p={2.5}>
           <TextField
@@ -145,7 +140,7 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
             onChange={(v) => handleChange({ transport: v })}
           />
         </Box>
-      </Dialog>
-    </Flex>
+      </Surface>
+    </Block>
   );
 }

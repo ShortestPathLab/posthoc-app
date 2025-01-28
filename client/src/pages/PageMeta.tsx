@@ -1,5 +1,5 @@
-import { ReactElement, ReactNode } from "react";
 import { withSlots } from "components/withSlots";
+import { ReactElement } from "react";
 import { AccentColor } from "theme";
 import { PageProps, PageSlots } from "./Page";
 
@@ -14,7 +14,7 @@ export type PageMeta = {
   iconThin?: ReactElement;
   color?: AccentColor;
   description?: string;
-  content: (props: PageContentProps) => ReactNode;
+  content: (props: PageContentProps) => ReactElement;
   allowFullscreen?: boolean;
   showInSidebar?: "never" | "mobile-only" | "always";
 };

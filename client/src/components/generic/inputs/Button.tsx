@@ -13,7 +13,7 @@ export function Button({ children, sx, ...props }: ButtonProps) {
         minWidth: 0,
         borderColor: (t) =>
           alpha(t.palette.text.primary, t.palette.action.activatedOpacity),
-        ...(props.variant === "text" ? undefined : (paper(1) as any)),
+        ...(props.variant === "text" ? undefined : paper(1)),
         ...sx,
       }}
     >

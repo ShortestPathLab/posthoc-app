@@ -1,7 +1,7 @@
 import { ErrorOutlined, WidgetsOutlined } from "@mui-symbols-material/w400";
 import { Box, Divider, Stack } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
 import { Placeholder } from "components/inspector/Placeholder";
@@ -96,8 +96,8 @@ export const Page = withSlots<PageSlots, PageProps>(
           </Stack>
         )}
       >
-        <Flex vertical>
-          <Flex sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
+        <Block vertical>
+          <Block sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
             <Box
               sx={{
                 width: "100%",
@@ -107,9 +107,9 @@ export const Page = withSlots<PageSlots, PageProps>(
             >
               {slotProps.Content?.children}
             </Box>
-          </Flex>
-          <Flex sx={{ height: (t) => t.spacing(6), alignItems: "center" }}>
-            <Flex
+          </Block>
+          <Block sx={{ height: (t) => t.spacing(6), alignItems: "center" }}>
+            <Block
               sx={{
                 p: 0,
                 position: "absolute",
@@ -124,7 +124,7 @@ export const Page = withSlots<PageSlots, PageProps>(
               }}
             >
               <Scroll x>
-                <Flex
+                <Block
                   sx={{
                     width: "max-content",
                     height: (t) => t.spacing(6),
@@ -153,13 +153,13 @@ export const Page = withSlots<PageSlots, PageProps>(
                       {slotProps.Options.children}
                     </>
                   )}
-                </Flex>
+                </Block>
               </Scroll>
-            </Flex>
+            </Block>
             <Space sx={{ mx: "auto" }} />
             {slotProps.Extras?.children}
-          </Flex>
-        </Flex>
+          </Block>
+        </Block>
       </ErrorBoundary>
     );
   }

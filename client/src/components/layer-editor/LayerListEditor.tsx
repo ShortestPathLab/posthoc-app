@@ -1,6 +1,6 @@
 import { MoreVertOutlined } from "@mui-symbols-material/w400";
 import { Box, IconButton, Menu, MenuItem, MenuList } from "@mui/material";
-import { ListEditor } from "components/generic/ListEditor";
+import { ListEditor } from "components/generic/list-editor/ListEditor";
 import { head, map } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { nanoid as id } from "nanoid";
