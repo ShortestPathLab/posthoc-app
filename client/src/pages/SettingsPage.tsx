@@ -219,9 +219,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                               cannot be undone.
                             </Typography>
                             <Stack
-                              direction="row"
+                              direction={sm ? "column-reverse" : "row"}
                               justifyContent="flex-end"
-                              gap={2}
+                              gap={sm ? 1 : 2}
                             >
                               <Button
                                 variant="text"
