@@ -10,6 +10,7 @@ import {
 import { Block, BlockProps } from "components/generic/Block";
 import { Property, renderProperty } from "components/generic/Property";
 import { Surface, SurfaceProps } from "components/generic/surface";
+import { useSm } from "hooks/useSmallDisplay";
 import {
   Dictionary,
   chain as _,
@@ -59,6 +60,7 @@ export function PropertyDialog({
 }: Omit<PropertyListProps, "variant" | "simple" | "primitives"> &
   Partial<SurfaceProps>) {
   const sorted = sortEventKeys(event);
+  const sm = useSm();
   return (
     <Surface
       {...merge(
@@ -111,14 +113,14 @@ export function PropertyDialog({
             component="div"
             variant="overline"
             color="text.secondary"
-            sx={{ px: 3 }}
+            sx={{ px: sm ? 2 : 3 }}
           >
             {startCase(name)}
           </Typography>
           <Box
             key={name}
             sx={{
-              p: 1,
+              py: 1,
               pt: 0,
               display: "grid",
               gridAutoFlow: "row",
@@ -126,7 +128,10 @@ export function PropertyDialog({
             }}
           >
             {map(props, ([key, value]) => (
-              <ListItem key={`${key}::${value}`} sx={{ py: 0.5 }}>
+              <ListItem
+                key={`${key}::${value}`}
+                sx={{ py: 0.5, px: sm ? -2 : 3 }}
+              >
                 <ListItemText secondary={key} primary={renderProperty(value)} />
               </ListItem>
             ))}

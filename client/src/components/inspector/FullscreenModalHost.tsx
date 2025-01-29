@@ -1,4 +1,4 @@
-import { alpha, Box, Stack, Typography } from "@mui/material";
+import { alpha, Box, Stack } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { SurfaceBase } from "components/generic/surface";
@@ -73,7 +73,8 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
                     width: "max-content",
                     height: (t) => t.spacing(6),
                     alignItems: "center",
-                    p: 1,
+                    py: 0,
+                    px: sm ? 1.25 : 2.25,
                   }}
                 >
                   {slotProps.Options?.children && (
@@ -157,11 +158,7 @@ export function FullscreenModalHost() {
     <FullscreenModalContext.Provider {...{ value }}>
       {!!page && (
         <SurfaceBase
-          title={
-            <Typography sx={{ px: 2, pb: 1 }} variant="h6">
-              {page.name}
-            </Typography>
-          }
+          title={page.name}
           state={state}
           slotProps={{
             ...(sm

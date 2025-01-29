@@ -85,7 +85,7 @@ export function DrawerSurface({
                   easing: t.transitions.easing.easeOut,
                 }),
               transform: `translateY(${
-                -16 * ((maxDepth - depth) / maxDepth)
+                -32 * ((maxDepth - depth) / maxDepth)
               }px)`,
             },
           } as ModalProps,

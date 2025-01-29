@@ -4,12 +4,11 @@ import {
   usePopupState,
 } from "material-ui-popup-state/hooks";
 import { ReactElement, ReactNode } from "react";
-import { AppBarTitle as Title } from "./AppBarTitle";
 import { DrawerSurface } from "./DrawerSurface";
+import { DrawerTitle } from "./DrawerTitle";
 import { ModalAppBar } from "./ModalAppBar";
 import { PopoverSurface } from "./PopoverSurface";
 import { SlotProps } from "./SlotProps";
-import { Box } from "@mui/material";
 
 export type SurfaceGeneralProps = {
   title?: ReactNode;
@@ -34,19 +33,6 @@ export function Surface(props: SurfaceProps) {
 
 export type SurfaceBaseProps = SurfaceGeneralProps & { state: State };
 
-function DrawerTitle({ children }: { children?: ReactNode }) {
-  const sm = useSm();
-  return children ? (
-    typeof children === "string" ? (
-      <Box sx={{ px: sm ? 2 : 3 }}>
-        <Title>{children}</Title>
-      </Box>
-    ) : (
-      children
-    )
-  ) : null;
-}
-
 export function SurfaceBase({
   title,
   children: _children,
@@ -68,7 +54,7 @@ export function SurfaceBase({
   const childrenVariant = {
     drawer: (
       <>
-        <DrawerTitle>{title}</DrawerTitle>
+        <DrawerTitle onClose={state?.close}>{title}</DrawerTitle>
         {children}
       </>
     ),
