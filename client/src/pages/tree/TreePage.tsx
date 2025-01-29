@@ -4,6 +4,7 @@ import {
   LayersOutlined as LayersIcon,
   ModeStandbyOutlined,
   TimelineOutlined,
+  LineAxisOutlined,
 } from "@mui-symbols-material/w400";
 import {
   Box,
@@ -108,6 +109,8 @@ export function TreePage({ template: Page }: PageContentProps) {
   const [trackedProperty, setTrackedProperty, properties] =
     useTrackedProperty(trace);
 
+  // const [axisTracking, setAxisTracking] = useState<typeof properties | "">("");
+
   const { point, selected, selection, setSelection } = useSelection(
     step,
     trace
@@ -194,13 +197,15 @@ export function TreePage({ template: Page }: PageContentProps) {
                               setMenuOpen(true);
                             }}
                           />
-                          <TreeAxis
-                            tree={tree}
-                            trace={trace}
-                            key={key}
-                            height={size.height}
-                            width={size.width}
-                          ></TreeAxis>
+                          {trackedProperty && (
+                            <TreeAxis
+                              tree={tree}
+                              trace={trace}
+                              key={key}
+                              height={size.height}
+                              width={size.width}
+                            ></TreeAxis>
+                          )}
                         </SigmaContainer>
                       </>
                     )}
@@ -437,6 +442,16 @@ export function TreePage({ template: Page }: PageContentProps) {
                 ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
               ],
             },
+            // {
+            //   icon: <LineAxisOutlined />,
+            //   label: "Axis Tracking",
+            //   value: axisTracking,
+            //   onChange: setAxisTracking,
+            //   items: [
+            //     { id: "", name: "Off" },
+            //     ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
+            //   ],
+            // },
           ],
           ({ icon, label, value, items, onChange }, i) => (
             <>
