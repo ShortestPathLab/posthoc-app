@@ -14,33 +14,12 @@ import { TitleBar, TitleBarPlaceholder } from "components/title-bar/TitleBar";
 import { Image } from "pages/Image";
 import logo from "public/logo192.png";
 import { useMemo } from "react";
-import { BootstrapService } from "services/BootstrapService";
-import { CloudStorageService } from "services/CloudStorageService";
-import { ConnectionsService } from "services/ConnectionsService";
-import { FeaturesService } from "services/FeaturesService";
-import { FetchDriveFileService } from "services/FetchDriveFileService";
-import { LayerService } from "services/LayerService";
-import { LogCaptureService } from "services/LogCaptureService";
-import { RendererService } from "services/RendererService";
-import { SettingsService } from "services/SettingsService";
+import { services } from "services";
 import { minimal } from "services/SyncParticipant";
-import { SyncService, useSyncStatus } from "services/SyncService";
-import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
+import { useSyncStatus } from "services/SyncService";
 import { useSettings } from "slices/settings";
+import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { makeTheme } from "theme";
-
-const services = [
-  SyncService,
-  ConnectionsService,
-  FeaturesService,
-  RendererService,
-  LayerService,
-  LogCaptureService,
-  SettingsService,
-  BootstrapService,
-  CloudStorageService,
-  FetchDriveFileService,
-];
 
 function App() {
   const { palette } = useTheme();

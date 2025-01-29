@@ -1,19 +1,19 @@
-import { AccessToken } from "services/CloudStorageService";
+import { AccessToken } from "services/cloud-storage/CloudStorage";
 import { createSlice, withLocalStorage } from "./createSlice";
 
-export type AuthState = {
+export type AuthState<T extends AccessToken> = {
   authenticated?: boolean;
-  accessToken?: AccessToken;
+  accessToken?: T;
   expiredDateTime?: number;
 };
 
-export const defaultAuthState: AuthState = {
+export const defaultAuthState: AuthState<any> = {
   authenticated: undefined,
   accessToken: undefined,
   expiredDateTime: undefined,
 };
 
-export const [useAuth, AuthProvider] = createSlice<AuthState>(
+export const [useAuth, AuthProvider] = createSlice<AuthState<any>>(
   {},
   withLocalStorage("authState", defaultAuthState)
 );

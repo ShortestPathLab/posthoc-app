@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { FileMetaData } from "services/CloudStorageService";
+import { FileMetadata } from "services/cloud-storage/CloudStorage";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Button } from "./generic/inputs/Button";
 import { MouseEventHandler, useState } from "react";
@@ -28,7 +28,7 @@ import { useSnackbar } from "./generic/Snackbar";
 const FileList = ({
   fileMetaDataList,
 }: {
-  fileMetaDataList: FileMetaData[];
+  fileMetaDataList: FileMetadata[];
 }) => {
   const usingLoadingState = useLoadingState();
   const [{ instance: cloudService }] = useCloudStorageService();
@@ -46,7 +46,8 @@ const FileList = ({
       try {
         const file = await cloudService?.getFile(fileId);
         load(file);
-      } catch {
+      } catch (e: unknown) {
+        console.log(e);
         notify("Failed to fetch file from source");
       }
     });
@@ -191,13 +192,13 @@ const GoogleSignInButton = () => {
   // const { cloudService } = useSavedLogsService("google");
   const [authState] = useAuth();
   const [{ instance: cloudService }] = useCloudStorageService();
-  const [list, setList] = useState<FileMetaData[]>([]);
+  const [list, setList] = useState<FileMetadata[]>([]);
   const [loadingSavedFilesMetaData, setSavedFilesMetaData] = useState(false);
   useAsync(async () => {
-    if (authState.authenticated) {
+    if (authState.authenticated && cloudService) {
       try {
         setSavedFilesMetaData(true);
-        const res = await cloudService?.getSavedFilesMetaData();
+        const res = await cloudService.getSavedFilesMetadata();
         if (res) setList(res);
         console.log(res);
       } catch (error) {

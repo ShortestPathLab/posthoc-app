@@ -8,6 +8,7 @@ import {
   SegmentOutlined as StepsIconThin,
   AccountTreeOutlined as TreeIconThin,
   ViewInArOutlined as ViewportIconThin,
+  WorkspacesOutlined as WorkspaceIconThin,
 } from "@mui-symbols-material/w300";
 import {
   CodeOutlined,
@@ -19,7 +20,7 @@ import {
   SegmentOutlined as StepsIcon,
   AccountTreeOutlined as TreeIcon,
   ViewInArOutlined as ViewportIcon,
-  CloudUploadOutlined as SaveIcon,
+  WorkspacesOutlined as WorkspaceIcon,
 } from "@mui-symbols-material/w400";
 import { Dictionary } from "lodash";
 import { DebugPage } from "./DebugPage";
@@ -43,6 +44,17 @@ export const pages: Dictionary<PageMeta> = {
     icon: <RocketIcon />,
     iconThin: <RocketIconThin />,
     content: ExplorePage,
+    allowFullscreen: true,
+    showInSidebar: "always",
+  },
+  remote: {
+    id: "remote",
+    name: "Workspaces",
+    description: "Save and share logs with others",
+    color: "deepOrange",
+    icon: <WorkspaceIcon />,
+    iconThin: <WorkspaceIconThin />,
+    content: SavedLogsPage,
     allowFullscreen: true,
     showInSidebar: "always",
   },
@@ -96,7 +108,6 @@ export const pages: Dictionary<PageMeta> = {
     iconThin: <CodeOutlinedThin />,
     content: SourcePage,
     allowFullscreen: true,
-    showInSidebar: "mobile-only",
   },
   debug: {
     id: "debug",
@@ -128,17 +139,6 @@ export const pages: Dictionary<PageMeta> = {
     iconThin: <SettingsIconThin />,
     content: SettingsPage,
     allowFullscreen: true,
-    showInSidebar: "always",
-  },
-  remote: {
-    id: "remote",
-    name: "Saved logs",
-    description:
-      "Contains all saved logs and enables user to get shareable link",
-    color: "grey",
-    icon: <SaveIcon />,
-    content: SavedLogsPage,
-    allowFullscreen: false,
     showInSidebar: "always",
   },
 };
