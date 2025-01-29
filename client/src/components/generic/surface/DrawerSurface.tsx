@@ -58,6 +58,7 @@ export function DrawerSurface({
 }) {
   const { depth, maxDepth = 1 } = useModalDepth(state.isOpen);
   const gap = slotProps?.drawer?.gap ?? depth * 16 + 16;
+  const r = -32 * ((maxDepth - depth) / maxDepth);
   const theme = useTheme();
   const { setHandle, setPaper } = useDrawerHandle(state.close);
   return (
@@ -84,9 +85,7 @@ export function DrawerSurface({
                   duration: 500,
                   easing: t.transitions.easing.easeOut,
                 }),
-              transform: `translateY(${
-                -32 * ((maxDepth - depth) / maxDepth)
-              }px)`,
+              transform: `translateY(${r}px)`,
             },
           } as ModalProps,
         },
@@ -103,6 +102,8 @@ export function DrawerSurface({
               borderTopLeftRadius: (t) => t.shape.borderRadius * 4,
               borderTopRightRadius: (t) => t.shape.borderRadius * 4,
               maxHeight: `calc(100dvh - ${gap}px)`,
+              boxShadow: (t) =>
+                `0 ${t.spacing(4)} 0px 0px ${t.palette.background.paper} `,
             },
           } as PaperProps,
         },

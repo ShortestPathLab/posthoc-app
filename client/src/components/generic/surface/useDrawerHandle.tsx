@@ -20,7 +20,7 @@ export function useDrawerHandle(close?: () => void) {
     const controller = new AbortController();
     const start = (y: number) => {
       // eslint-disable-next-line react-compiler/react-compiler
-      paper.style.transition = theme.transitions.create("max-height", {
+      paper.style.transition = theme.transitions.create(["max-height"], {
         easing: theme.transitions.easing.easeOut,
         duration: 500,
       });

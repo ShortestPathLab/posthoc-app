@@ -185,6 +185,7 @@ export function FeatureCard({
   size,
   onOpenClick,
   loading,
+  children,
   ...rest
 }: Partial<ExampleDescriptor> &
   CardProps & { onOpenClick?: () => void; loading?: boolean }) {
@@ -200,7 +201,11 @@ export function FeatureCard({
   return (
     <Card
       variant="outlined"
-      sx={{ ...paper(1), position: "relative", height: "100%" }}
+      sx={{
+        ...paper(1),
+        position: "relative",
+        height: "100%",
+      }}
       {...rest}
     >
       <>
@@ -227,7 +232,7 @@ export function FeatureCard({
         <CardHeader
           sx={{
             flexDirection: "column",
-            "> .MuiCardHeader-content": { overflow: "hidden" },
+            "> .MuiCardHeader-content": { overflow: "hidden", width: "100%" },
           }}
           avatar={
             <Box
@@ -286,7 +291,7 @@ export function FeatureCard({
                 disabled={loading}
                 onClick={onOpenClick}
                 startIcon={<WorkspacesOutlined />}
-                sx={paper(2)}
+                sx={paper(1)}
               >
                 <Stack direction="row" gap={1}>
                   <Type component="div">Open</Type>
@@ -297,6 +302,7 @@ export function FeatureCard({
                   )}
                 </Stack>
               </Button>
+              {children}
             </Stack>
           }
         />

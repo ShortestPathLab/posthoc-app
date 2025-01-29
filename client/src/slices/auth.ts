@@ -5,6 +5,7 @@ export type AuthState<T extends AccessToken> = {
   authenticated?: boolean;
   accessToken?: T;
   expiredDateTime?: number;
+  user?: { name?: string; profile?: string };
 };
 
 export const defaultAuthState: AuthState<any> = {

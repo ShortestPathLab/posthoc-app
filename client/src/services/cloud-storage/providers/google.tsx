@@ -1,3 +1,5 @@
+import { AddToDriveOutlined } from "@mui-symbols-material/w400";
+import { createClient, RequestOptions } from "client/createHttpClient";
 import { each, head, isString, now, once } from "lodash";
 import {
   AuthError,
@@ -7,8 +9,6 @@ import {
   ProviderFactory,
 } from "services/cloud-storage";
 import { AuthState, defaultAuthState } from "slices/auth";
-import { createClient, RequestOptions } from "client/createHttpClient";
-import { AddToDriveOutlined } from "@mui-symbols-material/w400";
 
 const id = "google";
 
@@ -17,7 +17,8 @@ const rootFolderName = "posthoc-workspaces";
 const clientId = import.meta.env.VITE_CLIENT_ID;
 const apiKey = import.meta.env.VITE_API_KEY;
 
-const scope = "https://www.googleapis.com/auth/drive.file";
+const scope =
+  "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile";
 const authUrl = "https://accounts.google.com/o/oauth2/v2/auth";
 const driveApiUrl = "https://www.googleapis.com/drive/v3/files";
 const driveMultiPartApiUrl = "https://www.googleapis.com/upload/drive/v3/files";
@@ -28,6 +29,7 @@ type GoogleDriveFileList = { files: FileMetadata[] };
 const getFilePath = (fileId: string) =>
   `https://drive.google.com/uc?export=download&id=${fileId}`;
 
+const googleUserInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
 export const createGoogleStorageService: ProviderFactory<typeof id, string> = (
   storedToken
 ) => {
@@ -80,6 +82,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id, string> = (
       );
   };
 
+  const userClient = createClient<O>(googleUserInfoUrl, getHeaders);
   const client = createClient<O>(driveApiUrl, getHeaders);
   const multiPartApiClient = createClient<O>(driveMultiPartApiUrl, getHeaders);
 
@@ -208,7 +211,28 @@ export const createGoogleStorageService: ProviderFactory<typeof id, string> = (
 
   return {
     id,
-    checkAuth,
+    checkAuth: once(async () => {
+      const auth = await checkAuth();
+      if (auth.authenticated) {
+        const user = await userClient.get<{
+          name: string;
+          picture: string;
+        }>({
+          label: "Get user info",
+          result: "json",
+          path: "?alt=json",
+          auth: true,
+        });
+        return {
+          ...auth,
+          user: {
+            name: user.name,
+            profile: user.picture,
+          },
+        };
+      }
+      return defaultAuthState;
+    }),
     authenticate,
     logout,
     saveFile,

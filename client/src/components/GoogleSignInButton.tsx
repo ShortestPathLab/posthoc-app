@@ -1,29 +1,145 @@
 import {
+  CloseOutlined,
+  InfoOutlined,
+  LinkOutlined,
+  LogoutOutlined,
+  OpenInNewOutlined,
+  UploadOutlined,
+} from "@mui-symbols-material/w400";
+import GoogleIcon from "@mui/icons-material/Google";
+import {
+  Avatar,
+  Box,
   CircularProgress,
   Divider,
-  IconButton,
-  InputAdornment,
-  List,
   ListItem,
-  ListItemIcon,
+  ListItemAvatar,
   ListItemText,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { FileMetadata } from "services/cloud-storage/CloudStorage";
-import GoogleIcon from "@mui/icons-material/Google";
-import { Button } from "./generic/inputs/Button";
-import { MouseEventHandler, useState } from "react";
-import { useAuth } from "slices/auth";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { useCloudStorageService } from "slices/cloudStorage";
 import copy from "clipboard-copy";
+import { useSm } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
+import { round } from "lodash";
+import { FeatureCard } from "pages/ExplorePage";
+import { useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
-import DescriptionIcon from "@mui/icons-material/Description";
+import { FileMetadata } from "services/cloud-storage/CloudStorage";
+import { useAuth } from "slices/auth";
+import { useCloudStorageService } from "slices/cloudStorage";
 import { useLoadingState } from "slices/loading";
+import { usePaper } from "theme";
 import { useSnackbar } from "./generic/Snackbar";
+import { Button } from "./generic/inputs/Button";
+import { IconButtonWithTooltip } from "./generic/inputs/IconButtonWithTooltip";
+import { Surface, useSurface } from "./generic/surface";
+
+const FileShareSurface = ({ file }: { file: FileMetadata }) => {
+  const [{ instance: cloudService }] = useCloudStorageService();
+  const sm = useSm();
+  const paper = usePaper();
+  const notify = useSnackbar();
+  const link = useMemo(
+    () => cloudService?.generateLink(file.id),
+    [cloudService, file.id]
+  );
+  const handleCopy = async () => {
+    try {
+      if (link) {
+        await copy(link);
+        notify("Copied to clipboard");
+        return link;
+      } else {
+        throw new Error("Unable to generate link");
+      }
+    } catch {
+      notify("Unable to generate link");
+    }
+  };
+  const handleShare = async () => {
+    try {
+      const link = cloudService?.generateLink(file.id);
+      await navigator.share({
+        title: "Posthoc visualisation",
+        text: link ?? "",
+      });
+    } catch {
+      notify("Unable to generate link");
+    }
+  };
+  return (
+    <Stack sx={{ p: sm ? 2 : 3, gap: 2 }}>
+      <Box sx={{ width: 128, height: 128, ...paper(1) }} />
+      <ListItemText
+        primary={file.name}
+        secondary={
+          <>
+            <Typography variant="body2" color="textSecondary">
+              Type: {file.mimeType}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Size: {round(+file.size / 1024 / 1024, 2)} MB
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Modified: {new Date(file.modifiedTime).toLocaleString()}
+            </Typography>
+          </>
+        }
+      ></ListItemText>
+      <Stack sx={{ gap: 1 }}>
+        <Surface
+          title="Get shareable link"
+          trigger={({ open }) => {
+            return (
+              <Button
+                variant="contained"
+                startIcon={<LinkOutlined color="primary" />}
+                onClick={() => {
+                  if (link) {
+                    open();
+                  }
+                }}
+              >
+                Get shareable link
+              </Button>
+            );
+          }}
+        >
+          <Stack sx={{ p: sm ? 2 : 3, gap: 1, pb: 6 }} direction="row">
+            <TextField
+              sx={{ flex: 1 }}
+              label="Link"
+              variant="filled"
+              value={link}
+              autoFocus
+            />
+            <Button variant="outlined" onClick={handleCopy}>
+              Copy
+            </Button>
+          </Stack>
+        </Surface>
+        <Button
+          disabled={!navigator.share}
+          variant="text"
+          startIcon={<OpenInNewOutlined />}
+          onClick={handleShare}
+        >
+          Share via system
+        </Button>
+        <Button
+          disabled={!navigator.share}
+          variant="text"
+          startIcon={<CloseOutlined color="error" />}
+          onClick={handleShare}
+        >
+          Delete workspace
+        </Button>
+      </Stack>
+    </Stack>
+  );
+};
 
 const FileList = ({
   fileMetaDataList,
@@ -34,12 +150,6 @@ const FileList = ({
   const [{ instance: cloudService }] = useCloudStorageService();
   const notify = useSnackbar();
   const { load } = useWorkspace();
-  const formatSize = (size: string) => {
-    const sizeNum = parseInt(size);
-    if (sizeNum < 1024) return `${sizeNum} bytes`;
-    if (sizeNum < 1024 * 1024) return `${(sizeNum / 1024).toFixed(2)} KB`;
-    return `${(sizeNum / (1024 * 1024)).toFixed(2)} MB`;
-  };
 
   const handleView = async (fileId: string) => {
     usingLoadingState(async () => {
@@ -53,80 +163,78 @@ const FileList = ({
     });
   };
 
-  const handleShare = async (fileId: string) => {
-    try {
-      const link = cloudService?.generateLink(fileId);
-      if (link) await copy(link);
-      else {
-        throw new Error("Unable to generate link");
-      }
-    } catch {
-      notify("Unable to generate link");
-    }
-  };
   return (
-    <List>
-      {fileMetaDataList.map((file, index) => (
-        <div key={file.id}>
-          <ListItem>
-            <ListItemIcon>
-              <DescriptionIcon color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={file.name}
-              secondary={
-                <>
-                  <Typography variant="body2" color="textSecondary">
-                    Type: {file.mimeType}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Size: {formatSize(file.size)}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Modified: {new Date(file.modifiedTime).toLocaleString()}
-                  </Typography>
-                </>
-              }
-            />
-            <Stack direction="column" spacing={1} sx={{ mx: 2 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="small"
-                onClick={() => handleView(file.id)}
-              >
-                View
-              </Button>
-              <Button
-                variant="outlined"
-                color="secondary"
-                size="small"
-                onClick={() => handleShare(file.id)}
-              >
-                Share
-              </Button>
-            </Stack>
-          </ListItem>
-          {index < fileMetaDataList.length - 1 && <Divider />}
-        </div>
-      ))}
-    </List>
+    <>
+      <Typography variant="overline" color="text.secondary">
+        Shared workspaces
+      </Typography>
+      <Stack
+        sx={{
+          display: "grid",
+          gridAutoFlow: "row",
+          gridTemplateColumns:
+            "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
+          gap: 2,
+        }}
+      >
+        {fileMetaDataList.map((file) => (
+          <FeatureCard
+            name={file.name}
+            description={JSON.stringify(file)}
+            key={file.id}
+            id={file.id}
+            size={+file.size}
+            onOpenClick={() => handleView(file.id)}
+            loading={false}
+          >
+            <Surface
+              title="Workspace details"
+              trigger={({ open }) => (
+                <Button
+                  sx={{ mt: -1 }}
+                  variant="text"
+                  startIcon={<InfoOutlined />}
+                  onClick={open}
+                >
+                  Details
+                </Button>
+              )}
+            >
+              <FileShareSurface file={file} />
+            </Surface>
+          </FeatureCard>
+        ))}
+      </Stack>
+    </>
   );
 };
 const UploadWorkspace = () => {
+  const { open, dialog } = useSurface(FileShareSurface, {
+    title: "Workspace details",
+  });
   const [uploading, setUploading] = useState(false);
   const notify = useSnackbar();
   const [authState] = useAuth();
   const [{ instance: cloudService }] = useCloudStorageService();
-  const [link, setLink] = useState<string>("");
   const { generateWorkspaceFile } = useWorkspace();
   const handleUpload = async () => {
     try {
       setUploading(true);
-      const { compressedFile } = await generateWorkspaceFile();
-      if (authState.authenticated && compressedFile) {
-        const res = await cloudService?.saveFile(compressedFile);
-        setLink(res ? cloudService?.generateLink(res) ?? "" : "");
+      const { compressedFile: file } = await generateWorkspaceFile();
+      if (authState.authenticated && file) {
+        await cloudService?.saveFile(file);
+        if (file) {
+          open({
+            file: {
+              id: file.name,
+              name: file.name,
+              mimeType: file.type,
+              size: `${file.size}`,
+              modifiedTime: `${file.lastModified}`,
+            },
+          });
+          notify("Workspace uploaded");
+        }
       } else {
         // ? allow empty workspace upload?
         notify("Please start a workspace first");
@@ -139,56 +247,26 @@ const UploadWorkspace = () => {
     }
   };
 
-  const handleCopy: MouseEventHandler<HTMLButtonElement> = async () => {
-    try {
-      await copy(link);
-    } catch {
-      notify("Unable to copy url, pls copy manually");
-    }
-  };
-
   return (
-    <div style={{ margin: "1em auto" }}>
+    <Stack sx={{ width: "100%", gap: 2 }}>
+      <Typography variant="overline" color="text.secondary">
+        Share this workspace
+      </Typography>
       <Button
         disabled={uploading}
         variant="contained"
         onClick={handleUpload}
-        color="primary"
+        startIcon={<UploadOutlined color="primary" />}
       >
-        {uploading ? <CircularProgress size={"25px"} /> : "Upload Workspace"}
+        {uploading ? "Saving" : "Upload current workspace"}
       </Button>
-
-      {link !== "" && (
-        <div style={{ margin: "20px" }}>
-          <TextField
-            value={link}
-            fullWidth
-            disabled
-            variant="outlined"
-            margin="normal"
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="copy-link"
-                      color="primary"
-                      onClick={handleCopy}
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </div>
-      )}
-    </div>
+      {dialog}
+    </Stack>
   );
 };
 
 const GoogleSignInButton = () => {
+  const sm = useSm();
   // const { cloudService } = useSavedLogsService("google");
   const [authState] = useAuth();
   const [{ instance: cloudService }] = useCloudStorageService();
@@ -218,45 +296,39 @@ const GoogleSignInButton = () => {
   const loginMessage = "Login with Google to save and share your search traces";
   const loggedInMessage = "You are logged in with your google account.";
   return (
-    <>
-      <Typography variant="body2" align="center" color="text.secondary">
-        {authState?.authenticated ? loggedInMessage : loginMessage}
-      </Typography>
-      {!authState?.authenticated ? (
-        <IconButton
-          onClick={cloudService?.authenticate}
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: "#fff",
-            border: "1px solid #d9d9d9",
-            borderRadius: "50px",
-            padding: "8px 16px",
-            "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
-          <GoogleIcon sx={{ color: "#4285F4", marginRight: "8px" }} />
-          <Typography
-            sx={{ fontSize: "16px", fontWeight: "500", color: "#202124" }}
-          >
-            Continue with Google
-          </Typography>
-        </IconButton>
+    <Stack>
+      {authState?.authenticated ? (
+        <Stack>
+          <ListItem>
+            <ListItemAvatar>
+              <Avatar src={authState?.user?.profile} />
+            </ListItemAvatar>
+            <ListItemText
+              primary={authState?.user?.name}
+              secondary={"Signed in"}
+            />
+            <IconButtonWithTooltip
+              label="Sign out"
+              icon={<LogoutOutlined color="action" fontSize="small" />}
+            />
+          </ListItem>
+          <Divider />
+        </Stack>
       ) : (
-        <div
-          style={{
-            padding: "20px",
-            display: "flex",
-            flexDirection: "column",
-            rowGap: "1em",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
+        <Typography variant="body2" align="center" color="text.secondary">
+          {authState?.authenticated ? loggedInMessage : loginMessage}
+        </Typography>
+      )}
+      {!authState?.authenticated ? (
+        <Button
+          onClick={cloudService?.authenticate}
+          variant="contained"
+          startIcon={<GoogleIcon color="primary" />}
         >
+          Sign in with Google
+        </Button>
+      ) : (
+        <Stack sx={{ gap: 2, p: sm ? 2 : 3, maxWidth: 740, mx: "auto" }}>
           {/* how to handle uploading? */}
           <UploadWorkspace />
           {loadingSavedFilesMetaData ? (
@@ -264,9 +336,9 @@ const GoogleSignInButton = () => {
           ) : (
             <FileList fileMetaDataList={list} />
           )}
-        </div>
+        </Stack>
       )}
-    </>
+    </Stack>
   );
 };
 

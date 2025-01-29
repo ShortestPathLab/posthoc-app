@@ -1,7 +1,6 @@
-import { Box } from "@mui/material";
+import { Stack } from "@mui/material";
 import SavedLogsButton from "components/SavedLogsButton";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { values } from "lodash";
@@ -26,22 +25,19 @@ export function SavedLogsPage({ template: Page }: PageContentProps) {
         />
       </Page.Options>
       <Page.Content>
-        <Block vertical>
-          <Scroll y>
-            <Box
-              sx={{
-                pt: 9,
-                px: 2,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                rowGap: "1rem",
-              }}
-            >
-              <SavedLogsButton type="google" />
-            </Box>
-          </Scroll>
-        </Block>
+        <Scroll y style={{ width: "100%" }}>
+          <Stack
+            sx={{
+              width: "100%",
+              pt: 6,
+              display: "flex",
+              flexDirection: "column",
+              rowGap: "1rem",
+            }}
+          >
+            <SavedLogsButton type="google" />
+          </Stack>
+        </Scroll>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>
