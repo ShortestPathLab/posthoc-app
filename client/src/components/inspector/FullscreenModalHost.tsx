@@ -91,7 +91,6 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
             bgcolor: "background.paper",
             mt: slotProps.Options?.children ? -6 : 0,
             flex: 1,
-            position: "relative",
           }}
         >
           {slotProps.Content?.children}
@@ -160,13 +159,13 @@ export function FullscreenModalHost() {
         <SurfaceBase
           title={page.name}
           state={state}
-          slotProps={{
-            ...(sm
+          slotProps={
+            sm
               ? {}
               : {
-                  paper: { sx: { maxWidth: "70vw" } },
-                }),
-          }}
+                  paper: { sx: { maxWidth: "80vw" } },
+                }
+          }
         >
           {content}
         </SurfaceBase>

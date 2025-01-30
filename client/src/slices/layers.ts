@@ -1,7 +1,9 @@
 import { filter, find, head } from "lodash";
+import { producifyAsync } from "produce";
 import { map } from "promise-tools";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSlice } from "./createSlice";
+import { getController } from "layers/layerControllers";
 
 type LayerGuard<T> = (l: Layer<any>) => l is Layer<T>;
 
@@ -26,7 +28,7 @@ export const [useLayers, LayersProvider] = createSlice<Layers, Partial<Layers>>(
   }
 );
 
-export function useLayer<T>(
+export function useLayer<T extends Record<string, any>>(
   defaultKey?: string,
   guard: LayerGuard<T> = defaultGuard
 ) {
@@ -70,6 +72,8 @@ export function useLayer<T>(
     [setLayers, layer?.key]
   );
 
+  const updateLayer = useMemo(() => producifyAsync(setLayer), [setLayer]);
+
   return useMemo(
     () =>
       ({
@@ -77,8 +81,10 @@ export function useLayer<T>(
         setKey,
         layer,
         setLayer,
+        updateLayer,
         layers: filtered,
         allLayers: layers,
+        controller: getController(layer),
       } as const),
     [layers, layer, setLayer, filtered]
   );

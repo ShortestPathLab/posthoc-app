@@ -1,7 +1,6 @@
 import { Stack } from "@mui/material";
 import SavedLogsButton from "components/SavedLogsButton";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { values } from "lodash";
 import { cloudStorageProviders } from "services/cloud-storage";
@@ -25,19 +24,17 @@ export function SavedLogsPage({ template: Page }: PageContentProps) {
         />
       </Page.Options>
       <Page.Content>
-        <Scroll y style={{ width: "100%" }}>
-          <Stack
-            sx={{
-              width: "100%",
-              pt: 6,
-              display: "flex",
-              flexDirection: "column",
-              rowGap: "1rem",
-            }}
-          >
-            <SavedLogsButton type="google" />
-          </Stack>
-        </Scroll>
+        <Stack
+          sx={{
+            width: "100%",
+            pt: 6,
+            display: "flex",
+            flexDirection: "column",
+            rowGap: "1rem",
+          }}
+        >
+          <SavedLogsButton type="google" />
+        </Stack>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

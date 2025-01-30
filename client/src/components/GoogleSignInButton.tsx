@@ -2,7 +2,7 @@ import {
   CloseOutlined,
   InfoOutlined,
   LinkOutlined,
-  LogoutOutlined,
+  MoreVertOutlined,
   OpenInNewOutlined,
   UploadOutlined,
 } from "@mui-symbols-material/w400";
@@ -19,13 +19,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { makeCaughtObjectReportJson } from "caught-object-report-json";
 import copy from "clipboard-copy";
 import { useSm } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
 import { round } from "lodash";
 import { FeatureCard } from "pages/ExplorePage";
-import { useMemo, useState } from "react";
+import { Ref, useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
+import { useMeasure } from "react-use";
 import { FileMetadata } from "services/cloud-storage/CloudStorage";
 import { useAuth } from "slices/auth";
 import { useCloudStorageService } from "slices/cloudStorage";
@@ -35,6 +37,8 @@ import { useSnackbar } from "./generic/Snackbar";
 import { Button } from "./generic/inputs/Button";
 import { IconButtonWithTooltip } from "./generic/inputs/IconButtonWithTooltip";
 import { Surface, useSurface } from "./generic/surface";
+import { useViewTreeContext } from "./inspector/ViewTree";
+import { useSurfaceAvailableCssSize } from "./generic/surface/useSurfaceSize";
 
 const FileShareSurface = ({ file }: { file: FileMetadata }) => {
   const [{ instance: cloudService }] = useCloudStorageService();
@@ -90,7 +94,7 @@ const FileShareSurface = ({ file }: { file: FileMetadata }) => {
       ></ListItemText>
       <Stack sx={{ gap: 1 }}>
         <Surface
-          title="Get shareable link"
+          title="Shareable link"
           trigger={({ open }) => {
             return (
               <Button
@@ -157,55 +161,51 @@ const FileList = ({
         const file = await cloudService?.getFile(fileId);
         load(file);
       } catch (e: unknown) {
-        console.log(e);
-        notify("Failed to fetch file from source");
+        notify(
+          "Couldn't open file",
+          makeCaughtObjectReportJson(e).message ?? ""
+        );
       }
     });
   };
 
   return (
-    <>
-      <Typography variant="overline" color="text.secondary">
-        Shared workspaces
-      </Typography>
-      <Stack
-        sx={{
-          display: "grid",
-          gridAutoFlow: "row",
-          gridTemplateColumns:
-            "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
-          gap: 2,
-        }}
-      >
-        {fileMetaDataList.map((file) => (
-          <FeatureCard
-            name={file.name}
-            description={JSON.stringify(file)}
-            key={file.id}
-            id={file.id}
-            size={+file.size}
-            onOpenClick={() => handleView(file.id)}
-            loading={false}
+    <Stack
+      sx={{
+        display: "grid",
+        gridAutoFlow: "row",
+        gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
+        gap: 2,
+      }}
+    >
+      {fileMetaDataList.map((file) => (
+        <FeatureCard
+          name={file.name}
+          description={JSON.stringify(file)}
+          key={file.id}
+          id={file.id}
+          size={+file.size}
+          onOpenClick={() => handleView(file.id)}
+          loading={false}
+        >
+          <Surface
+            title="Workspace details"
+            trigger={({ open }) => (
+              <Button
+                sx={{ mt: -1 }}
+                variant="text"
+                startIcon={<InfoOutlined />}
+                onClick={open}
+              >
+                Workspace details
+              </Button>
+            )}
           >
-            <Surface
-              title="Workspace details"
-              trigger={({ open }) => (
-                <Button
-                  sx={{ mt: -1 }}
-                  variant="text"
-                  startIcon={<InfoOutlined />}
-                  onClick={open}
-                >
-                  Details
-                </Button>
-              )}
-            >
-              <FileShareSurface file={file} />
-            </Surface>
-          </FeatureCard>
-        ))}
-      </Stack>
-    </>
+            <FileShareSurface file={file} />
+          </Surface>
+        </FeatureCard>
+      ))}
+    </Stack>
   );
 };
 const UploadWorkspace = () => {
@@ -267,12 +267,15 @@ const UploadWorkspace = () => {
 
 const GoogleSignInButton = () => {
   const sm = useSm();
+  const { isViewTree } = useViewTreeContext();
+  const [ref, { width }] = useMeasure();
+  const height = useSurfaceAvailableCssSize()?.height;
   // const { cloudService } = useSavedLogsService("google");
   const [authState] = useAuth();
   const [{ instance: cloudService }] = useCloudStorageService();
   const [list, setList] = useState<FileMetadata[]>([]);
   const [loadingSavedFilesMetaData, setSavedFilesMetaData] = useState(false);
-  useAsync(async () => {
+  const f = useCallback(async () => {
     if (authState.authenticated && cloudService) {
       try {
         setSavedFilesMetaData(true);
@@ -286,6 +289,7 @@ const GoogleSignInButton = () => {
       }
     }
   }, [cloudService, authState.authenticated]);
+  useAsync(f, [f]);
   if (authState == undefined) {
     return (
       <Typography variant="body2" align="center" color="text.secondary">
@@ -293,49 +297,91 @@ const GoogleSignInButton = () => {
       </Typography>
     );
   }
-  const loginMessage = "Login with Google to save and share your search traces";
-  const loggedInMessage = "You are logged in with your google account.";
+  const loginMessage =
+    "Sign in to save and share your visualisations via Google Drive";
+
+  const padding = sm || isViewTree ? 2 : 3;
+  const dual = width > 740;
+
   return (
-    <Stack>
+    <Stack ref={ref as Ref<HTMLDivElement>}>
       {authState?.authenticated ? (
-        <Stack>
-          <ListItem>
-            <ListItemAvatar>
-              <Avatar src={authState?.user?.profile} />
-            </ListItemAvatar>
-            <ListItemText
-              primary={authState?.user?.name}
-              secondary={"Signed in"}
-            />
-            <IconButtonWithTooltip
-              label="Sign out"
-              icon={<LogoutOutlined color="action" fontSize="small" />}
-            />
-          </ListItem>
-          <Divider />
+        <Stack
+          direction={dual ? "row" : "column"}
+          gap={dual ? 2 : 0}
+          sx={{
+            visibility: width ? "visible" : "hidden",
+            px: padding,
+            py: 2,
+            gap: padding,
+            mx: "auto",
+            // Subtract height of app bar
+            minHeight: (t) =>
+              `calc(${height} - ${t.spacing(isViewTree ? 0 : 6)})`,
+            width: "100%",
+          }}
+        >
+          <Stack
+            sx={{
+              gap: 2,
+              width: "100%",
+              ...(dual && {
+                maxWidth: 280,
+                position: "sticky",
+                top: 64,
+                left: 0,
+                height: "max-content",
+              }),
+            }}
+          >
+            <Typography variant="overline" color="text.secondary">
+              Google account
+            </Typography>
+            <ListItem disablePadding>
+              <ListItemAvatar>
+                <Avatar src={authState?.user?.profile} />
+              </ListItemAvatar>
+              <ListItemText
+                primary={authState?.user?.name}
+                secondary={"Signed in"}
+              />
+              <IconButtonWithTooltip
+                label="Account options"
+                edge="end"
+                icon={<MoreVertOutlined color="action" fontSize="small" />}
+              />
+            </ListItem>
+            <UploadWorkspace />
+          </Stack>
+          {dual && <Divider sx={{ my: -2 }} orientation="vertical" flexItem />}
+          <Stack sx={{ gap: 2, width: "100%", flex: 1 }}>
+            <Typography variant="overline" color="text.secondary">
+              Available workspaces
+            </Typography>
+            {loadingSavedFilesMetaData ? (
+              <CircularProgress size={30} />
+            ) : list.length ? (
+              <FileList fileMetaDataList={list} />
+            ) : (
+              <Typography color="text.secondary">
+                No workspaces found
+              </Typography>
+            )}
+          </Stack>
         </Stack>
       ) : (
-        <Typography variant="body2" align="center" color="text.secondary">
-          {authState?.authenticated ? loggedInMessage : loginMessage}
-        </Typography>
-      )}
-      {!authState?.authenticated ? (
-        <Button
-          onClick={cloudService?.authenticate}
-          variant="contained"
-          startIcon={<GoogleIcon color="primary" />}
-        >
-          Sign in with Google
-        </Button>
-      ) : (
-        <Stack sx={{ gap: 2, p: sm ? 2 : 3, maxWidth: 740, mx: "auto" }}>
-          {/* how to handle uploading? */}
-          <UploadWorkspace />
-          {loadingSavedFilesMetaData ? (
-            <CircularProgress size={30} />
-          ) : (
-            <FileList fileMetaDataList={list} />
-          )}
+        <Stack sx={{ p: sm ? 2 : 3, gap: 2, alignItems: "center" }}>
+          <Typography variant="body2" align="center" color="text.secondary">
+            {loginMessage}
+          </Typography>
+          <Button
+            sx={{ width: 360, maxWidth: "100%" }}
+            onClick={cloudService?.authenticate}
+            variant="contained"
+            startIcon={<GoogleIcon color="primary" />}
+          >
+            Continue with Google
+          </Button>
         </Stack>
       )}
     </Stack>

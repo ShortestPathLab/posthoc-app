@@ -213,7 +213,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id, string> = (
     id,
     checkAuth: once(async () => {
       const auth = await checkAuth();
-      if (auth.authenticated) {
+      if (auth.authenticated && !auth.user) {
         const user = await userClient.get<{
           name: string;
           picture: string;
@@ -231,7 +231,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id, string> = (
           },
         };
       }
-      return defaultAuthState;
+      return auth;
     }),
     authenticate,
     logout,
