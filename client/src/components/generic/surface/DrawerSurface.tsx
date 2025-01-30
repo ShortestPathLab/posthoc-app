@@ -107,8 +107,8 @@ export function DrawerSurface({
               mx: "auto",
               bgcolor: "background.paper",
               "--Paper-overlay": "none !important",
-              borderTopLeftRadius: (t) => t.shape.borderRadius * 4,
-              borderTopRightRadius: (t) => t.shape.borderRadius * 4,
+              borderTopLeftRadius: (t) => t.shape.borderRadius * 3.5,
+              borderTopRightRadius: (t) => t.shape.borderRadius * 3.5,
               maxHeight: `calc(100dvh - ${gap}px)`,
               boxShadow: (t) =>
                 `0 ${t.spacing(4)} 0px 0px ${t.palette.background.paper} `,

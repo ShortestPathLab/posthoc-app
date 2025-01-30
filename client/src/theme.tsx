@@ -62,8 +62,8 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
       h2: { fontFamily: headingFamily },
       h3: { fontFamily: headingFamily },
       h4: { fontFamily: headingFamily },
-      h5: { fontFamily: headingFamily },
-      h6: { fontFamily: headingFamily },
+      h5: { fontFamily: headingFamily, fontWeight: 400 },
+      h6: { fontFamily: headingFamily, fontWeight: 450 },
       button: {
         textTransform: "none",
         fontWeight: 400,
@@ -108,7 +108,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
             marginBottom: 12,
           },
           h6: {
-            fontWeight: 500,
+            fontWeight: 400,
           },
         },
       },
@@ -138,7 +138,7 @@ export function useAcrylic(color?: string) {
 export function usePaper() {
   return (elevation: number = 1) =>
     ({
-      borderRadius: 1,
+      borderRadius: 1.5,
       transition: ({ transitions }) =>
         transitions.create(["background-color", "box-shadow"]),
       boxShadow: ({ shadows, palette }) =>
@@ -152,7 +152,7 @@ export function usePaper() {
       border: ({ palette }) =>
         palette.mode === "dark"
           ? `1px solid ${alpha(palette.text.primary, elevation * 0.08)}`
-          : `1px solid ${alpha(palette.text.primary, elevation * 0.16)}`,
+          : `1px solid ${alpha(palette.text.primary, elevation * 0.12)}`,
     } satisfies SxProps<Theme>);
 }
 
