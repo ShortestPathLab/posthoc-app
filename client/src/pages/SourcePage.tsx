@@ -8,7 +8,6 @@ import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 import { LayerSource } from "layers";
 import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
-import { transactionAsync } from "produce";
 import { useEffect, useMemo } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Layer, useLayer } from "slices/layers";
@@ -27,18 +26,19 @@ export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
   useMonacoTheme(theme);
 
-  const { layers, setLayer, setKey } = useLayer(undefined, isSourceLayer);
+  const { layers, updateLayer, setKey, controller } = useLayer(
+    undefined,
+    isSourceLayer
+  );
 
   const sources = useMemo(
     () =>
       layers?.flatMap?.(
         (l) =>
-          getController(l)
-            ?.getSources?.(l)
-            ?.map?.((c) => ({
-              layer: l.key,
-              source: c,
-            }))
+          controller.getSources?.(l)?.map?.((c) => ({
+            layer: l.key,
+            source: c,
+          }))
         // why is layer string here?
         // layer is only the layer id
       ) as { layer: string; source: LayerSource }[],
@@ -65,29 +65,19 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   const handleEditorContentChange = useMemo(
     () =>
-      debounceLifo((value) =>
+      debounceLifo((value?: string) =>
         usingLoading(() =>
-          setLayer(
-            async (l) =>
-              (await transactionAsync(
-                l,
-                async (l) =>
-                  await getController(l)?.onEditSource?.(
-                    l,
-                    selected?.source?.id,
-                    value
-                  )
-              )) ?? l
+          updateLayer((l) =>
+            controller.onEditSource!(l, selected?.source?.id, value)
           )
         )
       ),
-    [usingLoading, selected?.source?.id, setLayer]
+    [usingLoading, selected?.source?.id, updateLayer]
   );
 
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>source</Page.Key>
-
       <Page.Title>Source</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>

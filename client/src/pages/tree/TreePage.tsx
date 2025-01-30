@@ -60,6 +60,7 @@ import { useTreeMemo } from "./TreeWorker";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
 import { TreeAxis } from "./TreeAxis";
+import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 
 type TreePageContext = PanelState;
 
@@ -102,6 +103,7 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<TreePageContext>();
+  const size = useSurfaceAvailableCssSize();
 
   // ─── Options ─────────────────────────────────────────────────────────
 
@@ -153,7 +155,7 @@ export function TreePage({ template: Page }: PageContentProps) {
       <Page.Title>Tree</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Block>
+        <Block sx={size}>
           {trace ? (
             !loading ? (
               tree?.length ? (

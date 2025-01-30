@@ -1,17 +1,42 @@
 import { ErrorOutlined, WidgetsOutlined } from "@mui-symbols-material/w400";
-import { Box, Divider, Stack } from "@mui/material";
+import { Box, BoxProps, Divider, Stack } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { Space } from "components/generic/Space";
+import { SurfaceSizeContext } from "components/generic/surface/DrawerSurface";
 import { Placeholder } from "components/inspector/Placeholder";
 import { withSlots } from "components/withSlots";
-import { values } from "lodash";
+import { merge, values } from "lodash";
 import { pages } from "pages";
-import React, { ReactNode } from "react";
+import React, { ReactNode, Ref } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { useMeasure } from "react-use";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
+
+export function PageContent({ children, ...props }: BoxProps) {
+  const [ref, size] = useMeasure();
+  return (
+    <Block sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
+      <Box
+        {...merge(
+          {
+            sx: { width: "100%", height: "100%", bgcolor: "background.paper" },
+          },
+          props
+        )}
+        ref={ref as Ref<HTMLDivElement>}
+      >
+        <Scroll y style={{ height: "100%", width: "100%" }}>
+          <SurfaceSizeContext.Provider value={size}>
+            {children}
+          </SurfaceSizeContext.Provider>
+        </Scroll>
+      </Box>
+    </Block>
+  );
+}
 
 export const divider = (
   <Divider
@@ -97,17 +122,7 @@ export const Page = withSlots<PageSlots, PageProps>(
         )}
       >
         <Block vertical>
-          <Block sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
-            <Box
-              sx={{
-                width: "100%",
-                height: "100%",
-                bgcolor: "background.paper",
-              }}
-            >
-              {slotProps.Content?.children}
-            </Box>
-          </Block>
+          <PageContent>{slotProps?.Content?.children}</PageContent>
           <Block sx={{ height: (t) => t.spacing(6), alignItems: "center" }}>
             <Block
               sx={{

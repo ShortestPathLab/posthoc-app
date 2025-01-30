@@ -38,6 +38,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
 import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
+import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 
 function lerp(start: number, end: number, amount: number): number {
   return start + clamp(amount, 0, 1) * (end - start);
@@ -125,7 +126,9 @@ export function StepsPage({ template: Page }: PageContentProps) {
     null
   );
 
-  const { controls, onChange, state, dragHandle } =
+  const size = useSurfaceAvailableCssSize();
+
+  const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext<StepsPageState>();
 
   const {
@@ -276,7 +279,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
       <Page.Title>Steps</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Block vertical alignItems="center">
+        <Block vertical alignItems="center" sx={size}>
           {steps ? (
             steps.length ? (
               <List
@@ -354,7 +357,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
                 ...acrylic,
                 alignItems: "center",
                 position: "absolute",
-                top: (t) => t.spacing(6),
+                top: (t) => t.spacing(isViewTree ? 6 : 6 + 7),
                 height: (t) => t.spacing(6),
                 borderRadius: 1,
                 px: 1,

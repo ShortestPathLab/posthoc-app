@@ -1,17 +1,18 @@
 import {
-  BlurCircularOutlined,
-  LayersOutlined,
-} from "@mui-symbols-material/w400";
-import {
   CameraOutlined,
   CenterFocusWeakOutlined,
   TimesOneMobiledataOutlined,
 } from "@mui-symbols-material/w300";
+import {
+  BlurCircularOutlined,
+  LayersOutlined,
+} from "@mui-symbols-material/w400";
 import { Box, Divider, Stack, SxProps, Theme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
 import { Block } from "components/generic/Block";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
+import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import download from "downloadjs";
@@ -88,13 +89,15 @@ export function ViewportPage({ template: Page }: PageContentProps) {
     _(selectedLayers).map("viewKey").sort().join(".").value(),
   ]);
 
+  const size = useSurfaceAvailableCssSize();
+
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>viewport</Page.Key>
       <Page.Title>Viewport</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Block>
+        <Block sx={size}>
           <AutoSize>
             {(size) => (
               <Box>

@@ -8,7 +8,7 @@ import { withSlots } from "components/withSlots";
 import { ErrorBoundary } from "react-error-boundary";
 import { useUIState } from "slices/UIState";
 import { useAcrylic } from "theme";
-import { PageProps, PageSlots, divider } from "./Page";
+import { PageContent, PageProps, PageSlots, divider } from "./Page";
 
 export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
   const bg = useSidebarBackground();
@@ -29,17 +29,9 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
       }
     >
       <Block vertical>
-        <Block sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
-          <Box
-            sx={{
-              width: "100%",
-              height: "100%",
-              bgcolor: bg,
-            }}
-          >
-            {slotProps.Content?.children}
-          </Box>
-        </Block>
+        <PageContent sx={{ bgcolor: bg }}>
+          {slotProps?.Content?.children}
+        </PageContent>
         <Block sx={{ height: (t) => t.spacing(6) }}>
           <Block
             sx={{
