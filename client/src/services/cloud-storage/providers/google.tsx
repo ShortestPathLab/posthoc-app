@@ -1,5 +1,5 @@
-import { AddToDriveOutlined } from "@mui-symbols-material/w400";
 import { createClient, RequestOptions } from "client/createHttpClient";
+import { Lawnicon } from "components/generic/Lawnicon";
 import { each, head, isString, now, once } from "lodash";
 import {
   AuthError,
@@ -248,6 +248,6 @@ export default {
   id: "google",
   name: "Google Drive",
   description: "Save and sync workspaces to your Google Drive",
-  icon: <AddToDriveOutlined />,
+  icon: <Lawnicon>google_drive</Lawnicon>,
   create: createGoogleStorageService,
 } satisfies CloudStorageProviderMeta<"google", string>;
