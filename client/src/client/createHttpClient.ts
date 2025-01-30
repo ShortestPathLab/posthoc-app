@@ -1,6 +1,6 @@
-import { merge } from "lodash";
-import { ResponseCodeError } from "services/cloud-storage";
+import { lowerFirst, merge } from "lodash";
 import { Overloads } from "utils/Overloads";
+import { ResponseCodeError } from "./ResponseCodeError";
 
 export type RequestOptions<T = string> = {
   /**
@@ -103,7 +103,9 @@ export const createClient = <
           if (!response.ok) throw new ResponseCodeError(response);
           return await extractions[result ?? "raw"](response);
         } catch (e) {
-          throw new Error(`Error making request '${label}'`, { cause: e });
+          throw new Error(`Failed to ${lowerFirst(label)}`, {
+            cause: e,
+          });
         }
       },
     {

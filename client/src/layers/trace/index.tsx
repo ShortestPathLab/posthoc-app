@@ -64,6 +64,7 @@ import { set } from "utils/set";
 import { parseYamlAsync } from "workers/async";
 import { TrustedLayerData } from "../TrustedLayerData";
 import { use2DPath } from "./use2DPath";
+import { isTraceLayer } from "./isTraceLayer";
 
 export type TraceLayerData = {
   trace?: UploadedTrace & { error?: string };
@@ -269,7 +270,7 @@ export const controller = {
   },
   steps: (layer) => layer?.source?.parsedTrace?.content?.events ?? [],
   provideSelectionInfo: ({ layer: key, event, children }) => {
-    const { layer, setLayer } = useLayer(key);
+    const { layer, setLayer } = useLayer(key, isTraceLayer);
     const menu = useMemo(() => {
       const events = layer?.source?.parsedTrace?.content?.events ?? [];
       const steps = chain(event?.info?.components)
@@ -372,8 +373,7 @@ export const controller = {
   onEditSource: async (layer, id, content) => {
     try {
       if (id !== "trace") throw { error: "id not trace", id };
-      if (!layer || !content)
-        throw { error: "layer or content is undefined", layer, content };
+      if (!content) throw { error: "content is undefined", layer, content };
 
       const updatedLayerSource = (await parseYamlAsync(content)) as Trace;
       // Set the trace content
@@ -381,9 +381,9 @@ export const controller = {
       // To get things to change, we also need to change the trace key
       set(layer, "source.trace.key", nanoid());
       console.log(layer);
-      return layer;
     } catch (error) {
       console.error(error);
     }
+    return layer;
   },
 } satisfies LayerController<"trace", TraceLayerData>;

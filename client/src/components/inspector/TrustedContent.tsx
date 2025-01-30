@@ -45,14 +45,15 @@ export function TrustedContent({ children }: { children?: ReactNode }) {
             <Button
               variant="text"
               startIcon={<DoneAllOutlined />}
-              onClick={() =>
+              onClick={() => {
                 setSettings(
                   producify((f) => {
                     f.trustedOrigins = f.trustedOrigins ?? [];
                     f.trustedOrigins?.push(untrustedLayerOrigin);
                   })
-                )
-              }
+                );
+                setUIState(() => ({ isTrusted: true }));
+              }}
             >
               Always trust workspaces from this origin
             </Button>

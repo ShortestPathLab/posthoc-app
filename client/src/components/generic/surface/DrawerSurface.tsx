@@ -9,12 +9,13 @@ import {
 } from "@mui/material";
 import { merge, noop } from "lodash";
 import { bindDialog, PopupState as State } from "material-ui-popup-state/hooks";
-import { ReactNode } from "react";
+import { createContext, ReactNode } from "react";
 import { Scroll } from "../Scrollbars";
 import { SlotProps } from "./SlotProps";
 import { stopPropagation } from "./stopPropagation";
 import { useDrawerHandle } from "./useDrawerHandle";
 import { useModalDepth } from "./useModalDepth";
+import { useMeasure } from "react-use";
 
 function Handle(props: StackProps) {
   return (
@@ -47,6 +48,11 @@ function Handle(props: StackProps) {
   );
 }
 
+export const SurfaceSizeContext = createContext<{
+  width: number | string;
+  height: number | string;
+} | null>(null);
+
 export function DrawerSurface({
   state,
   slotProps,
@@ -60,6 +66,8 @@ export function DrawerSurface({
   const gap = slotProps?.drawer?.gap ?? depth * 16 + 16;
   const theme = useTheme();
   const { setHandle, setPaper } = useDrawerHandle(state.close);
+  const [ref, { width }] = useMeasure();
+  const maxHeight = `calc(100dvh - ${gap + 32}px)`;
   return (
     <SwipeableDrawer
       transitionDuration={{ enter: 500, exit: 500 }}
@@ -111,16 +119,11 @@ export function DrawerSurface({
       )}
     >
       <Handle ref={setHandle} />
-      <Box onTouchStart={stopPropagation}>
-        <Scroll
-          y
-          px={0}
-          style={{
-            maxHeight: `calc(100dvh - ${gap + 32}px)`,
-          }}
-          {...slotProps?.scroll}
-        >
-          {children}
+      <Box onTouchStart={stopPropagation} ref={ref}>
+        <Scroll y px={0} style={{ maxHeight }} {...slotProps?.scroll}>
+          <SurfaceSizeContext.Provider value={{ width, height: maxHeight }}>
+            {children}
+          </SurfaceSizeContext.Provider>
         </Scroll>
       </Box>
     </SwipeableDrawer>

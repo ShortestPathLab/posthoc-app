@@ -237,7 +237,7 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
       background:
         palette.mode === "dark" ? palette.background.default : palette.divider,
       boxShadow: `inset 0 0 0 1px ${palette.background.paper}`,
-      "&:hover": {
+      "&:hover, &:active": {
         background: palette.primary.main,
         boxShadow: "none",
       },

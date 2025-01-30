@@ -201,6 +201,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       <Surface
                         trigger={({ open }) => (
                           <Button
+                            size="small"
                             sx={{ mx: 1 }}
                             color="error"
                             startIcon={<RestartAltOutlined />}
