@@ -65,7 +65,9 @@ export function Select<T extends string>({
                   }}
                 >
                   {icon && (
-                    <ListItemIcon sx={{ transform: "scale(0.8)" }}>
+                    <ListItemIcon
+                      sx={{ transform: "scale(0.8)", fontSize: 24 }}
+                    >
                       {icon}
                     </ListItemIcon>
                   )}
