@@ -63,12 +63,19 @@ export function DrawerSurface({
   slotProps?: Pick<SlotProps, "drawer" | "paper" | "scroll">;
 }) {
   const { depth, maxDepth = 1 } = useModalDepth(state.isOpen);
+
+  // ─── Measurements ────────────────────────────────────────────────────
+
   const gap = slotProps?.drawer?.gap ?? depth * 16 + 16;
-  const r = -32 * ((maxDepth - depth) / maxDepth);
+  const ratio = (maxDepth - depth) / maxDepth;
+
+  // ─────────────────────────────────────────────────────────────────────
+
   const theme = useTheme();
   const { setHandle, setPaper } = useDrawerHandle(state.close);
   const [ref, { width }] = useMeasure();
   const maxHeight = `calc(100dvh - ${gap + 32}px)`;
+
   return (
     <SwipeableDrawer
       transitionDuration={{ enter: 500, exit: 500 }}
@@ -93,7 +100,9 @@ export function DrawerSurface({
                   duration: 500,
                   easing: t.transitions.easing.easeOut,
                 }),
-              transform: `translateY(${r}px)`,
+              transform: `translateY(${-32 * ratio}px) scale(${
+                1 - ratio * 0.025
+              })`,
             },
           } as ModalProps,
         },
