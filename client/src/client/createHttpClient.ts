@@ -26,6 +26,7 @@ type RequestHandler<
 > = {
   (options: O & RequestOptions<"raw">): Response | Promise<Response>;
   (options: O & RequestOptions<"blob">): Promise<Blob>;
+  (options: O & RequestOptions<"text">): Promise<string>;
   <R>(options: O & RequestOptions<"json">): Promise<R>;
 };
 
@@ -39,6 +40,7 @@ type Result<K> = ReturnType<
 
 const extractions = {
   raw: (r) => r,
+  text: (r) => r.text(),
   blob: (r) => r.blob(),
   json: (r) => r.json(),
 } satisfies {
@@ -112,3 +114,5 @@ export const createClient = <
       get: (target, method: Method) => target(method),
     }
   ) as unknown as { [K in Method]: RequestHandler<O> };
+
+export const request = createClient("", async () => ({}));
