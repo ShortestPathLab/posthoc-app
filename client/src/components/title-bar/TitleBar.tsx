@@ -22,7 +22,9 @@ import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useSurface } from "components/generic/surface";
+import { useFileImport } from "components/inspector/FileDropZone";
 import { shades } from "components/renderer/colors";
+import { fileDialog as file } from "file-select-dialog";
 import { useTitleBar } from "hooks/useTitleBar";
 import { useWorkspace } from "hooks/useWorkspace";
 import { get, startCase } from "lodash";
@@ -148,6 +150,7 @@ export const TitleBar = () => {
   const { save, load } = useWorkspace();
   const { visible, rect } = useTitleBarVisible();
   const [, setView] = useView();
+  const importFiles = useFileImport();
   // const sm = useSmallDisplay();
   // const prevSm = usePrevious(sm);
   // useEffect(() => {
@@ -273,13 +276,24 @@ export const TitleBar = () => {
                   items: [
                     {
                       type: "action",
-                      name: "Open workspace",
+                      name: "Import files",
+                      key: "import-files",
+                      action: async () => {
+                        const files = await file({ multiple: true });
+                        if (files?.length) importFiles([...files]);
+                      },
+                    },
+                    { type: "divider" },
+                    {
+                      type: "action",
+                      name: "Open workspace from file",
                       key: "workspace-load",
                       action: load,
                     },
+
                     {
                       type: "action",
-                      name: "Save workspace",
+                      name: "Save workspace to file",
                       key: "workspace-save",
                       action: save,
                     },

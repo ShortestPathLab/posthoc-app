@@ -13,15 +13,13 @@ import { formatByte, useBusyState } from "slices/busy";
 import { useLayers } from "slices/layers";
 import { useAcrylic } from "theme";
 
-export function FileDropZone() {
-  const acrylic = useAcrylic();
+export function useFileImport() {
   const { load: loadWorkspace } = useWorkspace();
-  const [itemCount, setItemCount] = useState<number>(0);
   const [, setLayers] = useLayers();
   const usingBusyState = useBusyState("file-drop-import");
   const notify = useSnackbar();
 
-  async function importFiles(fs: File[]) {
+  return async function importFiles(fs: File[]) {
     let totalClaimed = 0;
     for (const [file, i] of fs.map((...args) => args)) {
       for (const [type, { claimImportedFile }] of entries(getControllers())) {
@@ -43,15 +41,19 @@ export function FileDropZone() {
         }
       }
     }
-    if (!totalClaimed) {
-      const success = await loadWorkspace(head(fs));
-      if (success) return;
-      notify(
-        `Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`
-      );
-    }
-  }
+    if (totalClaimed) return;
+    const success = await loadWorkspace(head(fs));
+    if (success) return;
+    notify(
+      `Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`
+    );
+  };
+}
 
+export function FileDropZone() {
+  const acrylic = useAcrylic();
+  const [itemCount, setItemCount] = useState<number>(0);
+  const importFiles = useFileImport();
   return (
     <FileDrop
       onFrameDragLeave={() => setItemCount(0)}
