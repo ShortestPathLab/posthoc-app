@@ -30,6 +30,25 @@ code {
   display: block;
 }
 
+.icon-glyph {
+  background: red;
+  font-family: "Arial", sans-serif; /* You can use any font */
+  font-size: 20px;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+}
+.icon-glyph::before {
+  content: "!"; /* Unicode character e009 */
+  font-family: "Arial", sans-serif; /* Make sure it's using a font that supports it */
+}
+.error-text {
+  background: #483736;
+}
 @property --scrollbar-size {
   syntax: "<length>";
   inherits: true;

@@ -17,6 +17,7 @@ import { debounceLifo } from "utils/debounceLifo";
 import { PageContentProps } from "./PageMeta";
 import { OutError, OutErrorDetails } from "workers/usingWorker";
 import * as monaco from "monaco-editor";
+import { Button } from "components/generic/Button";
 type SourceLayer = Layer;
 
 const isSourceLayer = (l: Layer): l is SourceLayer =>
@@ -48,6 +49,8 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
   const monacoRef = useRef<null | Monaco>(null);
+  const decorationsRef =
+    useRef<null | monaco.editor.IEditorDecorationsCollection>(null);
 
   const usingLoading = useLoadingState("layers");
 
@@ -63,12 +66,16 @@ export function SourcePage({ template: Page }: PageContentProps) {
     () => void (selected?.layer && setKey(selected?.layer)),
     [setKey, selected?.layer],
   );
+  const [locked, setLocked] = useState(
+    !!selected?.source?.readonly ? null : true,
+  );
   const handleEditorMount = (
     editor: monaco.editor.IStandaloneCodeEditor,
     monacoInstance: Monaco,
   ) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
+    decorationsRef.current = editor.createDecorationsCollection();
   };
   const addEditorModelMarker = ({}: {
     startLineNumber: number;
@@ -89,6 +96,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
             async (l) =>
               (await transactionAsync(l, async (l) => {
                 try {
+                  decorationsRef.current?.clear();
                   const modifiedLayer = await getController(l)?.onEditSource?.(
                     l,
                     selected?.source?.id,
@@ -99,30 +107,30 @@ export function SourcePage({ template: Page }: PageContentProps) {
                 } catch (error) {
                   if (error instanceof OutError) {
                     console.log(error.details);
-                    if (editorRef.current && monacoRef.current) {
-                      const model = editorRef.current.getModel();
-                      if (model) {
-                        monacoRef.current.editor.setModelMarkers(
-                          model,
-                          "owner",
-                          [
-                            {
-                              startLineNumber: error.details.mark.line,
-                              startColumn: error.details.mark.column,
-                              message: error.details.mark.message,
-                              endLineNumber: error.details.mark.line,
-                              endColumn: error.details.mark.column,
-                              severity: monacoRef.current.MarkerSeverity.Error,
-                            },
-                          ],
-                        );
-                      } else {
-                        console.log("model undefined");
-                      }
-                      // setEditorError(error.details);
-                    } else {
-                      console.log("undefinedjj w");
-                    }
+                    const startLine = error.details.mark.line;
+                    const endLine = startLine;
+                    const startColumn = error.details.mark.column;
+                    const endColumn = startColumn;
+
+                    console.log(decorationsRef.current);
+                    decorationsRef.current?.set([
+                      {
+                        range: new monaco.Range(
+                          startLine,
+                          startColumn,
+                          endLine,
+                          endColumn,
+                        ),
+                        options: {
+                          isWholeLine: true,
+                          className: "error-text",
+                          glyphMarginClassName: "icon-glyph",
+                          glyphMarginHoverMessage: {
+                            value: error.details.reason,
+                          },
+                        },
+                      },
+                    ]);
                   }
                 }
               })) ?? l,
@@ -152,6 +160,8 @@ export function SourcePage({ template: Page }: PageContentProps) {
                   }
                   options={{
                     readOnly: !!selected?.source?.readonly,
+                    renderValidationDecorations: "on",
+                    glyphMargin: true,
                   }}
                   language={selected?.source?.language}
                   loading={<CircularProgress variant="indeterminate" />}
