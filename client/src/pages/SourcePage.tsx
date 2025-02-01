@@ -106,13 +106,11 @@ export function SourcePage({ template: Page }: PageContentProps) {
                   return modifiedLayer;
                 } catch (error) {
                   if (error instanceof OutError) {
-                    console.log(error.details);
                     const startLine = error.details.mark.line;
                     const endLine = startLine;
                     const startColumn = error.details.mark.column;
                     const endColumn = startColumn;
 
-                    console.log(decorationsRef.current);
                     decorationsRef.current?.set([
                       {
                         range: new monaco.Range(

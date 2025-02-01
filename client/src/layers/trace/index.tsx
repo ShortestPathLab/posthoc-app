@@ -91,26 +91,26 @@ export const controller = {
   claimImportedFile: async (file) =>
     isTraceFormat(file)
       ? {
-          claimed: true,
-          layer: async (notify) => {
-            notify("Opening trace...");
-            try {
-              const output = readUploadedTrace(file);
-              return { trace: await output.read() };
-            } catch (e) {
-              console.error(e);
-              notify(`Error opening, ${get(e, "message")}`);
-              return {
-                trace: {
-                  key: nanoid(),
-                  id: custom().id,
-                  error: get(e, "message"),
-                  name: startCase(name(file.name)),
-                },
-              };
-            }
-          },
-        }
+        claimed: true,
+        layer: async (notify) => {
+          notify("Opening trace...");
+          try {
+            const output = readUploadedTrace(file);
+            return { trace: await output.read() };
+          } catch (e) {
+            console.error(e);
+            notify(`Error opening, ${get(e, "message")}`);
+            return {
+              trace: {
+                key: nanoid(),
+                id: custom().id,
+                error: get(e, "message"),
+                name: startCase(name(file.name)),
+              },
+            };
+          }
+        },
+      }
       : { claimed: false },
   editor: withProduce(({ value, produce }) => {
     return (
@@ -384,10 +384,8 @@ export const controller = {
       return layer;
     } catch (error) {
       if (error instanceof OutError) {
-        console.log(error.details);
         throw error;
       }
-      console.error(error);
     }
   },
 } satisfies LayerController<"trace", TraceLayerData>;
