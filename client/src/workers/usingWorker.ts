@@ -33,6 +33,7 @@ export const usingWorker =
     const worker = new w();
     const out = (await task(worker)) as WorkerResult;
     if ("error" in out) {
+      // console.log(out.error);
       throw new OutError("Yaml parsing error", out.error);
     }
     worker.terminate();
