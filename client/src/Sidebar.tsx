@@ -80,10 +80,14 @@ export function useSidebarState() {
 
 export function useSidebarBackground() {
   const { palette } = useTheme();
-  return useMemo(
-    () => interpolate([palette.background.paper, palette.text.primary])(0.025),
-    [palette]
-  );
+  return useMemo(() => {
+    const dark = palette.mode === "dark";
+    return dark
+      ? interpolate([palette.background.paper, palette.text.primary])(0.025)
+      : interpolate([palette.background.paper, palette.background.default])(
+          0.25
+        );
+  }, [palette]);
 }
 
 function Divider2() {
