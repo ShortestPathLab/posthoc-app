@@ -103,6 +103,7 @@ export function useWorkspace() {
       save: async (raw?: boolean, name?: string) => {
         notify("Saving workspace...");
         const content = JSON.stringify(minimise(UIStateStore, layersStore));
+        console.log(content);
         const filename = name ?? id("-");
         if (raw) {
           const name = `${filename}.workspace.json`;
@@ -116,6 +117,17 @@ export function useWorkspace() {
           notify("Workspace saved", name);
           return { name, size: compressed.byteLength };
         }
+      },
+      generateWorkspaceFile: async (name?: string) => {
+        const content = JSON.stringify(minimise(UIStateStore, layersStore));
+        const filename = `${name ?? id("-")}.workspace`;
+        const fileType = "application/octet-stream";
+        const compressed = await compress(content);
+        const blob = new Blob([compressed], {
+          type: fileType
+        });
+        const file = new File([blob], filename, { type: fileType });
+        return { filename, compressedFile: file, size: compressed.byteLength };
       },
       estimateWorkspaceSize: memo((raw?: boolean) => {
         const size = sizeOf(minimise(UIStateStore, layersStore));

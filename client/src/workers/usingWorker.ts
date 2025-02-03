@@ -2,7 +2,7 @@ import memoize from "memoizee";
 
 type WorkerConstructor = new () => Worker;
 
-type WorkerResult = { result: any } | { error: any };
+type WorkerResult = { result: unknown } | { error: unknown };
 
 export const usingWorker =
   <R>(w: WorkerConstructor) =>
@@ -11,7 +11,7 @@ export const usingWorker =
     const out = (await task(worker)) as WorkerResult;
     if ("error" in out) {
       console.error(out.error);
-      throw new Error(out.error);
+      throw new Error(`${out.error}`);
     }
     worker.terminate();
     return out.result as R;

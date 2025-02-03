@@ -208,19 +208,12 @@ export const controller = {
       return [
         {
           id: "map",
+          readonly: true,
           name: `${map.name}`,
           language: "txt",
           content: parsedMap?.content,
         },
       ];
     } else return [];
-  },
-  onEditSource: (layer, id, content) => {
-    switch (id) {
-      case "map":
-        // Object.assign(layer?.source?.map.)
-        break;
-    }
-    return layer;
   },
 } satisfies LayerController<"map", MapLayerData>;

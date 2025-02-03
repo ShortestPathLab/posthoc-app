@@ -2,7 +2,7 @@ import { ReplayOutlined as ResetIcon } from "@mui-symbols-material/w400";
 import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
-import { ListEditor } from "components/generic/ListEditor";
+import { ListEditor } from "components/generic/list-editor/ListEditor";
 import { debounce, head } from "lodash";
 import { defaultRemotes, Remote, useSettings } from "slices/settings";
 import { ServerEditor } from "./ServerEditor";

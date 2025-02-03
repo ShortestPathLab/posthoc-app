@@ -25,7 +25,7 @@ import "@react-sigma/core/lib/react-sigma.min.css";
 import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { PlaybackLayerData } from "components/app-bar/Playback";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Label } from "components/generic/Label";
 import { Placeholder } from "components/inspector/Placeholder";
 import {
@@ -61,6 +61,7 @@ import { useTreeMemo } from "./TreeWorker";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
 import { TreeAxis } from "./TreeAxis";
+import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 
 type TreePageContext = PanelState;
 
@@ -103,6 +104,7 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<TreePageContext>();
+  const size = useSurfaceAvailableCssSize();
 
   // ─── Options ─────────────────────────────────────────────────────────
 
@@ -156,7 +158,7 @@ export function TreePage({ template: Page }: PageContentProps) {
       <Page.Title>Tree</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Flex>
+        <Block sx={size}>
           {trace ? (
             !loading ? (
               tree?.length ? (
@@ -184,7 +186,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                               if (!isEmpty(layer?.source?.highlighting)) {
                                 setLayer(
                                   produce(layer, (l) =>
-                                    set(l?.source!, "highlighting", {})
+                                    set(l?.source ?? {}, "highlighting", {})
                                   )!
                                 );
                               }
@@ -272,14 +274,14 @@ export function TreePage({ template: Page }: PageContentProps) {
                             <Box sx={{ flex: 0 }}>
                               <PropertyDialog
                                 {...{ event: entry.event }}
-                                trigger={(onClick) => (
+                                trigger={({ open }) => (
                                   <Tooltip
                                     title="See all properties"
                                     placement="right"
                                   >
                                     <MenuItem
                                       selected={selected}
-                                      {...{ onClick }}
+                                      onClick={open}
                                       sx={{ pr: 0 }}
                                     >
                                       <ListItemIcon>
@@ -353,7 +355,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                                     }}
                                     onClick={() => {
                                       showHighlight[highlight.type](
-                                        selected?.current?.step!
+                                        selected!.current!.step!
                                       );
                                       setMenuOpen(false);
                                     }}
@@ -381,7 +383,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 />
               )
             ) : (
-              <Flex
+              <Block
                 sx={{
                   flexDirection: "column",
                   gap: 4,
@@ -397,7 +399,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 >
                   Generating layout
                 </Typography>
-              </Flex>
+              </Block>
             )
           ) : (
             <Placeholder
@@ -406,7 +408,7 @@ export function TreePage({ template: Page }: PageContentProps) {
               secondary="When you load a trace that has tree-like data, you'll see it here as a decision tree."
             />
           )}
-        </Flex>
+        </Block>
       </Page.Content>
       <Page.Options>
         {map(
@@ -426,7 +428,7 @@ export function TreePage({ template: Page }: PageContentProps) {
               icon: <ModeStandbyOutlined />,
               label: "Layout",
               value: mode,
-              onChange: setMode as any,
+              onChange: setMode,
               items: map(entries(layoutModes), ([k, v]) => ({
                 id: k,
                 ...v,
@@ -461,6 +463,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 label={label}
                 value={value}
                 items={items}
+                /// @ts-expect-error poor type inference
                 onChange={onChange}
                 arrow
               />

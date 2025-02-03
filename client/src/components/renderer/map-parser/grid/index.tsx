@@ -11,6 +11,7 @@ import interpolate from "color-interpolate";
 import { EditorProps } from "components/Editor";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Option } from "components/layer-editor/Option";
+import { useDebouncedState } from "hooks/useDebouncedState";
 import { find, flow, round, set, sortBy, startCase } from "lodash";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import memo from "memoizee";
@@ -22,9 +23,6 @@ import { MapEditor, MapParser, ParsedMapHydrator } from "../Parser";
 import { getGridSymbolsAsync } from "./getGridSymbolsAsync";
 import { Options } from "./parseGrid.worker";
 import { parseGridAsync } from "./parseGridAsync";
-import { useDebouncedState } from "hooks/useDebouncedState";
-
-const { floor } = Math;
 
 function between(v: number, min: number, max: number) {
   return v >= min && v < max;
@@ -148,7 +146,7 @@ export const editor: MapEditor<{
       );
     });
   } else {
-    return () => <></>;
+    return () => null;
   }
 };
 

@@ -1,7 +1,7 @@
 import renderers from "internal-renderers";
 import { Dictionary } from "lodash";
 import { useAsync } from "react-async-hook";
-import { RendererDefinition } from "renderer";
+import { RendererDefinition, RendererEvents, RendererOptions } from "renderer";
 import url from "url-parse";
 import { Renderer, useRenderers } from "slices/renderers";
 import { useSettings } from "slices/settings";
@@ -9,7 +9,9 @@ import { useSettings } from "slices/settings";
 type RendererTransportOptions = { url: string };
 
 interface RendererTransport {
-  get(): Promise<RendererDefinition<any, any, any>>;
+  get(): Promise<
+    RendererDefinition<RendererOptions, RendererEvents, { $: string }>
+  >;
 }
 
 export type RendererTransportConstructor = new (

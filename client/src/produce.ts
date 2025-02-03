@@ -1,16 +1,37 @@
 import { EditorSetterProps } from "components/Editor";
 import { clone } from "lodash";
-import { ReactNode, createElement } from "react";
+import { createElement, ReactElement } from "react";
 
 export function produce<T>(obj: T, f: (obj: T) => void) {
   const b = clone(obj);
   f(b);
   return b;
 }
-export function transaction<T, U>(obj: T, f: (obj: T) => U) {
-  const b = f(clone(obj));
+
+export async function produceAsync<T>(obj: T, f: (obj: T) => Promise<void>) {
+  const b = clone(obj);
+  await f(b);
   return b;
 }
+
+export function transaction<T, U>(obj: T, f: (obj: T) => U) {
+  return f(clone(obj));
+}
+
+export async function transactionAsync<T, U>(
+  obj: T,
+  f: (obj: T) => Promise<U>
+) {
+  return await f(clone(obj));
+}
+
+export const producifyAsync =
+  <T>(f: (obj: T) => Promise<void>) =>
+  async (obj: T) => {
+    const b = clone(obj);
+    await f(b);
+    return b;
+  };
 
 export const producify =
   <T>(f: (obj: T) => void) =>
@@ -25,11 +46,12 @@ export function withProduce<T>(
     props: EditorSetterProps<T> & {
       produce: (f: (obj: T) => void) => void;
     }
-  ) => ReactNode
+  ) => ReactElement
 ) {
-  return (props: EditorSetterProps<T>) =>
-    createElement(component, {
+  return function WithProduce(props: EditorSetterProps<T>) {
+    return createElement(component, {
       ...props,
       produce: (f) => props?.onChange?.(producify(f)),
     });
+  };
 }

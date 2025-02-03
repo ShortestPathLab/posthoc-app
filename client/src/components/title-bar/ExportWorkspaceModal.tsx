@@ -1,20 +1,19 @@
 import { DownloadOutlined } from "@mui-symbols-material/w400";
 import { Box, Stack, TextField, Typography } from "@mui/material";
-import { Button } from "components/generic/Button";
-import Modal, { ModalAppBar } from "components/generic/Modal";
+import { Button } from "components/generic/inputs/Button";
 import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
 import { useDebouncedState2 } from "hooks/useDebouncedState";
 import { useWorkspace } from "hooks/useWorkspace";
+import { Jimp } from "jimp";
 import { ceil, entries, kebabCase, reduce } from "lodash";
 import { nanoid as id } from "nanoid";
 import { producify } from "produce";
 import { map } from "promise-tools";
-import { ComponentProps, useMemo } from "react";
-import { WorkspaceMeta, useUIState } from "slices/UIState";
+import { useMemo } from "react";
 import { useLoadingState } from "slices/loading";
+import { useUIState, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
-import { Jimp, ResizeStrategy } from "jimp";
 import { set } from "utils/set";
 import { Gallery } from "./Gallery";
 
@@ -57,21 +56,26 @@ async function resizeImage(s: string) {
     .getBase64("image/jpeg");
 }
 
-export function A() {
+export function ExportWorkspace() {
   const paper = usePaper();
   const [_uiState, _setUIState] = useUIState();
   const [{ workspaceMeta: fields }, setUIState] = useDebouncedState2(
     _uiState,
     _setUIState
   );
-  function set2(k: keyof WorkspaceMeta, v: any) {
-    setUIState(producify((prev) => set(prev, `workspaceMeta.${k}`, v)));
+  function setMeta<K extends keyof WorkspaceMeta>(k: K, v: WorkspaceMeta[K]) {
+    setUIState(
+      producify((prev) =>
+        ///@ts-expect-error poor type inference as of TypeScript 5.7.2
+        set(prev, `workspaceMeta.${k}` as `workspaceMeta.${K}`, v)
+      )
+    );
   }
   const { save, estimateWorkspaceSize } = useWorkspace();
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();
 
-  const workspaceSize = useMemo(estimateWorkspaceSize, []);
+  const workspaceSize = useMemo(() => estimateWorkspaceSize(), []);
 
   async function getFields(size: number): Promise<WorkspaceMeta> {
     return {
@@ -85,13 +89,13 @@ export function A() {
   return (
     <>
       <Box>
-        <Gallery onChange={(v) => set2("screenshots", v)} />
+        <Gallery onChange={(v) => setMeta("screenshots", v)} />
       </Box>
       <Stack p={2} gap={2}>
         <TextField
           {...textFieldProps}
           defaultValue={fields.name}
-          onChange={(e) => set2("name", e.target.value)}
+          onChange={(e) => setMeta("name", e.target.value)}
           label="Name"
           fullWidth
         />
@@ -100,7 +104,7 @@ export function A() {
           minRows={3}
           defaultValue={fields.description}
           size="small"
-          onChange={(e) => set2("description", e.target.value)}
+          onChange={(e) => setMeta("description", e.target.value)}
           label="Description"
           fullWidth
           multiline
@@ -109,7 +113,7 @@ export function A() {
           {...textFieldProps}
           defaultValue={fields.author}
           size="small"
-          onChange={(e) => set2("author", e.target.value)}
+          onChange={(e) => setMeta("author", e.target.value)}
           label="Author"
           fullWidth
           multiline
@@ -144,18 +148,5 @@ export function A() {
         </Box>
       </Stack>
     </>
-  );
-}
-
-export function ExportWorkspaceModal(props: ComponentProps<typeof Modal>) {
-  return (
-    <Modal {...props}>
-      <ModalAppBar onClose={() => props?.onClose?.({}, "backdropClick")}>
-        <Typography component="div" variant="h6">
-          Publish Workspace
-        </Typography>
-      </ModalAppBar>
-      <A />
-    </Modal>
   );
 }

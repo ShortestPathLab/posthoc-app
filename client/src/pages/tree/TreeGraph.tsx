@@ -19,8 +19,8 @@ import {
   MinimisedPlaybackControls,
   PlaybackLayerData,
 } from "components/app-bar/Playback";
-import { Button } from "components/generic/Button";
-import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
+import { Button } from "components/generic/inputs/Button";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Scroll } from "components/generic/Scrollbars";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
@@ -38,7 +38,7 @@ export function setAttributes(
   graph: MultiDirectedGraph,
   id: string,
   type: "edge" | "node",
-  values: { [K in string]: any }
+  values: { [K in string]: string | number }
 ) {
   const a = {
     node: "setNodeAttribute" as const,
@@ -58,7 +58,7 @@ export const orientationOptions = {
   },
 };
 
-export const isDefined = (a: any) => !isUndefined(a) && !isNull(a);
+export const isDefined = (a: unknown) => !isUndefined(a) && !isNull(a);
 
 export const divider = (
   <Divider orientation="vertical" flexItem sx={{ m: 1 }} />
@@ -214,7 +214,7 @@ export function TreeGraph(props: TreeGraphProps) {
             <Scroll x style={{ height: theme.spacing(5) }}>
               <Box
                 sx={{
-                  ...pick(acrylic as any, "backdropFilter"),
+                  ...pick(acrylic, "backdropFilter"),
                   transition: (t) => t.transitions.create("background-color"),
                   pointerEvents: "all",
                   alignItems: "center",

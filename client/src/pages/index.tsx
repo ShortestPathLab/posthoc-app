@@ -8,6 +8,7 @@ import {
   SegmentOutlined as StepsIconThin,
   AccountTreeOutlined as TreeIconThin,
   ViewInArOutlined as ViewportIconThin,
+  WorkspacesOutlined as WorkspaceIconThin,
 } from "@mui-symbols-material/w300";
 import {
   CodeOutlined,
@@ -19,6 +20,7 @@ import {
   SegmentOutlined as StepsIcon,
   AccountTreeOutlined as TreeIcon,
   ViewInArOutlined as ViewportIcon,
+  WorkspacesOutlined as WorkspaceIcon,
 } from "@mui-symbols-material/w400";
 import { Dictionary } from "lodash";
 import { DebugPage } from "./DebugPage";
@@ -29,18 +31,30 @@ import { PageMeta } from "./PageMeta";
 import { SettingsPage } from "./SettingsPage";
 import { SourcePage } from "./SourcePage";
 import { StepsPage } from "./StepsPage";
-import { TreePage } from "./tree/TreePage";
+import { TreePage } from "./tree";
 import { ViewportPage } from "./ViewportPage";
+import { WorkspacesPage } from "./workspaces";
 
 export const pages: Dictionary<PageMeta> = {
   explore: {
     id: "explore",
-    name: "Explore",
+    name: "Explore Posthoc",
     color: "deepOrange",
     description: "Browse examples and guides",
     icon: <RocketIcon />,
     iconThin: <RocketIconThin />,
     content: ExplorePage,
+    allowFullscreen: true,
+    showInSidebar: "always",
+  },
+  remote: {
+    id: "remote",
+    name: "Workspaces",
+    description: "Save and share logs with others",
+    color: "deepOrange",
+    icon: <WorkspaceIcon />,
+    iconThin: <WorkspaceIconThin />,
+    content: WorkspacesPage,
     allowFullscreen: true,
     showInSidebar: "always",
   },
@@ -94,7 +108,6 @@ export const pages: Dictionary<PageMeta> = {
     iconThin: <CodeOutlinedThin />,
     content: SourcePage,
     allowFullscreen: true,
-    showInSidebar: "mobile-only",
   },
   debug: {
     id: "debug",
@@ -128,12 +141,4 @@ export const pages: Dictionary<PageMeta> = {
     allowFullscreen: true,
     showInSidebar: "always",
   },
-  // about: {
-  //   id: "about",
-  //   name: "About",
-  //   description: "",
-  //   color: "grey",
-  //   icon: <AboutIcon />,
-  //   content: AboutPage,
-  // },
 };

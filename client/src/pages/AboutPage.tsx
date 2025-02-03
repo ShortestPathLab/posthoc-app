@@ -9,12 +9,12 @@ import {
   ListItemText,
   Typography as Type,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { head, trimEnd } from "lodash";
 import logo from "public/logo512.png";
-import { name, version_name, repository, homepage } from "public/manifest.json";
+import { homepage, name, repository, version_name } from "public/manifest.json";
 import { ReactNode } from "react";
 import { PageContentProps } from "./PageMeta";
 
@@ -101,29 +101,17 @@ export function AboutContent() {
 export function AboutPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
 
-  function renderSection(label: ReactNode, content: ReactNode) {
-    return (
-      <Box sx={{ pt: 2 }}>
-        <Type component="div" variant="overline" color="text.secondary">
-          {label}
-        </Type>
-        <Type component="div" variant="body2">
-          {content}
-        </Type>
-      </Box>
-    );
-  }
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>about</Page.Key>
 
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Flex>
+        <Block>
           <Scroll y>
             <AboutContent />
           </Scroll>
-        </Flex>
+        </Block>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

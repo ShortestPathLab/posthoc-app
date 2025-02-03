@@ -26,7 +26,7 @@ type C = CompiledComponent<string, Record<string, any>>;
 const makeKey = (id: string | number = "", condition: string | number = "") =>
   `${id}::::${condition}`;
 
-const getPersistence = (c: C) =>
+export const getPersistence = (c: C) =>
   !c.clear
     ? "persistent"
     : typeof c.clear === "string"

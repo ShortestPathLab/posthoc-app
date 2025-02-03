@@ -1,11 +1,9 @@
+import { useRegisterEvents, useSigma } from "@react-sigma/core";
+import { chain, forOwn, List, map } from "lodash";
+import { sort } from "moderndash";
+import { Trace } from "protocol";
 import { useEffect, useRef, useState } from "react";
 import { TreeWorkerReturnType } from "./tree.worker";
-import { Trace } from "protocol";
-import { CameraState, Coordinates } from "sigma/types";
-import { chain, filter, forOwn, isUndefined, List, map } from "lodash";
-import { sort } from "moderndash";
-import { useRegisterEvents, useSigma } from "@react-sigma/core";
-import { useThrottle } from "react-use";
 
 type TreeAxisProps = {
   tree?: TreeWorkerReturnType;
@@ -35,10 +33,10 @@ export function TreeAxis(props: TreeAxisProps) {
   } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const events = trace?.events;
-
-  const registerEvents = useRegisterEvents();
-  const [tree, setTree] = useState<List<node>>();
   const sigma = useSigma();
+  const registerEvents = useRegisterEvents();
+
+  const [tree, setTree] = useState<List<node>>();
   const nodesData = chain(events)
     .map((c, i) => ({ step: i, id: c.id, pId: c.pId, g: c.g }))
     .groupBy("id")

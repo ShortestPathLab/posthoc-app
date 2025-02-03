@@ -1,6 +1,8 @@
 import type { pages } from "pages";
 import { createSlice, withLocalStorage } from "./createSlice";
 import { AccentColor } from "theme";
+import { cloudStorageProviders } from "services/cloud-storage";
+import { keys } from "lodash";
 
 export type Sources = {
   trustedOrigins?: string[];
@@ -23,6 +25,7 @@ export type Renderer = {
 export type Settings = {
   remote?: Remote[];
   renderer?: Renderer[];
+  cloudStorageType?: keyof typeof cloudStorageProviders;
   "playback/playbackRate"?: number;
   "appearance/acrylic"?: boolean;
   "appearance/theme"?: "dark" | "light";
@@ -53,10 +56,21 @@ export const defaultRenderers = [
 
 export const defaultPlaybackRate = 1;
 
+// export const defaultAuthState = {
+//   accessToken: null,
+//   createdTimestamp: null,
+//   expiresIn: null,
+// };
+
+export const defaultCloudStorage = keys(
+  cloudStorageProviders
+)[0] as keyof typeof cloudStorageProviders;
+
 export const defaults = {
   renderer: defaultRenderers,
   remote: defaultRemotes,
   trustedOrigins: [],
+  cloudStorageType: defaultCloudStorage,
   "playback/playbackRate": defaultPlaybackRate,
   "appearance/theme": "dark",
   "appearance/acrylic": true,

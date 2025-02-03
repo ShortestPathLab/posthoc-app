@@ -10,7 +10,7 @@ import { useAcrylic } from "theme";
 
 export function FullscreenProgress() {
   const [busy] = useBusy();
-  const acrylic = useAcrylic() as any;
+  const acrylic = useAcrylic();
 
   const messages = values(busy);
   return (

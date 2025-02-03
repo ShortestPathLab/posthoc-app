@@ -164,6 +164,7 @@ function useSelectionMenu() {
       chain(layers)
         .reduce((A, l) => {
           const B = getController(l)?.provideSelectionInfo ?? identity;
+          // eslint-disable-next-line react/display-name
           return ({ children, event }: SelectionInfoProviderProps) => (
             <B layer={l.key} event={event}>
               {(a) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}

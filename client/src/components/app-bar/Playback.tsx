@@ -19,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import { EditorSetterProps } from "components/Editor";
-import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
+import { IconButtonWithTooltip as IconButton } from "components/generic/inputs/IconButtonWithTooltip";
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { ceil, noop } from "lodash";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
