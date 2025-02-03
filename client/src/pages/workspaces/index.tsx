@@ -1,13 +1,15 @@
 import { Stack } from "@mui/material";
-import SavedLogsButton from "components/SavedLogsButton";
+import WorkspacesEditor from "pages/workspaces/WorkspacesEditor";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { values } from "lodash";
 import { cloudStorageProviders } from "services/cloud-storage";
-import { PageContentProps } from "./PageMeta";
+import { useCloudStorageInstance } from "slices/cloudStorage";
+import { PageContentProps } from "../PageMeta";
 
-export function SavedLogsPage({ template: Page }: PageContentProps) {
+export function WorkspacesPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
+  const { meta } = useCloudStorageInstance() ?? {};
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>remote</Page.Key>
@@ -15,9 +17,9 @@ export function SavedLogsPage({ template: Page }: PageContentProps) {
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Options>
         <FeaturePicker
-          icon={cloudStorageProviders.google.icon}
+          icon={meta?.id ? cloudStorageProviders[meta?.id].icon : null}
           label="Source"
-          value={"google"}
+          value={meta?.id}
           items={values(cloudStorageProviders)}
           arrow
           ellipsis={12}
@@ -33,7 +35,7 @@ export function SavedLogsPage({ template: Page }: PageContentProps) {
             rowGap: "1rem",
           }}
         >
-          <SavedLogsButton type="google" />
+          <WorkspacesEditor />
         </Stack>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>

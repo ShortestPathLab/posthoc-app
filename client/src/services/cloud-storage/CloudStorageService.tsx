@@ -1,57 +1,39 @@
-import { useEffect, useMemo } from "react";
+import { has } from "lodash";
+import { useEffect } from "react";
 import { useAsync } from "react-async-hook";
-import { AuthState, defaultAuthState, useAuth } from "slices/auth";
+import { useLatest } from "react-use";
+import { useAuth } from "slices/auth";
 import { useCloudStorageService } from "slices/cloudStorage";
 import { defaultCloudStorage, useSettings } from "slices/settings";
-import providers, { AccessTokenOf } from "./providers";
+import { assert } from "utils/assert";
+import providers from "./providers";
+
+function useCloudStorageManager(provider: keyof typeof providers) {
+  //
+  // ─── Create Storage Provider ─────────────────────────────────────────
+
+  assert(has(providers, provider), "provider exists");
+  const [{ [provider]: s }, setAuthState, initialised] = useAuth();
+  const state = useLatest(s);
+  const { result: service } = useAsync(async () => {
+    if (!initialised) return;
+    const service = providers[provider].create(
+      async () => state.current,
+      async (s) => setAuthState(() => ({ [provider]: s }))
+    );
+    await service.checkAuth();
+    return service;
+  }, [provider, state, initialised]);
+
+  // ─── Publicise Changes ───────────────────────────────────────────────
+
+  const [, setCloudStorageService] = useCloudStorageService();
+  useEffect(() => {
+    setCloudStorageService(() => ({ instance: service }));
+  }, [service]);
+}
 
 export function CloudStorageService() {
-  const [, setCloudStorageService] = useCloudStorageService();
   const [{ cloudStorageType = defaultCloudStorage }] = useSettings();
-  const [authState, setAuthState] = useAuth();
-  const cloudService = useMemo(() => {
-    if (!(cloudStorageType in providers)) {
-      throw new Error("Invalid Provider");
-    }
-    const token = authState.accessToken as AccessTokenOf<
-      typeof cloudStorageType
-    >;
-    const update = async (newState: AuthState<unknown>) => {
-      try {
-        setAuthState(() => newState);
-        return true;
-      } catch {
-        return false;
-      }
-    };
-    return providers[cloudStorageType].create(token, update);
-  }, [cloudStorageType, authState.accessToken]);
-
-  useAsync(async () => {
-    try {
-      const res = await cloudService.checkAuth();
-      setAuthState((authState) => {
-        const now = Date.now();
-
-        if (
-          authState?.authenticated &&
-          authState.expiredDateTime &&
-          authState.expiredDateTime < now
-        ) {
-          return res?.accessToken ? res : defaultAuthState;
-        }
-        return res?.accessToken ? res : authState || defaultAuthState;
-      });
-    } catch (error) {
-      console.error("Auth error:", error);
-    }
-  }, [cloudService]);
-
-  useEffect(() => {
-    setCloudStorageService(() => ({
-      instance: cloudService,
-    }));
-  }, [cloudService]);
-
-  return <></>;
+  useCloudStorageManager(cloudStorageType);
 }

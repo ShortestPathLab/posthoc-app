@@ -8,13 +8,6 @@ export type AuthState<T extends AccessToken> = {
   user?: { name?: string; profile?: string };
 };
 
-export const defaultAuthState: AuthState<any> = {
-  authenticated: undefined,
-  accessToken: undefined,
-  expiredDateTime: undefined,
-};
-
-export const [useAuth, AuthProvider] = createSlice<AuthState<any>>(
-  {},
-  withLocalStorage("authState", defaultAuthState)
-);
+export const [useAuth, AuthProvider] = createSlice<{
+  [K in string]: AuthState<unknown>;
+}>({}, withLocalStorage("authState", {}));

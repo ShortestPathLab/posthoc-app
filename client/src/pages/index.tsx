@@ -31,9 +31,9 @@ import { PageMeta } from "./PageMeta";
 import { SettingsPage } from "./SettingsPage";
 import { SourcePage } from "./SourcePage";
 import { StepsPage } from "./StepsPage";
-import { TreePage } from "./tree/TreePage";
+import { TreePage } from "./tree";
 import { ViewportPage } from "./ViewportPage";
-import { SavedLogsPage } from "./SavedLogsPage";
+import { WorkspacesPage } from "./workspaces";
 
 export const pages: Dictionary<PageMeta> = {
   explore: {
@@ -54,7 +54,7 @@ export const pages: Dictionary<PageMeta> = {
     color: "deepOrange",
     icon: <WorkspaceIcon />,
     iconThin: <WorkspaceIconThin />,
-    content: SavedLogsPage,
+    content: WorkspacesPage,
     allowFullscreen: true,
     showInSidebar: "always",
   },

@@ -16,6 +16,7 @@ import { stopPropagation } from "./stopPropagation";
 import { useDrawerHandle } from "./useDrawerHandle";
 import { useModalDepth } from "./useModalDepth";
 import { useMeasure } from "react-use";
+import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
 
 function Handle(props: StackProps) {
   return (
@@ -62,11 +63,13 @@ export function DrawerSurface({
   children: ReactNode;
   slotProps?: Pick<SlotProps, "drawer" | "paper" | "scroll">;
 }) {
+  const { rect, visible } = useOverlayWindowControls();
   const { depth, maxDepth = 1 } = useModalDepth(state.isOpen);
 
   // ─── Measurements ────────────────────────────────────────────────────
 
-  const gap = slotProps?.drawer?.gap ?? depth * 16 + 16;
+  const gap =
+    slotProps?.drawer?.gap ?? depth * 16 + 16 + (visible ? rect.height : 0);
   const ratio = (maxDepth - depth) / maxDepth;
 
   // ─────────────────────────────────────────────────────────────────────

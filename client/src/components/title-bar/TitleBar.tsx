@@ -33,17 +33,12 @@ import { isMobile } from "mobile-device-detect";
 import { nanoid as id } from "nanoid";
 import logo from "public/logo512.png";
 import { changelog, docs, repository, version } from "public/manifest.json";
-import {
-  cloneElement,
-  ReactElement,
-  ReactNode,
-  useEffect,
-  useState,
-} from "react";
+import { cloneElement, ReactElement, ReactNode } from "react";
 import { useSyncStatus } from "services/SyncService";
 import { getDefaultViewTree, useView } from "slices/view";
 import { getShade } from "theme";
 import { ExportWorkspace } from "./ExportWorkspaceModal";
+import { useOverlayWindowControls } from "../../hooks/useOverlayWindowControls";
 import { openWindow } from "./window";
 
 const canOpenWindows = !isMobile;
@@ -68,27 +63,6 @@ function MenuEntry({
         cloneElement(endIcon, { fontSize: "small", color: "disabled" })}
     </Stack>
   );
-}
-
-export function useTitleBarVisible() {
-  const [visible, setVisible] = useState(false);
-  const [rect, setRect] = useState<DOMRect>(new DOMRect());
-  useEffect(() => {
-    if ("windowControlsOverlay" in navigator) {
-      const f = () => {
-        setVisible(!!navigator.windowControlsOverlay.visible);
-        setRect(navigator.windowControlsOverlay.getTitlebarAreaRect());
-      };
-      navigator.windowControlsOverlay.addEventListener("geometrychange", f);
-      f();
-      return () =>
-        navigator.windowControlsOverlay.removeEventListener(
-          "geometrychange",
-          f
-        );
-    }
-  }, [setVisible]);
-  return { visible, rect };
 }
 
 const WorkspaceChip = () => {
@@ -126,7 +100,7 @@ const WorkspaceChip = () => {
 };
 
 export const TitleBarPlaceholder = () => {
-  const visible = useTitleBarVisible();
+  const visible = useOverlayWindowControls();
   const { palette } = useTheme();
   const color = palette.background.default;
   useTitleBar(color);
@@ -148,7 +122,7 @@ export const TitleBar = () => {
   useTitleBar(color);
   // const push = useSnackbar();
   const { save, load } = useWorkspace();
-  const { visible, rect } = useTitleBarVisible();
+  const { visible, rect } = useOverlayWindowControls();
   const [, setView] = useView();
   const importFiles = useFileImport();
   // const sm = useSmallDisplay();
