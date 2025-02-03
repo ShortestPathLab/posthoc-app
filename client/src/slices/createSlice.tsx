@@ -16,9 +16,18 @@ type Slice<T, U = T> = [
   T,
   (
     next: ((prev: T) => U) | ((prev: T) => Promise<U>),
+    /**
+     * Whether to increment the current commit id.
+     */
     dontCommit?: boolean
   ) => void,
+  /**
+   * Whether the slice has been initialised.
+   */
   boolean,
+  /**
+   * The current commit id.
+   */
   string
 ];
 

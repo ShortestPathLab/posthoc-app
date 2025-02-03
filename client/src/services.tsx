@@ -10,14 +10,14 @@ import { SettingsService } from "services/SettingsService";
 import { SyncService } from "services/SyncService";
 
 export const services = [
-  SyncService,
-  ConnectionsService,
-  FeaturesService,
-  RendererService,
-  LayerService,
-  LogCaptureService,
   SettingsService,
-  BootstrapService,
   CloudStorageService,
   BootstrapCloudStorageFileService,
+  BootstrapService,
+  LogCaptureService,
+  LayerService,
+  RendererService,
+  FeaturesService,
+  ConnectionsService,
+  SyncService,
 ];
