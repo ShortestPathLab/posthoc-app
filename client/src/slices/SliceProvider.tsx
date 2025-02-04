@@ -3,13 +3,12 @@ import {
   cloneElement,
   createElement,
   FunctionComponent,
-  ReactElement,
   ReactNode,
 } from "react";
 
 type SliceProviderProps = {
   slices?: FunctionComponent[];
-  services?: (() => ReactElement | void)[];
+  services?: (() => ReactNode | void)[];
   children?: ReactNode;
 };
 
