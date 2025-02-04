@@ -2,7 +2,7 @@ import { useRegisterEvents, useSigma } from "@react-sigma/core";
 import { chain, forOwn, map } from "lodash";
 import { sort } from "moderndash";
 import { Trace } from "protocol";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { TreeWorkerReturnType } from "./tree.worker";
 
 type TreeAxisProps = {
@@ -24,19 +24,11 @@ type Node = {
 };
 
 export function TreeAxis(props: TreeAxisProps) {
-  const {
-    width = 0,
-    height = 0,
-    trace,
-    tree: orignalTree,
-    axisTrackingValue,
-  } = props;
+  const { width = 0, height = 0, trace, tree: orignalTree } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const events = trace?.events;
   const sigma = useSigma();
   const registerEvents = useRegisterEvents();
-
-  const [tree, setTree] = useState<Node[]>();
 
   const drawAxis = useCallback(
     (tree: Node[]) => {

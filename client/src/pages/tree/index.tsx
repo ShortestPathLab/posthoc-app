@@ -4,7 +4,6 @@ import {
   LayersOutlined as LayersIcon,
   ModeStandbyOutlined,
   TimelineOutlined,
-  LineAxisOutlined,
 } from "@mui-symbols-material/w400";
 import {
   Box,
@@ -21,12 +20,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { SigmaContainer } from "@react-sigma/core";
-import "@react-sigma/core/lib/react-sigma.min.css";
+import "@react-sigma/core/lib/style.css";
 import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { PlaybackLayerData } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
 import { Label } from "components/generic/Label";
+import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { Placeholder } from "components/inspector/Placeholder";
 import {
   PropertyDialog,
@@ -56,12 +56,11 @@ import { PanelState } from "slices/view";
 import { getShade } from "theme";
 import { PageContentProps } from "../PageMeta";
 import { GraphEvents } from "./GraphEvents";
+import { TreeAxis } from "./TreeAxis";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeMemo } from "./TreeWorker";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
-import { TreeAxis } from "./TreeAxis";
-import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 
 type TreePageContext = PanelState;
 

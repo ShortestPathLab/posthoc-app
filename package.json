@@ -1,11 +1,30 @@
 {
   "name": "app",
   "version": "1.0.5",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShortestPathLab/posthoc-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ShortestPathLab/posthoc-app/issues"
+  },
   "description": "",
+  "homepage": "posthoc.pathfinding.ai",
+  "license": "ISC",
   "scripts": {
     "start": "cd client && bun start",
     "build:all": "cd client && bun run build"
   },
+  "trustedDependencies": [
+    "bufferutil",
+    "canvas",
+    "electron",
+    "es5-ext",
+    "esbuild",
+    "pathfinding-binaries"
+  ],
+  "type": "module",
   "workspaces": [
     "protocol",
     "renderer",
@@ -16,24 +35,5 @@
     "adapter-warthog-websocket",
     "adapter-iron-harvest",
     "resources"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ShortestPathLab/posthoc-app.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ShortestPathLab/posthoc-app/issues"
-  },
-  "homepage": "posthoc.pathfinding.ai",
-  "type": "module",
-  "trustedDependencies": [
-    "bufferutil",
-    "canvas",
-    "electron",
-    "es5-ext",
-    "esbuild",
-    "pathfinding-binaries"
   ]
 }
