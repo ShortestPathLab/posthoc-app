@@ -1,10 +1,19 @@
 import { PlaybackLayerData } from "components/app-bar/Playback";
 import { useSnackbar } from "components/generic/Snackbar";
-import { clamp, min, range, set, trimEnd } from "lodash";
+import {
+  clamp,
+  filter,
+  forOwn,
+  isEmpty,
+  min,
+  range,
+  set,
+  trimEnd,
+} from "lodash";
 import { produce } from "produce";
 import { useEffect, useMemo } from "react";
 import { useLayer } from "slices/layers";
-import { useBreakpoints } from "./useBreakpoints";
+import { useBreakPoints2 } from "./useBreakPoints2";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
@@ -20,7 +29,7 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
 export function usePlaybackState(key?: string) {
   const { layer, setLayer, setKey } = useLayer<PlaybackLayerData>(key);
   const notify = useSnackbar();
-  const shouldBreak = useBreakpoints(key);
+  const shouldBreak = useBreakPoints2(key).shouldBreak();
 
   useEffect(() => {
     if (key) setKey(key);
@@ -64,13 +73,13 @@ export function usePlaybackState(key?: string) {
         async () => {
           for (const i of range(offset, count)) {
             const r = shouldBreak(step + i);
-            if (r.result || r.error) return { ...r, offset: i };
+            if (!isEmpty(r)) return { ...r, offset: i };
           }
           return { result: "", offset: 0, error: undefined };
         },
         ({ result, offset, error }) => {
           if (!error) {
-            if (result) {
+            if (!isEmpty(result)) {
               notify(`Breakpoint hit: ${result}`, `Step ${step + offset}`);
               pause(offset);
             } else tick(count);
@@ -84,7 +93,7 @@ export function usePlaybackState(key?: string) {
     const findBreakpoint = (direction: 1 | -1 = 1) => {
       let i;
       for (i = step + direction; i <= end && i >= 0; i += direction) {
-        if (shouldBreak(i)?.result) break;
+        if (!isEmpty(shouldBreak(i))) break;
       }
       return i;
     };

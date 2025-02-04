@@ -32,6 +32,7 @@ const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 export type PlaybackLayerData = {
   step?: number;
+  output?: { [key: string]: { step?: number; result: string }[] };
   playback?: "playing" | "paused";
   playbackTo?: number;
 };

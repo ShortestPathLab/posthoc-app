@@ -57,7 +57,6 @@ export function TreeAxis(props: TreeAxisProps) {
     const padding = 5;
 
     const yAxis = chain(tree).groupBy("y").value();
-    console.log(tree);
     // const nodesData = chain(events)
     //   .map((c, i) => ({ step: i, id: c.id, pId: c.pId, g: c.g }))
     //   .groupBy("id")

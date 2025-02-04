@@ -38,6 +38,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Layer, useLayer } from "slices/layers";
 import { useAcrylic, usePaper } from "theme";
 import { PageContentProps } from "./PageMeta";
+import { useBreakPoints2 } from "hooks/useBreakPoints2";
 
 function lerp(start: number, end: number, amount: number): number {
   return start + clamp(amount, 0, 1) * (end - start);
@@ -240,7 +241,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
     [isHighlighting]
   );
 
-  const shouldBreak = useBreakpoints(key);
+  const shouldBreak = useBreakPoints2(key).shouldBreak();
 
   useEffect(() => {
     if (stepToFilteredStep && scrollerRef && ref.current) {
@@ -322,7 +323,10 @@ export function StepsPage({ template: Page }: PageContentProps) {
                         event={event}
                         index={eventIndex}
                         selected={eventIndex === step}
-                        label={shouldBreak(eventIndex)?.result}
+                        label={map(
+                          shouldBreak(eventIndex),
+                          (b) => b.result
+                        ).toString()}
                         onClick={() => stepTo(eventIndex)}
                       />
                       <Divider variant="inset" />

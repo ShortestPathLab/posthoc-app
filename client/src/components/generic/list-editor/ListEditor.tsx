@@ -36,13 +36,13 @@ export type Props<T> = {
   button?: boolean;
   onChange?: (value: Item<T>[]) => void;
   onChangeItem?: (key: Key, value: T, enabled: boolean) => void;
-  onAddItem?: () => void;
+  onAddItem?: (label?: string) => void;
   onDeleteItem?: (key: Key) => void;
   category?: (value?: T) => string;
   order?: (value?: T) => string | number;
   extras?: (value?: T) => ReactNode;
   items?: Item<T>[];
-  addItemLabel?: ReactNode;
+  addItemLabels?: ReactNode;
   addItemExtras?: ReactNode;
   sortable?: boolean;
   toggleable?: boolean;
@@ -74,7 +74,7 @@ function reorder<T>(list: T[], startIndex: number, endIndex: number) {
 
 export default function Editor<T>(props: Props<T>) {
   const {
-    addItemLabel = "Add Item",
+    addItemLabels = ["Add Item"],
     onAddItem = () => {},
     onDeleteItem = () => {},
     items = [],
@@ -91,6 +91,7 @@ export default function Editor<T>(props: Props<T>) {
   const theme = useTheme();
   const [intermediateItems, setIntermediateItems] = useState(items);
   const [newIndex, setNewIndex] = useState(-1);
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIntermediateItems(items);
@@ -99,6 +100,7 @@ export default function Editor<T>(props: Props<T>) {
       clearTimeout(timeout);
     };
   }, [items, setIntermediateItems, theme.transitions.duration.standard]);
+
   const children = uniqBy([...intermediateItems, ...items], (c) => c.id)
     .map((c) => items.find((c2) => c.id === c2.id) ?? c)
     .map((x, i) => {
@@ -212,30 +214,34 @@ export default function Editor<T>(props: Props<T>) {
           </Box>
         </Collapse>
         <Stack p={2} pt={2} gap={2} direction="row">
-          {addable && (
-            <Button
-              disableElevation
-              variant="outlined"
-              startIcon={<Add />}
-              onClick={() => {
-                onAddItem();
-                setNewIndex(items.length);
-              }}
-              sx={{
-                ...paper(1),
-              }}
-            >
-              <Box
+          {addable && Array.isArray(addItemLabels) ? (
+            map(addItemLabels, (addItemLabel) => (
+              <Button
+                disableElevation
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={() => {
+                  onAddItem(addItemLabel);
+                  setNewIndex(items.length);
+                }}
                 sx={{
-                  color: "text.primary",
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
+                  ...paper(1),
                 }}
               >
-                {addItemLabel}
-              </Box>
-            </Button>
+                <Box
+                  sx={{
+                    color: "text.primary",
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {addItemLabel}
+                </Box>
+              </Button>
+            ))
+          ) : (
+            <></>
           )}
           {extras}
         </Stack>
@@ -261,7 +267,7 @@ export function ListEditor<T extends { key: string }>({
   ...props
 }: Omit<Props<T>, "items" | "onChange"> & {
   items?: T[];
-  onChange?: (value: T[]) => void;
+  onChange?: (value: T[], itemType?: string) => void;
   value?: T[];
   editor?: (item: T) => ReactElement;
   create?: () => Omit<T, "key">;
@@ -286,18 +292,23 @@ export function ListEditor<T extends { key: string }>({
           value: c,
           editor: editor?.(c),
         }))}
-        onAddItem={() => {
+        onAddItem={(label) => {
           const _id = id();
-          handleChange?.([...state, { key: _id, ...create?.() } as T]);
+          handleChange?.([
+            ...state,
+            { key: _id, label: label ?? "", ...create?.() } as unknown as T,
+          ]);
           defer(() => onFocus?.(_id));
         }}
         onDeleteItem={(k) => {
           return handleChange?.(filter(state, (b) => b.key !== k));
         }}
-        onChangeItem={(k, v) =>
-          handleChange?.(map(state, (b) => (b.key === k ? v : b)))
-        }
-        onChange={(k) => handleChange?.(map(k, (a) => a.value!))}
+        onChangeItem={(k, v) => {
+          handleChange?.(map(state, (b) => (b.key === k ? { ...b, ...v } : b)));
+        }}
+        onChange={(k) => {
+          handleChange?.(map(k, (a) => a.value!));
+        }}
       />
     </Box>
   );

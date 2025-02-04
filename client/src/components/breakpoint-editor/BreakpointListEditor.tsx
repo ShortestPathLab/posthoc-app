@@ -1,13 +1,27 @@
-import { Box } from "@mui/material";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { Breakpoint, DebugLayerData } from "hooks/useBreakpoints";
-import { chain as _, keys, set } from "lodash";
+import { DebugLayerData } from "hooks/useBreakPoints2";
+import {
+  chain as _,
+  filter,
+  isEmpty,
+  isUndefined,
+  keys,
+  map,
+  set,
+} from "lodash";
 import { produce } from "produce";
-import { useMemo } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import { useLayer } from "slices/layers";
-import { BreakpointEditor } from "./BreakpointEditor";
+import {
+  Breakpoint,
+  BreakpointEditor,
+  breakpointType,
+  violations,
+} from "./BreakPointEditor2";
 import { comparators } from "./comparators";
 import { Scroll } from "components/generic/Scrollbars";
+import { Box, Typography as Type } from "@mui/material";
+import { eventTypes } from "./eventTypes";
 
 type BreakpointListEditorProps = {
   breakpoints?: Breakpoint[];
@@ -19,15 +33,29 @@ export function BreakpointListEditor({
   layer: key,
 }: BreakpointListEditorProps) {
   const { layer, setLayer } = useLayer<DebugLayerData>(key);
-  const { breakpoints } = layer?.source ?? {};
+  const result: Breakpoint[] = [];
 
-  function handleBreakpointsChange(updatedBreakpoints: Breakpoint[]) {
+  function handleBreakpointsChange(updatedBreakpoints: any) {
     if (layer) {
-      setLayer(
-        produce(layer, (layer) =>
-          set(layer, "source.breakpoints", updatedBreakpoints)
-        )
-      );
+      if (layer?.source?.output) {
+        let filteredRes = map(updatedBreakpoints, (b) => {
+          if (layer?.source?.output?.[b.key])
+            return { [b.key]: layer?.source?.output?.[b.key] };
+        });
+        filteredRes = filter(filteredRes, (v) => !isUndefined(v));
+        if (!isEmpty(filteredRes)) {
+          setLayer(
+            produce(layer, (layer) =>
+              set(layer?.source ?? {}, "output", filteredRes)
+            )
+          );
+        }
+        if (isEmpty(updatedBreakpoints)) {
+          setLayer(
+            produce(layer, (layer) => set(layer?.source ?? {}, "output", {}))
+          );
+        }
+      }
     }
   }
 
@@ -41,32 +69,73 @@ export function BreakpointListEditor({
     [layer?.source?.trace?.content?.events]
   );
 
+  function renderHeading(label: ReactNode) {
+    return (
+      <Type component="div" variant="overline" color="text.secondary">
+        {label}
+      </Type>
+    );
+  }
+
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>
       <Scroll x>
         <Box sx={{ minWidth: 720, mb: 2 }}>
+          <Box px={2}>{renderHeading("Breakpoints")}</Box>
           <ListEditor<Breakpoint>
             sortable
             button={false}
             icon={null}
-            value={breakpoints}
+            value={result}
             deletable
             editable={false}
-            editor={(v) => (
-              <BreakpointEditor value={v} properties={properties} />
-            )} //v = a breakpoint
+            editor={(v: any) => (
+              <BreakpointEditor
+                value={v}
+                layerKey={key}
+                trace={layer?.source?.trace}
+              />
+            )}
             create={() => ({
               active: true,
               property: properties?.[0],
-              condition: comparators?.[0],
-              type: undefined,
+              condition: comparators?.[0].key,
+              eventType: eventTypes?.[0],
               reference: 0,
             })}
             onChange={(updatedBreakpoints) =>
               handleBreakpointsChange(updatedBreakpoints)
             }
-            addItemLabel="Breakpoint"
+            addItemLabels={["Breakpoint"]}
             placeholder="Get started by adding a breakpoint."
+          />
+        </Box>
+        <Box sx={{ minWidth: 720, mb: 2 }}>
+          <Box px={2}>{renderHeading("Violations")}</Box>
+          <ListEditor
+            sortable
+            button={false}
+            icon={null}
+            value={result}
+            deletable
+            editable={false}
+            editor={(v) => (
+              <BreakpointEditor
+                value={v}
+                trace={layer?.source?.trace}
+                layerKey={key}
+              />
+            )}
+            create={() => ({
+              active: true,
+              property: properties?.[0],
+              condition: "",
+            })}
+            onChange={(updatedBreakpoints) => {
+              handleBreakpointsChange(updatedBreakpoints);
+            }}
+            addItemLabels={violations}
+            placeholder="Certain types of errors can be detected by checking for invariant violations."
           />
         </Box>
       </Scroll>
