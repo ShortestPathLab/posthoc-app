@@ -164,9 +164,9 @@ export const controller = {
     const { result: trace, loading } = useTraceContent(value?.source?.trace);
     // Set playback
     useEffect(() => {
-      produce((l) => {
-        return set(l, "source.playbackTo", trace?.content?.events?.length ?? 0);
-      });
+      produce((l) =>
+        set(l, "source.playbackTo", trace?.content?.events?.length ?? 0)
+      );
     }, [trace?.key]);
     const { isTrusted } = useUntrustedLayers();
     // Make the trace parser
@@ -380,7 +380,6 @@ export const controller = {
       set(layer, "source.trace.content", updatedLayerSource);
       // To get things to change, we also need to change the trace key
       set(layer, "source.trace.key", nanoid());
-      console.log(layer);
     } catch (error) {
       console.error(error);
     }

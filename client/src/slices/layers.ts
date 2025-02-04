@@ -1,5 +1,5 @@
 import { filter, find, head } from "lodash";
-import { producifyAsync } from "produce";
+import { producify, producifyAsync } from "produce";
 import { map } from "promise-tools";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSlice } from "./createSlice";
@@ -72,7 +72,14 @@ export function useLayer<T extends Record<string, any>>(
     [setLayers, layer?.key]
   );
 
-  const updateLayer = useMemo(() => producifyAsync(setLayer), [setLayer]);
+  const updateLayerAsync = useCallback(
+    (s: (u: Layer<T>) => Promise<void>) => setLayer(producifyAsync(s)),
+    [setLayer]
+  );
+  const updateLayer = useCallback(
+    (s: (u: Layer<T>) => void) => setLayer(producify(s)),
+    [setLayer]
+  );
 
   return useMemo(
     () =>
@@ -82,10 +89,11 @@ export function useLayer<T extends Record<string, any>>(
         layer,
         setLayer,
         updateLayer,
+        updateLayerAsync,
         layers: filtered,
         allLayers: layers,
         controller: getController(layer),
       } as const),
-    [layers, layer, setLayer, filtered]
+    [layers, layer, setLayer, filtered, updateLayer, updateLayerAsync]
   );
 }

@@ -26,10 +26,12 @@ export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
   useMonacoTheme(theme);
 
-  const { layers, updateLayer, setKey, controller } = useLayer(
-    undefined,
-    isSourceLayer
-  );
+  const {
+    layers,
+    updateLayerAsync: updateLayer,
+    setKey,
+    controller,
+  } = useLayer(undefined, isSourceLayer);
 
   const sources = useMemo(
     () =>

@@ -3,12 +3,13 @@ import {
   cloneElement,
   createElement,
   FunctionComponent,
+  ReactElement,
   ReactNode,
 } from "react";
 
 type SliceProviderProps = {
   slices?: FunctionComponent[];
-  services?: (() => unknown)[];
+  services?: (() => ReactElement | undefined)[];
   children?: ReactNode;
 };
 
@@ -26,7 +27,7 @@ export function SliceProvider({
           {children}
           {map(services.toReversed(), (s, i) =>
             createElement(
-              flow(s, () => null),
+              flow(s, (b) => b ?? null),
               { key: i }
             )
           )}

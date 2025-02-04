@@ -53,6 +53,57 @@ type PropertyListProps = {
   variant?: TypographyVariant;
 };
 
+export function EventProperties({ event }: Pick<PropertyListProps, "event">) {
+  const sm = useSm();
+  const sorted = sortEventKeys(event);
+  return [
+    {
+      name: "common",
+      props: filter(sorted, ([k]) => COMMON_PROPS.includes(k)),
+    },
+    {
+      name: "Graph",
+      props: filter(sorted, ([k]) => GRAPH_PROPS.includes(k)),
+    },
+    {
+      name: "Heuristic",
+      props: filter(sorted, ([k]) => HEURISTIC_PROPS.includes(k)),
+    },
+    {
+      name: "other",
+      props: filter(sorted, ([k]) => !ALL_PROPS.includes(k)),
+    },
+  ].map(({ name, props }, i) => (
+    <Fragment key={name}>
+      {!!i && <Divider sx={{ mb: 1 }} />}
+      <Typography
+        component="div"
+        variant="overline"
+        color="text.secondary"
+        sx={{ px: sm ? 2 : 3 }}
+      >
+        {startCase(name)}
+      </Typography>
+      <Box
+        key={name}
+        sx={{
+          py: 1,
+          pt: 0,
+          display: "grid",
+          gridAutoFlow: "row",
+          gridTemplateColumns: "repeat(2, 1fr)",
+        }}
+      >
+        {map(props, ([key, value]) => (
+          <ListItem key={`${key}::${value}`} sx={{ py: 0.5, px: sm ? -2 : 3 }}>
+            <ListItemText secondary={key} primary={renderProperty(value)} />
+          </ListItem>
+        ))}
+      </Box>
+    </Fragment>
+  ));
+}
+
 export function PropertyDialog({
   event,
   max = 10,
@@ -60,7 +111,6 @@ export function PropertyDialog({
 }: Omit<PropertyListProps, "variant" | "simple" | "primitives"> &
   Partial<SurfaceProps>) {
   const sorted = sortEventKeys(event);
-  const sm = useSm();
   return (
     <Surface
       {...merge(
@@ -89,55 +139,7 @@ export function PropertyDialog({
         rest
       )}
     >
-      {[
-        {
-          name: "common",
-          props: filter(sorted, ([k]) => COMMON_PROPS.includes(k)),
-        },
-        {
-          name: "Graph",
-          props: filter(sorted, ([k]) => GRAPH_PROPS.includes(k)),
-        },
-        {
-          name: "Heuristic",
-          props: filter(sorted, ([k]) => HEURISTIC_PROPS.includes(k)),
-        },
-        {
-          name: "other",
-          props: filter(sorted, ([k]) => !ALL_PROPS.includes(k)),
-        },
-      ].map(({ name, props }, i) => (
-        <Fragment key={name}>
-          {!!i && <Divider sx={{ mb: 1 }} />}
-          <Typography
-            component="div"
-            variant="overline"
-            color="text.secondary"
-            sx={{ px: sm ? 2 : 3 }}
-          >
-            {startCase(name)}
-          </Typography>
-          <Box
-            key={name}
-            sx={{
-              py: 1,
-              pt: 0,
-              display: "grid",
-              gridAutoFlow: "row",
-              gridTemplateColumns: "repeat(2, 1fr)",
-            }}
-          >
-            {map(props, ([key, value]) => (
-              <ListItem
-                key={`${key}::${value}`}
-                sx={{ py: 0.5, px: sm ? -2 : 3 }}
-              >
-                <ListItemText secondary={key} primary={renderProperty(value)} />
-              </ListItem>
-            ))}
-          </Box>
-        </Fragment>
-      ))}
+      <EventProperties />
     </Surface>
   );
 }
@@ -150,6 +152,7 @@ export function PropertyList({
   primitives,
   ...rest
 }: PropertyListProps & BlockProps) {
+  console.log("hi");
   const sorted = sortEventKeys(event);
   return (
     <Block {...rest}>
