@@ -1,4 +1,4 @@
-import { Editor, Monaco, useMonaco } from "@monaco-editor/react";
+import { Editor, Monaco } from "@monaco-editor/react";
 import { CodeOutlined } from "@mui-symbols-material/w400";
 import { CircularProgress, Tab, Tabs, useTheme } from "@mui/material";
 import { Flex } from "components/generic/Flex";
@@ -9,15 +9,14 @@ import { LayerSource } from "layers";
 import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
 import { transactionAsync } from "produce";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Layer, useLayer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
 import { debounceLifo } from "utils/debounceLifo";
 import { PageContentProps } from "./PageMeta";
-import { OutError, OutErrorDetails } from "workers/usingWorker";
+import { OutError } from "workers/usingWorker";
 import * as monaco from "monaco-editor";
-import { Button } from "components/generic/Button";
 type SourceLayer = Layer;
 
 const isSourceLayer = (l: Layer): l is SourceLayer =>
@@ -28,7 +27,6 @@ type SourceLayerState = { source?: string; layer?: string };
 export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
   useMonacoTheme(theme);
-  const [editorError, setEditorError] = useState<null | OutErrorDetails>(null);
   const { layers, setLayer, setKey } = useLayer(undefined, isSourceLayer);
 
   const sources = useMemo(
@@ -66,26 +64,37 @@ export function SourcePage({ template: Page }: PageContentProps) {
     () => void (selected?.layer && setKey(selected?.layer)),
     [setKey, selected?.layer],
   );
-  const [locked, setLocked] = useState(
-    !!selected?.source?.readonly ? null : true,
-  );
+
   const handleEditorMount = (
     editor: monaco.editor.IStandaloneCodeEditor,
     monacoInstance: Monaco,
   ) => {
     editorRef.current = editor;
-    monacoRef.current = monaco;
+    monacoRef.current = monacoInstance;
     decorationsRef.current = editor.createDecorationsCollection();
   };
-  const addEditorModelMarker = ({}: {
-    startLineNumber: number;
-    startColumn: number;
-    endLineNumber: number;
-    endColumn: number;
-    message: string;
-    severity: Monaco["MarkerSeverity"];
-  }) => {
-    // editor;
+
+  const setParserErrorDecorations = (error: OutError) => {
+    const startLine = error.details.mark.line;
+    const endLine = startLine;
+    const startColumn = error.details.mark.column;
+    const endColumn = startColumn;
+    const lineWrapClass = "error-text";
+    const glyphMarginClass = "icon-glyph";
+
+    decorationsRef.current?.set([
+      {
+        range: new monaco.Range(startLine, startColumn, endLine, endColumn),
+        options: {
+          isWholeLine: true,
+          className: lineWrapClass,
+          glyphMarginClassName: glyphMarginClass,
+          glyphMarginHoverMessage: {
+            value: error.details.reason,
+          },
+        },
+      },
+    ]);
   };
 
   const handleEditorContentChange = useMemo(
@@ -102,33 +111,10 @@ export function SourcePage({ template: Page }: PageContentProps) {
                     selected?.source?.id,
                     value,
                   );
-                  setEditorError(null);
                   return modifiedLayer;
                 } catch (error) {
                   if (error instanceof OutError) {
-                    const startLine = error.details.mark.line;
-                    const endLine = startLine;
-                    const startColumn = error.details.mark.column;
-                    const endColumn = startColumn;
-
-                    decorationsRef.current?.set([
-                      {
-                        range: new monaco.Range(
-                          startLine,
-                          startColumn,
-                          endLine,
-                          endColumn,
-                        ),
-                        options: {
-                          isWholeLine: true,
-                          className: "error-text",
-                          glyphMarginClassName: "icon-glyph",
-                          glyphMarginHoverMessage: {
-                            value: error.details.reason,
-                          },
-                        },
-                      },
-                    ]);
+                    setParserErrorDecorations(error);
                   }
                 }
               })) ?? l,
