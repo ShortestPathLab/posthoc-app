@@ -9,7 +9,7 @@ import {
 
 type SliceProviderProps = {
   slices?: FunctionComponent[];
-  services?: (() => ReactElement | undefined)[];
+  services?: (() => ReactElement | void)[];
   children?: ReactNode;
 };
 
