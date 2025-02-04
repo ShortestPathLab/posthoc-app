@@ -103,7 +103,7 @@ export type NodeType = { x: number; y: number; label: string; size: number };
 export type EdgeType = { label: string };
 
 export function TreeGraph(props: TreeGraphProps) {
-  const { trace, tree, layer, highlightEdges, onExit } = props;
+  const { trace, tree, layer, highlightEdges, onExit, trackedProperty } = props;
 
   const paper = usePaper();
   const acrylic = useAcrylic();
@@ -139,11 +139,14 @@ export function TreeGraph(props: TreeGraphProps) {
 
   const event = trace?.events?.[highlightEdges?.step ?? 0];
 
+  const isAxisEnabled = !isEmpty(trackedProperty);
+
   return (
     <>
       <Stack
         sx={{
           pt: isHighlightingEnabled ? 11 : 6,
+          pl: isAxisEnabled ? 6 : 0,
           transition: (t) => t.transitions.create("padding-top"),
           position: "absolute",
           top: 0,

@@ -1,9 +1,8 @@
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
-import { chain, isUndefined, List, map } from "lodash";
+import { chain, forOwn, map } from "lodash";
 import { sort } from "moderndash";
 import { Trace } from "protocol";
-import { useEffect, useRef, useState } from "react";
-import { Coordinates } from "sigma/types";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TreeWorkerReturnType } from "./tree.worker";
 
 type TreeAxisProps = {
@@ -11,30 +10,132 @@ type TreeAxisProps = {
   trace?: Trace;
   width?: number;
   height?: number;
+  axisTrackingValue?: string;
+};
+
+type Node = {
+  x?: number;
+  y?: number;
+  id?: string | number;
+  step?: number;
+  f?: number;
+  g?: number;
+  [key: string]: any;
 };
 
 export function TreeAxis(props: TreeAxisProps) {
+  const {
+    width = 0,
+    height = 0,
+    trace,
+    tree: orignalTree,
+    axisTrackingValue,
+  } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { width = 0, height = 0 } = props;
+  const events = trace?.events;
   const sigma = useSigma();
   const registerEvents = useRegisterEvents();
 
-  const graph = sigma.getGraph();
-  const [tree, setTree] = useState<List<Coordinates>>([{ x: 0, y: 0 }]);
+  const [tree, setTree] = useState<Node[]>();
+
+  const drawAxis = useCallback(
+    (tree: Node[]) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      ctx.clearRect(0, 0, width!, height!);
+
+      const padding = 5;
+
+      // check the ratio of camera
+      const camera = sigma.getCamera();
+      const { ratio } = camera.getState();
+      const isSkip = Math.round(ratio);
+
+      const yAxis = chain(tree).groupBy("y").value();
+
+      const yAxisArray = sort(
+        Object.keys(yAxis).map((e) => Number(e)),
+        { order: "asc" }
+      );
+      let yAxisData = [];
+      if (isSkip >= 1) {
+        for (let i = 0; i < yAxisArray.length; ) {
+          yAxisData.push(yAxisArray[i]);
+          i += isSkip + 1;
+        }
+      } else {
+        yAxisData = yAxisArray;
+      }
+
+      // g value
+      const labelText: { [key: string]: [string, string] } = {};
+
+      forOwn(yAxis, (value, key) => {
+        const ave =
+          value.reduce((acc, curr) => acc + (curr?.g ?? 0), 0) / value.length;
+        const [coefficient, exp] = ave
+          .toExponential(2)
+          .split("e")
+          .map((item) => +item);
+        labelText[key] = [coefficient.toString(), exp.toString()];
+      });
+      const maxY = Math.max(...yAxisData);
+      const minY = Math.min(...yAxisData);
+
+      ctx.beginPath();
+      ctx.moveTo(5, minY);
+      ctx.lineTo(5, maxY);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.font = "10px Arial";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      ctx.fillText("Y Axis: G Value", padding, height * 0.98);
+
+      for (let i = 0; i <= yAxisData.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(padding, yAxisData[i]);
+        ctx.lineTo(padding + 5, yAxisData[i]);
+        ctx.stroke();
+
+        ctx.font = "10px Arial";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(labelText[yAxisData[i]]?.[0], padding + 5, yAxisData[i]);
+
+        ctx.font = "8px Arial";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(
+          labelText[yAxisData[i]]?.[1],
+          padding + 25,
+          yAxisData[i] - 4
+        );
+      }
+    },
+    [sigma, width, height]
+  );
 
   useEffect(() => {
+    const nodesData = chain(events)
+      .map((c, i) => ({ step: i, id: c.id, pId: c.pId, g: c.g }))
+      .groupBy("id")
+      .value();
+
     function updateTree() {
-      const nodes = graph.nodes();
-      const updatedTree = map(nodes, (node: string) => {
-        const displayData = sigma.getNodeDisplayData(node);
-        const y = displayData?.y;
-        let coordinates = { x: 0, y: 0 };
-        if (!isUndefined(y)) {
-          coordinates = sigma.framedGraphToViewport({ x: 0, y });
-        }
-        return coordinates;
+      const updatedTree = map(orignalTree, ({ x, y, ...node }) => {
+        return {
+          ...nodesData[node.label][0],
+          ...sigma.graphToViewport({ x, y }),
+        };
       });
-      setTree(updatedTree);
+      drawAxis(updatedTree);
     }
     updateTree();
 
@@ -43,53 +144,7 @@ export function TreeAxis(props: TreeAxisProps) {
         updateTree();
       },
     });
-  }, [sigma]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, width!, height!);
-
-    const padding = 5;
-
-    const yAxis = chain(tree).groupBy("y").value();
-    console.log(tree);
-    // const nodesData = chain(events)
-    //   .map((c, i) => ({ step: i, id: c.id, pId: c.pId, g: c.g }))
-    //   .groupBy("id")
-    //   .value();
-
-    const yAxisData = sort(
-      Object.keys(yAxis).map((e) => Number(e)),
-      { order: "asc" }
-    );
-
-    const maxY = Math.max(...yAxisData);
-    const minY = Math.min(...yAxisData);
-
-    ctx.beginPath();
-    ctx.moveTo(5, minY);
-    ctx.lineTo(5, maxY);
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    for (let i = 0; i <= yAxisData.length; i++) {
-      ctx.beginPath();
-      ctx.moveTo(padding, yAxisData[i]);
-      ctx.lineTo(padding + 5, yAxisData[i]);
-      ctx.stroke();
-
-      ctx.font = "10px Arial";
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      ctx.fillText(yAxisData[i]?.toFixed(2), padding + 38, yAxisData[i]);
-    }
-  }, [sigma, tree, width, height]);
+  }, [sigma, drawAxis, events]);
 
   return (
     <>
