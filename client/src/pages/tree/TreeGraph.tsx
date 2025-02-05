@@ -31,6 +31,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Layer } from "slices/layers";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { TreeWorkerReturnType } from "./tree.worker";
+import { TreeAxis } from "./TreeAxis";
 import { useGraphColoring } from "./useGraphColoring";
 import { useMultiDirectedGraph } from "./useMultiDirectedGraph";
 
@@ -97,13 +98,24 @@ export type TreeGraphProps = {
   trackedProperty?: string;
   highlightEdges?: HighlightLayerData["highlighting"];
   onExit?: () => void;
+  width?: number;
+  height?: number;
 };
 
 export type NodeType = { x: number; y: number; label: string; size: number };
 export type EdgeType = { label: string };
 
 export function TreeGraph(props: TreeGraphProps) {
-  const { trace, tree, layer, highlightEdges, onExit, trackedProperty } = props;
+  const {
+    trace,
+    tree,
+    layer,
+    highlightEdges,
+    onExit,
+    trackedProperty,
+    width,
+    height,
+  } = props;
 
   const paper = usePaper();
   const acrylic = useAcrylic();
@@ -143,10 +155,12 @@ export function TreeGraph(props: TreeGraphProps) {
 
   return (
     <>
+      {!!isAxisEnabled && (
+        <TreeAxis tree={tree} trace={trace} height={height} width={width} />
+      )}
       <Stack
         sx={{
           pt: isHighlightingEnabled ? 11 : 6,
-          pl: isAxisEnabled ? 6 : 0,
           transition: (t) => t.transitions.create("padding-top"),
           position: "absolute",
           top: 0,

@@ -56,7 +56,6 @@ import { PanelState } from "slices/view";
 import { getShade } from "theme";
 import { PageContentProps } from "../PageMeta";
 import { GraphEvents } from "./GraphEvents";
-import { TreeAxis } from "./TreeAxis";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeMemo } from "./TreeWorker";
 import { useSelection } from "./useSelection";
@@ -174,6 +173,8 @@ export function TreePage({ template: Page }: PageContentProps) {
                           settings={graphSettings}
                         >
                           <TreeGraph
+                            width={size.width}
+                            height={size.height}
                             step={step}
                             tree={tree}
                             trace={trace}
@@ -198,15 +199,6 @@ export function TreePage({ template: Page }: PageContentProps) {
                               setMenuOpen(true);
                             }}
                           />
-                          {trackedProperty && (
-                            <TreeAxis
-                              tree={tree}
-                              trace={trace}
-                              key={key}
-                              height={size.height}
-                              width={size.width}
-                            ></TreeAxis>
-                          )}
                         </SigmaContainer>
                       </>
                     )}
