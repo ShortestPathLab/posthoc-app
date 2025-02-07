@@ -33,12 +33,12 @@ export const producify =
     return b;
   };
 
+export type ServiceProps<T> = EditorSetterProps<T> & {
+  produce: (f: (obj: T) => void) => void;
+};
+
 export function withProduce<T>(
-  component: (
-    props: EditorSetterProps<T> & {
-      produce: (f: (obj: T) => void) => void;
-    }
-  ) => ReactElement
+  component: (props: ServiceProps<T>) => ReactElement
 ) {
   return function WithProduce(props: EditorSetterProps<T>) {
     return createElement(component, {

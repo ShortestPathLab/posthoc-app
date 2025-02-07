@@ -16,7 +16,6 @@ import { EventInspector, Skeleton } from "components/inspector/EventInspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex, tint } from "components/renderer/colors";
-import { useBreakpoints } from "hooks/useBreakpoints";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { flattenSubtree, HighlightLayerData } from "hooks/useHighlight";
 import { usePlaybackState } from "hooks/usePlaybackState";
@@ -241,7 +240,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
     [isHighlighting]
   );
 
-  const shouldBreak = useBreakPoints2(key).shouldBreak();
+  const { shouldBreak } = useBreakPoints2(key);
 
   useEffect(() => {
     if (stepToFilteredStep && scrollerRef && ref.current) {
@@ -323,10 +322,9 @@ export function StepsPage({ template: Page }: PageContentProps) {
                         event={event}
                         index={eventIndex}
                         selected={eventIndex === step}
-                        label={map(
-                          shouldBreak(eventIndex),
-                          (b) => b.result
-                        ).toString()}
+                        label={map(shouldBreak(eventIndex), (b) => {
+                          return b?.result;
+                        }).toString()}
                         onClick={() => stepTo(eventIndex)}
                       />
                       <Divider variant="inset" />

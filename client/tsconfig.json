@@ -1,8 +1,14 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["vite/client"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "types": [
+      "vite/client"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -19,5 +25,8 @@
     "baseUrl": "src",
     "downlevelIteration": true
   },
-  "include": ["src", "src/components/app-bar/Title.test.tsx"]
+  "include": [
+    "src",
+    "src/components/app-bar/Title.test.tsx"
+  ]
 }

@@ -1,11 +1,10 @@
 import { Box, Divider, TextField, Typography } from "@mui/material";
-import { find, last, map, startCase } from "lodash";
-import { comparators } from "./comparators";
+import { last, map, startCase } from "lodash";
 import { eventTypes } from "./eventTypes";
 import { SelectField as Select } from "components/generic/inputs/Select";
 import { Space } from "components/generic/Space";
 import { Switch } from "components/generic/inputs/Switch";
-import { BreakpointFieldProps } from "hooks/useBreakPoints2";
+import { BreakpointFieldProps } from "./BreakpointHandlers";
 
 export const EventSelect = (props: BreakpointFieldProps<string>) => {
   return (
@@ -104,5 +103,18 @@ export const BreakPointSwitch = (props: BreakpointFieldProps<boolean>) => {
         value={props.value}
       />
     </Box>
+  );
+};
+
+export const Header = (props: BreakpointFieldProps<string>) => {
+  return (
+    <>
+      <Box display="flex">
+        <Typography component="div" variant="overline" color="text.secondary">
+          {props.value}
+        </Typography>
+        <Space />
+      </Box>
+    </>
   );
 };

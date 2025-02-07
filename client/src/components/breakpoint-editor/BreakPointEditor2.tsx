@@ -1,17 +1,9 @@
-import { chain, debounce, isEmpty, isUndefined, keys, set } from "lodash";
+import { chain, keys } from "lodash";
 import { useMemo } from "react";
 import { Block } from "components/generic/Block";
 import { TraceEventType } from "protocol";
-
-import {
-  BreakpointData,
-  BreakpointHandler,
-  DebugLayerData,
-  useBreakPoints2,
-} from "hooks/useBreakPoints2";
 import { UploadedTrace } from "slices/UIState";
-import { useLayer } from "slices/layers";
-import { produce } from "produce";
+import handlersCollection from "./BreakpointHandlers";
 
 export const breakpointType = [
   "Breakpoint",
@@ -26,7 +18,7 @@ export const violations = [
   "Label out-of-bounds",
 ];
 
-export type Breakpoint = {
+export type Breakpoint<InputsType extends unknown[] = unknown[]> = {
   key: string;
   type?: string;
   property?: string;
@@ -35,6 +27,7 @@ export type Breakpoint = {
   active?: boolean;
   eventType?: TraceEventType;
   label?: string;
+  inputs?: InputsType;
 };
 
 type BreakpointEditorProps = {
@@ -51,8 +44,6 @@ export function BreakpointEditor({
   trace,
   onValueChange: onChange,
 }: BreakpointEditorProps) {
-  const { handlersCollection } = useBreakPoints2(layerKey);
-  const { layer, setLayer } = useLayer<DebugLayerData>(layerKey);
   const properties = useMemo(
     () =>
       chain(trace?.content?.events)
@@ -63,23 +54,7 @@ export function BreakpointEditor({
     [trace?.content?.events]
   );
 
-  async function handleChange(
-    next: Partial<Breakpoint>,
-    handler: BreakpointHandler<string, Partial<BreakpointData>>
-  ) {
-    // To do: debounce?
-    const res = await handler.processor({ ...value, ...next }, trace!!);
-    const resWithKey = { [value?.key]: res };
-    if (!isEmpty(res) && !isUndefined(res) && layer) {
-      setLayer(
-        produce(layer, (layer) =>
-          set(layer?.source ?? {}, "output", {
-            ...layer?.source?.output,
-            ...resWithKey,
-          })
-        )
-      );
-    }
+  async function handleChange(next: Partial<Breakpoint>) {
     onChange?.({ ...value, ...next });
   }
 
@@ -95,7 +70,7 @@ export function BreakpointEditor({
                   <Field
                     properties={properties}
                     onChange={(v: any) => {
-                      handleChange({ [fieldKey]: v }, handler as any);
+                      handleChange({ [fieldKey]: v });
                     }}
                     value={value?.[fieldKey as keyof Breakpoint] as any}
                     disabled={

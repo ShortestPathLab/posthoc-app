@@ -37,6 +37,8 @@
     "pathfinding-binaries"
   ],
   "dependencies": {
-    "clipboard-copy": "^4.0.1"
+    "@types/object-hash": "^3.0.6",
+    "clipboard-copy": "^4.0.1",
+    "object-hash": "^3.0.0"
   }
 }

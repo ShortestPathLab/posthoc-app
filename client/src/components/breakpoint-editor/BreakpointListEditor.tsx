@@ -1,27 +1,19 @@
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { DebugLayerData } from "hooks/useBreakPoints2";
 import {
-  chain as _,
-  filter,
-  isEmpty,
-  isUndefined,
-  keys,
-  map,
-  set,
-} from "lodash";
+  DebugLayerData,
+  treeToDict,
+  BreakpointService,
+} from "hooks/useBreakPoints2";
+import { chain as _, keys, set } from "lodash";
 import { produce } from "produce";
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { useLayer } from "slices/layers";
-import {
-  Breakpoint,
-  BreakpointEditor,
-  breakpointType,
-  violations,
-} from "./BreakPointEditor2";
+import { Breakpoint, BreakpointEditor, violations } from "./BreakpointEditor2";
 import { comparators } from "./comparators";
 import { Scroll } from "components/generic/Scrollbars";
 import { Box, Typography as Type } from "@mui/material";
 import { eventTypes } from "./eventTypes";
+import { useTreeMemo } from "pages/tree/TreeWorkerLegacy";
 
 type BreakpointListEditorProps = {
   breakpoints?: Breakpoint[];
@@ -34,28 +26,28 @@ export function BreakpointListEditor({
 }: BreakpointListEditorProps) {
   const { layer, setLayer } = useLayer<DebugLayerData>(key);
   const result: Breakpoint[] = [];
+  const trace = layer?.source?.trace;
 
-  function handleBreakpointsChange(updatedBreakpoints: any) {
+  const { result: treeRaw } = useTreeMemo(
+    {
+      trace: trace?.content,
+      step: trace?.content?.events?.length,
+      radius: undefined,
+    },
+    [trace?.content]
+  );
+
+  const trees = useMemo(() => {
+    return treeToDict(treeRaw?.tree ?? []);
+  }, [treeRaw]);
+
+  function handleBreakpointsChange(updatedBreakpoints: Breakpoint[]) {
     if (layer) {
-      if (layer?.source?.output) {
-        let filteredRes = map(updatedBreakpoints, (b) => {
-          if (layer?.source?.output?.[b.key])
-            return { [b.key]: layer?.source?.output?.[b.key] };
-        });
-        filteredRes = filter(filteredRes, (v) => !isUndefined(v));
-        if (!isEmpty(filteredRes)) {
-          setLayer(
-            produce(layer, (layer) =>
-              set(layer?.source ?? {}, "output", filteredRes)
-            )
-          );
-        }
-        if (isEmpty(updatedBreakpoints)) {
-          setLayer(
-            produce(layer, (layer) => set(layer?.source ?? {}, "output", {}))
-          );
-        }
-      }
+      setLayer(
+        produce(layer, (layer) =>
+          set(layer?.source ?? {}, "breakpointInput", updatedBreakpoints)
+        )
+      );
     }
   }
 
@@ -129,7 +121,7 @@ export function BreakpointListEditor({
             create={() => ({
               active: true,
               property: properties?.[0],
-              condition: "",
+              condition: "increase",
             })}
             onChange={(updatedBreakpoints) => {
               handleBreakpointsChange(updatedBreakpoints);
@@ -139,6 +131,11 @@ export function BreakpointListEditor({
           />
         </Box>
       </Scroll>
+      <BreakpointService
+        layer={layer}
+        trees={trees}
+        setLayer={setLayer}
+      ></BreakpointService>
     </Box>
   );
 }
