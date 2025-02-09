@@ -20,12 +20,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { SigmaContainer } from "@react-sigma/core";
-import "@react-sigma/core/lib/react-sigma.min.css";
+import "@react-sigma/core/lib/style.css";
 import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { PlaybackLayerData } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
 import { Label } from "components/generic/Label";
+import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { Placeholder } from "components/inspector/Placeholder";
 import {
   PropertyDialog,
@@ -59,8 +60,6 @@ import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeMemo } from "./TreeWorker";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
-import { TreeAxis } from "./TreeAxis";
-import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 
 type TreePageContext = PanelState;
 
@@ -109,6 +108,8 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const [trackedProperty, setTrackedProperty, properties] =
     useTrackedProperty(trace);
+
+  // const [axisTracking, setAxisTracking] = useState<typeof properties | "">("");
 
   const { point, selected, selection, setSelection } = useSelection(
     step,
@@ -172,6 +173,8 @@ export function TreePage({ template: Page }: PageContentProps) {
                           settings={graphSettings}
                         >
                           <TreeGraph
+                            width={size.width}
+                            height={size.height}
                             step={step}
                             tree={tree}
                             trace={trace}
@@ -196,13 +199,6 @@ export function TreePage({ template: Page }: PageContentProps) {
                               setMenuOpen(true);
                             }}
                           />
-                          <TreeAxis
-                            tree={tree}
-                            trace={trace}
-                            key={key}
-                            height={size.height}
-                            width={size.width}
-                          ></TreeAxis>
                         </SigmaContainer>
                       </>
                     )}
@@ -439,6 +435,16 @@ export function TreePage({ template: Page }: PageContentProps) {
                 ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
               ],
             },
+            // {
+            //   icon: <LineAxisOutlined />,
+            //   label: "Axis Tracking",
+            //   value: axisTracking,
+            //   onChange: setAxisTracking,
+            //   items: [
+            //     { id: "", name: "Off" },
+            //     ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
+            //   ],
+            // },
           ],
           ({ icon, label, value, items, onChange }, i) => (
             <>

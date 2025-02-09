@@ -165,9 +165,9 @@ export const controller = {
     const { result: trace, loading } = useTraceContent(value?.source?.trace);
     // Set playback
     useEffect(() => {
-      produce((l) => {
-        return set(l, "source.playbackTo", trace?.content?.events?.length ?? 0);
-      });
+      produce((l) =>
+        set(l, "source.playbackTo", trace?.content?.events?.length ?? 0)
+      );
     }, [trace?.key]);
     const { isTrusted } = useUntrustedLayers();
     // Make the trace parser

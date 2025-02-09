@@ -8,7 +8,7 @@ import {
 
 type SliceProviderProps = {
   slices?: FunctionComponent[];
-  services?: (() => unknown)[];
+  services?: (() => ReactNode | void)[];
   children?: ReactNode;
 };
 
@@ -26,7 +26,7 @@ export function SliceProvider({
           {children}
           {map(services.toReversed(), (s, i) =>
             createElement(
-              flow(s, () => null),
+              flow(s, (b) => b ?? null),
               { key: i }
             )
           )}

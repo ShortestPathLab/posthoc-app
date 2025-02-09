@@ -25,7 +25,6 @@ export function useTraceContent(trace?: UploadedTrace) {
               const result = await connection
                 .transport()
                 .call("features/trace", { id });
-              console.log(result?.content);
               return result?.content;
             }
           }

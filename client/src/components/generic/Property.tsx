@@ -31,7 +31,7 @@ export function renderProperty(obj: unknown, simple: boolean = false) {
           .map((item) => +item);
         return exp < -2 || exp > 4 ? (
           <span>
-            {coefficient}x10<sup style={supProps}>{exp}</sup>
+            {coefficient}×10<sup style={supProps}>{exp}</sup>
           </span>
         ) : (
           round(obj, 2)

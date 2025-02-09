@@ -1,6 +1,5 @@
 import {
   ArrowForwardOutlined,
-  NavigateNextOutlined,
   ChevronRightOutlined as NextIcon,
   PauseOutlined as PauseIcon,
   PlayArrowOutlined as PlayIcon,
@@ -235,7 +234,7 @@ export function MinimisedPlaybackControls({
               transform: state.isOpen ? "rotate(180deg)" : undefined,
               transition: (t) => t.transitions.create("transform"),
             }}
-            icon={<NavigateNextOutlined />}
+            icon={<NextIcon />}
           />
         </>
       )}
