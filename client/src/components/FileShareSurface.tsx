@@ -7,7 +7,7 @@ import { Box, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import copy from "clipboard-copy";
 import { useSm } from "hooks/useSmallDisplay";
 import { round } from "lodash";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { FileMetadata } from "services/cloud-storage/CloudStorage";
 import { useCloudStorageService } from "slices/cloudStorage";
 import { usePaper } from "theme";
@@ -20,10 +20,26 @@ export const FileShareSurface = ({ file }: { file: FileMetadata }) => {
   const sm = useSm();
   const paper = usePaper();
   const notify = useSnackbar();
-  const link = useMemo(
-    () => cloudService?.getFileLink(file.id),
-    [cloudService, file.id]
-  );
+  const [link, setLink] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+    const getLink = async () => {
+      try {
+        const result = await cloudService?.getFileLink(file.id);
+        if (isMounted) {
+          if (result) setLink(result);
+        }
+      } catch {
+        if (isMounted) setLink("");
+      }
+    };
+    getLink();
+    return () => {
+      isMounted = false;
+    };
+  }, [cloudService, file.id]);
+
   const handleCopy = async () => {
     try {
       if (link) {
@@ -39,7 +55,7 @@ export const FileShareSurface = ({ file }: { file: FileMetadata }) => {
   };
   const handleShare = async () => {
     try {
-      const link = cloudService?.getFileLink(file.id);
+      const link = await cloudService?.getFileLink(file.id);
       await navigator.share({
         title: "Posthoc visualisation",
         text: link ?? "",
@@ -62,7 +78,7 @@ export const FileShareSurface = ({ file }: { file: FileMetadata }) => {
               Size: {round(+file.size / 1024 / 1024, 2)} MB
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Modified: {new Date(file.modifiedTime).toLocaleString()}
+              Modified: {new Date(file.lastModified).toLocaleString()}
             </Typography>
           </>
         }

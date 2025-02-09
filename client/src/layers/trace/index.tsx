@@ -21,7 +21,7 @@ import {
   isTraceFormat,
   readUploadedTrace,
 } from "components/app-bar/upload";
-import Editor from "components/generic/ListEditor";
+import Editor from "components/generic/list-editor/ListEditor";
 import {
   PropertyDialog,
   PropertyList,
@@ -65,6 +65,7 @@ import { parseYamlAsync } from "workers/async";
 import { TrustedLayerData } from "../TrustedLayerData";
 import { use2DPath } from "./use2DPath";
 import { OutError } from "workers/usingWorker";
+import { isTraceLayer } from "./isTraceLayer";
 
 export type TraceLayerData = {
   trace?: UploadedTrace & { error?: string };
@@ -270,7 +271,7 @@ export const controller = {
   },
   steps: (layer) => layer?.source?.parsedTrace?.content?.events ?? [],
   provideSelectionInfo: ({ layer: key, event, children }) => {
-    const { layer, setLayer } = useLayer(key);
+    const { layer, setLayer } = useLayer(key, isTraceLayer);
     const menu = useMemo(() => {
       const events = layer?.source?.parsedTrace?.content?.events ?? [];
       const steps = chain(event?.info?.components)
@@ -282,7 +283,7 @@ export const controller = {
       const info = chain(event?.info?.components)
         .filter((c) => c.meta?.sourceLayer === layer?.key)
         .filter((c) => c.meta?.info)
-        .value() as any[];
+        .value();
       if (steps.length && layer) {
         const step = last(steps)!;
         const event = events[step];
@@ -295,7 +296,7 @@ export const controller = {
                 items: {
                   info: {
                     index: -1,
-                    primary: <PropertyList event={x.meta.info} vertical />,
+                    primary: <PropertyList event={x.meta?.info} vertical />,
                   },
                 },
               })),
@@ -315,8 +316,8 @@ export const controller = {
                   extras: (
                     <PropertyDialog
                       {...{ event }}
-                      trigger={(onClick) => (
-                        <MenuItem {...{ onClick }}>
+                      trigger={({ open }) => (
+                        <MenuItem onClick={open}>
                           <ListItemIcon>
                             <DataObjectOutlined />
                           </ListItemIcon>
@@ -373,9 +374,9 @@ export const controller = {
   onEditSource: async (layer, id, content) => {
     try {
       if (id !== "trace") throw { error: "id not trace", id };
-      if (!layer || !content)
-        throw { error: "layer or content is undefined", layer, content };
-      const updatedLayerSource = await parseYamlAsync(content);
+      if (!content) throw { error: "content is undefined", layer, content };
+
+      const updatedLayerSource = (await parseYamlAsync(content)) as Trace;
       // Set the trace content
       set(layer, "source.trace.content", updatedLayerSource);
       // To get things to change, we also need to change the trace key
@@ -387,5 +388,6 @@ export const controller = {
         throw error;
       }
     }
+    return layer;
   },
 } satisfies LayerController<"trace", TraceLayerData>;

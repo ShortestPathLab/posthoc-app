@@ -3,30 +3,30 @@ import { useEffect, useState } from "react";
 import { useAsyncAbortable } from "react-async-hook";
 import { usePrevious } from "react-use";
 
-export const useEffectWhen = (
+export const useEffectWhen = <T, U>(
   effect: () => void,
-  deps: any[],
-  watch: any[]
+  deps: T[],
+  watch: U[]
 ) => {
   const prev = usePrevious(watch);
   return useEffect(() => {
     if (!allSame(watch, prev)) {
       effect();
     }
-  }, [deps]);
+  }, [deps, watch, prev]);
 };
 
-function allSame(a?: any[], b?: any[]) {
+function allSame<T>(a?: T[], b?: T[]) {
   return zip(a, b).every(([x, y]) => x === y);
 }
 
-export const useEffectWhenAsync = (
+export const useEffectWhenAsync = <T, U>(
   effect: (signal: AbortSignal) => Promise<void>,
-  deps: any[] = [],
-  whenDeps: any[] = []
+  deps: T[] = [],
+  whenDeps: U[] = []
 ) => {
-  const [prevDeps, setDeps] = useState<any[]>(deps);
-  const [prevWhenDeps, setWhenDeps] = useState<any[]>(whenDeps);
+  const [prevDeps, setDeps] = useState<T[]>(deps);
+  const [prevWhenDeps, setWhenDeps] = useState<U[]>(whenDeps);
 
   useEffect(() => {
     if (!allSame(prevWhenDeps, whenDeps)) {
@@ -35,5 +35,8 @@ export const useEffectWhenAsync = (
     }
   }, [deps, whenDeps, prevWhenDeps]);
 
-  return useAsyncAbortable<void, any[]>(effect, [...prevDeps, ...prevWhenDeps]);
+  return useAsyncAbortable<void, (T | U)[]>(effect, [
+    ...prevDeps,
+    ...prevWhenDeps,
+  ]);
 };

@@ -22,7 +22,8 @@ export function useTree(trace: TreeWorkerParameters) {
   return useAsync(async () => await treeAsync(trace), [trace]);
 }
 
-export function useTreeMemo(trace: TreeWorkerParameters, deps: any[]) {
+export function useTreeMemo(trace: TreeWorkerParameters, deps: unknown[]) {
+  // eslint-disable-next-line react-compiler/react-compiler
   const params = useMemo(() => trace, deps);
 
   return useTree(params);

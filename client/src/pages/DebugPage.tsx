@@ -34,7 +34,8 @@ const divider = (
 );
 
 export function DebugPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state, dragHandle } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle, isViewTree } =
+    useViewTreeContext();
 
   const [tab, setTab] = useState("standard");
   const { key, setKey, layers, layer, setLayer, allLayers } = useLayer(
@@ -53,7 +54,6 @@ export function DebugPage({ template: Page }: PageContentProps) {
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
         <Page.Key>debug</Page.Key>
-
         <Page.Title>Debugger</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
@@ -71,7 +71,13 @@ export function DebugPage({ template: Page }: PageContentProps) {
             ellipsis={12}
           />
           {divider}
-          <TabList onChange={(_, v) => setTab(v)}>
+          <TabList
+            onChange={(_, v) => setTab(v)}
+            sx={{
+              mx: isViewTree ? 0 : -1,
+              "& button": { minWidth: 0 },
+            }}
+          >
             <Tab label="Standard" value="standard" disabled={!layer} />
             <Tab label="Advanced" value="advanced" disabled={!layer} />
           </TabList>

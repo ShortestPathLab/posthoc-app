@@ -245,8 +245,8 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     getFileLink: async (fileId: string) => {
       return `${window.location.origin}?workspaceFile=${id}:${fileId}`;
     },
-    ///@ts-expect-error TODO: implement this
-    deleteFile: async () => new File(),
+    // TODO: implement this
+    deleteFile: async () => {},
   };
 };
 

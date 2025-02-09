@@ -35,8 +35,5 @@
     "es5-ext",
     "esbuild",
     "pathfinding-binaries"
-  ],
-  "dependencies": {
-    "clipboard-copy": "^4.0.1"
-  }
+  ]
 }

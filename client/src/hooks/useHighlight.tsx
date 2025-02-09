@@ -72,7 +72,7 @@ export function useHighlightNodes(key?: string): {
         if (path.length > 1) {
           setLayer(
             produce(layer, (l) =>
-              set(l?.source!, "highlighting", {
+              set(l?.source ?? {}, "highlighting", {
                 type: "backtracking",
                 step,
                 path,
@@ -80,7 +80,9 @@ export function useHighlightNodes(key?: string): {
             )!
           );
         } else {
-          setLayer(produce(layer, (l) => set(l?.source!, "highlighting", {}))!);
+          setLayer(
+            produce(layer, (l) => set(l?.source ?? {}, "highlighting", {}))!
+          );
         }
       }
     },
@@ -108,11 +110,11 @@ export function useHighlightNodes(key?: string): {
 
     if (parentEvents) {
       const groupedParents = chain(parentEvents)
-        .map((c, i) => ({ step: c.step, id: c.id, pId: c.pId }))
+        .map((c) => ({ step: c.step, id: c.id, pId: c.pId }))
         .groupBy("pId")
         .value();
 
-      forOwn(groupedParents, (parent, key) => {
+      forOwn(groupedParents, (parent) => {
         const event = find(parent, (c) => c.step <= root!.step);
         if (event && !precedentTree[event.step]) {
           // Use lodash findLastIndex to make TypeScript happy
@@ -140,7 +142,7 @@ export function useHighlightNodes(key?: string): {
         if (Object.keys(path[current.step]).length > 0) {
           setLayer(
             produce(layer, (l) =>
-              set(l?.source!, "highlighting", {
+              set(l?.source ?? {}, "highlighting", {
                 type: "precedent",
                 step,
                 path,
@@ -148,7 +150,9 @@ export function useHighlightNodes(key?: string): {
             )!
           );
         } else {
-          setLayer(produce(layer, (l) => set(l?.source!, "highlighting", {}))!);
+          setLayer(
+            produce(layer, (l) => set(l?.source ?? {}, "highlighting", {}))!
+          );
         }
       }
     },
@@ -175,7 +179,7 @@ export function useHighlightNodes(key?: string): {
 
     if (children) {
       const groupedChildren = chain(children)
-        .map((c, i) => ({ step: c.step, id: c.id, pId: c.pId }))
+        .map((c) => ({ step: c.step, id: c.id, pId: c.pId }))
         .groupBy("id")
         .value();
 
@@ -198,11 +202,17 @@ export function useHighlightNodes(key?: string): {
       if (Object.keys(path[current.step]).length > 0) {
         setLayer(
           produce(layer, (l) =>
-            set(l?.source!, "highlighting", { type: "subtree", step, path })
+            set(l?.source ?? {}, "highlighting", {
+              type: "subtree",
+              step,
+              path,
+            })
           )!
         );
       } else {
-        setLayer(produce(layer, (l) => set(l?.source!, "highlighting", {}))!);
+        setLayer(
+          produce(layer, (l) => set(l?.source ?? {}, "highlighting", {}))!
+        );
       }
     },
     [layer?.source?.highlighting, trace]
@@ -217,7 +227,7 @@ export function useHighlightNodes(key?: string): {
 }
 
 export function flattenSubtree(subtree: Subtree) {
-  let result: number[] = [];
+  const result: number[] = [];
 
   function traverse(tree: Subtree, path: number[]) {
     for (const key in tree) {

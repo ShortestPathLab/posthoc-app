@@ -7,7 +7,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useViewTreeContext } from "components/inspector/ViewTree";
@@ -71,7 +71,7 @@ export function RecipesPage({ template: Page }: PageContentProps) {
 
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Flex vertical>
+        <Block vertical>
           <Scroll y>
             <Box sx={{ pt: 6 }}>
               {!loading ? (
@@ -90,7 +90,7 @@ export function RecipesPage({ template: Page }: PageContentProps) {
               )}
             </Box>
           </Scroll>
-        </Flex>
+        </Block>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

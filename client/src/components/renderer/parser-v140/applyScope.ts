@@ -1,5 +1,5 @@
 import { Properties as Props } from "protocol";
-import { Context, PropMap } from "./Context";
+import { PropMap } from "./Context";
 import { mapProperties } from "./mapProperties";
 
 export function applyScope<T extends Props>(
@@ -7,7 +7,7 @@ export function applyScope<T extends Props>(
   props: PropMap<T>
 ): PropMap<T> {
   return Object.setPrototypeOf(
-    mapProperties(props, (prop) => (provided: Context<T>) => prop(scope)),
+    mapProperties(props, (prop) => () => prop(scope)),
     scope
   );
 }

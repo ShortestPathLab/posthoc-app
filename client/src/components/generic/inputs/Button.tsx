@@ -1,7 +1,7 @@
 import { Box, Button as MuiButton, ButtonProps, alpha } from "@mui/material";
 import { usePaper } from "theme";
 
-export function Button({ children, sx, ...props }: ButtonProps) {
+export function Button({ children, sx, size, ...props }: ButtonProps) {
   const paper = usePaper();
   return (
     <MuiButton
@@ -13,7 +13,8 @@ export function Button({ children, sx, ...props }: ButtonProps) {
         minWidth: 0,
         borderColor: (t) =>
           alpha(t.palette.text.primary, t.palette.action.activatedOpacity),
-        ...(props.variant === "text" ? undefined : (paper(1) as any)),
+        ...(props.variant === "text" ? undefined : paper(1)),
+        py: size === "small" ? 0.75 : 1,
         ...sx,
       }}
     >

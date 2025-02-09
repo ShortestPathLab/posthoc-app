@@ -5,6 +5,8 @@ import { UploadedTrace } from "slices/UIState";
 import { parseYamlAsync } from "workers/async";
 import { name, ext } from "../../utils/path";
 import { nanoid as id } from "nanoid";
+import { Trace as TraceLegacy } from "protocol";
+import { Trace } from "protocol/Trace-v140";
 
 const customId = "internal/custom";
 
@@ -47,10 +49,9 @@ export function readUploadedTrace(f: File) {
     read: async () => {
       if (isTraceFormat(f)) {
         const content = await f.text();
-        const parsed = await parseYamlAsync(content);
+        const parsed = (await parseYamlAsync(content)) as Trace | TraceLegacy;
         return {
           ...custom(),
-          format: parsed?.format,
           content: parsed,
           name: startCase(name(f.name)),
           type: customId,

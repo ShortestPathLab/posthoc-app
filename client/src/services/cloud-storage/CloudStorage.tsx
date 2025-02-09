@@ -37,7 +37,7 @@ export interface CloudStorageProvider<
     fileId?: string,
   ) => Promise<string>;
   getFile: (fileId: string) => Promise<File>;
-  deleteFile: (fileId: string) => Promise<File>;
+  deleteFile: (fileId: string) => Promise<void>;
   getFileLink: (fileId: string) => Promise<string>;
   getIndex: () => Promise<FileMetadata[]>;
 }

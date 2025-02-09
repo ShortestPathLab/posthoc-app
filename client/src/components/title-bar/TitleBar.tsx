@@ -4,6 +4,7 @@ import {
   WorkspacesOutlined,
 } from "@mui-symbols-material/w400";
 import {
+  alpha,
   Box,
   ButtonBase,
   Chip,
@@ -15,14 +16,15 @@ import {
   Stack,
   Tooltip,
   Typography as Type,
-  alpha,
   useTheme,
 } from "@mui/material";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
+import { useSurface } from "components/generic/surface";
+import { useFileImport } from "components/inspector/FileDropZone";
 import { shades } from "components/renderer/colors";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
+import { fileDialog as file } from "file-select-dialog";
 import { useTitleBar } from "hooks/useTitleBar";
 import { useWorkspace } from "hooks/useWorkspace";
 import { get, startCase } from "lodash";
@@ -31,17 +33,12 @@ import { isMobile } from "mobile-device-detect";
 import { nanoid as id } from "nanoid";
 import logo from "public/logo512.png";
 import { changelog, docs, repository, version } from "public/manifest.json";
-import {
-  ReactElement,
-  ReactNode,
-  cloneElement,
-  useEffect,
-  useState,
-} from "react";
+import { cloneElement, ReactElement, ReactNode } from "react";
 import { useSyncStatus } from "services/SyncService";
 import { getDefaultViewTree, useView } from "slices/view";
 import { getShade } from "theme";
-import { ExportWorkspaceModal } from "./ExportWorkspaceModal";
+import { ExportWorkspace } from "./ExportWorkspaceModal";
+import { useOverlayWindowControls } from "../../hooks/useOverlayWindowControls";
 import { openWindow } from "./window";
 
 const canOpenWindows = !isMobile;
@@ -66,27 +63,6 @@ function MenuEntry({
         cloneElement(endIcon, { fontSize: "small", color: "disabled" })}
     </Stack>
   );
-}
-
-export function useTitleBarVisible() {
-  const [visible, setVisible] = useState(false);
-  const [rect, setRect] = useState<DOMRect>(new DOMRect());
-  useEffect(() => {
-    if ("windowControlsOverlay" in navigator) {
-      const f = () => {
-        setVisible(!!navigator.windowControlsOverlay.visible);
-        setRect(navigator.windowControlsOverlay.getTitlebarAreaRect());
-      };
-      navigator.windowControlsOverlay.addEventListener("geometrychange", f);
-      f();
-      return () =>
-        navigator.windowControlsOverlay.removeEventListener(
-          "geometrychange",
-          f
-        );
-    }
-  }, [setVisible]);
-  return { visible, rect };
 }
 
 const WorkspaceChip = () => {
@@ -124,7 +100,7 @@ const WorkspaceChip = () => {
 };
 
 export const TitleBarPlaceholder = () => {
-  const visible = useTitleBarVisible();
+  const visible = useOverlayWindowControls();
   const { palette } = useTheme();
   const color = palette.background.default;
   useTitleBar(color);
@@ -146,8 +122,9 @@ export const TitleBar = () => {
   useTitleBar(color);
   // const push = useSnackbar();
   const { save, load } = useWorkspace();
-  const { visible, rect } = useTitleBarVisible();
+  const { visible, rect } = useOverlayWindowControls();
   const [, setView] = useView();
+  const importFiles = useFileImport();
   // const sm = useSmallDisplay();
   // const prevSm = usePrevious(sm);
   // useEffect(() => {
@@ -160,7 +137,9 @@ export const TitleBar = () => {
   //     }
   //   }
   // }, [sm, prevSm, setView]);
-  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const { open: openModal, dialog } = useSurface(ExportWorkspace, {
+    title: "Export Workspace",
+  });
   function handleOpenPanel(orientation: "horizontal" | "vertical") {
     setView(({ view }) => {
       return {
@@ -271,13 +250,24 @@ export const TitleBar = () => {
                   items: [
                     {
                       type: "action",
-                      name: "Open workspace",
+                      name: "Import files",
+                      key: "import-files",
+                      action: async () => {
+                        const files = await file({ multiple: true });
+                        if (files?.length) importFiles([...files]);
+                      },
+                    },
+                    { type: "divider" },
+                    {
+                      type: "action",
+                      name: "Open workspace from file",
                       key: "workspace-load",
                       action: load,
                     },
+
                     {
                       type: "action",
-                      name: "Save workspace",
+                      name: "Save workspace to file",
                       key: "workspace-save",
                       action: save,
                     },
@@ -291,7 +281,7 @@ export const TitleBar = () => {
                         />
                       ),
                       key: "workspace-save-metadata",
-                      action: () => setExportModalOpen(true),
+                      action: () => openModal({}),
                     },
                   ],
                 },
@@ -368,10 +358,7 @@ export const TitleBar = () => {
           </Box>
         </Scroll>
       </Box>
-      <ExportWorkspaceModal
-        open={exportModalOpen}
-        onClose={() => setExportModalOpen(false)}
-      />
+      {dialog}
     </>
   );
 };

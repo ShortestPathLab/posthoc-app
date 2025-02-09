@@ -1,7 +1,6 @@
 import { nanoid as id } from "nanoid";
-import { createSlice } from "./createSlice";
-import { once } from "lodash";
 import { minimal, page } from "services/SyncParticipant";
+import { createSlice } from "./createSlice";
 
 export type Node = { size?: number; key: string; hidden?: boolean };
 

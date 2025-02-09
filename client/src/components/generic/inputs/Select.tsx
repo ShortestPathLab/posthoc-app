@@ -2,17 +2,13 @@ import {
   ListItemIcon,
   Menu,
   MenuItem,
-  SxProps,
   TextField,
   TextFieldProps,
-  Theme,
   Tooltip,
 } from "@mui/material";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
-import { findIndex, map, max } from "lodash";
+import { map } from "lodash";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { ReactElement, ReactNode } from "react";
-import { useAcrylic, usePaper } from "theme";
 
 type Key = string | number;
 
@@ -30,9 +26,6 @@ export type SelectProps<T extends Key> = {
   showTooltip?: boolean;
 };
 
-const itemHeight = (sm: boolean) => (sm ? 48 : 36);
-const padding = 8;
-
 export function Select<T extends string>({
   trigger,
   items,
@@ -41,8 +34,6 @@ export function Select<T extends string>({
   showTooltip,
   placeholder = "Select Option",
 }: SelectProps<T>) {
-  const sm = useSmallDisplay();
-  const index = max([findIndex(items, { value: value as any }), 0]) ?? 0;
   return (
     <State variant="popover">
       {(state) => (
@@ -74,7 +65,9 @@ export function Select<T extends string>({
                   }}
                 >
                   {icon && (
-                    <ListItemIcon sx={{ transform: "scale(0.8)" }}>
+                    <ListItemIcon
+                      sx={{ transform: "scale(0.8)", fontSize: 24 }}
+                    >
                       {icon}
                     </ListItemIcon>
                   )}

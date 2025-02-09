@@ -1,7 +1,7 @@
 import { CloseOutlined, ListOutlined } from "@mui-symbols-material/w400";
 import { Divider, List, ListItem, ListItemText } from "@mui/material";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
@@ -16,7 +16,6 @@ export function InfoPage({ template: Page }: PageContentProps) {
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>info</Page.Key>
-
       <Page.Title>Logs</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Options>
@@ -29,7 +28,7 @@ export function InfoPage({ template: Page }: PageContentProps) {
         </FeaturePickerButton>
       </Page.Options>
       <Page.Content>
-        <Flex vertical>
+        <Block vertical>
           {log.length ? (
             <Scroll y>
               <List sx={{ pt: 6 }}>
@@ -49,7 +48,7 @@ export function InfoPage({ template: Page }: PageContentProps) {
           ) : (
             <Placeholder pt={6} label="Logs" icon={<ListOutlined />} />
           )}
-        </Flex>
+        </Block>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

@@ -2,7 +2,7 @@ import memoize from "memoizee";
 
 type WorkerConstructor = new () => Worker;
 
-type WorkerResult = { result: any } | { error: any };
+type WorkerResult = { result: unknown } | { error: unknown };
 
 export type OutErrorDetails = {
   name: string;

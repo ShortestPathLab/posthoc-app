@@ -1,6 +1,6 @@
 import Editor, { useMonaco } from "@monaco-editor/react";
 import { CircularProgress, Theme, useTheme } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { debounce } from "lodash";
 import { ComponentProps } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
@@ -19,7 +19,7 @@ export function ScriptEditor({
   useMonacoTheme(theme);
 
   return (
-    <Flex height="100%" overflow="hidden">
+    <Block height="100%" overflow="hidden">
       <AutoSize>
         {({ width, height }) => (
           <Editor
@@ -38,7 +38,7 @@ export function ScriptEditor({
           />
         )}
       </AutoSize>
-    </Flex>
+    </Block>
   );
 }
 
@@ -58,7 +58,7 @@ export function ScriptViewer(props: ComponentProps<typeof Editor>) {
   const theme = useTheme();
   useMonacoTheme(theme);
   return (
-    <Flex height="100%" overflow="hidden">
+    <Block height="100%" overflow="hidden">
       <AutoSize>
         {({ width, height }) => (
           <Editor
@@ -77,6 +77,6 @@ export function ScriptViewer(props: ComponentProps<typeof Editor>) {
           />
         )}
       </AutoSize>
-    </Flex>
+    </Block>
   );
 }

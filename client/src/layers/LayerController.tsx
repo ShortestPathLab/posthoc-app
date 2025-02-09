@@ -17,28 +17,28 @@ export type LayerSource = Feature & {
   readonly?: boolean;
 };
 
-export type LayerController<K extends string, T> = {
+export type LayerController<K extends string, Data> = {
   key: K;
   icon: ReactElement;
-  editor: FC<EditorSetterProps<Layer<T>>>;
-  renderer: FC<{ layer?: Layer<T>; index?: number }>;
-  service?: FC<EditorSetterProps<Layer<T>>>;
-  inferName: (layer: Layer<T>) => string;
-  steps?: (layer?: Layer<T>) => TraceEvent[];
-  error?: (layer?: Layer<T>) => string | boolean | undefined;
+  editor: FC<EditorSetterProps<Layer<Data>>>;
+  renderer: FC<{ layer?: Layer<Data>; index?: number }>;
+  service?: FC<EditorSetterProps<Layer<Data>>>;
+  inferName: (layer: Layer<Data>) => string;
+  steps?: (layer?: Layer<Data>) => TraceEvent[];
+  error?: (layer?: Layer<Data>) => string | boolean | undefined;
   provideSelectionInfo?: SelectionInfoProvider;
   claimImportedFile?: (file: File) => Promise<
     | {
         claimed: true;
-        layer: (notify: (s: string) => void) => Promise<T>;
+        layer: (notify: (s: string) => void) => Promise<Data>;
       }
     | { claimed: false }
   >;
-  getSources?: (layer?: Layer<T>) => LayerSource[];
-  compress?: (t?: T) => any;
+  getSources?: (layer?: Layer<Data>) => LayerSource[];
+  compress?: (data?: Data) => any;
   onEditSource?: (
-    layer?: Layer<T>,
+    layer: Layer<Data>,
     id?: string,
     content?: string
-  ) => Promise<Layer<T> | undefined>;
+  ) => Promise<Layer<Data>>;
 };

@@ -1,17 +1,18 @@
 import {
-  BlurCircularOutlined,
-  LayersOutlined,
-} from "@mui-symbols-material/w400";
-import {
   CameraOutlined,
   CenterFocusWeakOutlined,
   TimesOneMobiledataOutlined,
 } from "@mui-symbols-material/w300";
+import {
+  BlurCircularOutlined,
+  LayersOutlined,
+} from "@mui-symbols-material/w400";
 import { Box, Divider, Stack, SxProps, Theme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
-import { Flex } from "components/generic/Flex";
-import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
+import { Block } from "components/generic/Block";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
+import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import download from "downloadjs";
@@ -46,6 +47,7 @@ type ViewportPageContext = PanelState & {
 export function autoSelectRenderer(
   renderers: Renderer[],
   //TODO:
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   components: string[]
 ) {
   return find(renderers, (r) => {
@@ -87,13 +89,15 @@ export function ViewportPage({ template: Page }: PageContentProps) {
     _(selectedLayers).map("viewKey").sort().join(".").value(),
   ]);
 
+  const size = useSurfaceAvailableCssSize();
+
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>viewport</Page.Key>
       <Page.Title>Viewport</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        <Flex>
+        <Block sx={size}>
           <AutoSize>
             {(size) => (
               <Box>
@@ -153,7 +157,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
               </Box>
             )}
           </AutoSize>
-        </Flex>
+        </Block>
       </Page.Content>
       <Page.Options>
         <Stack direction="row">

@@ -16,7 +16,7 @@ import {
   Typography as Type,
   useTheme,
 } from "@mui/material";
-import { IconButtonWithTooltip as IconButton } from "components/generic/IconButtonWithTooltip";
+import { IconButtonWithTooltip as IconButton } from "components/generic/inputs/IconButtonWithTooltip";
 import { getColorHex } from "components/renderer/colors";
 import { omit, pick, startCase } from "lodash";
 import { TraceEvent } from "protocol/Trace";
@@ -140,13 +140,13 @@ export function EventInspector({
       >
         <PropertyDialog
           {...{ event }}
-          trigger={(onClick) => (
+          trigger={({ open }) => (
             <IconButton
-              {...{ onClick }}
+              onClick={open}
               sx={{ p: 1.5, color: "text.secondary" }}
               label="See All Properties"
               icon={<DataObjectOutlined fontSize="small" />}
-            ></IconButton>
+            />
           )}
         />
       </Stack>

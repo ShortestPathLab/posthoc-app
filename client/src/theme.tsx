@@ -5,6 +5,7 @@ import {
   SxProps,
   TextFieldProps,
   Theme,
+  ThemeOptions,
 } from "@mui/material";
 import { constant, floor, times } from "lodash";
 import { useSettings } from "slices/settings";
@@ -44,7 +45,14 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
         mode === "dark"
           ? // ? { default: "#101418", paper: "#14191f" }
             { default: "#0a0c10", paper: "#111317" }
-          : { default: "#ebecef", paper: "#ffffff" },
+          : { default: "#ebecf1", paper: "#ffffff" },
+    },
+    transitions: {
+      easing: {
+        easeInOut: "cubic-bezier(0.2, 0, 0, 1)",
+        easeOut: "cubic-bezier(0.05, 0.7, 0.1, 1.0)",
+        easeIn: "cubic-bezier(0.3, 0.0, 0.8, 0.15)",
+      },
     },
     typography: {
       allVariants: {
@@ -54,8 +62,8 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
       h2: { fontFamily: headingFamily },
       h3: { fontFamily: headingFamily },
       h4: { fontFamily: headingFamily },
-      h5: { fontFamily: headingFamily },
-      h6: { fontFamily: headingFamily },
+      h5: { fontFamily: headingFamily, fontWeight: 400 },
+      h6: { fontFamily: headingFamily, fontWeight: 450 },
       button: {
         textTransform: "none",
         fontWeight: 400,
@@ -100,46 +108,52 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
             marginBottom: 12,
           },
           h6: {
-            fontWeight: 500,
+            fontWeight: 400,
           },
         },
       },
     },
-    shadows: ["", ...times(24, constant(shadow))] as any,
+    shadows: [
+      "none",
+      ...times(24, constant(shadow)),
+    ] as ThemeOptions["shadows"],
   });
 
-export function useAcrylic(color?: string): SxProps<Theme> {
+export function useAcrylic(color?: string) {
   const [{ "appearance/acrylic": acrylic }] = useSettings();
-  return acrylic
-    ? {
-        backdropFilter: "blur(16px)",
-        background: ({ palette }) =>
-          alpha(color ?? palette.background.paper, 0.75),
-      }
-    : {
-        backdropFilter: "blur(0px)",
-        background: ({ palette }) => color ?? palette.background.paper,
-      };
+  return (
+    acrylic
+      ? {
+          backdropFilter: "blur(16px)",
+          background: ({ palette }) =>
+            alpha(color ?? palette.background.paper, 0.75),
+        }
+      : {
+          backdropFilter: "blur(0px)",
+          background: ({ palette }) => color ?? palette.background.paper,
+        }
+  ) satisfies SxProps<Theme>;
 }
 
-export function usePaper(): (e?: number) => SxProps<Theme> {
-  return (elevation: number = 1) => ({
-    borderRadius: 1,
-    transition: ({ transitions }) =>
-      transitions.create(["background-color", "box-shadow"]),
-    boxShadow: ({ shadows, palette }) =>
-      palette.mode === "dark"
-        ? shadows[1]
-        : shadows[Math.max(floor(elevation) - 1, 0)],
-    backgroundColor: ({ palette }) =>
-      palette.mode === "dark"
-        ? alpha(palette.action.disabledBackground, elevation * 0.02)
-        : palette.background.paper,
-    border: ({ palette }) =>
-      palette.mode === "dark"
-        ? `1px solid ${alpha(palette.text.primary, elevation * 0.08)}`
-        : `1px solid ${alpha(palette.text.primary, elevation * 0.16)}`,
-  });
+export function usePaper() {
+  return (elevation: number = 1) =>
+    ({
+      borderRadius: 1.5,
+      transition: ({ transitions }) =>
+        transitions.create(["background-color", "box-shadow"]),
+      boxShadow: ({ shadows, palette }) =>
+        palette.mode === "dark"
+          ? shadows[1]
+          : shadows[Math.max(floor(elevation) - 1, 0)],
+      backgroundColor: ({ palette }) =>
+        palette.mode === "dark"
+          ? alpha(palette.action.disabledBackground, elevation * 0.02)
+          : palette.background.paper,
+      border: ({ palette }) =>
+        palette.mode === "dark"
+          ? `1px solid ${alpha(palette.text.primary, elevation * 0.08)}`
+          : `1px solid ${alpha(palette.text.primary, elevation * 0.12)}`,
+    } satisfies SxProps<Theme>);
 }
 
 export const textFieldProps = {

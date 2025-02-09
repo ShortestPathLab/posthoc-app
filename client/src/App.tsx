@@ -6,57 +6,27 @@ import {
   ThemeProvider,
   useTheme,
 } from "@mui/material";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { Inspector } from "components/inspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { TitleBar, TitleBarPlaceholder } from "components/title-bar/TitleBar";
-import { useTitleBar } from "hooks/useTitleBar";
-import { useWorkspace } from "hooks/useWorkspace";
-import { setLayerSource } from "layers/TrustedLayerData";
 import { Image } from "pages/Image";
 import logo from "public/logo192.png";
-import { useEffect, useMemo } from "react";
-import { BootstrapService } from "services/BootstrapService";
-import { ConnectionsService } from "services/ConnectionsService";
-import { FeaturesService } from "services/FeaturesService";
-import { LayerService } from "services/LayerService";
-import { LogCaptureService } from "services/LogCaptureService";
-import { RendererService } from "services/RendererService";
-import { CloudStorageService } from "services/CloudStorageService";
-import { SettingsService } from "services/SettingsService";
+import { useMemo } from "react";
+import { services } from "services";
 import { minimal } from "services/SyncParticipant";
-import { SyncService, useSyncStatus } from "services/SyncService";
-import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
-import { useUIState } from "slices/UIState";
-import { useLayers } from "slices/layers";
+import { useSyncStatus } from "services/SyncService";
 import { useSettings } from "slices/settings";
+import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { makeTheme } from "theme";
-import { parseYamlAsync } from "workers/async";
-import { FetchDriveFileService } from "services/FetchDriveFileService";
-
-const services = [
-  SyncService,
-  ConnectionsService,
-  FeaturesService,
-  RendererService,
-  LayerService,
-  LogCaptureService,
-  SettingsService,
-  BootstrapService,
-  CloudStorageService,
-  FetchDriveFileService,
-];
 
 function App() {
   const { palette } = useTheme();
   const color = palette.background.default;
   const { loading } = useSyncStatus();
-  const [UIStateStore, setUIState] = useUIState();
-
-  const [layersStore, setLayers] = useLayers();
   return (
-    <Flex
+    <Block
       vertical
       sx={{
         bgcolor: color,
@@ -67,9 +37,9 @@ function App() {
       {!loading ? (
         <>
           <TitleBar />
-          <Flex flex={1}>
+          <Block flex={1}>
             <Inspector flex={1} />
-          </Flex>
+          </Block>
         </>
       ) : minimal ? (
         <Fade in>
@@ -102,7 +72,7 @@ function App() {
           </Stack>
         </Fade>
       )}
-    </Flex>
+    </Block>
   );
 }
 

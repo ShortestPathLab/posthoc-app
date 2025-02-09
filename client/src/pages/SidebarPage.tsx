@@ -1,15 +1,14 @@
 import { FullscreenOutlined } from "@mui-symbols-material/w400";
 import { Box, Typography } from "@mui/material";
 import { useSidebarBackground } from "Sidebar";
-import { Flex } from "components/generic/Flex";
-import { IconButtonWithTooltip } from "components/generic/IconButtonWithTooltip";
+import { Block } from "components/generic/Block";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Scroll } from "components/generic/Scrollbars";
-import { ErrorBoundary } from "react-error-boundary";
 import { withSlots } from "components/withSlots";
-import { useAcrylic } from "theme";
-import { PageProps, PageSlots, divider } from "./Page";
+import { ErrorBoundary } from "react-error-boundary";
 import { useUIState } from "slices/UIState";
-import { useEffect } from "react";
+import { useAcrylic } from "theme";
+import { PageContent, PageProps, PageSlots, divider } from "./Page";
 
 export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
   const bg = useSidebarBackground();
@@ -29,20 +28,12 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
         </Box>
       }
     >
-      <Flex vertical>
-        <Flex sx={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
-          <Box
-            sx={{
-              width: "100%",
-              height: "100%",
-              bgcolor: bg,
-            }}
-          >
-            {slotProps.Content?.children}
-          </Box>
-        </Flex>
-        <Flex sx={{ height: (t) => t.spacing(6) }}>
-          <Flex
+      <Block vertical>
+        <PageContent sx={{ bgcolor: bg }}>
+          {slotProps?.Content?.children}
+        </PageContent>
+        <Block sx={{ height: (t) => t.spacing(6) }}>
+          <Block
             sx={{
               p: 0,
               position: "absolute",
@@ -56,7 +47,7 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
             }}
           >
             <Scroll x>
-              <Flex
+              <Block
                 sx={{
                   width: "max-content",
                   height: (t) => t.spacing(6),
@@ -77,7 +68,7 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
                     {slotProps.Options.children}
                   </>
                 )}
-              </Flex>
+              </Block>
             </Scroll>
             <IconButtonWithTooltip
               onClick={() => {
@@ -96,9 +87,9 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
               }
               label="Maximise"
             ></IconButtonWithTooltip>
-          </Flex>
-        </Flex>
-      </Flex>
+          </Block>
+        </Block>
+      </Block>
     </ErrorBoundary>
   );
 });

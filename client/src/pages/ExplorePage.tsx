@@ -23,12 +23,12 @@ import {
   useTheme,
 } from "@mui/material";
 import { ColorTranslator } from "colortranslator";
-import { Flex } from "components/generic/Flex";
+import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useFullscreenModalContext } from "components/inspector/FullscreenModalHost";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { useSmallDisplay } from "hooks/useSmallDisplay";
+import { useSm } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
 import { chain as _, entries, first, map, round, upperCase } from "lodash";
 import memoizee from "memoizee";
@@ -40,7 +40,7 @@ import { useLoadingState } from "slices/loading";
 import { useSettings } from "slices/settings";
 import { textFieldProps, usePaper } from "theme";
 import { parse, stringify } from "yaml";
-import { Button } from "../components/generic/Button";
+import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
 
@@ -94,6 +94,7 @@ type ExampleDescriptor = FeatureDescriptor & {
   size?: number;
 };
 
+// eslint-disable-next-line react/display-name
 const makeAvatar = (children?: ReactNode) => (sx: SxProps) =>
   <Avatar sx={sx}>{children}</Avatar>;
 
@@ -127,7 +128,7 @@ function getAuthor(s?: string): {
         default:
           break;
       }
-    } catch (e) {
+    } catch {
       /* empty */
     }
     return { name: s, avatar: makeAvatar(s[0]) };
@@ -184,6 +185,7 @@ export function FeatureCard({
   size,
   onOpenClick,
   loading,
+  children,
   ...rest
 }: Partial<ExampleDescriptor> &
   CardProps & { onOpenClick?: () => void; loading?: boolean }) {
@@ -199,7 +201,11 @@ export function FeatureCard({
   return (
     <Card
       variant="outlined"
-      sx={{ ...paper(1), position: "relative", height: "100%" }}
+      sx={{
+        ...paper(1),
+        position: "relative",
+        height: "100%",
+      }}
       {...rest}
     >
       <>
@@ -226,7 +232,7 @@ export function FeatureCard({
         <CardHeader
           sx={{
             flexDirection: "column",
-            "> .MuiCardHeader-content": { overflow: "hidden" },
+            "> .MuiCardHeader-content": { overflow: "hidden", width: "100%" },
           }}
           avatar={
             <Box
@@ -285,7 +291,7 @@ export function FeatureCard({
                 disabled={loading}
                 onClick={onOpenClick}
                 startIcon={<WorkspacesOutlined />}
-                sx={paper(2)}
+                sx={paper(1)}
               >
                 <Stack direction="row" gap={1}>
                   <Type component="div">Open</Type>
@@ -296,6 +302,7 @@ export function FeatureCard({
                   )}
                 </Stack>
               </Button>
+              {children}
             </Stack>
           }
         />
@@ -315,7 +322,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
   const { close: closeModal } = useFullscreenModalContext();
-  const sm = useSmallDisplay();
+  const sm = useSm();
   const narrow = sm || isViewTree;
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("explore");
@@ -378,7 +385,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
-        <Page.Title>Explore</Page.Title>
+        <Page.Title>Explore Posthoc</Page.Title>
         <Page.Key>explore</Page.Key>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
@@ -391,7 +398,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
           </TabList>
         </Page.Options>
         <Page.Content>
-          <Flex vertical>
+          <Block vertical>
             <Scroll y>
               <Box
                 sx={
@@ -458,7 +465,8 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                           search={search}
                           entry={entry}
                           onOpenClick={(p) => {
-                            open(p), closeModal?.();
+                            open(p);
+                            closeModal?.();
                           }}
                         />
                       ))}
@@ -488,7 +496,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       gap={2}
                     >
                       <Type component="div">
-                        We're still working on this feature. Check out our
+                        We&apos;re still working on this feature. Check out our
                         documentation instead.
                       </Type>
                       <Button
@@ -505,7 +513,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                 </Box>
               </Box>
             </Scroll>
-          </Flex>
+          </Block>
         </Page.Content>
         <Page.Extras>
           {!narrow && (

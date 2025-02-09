@@ -25,6 +25,14 @@ export async function transactionAsync<T, U>(
   return await f(clone(obj));
 }
 
+export const producifyAsync =
+  <T>(f: (obj: T) => Promise<void>) =>
+  async (obj: T) => {
+    const b = clone(obj);
+    await f(b);
+    return b;
+  };
+
 export const producify =
   <T>(f: (obj: T) => void) =>
   (obj: T) => {
@@ -40,9 +48,10 @@ export function withProduce<T>(
     }
   ) => ReactElement
 ) {
-  return (props: EditorSetterProps<T>) =>
-    createElement(component, {
+  return function WithProduce(props: EditorSetterProps<T>) {
+    return createElement(component, {
       ...props,
       produce: (f) => props?.onChange?.(producify(f)),
     });
+  };
 }
