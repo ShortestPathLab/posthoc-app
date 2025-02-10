@@ -9,10 +9,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { defer, filter, map, sortBy, uniqBy } from "lodash";
+import { defer, find, findIndex, pull, set, sortBy, uniqBy } from "lodash";
 import { nanoid as id } from "nanoid";
 
 import { useInitialRender } from "hooks/useInitialRender";
+import { produce } from "produce";
 import {
   CSSProperties,
   ReactElement,
@@ -20,10 +21,11 @@ import {
   useEffect,
   useState,
 } from "react";
+import { Transaction } from "slices/selector";
 import { usePaper } from "theme";
 import { ListEditorField, ListEditorFieldProps1 } from "./ListEditorField";
 
-type Key = string | number;
+type Key = string;
 
 export type Item<T> = {
   editor?: ReactElement;
@@ -34,7 +36,7 @@ export type Item<T> = {
 
 export type Props<T> = {
   button?: boolean;
-  onChange?: (value: Item<T>[]) => void;
+  onChange?: (value: Transaction<T[]>) => void;
   onChangeItem?: (key: Key, value: T, enabled: boolean) => void;
   onAddItem?: () => void;
   onDeleteItem?: (key: Key) => void;
@@ -149,15 +151,14 @@ export default function Editor<T>(props: Props<T>) {
         if (!result.destination) {
           return;
         }
+        const { source, destination } = result;
 
-        const reordered = reorder(
-          items,
-          result.source.index,
-          result.destination.index
-        );
+        function t<T>(xs: T[]) {
+          return reorder(xs, source.index, destination.index);
+        }
 
-        onChange?.(reordered);
-        setIntermediateItems(reordered);
+        onChange?.(t);
+        setIntermediateItems(t(items));
       }}
     >
       <List>
@@ -252,7 +253,7 @@ export default function Editor<T>(props: Props<T>) {
   }
 }
 
-export function ListEditor<T extends { key: string }>({
+export function ListEditor<T extends { key: Key }>({
   onChange,
   value,
   editor,
@@ -261,20 +262,22 @@ export function ListEditor<T extends { key: string }>({
   ...props
 }: Omit<Props<T>, "items" | "onChange"> & {
   items?: T[];
-  onChange?: (value: T[]) => void;
+  onChange?: (value: Transaction<T[]>) => void;
   value?: T[];
   editor?: (item: T) => ReactElement;
   create?: () => Omit<T, "key">;
-  onFocus?: (key: string) => void;
+  onFocus?: (key: Key) => void;
 }) {
   const [state, setState] = useState(value ?? []);
-  function handleChange(next: T[]) {
-    setState(next);
+  function handleChange(next: Transaction<T[]>) {
+    setState(produce(state, next));
     onChange?.(next);
   }
+
   useEffect(() => {
     setState(value ?? []);
   }, [value]);
+
   return (
     <Box>
       <Editor
@@ -287,17 +290,24 @@ export function ListEditor<T extends { key: string }>({
           editor: editor?.(c),
         }))}
         onAddItem={() => {
-          const _id = id();
-          handleChange?.([...state, { key: _id, ...create?.() } as T]);
-          defer(() => onFocus?.(_id));
+          const key = id();
+          handleChange?.((xs) => void xs.push({ ...(create?.() as T), key }));
+          defer(() => onFocus?.(key));
         }}
-        onDeleteItem={(k) => {
-          return handleChange?.(filter(state, (b) => b.key !== k));
-        }}
-        onChangeItem={(k, v) =>
-          handleChange?.(map(state, (b) => (b.key === k ? v : b)))
+        onDeleteItem={(k) =>
+          handleChange?.((xs) => void pull(xs, find(xs, { key: k })))
         }
-        onChange={(k) => handleChange?.(map(k, (a) => a.value!))}
+        onChangeItem={(k, v) =>
+          handleChange?.(
+            (xs) =>
+              void set(
+                xs,
+                findIndex(xs, (x) => x.key === k),
+                v
+              )
+          )
+        }
+        onChange={(k) => handleChange?.(k)}
       />
     </Box>
   );

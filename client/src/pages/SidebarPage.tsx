@@ -1,19 +1,18 @@
 import { FullscreenOutlined } from "@mui-symbols-material/w400";
 import { Box, Typography } from "@mui/material";
-import { useSidebarBackground } from "Sidebar";
 import { Block } from "components/generic/Block";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Scroll } from "components/generic/Scrollbars";
 import { withSlots } from "components/withSlots";
 import { ErrorBoundary } from "react-error-boundary";
-import { useUIState } from "slices/UIState";
+import { useSidebarBackground } from "Sidebar";
+import { slice } from "slices";
 import { useAcrylic } from "theme";
 import { PageContent, PageProps, PageSlots, divider } from "./Page";
 
 export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
   const bg = useSidebarBackground();
   const acrylic = useAcrylic(bg);
-  const [, setUIState] = useUIState();
   return (
     <ErrorBoundary
       fallback={
@@ -72,10 +71,8 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
             </Scroll>
             <IconButtonWithTooltip
               onClick={() => {
-                setUIState(() => ({
-                  fullscreenModal: slotProps.Key?.children,
-                  sidebarOpen: false,
-                }));
+                slice.ui.fullscreenModal.set(slotProps.Key?.children);
+                slice.ui.sidebarOpen.set(false);
               }}
               size="small"
               sx={{ m: 1 }}
@@ -86,7 +83,7 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
                 />
               }
               label="Maximise"
-            ></IconButtonWithTooltip>
+            />
           </Block>
         </Block>
       </Block>

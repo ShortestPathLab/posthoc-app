@@ -7,7 +7,7 @@ type TemplateMap = typeof templates;
 type Key = keyof TemplateMap;
 
 type ReturnTypeOf<T extends Key> = TemplateMap[T] extends FunctionTemplate<
-  [...never],
+  [...unknown[]],
   infer R
 >
   ? R

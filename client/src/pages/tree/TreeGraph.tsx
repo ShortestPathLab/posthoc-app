@@ -15,21 +15,19 @@ import {
   useTheme,
 } from "@mui/material";
 import { useSigma } from "@react-sigma/core";
-import {
-  MinimisedPlaybackControls,
-  PlaybackLayerData,
-} from "components/app-bar/Playback";
+import { MinimisedPlaybackControls } from "components/app-bar/Playback";
 import { Button } from "components/generic/inputs/Button";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Scroll } from "components/generic/Scrollbars";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
-import { HighlightLayerData, highlightNodesOptions } from "hooks/useHighlight";
+import { highlightNodesOptions } from "hooks/useHighlight";
 import { forOwn, isEmpty, isNull, isUndefined, pick, startCase } from "lodash";
 import { Trace } from "protocol";
 import { ReactNode, useEffect, useState } from "react";
-import { Layer } from "slices/layers";
+import { layers } from "slices/layers";
 import { getShade, useAcrylic, usePaper } from "theme";
+import { TreeLayer } from ".";
 import { TreeWorkerReturnType } from "./tree.worker";
 import { TreeAxis } from "./TreeAxis";
 import { useGraphColoring } from "./useGraphColoring";
@@ -93,10 +91,9 @@ export type TreeGraphProps = {
   trace?: Trace;
   tree?: TreeWorkerReturnType;
   step?: number;
-  layer?: Layer<PlaybackLayerData>;
+  layer?: string;
   showAllEdges?: boolean;
   trackedProperty?: string;
-  highlightEdges?: HighlightLayerData["highlighting"];
   onExit?: () => void;
   width?: number;
   height?: number;
@@ -109,13 +106,16 @@ export function TreeGraph(props: TreeGraphProps) {
   const {
     trace,
     tree,
-    layer,
-    highlightEdges,
+    layer: key,
     onExit,
     trackedProperty,
     width,
     height,
   } = props;
+
+  const highlightEdges = layers
+    .one<TreeLayer>(key)
+    .use((l) => l.source?.highlighting);
 
   const paper = usePaper();
   const acrylic = useAcrylic();
@@ -155,7 +155,7 @@ export function TreeGraph(props: TreeGraphProps) {
 
   return (
     <>
-      {!!isAxisEnabled && (
+      {isAxisEnabled && (
         <TreeAxis tree={tree} trace={trace} height={height} width={width} />
       )}
       <Stack
@@ -200,7 +200,7 @@ export function TreeGraph(props: TreeGraphProps) {
             icon={<RotateIcon />}
           />
           {divider}
-          {<MinimisedPlaybackControls layer={layer} />}
+          {<MinimisedPlaybackControls layer={key} />}
         </Stack>
       </Stack>
       <Stack

@@ -1,6 +1,7 @@
 import {
   Box,
   ButtonBase,
+  ButtonBaseProps,
   Chip,
   Divider,
   Stack,
@@ -12,23 +13,36 @@ import {
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Block } from "components/generic/Block";
-import { Surface } from "components/generic/surface";
 import { Space } from "components/generic/Space";
+import { Surface } from "components/generic/surface";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController, getControllers } from "layers/layerControllers";
 import {
   debounce,
-  first,
+  head,
+  isEqual,
   keys,
   merge,
   omit,
-  set,
+  pick,
   startCase,
   truncate,
 } from "lodash";
-import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
-import { Layer } from "slices/layers";
+import { produce } from "produce";
+import {
+  ReactNode,
+  createElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useToggle } from "react-use";
+import { slice } from "slices";
+import { Layer, WithLayer } from "slices/layers";
+import { Transaction } from "slices/selector";
 import { usePaper } from "theme";
+import { set } from "utils/set";
 
 const compositeOperations = [
   "color",
@@ -60,11 +74,11 @@ const compositeOperations = [
 ];
 
 type LayerEditorProps = {
-  value: Layer;
-  onValueChange?: (v: Layer) => void;
+  layer?: string;
+  onValueChange?: (v: Transaction<Layer>) => void;
 };
 
-function useDraft<T>(
+export function useDraft<T>(
   initial: T,
   commit?: (value: T) => void,
   ms: number = 300,
@@ -74,7 +88,7 @@ function useDraft<T>(
   useEffect(() => {
     if (initial) {
       requestIdleCallback(() =>
-        setState(merge(state, omit(initial, ...stayDraft)))
+        setState(merge({}, state, omit(initial, ...stayDraft)))
       );
     }
   }, [setState, initial]);
@@ -92,178 +106,271 @@ function useDraft<T>(
   ] as const;
 }
 
-export function LayerEditor({
-  value,
-  onValueChange: onChange,
-}: LayerEditorProps) {
-  const paper = usePaper();
-  const [draft, setDraft] = useDraft(value, onChange, 300, [
-    "name",
-    "source.type",
-  ]);
+function useLayerProperties(layer?: string) {
+  "use no memo";
 
-  const renderHeading = (label: ReactNode) => (
+  const one = slice.layers.one(layer);
+
+  return one.use(
+    (l) => pick(l, "name", "transparency", "displayMode", "source.type"),
+    isEqual
+  ) as Layer | undefined;
+}
+
+export function Heading({ children }: { children: ReactNode }) {
+  return (
     <Type
       component="div"
       variant="overline"
       color="text.secondary"
       sx={{ pt: 1 }}
     >
-      {label}
+      {children}
     </Type>
   );
-  const renderLabel = (label: ReactNode) => (
+}
+
+export function Label({ children }: { children: ReactNode }) {
+  return (
     <Type component="div" variant="body1">
-      {label}
+      {children}
     </Type>
   );
-  const renderOption = (label: ReactNode, option: ReactNode) => (
+}
+
+export function Option({
+  label,
+  option,
+}: {
+  label: ReactNode;
+  option: ReactNode;
+}) {
+  return (
     <Block alignItems="center">
-      {renderLabel(label)}
+      <Label>{label}</Label>
       <Space flex={1} />
       {option}
     </Block>
   );
+}
 
-  const options = (a: string[]) =>
-    a.map((c) => ({
-      id: c,
-      name: startCase(c),
-    }));
+const options = (a: string[]) =>
+  a.map((c) => ({
+    id: c,
+    name: startCase(c),
+  }));
 
-  const name = draft.name || inferLayerName(value);
+function useOptimistic<T>(
+  value: T,
+  update: (f: Transaction<T>) => Promise<void>
+) {
+  const [enabled, setEnabled] = useToggle(false);
+  const [optimistic, setOptimistic] = useState(value);
 
-  const error = getController(value)?.error?.(value);
+  const start = () => {
+    setOptimistic(value);
+    setEnabled(true);
+  };
+  const end = () => {
+    setOptimistic(value);
+    setEnabled(false);
+  };
+
+  const latest = useRef<Promise<void> | null>(null);
+
+  return [
+    enabled ? optimistic : value,
+    async (f: Transaction<T>) => {
+      start();
+      const job = update(f);
+      latest.current = job;
+      setOptimistic(produce(optimistic, f));
+      await job;
+      if (latest.current === job) end();
+    },
+  ] as const;
+}
+
+const idle = (f: () => void, wait?: number): Promise<void> =>
+  new Promise<void>((res) =>
+    requestIdleCallback(
+      () => {
+        f();
+        res();
+      },
+      { timeout: wait }
+    )
+  );
+
+export function LayerEditor({ layer: key }: LayerEditorProps) {
+  const one = slice.layers.one(key);
+  const layer = useLayerProperties(key);
+  const [
+    { name, transparency, displayMode, source: { type } = {} } = {},
+    setOptimistic,
+  ] = useOptimistic(layer!, (f) => idle(() => one.set(f), 1000));
 
   return (
-    <>
-      <Surface
-        popover
-        slotProps={{
-          popover: {
-            anchorOrigin: { horizontal: -12, vertical: -12 },
-          },
-        }}
-        trigger={({ open }) => (
-          <ButtonBase
-            onClick={open}
-            className={draft.key}
-            sx={{
-              flex: 1,
-              display: "block",
-              textAlign: "left",
-              px: 2,
-            }}
-          >
-            <Stack alignItems="center" direction="row" gap={2}>
-              <Stack
-                sx={{
-                  ...paper(0.5),
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 36,
-                  height: 36,
-                  color: "action.disabled",
-                }}
-              >
-                {getController(value).icon}
-              </Stack>
-              <Box
-                sx={{
-                  py: 1.5,
-                  flex: 1,
-                  width: 0,
-                  ml: 0,
-                  overflow: "hidden",
-                  "> *": {
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  },
-                }}
-              >
-                <Type component="div">{name}</Type>
-                <Type component="div" variant="body2" color="text.secondary">
-                  {startCase(value.source?.type)}
-                </Type>
-              </Box>
-              {!!error && (
-                <Tooltip title={error}>
-                  <Chip
-                    sx={{
-                      mr: -2,
-                      ...omit(paper(1), "borderRadius"),
-                      color: (t) => t.palette.error.main,
-                      flex: 0,
-                    }}
-                    label={`${truncate(`${error}`, { length: 8 })}`}
-                    size="small"
-                  />
-                </Tooltip>
-              )}
-            </Stack>
-          </ButtonBase>
-        )}
-      >
-        <Box p={2}>
-          <TextField
-            sx={{ mb: 2 }}
-            autoComplete="off"
-            autoFocus
-            placeholder={inferLayerName(draft)}
-            fullWidth
-            variant="filled"
-            label="Layer Name"
-            defaultValue={draft.name ?? ""}
-            onChange={(e) => setDraft?.((d) => set(d, "name", e.target.value))}
-          />
-          <Box sx={{ mx: -2, pb: 1 }}>
-            <Tabs
-              variant="fullWidth"
-              onChange={(_, v) =>
-                setDraft?.((d) => set(d, "source", { type: v }))
+    <Surface
+      popover
+      slotProps={{
+        popover: {
+          anchorOrigin: { horizontal: -12, vertical: -12 },
+        },
+      }}
+      trigger={({ open }) => <Item onClick={open} layer={key} />}
+    >
+      <Box p={2}>
+        <WithLayer layer={key}>
+          {(l) => (
+            <TextField
+              sx={{ mb: 2 }}
+              autoComplete="off"
+              autoFocus
+              placeholder={getController(l)?.inferName?.(l)}
+              fullWidth
+              variant="filled"
+              label="Layer Name"
+              value={name ?? ""}
+              onChange={(e) =>
+                setOptimistic((d) => set(d, "name", e.target.value))
               }
-              value={draft.source?.type ?? first(keys(getControllers())) ?? ""}
-            >
-              {keys(getControllers()).map((s) => (
-                <Tab label={startCase(s)} value={s} key={s} />
-              ))}
-            </Tabs>
-            <Divider sx={{ width: "100%" }} />
-          </Box>
+            />
+          )}
+        </WithLayer>
+        <Box sx={{ mx: -2, pb: 1 }}>
+          <Tabs
+            variant="fullWidth"
+            onChange={(_, v) =>
+              setOptimistic((d) => set(d, "source", { type: v }))
+            }
+            value={type ?? head(keys(getControllers())) ?? ""}
+          >
+            {keys(getControllers()).map((s) => (
+              <Tab label={startCase(s)} value={s} key={s} />
+            ))}
+          </Tabs>
+          <Divider sx={{ width: "100%" }} />
+        </Box>
 
-          {renderHeading("Source Options")}
-          {draft.source?.type &&
-            createElement(getController(draft).editor, {
-              onChange: setDraft,
-              value: draft,
-            })}
-          {renderHeading("Layer Options")}
-          {renderOption(
-            "Transparency",
+        <Heading>Source Options</Heading>
+
+        {type && getController(type) && (
+          <WithLayer layer={key}>
+            {(l) =>
+              createElement(getController(type).editor, {
+                onChange: setOptimistic,
+                value: l,
+              })
+            }
+          </WithLayer>
+        )}
+        <Heading>Layer Options</Heading>
+        <Option
+          label="Transparency"
+          option={
             <FeaturePicker
               label="Transparency"
               items={["0", "25", "50", "75"].map((c) => ({
                 id: c,
                 name: `${c}%`,
               }))}
-              value={draft.transparency ?? "0"}
+              value={transparency ?? "0"}
               arrow
-              onChange={(e) => setDraft?.((d) => set(d, "transparency", e))}
+              onChange={(e) =>
+                setOptimistic((d) => set(d, "transparency", e as any))
+              }
             />
-          )}
-          {renderOption(
-            "Display Mode",
+          }
+        />
+        <Option
+          label="Display Mode"
+          option={
             <FeaturePicker
               arrow
               label="Display Mode"
-              value={draft.displayMode ?? "source-over"}
+              value={displayMode ?? "source-over"}
               items={options(compositeOperations)}
-              onChange={(e) => setDraft?.((d) => set(d, "displayMode", e))}
+              onChange={(e) =>
+                setOptimistic((d) =>
+                  set(d, "displayMode", e as GlobalCompositeOperation)
+                )
+              }
             />
-          )}
+          }
+        />
+      </Box>
+    </Surface>
+  );
+}
+
+function Item({ layer, ...props }: { layer?: string } & ButtonBaseProps) {
+  const paper = usePaper();
+  const one = slice.layers.one<Layer>(layer);
+
+  const { icon } = one.use((l) => getController(l)) ?? {};
+  const name = one.use((l) => inferLayerName(l));
+  const error = one.use((l) => getController(l)?.error?.(l));
+  const type = one.use((l) => l?.source?.type);
+
+  return (
+    <ButtonBase
+      className={layer}
+      sx={{
+        flex: 1,
+        display: "block",
+        textAlign: "left",
+        px: 2,
+      }}
+      {...props}
+    >
+      <Stack alignItems="center" direction="row" gap={2}>
+        <Stack
+          sx={{
+            ...paper(0.5),
+            alignItems: "center",
+            justifyContent: "center",
+            width: 36,
+            height: 36,
+            color: "action.disabled",
+          }}
+        >
+          {icon}
+        </Stack>
+        <Box
+          sx={{
+            py: 1.5,
+            flex: 1,
+            width: 0,
+            ml: 0,
+            overflow: "hidden",
+            "> *": {
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            },
+          }}
+        >
+          <Type component="div">{name}</Type>
+          <Type component="div" variant="body2" color="text.secondary">
+            {startCase(type)}
+          </Type>
         </Box>
-      </Surface>
-    </>
+        {!!error && (
+          <Tooltip title={error}>
+            <Chip
+              sx={{
+                mr: -2,
+                ...omit(paper(1), "borderRadius"),
+                color: (t) => t.palette.error.main,
+                flex: 0,
+              }}
+              label={`${truncate(`${error}`, { length: 8 })}`}
+              size="small"
+            />
+          </Tooltip>
+        )}
+      </Stack>
+    </ButtonBase>
   );
 }

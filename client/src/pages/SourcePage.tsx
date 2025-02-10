@@ -10,7 +10,7 @@ import { getController } from "layers/layerControllers";
 import { find, first, map } from "lodash";
 import { useEffect, useMemo } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
-import { Layer, useLayer } from "slices/layers";
+import { Layer, useLayerPicker } from "slices/layers";
 import { useLoadingState } from "slices/loading";
 import { debounceLifo } from "utils/debounceLifo";
 import { PageContentProps } from "./PageMeta";
@@ -27,11 +27,11 @@ export function SourcePage({ template: Page }: PageContentProps) {
   useMonacoTheme(theme);
 
   const {
-    layers,
+    all: layers,
     updateLayerAsync: updateLayer,
     setKey,
     controller,
-  } = useLayer(undefined, isSourceLayer);
+  } = useLayerPicker(undefined, isSourceLayer);
 
   const sources = useMemo(
     () =>

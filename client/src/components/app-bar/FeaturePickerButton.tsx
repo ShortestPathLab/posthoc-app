@@ -1,13 +1,13 @@
 import { KeyboardArrowDownOutlined } from "@mui-symbols-material/w400";
 import { Box, Button, ButtonProps } from "@mui/material";
-import { Props } from "./FeaturePicker";
+import { FeaturePickerProps } from "./FeaturePicker";
 
 export function FeaturePickerButton({
   children,
   icon,
   arrow,
   ...props
-}: ButtonProps & Pick<Props, "icon" | "arrow">) {
+}: ButtonProps & Pick<FeaturePickerProps, "icon" | "arrow">) {
   return (
     <Button
       {...props}

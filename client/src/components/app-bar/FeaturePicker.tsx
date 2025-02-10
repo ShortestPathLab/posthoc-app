@@ -1,6 +1,7 @@
 import {
   ButtonProps,
   Stack,
+  SxProps,
   Typography as Type,
   useTheme,
 } from "@mui/material";
@@ -12,7 +13,7 @@ import { ReactElement, ReactNode, cloneElement } from "react";
 import { AccentColor, getShade, usePaper } from "theme";
 import { FeaturePickerButton } from "./FeaturePickerButton";
 
-export type Props = {
+export type FeaturePickerProps = {
   showTooltip?: boolean;
   label?: string;
   value?: string;
@@ -25,6 +26,7 @@ export type Props = {
   itemOrientation?: "vertical" | "horizontal";
   ellipsis?: number;
   paper?: boolean;
+  renderItem?: (item: FeatureDescriptor) => ReactNode;
 };
 
 export function FeaturePicker({
@@ -40,13 +42,14 @@ export function FeaturePicker({
   itemOrientation = "horizontal",
   ellipsis = Infinity,
   paper: _paper,
-}: Props) {
+  renderItem,
+}: FeaturePickerProps) {
   const paper = usePaper();
   const { palette } = useTheme();
 
   const getIcon = (icon: ReactNode, color?: AccentColor) =>
     icon &&
-    cloneElement(icon as ReactElement, {
+    cloneElement(icon as ReactElement<SxProps>, {
       sx: {
         color: color ? getShade(color, palette.mode) : "primary.main",
       },
@@ -66,9 +69,11 @@ export function FeaturePicker({
           icon={selected?.icon ? getIcon(selected.icon, selected.color) : icon}
           arrow={arrow}
         >
-          {truncate(selected?.name ?? label, {
-            length: ellipsis,
-          })}
+          {renderItem && selected
+            ? renderItem(selected)
+            : truncate(selected?.name ?? label, {
+                length: ellipsis,
+              })}
         </FeaturePickerButton>
       )}
       items={map(items, ({ id, name, description, hidden, icon, color }) => ({
@@ -80,12 +85,20 @@ export function FeaturePicker({
             }
             direction={itemOrientation === "vertical" ? "column" : "row"}
           >
-            <Type component="div">
-              {name}
-              <Space />
-            </Type>
-            <Type component="div" color="text.secondary">
-              {description}
+            <Type>
+              {renderItem ? (
+                renderItem({ id, name, description })
+              ) : (
+                <>
+                  <Type component="div">
+                    {name}
+                    <Space />
+                  </Type>
+                  <Type component="div" color="text.secondary">
+                    {description}
+                  </Type>
+                </>
+              )}
             </Type>
           </Stack>
         ),

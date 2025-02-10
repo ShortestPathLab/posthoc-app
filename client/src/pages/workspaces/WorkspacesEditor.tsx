@@ -111,7 +111,7 @@ const UploadWorkspace = () => {
   const handleUpload = async () => {
     try {
       setUploading(true);
-      const { compressedFile: file } = await generateWorkspaceFile();
+      const { file } = await generateWorkspaceFile();
       if (authState.authenticated && file) {
         await cloudService?.saveFile(file);
         if (file) {

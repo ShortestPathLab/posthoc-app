@@ -51,12 +51,13 @@ import {
   startCase,
 } from "lodash";
 import { nanoid } from "nanoid";
-import { produce, withProduce } from "produce";
+import { withProduce } from "produce";
 import { Trace as TraceLegacy } from "protocol";
 import { Trace } from "protocol/Trace-v140";
 import { useEffect, useMemo } from "react";
 import { useAsync, useThrottle } from "react-use";
-import { Layer, useLayer } from "slices/layers";
+import { slice } from "slices";
+import { Layer } from "slices/layers";
 import { UploadedTrace } from "slices/UIState";
 import { AccentColor, accentColors, getShade } from "theme";
 import { name } from "utils/path";
@@ -64,7 +65,6 @@ import { set } from "utils/set";
 import { parseYamlAsync } from "workers/async";
 import { TrustedLayerData } from "../TrustedLayerData";
 import { use2DPath } from "./use2DPath";
-import { isTraceLayer } from "./isTraceLayer";
 
 export type TraceLayerData = {
   trace?: UploadedTrace & { error?: string };
@@ -219,7 +219,7 @@ export const controller = {
       () =>
         map(parsedTrace?.stepsPersistent, (c) =>
           map(c, (d) =>
-            merge(d, {
+            merge({}, d, {
               meta: {
                 sourceLayer: layer?.key,
                 sourceLayerIndex: index,
@@ -241,7 +241,7 @@ export const controller = {
       () =>
         map(parsedTrace?.stepsTransient, (c) =>
           map(c, (d) =>
-            merge(d, {
+            merge({}, d, {
               meta: {
                 sourceLayer: layer?.key,
                 sourceLayerIndex: index,
@@ -268,9 +268,13 @@ export const controller = {
       </>
     );
   },
-  steps: (layer) => layer?.source?.parsedTrace?.content?.events ?? [],
+  steps: (layer) => ({
+    key: layer?.source?.trace?.key,
+    steps: layer?.source?.trace?.content?.events ?? [],
+  }),
   provideSelectionInfo: ({ layer: key, event, children }) => {
-    const { layer, setLayer } = useLayer(key, isTraceLayer);
+    const one = slice.layers.one<TraceLayer>(key);
+    const layer = one.use();
     const menu = useMemo(() => {
       const events = layer?.source?.parsedTrace?.content?.events ?? [];
       const steps = chain(event?.info?.components)
@@ -339,11 +343,7 @@ export const controller = {
                   primary: `Go to step ${step}`,
                   secondary: `${startCase(event.type)}`,
                   action: () =>
-                    setLayer(
-                      produce(layer, (l) => {
-                        set(l, "source.step", step);
-                      })
-                    ),
+                    one.set((l) => void set(l, "source.step", step)),
                   icon: <ArrowOutwardRounded />,
                 },
               },

@@ -19,5 +19,5 @@ export function useSurfaceAvailableCssSize() {
           isNumber(size.height) ? `${size.height}px` : size.height
         } - ${drawerTitleHeight}px)`,
       }
-    : null;
+    : { width: "100%", height: "100%" };
 }

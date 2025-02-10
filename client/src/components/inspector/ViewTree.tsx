@@ -15,7 +15,14 @@ import {
 } from "lodash";
 import { nanoid } from "nanoid";
 import { produce, transaction } from "produce";
-import { Context, ReactNode, createContext, useContext, useMemo } from "react";
+import {
+  Context,
+  ReactNode,
+  Ref,
+  createContext,
+  useContext,
+  useMemo,
+} from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useCss } from "react-use";
@@ -166,7 +173,10 @@ export function ViewLeaf<T>({
             />
           ),
           dragHandle: (
-            <Box ref={drag} sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              ref={drag as unknown as Ref<HTMLDivElement>}
+              sx={{ display: "flex", alignItems: "center" }}
+            >
               <DragIndicatorOutlined
                 fontSize="small"
                 color="disabled"
@@ -187,7 +197,7 @@ export function ViewLeaf<T>({
   return (
     <>
       <Block
-        ref={drop}
+        ref={drop as unknown as Ref<HTMLDivElement>}
         sx={{
           overflow: "hidden",
           "::before": {

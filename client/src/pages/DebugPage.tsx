@@ -18,7 +18,7 @@ import { getController } from "layers/layerControllers";
 import { find, map, set, values } from "lodash";
 import { produce } from "produce";
 import { ReactNode, useState } from "react";
-import { Layer, useLayer } from "slices/layers";
+import { Layer, useLayerPicker } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { PageContentProps } from "./PageMeta";
 
@@ -38,10 +38,14 @@ export function DebugPage({ template: Page }: PageContentProps) {
     useViewTreeContext();
 
   const [tab, setTab] = useState("standard");
-  const { key, setKey, layers, layer, setLayer, allLayers } = useLayer(
-    undefined,
-    stepsLayerGuard
-  );
+  const {
+    key,
+    setKey,
+    all: layers,
+    layer,
+    setLayer,
+    allLayers,
+  } = useLayerPicker(undefined, stepsLayerGuard);
   const { code } = layer?.source ?? {};
   function renderHeading(label: ReactNode) {
     return (

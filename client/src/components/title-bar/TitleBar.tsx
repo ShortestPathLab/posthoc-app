@@ -10,6 +10,7 @@ import {
   Chip,
   Collapse,
   Divider,
+  IconProps,
   Menu,
   MenuItem,
   MenuList,
@@ -37,8 +38,8 @@ import { cloneElement, ReactElement, ReactNode } from "react";
 import { useSyncStatus } from "services/SyncService";
 import { getDefaultViewTree, useView } from "slices/view";
 import { getShade } from "theme";
-import { ExportWorkspace } from "./ExportWorkspaceModal";
 import { useOverlayWindowControls } from "../../hooks/useOverlayWindowControls";
+import { ExportWorkspace } from "./ExportWorkspaceModal";
 import { openWindow } from "./window";
 
 const canOpenWindows = !isMobile;
@@ -57,10 +58,16 @@ function MenuEntry({
   return (
     <Stack direction="row" gap={1}>
       {!!startIcon &&
-        cloneElement(startIcon, { fontSize: "small", color: "disabled" })}
+        cloneElement(startIcon as ReactElement<IconProps>, {
+          fontSize: "small",
+          color: "disabled",
+        })}
       <span>{label}</span>
       {!!endIcon &&
-        cloneElement(endIcon, { fontSize: "small", color: "disabled" })}
+        cloneElement(endIcon as ReactElement<IconProps>, {
+          fontSize: "small",
+          color: "disabled",
+        })}
     </Stack>
   );
 }

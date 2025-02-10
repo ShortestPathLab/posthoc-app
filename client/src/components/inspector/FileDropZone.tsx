@@ -6,16 +6,14 @@ import { getControllers } from "layers/layerControllers";
 import { entries, head } from "lodash";
 import { nanoid as id } from "nanoid";
 import pluralize from "pluralize";
-import { producify } from "produce";
 import { useState } from "react";
 import { FileDrop } from "react-file-drop";
+import { slice } from "slices";
 import { formatByte, useBusyState } from "slices/busy";
-import { useLayers } from "slices/layers";
 import { useAcrylic } from "theme";
 
 export function useFileImport() {
   const { load: loadWorkspace } = useWorkspace();
-  const [, setLayers] = useLayers();
   const usingBusyState = useBusyState("file-drop-import");
   const notify = useSnackbar();
 
@@ -27,13 +25,11 @@ export function useFileImport() {
         if (outcome?.claimed) {
           await usingBusyState(async () => {
             const layer = await outcome.layer(notify);
-            setLayers(
-              producify((prev) =>
-                prev.layers.push({
-                  key: id(),
-                  source: { type, ...layer },
-                })
-              )
+            slice.layers.set((l) =>
+              l.push({
+                key: id(),
+                source: { type, ...layer },
+              })
             );
           }, `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`);
           totalClaimed++;

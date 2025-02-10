@@ -14,7 +14,7 @@ import {
   SxProps,
   Theme,
 } from "@mui/material";
-import { cloneElement, useState } from "react";
+import { cloneElement, ReactElement, useState } from "react";
 import { useAcrylic, usePaper } from "theme";
 import { Block } from "../Block";
 import { Item, Props } from "./ListEditor";
@@ -122,16 +122,24 @@ export function ListEditorField<T>({
                     px: 2,
                   }}
                 >
-                  {cloneElement(editor, {
-                    onDelete: () => onDeleteItem(id ?? i),
-                    autoFocus,
-                    value,
-                    key: id ?? i,
-                    onValueChange: (e: T) => onChangeItem(id ?? i, e, enabled),
-                    onChange: (e: { target: { value: T } }) =>
-                      onChangeItem(id ?? i, e.target.value, enabled),
-                    ref: (e: HTMLElement | null) => setField(e),
-                  })}
+                  {cloneElement(
+                    editor as ReactElement<
+                      any & {
+                        onDelete: () => void;
+                      }
+                    >,
+                    {
+                      onDelete: () => onDeleteItem(id ?? i),
+                      autoFocus,
+                      value,
+                      key: id ?? i,
+                      onValueChange: (e: T) =>
+                        onChangeItem(id ?? i, e, enabled),
+                      onChange: (e: { target: { value: T } }) =>
+                        onChangeItem(id ?? i, e.target.value, enabled),
+                      ref: (e: HTMLElement | null) => setField(e),
+                    }
+                  )}
                 </ListElement>
               ),
               extras: (

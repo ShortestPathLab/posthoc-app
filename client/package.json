@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@dagrejs/dagre": "^1.1.4",
+    "@davstack/store": "^1.4.6",
     "@devbookhq/splitter": "^1.4.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -16,6 +17,9 @@
     "@mui/material": "^6.4.2",
     "@react-sigma/core": "^5.0.2",
     "@sigma/edge-curve": "^3.1.0",
+    "@tanstack/react-query": "^5.66.0",
+    "@tanstack/react-query-devtools": "^5.66.0",
+    "@types/object-hash": "^3.0.6",
     "capture-console-logs": "^2.0.1-rc.1",
     "caught-object-report-json": "^8.0.0",
     "clipboard-copy": "^4.0.1",
@@ -42,6 +46,7 @@
     "monaco-editor": "^0.52.2",
     "nanoid": "^5.0.9",
     "nearest-pantone": "^1.0.1",
+    "object-hash": "^3.0.0",
     "object-sizeof": "^2.6.5",
     "overlayscrollbars": "^2.10.1",
     "overlayscrollbars-react": "^0.5.6",
@@ -69,11 +74,13 @@
     "typed-emitter": "^2.1.0",
     "typescript": "^5.7.3",
     "unique-username-generator": "^1.4.0",
-    "url-parse": "^1.5.10"
+    "url-parse": "^1.5.10",
+    "use-broadcast-ts": "^2.0.0",
+    "zustand": "^5.0.3"
   },
   "scripts": {
     "start": "bunx --bun vite --host",
-    "build": "bunx --bun vite build --emptyOutDir",
+    "build": "bunx --bun vite@5 build --emptyOutDir",
     "package": "sh ./package.sh",
     "test": "vitest"
   },

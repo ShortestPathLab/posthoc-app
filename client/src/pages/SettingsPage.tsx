@@ -12,13 +12,13 @@ import {
   Typography,
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Button } from "components/generic/inputs/Button";
 import { Block } from "components/generic/Block";
+import { Button } from "components/generic/inputs/Button";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { Surface } from "components/generic/surface";
 import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
 import { Space } from "components/generic/Space";
+import { Surface } from "components/generic/surface";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { shades } from "components/renderer/colors";
 import { mapParsers } from "components/renderer/map-parser";
@@ -27,13 +27,13 @@ import { ServerListEditor } from "components/settings-editor/ServerListEditor";
 import { useSm } from "hooks/useSmallDisplay";
 import { debounce, keys, map, startCase } from "lodash";
 import { ReactNode, useMemo, useState } from "react";
+import { slice } from "slices";
 import { useBusyState } from "slices/busy";
 import {
   defaultPlaybackRate as baseRate,
   defaults,
   useSettings,
 } from "slices/settings";
-import { useUIState } from "slices/UIState";
 import { AccentColor, getShade } from "theme";
 import { wait } from "utils/timed";
 import { AboutContent } from "./AboutPage";
@@ -44,7 +44,6 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
   const sm = useSm();
-  const [, setUIState] = useUIState();
   const push = useSnackbar();
   const usingBusyState = useBusyState("reset");
   const [
@@ -238,10 +237,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                                     await wait(300);
                                     setSettings(() => defaults);
                                     close();
-                                    setUIState(() => ({
-                                      sidebarOpen: false,
-                                      fullscreenModal: undefined,
-                                    }));
+                                    slice.ui.sidebarOpen.set(false);
+                                    slice.ui.fullscreenModal.set(undefined);
                                     push("Reset complete");
                                   }, "Resetting settings and extensions");
                                 }}
@@ -355,8 +352,8 @@ export function TrustedOriginListEditor() {
         value={b}
         onChange={debounce(
           (v) =>
-            setSettings(() => ({
-              trustedOrigins: map(v, "key"),
+            setSettings((prev) => ({
+              trustedOrigins: map(v(prev), "key"),
             })),
           300
         )}

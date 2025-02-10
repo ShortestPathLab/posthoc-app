@@ -30,6 +30,7 @@ import { usePaper } from "theme";
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 export type PlaybackLayerData = {
+  key?: string;
   step?: number;
   playback?: "playing" | "paused";
   playbackTo?: number;
@@ -77,7 +78,7 @@ export function PlaybackService({
 }
 
 const centered = { horizontal: "center", vertical: "center" } as const;
-export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
+export function Playback({ layer }: { layer?: string }) {
   const paper = usePaper();
   const {
     playing,
@@ -93,7 +94,7 @@ export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
     findBreakpoint,
     step,
     stepTo,
-  } = usePlaybackState(layer?.key);
+  } = usePlaybackState(layer);
   const [stepInput, setStepInput] = useState("");
   const parsedStepInput = parseInt(stepInput);
   const parsedStepInputValid = !isNaN(parsedStepInput);
@@ -207,18 +208,14 @@ export function Playback({ layer }: { layer?: Layer<PlaybackLayerData> }) {
     </>
   );
 }
-export function MinimisedPlaybackControls({
-  layer,
-}: {
-  layer?: Layer<PlaybackLayerData>;
-}) {
+export function MinimisedPlaybackControls({ layer: key }: { layer?: string }) {
   return (
     <PopupState variant="popover">
       {(state) => (
         <>
           <Collapse in={state.isOpen} orientation="horizontal">
             <Stack direction="row" sx={{ minWidth: "max-content" }}>
-              <Playback layer={layer} />
+              <Playback layer={key} />
               {divider}
             </Stack>
           </Collapse>

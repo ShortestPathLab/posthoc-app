@@ -1,13 +1,22 @@
-import { useTheme } from "@mui/material";
 import interpolate from "color-interpolate";
 import { times } from "lodash";
-import memoizee from "memoizee";
+import memo from "memoizee";
 import { name } from "public/manifest.json";
 import { useEffect, useState } from "react";
-import { useUIState } from "slices/UIState";
+import { slice } from "slices";
 import { getForegroundColor } from "./getForegroundColor";
 
-const stackColors = memoizee(
+interface Electron {
+  invoke(name: "title-bar", bg: string, fg: string): void;
+}
+
+declare global {
+  interface Window {
+    electron?: Electron;
+  }
+}
+
+const stackColors = memo(
   (base, layer, count = 0) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
@@ -23,22 +32,20 @@ const stackColors = memoizee(
       ctx.fill();
     }
 
-    const d = ctx.getImageData(0, 0, 1, 1).data;
+    const {
+      data: [r, g, b],
+    } = ctx.getImageData(0, 0, 1, 1);
 
-    return `rgb(${d[0]},${d[1]},${d[2]})`; // 139,124,37
+    return `rgb(${r},${g},${b})`; // 139,124,37
   },
   { normalizer: JSON.stringify }
 );
 
 export function useTitleBar(color: string) {
-  const { palette } = useTheme();
-  const [{ depth }] = useUIState();
-  const [target, setTarget] = useState(color);
+  "use no memo";
+  const depth = slice.ui.depth.use();
   const [current, setCurrent] = useState(color);
-  useEffect(() => {
-    const mixedColor = stackColors(color, "rgba(0,0,0,0.5)", depth);
-    setTarget(mixedColor);
-  }, [color, depth, palette]);
+  const target = stackColors(color, "rgba(0,0,0,0.5)", depth);
   useEffect(() => {
     if (current !== target) {
       const mixed = interpolate([current, target])(0.5);
@@ -47,8 +54,8 @@ export function useTitleBar(color: string) {
           .querySelector('meta[name="theme-color"]')!
           .setAttribute("content", mixed);
         document.title = name;
-        if ("electron" in window) {
-          (window.electron as any).invoke(
+        if (window.electron) {
+          window.electron.invoke(
             "title-bar",
             "#00000000",
             getForegroundColor(mixed)

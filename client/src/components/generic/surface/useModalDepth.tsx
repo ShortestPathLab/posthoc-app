@@ -1,22 +1,18 @@
 import { useEffect, useState } from "react";
-import { useUIState } from "slices/UIState";
+import { slice } from "slices";
 
 export function useModalDepth(open: boolean) {
-  const [{ depth: maxDepth }, setUIState] = useUIState();
+  "use no memo";
+  const maxDepth = slice.ui.depth.use();
   const [depth, setDepth] = useState(0);
   useEffect(() => {
     if (!open) return;
-    let depth = 0;
-    setUIState((prev) => {
-      //TODO: Fix side effect
-      depth = prev.depth!;
-      return { depth: prev.depth! + 1 };
-    });
-    setDepth(depth + 1);
+    slice.ui.depth.set((d = 0) => d + 1);
+    setDepth(slice.ui.depth.get() ?? 0);
     return () => {
-      setUIState((prev) => ({ depth: prev.depth! - 1 }));
+      slice.ui.depth.set((d = 0) => d - 1);
     };
-  }, [setUIState, setDepth, open]);
+  }, [setDepth, open]);
 
   return { depth, maxDepth };
 }

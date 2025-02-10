@@ -3,13 +3,14 @@ import download from "downloadjs";
 import { fileDialog as file } from "file-select-dialog";
 import { setLayerSource } from "layers/TrustedLayerData";
 import { getController } from "layers/layerControllers";
-import { find, pick } from "lodash";
+import { find, map } from "lodash";
 import memo from "memoizee";
 import sizeOf from "object-sizeof";
 import { useMemo } from "react";
-import { UIState, useUIState } from "slices/UIState";
+import { slice } from "slices";
+import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { formatByte, useBusyState } from "slices/busy";
-import { Layers, useLayers } from "slices/layers";
+import { Layer, layers } from "slices/layers";
 import { generateUsername as id } from "unique-username-generator";
 import {
   compressBinaryAsync as compress,
@@ -26,17 +27,17 @@ function byteLength(s: string) {
 }
 
 type Workspace = {
-  UIState: UIState;
-  layers: Layers;
+  UIState: {
+    workspaceMeta: WorkspaceMeta;
+  };
+  layers: { layers: Layer[] };
 };
 
-const compressUIState = (state: UIState) => pick(state, "workspaceMeta");
-
-function minimise(ui: UIState, layers: Layers) {
+function minimise(meta: WorkspaceMeta, layers: Layer[]): Workspace {
   return {
-    UIState: compressUIState(ui),
+    UIState: { workspaceMeta: meta },
     layers: {
-      layers: layers?.layers?.map((l) => {
+      layers: map(layers, (l) => {
         const handler = getController(l);
         return {
           ...l,
@@ -55,8 +56,6 @@ export const ORIGIN_UNKNOWN = "unknown";
 
 export function useWorkspace() {
   const notify = useSnackbar();
-  const [layersStore, setLayers] = useLayers();
-  const [UIStateStore, setUIState] = useUIState();
   const usingBusyState = useBusyState("workspace");
   return useMemo(() => {
     const pickFile = async (origin?: string) => {
@@ -69,71 +68,78 @@ export function useWorkspace() {
         origin,
       };
     };
+    const generateFile = async (raw?: boolean, name?: string) => {
+      notify("Saving workspace...");
+      const content = JSON.stringify(
+        minimise(workspaceMeta.get(), slice.layers.get())
+      );
+      const filename = name ?? id("-");
+      if (raw) {
+        const name = `${filename}.workspace.json`;
+        download(content, name, "application/json");
+        notify("Workspace saved", name);
+        return {
+          name,
+          content,
+          size: byteLength(content),
+          type: "application/json",
+        };
+      } else {
+        const name = `${filename}.workspace`;
+        const compressed = await compress(content);
+        download(compressed, name, "application/octet-stream");
+        notify("Workspace saved", name);
+        return {
+          name,
+          content,
+          size: compressed.byteLength,
+          type: "application/octet-stream",
+        };
+      }
+    };
     return {
       load: async (selectedFile?: File, origin2?: string) => {
         const { origin, f } = selectedFile
           ? { f: selectedFile, origin: origin2 }
           : await pickFile(origin2);
 
-        if (f) {
-          if (isWorkspaceFile(f)) {
-            await usingBusyState(async () => {
-              const content = isCompressedFile(f)
-                ? await decompress(new Uint8Array(await f.arrayBuffer()))
-                : await f.text();
-              const parsed = (await parseYamlAsync(content)) as
-                | Workspace
-                | undefined;
-              if (parsed) {
-                setLayers(() => {
-                  for (const l of parsed.layers?.layers ?? []) {
-                    setLayerSource(l, origin);
-                  }
-                  return parsed.layers;
-                });
-                setUIState(() => parsed.UIState);
-                setUIState(() => ({ isTrusted: false }));
-              }
-            }, `Opening workspace (${formatByte(f.size)})`);
-            return true;
-          }
+        if (f && isWorkspaceFile(f)) {
+          await usingBusyState(async () => {
+            const content = isCompressedFile(f)
+              ? await decompress(new Uint8Array(await f.arrayBuffer()))
+              : await f.text();
+            const parsed = (await parseYamlAsync(content)) as
+              | Workspace
+              | undefined;
+            if (!parsed) return;
+            for (const l of parsed.layers?.layers ?? [])
+              setLayerSource(l, origin);
+            slice.layers.set(() => parsed.layers.layers);
+            workspaceMeta.set(parsed.UIState?.workspaceMeta ?? {});
+            slice.ui.isTrusted.set(false);
+          }, `Opening workspace (${formatByte(f.size)})`);
+          return true;
         }
         return false;
       },
       save: async (raw?: boolean, name?: string) => {
-        notify("Saving workspace...");
-        const content = JSON.stringify(minimise(UIStateStore, layersStore));
-        const filename = name ?? id("-");
-        if (raw) {
-          const name = `${filename}.workspace.json`;
-          download(content, name, "application/json");
-          notify("Workspace saved", name);
-          return { name, size: byteLength(content) };
-        } else {
-          const name = `${filename}.workspace`;
-          const compressed = await compress(content);
-          download(compressed, name, "application/octet-stream");
-          notify("Workspace saved", name);
-          return { name, size: compressed.byteLength };
-        }
+        const { content, size, type } = await generateFile(raw, name);
+        download(content, name, type);
+        return { name, size };
       },
-      generateWorkspaceFile: async (name?: string) => {
-        const content = JSON.stringify(minimise(UIStateStore, layersStore));
-        const filename = `${name ?? id("-")}.workspace`;
-        const fileType = "application/octet-stream";
-        const compressed = await compress(content);
-        const blob = new Blob([compressed], {
-          type: fileType,
-        });
-        const file = new File([blob], filename, { type: fileType });
-        return { filename, compressedFile: file, size: compressed.byteLength };
+      generateWorkspaceFile: async (suggestedName?: string) => {
+        const { content, name, type } = await generateFile(
+          false,
+          suggestedName
+        );
+        return { file: new File([new Blob([content])], name, { type }) };
       },
       estimateWorkspaceSize: memo((raw?: boolean) => {
-        const size = sizeOf(minimise(UIStateStore, layersStore));
+        const size = sizeOf(minimise(workspaceMeta.get(), slice.layers.get()));
         return size * (raw ? 1 : LZ_COMPRESSION_RATIO);
       }),
     };
-  }, [layersStore, UIStateStore]);
+  }, [layers]);
 }
 
 function isCompressedFile(f: File) {

@@ -7,16 +7,16 @@ import {
   SwipeableDrawer,
   useTheme,
 } from "@mui/material";
+import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
 import { merge, noop } from "lodash";
 import { bindDialog, PopupState as State } from "material-ui-popup-state/hooks";
 import { createContext, ReactNode } from "react";
+import { useMeasure } from "react-use";
 import { Scroll } from "../Scrollbars";
 import { SlotProps } from "./SlotProps";
 import { stopPropagation } from "./stopPropagation";
 import { useDrawerHandle } from "./useDrawerHandle";
 import { useModalDepth } from "./useModalDepth";
-import { useMeasure } from "react-use";
-import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
 
 function Handle(props: StackProps) {
   return (
@@ -64,7 +64,7 @@ export function DrawerSurface({
   slotProps?: Pick<SlotProps, "drawer" | "paper" | "scroll">;
 }) {
   const { rect, visible } = useOverlayWindowControls();
-  const { depth, maxDepth = 1 } = useModalDepth(state.isOpen);
+  const { depth, maxDepth } = useModalDepth(state.isOpen);
 
   // ─── Measurements ────────────────────────────────────────────────────
 

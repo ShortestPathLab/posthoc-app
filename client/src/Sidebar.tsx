@@ -16,9 +16,9 @@ import { nanoid } from "nanoid";
 import { pages } from "pages";
 import { SidebarPage } from "pages/SidebarPage";
 import { produce } from "produce";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useSyncStatus } from "services/SyncService";
-import { useUIState } from "slices/UIState";
+import { slice } from "slices";
 import { PanelState, Root } from "slices/view";
 
 const defaultRoot: Root<PanelState | undefined> = {
@@ -40,11 +40,8 @@ const SIDEBAR = 0;
 const CONTENT = 1;
 
 export function useSidebarState() {
-  const [{ sidebarOpen: open }, setUIState] = useUIState();
-  const setOpen = useCallback(
-    (e: boolean) => setUIState(() => ({ sidebarOpen: e })),
-    [setUIState]
-  );
+  "use no memo";
+  const open = slice.ui.sidebarOpen.use();
   const [root, setRoot] = useState(defaultRoot);
   const produceRoot = (f: (obj: Root<PanelState | undefined>) => void) =>
     setRoot(produce(root, f));
@@ -72,7 +69,7 @@ export function useSidebarState() {
     tab,
     root: derivedRoot,
     open,
-    setOpen,
+    setOpen: (v: boolean) => slice.ui.sidebarOpen.set(v),
     produceRoot,
     setRoot,
   };
@@ -106,7 +103,6 @@ export function Sidebar({ children }: { children?: ReactNode }) {
     }
   }, [sm2, setOpen]);
   const sm = !isPrimary || sm2;
-  const [, setUIState] = useUIState();
   return (
     <TabContext value={(tab || false) as unknown as string}>
       <Stack direction={sm ? "column-reverse" : "row"} sx={{ width: "100%" }}>
@@ -134,13 +130,13 @@ export function Sidebar({ children }: { children?: ReactNode }) {
           <TabList
             TabIndicatorProps={{ sx: { left: 0, right: "auto" } }}
             onChange={(_, t) => {
-              if (!sm) {
+              if (sm) {
+                slice.ui.fullscreenModal.set(t);
+              } else {
                 produceRoot(
                   (r) => void set(r, `children[${SIDEBAR}].content.type`, t)
                 );
                 setOpen(true);
-              } else {
-                setUIState(() => ({ fullscreenModal: t }));
               }
             }}
             orientation={sm ? "horizontal" : "vertical"}

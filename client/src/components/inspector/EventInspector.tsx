@@ -172,18 +172,15 @@ function EventInspectorContents({
 export function Skeleton({ event }: EventInspectorProps) {
   const { spacing } = useTheme();
   return (
-    <>
-      <ListItem
-        sx={{
-          height: 80,
-          borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
-        }}
-      >
-        <ListItemIcon>
-          <Placeholder animation={false} width={spacing(4)} />
-        </ListItemIcon>
-      </ListItem>
-      <Divider variant="inset" />
-    </>
+    <ListItem
+      sx={{
+        height: 80,
+        borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
+      }}
+    >
+      <ListItemIcon>
+        <Placeholder animation={false} width={spacing(4)} />
+      </ListItemIcon>
+    </ListItem>
   );
 }

@@ -1,8 +1,9 @@
 import { PlaybackLayerData } from "components/app-bar/Playback";
 import { useSnackbar } from "components/generic/Snackbar";
 import { clamp, min, range, set, trimEnd } from "lodash";
-import { useEffect, useMemo } from "react";
-import { useLayer } from "slices/layers";
+import { useMemo } from "react";
+import { slice } from "slices";
+import { Layer } from "slices/layers";
 import { useBreakpoints } from "./useBreakpoints";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
@@ -17,15 +18,12 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
 }
 
 export function usePlaybackState(key?: string) {
-  const { layer, updateLayer, setKey } = useLayer<PlaybackLayerData>(key);
+  const one = slice.layers.one<Layer<PlaybackLayerData>>(key);
+  const source = one.use((l) => l?.source);
   const notify = useSnackbar();
   const shouldBreak = useBreakpoints(key);
 
-  useEffect(() => {
-    if (key) setKey(key);
-  }, [key]);
-
-  const { playback, playbackTo, step: _step = 0 } = layer?.source ?? {};
+  const { playback, playbackTo, step: _step = 0 } = source ?? {};
 
   const step = min([playbackTo, _step]) ?? 0;
 
@@ -37,9 +35,7 @@ export function usePlaybackState(key?: string) {
     const setPlaybackState = (
       s: (a: Partial<PlaybackLayerData>) => Partial<PlaybackLayerData>
     ) => {
-      updateLayer((l) =>
-        set(l, "source", { ...l.source, ...s(l.source ?? {}) })
-      );
+      one.set((l) => set(l, "source", { ...l.source, ...s(l.source ?? {}) }));
     };
     const state = {
       start,
@@ -123,15 +119,5 @@ export function usePlaybackState(key?: string) {
       ...state,
       ...callbacks,
     };
-  }, [
-    end,
-    playback,
-    playbackTo,
-    playing,
-    ready,
-    start,
-    step,
-    updateLayer,
-    shouldBreak,
-  ]);
+  }, [end, playback, playbackTo, playing, ready, start, step, shouldBreak]);
 }

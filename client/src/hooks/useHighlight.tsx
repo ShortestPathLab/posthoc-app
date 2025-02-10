@@ -8,13 +8,14 @@ import {
   forEach,
   forOwn,
   isUndefined,
+  keys,
   noop,
-  set,
 } from "lodash";
-import { produce } from "produce";
 import { useCallback } from "react";
-import { Layer, useLayer } from "slices/layers";
+import { slice } from "slices";
+import { Layer } from "slices/layers";
 import { AccentColor } from "theme";
+import { set } from "utils/set";
 export const highlightNodesOptions = [
   {
     type: "backtracking",
@@ -41,9 +42,9 @@ export const highlightNodesOptions = [
 
 export type HighlightLayerData = {
   highlighting?: {
-    step: number;
-    type: string;
-    path: number[] | Subtree;
+    step?: number;
+    type?: string;
+    path?: number[] | Subtree;
   };
 };
 
@@ -61,30 +62,23 @@ export const isHighlightLayer = (
 export function useHighlightNodes(key?: string): {
   [K in (typeof highlightNodesOptions)[number]["type"]]: (step: number) => void;
 } {
-  const { layer, setLayer } = useLayer(key, isHighlightLayer);
+  const { set: setLayer, use: useLayer } =
+    slice.layers.one<Layer<HighlightLayerData & TraceLayerData>>(key);
+  const layer = useLayer();
   const trace = layer?.source?.trace?.content;
 
   const showBacktracking = useCallback(
     (step: number) => {
-      if (trace) {
-        const { getPath } = makePathIndex(trace);
-        const path: number[] = getPath(step);
-        if (path.length > 1) {
-          setLayer(
-            produce(layer, (l) =>
-              set(l?.source ?? {}, "highlighting", {
-                type: "backtracking",
-                step,
-                path,
-              })
-            )!
-          );
-        } else {
-          setLayer(
-            produce(layer, (l) => set(l?.source ?? {}, "highlighting", {}))!
-          );
-        }
-      }
+      if (!trace) return;
+      const { getPath } = makePathIndex(trace);
+      const path: number[] = getPath(step);
+      setLayer((l) =>
+        set(
+          l,
+          "source.highlighting",
+          path.length > 1 ? { type: "backtracking", step, path } : {}
+        )
+      );
     },
     [layer?.source?.highlighting, trace]
   );
@@ -139,21 +133,19 @@ export function useHighlightNodes(key?: string): {
         const path = {
           [current.step]: getPrecedentEvents(current, new Set<number>()),
         };
-        if (Object.keys(path[current.step]).length > 0) {
-          setLayer(
-            produce(layer, (l) =>
-              set(l?.source ?? {}, "highlighting", {
-                type: "precedent",
-                step,
-                path,
-              })
-            )!
-          );
-        } else {
-          setLayer(
-            produce(layer, (l) => set(l?.source ?? {}, "highlighting", {}))!
-          );
-        }
+        setLayer((l) =>
+          set(
+            l,
+            "source.highlighting",
+            keys(path[current.step]).length > 0
+              ? {
+                  type: "precedent",
+                  step,
+                  path,
+                }
+              : {}
+          )
+        );
       }
     },
     [layer?.source?.highlighting, trace]
@@ -199,21 +191,13 @@ export function useHighlightNodes(key?: string): {
       const path = {
         [current.step]: getAllSubtreeNodes(current, new Set<number>()),
       };
-      if (Object.keys(path[current.step]).length > 0) {
-        setLayer(
-          produce(layer, (l) =>
-            set(l?.source ?? {}, "highlighting", {
-              type: "subtree",
-              step,
-              path,
-            })
-          )!
-        );
-      } else {
-        setLayer(
-          produce(layer, (l) => set(l?.source ?? {}, "highlighting", {}))!
-        );
-      }
+      setLayer((l) =>
+        set(l, "source.highlighting", {
+          type: "subtree",
+          step,
+          path: keys(path[current.step]).length > 0 ? path : undefined,
+        })
+      );
     },
     [layer?.source?.highlighting, trace]
   );

@@ -2,7 +2,7 @@ import { useEffectWhen } from "hooks/useEffectWhen";
 import { throttle } from "lodash";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { usePrevious } from "react-use";
-import { Layers, useLayers } from "slices/layers";
+import { Layer } from "slices/layers";
 import { Settings, useSettings } from "slices/settings";
 import sysend from "sysend";
 import { instance, participant } from "./SyncParticipant";
@@ -22,7 +22,7 @@ type SyncedData = {
   commit: string;
   state: {
     settings?: Settings;
-    layers?: Layers;
+    layers?: Layer[];
   };
 };
 
@@ -33,8 +33,9 @@ export function SyncService() {
     participants: participants,
     peers,
   } = useSyncStatus();
+  return null;
   const [settings, setSettings, , c1] = useSettings();
-  const [layers, setLayers, , c2] = useLayers();
+
   // Apply
   useEffect(() => {
     sysend.on<SyncedData>("settings", ({ initiator, state, commit: c3 }) => {

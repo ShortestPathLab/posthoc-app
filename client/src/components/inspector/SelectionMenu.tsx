@@ -8,13 +8,13 @@ import {
   MenuList,
   Typography,
 } from "@mui/material";
+import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
+import { useCache } from "hooks/useCache";
 import { SelectionInfoProvider } from "layers/LayerController";
 import { getController } from "layers/layerControllers";
-import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
-import { chain, Dictionary, entries, merge } from "lodash";
-import { useCache } from "hooks/useCache";
+import { chain, Dictionary, entries, map, merge } from "lodash";
 import { ComponentProps, ReactNode, useMemo } from "react";
-import { useLayers } from "slices/layers";
+import { slice } from "slices";
 
 type Props = {
   selection?: RendererSelectEvent;
@@ -158,12 +158,18 @@ const identity = ({ children }: SelectionInfoProviderProps) => (
 );
 
 function useSelectionMenu() {
-  const [{ layers: layers }] = useLayers();
+  "use no memo";
+  const layers = slice.layers.use((s) =>
+    map(s, (l) => ({
+      key: l.key,
+      type: l.source?.type,
+    }))
+  );
   return useMemo(
     () =>
       chain(layers)
         .reduce((A, l) => {
-          const B = getController(l)?.provideSelectionInfo ?? identity;
+          const B = getController(l.type)?.provideSelectionInfo ?? identity;
           // eslint-disable-next-line react/display-name
           return ({ children, event }: SelectionInfoProviderProps) => (
             <B layer={l.key} event={event}>

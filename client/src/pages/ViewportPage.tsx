@@ -30,7 +30,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
-import { useLayers } from "slices/layers";
+import { slice } from "slices";
 import { Renderer, useRenderers } from "slices/renderers";
 import { PanelState } from "slices/view";
 import { useAcrylic, usePaper } from "theme";
@@ -57,12 +57,13 @@ export function autoSelectRenderer(
 }
 
 export function ViewportPage({ template: Page }: PageContentProps) {
+  "use no memo";
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();
   const paper = usePaper();
   const acrylic = useAcrylic();
-  const [{ layers }] = useLayers();
+  const layers = slice.layers.use();
   const [layerSet, setLayerSet] = useState<Dictionary<boolean | undefined>>({});
   const selectedLayers = useMemo(
     () => filter(layers, (l) => layerSet?.[l.key] ?? true),

@@ -16,7 +16,10 @@ export function RendererListEditor() {
         editor={(v) => <RendererEditor value={v} />}
         icon={null}
         value={renderer}
-        onChange={debounce((v) => setSettings(() => ({ renderer: v })), 300)}
+        onChange={debounce(
+          (v) => setSettings((prev) => ({ renderer: v(prev) })),
+          300
+        )}
         addItemLabel="Add renderer"
         create={() => ({
           transport: defaultTransport,

@@ -1,7 +1,6 @@
 import {
   AccountTreeOutlined,
   DataObjectOutlined,
-  LayersOutlined as LayersIcon,
   ModeStandbyOutlined,
   TimelineOutlined,
 } from "@mui-symbols-material/w400";
@@ -43,17 +42,19 @@ import {
 import { usePlaybackState } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
+import { LayerPicker } from "components/generic/LayerPicker";
 import { TraceLayerData } from "layers/trace";
-import { entries, find, findLast, isEmpty, map, set, startCase } from "lodash";
-import { produce } from "produce";
+import { entries, findLast, isEmpty, map, startCase } from "lodash";
 import { Size } from "protocol";
 import { ComponentProps, useMemo, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { EdgeArrowProgram } from "sigma/rendering";
-import { Layer, useLayer } from "slices/layers";
+import { slice } from "slices";
+import { Layer, useLayerPicker, WithLayer } from "slices/layers";
 import { PanelState } from "slices/view";
 import { getShade } from "theme";
+import { set } from "utils/set";
 import { PageContentProps } from "../PageMeta";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
@@ -78,24 +79,31 @@ const layoutModes = {
   },
 };
 
-const stepsLayerGuard = (
-  l: Layer
-): l is Layer<PlaybackLayerData & TraceLayerData & HighlightLayerData> =>
-  !!getController(l).steps;
+export type TreeLayer = Layer<
+  PlaybackLayerData & TraceLayerData & HighlightLayerData
+>;
+
+const isTreeLayer = (l: Layer<unknown>): l is TreeLayer =>
+  !!getController(l)?.steps;
 
 export function TreePage({ template: Page }: PageContentProps) {
+  "use no memo";
+
   const theme = useTheme();
 
   // ─── Layer Data ──────────────────────────────────────────────────────
 
-  const { key, setKey, setLayer, layer, layers, allLayers } = useLayer(
-    undefined,
-    stepsLayerGuard
+  const { key, setKey } = useLayerPicker(isTreeLayer);
+  const one = slice.layers.one<TreeLayer>(key);
+  const trace = one.use(
+    (l) => l?.source?.trace,
+    (p, n) => p?.key === n?.key
   );
+  const step1 = one.use((l) => l?.source?.step);
 
-  const trace = layer?.source?.trace?.content;
+  // ─── Playback ────────────────────────────────────────────────────────
 
-  const step = useThrottle(layer?.source?.step ?? 0, 1000 / 24);
+  const step = useThrottle(step1 ?? 0, 1000 / 24);
   const { stepTo } = usePlaybackState(key);
 
   // ─── Panel Data ──────────────────────────────────────────────────────
@@ -106,14 +114,15 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   // ─── Options ─────────────────────────────────────────────────────────
 
-  const [trackedProperty, setTrackedProperty, properties] =
-    useTrackedProperty(trace);
+  const [trackedProperty, setTrackedProperty, properties] = useTrackedProperty(
+    trace?.content
+  );
 
   // const [axisTracking, setAxisTracking] = useState<typeof properties | "">("");
 
   const { point, selected, selection, setSelection } = useSelection(
     step,
-    trace
+    trace?.content
   );
 
   const [mode, setMode] = useState<"tree" | "directed-graph">("tree");
@@ -124,7 +133,10 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const showHighlight = useHighlightNodes(key);
 
-  const { result: tree, loading } = useTreeMemo({ trace, mode }, [key, mode]);
+  const { result: tree, loading } = useTreeMemo(
+    { trace: trace?.content, mode },
+    [key, mode]
+  );
 
   const graphSettings = useMemo(
     () =>
@@ -177,17 +189,15 @@ export function TreePage({ template: Page }: PageContentProps) {
                             height={size.height}
                             step={step}
                             tree={tree}
-                            trace={trace}
-                            layer={layer}
+                            trace={trace?.content}
+                            layer={key}
                             showAllEdges={layoutModes[mode].showAllEdges}
                             trackedProperty={trackedProperty}
-                            highlightEdges={layer.source?.highlighting}
                             onExit={() => {
+                              const layer = one.get();
                               if (!isEmpty(layer?.source?.highlighting)) {
-                                setLayer(
-                                  produce(layer, (l) =>
-                                    set(l?.source ?? {}, "highlighting", {})
-                                  )!
+                                one.set((l) =>
+                                  set(l, "source.highlighting", {})
                                 );
                               }
                             }}
@@ -332,31 +342,35 @@ export function TreePage({ template: Page }: PageContentProps) {
                                   title={highlight.description}
                                   placement="left"
                                 >
-                                  <MenuItem
-                                    selected={
-                                      layer.source?.highlighting?.type ===
-                                        highlight.type &&
-                                      layer.source?.highlighting?.step ===
-                                        selected?.current?.step
-                                    }
-                                    sx={{
-                                      height: 32,
-                                      flex: 1,
-                                      borderLeft: `4px solid ${highlightColor}`,
-                                    }}
-                                    onClick={() => {
-                                      showHighlight[highlight.type](
-                                        selected!.current!.step!
-                                      );
-                                      setMenuOpen(false);
-                                    }}
-                                  >
-                                    <Box sx={{ ml: -0.5, pr: 4 }}>
-                                      <Label
-                                        primary={startCase(highlight.type)}
-                                      />
-                                    </Box>
-                                  </MenuItem>
+                                  <WithLayer<TreeLayer> layer={key}>
+                                    {(l) => (
+                                      <MenuItem
+                                        selected={
+                                          l.source?.highlighting?.type ===
+                                            highlight.type &&
+                                          l.source?.highlighting?.step ===
+                                            selected?.current?.step
+                                        }
+                                        sx={{
+                                          height: 32,
+                                          flex: 1,
+                                          borderLeft: `4px solid ${highlightColor}`,
+                                        }}
+                                        onClick={() => {
+                                          showHighlight[highlight.type](
+                                            selected!.current!.step!
+                                          );
+                                          setMenuOpen(false);
+                                        }}
+                                      >
+                                        <Box sx={{ ml: -0.5, pr: 4 }}>
+                                          <Label
+                                            primary={startCase(highlight.type)}
+                                          />
+                                        </Box>
+                                      </MenuItem>
+                                    )}
+                                  </WithLayer>
                                 </Tooltip>
                               </Stack>
                             );
@@ -367,11 +381,15 @@ export function TreePage({ template: Page }: PageContentProps) {
                   </Menu>
                 </>
               ) : (
-                <Placeholder
-                  icon={<AccountTreeOutlined />}
-                  label="Graph"
-                  secondary={`${inferLayerName(layer)} is not a graph.`}
-                />
+                <WithLayer<TreeLayer> layer={key}>
+                  {(l) => (
+                    <Placeholder
+                      icon={<AccountTreeOutlined />}
+                      label="Graph"
+                      secondary={`${inferLayerName(l)} is not a graph.`}
+                    />
+                  )}
+                </WithLayer>
               )
             ) : (
               <Block
@@ -402,65 +420,58 @@ export function TreePage({ template: Page }: PageContentProps) {
         </Block>
       </Page.Content>
       <Page.Options>
-        {map(
-          [
-            {
-              icon: <LayersIcon />,
-              label: "Layer",
-              value: key,
-              items: map(allLayers, (l) => ({
-                id: l.key,
-                hidden: !find(layers, { key: l.key }),
-                name: inferLayerName(l),
-              })),
-              onChange: setKey,
-            },
-            {
-              icon: <ModeStandbyOutlined />,
-              label: "Layout",
-              value: mode,
-              onChange: setMode,
-              items: map(entries(layoutModes), ([k, v]) => ({
-                id: k,
-                ...v,
-              })),
-            },
-            {
-              icon: <TimelineOutlined />,
-              label: "Tracked Property",
-              value: trackedProperty,
-              onChange: setTrackedProperty,
-              items: [
-                { id: "", name: "Off" },
-                ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
-              ],
-            },
-            // {
-            //   icon: <LineAxisOutlined />,
-            //   label: "Axis Tracking",
-            //   value: axisTracking,
-            //   onChange: setAxisTracking,
-            //   items: [
-            //     { id: "", name: "Off" },
-            //     ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
-            //   ],
-            // },
-          ],
-          ({ icon, label, value, items, onChange }, i) => (
-            <>
-              {!!i && divider}
-              <FeaturePicker
-                icon={icon}
-                label={label}
-                value={value}
-                items={items}
-                /// @ts-expect-error poor type inference
-                onChange={onChange}
-                arrow
-              />
-            </>
-          )
-        )}
+        <>
+          <LayerPicker onChange={setKey} value={key} guard={isTreeLayer} />
+          {divider}
+          {map(
+            [
+              {
+                icon: <ModeStandbyOutlined />,
+                label: "Layout",
+                value: mode,
+                onChange: setMode,
+                items: map(entries(layoutModes), ([k, v]) => ({
+                  id: k,
+                  ...v,
+                })),
+              },
+              {
+                icon: <TimelineOutlined />,
+                label: "Tracked Property",
+                value: trackedProperty,
+                onChange: setTrackedProperty,
+                items: [
+                  { id: "", name: "Off" },
+                  ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
+                ],
+              },
+              // {
+              //   icon: <LineAxisOutlined />,
+              //   label: "Axis Tracking",
+              //   value: axisTracking,
+              //   onChange: setAxisTracking,
+              //   items: [
+              //     { id: "", name: "Off" },
+              //     ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
+              //   ],
+              // },
+            ],
+            ({ icon, label, value, items, onChange }, i) => (
+              <>
+                {!!i && divider}
+                <FeaturePicker
+                  icon={icon}
+                  label={label}
+                  value={value}
+                  items={items}
+                  /// @ts-expect-error poor type inference
+                  onChange={onChange}
+                  arrow
+                />
+              </>
+            )
+          )}
+        </>
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
     </Page>

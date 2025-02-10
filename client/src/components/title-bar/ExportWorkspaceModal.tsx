@@ -3,18 +3,15 @@ import { Box, Stack, TextField, Typography } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
 import { useSnackbar } from "components/generic/Snackbar";
 import download from "downloadjs";
-import { useDebouncedState2 } from "hooks/useDebouncedState";
 import { useWorkspace } from "hooks/useWorkspace";
 import { Jimp } from "jimp";
 import { ceil, entries, kebabCase, reduce } from "lodash";
 import { nanoid as id } from "nanoid";
-import { producify } from "produce";
 import { map } from "promise-tools";
 import { useMemo } from "react";
 import { useLoadingState } from "slices/loading";
-import { useUIState, WorkspaceMeta } from "slices/UIState";
+import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
-import { set } from "utils/set";
 import { Gallery } from "./Gallery";
 
 const replacements = {
@@ -57,20 +54,9 @@ async function resizeImage(s: string) {
 }
 
 export function ExportWorkspace() {
+  "use no memo";
+  const fields = workspaceMeta.use();
   const paper = usePaper();
-  const [_uiState, _setUIState] = useUIState();
-  const [{ workspaceMeta: fields }, setUIState] = useDebouncedState2(
-    _uiState,
-    _setUIState
-  );
-  function setMeta<K extends keyof WorkspaceMeta>(k: K, v: WorkspaceMeta[K]) {
-    setUIState(
-      producify((prev) =>
-        ///@ts-expect-error poor type inference as of TypeScript 5.7.2
-        set(prev, `workspaceMeta.${k}` as `workspaceMeta.${K}`, v)
-      )
-    );
-  }
   const { save, estimateWorkspaceSize } = useWorkspace();
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();
@@ -89,13 +75,13 @@ export function ExportWorkspace() {
   return (
     <>
       <Box>
-        <Gallery onChange={(v) => setMeta("screenshots", v)} />
+        <Gallery onChange={(v) => workspaceMeta.assign({ screenshots: v })} />
       </Box>
       <Stack p={2} gap={2}>
         <TextField
           {...textFieldProps}
           defaultValue={fields.name}
-          onChange={(e) => setMeta("name", e.target.value)}
+          onChange={(e) => workspaceMeta.assign({ name: e.target.value })}
           label="Name"
           fullWidth
         />
@@ -104,7 +90,9 @@ export function ExportWorkspace() {
           minRows={3}
           defaultValue={fields.description}
           size="small"
-          onChange={(e) => setMeta("description", e.target.value)}
+          onChange={(e) =>
+            workspaceMeta.assign({ description: e.target.value })
+          }
           label="Description"
           fullWidth
           multiline
@@ -113,7 +101,7 @@ export function ExportWorkspace() {
           {...textFieldProps}
           defaultValue={fields.author}
           size="small"
-          onChange={(e) => setMeta("author", e.target.value)}
+          onChange={(e) => workspaceMeta.assign({ author: e.target.value })}
           label="Author"
           fullWidth
           multiline

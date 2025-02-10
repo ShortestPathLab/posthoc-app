@@ -1,10 +1,10 @@
+import { store } from "@davstack/store";
+import { nanoid as id } from "nanoid";
+import { pages } from "pages";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
 import { Trace } from "protocol/Trace";
-import { createSlice } from "./createSlice";
-import { nanoid as id } from "nanoid";
-import { pages } from "pages";
 
 export type Map = Partial<
   Feature & {
@@ -36,7 +36,7 @@ export type UploadedTrace = FeatureDescriptor & {
 
 export type TrustedState = {
   isTrusted?: boolean;
-  origin?: string;
+  origin: string | undefined;
 };
 
 export type WorkspaceMeta = {
@@ -45,41 +45,39 @@ export type WorkspaceMeta = {
   author?: string;
 } & FeatureDescriptor;
 
-type WorkspaceMetaState = {
-  workspaceMeta: WorkspaceMeta;
-};
-
 type SidebarState = {
   sidebarOpen: boolean;
 };
 
 type FullscreenModalState = {
-  fullscreenModal?: keyof typeof pages;
+  fullscreenModal: keyof typeof pages | undefined;
   depth?: number;
 };
 
 export type UIState = BusyState &
-  WorkspaceMetaState &
   FullscreenModalState &
   SidebarState &
   TrustedState;
 
-export const [useUIState, UIStateProvider] = createSlice<
-  UIState,
-  Partial<UIState>
->({
-  sidebarOpen: false,
-  busy: {},
-  depth: 0,
-  fullscreenModal: undefined,
-  workspaceMeta: {
-    id: id(),
-    name: "",
-    description: "",
-    screenshots: [],
-    author: "",
-    size: 0,
+export const workspaceMeta = store<WorkspaceMeta>(
+  { id: id(), name: "", description: "", screenshots: [], author: "", size: 0 },
+  {
+    devtools: { enabled: import.meta.env.DEV },
+    name: "workspace-meta",
+  }
+);
+
+export const UI = store<Required<UIState>>(
+  {
+    sidebarOpen: false,
+    busy: {},
+    depth: 0,
+    fullscreenModal: undefined,
+    isTrusted: false,
+    origin: undefined,
   },
-  isTrusted: false,
-  origin: undefined,
-});
+  {
+    devtools: { enabled: import.meta.env.DEV },
+    name: "ui-state",
+  }
+);

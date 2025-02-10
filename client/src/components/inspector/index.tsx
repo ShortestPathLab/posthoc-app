@@ -5,7 +5,7 @@ import { openWindow } from "components/title-bar/window";
 import { pages } from "pages";
 import { Page } from "pages/Page";
 import { PlaceholderPage } from "pages/PlaceholderPage";
-import { useUIState } from "slices/UIState";
+import { slice } from "slices";
 import { useAnyLoading } from "slices/loading";
 import { PanelState, useView } from "slices/view";
 import { FileDropZone } from "./FileDropZone";
@@ -16,7 +16,6 @@ import { ViewTree } from "./ViewTree";
 export function Inspector(props: BlockProps) {
   const loading = useAnyLoading();
   const [{ view }, setView] = useView();
-  const [, setUIState] = useUIState();
   return (
     <>
       <Block {...props}>
@@ -28,7 +27,7 @@ export function Inspector(props: BlockProps) {
               });
             }}
             onMaximise={(leaf) => {
-              setUIState(() => ({ fullscreenModal: leaf.content?.type }));
+              slice.ui.fullscreenModal.set(leaf.content?.type);
             }}
             canPopOut={(leaf) => !!pages[leaf.content!.type!]?.allowFullscreen}
             root={view}

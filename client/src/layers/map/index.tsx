@@ -26,8 +26,9 @@ import {
 import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";
+import { slice } from "slices";
 import { Map } from "slices/UIState";
-import { Layer, useLayer } from "slices/layers";
+import { Layer } from "slices/layers";
 import { ext, name } from "utils/path";
 
 export type MapLayerData = {
@@ -164,7 +165,8 @@ export const controller = {
     return <></>;
   }),
   provideSelectionInfo: ({ children, event, layer: key }) => {
-    const { layer, setLayer, layers } = useLayer<MapLayerData>(key);
+    const one = slice.layers.one<MapLayer>(key);
+    const layer = one.use();
     const { parsedMap } = layer?.source ?? {};
     const { point, node } = useMemo(() => {
       if (parsedMap && event) {
@@ -197,7 +199,7 @@ export const controller = {
             },
           }),
       }),
-      [point, node, layer, layers, setLayer]
+      [point, node, layer]
     );
     return <>{children?.(menu)}</>;
   },

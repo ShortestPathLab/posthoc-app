@@ -1,10 +1,9 @@
-import { useAsync } from "react-async-hook";
-import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { usingMemoizedWorkerTask } from "../../workers/usingWorker";
 import {
   TreeWorkerParameters,
   TreeWorkerReturnType,
 } from "./treeLegacy.worker";
-import { usingMemoizedWorkerTask } from "../../workers/usingWorker";
 import treeWorkerUrl from "./treeLegacy.worker.ts?worker&url";
 
 export class TreeWorkerUrl extends Worker {
@@ -18,13 +17,16 @@ export const treeAsync = usingMemoizedWorkerTask<
   TreeWorkerReturnType
 >(TreeWorkerUrl);
 
-export function useTree(trace: TreeWorkerParameters) {
-  return useAsync(async () => await treeAsync(trace), [trace]);
-}
-
-export function useTreeMemo(trace: TreeWorkerParameters, deps: unknown[]) {
-  // eslint-disable-next-line react-compiler/react-compiler
-  const params = useMemo(() => trace, deps);
-
-  return useTree(params);
+export function useTreeMemo({
+  key,
+  radius,
+  step,
+  trace,
+}: TreeWorkerParameters & { key?: string }) {
+  return useQuery({
+    queryKey: ["compute/tree", key, radius, step],
+    queryFn: async () => await treeAsync({ radius, step, trace }),
+    enabled: !!key,
+    staleTime: Infinity,
+  });
 }

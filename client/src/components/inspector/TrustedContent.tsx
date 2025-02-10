@@ -8,25 +8,23 @@ import { Button } from "components/generic/inputs/Button";
 import { producify } from "produce";
 import { ReactNode } from "react";
 import { useSettings } from "slices/settings";
-import { useUIState } from "slices/UIState";
 import { Placeholder } from "./Placeholder";
 import { useUntrustedLayers as useUntrustedLayer } from "./useUntrustedLayers";
+import { slice } from "slices";
 
 export function TrustedContent({ children }: { children?: ReactNode }) {
-  const { isTrusted, untrustedLayerOrigin } = useUntrustedLayer();
+  const { isTrusted, origin } = useUntrustedLayer();
 
   const [, setSettings] = useSettings();
-  const [, setUIState] = useUIState();
   return isTrusted ? (
     <>{children}</>
   ) : (
     <Placeholder
       icon={<ShieldOutlined />}
       label={
-        untrustedLayerOrigin ? (
+        origin ? (
           <>
-            Trust{" "}
-            <Link href={untrustedLayerOrigin}>{untrustedLayerOrigin}</Link>?
+            Trust <Link href={origin}>{origin}</Link>?
           </>
         ) : (
           <>Trust this workspace?</>
@@ -36,12 +34,12 @@ export function TrustedContent({ children }: { children?: ReactNode }) {
       action={
         <Stack direction="column" gap={2} alignItems="center">
           <Button
-            onClick={() => setUIState(() => ({ isTrusted: true }))}
+            onClick={() => slice.ui.isTrusted.set(true)}
             startIcon={<CheckOutlined />}
           >
             Trust this time
           </Button>
-          {!!untrustedLayerOrigin && (
+          {!!origin && (
             <Button
               variant="text"
               startIcon={<DoneAllOutlined />}
@@ -49,10 +47,9 @@ export function TrustedContent({ children }: { children?: ReactNode }) {
                 setSettings(
                   producify((f) => {
                     f.trustedOrigins = f.trustedOrigins ?? [];
-                    f.trustedOrigins?.push(untrustedLayerOrigin);
+                    f.trustedOrigins?.push(origin);
                   })
                 );
-                setUIState(() => ({ isTrusted: true }));
               }}
             >
               Always trust workspaces from this origin

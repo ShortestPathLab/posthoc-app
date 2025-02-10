@@ -8,8 +8,9 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { useCss } from "react-use";
+import { useCss, useToggle } from "react-use";
 
+import { set } from "lodash";
 import { useOverlayScrollbars } from "overlayscrollbars-react";
 import {
   VirtuosoHandle as Handle,
@@ -17,7 +18,6 @@ import {
   VirtuosoProps as ListProps,
   VirtuosoHandle,
 } from "react-virtuoso";
-import { set } from "lodash";
 
 // const Scroller = forwardRef<HTMLDivElement, ScrollerProps>(
 //   ({ style, ...props }, ref) => {
@@ -120,6 +120,17 @@ export type LazyListProps<T> = {
   };
   placeholder?: ReactNode;
 } & Omit<BoxProps, "placeholder">;
+
+export function WhenIdle({ children }: { children: ReactElement }) {
+  const [current, toggle] = useToggle(false);
+  useEffect(() => {
+    const id = requestIdleCallback(() => toggle(true), {
+      timeout: 150,
+    });
+    return () => cancelIdleCallback(id);
+  }, []);
+  return current && children;
+}
 
 export function LazyList<T>({
   items = [],

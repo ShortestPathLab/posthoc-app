@@ -1,13 +1,15 @@
 import { Box } from "@mui/material";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
+import { Scroll } from "components/generic/Scrollbars";
 import { Breakpoint, DebugLayerData } from "hooks/useBreakpoints";
+import { getController } from "layers/layerControllers";
 import { chain as _, keys, set } from "lodash";
 import { produce } from "produce";
 import { useMemo } from "react";
-import { useLayer } from "slices/layers";
+import { slice } from "slices";
+import { Layer } from "slices/layers";
 import { BreakpointEditor } from "./BreakpointEditor";
 import { comparators } from "./comparators";
-import { Scroll } from "components/generic/Scrollbars";
 
 type BreakpointListEditorProps = {
   breakpoints?: Breakpoint[];
@@ -18,27 +20,22 @@ type BreakpointListEditorProps = {
 export function BreakpointListEditor({
   layer: key,
 }: BreakpointListEditorProps) {
-  const { layer, setLayer } = useLayer<DebugLayerData>(key);
-  const { breakpoints } = layer?.source ?? {};
+  const one = slice.layers.one<Layer<DebugLayerData>>(key);
+  const breakpoints = one.use((l) => l?.source?.breakpoints);
+  const events = one.use((l) => getController(l)?.steps?.(l));
 
   function handleBreakpointsChange(updatedBreakpoints: Breakpoint[]) {
-    if (layer) {
-      setLayer(
-        produce(layer, (layer) =>
-          set(layer, "source.breakpoints", updatedBreakpoints)
-        )
-      );
-    }
+    one.set((l) => set(l, "source.breakpoints", updatedBreakpoints));
   }
 
   const properties = useMemo(
     () =>
-      _(layer?.source?.trace?.content?.events)
+      _(events)
         .flatMap(keys)
         .uniq()
         .filter((p) => p !== "type")
         .value(),
-    [layer?.source?.trace?.content?.events]
+    [events]
   );
 
   return (
@@ -62,8 +59,8 @@ export function BreakpointListEditor({
               type: undefined,
               reference: 0,
             })}
-            onChange={(updatedBreakpoints) =>
-              handleBreakpointsChange(updatedBreakpoints)
+            onChange={(f) =>
+              handleBreakpointsChange(produce(breakpoints ?? [], f))
             }
             addItemLabel="Breakpoint"
             placeholder="Get started by adding a breakpoint."

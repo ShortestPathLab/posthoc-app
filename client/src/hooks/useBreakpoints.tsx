@@ -1,13 +1,14 @@
 import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { call } from "components/script-editor/call";
-import { get, toLower as lower, startCase } from "lodash";
+import { get, isEqual, toLower as lower, startCase } from "lodash";
 import memo from "memoizee";
 import { useTreeMemo } from "pages/tree/TreeWorkerLegacy";
 import { EventTree } from "pages/tree/treeLegacy.worker";
 import { TraceEvent, TraceEventType } from "protocol";
 import { useMemo } from "react";
+import { slice } from "slices";
 import { UploadedTrace } from "slices/UIState";
-import { useLayer } from "slices/layers";
+import { Layer } from "slices/layers";
 
 type ApplyOptions = {
   value: number;
@@ -37,29 +38,28 @@ export type Breakpoint = {
 
 export type DebugLayerData = {
   code?: string;
-  monotonicF?: boolean;
-  monotonicG?: boolean;
   breakpoints?: Breakpoint[];
   trace?: UploadedTrace;
 };
 
 export function useBreakpoints(key?: string) {
-  const { layer } = useLayer<DebugLayerData>(key);
-  const { isTrusted } = useUntrustedLayers();
-  const { monotonicF, monotonicG, breakpoints, code, trace } =
-    layer?.source ?? {};
-  const content = trace?.content;
-  const { result } = useTreeMemo(
-    {
-      trace: content,
-      step: content?.events?.length,
-      radius: undefined,
-    },
-    [content]
+  const one = slice.layers.one<Layer<DebugLayerData>>(key);
+  const trace = one.use(
+    (c) => c?.source?.trace,
+    (a, b) => a?.key === b?.key
   );
+  const breakpoints = one.use((c) => c?.source?.breakpoints, isEqual);
+  const code = one.use((c) => c?.source?.code);
+  const { isTrusted } = useUntrustedLayers();
+  const { data: result } = useTreeMemo({
+    key: trace?.key,
+    trace: trace?.content,
+    step: trace?.content?.events?.length,
+    radius: undefined,
+  });
 
   return useMemo(() => {
-    const events = content?.events ?? []; // the actual trace array
+    const events = trace?.content?.events ?? []; // the actual trace array
     const trees = treeToDict(result?.tree ?? []);
     return memo((step: number) => {
       const event = events[step];
@@ -78,7 +78,7 @@ export function useBreakpoints(key?: string) {
             const match = () =>
               condition?.apply?.({
                 type,
-                event: event,
+                event,
                 property,
                 value: get(event, property),
                 reference,
@@ -107,7 +107,7 @@ export function useBreakpoints(key?: string) {
               events,
               trees[step]?.parent,
               trees[step]?.children ?? [],
-            ])
+            ] as any)
           ) {
             return { result: "Script editor" };
           }
@@ -117,7 +117,7 @@ export function useBreakpoints(key?: string) {
       }
       return { result: "" };
     });
-  }, [isTrusted, code, content, breakpoints, monotonicF, monotonicG, result]);
+  }, [isTrusted, code, trace, breakpoints, result]);
 }
 
 type TreeDict = {

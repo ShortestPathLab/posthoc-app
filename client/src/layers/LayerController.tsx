@@ -17,14 +17,19 @@ export type LayerSource = Feature & {
   readonly?: boolean;
 };
 
-export type LayerController<K extends string, Data> = {
+export type Steps = {
+  key?: string;
+  steps: TraceEvent[];
+};
+
+export type LayerController<K extends string = string, Data = never> = {
   key: K;
   icon: ReactElement;
   editor: FC<EditorSetterProps<Layer<Data>>>;
   renderer: FC<{ layer?: Layer<Data>; index?: number }>;
   service?: FC<EditorSetterProps<Layer<Data>>>;
   inferName: (layer: Layer<Data>) => string;
-  steps?: (layer?: Layer<Data>) => TraceEvent[];
+  steps?: (layer?: Layer<Data>) => Steps;
   error?: (layer?: Layer<Data>) => string | boolean | undefined;
   provideSelectionInfo?: SelectionInfoProvider;
   claimImportedFile?: (file: File) => Promise<

@@ -1,7 +1,6 @@
 import {
   CodeOutlined,
   LocationOnOutlined as DestinationIcon,
-  LayersOutlined,
   RouteOutlined,
   TripOriginOutlined as StartIcon,
 } from "@mui-symbols-material/w400";
@@ -18,7 +17,7 @@ import { LayerController, inferLayerName } from "layers";
 import { MapLayer, MapLayerData } from "layers/map";
 import { TraceLayerData, controller as traceController } from "layers/trace";
 import {
-  filter,
+  chain as _,
   find,
   isArray,
   isObject,
@@ -28,15 +27,17 @@ import {
   omit,
   pick,
   reduce,
-  set,
   truncate,
 } from "lodash";
 import { nanoid as id } from "nanoid";
-import { produce, withProduce } from "produce";
+import { withProduce } from "produce";
 import { useMemo } from "react";
+import { slice } from "slices";
 import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
-import { Layer, useLayer, useLayers } from "slices/layers";
+import { Layer, WithLayer, useLayerPicker } from "slices/layers";
+import { set } from "utils/set";
+import { LayerPicker } from "../../components/generic/LayerPicker";
 
 function mapValuesDeep<T, U>(v: T, callback: (t: unknown) => any): U {
   return isArray(v)
@@ -69,6 +70,8 @@ export type QueryLayerData = {
 } & TraceLayerData;
 
 const maxStringPropLength = 40;
+const isMapLayer = (c: Layer<unknown>): c is MapLayer =>
+  c.source?.type === "map";
 export const controller = {
   ...omit(traceController, "claimImportedFile"),
   key: "query",
@@ -87,12 +90,7 @@ export const controller = {
     ]),
   editor: withProduce(({ value, produce }) => {
     const { algorithm } = value?.source ?? {};
-    const {
-      layers,
-      allLayers,
-      layer: selectedLayer,
-      key: mapLayerKey,
-    } = useLayer(undefined, (c): c is MapLayer => c.source?.type === "map");
+    const { key: mapLayerKey } = useLayerPicker(isMapLayer);
     const [{ algorithms }] = useFeatures();
     const [connections] = useConnections();
     return (
@@ -129,34 +127,27 @@ export const controller = {
         <Option
           label="Map"
           content={
-            <FeaturePicker
-              arrow
-              paper
-              icon={<LayersOutlined />}
-              label="Layer"
+            <LayerPicker<MapLayerData>
               value={mapLayerKey}
-              items={allLayers.map((c) => ({
-                id: c.key,
-                hidden: !find(layers, (d) => d.key === c.key),
-                name: inferLayerName(c),
-              }))}
-              onChange={async (v) =>
-                produce((p) => set(p, "source.mapLayerKey", v))
-              }
+              guard={isMapLayer}
+              onChange={(v) => produce((p) => set(p, "source.mapLayerKey", v))}
             />
           }
         />
-        {selectedLayer && (
-          <Type
-            component="div"
-            variant="body2"
-            color="text.secondary"
-            sx={{ mb: 1, mt: 1 }}
-          >
-            Define source and destination nodes by clicking on valid regions on{" "}
-            {inferLayerName(selectedLayer)}
-          </Type>
-        )}
+        <WithLayer<Layer<MapLayerData>> layer={mapLayerKey}>
+          {(l) => (
+            <Type
+              component="div"
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 1, mt: 1 }}
+            >
+              Define source and destination nodes by clicking on valid regions
+              on {inferLayerName(l)}
+            </Type>
+          )}
+        </WithLayer>
+
         <Heading label="Preview" />
         <Box sx={{ height: 240, mx: -2 }}>
           <TracePreview trace={value?.source?.trace?.content} />
@@ -165,10 +156,11 @@ export const controller = {
     );
   }),
   service: withProduce(({ value, produce, onChange }) => {
+    "use no memo";
     const TraceLayerService = traceController.service;
     const notify = useSnackbar();
     const { algorithm, mapLayerKey, start, end } = value?.source ?? {};
-    const [{ layers: layers }] = useLayers();
+    const layers = slice.layers.use();
     const [connections] = useConnections();
     const [{ algorithms }] = useFeatures();
     const mapLayer = useMemo(() => {
@@ -243,36 +235,37 @@ export const controller = {
   }),
   inferName: (l) => l.source?.trace?.name ?? "Untitled Query",
   provideSelectionInfo: ({ children, event, layer: key }) => {
+    "use no memo";
     const TraceLayerSelectionInfoProvider =
       traceController.provideSelectionInfo;
-    const { layer, setLayer, layers } = useLayer<QueryLayerData>(key);
-    const mapLayerData = useMemo(() => {
-      const filteredLayers = filter(layers, {
-        source: { type: "map" },
-      }) as Layer<MapLayerData>[];
-      return filter(
-        map(filteredLayers, (mapLayer) => {
-          const { parsedMap } = mapLayer?.source ?? {};
-          if (parsedMap && event) {
-            const hydratedMap = getParser(
-              mapLayer?.source?.map?.format
-            )?.hydrate?.(parsedMap);
-            if (hydratedMap) {
-              const point = event?.world && hydratedMap.snap(event.world);
-              if (point) {
-                const node = event?.world && hydratedMap.nodeAt(point);
-                return {
-                  point,
-                  node,
-                  key: mapLayer.key,
-                  name: inferLayerName(mapLayer),
-                };
-              }
-            }
-          }
-        })
-      );
-    }, [layers]);
+    const { use: useLayer, set: setLayer } = slice.layers.one(key);
+    const layer = useLayer();
+    const layers = slice.layers.use();
+    const mapLayerData = useMemo(
+      () =>
+        _(layers)
+          .map((l) => {
+            if (!isMapLayer(l)) return;
+            const { parsedMap } = l?.source ?? {};
+            if (!parsedMap || !event) return;
+            const hydratedMap = getParser(l?.source?.map?.format)?.hydrate?.(
+              parsedMap
+            );
+            if (!hydratedMap) return;
+            const point = event?.world && hydratedMap.snap(event.world);
+            if (!point) return;
+            const node = event?.world && hydratedMap.nodeAt(point);
+            return {
+              point,
+              node,
+              key: l.key,
+              name: inferLayerName(l),
+            };
+          })
+          .filter()
+          .value(),
+      [layers]
+    );
     const menu = useMemo(
       () =>
         !!layer &&
@@ -288,28 +281,24 @@ export const controller = {
                     primary: `Set as source`,
                     secondary: next?.name,
                     action: () =>
-                      setLayer(
-                        produce(layer, (l) => {
-                          set(l, "source.start", next?.node);
-                          set(l, "source.query", undefined);
-                          set(l, "source.mapLayerKey", next?.key);
-                          set(l, "source.trace", undefined);
-                        })
-                      ),
+                      setLayer((l) => {
+                        set(l, "source.start", next?.node);
+                        set(l, "source.query", undefined);
+                        set(l, "source.mapLayerKey", next?.key);
+                        set(l, "source.trace", undefined);
+                      }),
                     icon: <StartIcon sx={{ transform: "scale(0.5)" }} />,
                   },
                   [`${key}-${next?.key}-destination`]: {
                     primary: `Set as destination`,
                     secondary: next?.name,
                     action: () =>
-                      setLayer(
-                        produce(layer, (l) => {
-                          set(l, "source.end", next?.node);
-                          set(l, "source.query", undefined);
-                          set(l, "source.mapLayerKey", next?.key);
-                          set(l, "source.trace", undefined);
-                        })
-                      ),
+                      setLayer((l) => {
+                        set(l, "source.end", next?.node);
+                        set(l, "source.query", undefined);
+                        set(l, "source.mapLayerKey", next?.key);
+                        set(l, "source.trace", undefined);
+                      }),
                     icon: <DestinationIcon />,
                   },
                 }),

@@ -15,7 +15,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import { useUIState } from "slices/UIState";
+import { slice } from "slices";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
 import { wait } from "utils/timed";
@@ -101,16 +101,14 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
 );
 
 export function FullscreenModalHost() {
+  "use no memo";
   const sm = useSm();
-  const [{ fullscreenModal: key }, setUIState] = useUIState();
+  const key = slice.ui.fullscreenModal.use();
   const popupState = usePopupState({ variant: "dialog" });
-  const handleClose = useCallback(
-    async function () {
-      await wait(300);
-      setUIState(() => ({ fullscreenModal: undefined }));
-    },
-    [setUIState]
-  );
+  const handleClose = useCallback(async () => {
+    await wait(300);
+    slice.ui.fullscreenModal.set(undefined);
+  }, []);
   const state = useMemo(
     () => ({
       ...popupState,

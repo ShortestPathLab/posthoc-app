@@ -16,7 +16,10 @@ export function ServerListEditor() {
         editor={(v) => <ServerEditor value={v} />}
         icon={null}
         value={remote}
-        onChange={debounce((v) => setSettings(() => ({ remote: v })), 300)}
+        onChange={debounce(
+          (v) => setSettings((prev) => ({ remote: v(prev) })),
+          300
+        )}
         addItemLabel="Add adapter"
         create={() => ({
           transport: defaultTransport,

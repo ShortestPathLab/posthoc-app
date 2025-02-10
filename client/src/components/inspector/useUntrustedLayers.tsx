@@ -1,27 +1,32 @@
-import type { TraceLayerData } from "layers/trace";
-import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { ORIGIN_UNKNOWN } from "hooks/useWorkspace";
-import { Layer, useLayers } from "slices/layers";
+import { isTraceLayer } from "layers/trace/isTraceLayer";
+import { find, map } from "lodash";
+import { slice } from "slices";
 import { useSettings } from "slices/settings";
-import { useUIState } from "slices/UIState";
 
 export function useUntrustedLayers() {
-  const [{ layers }] = useLayers();
+  "use no memo";
   const [{ trustedOrigins }] = useSettings();
-  const [{ isTrusted }] = useUIState();
+  const isTrusted = slice.ui.isTrusted.use();
+  const layers = slice.layers.use((s) =>
+    map(s, (l) =>
+      isTraceLayer(l)
+        ? {
+            key: l.key,
+            origin: l.source?.origin,
+          }
+        : undefined
+    )
+  );
   if (!isTrusted) {
-    const untrustedLayer = layers?.find?.(
-      (t) =>
-        isTraceLayer(t) &&
-        t.source?.origin &&
-        !trustedOrigins?.includes?.(t.source?.origin)
-    ) as Layer<TraceLayerData>;
+    const untrustedLayer = find(
+      layers,
+      (l) => !!l?.origin && !trustedOrigins?.includes?.(l?.origin)
+    );
     if (untrustedLayer) {
-      const untrustedLayerOrigin =
-        untrustedLayer?.source?.origin ?? ORIGIN_UNKNOWN;
-      return { isTrusted: false, untrustedLayer, untrustedLayerOrigin };
+      const { key, origin = ORIGIN_UNKNOWN } = untrustedLayer;
+      return { isTrusted: false, key, origin };
     }
-    return { isTrusted: true };
   }
   return { isTrusted: true };
 }
