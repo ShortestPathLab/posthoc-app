@@ -83,6 +83,7 @@ export function DrawerSurface({
     <SwipeableDrawer
       transitionDuration={{ enter: 500, exit: 500 }}
       SlideProps={{
+        mountOnEnter: true,
         easing: {
           enter: theme.transitions.easing.easeOut,
           exit: theme.transitions.easing.easeOut,

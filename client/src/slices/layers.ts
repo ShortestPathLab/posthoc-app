@@ -2,6 +2,7 @@ import { store } from "@davstack/store";
 import { filter, head, isEqual, map } from "lodash";
 import { useEffect, useState } from "react";
 import { createOne, createSelector } from "./selector";
+import hash from "object-hash";
 
 export type Layer<T = Record<string, unknown>> = {
   key: string;
@@ -48,13 +49,14 @@ export function useLayerPicker<T extends Record<string, unknown>>(
 
   // Set key to a default layer
   useEffect(() => {
-    if (!key && guarded.length) setKey(head(guarded));
-  }, [key, guarded.length]);
+    if (guarded.length && (!key || !guarded.includes(key)))
+      setKey(head(guarded));
+  }, [key, hash(guarded)]);
 
   // Reset key if layer was removed
   useEffect(() => {
     if (key && !guarded.includes(key)) setKey(undefined);
-  }, [key, guarded]);
+  }, [key, hash(guarded)]);
 
   return { key, guarded, all, setKey };
 }

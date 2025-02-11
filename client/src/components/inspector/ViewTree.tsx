@@ -4,6 +4,7 @@ import { Box, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
 import {
   chain as _,
+  Dictionary,
   filter,
   find,
   flatMap,
@@ -17,15 +18,22 @@ import { nanoid } from "nanoid";
 import { produce, transaction } from "produce";
 import {
   Context,
+  createContext,
   ReactNode,
   Ref,
-  createContext,
   useContext,
+  useEffect,
   useMemo,
 } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useCss } from "react-use";
+import {
+  createHtmlPortalNode,
+  HtmlPortalNode,
+  InPortal,
+  OutPortal,
+} from "react-reverse-portal";
+import { useCss, useMap } from "react-use";
 import { Leaf, Root } from "slices/view";
 import { ViewControls } from "./ViewControls";
 
@@ -60,6 +68,10 @@ export function useViewTreeContext<T = any>() {
   );
 }
 
+const ViewTreePortalsContext = createContext<
+  Dictionary<HtmlPortalNode | undefined>
+>({});
+
 type ViewTreeProps<T> = {
   root?: Root<T>;
   renderLeaf?: (leaf: Leaf<T>) => ReactNode;
@@ -89,25 +101,71 @@ function handleSwap<T>(root: Root<T>, a: string, b: string) {
   }
   return root;
 }
-export function ViewTree<T>(props: ViewTreeProps<T>) {
-  const { onChange, root } = props;
+
+function getLeaves<T>(root?: Root<T>): Leaf<T>[] {
+  return root
+    ? root.type === "leaf"
+      ? [root]
+      : flatMap(root.children, getLeaves)
+    : [];
+}
+
+function A1<T>({
+  leaf: l,
+  renderLeaf,
+  onChange,
+}: {
+  onChange?: (a: string, v: HtmlPortalNode | undefined) => void;
+  leaf: Leaf<T>;
+  renderLeaf?: (leaf: Leaf<T>) => ReactNode;
+}) {
+  const portal = useMemo(
+    () =>
+      createHtmlPortalNode({
+        attributes: { style: "width: 100%; height: 100%" },
+      }),
+    []
+  );
+  useEffect(() => {
+    if (l.key && portal) {
+      onChange?.(l.key, portal);
+      return () => onChange?.(l.key, undefined);
+    }
+  }, [l.key, portal, onChange]);
   return (
-    <DndProvider backend={HTML5Backend}>
-      <ViewBranch<T>
-        {...props}
-        onSwap={(a, b) => {
-          if (root) {
-            onChange?.(produce(root, (root) => handleSwap(root, a, b)));
-          }
-        }}
-      />
-    </DndProvider>
+    <InPortal node={portal}>
+      <ViewTreeContext.Provider value={{}}>
+        {renderLeaf?.(l)}
+      </ViewTreeContext.Provider>
+    </InPortal>
+  );
+}
+
+export function ViewTree<T>(props: ViewTreeProps<T>) {
+  const { onChange, root, renderLeaf } = props;
+  const leaves = getLeaves(root);
+  const [portals, { set }] = useMap<Dictionary<HtmlPortalNode | undefined>>();
+  return (
+    <ViewTreePortalsContext.Provider value={portals}>
+      <DndProvider backend={HTML5Backend}>
+        <ViewBranch<T>
+          {...props}
+          onSwap={(a, b) => {
+            if (root) {
+              onChange?.(produce(root, (root) => handleSwap(root, a, b)));
+            }
+          }}
+        />
+        {map(leaves, (l) => (
+          <A1 key={l.key} leaf={l} renderLeaf={renderLeaf} onChange={set} />
+        ))}
+      </DndProvider>
+    </ViewTreePortalsContext.Provider>
   );
 }
 
 export function ViewLeaf<T>({
   root = { type: "leaf", key: "" },
-  renderLeaf,
   onChange,
   onClose,
   onPopOut,
@@ -117,6 +175,7 @@ export function ViewLeaf<T>({
   onSwap,
   onDrop,
 }: ViewLeafProps<T>) {
+  const view = useContext(ViewTreePortalsContext);
   const [{ isOver }, drop] = useDrop<Leaf<any>, void, { isOver: boolean }>(
     () => ({
       accept: ["panel"],
@@ -148,7 +207,7 @@ export function ViewLeaf<T>({
           type: "branch",
           orientation,
           children: [
-            { ...structuredClone(draft), size: 50, key: nanoid() },
+            { ...structuredClone(draft), size: 50, key: root.key },
             { ...structuredClone(draft), size: 50, key: nanoid() },
           ],
         }))
@@ -194,34 +253,32 @@ export function ViewLeaf<T>({
       : {};
   }, [onChange, onClose, depth, root, drag]);
 
+  const portal = view[root.key];
+
   return (
-    <>
-      <Block
-        ref={drop as unknown as Ref<HTMLDivElement>}
-        sx={{
-          overflow: "hidden",
-          "::before": {
-            pointerEvents: "none",
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1,
-            boxShadow: (t) =>
-              isOver ? `inset 0 0 0 2px ${t.palette.primary.main}` : "none",
-            transition: (t) => t.transitions.create("box-shadow"),
-          },
-          transition: (t) => t.transitions.create("opacity"),
-          opacity: (t) => (isDragging ? t.palette.action.disabledOpacity : 1),
-        }}
-      >
-        <ViewTreeContext.Provider value={context}>
-          {renderLeaf?.(root)}
-        </ViewTreeContext.Provider>
-      </Block>
-    </>
+    <Block
+      ref={drop as unknown as Ref<HTMLDivElement>}
+      sx={{
+        overflow: "hidden",
+        "::before": {
+          pointerEvents: "none",
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1,
+          boxShadow: (t) =>
+            isOver ? `inset 0 0 0 2px ${t.palette.primary.main}` : "none",
+          transition: (t) => t.transitions.create("box-shadow"),
+        },
+        transition: (t) => t.transitions.create("opacity"),
+        opacity: (t) => (isDragging ? t.palette.action.disabledOpacity : 1),
+      }}
+    >
+      {portal && <OutPortal node={portal} value={context} />}
+    </Block>
   );
 }
 
@@ -322,7 +379,7 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
                         if (draft.children[0].type === "leaf") {
                           return {
                             type: "leaf",
-                            key: nanoid(),
+                            key: draft.children[0].key,
                             content: draft.children[0].content,
                           };
                         } else {

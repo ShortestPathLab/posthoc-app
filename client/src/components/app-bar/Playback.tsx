@@ -19,10 +19,11 @@ import {
 } from "@mui/material";
 import { EditorSetterProps } from "components/Editor";
 import { IconButtonWithTooltip as IconButton } from "components/generic/inputs/IconButtonWithTooltip";
-import { usePlaybackState } from "hooks/usePlaybackState";
+import { computed, usePlaybackControls } from "hooks/usePlaybackState";
 import { ceil, noop } from "lodash";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { useEffect, useState } from "react";
+import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { useSettings } from "slices/settings";
 import { usePaper } from "theme";
@@ -38,12 +39,23 @@ export type PlaybackLayerData = {
 
 const FRAME_TIME_MS = 1000 / 60;
 
+function usePlaybackServiceState(layer?: string) {
+  "use no memo";
+  const one = slice.layers.one<Layer<PlaybackLayerData>>(layer);
+  return {
+    playing: one.use(computed("playing")),
+    step: one.use(computed("step")),
+    end: one.use(computed("end")),
+  };
+}
+
 export function PlaybackService({
   children,
   value,
 }: EditorSetterProps<Layer<PlaybackLayerData>>) {
-  const { step, end, playing, pause, stepWithBreakpointCheck } =
-    usePlaybackState(value?.key);
+  const { playing, step = 0, end = 0 } = usePlaybackServiceState(value?.key);
+
+  const { pause, stepWithBreakpointCheck } = usePlaybackControls(value?.key);
 
   const [{ "playback/playbackRate": playbackRate = 1 }] = useSettings();
 
@@ -78,26 +90,33 @@ export function PlaybackService({
 }
 
 const centered = { horizontal: "center", vertical: "center" } as const;
+
+function usePlaybackControlsState(layer?: string) {
+  "use no memo";
+  const one = slice.layers.one<Layer<PlaybackLayerData>>(layer);
+  return {
+    canPause: one.use(computed("canPause")),
+    canPlay: one.use(computed("canPlay")),
+    canStepBackward: one.use(computed("canStepBackward")),
+    canStepForward: one.use(computed("canStepForward")),
+    canStop: one.use(computed("canStop")),
+    playing: one.use(computed("playing")),
+  };
+}
+
 export function Playback({ layer }: { layer?: string }) {
-  const paper = usePaper();
   const {
-    playing,
     canPause,
-    canPlay,
     canStepBackward,
     canStepForward,
     canStop,
-    pause,
-    play,
-    stepBackward,
-    stepForward,
-    findBreakpoint,
-    step,
-    stepTo,
-  } = usePlaybackState(layer);
-  const [stepInput, setStepInput] = useState("");
-  const parsedStepInput = parseInt(stepInput);
-  const parsedStepInputValid = !isNaN(parsedStepInput);
+    playing,
+    canPlay,
+  } = usePlaybackControlsState(layer);
+
+  const { pause, play, stepBackward, stepForward, findBreakpoint, stepTo } =
+    usePlaybackControls(layer);
+
   return (
     <>
       <IconButton
@@ -145,69 +164,91 @@ export function Playback({ layer }: { layer?: string }) {
         disabled={!canStepForward}
       />
       {divider}
-      <PopupState variant="popover">
-        {(state) => (
-          <>
-            <Button sx={{ minWidth: 0 }} {...bindTrigger(state)}>
-              <Typography
-                component="div"
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  px: 0.25,
-                  py: 0.25,
-                  textAlign: "center",
-                  ...paper(0),
-                  borderRadius: 1,
-                }}
-              >
-                {step}
-              </Typography>
-            </Button>
-            <Popover
-              {...bindPopover(state)}
-              anchorOrigin={centered}
-              transformOrigin={centered}
-            >
-              <TextField
-                autoFocus
-                onChange={(e) => setStepInput(e.target.value)}
-                defaultValue={step}
-                placeholder="0"
-                sx={{ width: 180, border: "none" }}
-                slotProps={{
-                  input: {
-                    sx: { fontSize: "0.875rem" },
-                    startAdornment: (
-                      <InputAdornment position="start">Step</InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          icon={<ArrowForwardOutlined />}
-                          label="Go"
-                          size="small"
-                          color="inherit"
-                          disabled={
-                            !parsedStepInputValid || parsedStepInput === step
-                          }
-                          onClick={() => {
-                            stepTo(parsedStepInput);
-                            state.close();
-                          }}
-                        />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-            </Popover>
-          </>
-        )}
-      </PopupState>
+      <JumpToStep layer={layer} />
     </>
   );
 }
+
+function useStep(layer?: string) {
+  "use no memo";
+  return slice.layers
+    .one<Layer<PlaybackLayerData>>(layer)
+    .use(computed("step"));
+}
+
+function JumpToStep({ layer }: { layer?: string }) {
+  const paper = usePaper();
+  const [stepInput, setStepInput] = useState("");
+  const parsedStepInput = parseInt(stepInput);
+  const parsedStepInputValid = !isNaN(parsedStepInput);
+
+  const step = useStep(layer);
+
+  const { stepTo } = usePlaybackControls(layer);
+  return (
+    <PopupState variant="popover">
+      {(state) => (
+        <>
+          <Button sx={{ minWidth: 0 }} {...bindTrigger(state)}>
+            <Typography
+              component="div"
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                px: 0.25,
+                py: 0.25,
+                textAlign: "center",
+                ...paper(0),
+                borderRadius: 1,
+              }}
+            >
+              {step}
+            </Typography>
+          </Button>
+          <Popover
+            {...bindPopover(state)}
+            anchorOrigin={centered}
+            transformOrigin={centered}
+          >
+            <TextField
+              autoFocus
+              onChange={(e) => setStepInput(e.target.value)}
+              defaultValue={step}
+              placeholder="0"
+              sx={{ width: 180, border: "none" }}
+              slotProps={{
+                input: {
+                  sx: { fontSize: "0.875rem" },
+                  startAdornment: (
+                    <InputAdornment position="start">Step</InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        icon={<ArrowForwardOutlined />}
+                        label="Go"
+                        size="small"
+                        color="inherit"
+                        disabled={
+                          !parsedStepInputValid || parsedStepInput === step
+                        }
+                        onClick={() => {
+                          stepTo(parsedStepInput);
+                          state.close();
+                        }}
+                      />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          </Popover>
+        </>
+      )}
+    </PopupState>
+  );
+}
+
 export function MinimisedPlaybackControls({ layer: key }: { layer?: string }) {
   return (
     <PopupState variant="popover">

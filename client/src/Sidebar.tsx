@@ -1,79 +1,12 @@
 import { TabContext, TabList } from "@mui/lab";
-import {
-  Box,
-  Divider,
-  Fade,
-  Stack,
-  Tab,
-  Tooltip,
-  useTheme,
-} from "@mui/material";
+import { Box, Divider, Stack, Tab, Tooltip, useTheme } from "@mui/material";
 import interpolate from "color-interpolate";
-import { ViewTree } from "components/inspector/ViewTree";
-import { get, set, values } from "lodash";
+import { values } from "lodash";
 import { isMobile } from "mobile-device-detect";
-import { nanoid } from "nanoid";
 import { pages } from "pages";
-import { SidebarPage } from "pages/SidebarPage";
-import { produce } from "produce";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSyncStatus } from "services/SyncService";
 import { slice } from "slices";
-import { PanelState, Root } from "slices/view";
-
-const defaultRoot: Root<PanelState | undefined> = {
-  type: "branch",
-  orientation: "horizontal",
-  key: nanoid(),
-  children: [
-    {
-      type: "leaf",
-      content: { type: "explore" },
-      key: nanoid(),
-      size: 20,
-    },
-    { type: "leaf", content: undefined, key: nanoid(), size: 80 },
-  ],
-};
-
-const SIDEBAR = 0;
-const CONTENT = 1;
-
-export function useSidebarState() {
-  "use no memo";
-  const open = slice.ui.sidebarOpen.use();
-  const [root, setRoot] = useState(defaultRoot);
-  const produceRoot = (f: (obj: Root<PanelState | undefined>) => void) =>
-    setRoot(produce(root, f));
-  const { Content, derivedRoot, tab } = useMemo(() => {
-    const tab = get(root, `children[${SIDEBAR}].content.type`) ?? "";
-    const Content = pages[tab]?.content;
-    const derivedRoot = produce(root, (r) => {
-      if (r.type === "branch") {
-        r.locked = !open;
-        r.children[SIDEBAR].hidden = !open;
-        const size = open
-          ? r.children[SIDEBAR].size
-            ? r.children[SIDEBAR].size ?? 20
-            : 20
-          : 0;
-        r.children[SIDEBAR].size = size;
-        r.children[CONTENT].size = 100 - size;
-      }
-    });
-    const derivedTab = open ? tab : "";
-    return { Content, derivedRoot, tab: derivedTab };
-  }, [root, open]);
-  return {
-    Content,
-    tab,
-    root: derivedRoot,
-    open,
-    setOpen: (v: boolean) => slice.ui.sidebarOpen.set(v),
-    produceRoot,
-    setRoot,
-  };
-}
 
 export function useSidebarBackground() {
   const { palette } = useTheme();
@@ -91,135 +24,76 @@ function Divider2() {
   return <Divider sx={{ mx: 2, my: 1 }} />;
 }
 
-export function Sidebar({ children }: { children?: ReactNode }) {
+export function Sidebar() {
   const { isPrimary } = useSyncStatus();
-  const { Content, produceRoot, root, setRoot, setOpen, tab, open } =
-    useSidebarState();
   const bgcolor = useSidebarBackground();
   const sm2 = isMobile;
-  useEffect(() => {
-    if (sm2) {
-      setOpen(false);
-    }
-  }, [sm2, setOpen]);
   const sm = !isPrimary || sm2;
   return (
-    <TabContext value={(tab || false) as unknown as string}>
-      <Stack direction={sm ? "column-reverse" : "row"} sx={{ width: "100%" }}>
-        <Stack
-          sx={{
-            display: isPrimary ? "flex" : "none",
-            direction: sm ? "row" : "column",
-            width: sm ? "100%" : 64,
-            height: sm ? 64 : "100%",
-            alignItems: "center",
-            p: 1,
-            gap: sm ? 0 : 1,
-            bgcolor,
-            borderRight: open
-              ? (t) =>
-                  `1px solid ${
-                    t.palette.mode === "dark"
-                      ? t.palette.background.default
-                      : t.palette.divider
-                  }`
-              : "none",
-            borderTop: (t) => (sm ? `1px solid ${t.palette.divider}` : "none"),
+    <TabContext value={false as unknown as string}>
+      <Stack
+        sx={{
+          display: isPrimary ? "flex" : "none",
+          direction: sm ? "row" : "column",
+          width: sm ? "100%" : 64,
+          height: sm ? 64 : "100%",
+          alignItems: "center",
+          p: 1,
+          gap: sm ? 0 : 1,
+          bgcolor,
+          borderTop: (t) => (sm ? `1px solid ${t.palette.divider}` : "none"),
+        }}
+      >
+        <TabList
+          TabIndicatorProps={{ sx: { left: 0, right: "auto" } }}
+          onChange={(_, t) => {
+            slice.ui.fullscreenModal.set(t);
           }}
+          orientation={sm ? "horizontal" : "vertical"}
+          sx={sm ? { height: 64, width: "100%" } : { width: 64 }}
         >
-          <TabList
-            TabIndicatorProps={{ sx: { left: 0, right: "auto" } }}
-            onChange={(_, t) => {
-              if (sm) {
-                slice.ui.fullscreenModal.set(t);
-              } else {
-                produceRoot(
-                  (r) => void set(r, `children[${SIDEBAR}].content.type`, t)
-                );
-                setOpen(true);
-              }
-            }}
-            orientation={sm ? "horizontal" : "vertical"}
-            sx={sm ? { height: 64, width: "100%" } : { width: 64 }}
-          >
-            {values(pages)
-              .filter((c) =>
-                sm
-                  ? c.showInSidebar === "always" ||
-                    c.showInSidebar === "mobile-only"
-                  : c.showInSidebar === "always"
-              )
-              .flatMap((c, i, cx) => [
-                !sm && !!i && c.color !== cx[i - 1].color && (
-                  <Divider2 key={`divider-${i}`} />
-                ),
-                <Tab
-                  onClick={() => {
-                    if (!sm) {
-                      if (tab === c.id) {
-                        setOpen(false);
-                      } else {
-                        setOpen(true);
-                      }
-                    }
-                  }}
-                  key={c.id}
-                  value={c.id}
-                  sx={{
-                    minWidth: 0,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  label={
-                    <Tooltip
-                      key={c.id}
-                      title={c.name}
-                      placement={sm ? "top" : "right"}
+          {values(pages)
+            .filter((c) =>
+              sm
+                ? c.showInSidebar === "always" ||
+                  c.showInSidebar === "mobile-only"
+                : c.showInSidebar === "always"
+            )
+            .flatMap((c, i, cx) => [
+              !sm && !!i && c.color !== cx[i - 1].color && (
+                <Divider2 key={`divider-${i}`} />
+              ),
+              <Tab
+                key={c.id}
+                value={c.id}
+                sx={{
+                  minWidth: 0,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                label={
+                  <Tooltip
+                    key={c.id}
+                    title={c.name}
+                    placement={sm ? "top" : "right"}
+                  >
+                    <Box
+                      sx={{
+                        alignItems: "center",
+                        display: "flex",
+                        "> svg > path": {
+                          strokeWidth: 1,
+                          stroke: bgcolor,
+                        },
+                      }}
                     >
-                      <Box
-                        sx={{
-                          alignItems: "center",
-                          display: "flex",
-                          "> svg > path": {
-                            strokeWidth: 1,
-                            stroke: bgcolor,
-                          },
-                        }}
-                      >
-                        {c.iconThin ?? c.icon}
-                      </Box>
-                    </Tooltip>
-                  }
-                />,
-              ])}
-          </TabList>
-        </Stack>
-        <Box sx={{ flex: 1 }}>
-          <ViewTree
-            onChange={setRoot}
-            root={sm ? get(root, "children[1]") : root}
-            renderLeaf={(l) =>
-              l.content ? (
-                <Stack direction="row" sx={{ width: "100%", bgcolor }}>
-                  {!!Content && (
-                    <Fade in>
-                      <Box
-                        sx={{
-                          flex: 1,
-                          height: "100%",
-                        }}
-                      >
-                        <Content template={SidebarPage}></Content>
-                      </Box>
-                    </Fade>
-                  )}
-                </Stack>
-              ) : (
-                children
-              )
-            }
-          />
-        </Box>
+                      {c.iconThin ?? c.icon}
+                    </Box>
+                  </Tooltip>
+                }
+              />,
+            ])}
+        </TabList>
       </Stack>
     </TabContext>
   );

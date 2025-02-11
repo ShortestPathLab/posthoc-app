@@ -39,7 +39,7 @@ import {
   highlightNodesOptions,
   useHighlightNodes,
 } from "hooks/useHighlight";
-import { usePlaybackState } from "hooks/usePlaybackState";
+import { usePlaybackControls } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
 import { LayerPicker } from "components/generic/LayerPicker";
@@ -104,7 +104,7 @@ export function TreePage({ template: Page }: PageContentProps) {
   // ─── Playback ────────────────────────────────────────────────────────
 
   const step = useThrottle(step1 ?? 0, 1000 / 24);
-  const { stepTo } = usePlaybackState(key);
+  const { stepTo } = usePlaybackControls(key);
 
   // ─── Panel Data ──────────────────────────────────────────────────────
 

@@ -62,6 +62,7 @@
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
     "react-file-drop": "^3.1.6",
+    "react-reverse-portal": "^2.2.0",
     "react-transition-group": "^4.4.5",
     "react-use": "^17.6.0",
     "react-virtualized-auto-sizer": "^1.0.25",

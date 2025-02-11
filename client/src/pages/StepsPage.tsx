@@ -20,7 +20,7 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex, tint } from "components/renderer/colors";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { flattenSubtree, HighlightLayerData } from "hooks/useHighlight";
-import { usePlaybackState } from "hooks/usePlaybackState";
+import { computed, usePlaybackControls } from "hooks/usePlaybackState";
 import { Steps } from "layers";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
@@ -58,7 +58,7 @@ const pxToInt = (s: string) => Number(s.replace(/px$/, ""));
 const SYMBOL_ALL = id();
 const SYMBOL_HIGHLIGHTED = id();
 
-const isStepsLayer = (l: Layer<unknown>): l is StepsLayer =>
+export const isStepsLayer = (l: Layer<unknown>): l is StepsLayer =>
   !!getController(l).steps;
 
 type StepsLayer = Layer<PlaybackLayerData & HighlightLayerData>;
@@ -228,9 +228,11 @@ function PageContent({ layer: key }: { layer?: string }) {
     state: { selectedType: _selectedType, showHighlighting } = {},
   } = useViewTreeContext<StepsPageState>();
 
-  const { step, playing } = usePlaybackState(key);
-
   const one = slice.layers.one<StepsLayer>(key);
+
+  const step = one.use(computed("step"));
+  const playing = one.use(computed("playing"));
+
   const { steps: rawSteps } =
     one.use<Steps | undefined>(
       (c) => getController(c)?.steps?.(c),
@@ -403,6 +405,14 @@ function useItemState({
   const isSelected = one.use((l) => l.source?.step === index);
   return { event, isSelected };
 }
+function useItemPlaybackState(layer?: string) {
+  "use no memo";
+  const one = slice.layers.one<StepsLayer>(layer);
+  const playing = one.use(computed("playing"));
+
+  const { stepTo } = usePlaybackControls(layer);
+  return { stepTo, playing };
+}
 
 function Item({
   layer,
@@ -415,8 +425,7 @@ function Item({
 }) {
   const { spacing } = useTheme();
 
-  const { playing, stepTo } = usePlaybackState(layer);
-
+  const { stepTo, playing } = useItemPlaybackState(layer);
   const { event, isSelected } = useItemState({ layer, index });
 
   return (

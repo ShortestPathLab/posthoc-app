@@ -19,30 +19,29 @@ export function Inspector(props: BlockProps) {
   return (
     <>
       <Block {...props}>
-        <Sidebar>
-          <ViewTree<PanelState>
-            onPopOut={(leaf) => {
-              openWindow({
-                page: leaf.content?.type,
-              });
-            }}
-            onMaximise={(leaf) => {
-              slice.ui.fullscreenModal.set(leaf.content?.type);
-            }}
-            canPopOut={(leaf) => !!pages[leaf.content!.type!]?.allowFullscreen}
-            root={view}
-            onChange={(v) => setView(() => ({ view: v }))}
-            renderLeaf={({ content }) => {
-              const Content =
-                pages[content?.type ?? ""]?.content ?? PlaceholderPage;
-              return (
-                <Box sx={{ width: "100%", height: "100%" }}>
-                  <Content template={Page} />
-                </Box>
-              );
-            }}
-          />
-        </Sidebar>
+        <Sidebar />
+        <ViewTree<PanelState>
+          onPopOut={(leaf) => {
+            openWindow({
+              page: leaf.content?.type,
+            });
+          }}
+          onMaximise={(leaf) => {
+            slice.ui.fullscreenModal.set(leaf.content?.type);
+          }}
+          canPopOut={(leaf) => !!pages[leaf.content!.type!]?.allowFullscreen}
+          root={view}
+          onChange={(v) => setView(() => ({ view: v }))}
+          renderLeaf={({ content }) => {
+            const Content =
+              pages[content?.type ?? ""]?.content ?? PlaceholderPage;
+            return (
+              <Box sx={{ width: "100%", height: "100%" }}>
+                <Content template={Page} />
+              </Box>
+            );
+          }}
+        />
       </Block>
       <Fade in={loading}>
         <LinearProgress

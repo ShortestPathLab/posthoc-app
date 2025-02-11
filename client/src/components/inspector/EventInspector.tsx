@@ -4,7 +4,6 @@ import {
 } from "@mui-symbols-material/w400";
 import {
   Box,
-  Divider,
   ListItem,
   ListItemButton,
   ListItemButtonProps,

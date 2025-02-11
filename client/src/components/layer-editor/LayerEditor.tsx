@@ -231,7 +231,7 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               fullWidth
               variant="filled"
               label="Layer Name"
-              value={name ?? ""}
+              defaultValue={name ?? ""}
               onChange={(e) =>
                 setOptimistic((d) => set(d, "name", e.target.value))
               }

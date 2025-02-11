@@ -1,9 +1,10 @@
 import { PlaybackLayerData } from "components/app-bar/Playback";
 import { useSnackbar } from "components/generic/Snackbar";
-import { clamp, min, range, set, trimEnd } from "lodash";
+import { clamp, min, range, trimEnd } from "lodash";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
+import { set } from "utils/set";
 import { useBreakpoints } from "./useBreakpoints";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
@@ -17,27 +18,41 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   };
 }
 
-export function usePlaybackState(key?: string) {
-  const one = slice.layers.one<Layer<PlaybackLayerData>>(key);
-  const source = one.use((l) => l?.source);
-  const notify = useSnackbar();
-  const shouldBreak = useBreakpoints(key);
+const stepBy = (l: Layer<PlaybackLayerData>, n: number) => {
+  const { playbackTo, step = 0 } = l?.source ?? {};
+  const [start, end] = [0, (l?.source?.playbackTo ?? 1) - 1];
+  set(
+    l,
+    "source.step",
+    clamp((min([playbackTo ?? 0, step]) ?? 0) + n, start, end)
+  );
+};
 
-  const { playback, playbackTo, step: _step = 0 } = source ?? {};
+type ComputedPlaybackLayerProperties = {
+  start: number;
+  end: number;
+  step: number;
+  canPlay: boolean;
+  canPause: boolean;
+  canStop: boolean;
+  canStepForward: boolean;
+  canStepBackward: boolean;
+  playing: boolean;
+};
 
-  const step = min([playbackTo, _step]) ?? 0;
+export function computed<T extends keyof ComputedPlaybackLayerProperties>(
+  k: T
+) {
+  return (l?: Layer<PlaybackLayerData>) => {
+    const { playback, playbackTo, step: _step } = l?.source ?? {};
 
-  const ready = !!playbackTo;
-  const playing = playback === "playing";
-  const [start, end] = [0, (playbackTo ?? 1) - 1];
+    const step = min([playbackTo, _step]) ?? 0;
 
-  return useMemo(() => {
-    const setPlaybackState = (
-      s: (a: Partial<PlaybackLayerData>) => Partial<PlaybackLayerData>
-    ) => {
-      one.set((l) => set(l, "source", { ...l.source, ...s(l.source ?? {}) }));
-    };
-    const state = {
+    const ready = !!playbackTo;
+    const playing = playback === "playing";
+    const [start, end] = [0, (playbackTo ?? 1) - 1];
+
+    return {
       start,
       end,
       step,
@@ -46,78 +61,92 @@ export function usePlaybackState(key?: string) {
       canStop: ready && step,
       canStepForward: ready && !playing && step < end,
       canStepBackward: ready && !playing && step > 0,
-    };
+      playing: playback === "playing",
+    }[k];
+  };
+}
 
-    const stepBy = (step: number, n: number) =>
-      clamp((min([playbackTo, step]) ?? 0) + n, start, end);
+export function usePlaybackControls(key?: string) {
+  "use no memo";
 
-    const pause = (n = 0) => {
-      setPlaybackState(({ step = 0 }) => ({
-        playback: "paused",
-        step: stepBy(step, n),
-      }));
-    };
+  const notify = useSnackbar();
+  const shouldBreak = useBreakpoints(key);
 
-    const tick = (n = 1) => {
-      return setPlaybackState(({ step = 0 }) => ({
-        playback: "playing",
-        step: stepBy(step, n),
-      }));
-    };
+  return useMemo(() => {
+    const one = slice.layers.one<Layer<PlaybackLayerData>>(key);
 
-    const stepWithBreakpointCheck = (count: number, offset: number = 0) =>
-      cancellable(
-        async () => {
-          for (const i of range(offset, count)) {
-            const r = shouldBreak(step + i);
-            if (r.result || r.error) return { ...r, offset: i };
-          }
-          return { result: "", offset: 0, error: undefined };
-        },
-        ({ result, offset, error }) => {
-          if (error) {
-            notify(`${trimEnd(error, ".")}`, `Step ${step + offset}`);
-            pause();
-          } else if (result) {
-            notify(`Breakpoint hit: ${result}`, `Step ${step + offset}`);
-            pause(offset);
-          } else tick(count);
-        }
-      );
+    function get<T extends keyof PlaybackLayerData>(
+      key: T,
+      fallback: PlaybackLayerData[T]
+    ) {
+      return (one.get((l) => l.source?.[key]) ?? fallback)!;
+    }
 
-    const findBreakpoint = (direction: 1 | -1 = 1) => {
-      let i;
-      for (i = step + direction; i <= end && i >= 0; i += direction) {
-        if (shouldBreak(i)?.result) break;
-      }
-      return i;
-    };
+    const pause = (n = 0) =>
+      one.set((l) => {
+        set(l, "source.playback", "paused");
+        stepBy(l, n);
+      });
 
-    const callbacks = {
-      play: () => {
-        // notify("Playback started");
-        setPlaybackState(({ step = 0 }) => ({
-          playback: "playing",
-          step: stepBy(step, 1),
-        }));
-      },
-      pause,
-      stepTo: (n = 0) =>
-        setPlaybackState(() => ({ step: clamp(n, start, end) })),
-      stop: () => setPlaybackState(() => ({ step: start, playback: "paused" })),
-      stepForward: () =>
-        setPlaybackState(({ step = 0 }) => ({ step: stepBy(step, 1) })),
-      stepBackward: () =>
-        setPlaybackState(({ step = 0 }) => ({ step: stepBy(step, -1) })),
-      tick,
-      findBreakpoint,
-      stepWithBreakpointCheck,
-    };
+    const tick = (n = 1) =>
+      one.set((l) => {
+        set(l, "source.playback", "playing");
+        stepBy(l, n);
+      });
 
     return {
-      playing: playback === "playing",
-      ...state,
-      ...callbacks,
+      play: () =>
+        one.set((l) => {
+          set(l, "source.playback", "playing");
+          stepBy(l, 1);
+        }),
+      pause,
+      stepTo: (n = 0) =>
+        one.set((l) => {
+          set(l, "source.step", clamp(n, 0, get("playbackTo", 1) - 1));
+        }),
+      stop: () =>
+        one.set((l) => {
+          set(l, "source.step", 0);
+          set(l, "source.playback", "paused");
+        }),
+      stepForward: () => one.set((l) => stepBy(l, 1)),
+      stepBackward: () => one.set((l) => stepBy(l, -1)),
+      tick,
+      findBreakpoint: (direction: 1 | -1 = 1) => {
+        const step = one.get((l) => l.source?.step) ?? 0;
+        const end = get("playbackTo", 1) - 1;
+        let i;
+        for (i = step + direction; i <= end && i >= 0; i += direction) {
+          if (shouldBreak(i)?.result) break;
+        }
+        return i;
+      },
+      stepWithBreakpointCheck: (count: number, offset: number = 0) =>
+        cancellable(
+          async () => {
+            for (const i of range(offset, count)) {
+              const r = shouldBreak(get("step", 0) + i);
+              if (r.result || r.error) return { ...r, offset: i };
+            }
+            return { result: "", offset: 0, error: undefined };
+          },
+          ({ result, offset, error }) => {
+            if (error) {
+              notify(
+                `${trimEnd(error, ".")}`,
+                `Step ${get("step", 0) + offset}`
+              );
+              pause();
+            } else if (result) {
+              notify(
+                `Breakpoint hit: ${result}`,
+                `Step ${get("step", 0) + offset}`
+              );
+              pause(offset);
+            } else tick(count);
+          }
+        ),
     };
-  }, [end, playback, playbackTo, playing, ready, start, step, shouldBreak]);
+  }, [key, shouldBreak]);
 }

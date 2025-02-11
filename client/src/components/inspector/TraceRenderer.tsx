@@ -4,10 +4,10 @@ import {
 } from "@mui-symbols-material/w400";
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
-import { usePlaybackState } from "hooks/usePlaybackState";
 import { RenderLayer } from "layers/RenderLayer";
-import { clamp, find, floor, get, map } from "lodash";
+import { clamp, find, floor, get, map, some } from "lodash";
 import { nanoid } from "nanoid";
+import { isStepsLayer } from "pages/StepsPage";
 import { Size } from "protocol";
 import {
   createContext,
@@ -19,6 +19,7 @@ import {
 } from "react";
 import { useDebounce } from "react-use";
 import { Renderer, RendererEvent } from "renderer";
+import { slice } from "slices";
 import { useLoading } from "slices/loading";
 import { useRenderers } from "slices/renderers";
 import { useScreenshots } from "slices/screenshots";
@@ -119,6 +120,12 @@ function TraceRendererCircularProgress() {
 const VIEWPORT_PAGE_DESCRIPTION =
   "When you create a layer, you'll see it visualised here.";
 
+function useAnyLayerPlaying() {
+  return slice.layers.use((l) =>
+    some(l, (l) => isStepsLayer(l) && l.source?.playback === "playing")
+  );
+}
+
 export function TraceRenderer({
   width,
   height,
@@ -128,8 +135,9 @@ export function TraceRenderer({
 }: RendererProps) {
   const key = useMemo(() => nanoid(), []);
   const { instance, error, ref } = useRenderer(renderer, { width, height });
-  const { playing } = usePlaybackState();
   const [, setScreenshots] = useScreenshots();
+
+  const playing = useAnyLayerPlaying();
 
   const [selection, setSelection] = useState<SelectEvent>();
 
@@ -162,6 +170,7 @@ export function TraceRenderer({
   useEffect(() => {
     if (instance) {
       instance.setOptions({
+        // TODO: This is a 2D renderer specific setting
         tileResolution: {
           width: tileSize(playing),
           height: tileSize(playing),
