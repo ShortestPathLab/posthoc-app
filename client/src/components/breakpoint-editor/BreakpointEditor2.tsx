@@ -41,7 +41,6 @@ type BreakpointEditorProps = {
 
 export function BreakpointEditor({
   value,
-  layerKey,
   trace,
   onValueChange: onChange,
 }: BreakpointEditorProps) {
