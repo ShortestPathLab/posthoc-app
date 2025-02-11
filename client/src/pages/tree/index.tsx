@@ -46,7 +46,7 @@ import { getController } from "layers/layerControllers";
 import { TraceLayerData } from "layers/trace";
 import { entries, findLast, isEmpty, map, startCase } from "lodash";
 import { Size } from "protocol";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
@@ -57,10 +57,12 @@ import { set } from "utils/set";
 import { PageContentProps } from "../PageMeta";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
-import { useTreeLayoutMemo } from "./TreeLayoutWorker";
+import { useTreeLayout } from "./TreeLayoutWorker";
 import { useGraphSettings } from "./useGraphSettings";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
+import { equal } from "slices/selector";
+import { UploadedTrace } from "slices/UIState";
 
 type TreePageContext = PanelState;
 
@@ -246,12 +248,12 @@ function useTreePageState(key?: string) {
   "use no memo";
 
   const one = slice.layers.one<TreeLayer>(key);
-  const trace = one.use(
+  const trace = one.use<UploadedTrace | undefined>(
     (l) => l?.source?.trace,
-    (p, n) => p?.key === n?.key
+    equal("key")
   );
   const step = one.use((l) => l?.source?.step);
-  return { step: step, trace };
+  return { step, trace };
 }
 
 export function TreePage({ template: Page }: PageContentProps) {
@@ -261,11 +263,11 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const { key, setKey } = useLayerPicker(isTreeLayer);
   const one = slice.layers.one<TreeLayer>(key);
-  const { trace, step: step1 } = useTreePageState(key);
+  const { trace, step } = useTreePageState(key);
 
   // ─── Playback ────────────────────────────────────────────────────────
 
-  const step = useThrottle(step1 ?? 0, 1000 / 24);
+  const throttled = useThrottle(step ?? 0, 1000 / 24);
 
   // ─── Panel Data ──────────────────────────────────────────────────────
 
@@ -282,7 +284,7 @@ export function TreePage({ template: Page }: PageContentProps) {
   // const [axisTracking, setAxisTracking] = useState<typeof properties | "">("");
 
   const { point, selected, selection, setSelection } = useSelection(
-    step,
+    throttled,
     trace?.content
   );
 
@@ -292,10 +294,11 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const { result: tree, loading } = useTreeLayoutMemo(
-    { trace: trace?.content, mode },
-    [key, mode]
-  );
+  const { data: tree, isLoading: loading } = useTreeLayout({
+    trace: trace?.content,
+    mode,
+    key: trace?.key,
+  });
 
   const graphSettings = useGraphSettings();
 
@@ -307,78 +310,7 @@ export function TreePage({ template: Page }: PageContentProps) {
       <Page.Content>
         <Block sx={size}>
           {trace ? (
-            !loading ? (
-              tree?.length ? (
-                <>
-                  <AutoSize>
-                    {(size: Size) => (
-                      <>
-                        <SigmaContainer
-                          style={{
-                            ...size,
-                            background: theme.palette.background.paper,
-                          }}
-                          graph={MultiDirectedGraph}
-                          settings={graphSettings}
-                        >
-                          <TreeGraph
-                            width={size.width}
-                            height={size.height}
-                            step={step}
-                            tree={tree}
-                            trace={trace?.content}
-                            layer={key}
-                            showAllEdges={layoutModes[mode].showAllEdges}
-                            trackedProperty={trackedProperty}
-                            onExit={() => {
-                              const layer = one.get();
-                              if (!isEmpty(layer?.source?.highlighting)) {
-                                one.set((l) =>
-                                  set(l, "source.highlighting", {})
-                                );
-                              }
-                            }}
-                          />
-                          <GraphEvents
-                            layerKey={key}
-                            onSelection={(e) => {
-                              setSelection(e);
-                              setMenuOpen(true);
-                            }}
-                          />
-                        </SigmaContainer>
-                      </>
-                    )}
-                  </AutoSize>
-                  <TreeMenu
-                    onClose={() => setMenuOpen(false)}
-                    anchorReference="anchorPosition"
-                    anchorPosition={{
-                      left: point.x,
-                      top: point.y,
-                    }}
-                    transformOrigin={{
-                      horizontal: "left",
-                      vertical: "top",
-                    }}
-                    open={menuOpen}
-                    layer={key}
-                    selected={selected}
-                    selection={selection}
-                  />
-                </>
-              ) : (
-                <WithLayer<TreeLayer> layer={key}>
-                  {(l) => (
-                    <Placeholder
-                      icon={<AccountTreeOutlined />}
-                      label="Graph"
-                      secondary={`${inferLayerName(l)} is not a graph.`}
-                    />
-                  )}
-                </WithLayer>
-              )
-            ) : (
+            loading ? (
               <Block
                 sx={{
                   flexDirection: "column",
@@ -396,6 +328,71 @@ export function TreePage({ template: Page }: PageContentProps) {
                   Generating layout
                 </Typography>
               </Block>
+            ) : tree?.length ? (
+              <>
+                <AutoSize>
+                  {(size: Size) => (
+                    <SigmaContainer
+                      style={{
+                        ...size,
+                        background: theme.palette.background.paper,
+                      }}
+                      graph={MultiDirectedGraph}
+                      settings={graphSettings}
+                    >
+                      <TreeGraph
+                        width={size.width}
+                        height={size.height}
+                        step={throttled}
+                        tree={tree}
+                        trace={trace?.content}
+                        layer={key}
+                        showAllEdges={layoutModes[mode].showAllEdges}
+                        trackedProperty={trackedProperty}
+                        onExit={() => {
+                          const layer = one.get();
+                          if (!isEmpty(layer?.source?.highlighting)) {
+                            one.set((l) => set(l, "source.highlighting", {}));
+                          }
+                        }}
+                      />
+                      <GraphEvents
+                        layerKey={key}
+                        onSelection={(e) => {
+                          setSelection(e);
+                          setMenuOpen(true);
+                        }}
+                      />
+                    </SigmaContainer>
+                  )}
+                </AutoSize>
+                <TreeMenu
+                  onClose={() => setMenuOpen(false)}
+                  anchorReference="anchorPosition"
+                  anchorPosition={{
+                    left: point.x,
+                    top: point.y,
+                  }}
+                  transformOrigin={{
+                    horizontal: "left",
+                    vertical: "top",
+                  }}
+                  open={menuOpen}
+                  layer={key}
+                  selected={selected}
+                  selection={selection}
+                />
+              </>
+            ) : (
+              <WithLayer<TreeLayer> layer={key}>
+                {(l) => (
+                  <Placeholder
+                    icon={<AccountTreeOutlined />}
+                    label="Graph"
+                    secondary={`${inferLayerName(l)} is not a graph.`}
+                  />
+                )}
+              </WithLayer>
             )
           ) : (
             <Placeholder
@@ -444,7 +441,7 @@ export function TreePage({ template: Page }: PageContentProps) {
               // },
             ],
             ({ icon, label, value, items, onChange }, i) => (
-              <>
+              <Fragment key={i}>
                 {!!i && divider}
                 <FeaturePicker
                   icon={icon}
@@ -455,7 +452,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                   onChange={onChange}
                   arrow
                 />
-              </>
+              </Fragment>
             )
           )}
         </>

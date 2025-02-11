@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { treeToDict } from "hooks/useBreakPoints2";
-import { usingMemoizedWorkerTask } from "../../workers/usingWorker";
+import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import {
   TreeWorkerParameters,
   TreeWorkerReturnType,
-} from "./treeLegacy.worker";
-import treeWorkerUrl from "./treeLegacy.worker.ts?worker&url";
+} from "./treeUtility.worker";
+import treeWorkerUrl from "./treeUtility.worker.ts?worker&url";
 
 export class TreeWorkerUrl extends Worker {
   constructor() {
@@ -25,7 +25,7 @@ export function useComputeTree({
   trace,
 }: TreeWorkerParameters & { key?: string }) {
   return useQuery({
-    queryKey: ["compute/tree", key, radius, step],
+    queryKey: ["compute/tree/utility", key, radius, step],
     queryFn: async () => {
       const tree = await treeAsync({ radius, step, trace });
       if (tree) {

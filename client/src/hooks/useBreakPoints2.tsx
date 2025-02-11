@@ -9,7 +9,7 @@ import { chain, forEach, isEqual, values } from "lodash";
 import memoizee from "memoizee";
 import objectHash from "object-hash";
 import { EventTree } from "pages/tree/treeLayout.worker";
-import { useComputeTree } from "pages/tree/TreeWorkerLegacy";
+import { useComputeTree } from "pages/tree/TreeUtility";
 import { useEffect, useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";

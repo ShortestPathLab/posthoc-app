@@ -18,9 +18,8 @@ export const usingWorker = <R>(w: WorkerConstructor) => {
 };
 
 export const usingWorkerTask = <T, R>(w: WorkerConstructor) => {
-  const withWorker = usingWorker<R>(w);
   return (inp: T) =>
-    withWorker((worker) => {
+    usingWorker<R>(w)((worker) => {
       worker.postMessage(inp);
       return new Promise<R>((res, rej) => {
         worker.onmessage = (out) => {
