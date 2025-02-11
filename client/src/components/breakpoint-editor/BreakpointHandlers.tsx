@@ -1,8 +1,8 @@
 import { UploadedTrace } from "slices/UIState";
 import { Breakpoint } from "./BreakpointEditor2";
-import { EventTree, Key } from "pages/tree/tree.worker";
+import { EventTree, Key } from "pages/tree/treeLayout.worker";
 import { comparators } from "./comparators";
-import { find, forEach, get, map, startCase } from "lodash";
+import { find, forEach, get, lowerCase as lower, map, startCase } from "lodash";
 import {
   BreakPointSwitch,
   ConditionSelect,
@@ -252,7 +252,3 @@ const handlersCollection = {
 export default handlersCollection satisfies {
   [K in keyof typeof handlersCollection]: BreakpointHandler<K, any>;
 };
-
-function lower(arg0: any) {
-  throw new Error("Function not implemented.");
-}

@@ -4,7 +4,7 @@ import { chain, each, forOwn, groupBy, map, max, min } from "lodash";
 import { sort } from "moderndash";
 import { Trace } from "protocol";
 import { useCallback, useEffect, useState } from "react";
-import { TreeWorkerReturnType } from "./tree.worker";
+import { TreeWorkerReturnType } from "./treeLayout.worker";
 
 const digits = {
   "-": "⁻",

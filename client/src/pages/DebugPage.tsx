@@ -1,28 +1,24 @@
-import {
-  BugReportOutlined,
-  LayersOutlined as LayersIcon,
-} from "@mui-symbols-material/w400";
+import { BugReportOutlined } from "@mui-symbols-material/w400";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Divider, Tab, Typography as Type } from "@mui/material";
-import { FeaturePicker } from "components/app-bar/FeaturePicker";
+import { Box, Divider, Tab } from "@mui/material";
+import { LayerPicker } from "components/generic/LayerPicker";
 import { Scroll } from "components/generic/Scrollbars";
 import { Placeholder } from "components/inspector/Placeholder";
 import { TrustedContent } from "components/inspector/TrustedContent";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { makeTemplate } from "components/script-editor/makeTemplate";
+import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { templates } from "components/script-editor/templates";
 import { DebugLayerData } from "hooks/useBreakpoints";
-import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
-import { find, map, set, values } from "lodash";
-import { produce } from "produce";
-import { ReactNode, useState } from "react";
+import { set, values } from "lodash";
+import { useState } from "react";
+import { slice } from "slices";
 import { Layer, useLayerPicker } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { PageContentProps } from "./PageMeta";
 
-const stepsLayerGuard = (l: Layer): l is Layer<DebugLayerData> =>
+const stepsLayerGuard = (l: Layer<unknown>): l is Layer<DebugLayerData> =>
   !!getController(l).steps;
 
 const divider = (
@@ -33,19 +29,21 @@ const divider = (
   />
 );
 
+function useDebugPageState(key?: string) {
+  const layer = slice.layers.one<Layer<DebugLayerData>>(key).use();
+  return { layer };
+}
+
 export function DebugPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
 
   const [tab, setTab] = useState("standard");
-  const {
-    key,
-    setKey,
-    all: layers,
-    layer,
-    setLayer,
-    allLayers,
-  } = useLayerPicker(undefined, stepsLayerGuard);
+
+  const { key, setKey } = useLayerPicker(stepsLayerGuard);
+
+  const one = slice.layers.one<Layer<DebugLayerData>>(key);
+  const { layer } = useDebugPageState(key);
   const { code } = layer?.source ?? {};
 
   return (
@@ -55,19 +53,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
         <Page.Title>Debugger</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
-          <FeaturePicker
-            icon={<LayersIcon />}
-            label="Layer"
-            value={key}
-            items={map(allLayers, (l) => ({
-              id: l.key,
-              hidden: !find(layers, { key: l.key }),
-              name: inferLayerName(l),
-            }))}
-            onChange={setKey}
-            arrow
-            ellipsis={12}
-          />
+          <LayerPicker guard={stepsLayerGuard} onChange={setKey} value={key} />
           {divider}
           <TabList
             onChange={(_, v) => setTab(v)}
@@ -94,12 +80,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
                     <ScriptEditor
                       code={code ?? makeTemplate(values(templates))}
                       onChange={(v) =>
-                        layer &&
-                        setLayer(
-                          produce(layer, (layer) =>
-                            set(layer, "source.code", v)
-                          )
-                        )
+                        layer && one.set((l) => set(l, "source.code", v))
                       }
                     />
                   </TrustedContent>

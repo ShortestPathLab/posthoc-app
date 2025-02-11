@@ -34,6 +34,7 @@ import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/ParseTraceSlaveWorker";
 import { DebugLayerData } from "hooks/useBreakpoints";
+import { BreakpointService } from "hooks/useBreakPoints2";
 import { useTraceContent } from "hooks/useTraceContent";
 import { dump } from "js-yaml";
 import { inferLayerName, LayerController } from "layers";
@@ -207,6 +208,7 @@ export const controller = {
     return (
       <>
         <PlaybackService value={value} />
+        <BreakpointService value={value?.key} />
       </>
     );
   }),

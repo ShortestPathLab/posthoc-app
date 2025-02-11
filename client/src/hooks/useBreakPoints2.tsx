@@ -1,19 +1,21 @@
-import { useEffect, useMemo } from "react";
-import { Layer, useLayer } from "slices/layers";
-import { chain, forEach, set, values } from "lodash";
-import { call } from "components/script-editor/call";
-import { EventTree } from "pages/tree/tree.worker";
-import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
-import { useTreeMemo } from "pages/tree/TreeWorkerLegacy";
+import { Breakpoint } from "components/breakpoint-editor/BreakpointEditor2";
 import handlersCollection, {
   BreakpointHandler,
   TreeDict,
 } from "components/breakpoint-editor/BreakpointHandlers";
-import { Breakpoint } from "components/breakpoint-editor/BreakpointEditor2";
-import { UploadedTrace } from "slices/UIState";
-import { produce } from "produce";
-import objectHash from "object-hash";
+import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
+import { call } from "components/script-editor/call";
+import { chain, forEach, isEqual, values } from "lodash";
 import memoizee from "memoizee";
+import objectHash from "object-hash";
+import { EventTree } from "pages/tree/treeLayout.worker";
+import { useComputeTree } from "pages/tree/TreeWorkerLegacy";
+import { useEffect, useMemo } from "react";
+import { slice } from "slices";
+import { Layer } from "slices/layers";
+import { equal } from "slices/selector";
+import { UploadedTrace } from "slices/UIState";
+import { set } from "utils/set";
 
 export type DebugLayerData = {
   code?: string;
@@ -25,24 +27,20 @@ export type DebugLayerData = {
 };
 
 export function useBreakPoints2(key?: string) {
-  const { layer } = useLayer<DebugLayerData>(key);
+  "use no memo";
+
+  const layer = slice.layers.one<Layer<DebugLayerData>>(key).use();
   const { code = "" } = layer?.source ?? {};
   const { isTrusted } = useUntrustedLayers();
   const events = layer?.source?.trace?.content?.events ?? [];
-  const { result: treeRaw } = useTreeMemo(
-    {
-      trace: layer?.source?.trace?.content,
-      step: layer?.source?.trace?.content?.events?.length,
-      radius: undefined,
-    },
-    [layer?.source?.trace?.content]
-  );
-
-  const trees = useMemo(() => {
-    return treeToDict(treeRaw?.tree ?? []);
-  }, [treeRaw]);
+  const { data: { dict } = {} } = useComputeTree({
+    trace: layer?.source?.trace?.content,
+    step: layer?.source?.trace?.content?.events?.length,
+    radius: undefined,
+  });
 
   const shouldBreak = useMemo(() => {
+    if (!dict) return;
     const steps =
       chain(layer?.source?.output)
         .map((s) => values(s))
@@ -55,15 +53,16 @@ export function useBreakPoints2(key?: string) {
       if (
         code &&
         isTrusted &&
+        //TODO: Fix type
         call(code, "shouldBreak", [
           step,
           event,
           events,
-          trees[step]?.parent,
-          trees[step]?.children ?? [],
-        ])
+          dict[step]?.parent,
+          dict[step]?.children ?? [],
+        ] as unknown as any)
       ) {
-        return [{ step: step, result: "Script editor" }];
+        return [{ step, result: "Script editor" }];
       }
 
       return steps?.[`${step}`];
@@ -75,16 +74,27 @@ export function useBreakPoints2(key?: string) {
   };
 }
 
-export function BreakpointService({
-  layer,
-  trees,
-  setLayer,
-}: {
-  layer?: Layer<DebugLayerData>;
-  trees: TreeDict;
-  setLayer: (layer: Layer<DebugLayerData>) => {};
-}) {
+export function BreakpointService({ value }: { value?: string }) {
+  "use no memo";
+
+  const one = slice.layers.one<Layer<DebugLayerData>>(value);
+
+  const trace = one.use<UploadedTrace | undefined>(
+    (l) => l?.source?.trace,
+    equal("key")
+  );
+
+  const inputs = one.use((l) => l?.source?.breakpointInput, isEqual);
+
+  const { data: { dict, tree } = {} } = useComputeTree({
+    key: trace?.key,
+    trace: trace?.content,
+    step: trace?.content?.events?.length,
+    radius: undefined,
+  });
+
   useEffect(() => {
+    if (!dict || !tree || !trace) return;
     const processBreakpoint = memoizee(
       async (breakpoint: Breakpoint) => {
         const label = breakpoint.label as keyof typeof handlersCollection;
@@ -92,29 +102,22 @@ export function BreakpointService({
           any,
           any
         >;
-        const res = await handler.processor(
-          breakpoint,
-          layer?.source?.trace!,
-          trees
-        );
+        const res = await handler.processor(breakpoint, trace, dict);
         return res;
       },
       { normalizer: ([e]) => objectHash(e) }
     );
     const output: [{ step: number; result: string }[] | { error: string }] =
       [] as any;
-    if (layer?.source?.breakpointInput) {
-      forEach(layer?.source?.breakpointInput, async (b) => {
+    if (inputs) {
+      forEach(inputs, async (b) => {
         const res = await processBreakpoint(b);
         output.push(res);
       });
+
+      one.set((l) => set(l, "source.output", output));
     }
-    if (layer) {
-      setLayer(
-        produce(layer, (layer) => set(layer?.source ?? {}, "output", output))
-      );
-    }
-  }, [layer?.key, trees, layer?.source?.breakpointInput]);
+  }, [dict, inputs]);
   return <></>;
 }
 

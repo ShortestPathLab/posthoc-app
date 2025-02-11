@@ -5,47 +5,41 @@ import { Block } from "components/generic/Block";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useMonacoTheme } from "components/script-editor/ScriptEditor";
-import { LayerSource } from "layers";
 import { getController } from "layers/layerControllers";
-import { find, first, map } from "lodash";
-import { useEffect, useMemo } from "react";
+import { find, first, flatMap, map } from "lodash";
+import { useMemo } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
-import { Layer, useLayerPicker } from "slices/layers";
+import { slice } from "slices";
+import { Layer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
+import { assert } from "utils/assert";
 import { debounceLifo } from "utils/debounceLifo";
+import { idle } from "utils/idle";
 import { PageContentProps } from "./PageMeta";
+import { useOptimistic } from "hooks/useOptimistic";
 
 type SourceLayer = Layer;
 
-const isSourceLayer = (l: Layer): l is SourceLayer =>
-  !!getController(l)?.getSources;
-
 type SourceLayerState = { source?: string; layer?: string };
+
+function useSources() {
+  "use no memo";
+  // TODO: Slightly not performance
+  return slice.layers.use((l) =>
+    flatMap(l, (l) =>
+      map(getController(l)?.getSources?.(l), (s) => ({
+        layer: l.key,
+        source: s,
+      }))
+    )
+  );
+}
 
 export function SourcePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
   useMonacoTheme(theme);
 
-  const {
-    all: layers,
-    updateLayerAsync: updateLayer,
-    setKey,
-    controller,
-  } = useLayerPicker(undefined, isSourceLayer);
-
-  const sources = useMemo(
-    () =>
-      layers?.flatMap?.(
-        (l) =>
-          controller.getSources?.(l)?.map?.((c) => ({
-            layer: l.key,
-            source: c,
-          }))
-        // why is layer string here?
-        // layer is only the layer id
-      ) as { layer: string; source: LayerSource }[],
-    [layers]
-  );
+  const sources = useSources();
 
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<SourceLayerState>();
@@ -60,21 +54,28 @@ export function SourcePage({ template: Page }: PageContentProps) {
       ) ?? first(sources),
     [sources, state?.source, state?.layer]
   );
-  useEffect(
-    () => void (selected?.layer && setKey(selected?.layer)),
-    [setKey, selected?.layer]
-  );
-
   const handleEditorContentChange = useMemo(
     () =>
-      debounceLifo((value?: string) =>
-        usingLoading(() =>
-          updateLayer((l) =>
-            controller.onEditSource!(l, selected?.source?.id, value)
-          )
-        )
+      debounceLifo((v?: string) =>
+        usingLoading(async () => {
+          if (!selected?.source?.id || !selected?.layer) return;
+          const one = slice.layers.one<SourceLayer>(selected.layer);
+          const l = one.get();
+          assert(l, "layer is defined");
+          const next = await getController(l)?.onEditSource?.(
+            l,
+            selected.source.id,
+            v
+          );
+          assert(next, "updated source is defined");
+          one.set(next);
+        })
       ),
-    [usingLoading, selected?.source?.id, updateLayer]
+    [usingLoading, selected?.source?.id]
+  );
+
+  const [value, setValue] = useOptimistic(selected?.source?.content, (v) =>
+    idle(() => handleEditorContentChange(v))
   );
 
   return (
@@ -88,8 +89,6 @@ export function SourcePage({ template: Page }: PageContentProps) {
             <AutoSize>
               {(size: { width: number; height: number }) => (
                 <Editor
-                  // Refresh the editor when the id changes
-                  key={selected?.source?.id}
                   theme={
                     theme.palette.mode === "dark" ? "posthoc-dark" : "light"
                   }
@@ -99,14 +98,8 @@ export function SourcePage({ template: Page }: PageContentProps) {
                   language={selected?.source?.language}
                   loading={<CircularProgress variant="indeterminate" />}
                   {...size}
-                  // If source is readonly, use value, so the value updates the editor.
-                  // Otherwise, don't update the editor when value changes
-                  // for better editing experience
-                  {...{
-                    [selected?.source?.readonly ? "value" : "defaultValue"]:
-                      selected?.source?.content,
-                  }}
-                  onChange={handleEditorContentChange}
+                  value={value}
+                  onChange={setValue}
                 />
               )}
             </AutoSize>
@@ -117,19 +110,28 @@ export function SourcePage({ template: Page }: PageContentProps) {
       </Page.Content>
       <Page.Options>
         {!!sources?.length && (
-          <>
-            <Tabs
-              value={`${selected?.source.id}::${selected?.layer}`}
-              onChange={(_, v: string) => {
-                const [a, b] = v.split("::");
-                onChange?.({ source: a, layer: b });
-              }}
-            >
-              {map(sources, ({ source, layer }) => (
-                <Tab label={source.name} value={`${source.id}::${layer}`} />
-              ))}
-            </Tabs>
-          </>
+          <Tabs
+            value={`${selected?.source.id}::${selected?.layer}`}
+            onChange={(_, v: string) => {
+              const [a, b] = v.split("::");
+              onChange?.({ source: a, layer: b });
+            }}
+          >
+            {map(sources, ({ source, layer }) => (
+              <Tab
+                label={
+                  source.readonly ? (
+                    <span>
+                      <span>{source.name}</span> <i>(Read-only)</i>
+                    </span>
+                  ) : (
+                    source.name
+                  )
+                }
+                value={`${source.id}::${layer}`}
+              />
+            ))}
+          </Tabs>
         )}
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>

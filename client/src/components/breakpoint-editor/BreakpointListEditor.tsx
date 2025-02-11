@@ -2,14 +2,8 @@ import { Box, Typography as Type } from "@mui/material";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
 import { Scroll } from "components/generic/Scrollbars";
 import { Breakpoint, DebugLayerData } from "hooks/useBreakpoints";
-import {
-  BreakpointService,
-  treeToDict
-} from "hooks/useBreakPoints2";
 import { getController } from "layers/layerControllers";
 import { chain as _, keys } from "lodash";
-import { useTreeMemo } from "pages/tree/TreeWorkerLegacy";
-import { produce } from "produce";
 import { ReactNode, useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
@@ -30,22 +24,6 @@ export function BreakpointListEditor({
   const one = slice.layers.one<Layer<DebugLayerData>>(key);
   const breakpoints = one.use((l) => l?.source?.breakpoints);
   const events = one.use((l) => getController(l)?.steps?.(l));
-
-
-
-  const { result: treeRaw } = useTreeMemo(
-    {
-      trace: trace?.content,
-      step: trace?.content?.events?.length,
-      radius: undefined,
-    },
-    [trace?.content]
-  );
-
-  const trees = useMemo(() => {
-    return treeToDict(treeRaw?.tree ?? []);
-  }, [treeRaw]);
-
 
   const properties = useMemo(
     () =>
@@ -74,16 +52,11 @@ export function BreakpointListEditor({
             sortable
             button={false}
             icon={null}
-            value={result}
+            value={breakpoints}
             deletable
             editable={false}
-            editor={(v: any) => (
-              <BreakpointEditor
-                value={v}
-                layerKey={key}
-                trace={layer?.source?.trace}
-              />
-            )}
+            editor={(v: any) => <BreakpointEditor value={v} />}
+            // TODO: Refactor
             create={() => ({
               active: true,
               property: properties?.[0],
@@ -92,7 +65,7 @@ export function BreakpointListEditor({
               reference: 0,
             })}
             onChange={(f) =>
-              handleBreakpointsChange(produce(breakpoints ?? [], f))
+              one.set((l) => void f(l?.source?.breakpoints ?? []))
             }
             addItemLabels={["Breakpoint"]}
             placeholder="Get started by adding a breakpoint."
@@ -104,34 +77,24 @@ export function BreakpointListEditor({
             sortable
             button={false}
             icon={null}
-            value={result}
+            value={breakpoints}
             deletable
             editable={false}
-            editor={(v) => (
-              <BreakpointEditor
-                value={v}
-                trace={layer?.source?.trace}
-                layerKey={key}
-              />
-            )}
+            editor={(v) => <BreakpointEditor value={v} />}
+            // TODO: Refactor
             create={() => ({
               active: true,
               property: properties?.[0],
               condition: "increase",
             })}
-            onChange={(updatedBreakpoints) => {
-              handleBreakpointsChange(updatedBreakpoints);
-            }}
+            onChange={(f) =>
+              one.set((l) => void f(l?.source?.breakpoints ?? []))
+            }
             addItemLabels={violations}
             placeholder="Certain types of errors can be detected by checking for invariant violations."
           />
         </Box>
       </Scroll>
-      <BreakpointService
-        layer={layer}
-        trees={trees}
-        setLayer={setLayer}
-      ></BreakpointService>
     </Box>
   );
 }

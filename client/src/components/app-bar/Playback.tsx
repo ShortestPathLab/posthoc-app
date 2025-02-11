@@ -170,7 +170,7 @@ export function Playback({ layer }: { layer?: string }) {
   );
 }
 
-function useStep(layer?: string) {
+export function useStep(layer?: string) {
   "use no memo";
   return slice.layers
     .one<Layer<PlaybackLayerData>>(layer)

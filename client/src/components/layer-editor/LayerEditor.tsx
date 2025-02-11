@@ -28,21 +28,14 @@ import {
   startCase,
   truncate,
 } from "lodash";
-import { produce } from "produce";
-import {
-  ReactNode,
-  createElement,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useToggle } from "react-use";
+import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
 import { slice } from "slices";
 import { Layer, WithLayer } from "slices/layers";
 import { Transaction } from "slices/selector";
 import { usePaper } from "theme";
 import { set } from "utils/set";
+import { idle } from "../../utils/idle";
+import { useOptimisticTransaction } from "../../hooks/useOptimistic";
 
 const compositeOperations = [
   "color",
@@ -160,55 +153,13 @@ const options = (a: string[]) =>
     name: startCase(c),
   }));
 
-function useOptimistic<T>(
-  value: T,
-  update: (f: Transaction<T>) => Promise<void>
-) {
-  const [enabled, setEnabled] = useToggle(false);
-  const [optimistic, setOptimistic] = useState(value);
-
-  const start = () => {
-    setOptimistic(value);
-    setEnabled(true);
-  };
-  const end = () => {
-    setOptimistic(value);
-    setEnabled(false);
-  };
-
-  const latest = useRef<Promise<void> | null>(null);
-
-  return [
-    enabled ? optimistic : value,
-    async (f: Transaction<T>) => {
-      start();
-      const job = update(f);
-      latest.current = job;
-      setOptimistic(produce(optimistic, f));
-      await job;
-      if (latest.current === job) end();
-    },
-  ] as const;
-}
-
-const idle = (f: () => void, wait?: number): Promise<void> =>
-  new Promise<void>((res) =>
-    requestIdleCallback(
-      () => {
-        f();
-        res();
-      },
-      { timeout: wait }
-    )
-  );
-
 export function LayerEditor({ layer: key }: LayerEditorProps) {
   const one = slice.layers.one(key);
   const layer = useLayerProperties(key);
   const [
     { name, transparency, displayMode, source: { type } = {} } = {},
     setOptimistic,
-  ] = useOptimistic(layer!, (f) => idle(() => one.set(f), 1000));
+  ] = useOptimisticTransaction(layer!, (f) => idle(() => one.set(f), 1000));
 
   return (
     <Surface

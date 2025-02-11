@@ -20,7 +20,7 @@ export function RendererListEditor() {
           (v) => setSettings((prev) => ({ renderer: v(prev) })),
           300
         )}
-        addItemLabel="Add renderer"
+        addItemLabels={["Add renderer"]}
         create={() => ({
           transport: defaultTransport,
           url: "",

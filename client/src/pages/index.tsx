@@ -30,7 +30,7 @@ import { LayersPage } from "./LayersPage";
 import { PageMeta } from "./PageMeta";
 import { SettingsPage } from "./SettingsPage";
 import { SourcePage } from "./SourcePage";
-import { StepsPage } from "./StepsPage";
+import { StepsPage } from "./steps";
 import { TreePage } from "./tree";
 import { ViewportPage } from "./ViewportPage";
 import { WorkspacesPage } from "./workspaces";

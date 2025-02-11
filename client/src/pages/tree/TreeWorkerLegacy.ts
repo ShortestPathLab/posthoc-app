@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { treeToDict } from "hooks/useBreakPoints2";
 import { usingMemoizedWorkerTask } from "../../workers/usingWorker";
 import {
   TreeWorkerParameters,
@@ -17,7 +18,7 @@ export const treeAsync = usingMemoizedWorkerTask<
   TreeWorkerReturnType
 >(TreeWorkerUrl);
 
-export function useTreeMemo({
+export function useComputeTree({
   key,
   radius,
   step,
@@ -25,7 +26,13 @@ export function useTreeMemo({
 }: TreeWorkerParameters & { key?: string }) {
   return useQuery({
     queryKey: ["compute/tree", key, radius, step],
-    queryFn: async () => await treeAsync({ radius, step, trace }),
+    queryFn: async () => {
+      const tree = await treeAsync({ radius, step, trace });
+      if (tree) {
+        const dict = treeToDict(tree?.tree ?? []);
+        return { dict, ...tree };
+      }
+    },
     enabled: !!key,
     staleTime: Infinity,
   });

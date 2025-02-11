@@ -13,6 +13,7 @@ import {
   Menu,
   MenuItem,
   MenuList,
+  MenuProps,
   Stack,
   Tooltip,
   Typography,
@@ -20,11 +21,11 @@ import {
 } from "@mui/material";
 import { SigmaContainer } from "@react-sigma/core";
 import "@react-sigma/core/lib/style.css";
-import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { PlaybackLayerData } from "components/app-bar/Playback";
+import { PlaybackLayerData, useStep } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
 import { Label } from "components/generic/Label";
+import { LayerPicker } from "components/generic/LayerPicker";
 import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { Placeholder } from "components/inspector/Placeholder";
 import {
@@ -42,14 +43,12 @@ import {
 import { usePlaybackControls } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
-import { LayerPicker } from "components/generic/LayerPicker";
 import { TraceLayerData } from "layers/trace";
 import { entries, findLast, isEmpty, map, startCase } from "lodash";
 import { Size } from "protocol";
-import { ComponentProps, useMemo, useState } from "react";
+import { useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
-import { EdgeArrowProgram } from "sigma/rendering";
 import { slice } from "slices";
 import { Layer, useLayerPicker, WithLayer } from "slices/layers";
 import { PanelState } from "slices/view";
@@ -58,7 +57,8 @@ import { set } from "utils/set";
 import { PageContentProps } from "../PageMeta";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
-import { useTreeMemo } from "./TreeWorker";
+import { useTreeLayoutMemo } from "./TreeLayoutWorker";
+import { useGraphSettings } from "./useGraphSettings";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
 
@@ -86,25 +86,186 @@ export type TreeLayer = Layer<
 const isTreeLayer = (l: Layer<unknown>): l is TreeLayer =>
   !!getController(l)?.steps;
 
-export function TreePage({ template: Page }: PageContentProps) {
+function TreeMenu({
+  layer: key,
+  selected,
+  selection,
+  ...props
+}: {
+  layer?: string;
+  selected?: ReturnType<typeof useSelection>["selected"];
+  selection?: ReturnType<typeof useSelection>["selection"];
+} & MenuProps) {
+  const theme = useTheme();
+  const step = useStep(key) ?? 0;
+  const { stepTo } = usePlaybackControls(key);
+  const showHighlight = useHighlightNodes(key);
+  return (
+    <Menu keepMounted {...props}>
+      <MenuList dense sx={{ p: 0 }}>
+        <ListItem sx={{ py: 0 }}>
+          <Typography component="div" color="text.secondary" variant="overline">
+            Events at {selection?.node}
+          </Typography>
+        </ListItem>
+        {map(selected?.events, (entry, _, es) => {
+          const selected =
+            findLast(es, (c) => c.step <= step)?.step === entry.step;
+          return (
+            <Stack direction="row">
+              <Tooltip title={`Go to step ${entry.step}`} placement="left">
+                <MenuItem
+                  selected={selected}
+                  sx={{
+                    height: 32,
+                    flex: 1,
+                    borderLeft: `4px solid ${getColorHex(entry.event.type)}`,
+                  }}
+                  onClick={() => {
+                    // setMenuOpen(false);
+                    stepTo(entry.step);
+                  }}
+                >
+                  <Box sx={{ ml: -0.5, pr: 4 }}>
+                    <Label
+                      primary={startCase(entry.event.type)}
+                      secondary={
+                        isDefined(entry.event.pId)
+                          ? `Step ${entry.step}, from ${entry.event.pId}`
+                          : `Step ${entry.step}`
+                      }
+                    />
+                  </Box>
+                </MenuItem>
+              </Tooltip>
+              <Box sx={{ flex: 0 }}>
+                <PropertyDialog
+                  event={entry.event}
+                  trigger={({ open }) => (
+                    <Tooltip title="See all properties" placement="right">
+                      <MenuItem
+                        selected={selected}
+                        onClick={(e) => {
+                          open();
+                          props?.onClose?.(e, "backdropClick");
+                        }}
+                        sx={{ pr: 0 }}
+                      >
+                        <ListItemIcon>
+                          <DataObjectOutlined />
+                        </ListItemIcon>
+                      </MenuItem>
+                    </Tooltip>
+                  )}
+                />
+              </Box>
+            </Stack>
+          );
+        })}
+        {!!selected?.current && (
+          <>
+            <Divider sx={{ my: 1, mx: 2 }} />
+            <ListItem sx={{ py: 0 }}>
+              <Typography
+                component="div"
+                color="text.secondary"
+                variant="overline"
+              >
+                Step {selected.current.step}
+              </Typography>
+            </ListItem>
+            <Box px={2} py={1}>
+              <PropertyList
+                event={selected.current.event}
+                vertical
+                simple
+                primitives
+              />
+            </Box>
+          </>
+        )}
+        {!!selected?.current && (
+          <>
+            <ListItem sx={{ py: 0 }}>
+              <Typography
+                component="div"
+                color="text.secondary"
+                variant="overline"
+              >
+                Focus on
+              </Typography>
+            </ListItem>
+            {map(highlightNodesOptions, (highlight) => {
+              const highlightColor = getShade(
+                highlight.color,
+                theme.palette.mode,
+                500,
+                400
+              );
+              return (
+                <Stack direction="row">
+                  <Tooltip title={highlight.description} placement="left">
+                    <WithLayer<TreeLayer> layer={key}>
+                      {(l) => (
+                        <MenuItem
+                          selected={
+                            l.source?.highlighting?.type === highlight.type &&
+                            l.source?.highlighting?.step ===
+                              selected?.current?.step
+                          }
+                          sx={{
+                            height: 32,
+                            flex: 1,
+                            borderLeft: `4px solid ${highlightColor}`,
+                          }}
+                          onClick={(e) => {
+                            showHighlight[highlight.type](
+                              selected!.current!.step!
+                            );
+                            props?.onClose?.(e, "backdropClick");
+                          }}
+                        >
+                          <Box sx={{ ml: -0.5, pr: 4 }}>
+                            <Label primary={startCase(highlight.type)} />
+                          </Box>
+                        </MenuItem>
+                      )}
+                    </WithLayer>
+                  </Tooltip>
+                </Stack>
+              );
+            })}
+          </>
+        )}
+      </MenuList>
+    </Menu>
+  );
+}
+
+function useTreePageState(key?: string) {
   "use no memo";
 
+  const one = slice.layers.one<TreeLayer>(key);
+  const trace = one.use(
+    (l) => l?.source?.trace,
+    (p, n) => p?.key === n?.key
+  );
+  const step = one.use((l) => l?.source?.step);
+  return { step: step, trace };
+}
+
+export function TreePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
 
   // ─── Layer Data ──────────────────────────────────────────────────────
 
   const { key, setKey } = useLayerPicker(isTreeLayer);
   const one = slice.layers.one<TreeLayer>(key);
-  const trace = one.use(
-    (l) => l?.source?.trace,
-    (p, n) => p?.key === n?.key
-  );
-  const step1 = one.use((l) => l?.source?.step);
+  const { trace, step: step1 } = useTreePageState(key);
 
   // ─── Playback ────────────────────────────────────────────────────────
 
   const step = useThrottle(step1 ?? 0, 1000 / 24);
-  const { stepTo } = usePlaybackControls(key);
 
   // ─── Panel Data ──────────────────────────────────────────────────────
 
@@ -131,36 +292,12 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const showHighlight = useHighlightNodes(key);
-
-  const { result: tree, loading } = useTreeMemo(
+  const { result: tree, loading } = useTreeLayoutMemo(
     { trace: trace?.content, mode },
     [key, mode]
   );
 
-  const graphSettings = useMemo(
-    () =>
-      ({
-        stagePadding: 8 * 8,
-        allowInvalidContainer: true,
-        edgeLabelColor: { color: theme.palette.text.secondary },
-        labelFont: "Inter",
-        labelSize: 14,
-        labelDensity: 0.1,
-        renderEdgeLabels: true,
-        edgeLabelFont: "Inter",
-        edgeLabelSize: 12,
-        defaultDrawNodeHover: () => {},
-        labelColor: { color: theme.palette.text.primary },
-        edgeLabelWeight: "500",
-        defaultEdgeType: "arrow",
-        edgeProgramClasses: {
-          straight: EdgeArrowProgram,
-          curvedArrow: EdgeCurvedArrowProgram,
-        },
-      } as ComponentProps<typeof SigmaContainer>["settings"]),
-    [theme]
-  );
+  const graphSettings = useGraphSettings();
 
   return (
     <Page onChange={onChange} stack={state}>
@@ -213,7 +350,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                       </>
                     )}
                   </AutoSize>
-                  <Menu
+                  <TreeMenu
                     onClose={() => setMenuOpen(false)}
                     anchorReference="anchorPosition"
                     anchorPosition={{
@@ -225,160 +362,10 @@ export function TreePage({ template: Page }: PageContentProps) {
                       vertical: "top",
                     }}
                     open={menuOpen}
-                  >
-                    <MenuList dense sx={{ p: 0 }}>
-                      <ListItem sx={{ py: 0 }}>
-                        <Typography
-                          component="div"
-                          color="text.secondary"
-                          variant="overline"
-                        >
-                          Events at {selection?.node}
-                        </Typography>
-                      </ListItem>
-                      {map(selected.events, (entry, _, es) => {
-                        const selected =
-                          findLast(es, (c) => c.step <= step)?.step ===
-                          entry.step;
-                        return (
-                          <Stack direction="row">
-                            <Tooltip
-                              title={`Go to step ${entry.step}`}
-                              placement="left"
-                            >
-                              <MenuItem
-                                selected={selected}
-                                sx={{
-                                  height: 32,
-                                  flex: 1,
-                                  borderLeft: `4px solid ${getColorHex(
-                                    entry.event.type
-                                  )}`,
-                                }}
-                                onClick={() => {
-                                  // setMenuOpen(false);
-                                  stepTo(entry.step);
-                                }}
-                              >
-                                <Box sx={{ ml: -0.5, pr: 4 }}>
-                                  <Label
-                                    primary={startCase(entry.event.type)}
-                                    secondary={
-                                      isDefined(entry.event.pId)
-                                        ? `Step ${entry.step}, from ${entry.event.pId}`
-                                        : `Step ${entry.step}`
-                                    }
-                                  />
-                                </Box>
-                              </MenuItem>
-                            </Tooltip>
-                            <Box sx={{ flex: 0 }}>
-                              <PropertyDialog
-                                {...{ event: entry.event }}
-                                trigger={({ open }) => (
-                                  <Tooltip
-                                    title="See all properties"
-                                    placement="right"
-                                  >
-                                    <MenuItem
-                                      selected={selected}
-                                      onClick={open}
-                                      sx={{ pr: 0 }}
-                                    >
-                                      <ListItemIcon>
-                                        <DataObjectOutlined />
-                                      </ListItemIcon>
-                                    </MenuItem>
-                                  </Tooltip>
-                                )}
-                              />
-                            </Box>
-                          </Stack>
-                        );
-                      })}
-                      {!!selected.current && (
-                        <>
-                          <Divider sx={{ my: 1, mx: 2 }} />
-                          <ListItem sx={{ py: 0 }}>
-                            <Typography
-                              component="div"
-                              color="text.secondary"
-                              variant="overline"
-                            >
-                              Step {selected.current.step}
-                            </Typography>
-                          </ListItem>
-                          <Box px={2} py={1}>
-                            <PropertyList
-                              event={selected.current.event}
-                              vertical
-                              simple
-                              primitives
-                            />
-                          </Box>
-                        </>
-                      )}
-                      {!!selected.current && (
-                        <>
-                          <ListItem sx={{ py: 0 }}>
-                            <Typography
-                              component="div"
-                              color="text.secondary"
-                              variant="overline"
-                            >
-                              Focus on
-                            </Typography>
-                          </ListItem>
-                          {map(highlightNodesOptions, (highlight) => {
-                            const highlightColor = getShade(
-                              highlight.color,
-                              theme.palette.mode,
-                              500,
-                              400
-                            );
-                            return (
-                              <Stack direction="row">
-                                <Tooltip
-                                  title={highlight.description}
-                                  placement="left"
-                                >
-                                  <WithLayer<TreeLayer> layer={key}>
-                                    {(l) => (
-                                      <MenuItem
-                                        selected={
-                                          l.source?.highlighting?.type ===
-                                            highlight.type &&
-                                          l.source?.highlighting?.step ===
-                                            selected?.current?.step
-                                        }
-                                        sx={{
-                                          height: 32,
-                                          flex: 1,
-                                          borderLeft: `4px solid ${highlightColor}`,
-                                        }}
-                                        onClick={() => {
-                                          showHighlight[highlight.type](
-                                            selected!.current!.step!
-                                          );
-                                          setMenuOpen(false);
-                                        }}
-                                      >
-                                        <Box sx={{ ml: -0.5, pr: 4 }}>
-                                          <Label
-                                            primary={startCase(highlight.type)}
-                                          />
-                                        </Box>
-                                      </MenuItem>
-                                    )}
-                                  </WithLayer>
-                                </Tooltip>
-                              </Stack>
-                            );
-                          })}
-                        </>
-                      )}
-                    </MenuList>
-                  </Menu>
+                    layer={key}
+                    selected={selected}
+                    selection={selection}
+                  />
                 </>
               ) : (
                 <WithLayer<TreeLayer> layer={key}>

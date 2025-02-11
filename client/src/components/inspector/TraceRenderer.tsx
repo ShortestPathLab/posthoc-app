@@ -7,7 +7,7 @@ import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { RenderLayer } from "layers/RenderLayer";
 import { clamp, find, floor, get, map, some } from "lodash";
 import { nanoid } from "nanoid";
-import { isStepsLayer } from "pages/StepsPage";
+import { isStepsLayer } from "pages/steps/StepsLayer";
 import { Size } from "protocol";
 import {
   createContext,
@@ -202,13 +202,17 @@ export function TraceRenderer({
                   {error}
                 </Box>
               ) : (
-                <>
-                  <Box ref={ref}>
-                    {layers.map((l, i) => (
-                      <RenderLayer index={i} key={l.key} layer={l} />
-                    ))}
-                  </Box>
-                </>
+                <Box
+                  ref={ref}
+                  sx={{
+                    "> canvas": { position: "absolute" },
+                    animation: "fadeIn 75ms linear 450ms both",
+                  }}
+                >
+                  {layers.map((l, i) => (
+                    <RenderLayer index={i} key={l.key} layer={l} />
+                  ))}
+                </Box>
               )}
             </TrustedContent>
           ) : (

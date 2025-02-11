@@ -128,6 +128,7 @@ export const controller = {
           label="Map"
           content={
             <LayerPicker<MapLayerData>
+              paper
               value={mapLayerKey}
               guard={isMapLayer}
               onChange={(v) => produce((p) => set(p, "source.mapLayerKey", v))}

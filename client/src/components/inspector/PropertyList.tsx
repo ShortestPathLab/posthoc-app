@@ -139,7 +139,7 @@ export function PropertyDialog({
         rest
       )}
     >
-      <EventProperties />
+      <EventProperties event={event} />
     </Surface>
   );
 }

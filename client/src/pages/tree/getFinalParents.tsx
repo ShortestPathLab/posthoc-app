@@ -1,6 +1,6 @@
 import { Dictionary, forEach } from "lodash";
 import { Trace } from "protocol";
-import { Key } from "./tree.worker";
+import { Key } from "./treeLayout.worker";
 
 export function getFinalParents(trace: Trace | undefined) {
   const finalParent: Dictionary<Key> = {};

@@ -20,7 +20,7 @@ export function ServerListEditor() {
           (v) => setSettings((prev) => ({ remote: v(prev) })),
           300
         )}
-        addItemLabel="Add adapter"
+        addItemLabels={["Add adapter"]}
         create={() => ({
           transport: defaultTransport,
           url: "",

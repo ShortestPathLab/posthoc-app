@@ -2,7 +2,7 @@ import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { call } from "components/script-editor/call";
 import { get, isEqual, toLower as lower, startCase } from "lodash";
 import memo from "memoizee";
-import { useTreeMemo } from "pages/tree/TreeWorkerLegacy";
+import { useComputeTree } from "pages/tree/TreeWorkerLegacy";
 import { EventTree } from "pages/tree/treeLegacy.worker";
 import { TraceEvent, TraceEventType } from "protocol";
 import { useMemo } from "react";
@@ -51,7 +51,7 @@ export function useBreakpoints(key?: string) {
   const breakpoints = one.use((c) => c?.source?.breakpoints, isEqual);
   const code = one.use((c) => c?.source?.code);
   const { isTrusted } = useUntrustedLayers();
-  const { data: result } = useTreeMemo({
+  const { data: result } = useComputeTree({
     key: trace?.key,
     trace: trace?.content,
     step: trace?.content?.events?.length,

@@ -25,13 +25,10 @@ export function LayerListEditor() {
           deletable
           orderable
           extras={(v) => <LayerListEditorExtras layer={v?.key} />}
-          renderEditor={({ extras, handle, value, onValueChange }) => (
+          renderEditor={({ extras, handle, value }) => (
             <>
               {handle}
-              <LayerEditor
-                layer={value?.key}
-                {...{ value: value!, onValueChange }}
-              />
+              <LayerEditor layer={value?.key} />
               {extras}
             </>
           )}
@@ -39,7 +36,7 @@ export function LayerListEditor() {
             source: { type: "trace", trace: {} },
           })}
           onChange={(v) => startTransition(() => slice.layers.set(v))}
-          addItemLabel="Layer"
+          addItemLabels={["Layer"]}
           placeholder={<Box pt={2}>Get started by adding a layer.</Box>}
           onFocus={(key) => {
             const element = head(document.getElementsByClassName(key));

@@ -28,7 +28,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { layers } from "slices/layers";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { TreeLayer } from ".";
-import { TreeWorkerReturnType } from "./tree.worker";
+import { TreeWorkerReturnType } from "./treeLayout.worker";
 import { TreeAxis } from "./TreeAxis";
 import { useGraphColoring } from "./useGraphColoring";
 import { useMultiDirectedGraph } from "./useMultiDirectedGraph";

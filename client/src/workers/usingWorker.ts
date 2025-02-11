@@ -4,10 +4,9 @@ type WorkerConstructor = new () => Worker;
 
 type WorkerResult = { result: unknown } | { error: unknown };
 
-export const usingWorker =
-  <R>(w: WorkerConstructor) =>
-  async (task: (w: Worker) => Promise<R>) => {
-    const worker = new w();
+export const usingWorker = <R>(w: WorkerConstructor) => {
+  const worker = new w();
+  return async (task: (w: Worker) => Promise<R>) => {
     const out = (await task(worker)) as WorkerResult;
     if ("error" in out) {
       console.error(out.error);
@@ -16,11 +15,12 @@ export const usingWorker =
     worker.terminate();
     return out.result as R;
   };
+};
 
-export const usingWorkerTask =
-  <T, R>(w: WorkerConstructor) =>
-  (inp: T) =>
-    usingWorker<R>(w)((worker) => {
+export const usingWorkerTask = <T, R>(w: WorkerConstructor) => {
+  const withWorker = usingWorker<R>(w);
+  return (inp: T) =>
+    withWorker((worker) => {
       worker.postMessage(inp);
       return new Promise<R>((res, rej) => {
         worker.onmessage = (out) => {
@@ -32,6 +32,7 @@ export const usingWorkerTask =
         };
       });
     });
+};
 
 export const usingMemoizedWorkerTask = <T, R>(
   w: WorkerConstructor,

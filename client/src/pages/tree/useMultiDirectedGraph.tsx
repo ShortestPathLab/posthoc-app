@@ -4,7 +4,7 @@ import { MultiDirectedGraph } from "graphology";
 import { Dictionary, forEach } from "lodash";
 import { Trace } from "protocol";
 import { useMemo } from "react";
-import { TreeWorkerReturnType } from "./tree.worker";
+import { TreeWorkerReturnType } from "./treeLayout.worker";
 import { makeEdgeKey } from "./makeEdgeKey";
 import { isDefined } from "./TreeGraph";
 import { getFinalParents } from "./getFinalParents";
