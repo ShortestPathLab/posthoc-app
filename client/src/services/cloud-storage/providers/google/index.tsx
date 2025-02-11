@@ -7,12 +7,14 @@ import {
   AuthError,
   CloudStorageError,
   CloudStorageProviderMeta,
-  FileMetadata,
+  PosthocMetaData,
   ProviderFactory,
 } from "services/cloud-storage";
 import { AuthState } from "slices/auth";
 import { assert } from "utils/assert";
 import { GoogleLogo } from "./GoogleLogo";
+import { map } from "promise-tools";
+import { WorkspaceMeta } from "slices/UIState";
 
 const id = "google";
 
@@ -29,7 +31,7 @@ const driveMultiPartApiUrl = "https://www.googleapis.com/upload/drive/v3/files";
 const folderMime = "application/vnd.google-apps.folder";
 const googleUserInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
 
-type GoogleDriveFileList = { files: FileMetadata[] };
+type GoogleDriveFileList = { files: WorkspaceMeta[] };
 
 const getFilePath = (fileId: string) =>
   `https://drive.google.com/uc?export=download&id=${fileId}`;
@@ -39,7 +41,7 @@ const isAuthenticated = (t: AuthState<unknown>): t is AuthState<string> =>
 
 export const createGoogleStorageService: ProviderFactory<typeof id> = (
   getState,
-  setState,
+  setState
 ) => {
   //
   // ─── Create Http Clients ─────────────────────────────────────────────
@@ -53,7 +55,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     const state = await getState();
     assert(
       isAuthenticated(state),
-      new AuthError("User not authenticated (did you call initialise?)"),
+      new AuthError("User not authenticated (did you call initialise?)")
     );
     return { Authorization: `Bearer ${state.accessToken}` };
   };
@@ -62,7 +64,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
   const client = createClient<HeaderOptions>(driveApiUrl, getHeaders);
   const multiPartApiClient = createClient<HeaderOptions>(
     driveMultiPartApiUrl,
-    getHeaders,
+    getHeaders
   );
 
   // ─────────────────────────────────────────────────────────────────────
@@ -81,6 +83,16 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
       name: user.name,
       profile: user.picture,
     };
+  };
+  const getFolderId = async (folderName: string) => {
+    const data = await client.get<GoogleDriveFileList>({
+      label: "Find folder by name",
+      path: `/?q=name='${folderName}'+and+mimeType='${folderMime}'&fields=files(id,name)`,
+      auth: true,
+      result: "json",
+    });
+    if (data.files.length) return head(data.files)?.id;
+    throw new CloudStorageError("No folder found with the specified name.");
   };
 
   // Should probably rename this to smth else since
@@ -103,7 +115,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
             await setState({
               ...(await getState()),
               user: await getUserInfo(),
-            }),
+            })
         );
       }
     }
@@ -141,7 +153,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     // ! in the future we can implement more complex handling for this case.
     const id = await rootFolderExists(folderName);
     if (id) return id;
-    const data = await client.post<FileMetadata>({
+    const data = await client.post<WorkspaceMeta>({
       label: "Create folder",
       body: { name: folderName, mimeType: folderMime },
       auth: true,
@@ -156,6 +168,26 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     await makePublic(data.id);
 
     return data.id;
+  };
+
+  const getFile = async (fileId: string) => {
+    const [{ name, lastModified }, media] = await Promise.all([
+      client.get<WorkspaceMeta>({
+        label: "Get file metadata",
+        path: `/${fileId}?key=${apiKey}`,
+        result: "json",
+      }),
+
+      client.get({
+        label: "Get file media",
+        path: `/${fileId}?alt=media&key=${apiKey}`,
+        result: "blob",
+      }),
+    ]);
+    console.log(media);
+    return new File([media], name!, {
+      lastModified: new Date(lastModified!).valueOf(),
+    });
   };
 
   return {
@@ -189,12 +221,12 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
               parents: [parentId],
             }),
           ],
-          { type: "application/json" },
+          { type: "application/json" }
         ),
         file,
       };
       each(metadata, (value, key) => void form.append(key, value));
-      const data = await multiPartApiClient.post<FileMetadata>({
+      const data = await multiPartApiClient.post<WorkspaceMeta>({
         label: "Save file",
         path: "?uploadType=multipart",
         body: form,
@@ -203,44 +235,31 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
       });
       return data.id;
     },
-    getFile: async (fileId: string) => {
-      const [{ name, lastModified }, media] = await Promise.all([
-        client.get<FileMetadata>({
-          label: "Get file metadata",
-          path: `/${fileId}?key=${apiKey}`,
-          result: "json",
-        }),
-
-        client.get({
-          label: "Get file media",
-          path: `/${fileId}?alt=media&key=${apiKey}`,
-          result: "blob",
-        }),
-      ]);
-      return new File([media], name, {
-        lastModified: new Date(lastModified).valueOf(),
-      });
-    },
+    getFile: getFile,
     getIndex: async () => {
       await createRootFolder(rootFolderName);
       // * change this to a global var
-      const folderId = await (async (folderName: string) => {
-        const data = await client.get<GoogleDriveFileList>({
-          label: "Find folder by name",
-          path: `/?q=name='${folderName}'+and+mimeType='${folderMime}'&fields=files(id,name)`,
-          auth: true,
-          result: "json",
-        });
-        if (data.files.length) return head(data.files)?.id;
-        throw new CloudStorageError("No folder found with the specified name.");
-      })(rootFolderName);
+      const folderId = await getFolderId(rootFolderName);
       const data = await client.get<GoogleDriveFileList>({
         label: "Get files in folder",
         path: `?q='${folderId}'+in+parents&fields=files(id,name,mimeType,modifiedTime,size)`,
         auth: true,
         result: "json",
       });
-      return data.files;
+
+      return await map(
+        data.files.filter((file) => file.name!.endsWith(".meta")),
+        async (file) => {
+          const metadataFile = await getFile(file.id);
+          const metadata = JSON.parse(await metadataFile.text());
+          const posthocFileGoogleId =
+            data.files.find((f) => {
+              const baseName = file.name!.split(".")[0];
+              return f.name!.startsWith(baseName) && !f.name!.endsWith(".meta");
+            })?.id ?? null;
+          return { ...metadata, id: posthocFileGoogleId };
+        }
+      );
     },
     getFileLink: async (fileId: string) => {
       return `${window.location.origin}?workspaceFile=${id}:${fileId}`;

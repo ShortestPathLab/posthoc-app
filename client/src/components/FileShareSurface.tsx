@@ -8,14 +8,16 @@ import copy from "clipboard-copy";
 import { useSm } from "hooks/useSmallDisplay";
 import { round } from "lodash";
 import { useEffect, useState } from "react";
-import { FileMetadata } from "services/cloud-storage/CloudStorage";
 import { useCloudStorageService } from "slices/cloudStorage";
 import { usePaper } from "theme";
 import { useSnackbar } from "./generic/Snackbar";
 import { Button } from "./generic/inputs/Button";
 import { Surface } from "./generic/surface";
 
-export const FileShareSurface = ({ file }: { file: FileMetadata }) => {
+import { PosthocMetaData } from "services/cloud-storage";
+import { WorkspaceMeta } from "slices/UIState";
+
+export const FileShareSurface = ({ file }: { file: WorkspaceMeta }) => {
   const [{ instance: cloudService }] = useCloudStorageService();
   const sm = useSm();
   const paper = usePaper();

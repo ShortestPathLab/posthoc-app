@@ -10,23 +10,17 @@ export type FileMetaDataType = {
 
 export type AccessToken = unknown;
 
-export type FileMetadata = {
-  id: string;
-  name: string;
-  mimeType: string;
-  lastModified: number;
-  size: number;
+export type PosthocMetaData = FeatureDescriptor & {
+  author?: string;
+  image?: string;
+  size?: number;
 };
-
 // Current
 export interface CloudStorageProvider<
   K extends string,
   A extends AccessToken = unknown,
 > {
   id: K;
-  /**
-   * Should probably rename this authenticate or initialise
-   */
   authenticate: () => Promise<AuthState<A>>;
   login: () => Promise<void>;
   logout: () => Promise<void>;
@@ -39,7 +33,7 @@ export interface CloudStorageProvider<
   getFile: (fileId: string) => Promise<File>;
   deleteFile: (fileId: string) => Promise<void>;
   getFileLink: (fileId: string) => Promise<string>;
-  getIndex: () => Promise<FileMetadata[]>;
+  getIndex: () => Promise<WorkspaceMeta[]>;
 }
 
 // Proposal
@@ -80,7 +74,7 @@ export interface CloudStorageProviderProposal<K extends string>
   /**
    * Get a list of all stored files.
    */
-  getIndex: () => Promise<FileMetadata[]>;
+  getIndex: () => Promise<WorkspaceMeta[]>;
 }
 
 export type ProviderFactory<

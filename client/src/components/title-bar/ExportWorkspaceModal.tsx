@@ -1,4 +1,4 @@
-import { DownloadOutlined } from "@mui-symbols-material/w400";
+import { DownloadOutlined, UploadOutlined } from "@mui-symbols-material/w400";
 import { Box, Stack, TextField, Typography } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
 import { useSnackbar } from "components/generic/Snackbar";
@@ -10,12 +10,13 @@ import { ceil, entries, kebabCase, reduce } from "lodash";
 import { nanoid as id } from "nanoid";
 import { producify } from "produce";
 import { map } from "promise-tools";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useLoadingState } from "slices/loading";
 import { useUIState, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
 import { set } from "utils/set";
 import { Gallery } from "./Gallery";
+import { useCloudStorageInstance } from "slices/cloudStorage";
 
 const replacements = {
   "*": "star",
@@ -41,7 +42,14 @@ function getFilename(name: string = "") {
 const imageSize = 64;
 
 async function resizeImage(s: string) {
-  const a = await Jimp.read(Buffer.from(s.split(",")[1], "base64"));
+  const base64String = s.split(",")[1];
+  if (!base64String) throw new Error("Invalid base64 image data");
+
+  const binaryData = Uint8Array.from(atob(base64String), (c) =>
+    c.charCodeAt(0)
+  );
+
+  const a = await Jimp.read(binaryData.buffer);
   const b =
     a.width < a.height
       ? a.resize({ w: imageSize })
@@ -71,12 +79,12 @@ export function ExportWorkspace() {
       )
     );
   }
-  const { save, estimateWorkspaceSize } = useWorkspace();
+  const { generateWorkspaceFile, estimateWorkspaceSize } = useWorkspace();
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();
-
+  const storage = useCloudStorageInstance();
   const workspaceSize = useMemo(() => estimateWorkspaceSize(), []);
-
+  const [uploading, setUploading] = useState(false);
   async function getFields(size: number): Promise<WorkspaceMeta> {
     return {
       ...fields,
@@ -121,18 +129,36 @@ export function ExportWorkspace() {
         <Box sx={{ pt: 2, width: "100%" }}>
           <Button
             sx={{ justifyContent: "flex-start", width: "100%", ...paper(1) }}
+            disabled={uploading}
             onClick={() =>
               usingLoadingState(async () => {
                 const name = getFilename(fields.name);
-                const { size } = await save(false, name);
-                download(
-                  JSON.stringify(await getFields(size)),
-                  `${name}.workspace.meta`
+                // const { size } = await save(false, name);
+                setUploading(true);
+                const { size, compressedFile } = await generateWorkspaceFile(
+                  name
                 );
-                notify(`Metadata saved, ${name}.workspace.meta`);
+                const posthocMetadata = JSON.stringify(await getFields(size));
+                const posthocMetaFile = new File(
+                  [posthocMetadata],
+                  `${name}.workspace.meta`,
+                  { type: "application/json" }
+                );
+                await storage?.instance.saveFile(posthocMetaFile);
+                // download(
+                //   JSON.stringify(await getFields(size)),
+                //   `${name}.workspace.meta`
+                // );
+                notify(`Metadata saved, ${name}.workspace.meta ✅`);
+
+                await storage?.instance.saveFile(compressedFile);
+                notify(`Posthoc file saved, ${name}.workspace ✅`);
+                // todo: close the modal after the files are uploaded
+                // ? remove the close button while uploading
+                setUploading(false);
               })
             }
-            startIcon={<DownloadOutlined />}
+            startIcon={<UploadOutlined />}
             size="large"
           >
             <Stack sx={{ ml: 1 }} alignItems="baseline">

@@ -32,6 +32,7 @@
     "js-yaml": "^4.1.0",
     "json-beautify": "^1.1.1",
     "json-rpc-2.0": "^1.7.0",
+    "load-json-file": "^7.0.1",
     "lodash": "^4.17.21",
     "lz-string": "^1.5.0",
     "material-ui-popup-state": "^5.3.3",
