@@ -12,13 +12,19 @@ import { FileDropZone } from "./FileDropZone";
 import { FullscreenModalHost } from "./FullscreenModalHost";
 import { FullscreenProgress } from "./FullscreenProgress";
 import { ViewTree } from "./ViewTree";
+import { isMobile } from "mobile-device-detect";
 
 export function Inspector(props: BlockProps) {
   const loading = useAnyLoading();
   const [{ view }, setView] = useView();
   return (
     <>
-      <Block {...props}>
+      <Block
+        {...props}
+        sx={{
+          flexDirection: isMobile ? "column-reverse" : "row",
+        }}
+      >
         <Sidebar />
         <ViewTree<PanelState>
           onPopOut={(leaf) => {
