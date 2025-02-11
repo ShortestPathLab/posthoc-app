@@ -323,6 +323,7 @@ function PageContent({ layer: key }: { layer?: string }) {
       }
     }
   }, [step, ref, scrollerRef, stepToFilteredStep, playing]);
+  
   return (
     <>
       <Block vertical alignItems="center">

@@ -47,13 +47,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
     allLayers,
   } = useLayerPicker(undefined, stepsLayerGuard);
   const { code } = layer?.source ?? {};
-  function renderHeading(label: ReactNode) {
-    return (
-      <Type component="div" variant="overline" color="text.secondary">
-        {label}
-      </Type>
-    );
-  }
+
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
@@ -92,7 +86,6 @@ export function DebugPage({ template: Page }: PageContentProps) {
               <Box pt={6} height="100%">
                 <TabPanel value="standard" sx={{ p: 2 }}>
                   <Box mx={-2}>
-                    <Box px={2}>{renderHeading("Breakpoints")}</Box>
                     <BreakpointListEditor layer={layer?.key} />
                   </Box>
                 </TabPanel>
