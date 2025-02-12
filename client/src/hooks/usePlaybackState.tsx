@@ -64,13 +64,13 @@ export function usePlaybackState(key?: string) {
         async () => {
           for (const i of range(offset, count)) {
             const r = shouldBreak(step + i);
-            if (!isEmpty(r)) return { ...r, offset: i };
+            if (r) return { ...r, offset: i };
           }
           return { result: "", offset: 0, error: undefined };
         },
         ({ result, offset, error }) => {
           if (!error) {
-            if (!isEmpty(result)) {
+            if (result) {
               notify(`Breakpoint hit: ${result}`, `Step ${step + offset}`);
               pause(offset);
             } else tick(count);
@@ -111,5 +111,5 @@ export function usePlaybackState(key?: string) {
       ...state,
       ...callbacks,
     };
-  }, [end, playback, playing, ready, start, step, setLayer]);
+  }, [end, playback, playing, ready, start, step, setLayer, shouldBreak]);
 }

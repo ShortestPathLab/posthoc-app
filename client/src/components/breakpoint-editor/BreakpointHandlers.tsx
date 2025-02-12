@@ -210,8 +210,8 @@ const monotonicityProcessor = async (
     if (!active) resolve([]);
     const violations: { step: number; result: string }[] = [];
     forEach(trace.content?.events, (cEvent, step) => {
-      const cNode = find(trees[step].events, (e) => e.step === step);
-      const node = trees[step];
+      const cNode = find(trees?.[step]?.events, (e) => e.step === step);
+      const node = trees?.[step];
       if (!cNode || !cNode.pId || !node.parent?.events) return;
 
       let closest = Infinity;
@@ -231,10 +231,10 @@ const monotonicityProcessor = async (
         }
       });
 
-      if (pEvent && pEvent.data?.[propertyValue] > cEvent?.[propertyValue]) {
+      if (pEvent && pEvent.data?.[propertyValue] >= cEvent?.[propertyValue]) {
         violations.push({
           step,
-          result: `Monotonicity Violation(${propertyValue}): child node ${cEvent.id} ${propertyValue}-value ${cEvent[propertyValue]} is small than parent node ${pEvent.id}  ${propertyValue}-value ${pEvent.data[propertyValue]}`,
+          result: `Monotonicity Violation(${propertyValue}): child node ${cEvent.id} ${propertyValue}-value ${cEvent[propertyValue]} is small or equal than parent node ${pEvent.id}  ${propertyValue}-value ${pEvent.data[propertyValue]}`,
         });
       }
     });

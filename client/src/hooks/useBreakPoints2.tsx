@@ -20,7 +20,7 @@ export type DebugLayerData = {
   monotonicF?: boolean;
   monotonicG?: boolean;
   breakpointInput?: Breakpoint[];
-  output: [{ step: number; result: string }[] | { error: string }];
+  output: [{ step: number; result: string } | { error: string }];
   trace?: UploadedTrace;
 };
 
@@ -35,7 +35,7 @@ export function useBreakPoints2(key?: string) {
       step: layer?.source?.trace?.content?.events?.length,
       radius: undefined,
     },
-    [layer?.source?.trace?.content]
+    [layer, layer?.source?.trace?.content]
   );
 
   const trees = useMemo(() => {
@@ -49,6 +49,7 @@ export function useBreakPoints2(key?: string) {
         .flattenDepth(2)
         .groupBy("step")
         .value() ?? [];
+    console.log(steps);
 
     return (step: number) => {
       const event = events[step];
@@ -65,7 +66,6 @@ export function useBreakPoints2(key?: string) {
       ) {
         return [{ step: step, result: "Script editor" }];
       }
-
       return steps?.[`${step}`];
     };
   }, [layer, layer?.source?.output, code, isTrusted, events]);
@@ -86,7 +86,7 @@ export function BreakpointService({
 }) {
   useEffect(() => {
     const processBreakpoint = memoizee(
-      async (breakpoint: Breakpoint) => {
+      async (breakpoint: Breakpoint, trees: TreeDict) => {
         const label = breakpoint.label as keyof typeof handlersCollection;
         const handler = handlersCollection[label] as BreakpointHandler<
           any,
@@ -105,7 +105,7 @@ export function BreakpointService({
       [] as any;
     if (layer?.source?.breakpointInput) {
       forEach(layer?.source?.breakpointInput, async (b) => {
-        const res = await processBreakpoint(b);
+        const res = await processBreakpoint(b, trees);
         output.push(res);
       });
     }
