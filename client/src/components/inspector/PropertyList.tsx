@@ -152,7 +152,6 @@ export function PropertyList({
   primitives,
   ...rest
 }: PropertyListProps & BlockProps) {
-  console.log("hi");
   const sorted = sortEventKeys(event);
   return (
     <Block {...rest}>

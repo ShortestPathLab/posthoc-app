@@ -112,23 +112,27 @@ const UploadWorkspace = () => {
     title: "Workspace details",
   });
 
-  const { open: openUploadWorkspaceModal, dialog: uploadWorkspaceDialog } =
-    useSurface(ExportWorkspace, {
-      title: "Upload Workspace",
-    });
   const [uploading, setUploading] = useState(false);
   const notify = useSnackbar();
   const storage = useCloudStorageInstance();
+  const {
+    open: openUploadWorkspaceModal,
+    dialog: uploadWorkspaceDialog,
+    close: closeUploadWorkspaceDialog,
+  } = useSurface(ExportWorkspace, {
+    title: "Upload Workspace",
+  });
+
   const [{ instance: cloudService }] = useCloudStorageService();
   const { generateWorkspaceFile } = useWorkspace();
 
+  //
   const handleUpload = async () => {
     try {
       setUploading(true);
       openUploadWorkspaceModal({
-        onClose: () => {
-          setUploading(false);
-        },
+        uploadFile: storage?.instance.saveFile,
+        closePopup: closeUploadWorkspaceDialog
       });
       // const { compressedFile: file } = await generateWorkspaceFile();
       // if (storage?.auth.authenticated && file) {
@@ -188,9 +192,12 @@ const WorkspacesEditor = () => {
     if (storage?.instance && storage?.auth?.authenticated) {
       try {
         setSavedFilesMetaData(true);
-        const res = await storage.instance.getIndex();
+
+        // const res = await storage.instance.getIndex();
+        // * while dev, use empty list
+        const res = [];
+
         if (res) setList(res);
-        console.log(res);
       } catch (error) {
         console.log(error);
       } finally {

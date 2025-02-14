@@ -184,7 +184,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
         result: "blob",
       }),
     ]);
-    console.log(media);
+    // console.log(media);
     return new File([media], name!, {
       lastModified: new Date(lastModified!).valueOf(),
     });

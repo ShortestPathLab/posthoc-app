@@ -1,4 +1,4 @@
-import { DownloadOutlined, UploadOutlined } from "@mui-symbols-material/w400";
+import { UploadOutlined } from "@mui-symbols-material/w400";
 import { Box, Stack, TextField, Typography } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
 import { useSnackbar } from "components/generic/Snackbar";
@@ -16,7 +16,11 @@ import { useUIState, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
 import { set } from "utils/set";
 import { Gallery } from "./Gallery";
-import { useCloudStorageInstance } from "slices/cloudStorage";
+import {
+  CloudStorageProvider,
+  cloudStorageProviders,
+} from "services/cloud-storage";
+import { SurfaceContentProps } from "components/generic/surface";
 
 const replacements = {
   "*": "star",
@@ -64,7 +68,16 @@ async function resizeImage(s: string) {
     .getBase64("image/jpeg");
 }
 
-export function ExportWorkspace() {
+export function ExportWorkspace({
+  uploadFile,
+  closePopup,
+}: {
+  uploadFile?: CloudStorageProvider<
+    keyof typeof cloudStorageProviders,
+    unknown
+  >["saveFile"];
+  closePopup: () => void;
+} & SurfaceContentProps) {
   const paper = usePaper();
   const [_uiState, _setUIState] = useUIState();
   const [{ workspaceMeta: fields }, setUIState] = useDebouncedState2(
@@ -79,10 +92,10 @@ export function ExportWorkspace() {
       )
     );
   }
-  const { generateWorkspaceFile, estimateWorkspaceSize } = useWorkspace();
+  const { generateWorkspaceFile, estimateWorkspaceSize, save } = useWorkspace();
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();
-  const storage = useCloudStorageInstance();
+  // const storage = useCloudStorageInstance();
   const workspaceSize = useMemo(() => estimateWorkspaceSize(), []);
   const [uploading, setUploading] = useState(false);
   async function getFields(size: number): Promise<WorkspaceMeta> {
@@ -94,6 +107,7 @@ export function ExportWorkspace() {
       lastModified: Date.now(),
     };
   }
+
   return (
     <>
       <Box>
@@ -133,29 +147,36 @@ export function ExportWorkspace() {
             onClick={() =>
               usingLoadingState(async () => {
                 const name = getFilename(fields.name);
-                // const { size } = await save(false, name);
+
                 setUploading(true);
-                const { size, compressedFile } = await generateWorkspaceFile(
-                  name
-                );
+                const { size, compressedFile } =
+                  await generateWorkspaceFile(name);
                 const posthocMetadata = JSON.stringify(await getFields(size));
                 const posthocMetaFile = new File(
                   [posthocMetadata],
                   `${name}.workspace.meta`,
                   { type: "application/json" }
                 );
-                await storage?.instance.saveFile(posthocMetaFile);
-                // download(
-                //   JSON.stringify(await getFields(size)),
-                //   `${name}.workspace.meta`
-                // );
+
+                if (uploadFile) {
+                  await uploadFile(posthocMetaFile);
+                  // await storage?.instance.saveFile(posthocMetaFile);
+                } else {
+                  download(
+                    JSON.stringify(await getFields(size)),
+                    `${name}.workspace.meta`
+                  );
+                }
                 notify(`Metadata saved, ${name}.workspace.meta ✅`);
 
-                await storage?.instance.saveFile(compressedFile);
+                if (uploadFile) {
+                  await uploadFile(compressedFile);
+                  // await storage?.instance.saveFile(compressedFile);
+                } else {
+                  await save(false, name);
+                }
                 notify(`Posthoc file saved, ${name}.workspace ✅`);
-                // todo: close the modal after the files are uploaded
-                // ? remove the close button while uploading
-                setUploading(false);
+                closePopup();
               })
             }
             startIcon={<UploadOutlined />}

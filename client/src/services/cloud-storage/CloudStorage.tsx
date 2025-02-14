@@ -1,6 +1,7 @@
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactElement, ReactNode } from "react";
 import { AuthState } from "slices/auth";
+import { WorkspaceMeta } from "slices/UIState";
 import TypedEmitter from "typed-emitter";
 
 export type FileMetaDataType = {
