@@ -73,6 +73,7 @@ const ViewTreePortalsContext = createContext<
 >({});
 
 type ViewTreeProps<T> = {
+  defaultContent?: T;
   root?: Root<T>;
   renderLeaf?: (leaf: Leaf<T>) => ReactNode;
   onChange?: (root: Root<T>) => void;
@@ -110,7 +111,7 @@ function getLeaves<T>(root?: Root<T>): Leaf<T>[] {
     : [];
 }
 
-function A1<T>({
+function Panel<T>({
   leaf: l,
   renderLeaf,
   onChange,
@@ -157,7 +158,7 @@ export function ViewTree<T>(props: ViewTreeProps<T>) {
           }}
         />
         {map(leaves, (l) => (
-          <A1 key={l.key} leaf={l} renderLeaf={renderLeaf} onChange={set} />
+          <Panel key={l.key} leaf={l} renderLeaf={renderLeaf} onChange={set} />
         ))}
       </DndProvider>
     </ViewTreePortalsContext.Provider>
@@ -174,6 +175,7 @@ export function ViewLeaf<T>({
   depth = 0,
   onSwap,
   onDrop,
+  defaultContent,
 }: ViewLeafProps<T>) {
   const view = useContext(ViewTreePortalsContext);
   const [{ isOver }, drop] = useDrop<Leaf<any>, void, { isOver: boolean }>(
@@ -208,7 +210,13 @@ export function ViewLeaf<T>({
           orientation,
           children: [
             { ...structuredClone(draft), size: 50, key: root.key },
-            { ...structuredClone(draft), size: 50, key: nanoid() },
+            {
+              type: "leaf",
+              acceptDrop: true,
+              content: defaultContent,
+              size: 50,
+              key: nanoid(),
+            },
           ],
         }))
       );
@@ -245,9 +253,10 @@ export function ViewLeaf<T>({
           ),
           onChange: (c: any) =>
             onChange?.(
-              produce(root, (draft) => {
-                draft.content = { ...draft.content, ...c };
-              })
+              produce(
+                root,
+                (draft) => void (draft.content = { ...draft.content, ...c })
+              )
             ),
         } satisfies ViewTreeContextType<T>)
       : {};
@@ -342,11 +351,13 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
           draggerClassName={dragCls}
           onResizeFinished={(_, sizes) =>
             onChange?.(
-              produce(root, (draft) => {
-                forEach(sizes, (size, i) => {
-                  draft.children[i].size = size;
-                });
-              })
+              produce(
+                root,
+                (draft) =>
+                  void forEach(sizes, (size, i) => {
+                    draft.children[i].size = size;
+                  })
+              )
             )
           }
           minHeights={map(root.children, () => getSpacing(6) - 8)}
@@ -368,7 +379,10 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
                 root={c}
                 onChange={(newChild) =>
                   onChange?.(
-                    produce(root, (draft) => (draft.children[i] = newChild))
+                    produce(
+                      root,
+                      (draft) => void (draft.children[i] = newChild)
+                    )
                   )
                 }
                 onClose={() =>

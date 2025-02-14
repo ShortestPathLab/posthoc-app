@@ -1,17 +1,12 @@
-import { chain as _, keys } from "lodash";
 import { Trace } from "protocol";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useComputeLabels } from "./TreeUtility";
 
-export function useTrackedProperty(trace: Trace | undefined) {
-  const properties = useMemo(
-    () =>
-      _(trace?.events)
-        .flatMap(keys)
-        .uniq()
-        .filter((p) => p !== "type")
-        .value(),
-    [trace?.events]
-  );
+export function useTrackedProperty(key?: string, trace?: Trace) {
+  const { data: properties = {} } = useComputeLabels({
+    key,
+    trace: trace as any,
+  });
 
   const [trackedProperty, setTrackedProperty] = useState<string>("");
 

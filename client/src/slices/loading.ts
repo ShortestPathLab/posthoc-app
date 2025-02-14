@@ -1,55 +1,41 @@
+import { store } from "@davstack/store";
 import { some, values } from "lodash";
 import { useCallback } from "react";
-import { createSlice } from "./createSlice";
-import { produce } from "produce";
 
-type Loading = {
-  layers: number;
-  connections: number;
-  features: number;
-  general: number;
+const defaultLoadingStore = {
+  layers: 0,
+  connections: 0,
+  features: 0,
+  general: 0,
 };
 
-type A = { action: "start" | "end"; key: keyof Loading };
+type Loading = keyof typeof defaultLoadingStore;
 
-export const [useLoading, LoadingProvider] = createSlice<Loading, A>(
-  {
-    layers: 0,
-    connections: 0,
-    features: 0,
-    general: 0,
-  },
-  {
-    reduce: (prev, { action, key }: A) => {
-      return produce(prev, (draft) => {
-        switch (action) {
-          case "start":
-            draft[key] += 1;
-            break;
-          case "end":
-            draft[key] -= 1;
-        }
-        return draft;
-      });
-    },
-  }
-);
+export const loading = store<Record<Loading, number>>(defaultLoadingStore, {
+  devtools: { enabled: import.meta.env.DEV },
+  name: "loading-state",
+}).actions((a) => ({
+  start: (key: Loading) => a.set((s) => void s[key]++),
+  end: (key: Loading) => a.set((s) => void s[key]--),
+}));
 
 export function useAnyLoading() {
-  const [loading] = useLoading();
-  return some(values(loading));
+  "use no memo";
+  return loading.use((l) => some(values(l)));
 }
 
-export function useLoadingState(key: keyof Loading = "general") {
-  const [, dispatch] = useLoading();
-
+export function useLoadingState(key: Loading = "general") {
   return useCallback(
     async <T>(task: () => Promise<T>) => {
-      dispatch(() => ({ action: "start", key }));
-      const out = await task();
-      dispatch(() => ({ action: "end", key }));
-      return out;
+      loading.start(key);
+      try {
+        return await task();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        loading.end(key);
+      }
     },
-    [key, dispatch]
+    [key]
   );
 }

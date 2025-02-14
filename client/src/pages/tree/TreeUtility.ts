@@ -1,5 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { treeToDict } from "hooks/useBreakPoints2";
+import { treeToDict } from "hooks/useBreakPoints";
+import {
+  chain,
+  entries,
+  every,
+  flatMap,
+  head,
+  isInteger,
+  isPlainObject,
+  uniqBy,
+} from "lodash";
+import { Trace } from "protocol/Trace";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import {
   TreeWorkerParameters,
@@ -7,7 +18,7 @@ import {
 } from "./treeUtility.worker";
 import treeWorkerUrl from "./treeUtility.worker.ts?worker&url";
 
-export class TreeWorkerUrl extends Worker {
+export class TreeWorker extends Worker {
   constructor() {
     super(treeWorkerUrl, { type: "module" });
   }
@@ -16,7 +27,80 @@ export class TreeWorkerUrl extends Worker {
 export const treeAsync = usingMemoizedWorkerTask<
   TreeWorkerParameters,
   TreeWorkerReturnType
->(TreeWorkerUrl);
+>(TreeWorker);
+
+type X = "text" | "number" | "boolean" | "mixed";
+
+type Y = {
+  path: string;
+  type: X;
+  value: unknown;
+};
+
+function computeLabelsOne(t: unknown, root: string = ""): Y[] {
+  switch (typeof t) {
+    case "symbol":
+    case "string":
+      return [{ path: root, type: "text", value: t }];
+    case "bigint":
+    case "number":
+      return [{ path: root, type: "number", value: t }];
+    case "boolean":
+      return [{ path: root, type: "boolean", value: t }];
+    case "undefined":
+      return [];
+    case "function":
+      throw Error("Non-serialisable function");
+    case "object":
+      if (isPlainObject(t))
+        return flatMap(entries(t!), ([k, v]) =>
+          computeLabelsOne(v, `${root}.${k}`)
+        );
+  }
+  return [{ path: root, type: "mixed", value: undefined }];
+}
+
+function computeLabels(t?: unknown[]) {
+  function resolveType(v: Y[]) {
+    const unique = uniqBy(v, "type");
+    if (unique.length === 1) {
+      const { type } = head(unique)!;
+      switch (type) {
+        case "text":
+          // Infer categorical if more than 50% of labels are reused
+          return v.length > unique.length * 2 ? "text/categorical" : "text";
+        case "number":
+          return every(v, (c) => isInteger(c.value))
+            ? "number/discrete"
+            : "number/continuous";
+      }
+    }
+    return "mixed";
+  }
+
+  return chain(t)
+    .flatMap((v) => computeLabelsOne(v))
+    .groupBy("path")
+    .mapValues((v) => ({
+      type: resolveType(v),
+    }))
+    .value();
+}
+
+export function useComputeLabels({
+  key,
+  trace,
+}: {
+  key?: string;
+  trace?: Trace;
+}) {
+  return useQuery({
+    queryKey: ["compute/labels", key],
+    queryFn: async () => computeLabels(trace?.events),
+    enabled: !!key,
+    staleTime: Infinity,
+  });
+}
 
 export function useComputeTree({
   key,
@@ -30,6 +114,7 @@ export function useComputeTree({
       const tree = await treeAsync({ radius, step, trace });
       if (tree) {
         const dict = treeToDict(tree?.tree ?? []);
+
         return { dict, ...tree };
       }
     },

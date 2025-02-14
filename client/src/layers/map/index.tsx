@@ -112,9 +112,14 @@ export const controller = {
               <Editor
                 value={value?.source?.options}
                 onChange={(v) =>
-                  produce((prev) => {
-                    set(prev, "source.options", v(prev.source?.options ?? {}));
-                  })
+                  produce(
+                    (prev) =>
+                      void set(
+                        prev,
+                        "source.options",
+                        v(prev.source?.options ?? {})
+                      )
+                  )
                 }
               />
             ) : (
@@ -159,7 +164,7 @@ export const controller = {
           });
         }
       },
-      [parsedMap, produce, loading],
+      [parsedMap, loading, produce],
       [parsedMap]
     );
     return <></>;

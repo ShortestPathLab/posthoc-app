@@ -24,20 +24,27 @@ import { shades } from "components/renderer/colors";
 import { mapParsers } from "components/renderer/map-parser";
 import { RendererListEditor } from "components/settings-editor/RendererListEditor";
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
+import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { useSm } from "hooks/useSmallDisplay";
-import { debounce, keys, map, startCase } from "lodash";
+import { $, Objects } from "hotscript";
+import { keys, map, startCase } from "lodash";
+import { produce } from "produce";
 import { ReactNode, useMemo, useState } from "react";
 import { slice } from "slices";
 import { useBusyState } from "slices/busy";
+import { Transaction } from "slices/selector";
 import {
   defaultPlaybackRate as baseRate,
   defaults,
+  Settings,
   useSettings,
 } from "slices/settings";
 import { AccentColor, getShade } from "theme";
+import { idle } from "utils/idle";
 import { wait } from "utils/timed";
 import { AboutContent } from "./AboutPage";
 import { PageContentProps } from "./PageMeta";
+import { Get, get } from "utils/set";
 const formatLabel = (v: number) => `${v}x`;
 
 export function SettingsPage({ template: Page }: PageContentProps) {
@@ -316,12 +323,24 @@ export function SettingsPage({ template: Page }: PageContentProps) {
 const a = keys(mapParsers).map((c) => ({ key: c }));
 type A = (typeof a)[number];
 
-function Sink({ children }: { children?: ReactNode }) {
-  return <>{children}</>;
+export function useSetting<TPath extends $<Objects.AllPaths, Settings>>(
+  key: TPath,
+  def: Exclude<Get<Settings, TPath>, undefined | void>
+) {
+  const [settings, setSettings] = useSettings();
+  return useOptimisticTransaction(
+    get(settings, key)! ?? def,
+    (f: Transaction<Exclude<Get<Settings, TPath>, undefined | void>>) =>
+      idle(() =>
+        setSettings((prev) => ({
+          [key]: produce(get(prev, key) ?? def, f),
+        }))
+      )
+  );
 }
 
 export function TrustedOriginListEditor() {
-  const [{ trustedOrigins }, setSettings] = useSettings();
+  const [trustedOrigins, setTrustedOrigins] = useSetting("trustedOrigins", []);
   const b = useMemo(
     () =>
       map(trustedOrigins, (t) => ({
@@ -343,20 +362,22 @@ export function TrustedOriginListEditor() {
         sortable
         addable={false}
         deletable
-        editor={(v) => (
-          <Sink key={v.key}>
-            <ListItemText primary={v.key} />
-          </Sink>
+        renderEditor={({ handle, props: { id: key }, extras }) => (
+          <>
+            {handle}
+            <ListItemText primary={key} />
+            {extras}
+          </>
         )}
         icon={null}
         value={b}
-        onChange={debounce(
-          (v) =>
-            setSettings((prev) => ({
-              trustedOrigins: map(v(prev), "key"),
-            })),
-          300
-        )}
+        onChange={(f) =>
+          setTrustedOrigins((prev) => {
+            const next = map(prev, (v) => ({ key: v }));
+            f(next);
+            return map(next, "key");
+          })
+        }
         create={() => ({
           key: "",
         })}
@@ -379,13 +400,15 @@ export function MapParserListEditor() {
         sortable
         addable={false}
         deletable={false}
-        editor={(v) => (
-          <Sink key={v.key}>
+        renderEditor={({ props: { id: key }, handle, extras }) => (
+          <>
+            {handle}
             <ListItemText
-              primary={startCase(v.key)}
-              secondary={`Support for *.${v.key} maps`}
+              primary={startCase(key)}
+              secondary={`Support for *.${key} maps`}
             />
-          </Sink>
+            {extras}
+          </>
         )}
         icon={null}
         value={a}

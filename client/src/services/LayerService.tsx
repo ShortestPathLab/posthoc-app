@@ -16,7 +16,9 @@ function useLayerServices() {
             return createElement(service, {
               key: layer.key,
               value: layer,
-              onChange: (v) => slice.layers.one(layer.key).set(v),
+              onChange: (v) => {
+                slice.layers.one(layer.key).set(v);
+              },
             });
           }
         })

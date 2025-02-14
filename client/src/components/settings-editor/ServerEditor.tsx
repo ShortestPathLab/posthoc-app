@@ -19,6 +19,8 @@ import { useMemo } from "react";
 import { merge } from "slices/reducers";
 import { Remote } from "slices/settings";
 import { usePaper } from "theme";
+import { EditorProps } from "components/Editor";
+import { assert } from "utils/assert";
 
 const statusColor = {
   connected: "success.light",
@@ -26,13 +28,8 @@ const statusColor = {
   error: "error.light",
   "not-connected": "text.disabled",
 };
-
-type ServerEditorProps = {
-  value: Remote;
-  onValueChange?: (e: Remote) => void;
-};
-
-export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
+export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
+  assert(value, "server is defined");
   const connection = useConnection(value.url);
   const paper = usePaper();
   const status = useConnectionStatus(value.url);
@@ -40,9 +37,9 @@ export function ServerEditor({ value, onValueChange }: ServerEditorProps) {
   const handleChange = useMemo(
     () =>
       debounce((next: Partial<Remote>) => {
-        onValueChange?.(merge(value, next));
+        onChange?.(merge(value, next));
       }, 300),
-    [onValueChange, value]
+    [onChange, value]
   );
 
   return (

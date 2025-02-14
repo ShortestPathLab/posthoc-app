@@ -1,16 +1,20 @@
-import { Box, Typography as Type } from "@mui/material";
-import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { Scroll } from "components/generic/Scrollbars";
-import { Breakpoint, DebugLayerData } from "hooks/useBreakpoints";
-import { getController } from "layers/layerControllers";
-import { chain as _, keys } from "lodash";
-import { ReactNode, useMemo } from "react";
+import { MoreVertOutlined } from "@mui-symbols-material/w400";
+import { Box, IconButton, Tooltip } from "@mui/material";
+import {
+  AddItemButton,
+  ListEditor,
+} from "components/generic/list-editor/ListEditor";
+import { DebugLayerData } from "hooks/useBreakpointsOld";
+import { useOptimisticTransaction } from "hooks/useOptimistic";
+import { isEqual, startCase, values } from "lodash";
+import { produce } from "produce";
+import { startTransition } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
-import { BreakpointEditor } from "./BreakpointEditor";
-import { violations } from "./BreakpointEditor2";
-import { comparators } from "./comparators";
-import { eventTypes } from "./eventTypes";
+import { idle } from "utils/idle";
+import { set } from "utils/set";
+import { Breakpoint, BreakpointEditor } from "./BreakpointEditor";
+import handlersCollection from "./breakpoints";
 
 type BreakpointListEditorProps = {
   breakpoints?: Breakpoint[];
@@ -18,83 +22,69 @@ type BreakpointListEditorProps = {
   layer?: string;
 };
 
+function useBreakpoints(key?: string) {
+  "use no memo";
+  const one = slice.layers.one<Layer<DebugLayerData>>(key);
+  const breakpoints = one.use((l) => l?.source?.breakpoints, isEqual);
+  const [optimistic, setOptimistic] = useOptimisticTransaction(
+    breakpoints ?? [],
+    (f) =>
+      idle(() =>
+        startTransition(() =>
+          one.set((l) =>
+            set(
+              l,
+              "source.breakpoints",
+              produce(l.source?.breakpoints ?? [], f)
+            )
+          )
+        )
+      )
+  );
+  return [optimistic, setOptimistic] as const;
+}
+
 export function BreakpointListEditor({
   layer: key,
 }: BreakpointListEditorProps) {
-  const one = slice.layers.one<Layer<DebugLayerData>>(key);
-  const breakpoints = one.use((l) => l?.source?.breakpoints);
-  const events = one.use((l) => getController(l)?.steps?.(l));
-
-  const properties = useMemo(
-    () =>
-      _(events)
-        .flatMap(keys)
-        .uniq()
-        .filter((p) => p !== "type")
-        .value(),
-    [events]
-  );
-
-  function renderHeading(label: ReactNode) {
-    return (
-      <Type component="div" variant="overline" color="text.secondary">
-        {label}
-      </Type>
-    );
-  }
+  const [breakpoints, setBreakpoints] = useBreakpoints(key);
 
   return (
-    <Box sx={{ overflow: "auto hidden", width: "100%" }}>
-      <Scroll x>
-        <Box sx={{ minWidth: 720, mb: 2 }}>
-          <Box px={2}>{renderHeading("Breakpoints")}</Box>
-          <ListEditor<Breakpoint>
-            sortable
-            button={false}
-            icon={null}
-            value={breakpoints}
-            deletable
-            editable={false}
-            editor={(v: any) => <BreakpointEditor value={v} />}
-            // TODO: Refactor
-            create={() => ({
-              active: true,
-              property: properties?.[0],
-              condition: comparators?.[0].key,
-              eventType: eventTypes?.[0],
-              reference: 0,
-            })}
-            onChange={(f) =>
-              one.set((l) => void f(l?.source?.breakpoints ?? []))
-            }
-            addItemLabels={["Breakpoint"]}
-            placeholder="Get started by adding a breakpoint."
-          />
-        </Box>
-        <Box sx={{ minWidth: 720, mb: 2 }}>
-          <Box px={2}>{renderHeading("Violations")}</Box>
-          <ListEditor
-            sortable
-            button={false}
-            icon={null}
-            value={breakpoints}
-            deletable
-            editable={false}
-            editor={(v) => <BreakpointEditor value={v} />}
-            // TODO: Refactor
-            create={() => ({
-              active: true,
-              property: properties?.[0],
-              condition: "increase",
-            })}
-            onChange={(f) =>
-              one.set((l) => void f(l?.source?.breakpoints ?? []))
-            }
-            addItemLabels={violations}
-            placeholder="Certain types of errors can be detected by checking for invariant violations."
-          />
-        </Box>
-      </Scroll>
+    <Box sx={{ overflow: "hidden hidden", width: "100%" }}>
+      <ListEditor<Breakpoint>
+        value={breakpoints}
+        onChange={setBreakpoints}
+        sortable
+        button={false}
+        icon={null}
+        deletable
+        editable={false}
+        renderEditor={({ props, handle, extras }) => (
+          <>
+            {handle}
+            <BreakpointEditor {...props} layer={key} />
+            {extras}
+          </>
+        )}
+        create={() => ({ active: true })}
+        extras={() => (
+          <IconButton>
+            <MoreVertOutlined />
+          </IconButton>
+        )}
+        renderAddItem={(create) => (
+          <>
+            {values(handlersCollection).map(({ id, name, description }) => (
+              <Tooltip key={id} title={description}>
+                <AddItemButton onClick={() => create({ type: id })}>
+                  {name ?? startCase(id)}
+                </AddItemButton>
+              </Tooltip>
+            ))}
+          </>
+        )}
+        placeholder="Certain types of errors can be detected by checking for invariant violations."
+      />
     </Box>
   );
 }

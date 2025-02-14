@@ -9,7 +9,7 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { makeTemplate } from "components/script-editor/makeTemplate";
 import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { templates } from "components/script-editor/templates";
-import { DebugLayerData } from "hooks/useBreakpoints";
+import { DebugLayerData } from "hooks/useBreakpointsOld";
 import { getController } from "layers/layerControllers";
 import { set, values } from "lodash";
 import { useState } from "react";

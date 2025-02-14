@@ -33,8 +33,8 @@ import { colorsHex } from "components/renderer/colors";
 import { LazyNodeList, NodeList } from "components/renderer/NodeList";
 import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/ParseTraceSlaveWorker";
-import { DebugLayerData } from "hooks/useBreakpoints";
-import { BreakpointService } from "hooks/useBreakPoints2";
+import { DebugLayerData } from "hooks/useBreakpointsOld";
+import { BreakpointService } from "services/BreakpointService";
 import { useTraceContent } from "hooks/useTraceContent";
 import { dump } from "js-yaml";
 import { inferLayerName, LayerController } from "layers";
@@ -165,8 +165,9 @@ export const controller = {
     const { result: trace, loading } = useTraceContent(value?.source?.trace);
     // Set playback
     useEffect(() => {
-      produce((l) =>
-        set(l, "source.playbackTo", trace?.content?.events?.length ?? 0)
+      produce(
+        (l) =>
+          void set(l, "source.playbackTo", trace?.content?.events?.length ?? 0)
       );
     }, [trace?.key]);
     const { isTrusted } = useUntrustedLayers();

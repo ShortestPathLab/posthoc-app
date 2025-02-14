@@ -1,4 +1,5 @@
 import { mapParsers } from "components/renderer/map-parser";
+import { useConnectionsLoading } from "hooks/useConnectionStatus";
 import {
   Dictionary,
   chain as _,
@@ -13,7 +14,7 @@ import { map as mapAsync } from "promise-tools";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { Connection, useConnections } from "slices/connections";
 import { Features, useFeatures } from "slices/features";
-import { useLoading, useLoadingState } from "slices/loading";
+import { useLoadingState } from "slices/loading";
 import { timed } from "utils/timed";
 
 function withSource<T>(source: string) {
@@ -41,49 +42,48 @@ const getFeatures = async ({ transport, url }: Connection) => {
 export function FeaturesService() {
   const [connections] = useConnections();
   const [, setFeatures] = useFeatures();
-  const [{ connections: connectionsLoading }] = useLoading();
+  const loading = useConnectionsLoading();
   const usingLoadingState = useLoadingState("features");
 
   useAsync(
     async (signal) => {
       usingLoadingState(async () => {
-        if (!connectionsLoading) {
-          const features: Dictionary<Features> = {
-            default: {
-              algorithms: [],
-              formats: keys(mapParsers).map((c) => ({
-                id: c,
-                source: "internal",
-              })),
-              traces: [],
-              maps: [],
-            },
-          };
-          const reload = () => {
-            if (!signal.aborted) {
-              const merged = _(features)
-                .values()
-                .reduce((prev, next) =>
-                  mergeWith({}, prev, next, (obj, src) =>
-                    isArray(obj) ? uniqBy([...obj, ...src], "id") : undefined
-                  )
+        if (loading) return;
+        const features: Dictionary<Features> = {
+          default: {
+            algorithms: [],
+            formats: keys(mapParsers).map((c) => ({
+              id: c,
+              source: "internal",
+            })),
+            traces: [],
+            maps: [],
+          },
+        };
+        const reload = () => {
+          if (!signal.aborted) {
+            const merged = _(features)
+              .values()
+              .reduce((prev, next) =>
+                mergeWith({}, prev, next, (obj, src) =>
+                  isArray(obj) ? uniqBy([...obj, ...src], "id") : undefined
                 )
-                .value();
-              setFeatures(() => merged);
-            }
-          };
-          for (const connection of connections) {
-            const f = async () => {
-              features[connection.url] = await getFeatures(connection);
-              reload();
-            };
-            connection.transport().on("features/changed", f);
-            f();
+              )
+              .value();
+            setFeatures(() => merged);
           }
+        };
+        for (const connection of connections) {
+          const f = async () => {
+            features[connection.url] = await getFeatures(connection);
+            reload();
+          };
+          connection.transport().on("features/changed", f);
+          f();
         }
       });
     },
-    [connections, getFeatures, setFeatures, connectionsLoading]
+    [connections, getFeatures, setFeatures, loading]
   );
 
   return <></>;

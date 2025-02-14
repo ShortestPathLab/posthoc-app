@@ -1,18 +1,26 @@
 import { produce } from "produce";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useToggle } from "react-use";
 import { Transaction } from "slices/selector";
+
+function useGet<T>(v: T) {
+  const val = useRef(v);
+  useEffect(() => {
+    val.current = v;
+  }, [v]);
+  return useCallback(() => val.current, []);
+}
 
 function useOptimisticState<T>(value: T) {
   const [enabled, setEnabled] = useToggle(false);
   const [optimistic, setOptimistic] = useState(value);
+  const get = useGet(value);
 
   const start = () => {
-    setOptimistic(value);
+    setOptimistic(get());
     setEnabled(true);
   };
   const end = () => {
-    setOptimistic(value);
     setEnabled(false);
   };
 
@@ -50,9 +58,10 @@ export function useOptimisticTransaction<T>(
       start();
       const job = update(f);
       latest.current = job;
-      setOptimistic(produce(optimistic, f));
+      setOptimistic((l) => produce(l, f));
       await job;
       if (latest.current === job) end();
     },
+    enabled,
   ] as const;
 }

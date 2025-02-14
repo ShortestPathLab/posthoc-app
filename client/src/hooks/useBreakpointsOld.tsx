@@ -1,3 +1,4 @@
+import { Breakpoint } from "components/breakpoint-editor/BreakpointEditor";
 import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { call } from "components/script-editor/call";
 import { get, isEqual, toLower as lower, startCase } from "lodash";
@@ -25,15 +26,6 @@ export type Comparator = {
   key: string;
   apply: (options: ApplyOptions) => boolean;
   needsReference?: boolean;
-};
-
-export type Breakpoint = {
-  key: string;
-  property?: string;
-  reference?: number;
-  condition?: Comparator;
-  active?: boolean;
-  type?: TraceEventType;
 };
 
 export type DebugLayerData = {

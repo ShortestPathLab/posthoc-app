@@ -27,6 +27,7 @@ export function Inspector(props: BlockProps) {
       >
         <Sidebar />
         <ViewTree<PanelState>
+          defaultContent={{ type: "" }}
           onPopOut={(leaf) => {
             openWindow({
               page: leaf.content?.type,

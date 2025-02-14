@@ -90,11 +90,11 @@ export function FeaturePicker({
                 renderItem({ id, name, description })
               ) : (
                 <>
-                  <Type component="div">
+                  <Type component="span">
                     {name}
                     <Space />
                   </Type>
-                  <Type component="div" color="text.secondary">
+                  <Type component="span" color="text.secondary">
                     {description}
                   </Type>
                 </>

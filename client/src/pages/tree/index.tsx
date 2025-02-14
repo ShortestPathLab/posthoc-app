@@ -278,6 +278,7 @@ export function TreePage({ template: Page }: PageContentProps) {
   // ─── Options ─────────────────────────────────────────────────────────
 
   const [trackedProperty, setTrackedProperty, properties] = useTrackedProperty(
+    trace?.key,
     trace?.content
   );
 
@@ -426,7 +427,11 @@ export function TreePage({ template: Page }: PageContentProps) {
                 onChange: setTrackedProperty,
                 items: [
                   { id: "", name: "Off" },
-                  ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
+                  ...map(entries(properties), ([k, v]) => ({
+                    id: k,
+                    name: `$${k}`,
+                    description: v.type,
+                  })),
                 ],
               },
               // {

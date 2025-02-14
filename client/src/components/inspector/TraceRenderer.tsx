@@ -20,7 +20,6 @@ import {
 import { useDebounce } from "react-use";
 import { Renderer, RendererEvent } from "renderer";
 import { slice } from "slices";
-import { useLoading } from "slices/loading";
 import { useRenderers } from "slices/renderers";
 import { useScreenshots } from "slices/screenshots";
 import { Placeholder } from "./Placeholder";
@@ -104,9 +103,14 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
   return { instance, ref, error };
 }
 
+function useLoading() {
+  "use no memo";
+  return slice.loading.use((l) => !!l.layers);
+}
+
 function TraceRendererCircularProgress() {
-  const [{ layers }] = useLoading();
-  return layers ? (
+  const loading = useLoading();
+  return loading ? (
     <CircularProgress
       sx={{
         position: "absolute",

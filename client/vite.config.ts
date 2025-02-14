@@ -46,5 +46,8 @@ export default defineConfig(
         },
       },
     },
+    worker: {
+      plugins: () => [viteTsconfigPaths()],
+    },
   })
 );

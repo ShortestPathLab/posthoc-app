@@ -4,7 +4,7 @@ import { ListEditor } from "components/generic/list-editor/ListEditor";
 import { each, head, isEqual, map, pick } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { nanoid as id } from "nanoid";
-import { useTransition } from "react";
+import { startTransition } from "react";
 import { slice } from "slices";
 import { LayerEditor } from "./LayerEditor";
 
@@ -14,7 +14,6 @@ export function LayerListEditor() {
     (l) => map(l, (l) => pick(l, "key")),
     isEqual
   );
-  const [, startTransition] = useTransition();
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>
       <Box sx={{ mb: 2 }}>
@@ -25,10 +24,10 @@ export function LayerListEditor() {
           deletable
           orderable
           extras={(v) => <LayerListEditorExtras layer={v?.key} />}
-          renderEditor={({ extras, handle, value }) => (
+          renderEditor={({ extras, handle, props: { id: key } }) => (
             <>
               {handle}
-              <LayerEditor layer={value?.key} />
+              <LayerEditor layer={key} />
               {extras}
             </>
           )}
@@ -36,7 +35,7 @@ export function LayerListEditor() {
             source: { type: "trace", trace: {} },
           })}
           onChange={(v) => startTransition(() => slice.layers.set(v))}
-          addItemLabels={["Layer"]}
+          addItemLabel="Layer"
           placeholder={<Box pt={2}>Get started by adding a layer.</Box>}
           onFocus={(key) => {
             const element = head(document.getElementsByClassName(key));

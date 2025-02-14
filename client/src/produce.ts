@@ -1,11 +1,20 @@
 import { EditorSetterProps } from "components/Editor";
-import { clone } from "lodash";
+import { isDefined } from "pages/tree/TreeGraph";
 import { createElement, ReactElement } from "react";
+import { Transaction } from "slices/selector";
 
-export function produce<T>(obj: T, f: (obj: T) => void) {
+function clone<T>(obj: T) {
+  try {
+    return structuredClone(obj);
+  } catch {
+    return JSON.parse(JSON.stringify(obj));
+  }
+}
+
+export function produce<T>(obj: T, f: Transaction<T>) {
   const b = clone(obj);
-  f(b);
-  return b;
+  const out = f(b);
+  return isDefined(out) ? out! : b;
 }
 
 export async function produceAsync<T>(obj: T, f: (obj: T) => Promise<void>) {

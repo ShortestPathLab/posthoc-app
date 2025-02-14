@@ -15,6 +15,7 @@ import { merge } from "slices/reducers";
 import { useRenderers } from "slices/renderers";
 import { Renderer } from "slices/settings";
 import { usePaper } from "theme";
+import { assert } from "utils/assert";
 
 const statusColor = {
   connected: "success.light",
@@ -24,11 +25,16 @@ const statusColor = {
 };
 
 type RendererEditorProps = {
-  value: Renderer;
-  onValueChange?: (e: Renderer) => void;
+  value?: Renderer;
+  onChange?: (e: Renderer) => void;
 };
 
-export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
+export function RendererEditor({
+  value,
+  onChange: onValueChange,
+}: RendererEditorProps) {
+  assert(value, "renderer is defined");
+
   const [renderers] = useRenderers();
   const paper = usePaper();
 
@@ -38,7 +44,7 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
     onValueChange?.(merge(value, next));
   }
 
-  const status = value?.disabled
+  const status = value.disabled
     ? "disabled"
     : current?.renderer
     ? "connected"
@@ -88,9 +94,9 @@ export function RendererEditor({ value, onValueChange }: RendererEditorProps) {
                 </Type>
               )}
               <Type component="div" variant="body2" color="text.secondary">
-                {transports[value?.transport]?.name}
+                {transports[value.transport ?? "native"]?.name}
                 {": "}
-                {value?.url || "No URL"}
+                {value.url || "No URL"}
               </Type>
             </Box>
             <Chip

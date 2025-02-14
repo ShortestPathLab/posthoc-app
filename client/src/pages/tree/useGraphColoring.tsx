@@ -15,6 +15,7 @@ import {
   min,
   slice,
   startCase,
+  trimStart,
   truncate,
 } from "lodash";
 import memoizee from "memoizee";
@@ -22,10 +23,10 @@ import { useMemo } from "react";
 import { AccentColor, getShade } from "theme";
 import { makeEdgeKey } from "./makeEdgeKey";
 import {
-  TreeGraphProps,
-  setAttributes,
   isDefined,
+  setAttributes,
   SEVEN_CLASS_GNBU,
+  TreeGraphProps,
 } from "./TreeGraph";
 
 export function useGraphColoring(
@@ -195,8 +196,9 @@ export function useGraphColoring(
     }
 
     if (trackedProperty) {
-      const minVal = min(map(trace?.events, (e) => get(e, trackedProperty)));
-      const maxVal = max(map(trace?.events, (e) => get(e, trackedProperty)));
+      const p = trimStart(trackedProperty, ".");
+      const minVal = min(map(trace?.events, (e) => get(e, p)));
+      const maxVal = max(map(trace?.events, (e) => get(e, p)));
       const f = (x: number) => {
         if (isNaN(minVal) || isNaN(maxVal) || isNaN(x)) {
           return 0;
@@ -205,7 +207,7 @@ export function useGraphColoring(
       const scale = interpolate(SEVEN_CLASS_GNBU);
       forEach(slice(trace?.events, 0, step + 1), (e) => {
         if (graph.hasNode(`${e.id}`)) {
-          const s = scale(f(get(e, trackedProperty)));
+          const s = scale(f(get(e, p)));
           graph.setNodeAttribute(`${e.id}`, "color", s);
           if (isDefined(e.pId)) {
             const a = makeEdgeKey(`${e.id}`, `${e.pId}`);

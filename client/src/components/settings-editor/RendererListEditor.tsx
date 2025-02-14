@@ -3,24 +3,28 @@ import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { debounce, head } from "lodash";
-import { Renderer, defaultRenderers, useSettings } from "slices/settings";
+import { head } from "lodash";
+import { useSetting } from "pages/SettingsPage";
+import { Renderer, defaultRenderers } from "slices/settings";
 import { RendererEditor } from "./RendererEditor";
 
 export function RendererListEditor() {
-  const [{ renderer }, setSettings] = useSettings();
+  const [renderers, setRenderers] = useSetting("renderer", []);
   return (
     <Box sx={{ mx: -2 }}>
       <ListEditor<Renderer>
         sortable
-        editor={(v) => <RendererEditor value={v} />}
-        icon={null}
-        value={renderer}
-        onChange={debounce(
-          (v) => setSettings((prev) => ({ renderer: v(prev) })),
-          300
+        renderEditor={({ props, handle, extras }) => (
+          <>
+            {handle}
+            <RendererEditor {...props} />
+            {extras}
+          </>
         )}
-        addItemLabels={["Add renderer"]}
+        icon={null}
+        value={renderers}
+        onChange={setRenderers}
+        addItemLabel="Add renderer"
         create={() => ({
           transport: defaultTransport,
           url: "",
@@ -29,7 +33,7 @@ export function RendererListEditor() {
         addItemExtras={
           <FeaturePickerButton
             icon={<ResetIcon />}
-            onClick={() => setSettings(() => ({ renderer: defaultRenderers }))}
+            onClick={() => setRenderers(() => defaultRenderers)}
           >
             Reset
           </FeaturePickerButton>

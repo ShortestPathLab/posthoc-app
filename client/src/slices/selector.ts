@@ -23,7 +23,7 @@ export type SelectorApi<T> = {
 
 export type Selector<Item> = <T extends Item>(key?: string) => SelectorApi<T>;
 
-export type Transaction<T> = (u: T) => T | void;
+export type Transaction<T> = (u: T) => T | undefined | void;
 
 export type Setter<T> = Transaction<T> | T;
 

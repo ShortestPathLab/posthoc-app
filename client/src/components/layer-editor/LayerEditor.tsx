@@ -1,10 +1,9 @@
 import {
   Box,
-  ButtonBase,
-  ButtonBaseProps,
   Chip,
   Divider,
   Stack,
+  StackProps,
   Tab,
   Tabs,
   TextField,
@@ -34,8 +33,8 @@ import { Layer, WithLayer } from "slices/layers";
 import { Transaction } from "slices/selector";
 import { usePaper } from "theme";
 import { set } from "utils/set";
-import { idle } from "../../utils/idle";
 import { useOptimisticTransaction } from "../../hooks/useOptimistic";
+import { idle } from "../../utils/idle";
 
 const compositeOperations = [
   "color",
@@ -255,7 +254,7 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
   );
 }
 
-function Item({ layer, ...props }: { layer?: string } & ButtonBaseProps) {
+function Item({ layer, ...props }: { layer?: string } & StackProps) {
   const paper = usePaper();
   const one = slice.layers.one<Layer>(layer);
 
@@ -265,7 +264,8 @@ function Item({ layer, ...props }: { layer?: string } & ButtonBaseProps) {
   const type = one.use((l) => l?.source?.type);
 
   return (
-    <ButtonBase
+    <Stack
+      direction="row"
       className={layer}
       sx={{
         flex: 1,
@@ -322,6 +322,6 @@ function Item({ layer, ...props }: { layer?: string } & ButtonBaseProps) {
           </Tooltip>
         )}
       </Stack>
-    </ButtonBase>
+    </Stack>
   );
 }

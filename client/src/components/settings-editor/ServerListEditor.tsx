@@ -3,24 +3,28 @@ import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { debounce, head } from "lodash";
-import { defaultRemotes, Remote, useSettings } from "slices/settings";
+import { head } from "lodash";
+import { useSetting } from "pages/SettingsPage";
+import { defaultRemotes, Remote } from "slices/settings";
 import { ServerEditor } from "./ServerEditor";
 
 export function ServerListEditor() {
-  const [{ remote }, setSettings] = useSettings();
+  const [remote, setRemote] = useSetting("remote", []);
   return (
     <Box sx={{ mx: -2 }}>
       <ListEditor<Remote>
         sortable
-        editor={(v) => <ServerEditor value={v} />}
+        renderEditor={({ props, handle, extras }) => (
+          <>
+            {handle}
+            <ServerEditor {...props} />
+            {extras}
+          </>
+        )}
         icon={null}
         value={remote}
-        onChange={debounce(
-          (v) => setSettings((prev) => ({ remote: v(prev) })),
-          300
-        )}
-        addItemLabels={["Add adapter"]}
+        onChange={setRemote}
+        addItemLabel="Add adapter"
         create={() => ({
           transport: defaultTransport,
           url: "",
@@ -29,7 +33,7 @@ export function ServerListEditor() {
         addItemExtras={
           <FeaturePickerButton
             icon={<ResetIcon />}
-            onClick={() => setSettings(() => ({ remote: defaultRemotes }))}
+            onClick={() => setRemote(() => defaultRemotes)}
           >
             Reset
           </FeaturePickerButton>

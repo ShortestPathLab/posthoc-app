@@ -1,11 +1,12 @@
 import { FileOpenOutlined } from "@mui-symbols-material/w400";
 import { useSnackbar } from "components/generic/Snackbar";
 import { find, get, startCase } from "lodash";
+import { slice } from "slices";
 import { Map, UploadedTrace } from "slices/UIState";
 import { LARGE_FILE_B, formatByte, useBusyState } from "slices/busy";
 import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
-import { useLoading, useLoadingState } from "slices/loading";
+import { useLoadingState } from "slices/loading";
 import { EditorProps } from "../Editor";
 import { FeaturePicker } from "./FeaturePicker";
 import { custom, uploadMap, uploadTrace } from "./upload";
@@ -16,20 +17,24 @@ function name(s: string) {
 
 export const mapDefaults = { start: undefined, end: undefined };
 
+function useLoading() {
+  "use no memo";
+  return slice.loading.use((l) => !!(l.features || l.connections));
+}
+
 export function MapPicker({ onChange, value }: EditorProps<Map>) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("layers");
-  const [{ features: featuresLoading, connections: connectionsLoading }] =
-    useLoading();
   const usingBusyState = useBusyState("layers");
   const [connections] = useConnections();
   const [{ maps, formats }] = useFeatures();
+  const loading = useLoading();
   return (
     <FeaturePicker
       showTooltip
       arrow
       paper
-      disabled={!!featuresLoading || !!connectionsLoading}
+      disabled={loading}
       ellipsis={25}
       icon={<FileOpenOutlined />}
       label="Choose Map"
@@ -82,16 +87,15 @@ export function TracePicker({
   const usingLoadingState = useLoadingState("layers");
   const usingBusyState = useBusyState("layers");
   const [connections] = useConnections();
-  const [{ features: featuresLoading, connections: connectionsLoading }] =
-    useLoading();
   const [{ traces }] = useFeatures();
+  const loading = useLoading();
   return (
     <FeaturePicker
       showTooltip
       paper
       arrow
       ellipsis={25}
-      disabled={!!featuresLoading || !!connectionsLoading}
+      disabled={loading}
       icon={<FileOpenOutlined />}
       label="Choose Trace"
       value={value?.id}

@@ -2,6 +2,7 @@ import { useTheme } from "@mui/material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { getParser } from "components/renderer";
 import { get } from "lodash";
+import objectHash from "object-hash";
 import { useAsync } from "react-async-hook";
 import { Map } from "slices/UIState";
 import { useLoadingState } from "slices/loading";
@@ -37,6 +38,6 @@ export function useParsedMap(map?: Map, options?: Record<string, any>) {
           }
         }
       }),
-    [format, content, theme, options]
+    [format, content, theme, objectHash(options ?? {})]
   );
 }

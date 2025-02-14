@@ -1,34 +1,34 @@
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { AddOutlined as Add } from "@mui-symbols-material/w400";
+import { Box, ButtonProps, Collapse, Stack, Typography } from "@mui/material";
+
 import {
-  Box,
-  Button,
-  Collapse,
-  List,
-  Stack,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { defer, find, findIndex, map, pull, set, sortBy, uniqBy } from "lodash";
+  defer,
+  filter,
+  find,
+  findIndex,
+  last,
+  map,
+  noop,
+  pick,
+  pull,
+  set,
+  sortBy,
+} from "lodash";
 import { nanoid as id } from "nanoid";
 
+import { EditorProps } from "components/Editor";
 import { useInitialRender } from "hooks/useInitialRender";
-import { produce } from "produce";
-import {
-  CSSProperties,
-  ReactElement,
-  ReactNode,
-  useEffect,
-  useState,
-} from "react";
+import { CSSProperties, ForwardedRef, ReactElement, ReactNode } from "react";
+import { useMap } from "react-use";
 import { Transaction } from "slices/selector";
-import { usePaper } from "theme";
-import { ListEditorField, ListEditorFieldProps1 } from "./ListEditorField";
+import { wait } from "utils/timed";
+import { Button } from "../inputs/Button";
+import { DraggableListItem } from "./ListEditorField";
 
-type Key = string;
+export type Key = string;
 
 export type Item<T> = {
-  editor?: ReactElement;
   enabled?: boolean;
   value?: T;
   id: Key;
@@ -38,13 +38,17 @@ export type Props<T> = {
   button?: boolean;
   onChange?: (value: Transaction<T[]>) => void;
   onChangeItem?: (key: Key, value: T, enabled: boolean) => void;
-  onAddItem?: (label?: string) => void;
+  onAddItem?: (partial?: Partial<T>) => void;
   onDeleteItem?: (key: Key) => void;
   category?: (value?: T) => string;
   order?: (value?: T) => string | number;
   extras?: (value?: T) => ReactNode;
   items?: Item<T>[];
-  addItemLabels?: ReactNode;
+  addItemLabel?: ReactNode;
+  renderAddItem?: (
+    create: (c: Partial<T>) => void,
+    button: ReactElement
+  ) => ReactNode;
   addItemExtras?: ReactNode;
   sortable?: boolean;
   toggleable?: boolean;
@@ -58,10 +62,13 @@ export type Props<T> = {
   cardStyle?: CSSProperties;
   autoFocus?: boolean;
   renderEditor?: (parts: {
-    value?: T;
-    onValueChange?: (v: T) => void;
     handle: ReactNode;
-    content: ReactNode;
+    props: {
+      id: Key;
+      autoFocus?: boolean;
+      onDelete?: () => void;
+      ref?: ForwardedRef<HTMLElement | null>;
+    } & EditorProps<T>;
     extras: ReactNode;
   }) => ReactNode;
 };
@@ -74,195 +81,147 @@ function reorder<T>(list: T[], startIndex: number, endIndex: number) {
   return result;
 }
 
-export default function Editor<T>(props: Props<T>) {
+function second<U>(_: unknown, b: U) {
+  return b;
+}
+
+export default function Editor<T extends { key: Key }>(props: Props<T>) {
   const {
-    addItemLabels = ["Add Item"],
-    onAddItem = () => {},
-    onDeleteItem = () => {},
-    items = [],
-    placeholder: placeholderText,
+    addItemLabel = "Add Item",
+    onAddItem = noop,
+    onDeleteItem = noop,
+    items,
+    placeholder,
     autoFocus,
-    category: getCategory,
-    order: getOrder,
+    order,
     onChange,
     addItemExtras: extras,
     addable = true,
+    renderAddItem = second,
   } = props;
-  const paper = usePaper();
-  const isInitialRender = useInitialRender();
-  const theme = useTheme();
-  const [intermediateItems, setIntermediateItems] = useState(items);
-  const [newIndex, setNewIndex] = useState(-1);
+  const initial = useInitialRender();
+  const [deleting, { set: pushDeleting, remove: pullDeleting }] = useMap();
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setIntermediateItems(items);
-    }, theme.transitions.duration.standard);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [items, setIntermediateItems, theme.transitions.duration.standard]);
+  const handleDelete = async (e: string): Promise<void> => {
+    pushDeleting(e, true);
+    await wait(600);
+    onDeleteItem(e);
+    pullDeleting(e);
+  };
 
-  const children = uniqBy([...intermediateItems, ...items], (c) => c.id)
-    .map((c) => items.find((c2) => c.id === c2.id) ?? c)
-    .map((x, i) => {
-      const { enabled, editor, value, id } = x ?? {};
-      return {
-        value,
-        render: (p?: ListEditorFieldProps1<T>) => (
-          <Collapse
-            in={!!items.find((p) => p.id === x.id)}
-            unmountOnExit
-            appear={!isInitialRender}
-            mountOnEnter
-          >
-            <ListEditorField<T>
-              {...props}
-              onDeleteItem={(e) => {
-                onDeleteItem(e);
-                setNewIndex(-1);
-              }}
-              enabled={enabled}
-              editor={editor}
-              value={value}
-              id={id}
-              i={i}
-              autoFocus={autoFocus || i === newIndex}
-              {...p}
-            />
-          </Collapse>
-        ),
-        key: id,
-        in: !!items.find((p) => p.id === x.id),
-      };
-    });
-  const sorted = sortBy(
-    children,
-    (c) => getCategory?.(c.value),
-    (c) => getOrder?.(c.value)
-  ).map((c) => ({
-    ...c,
-    render: (p?: ListEditorFieldProps1<T>) => (
-      <Box key={c.key}>{c.render(p)}</Box>
-    ),
-  }));
+  const isEmpty = !filter(items, (item) => !deleting[item.id]).length;
+
   return (
     <DragDropContext
       onDragEnd={(result) => {
         // dropped outside the list
-        if (!result.destination) {
-          return;
-        }
+        if (!result.destination) return;
         const { source, destination } = result;
 
-        function t<T>(xs: T[]) {
+        function f<T>(xs: T[]) {
           return reorder(xs, source.index, destination.index);
         }
 
-        onChange?.(t);
-        setIntermediateItems(t(items));
+        onChange?.(f);
       }}
     >
-      <List>
-        <Box mt={getCategory ? -1 : 0}>
-          <Droppable
-            droppableId="list"
-            isDropDisabled={false}
-            isCombineEnabled={false}
-            ignoreContainerClipping={true}
-          >
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {(() => {
-                  const out: ReactNode[] = [];
-                  sorted.forEach((c, i) => {
-                    if (getCategory && isNewCategory(sorted, i, c)) {
-                      out.push(
-                        <Collapse
-                          in={items.some(
-                            (c2) =>
-                              getCategory(c2.value) === getCategory(c.value)
-                          )}
-                          appear
-                          key={getCategory(c.value)}
-                        >
-                          <Box pl={2} pb={2} pt={1}>
-                            <Typography
-                              component="div"
-                              variant="overline"
-                              color="text.secondary"
-                            >
-                              {getCategory(c.value)}
-                            </Typography>
-                          </Box>
-                        </Collapse>
-                      );
-                    }
-                    out.push(c.render());
-                  });
-                  return out;
-                })()}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </Box>
-        <Collapse in={!items?.length}>
-          <Box ml={2} mb={1} pt={getCategory ? 1 : 0}>
+      <Box>
+        <Droppable
+          droppableId="list"
+          isDropDisabled={false}
+          isCombineEnabled={false}
+          ignoreContainerClipping={true}
+        >
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {map(
+                sortBy(items, (c) => order?.(c.value)),
+                (item, i, xs) => (
+                  <Collapse
+                    key={item.id}
+                    unmountOnExit
+                    appear={!initial}
+                    in={!deleting[item.id]}
+                    mountOnEnter
+                  >
+                    <DraggableListItem<T>
+                      {...pick(props, [
+                        "toggleable",
+                        "deletable",
+                        "editable",
+                        "button",
+                        "onChangeItem",
+                        "onDeleteItem",
+                        "extras",
+                        "sortable",
+                        "renderEditor",
+                        "id",
+                        "editor",
+                        "enabled",
+                        "value",
+                      ])}
+                      onDeleteItem={handleDelete}
+                      item={item}
+                      i={i}
+                      autoFocus={autoFocus && item.id === last(xs)?.id}
+                    />
+                  </Collapse>
+                )
+              )}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+        <Collapse in={isEmpty}>
+          <Box ml={2} my={1}>
             <Typography component="div" color="text.secondary">
-              {placeholderText ?? "No items"}
+              {placeholder ?? "No items"}
             </Typography>
           </Box>
         </Collapse>
         <Stack p={2} pt={2} gap={2} direction="row">
-          {addable && Array.isArray(addItemLabels) ? (
-            map(addItemLabels, (addItemLabel) => (
-              <Button
-                disableElevation
-                variant="outlined"
-                startIcon={<Add />}
-                onClick={() => {
-                  onAddItem(addItemLabel);
-                  setNewIndex(items.length);
-                }}
-                sx={{
-                  ...paper(1),
-                }}
-              >
-                <Box
-                  sx={{
-                    color: "text.primary",
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {addItemLabel}
-                </Box>
-              </Button>
-            ))
-          ) : (
-            <></>
+          {addable && (
+            <CustomAddItemButton
+              label={addItemLabel}
+              render={renderAddItem}
+              onAdd={(c?: Partial<T>) => {
+                onAddItem(c);
+              }}
+            />
           )}
           {extras}
         </Stack>
-      </List>
+      </Box>
     </DragDropContext>
   );
+}
 
-  function isNewCategory(arr: { value?: T }[], i: number, c: { value?: T }) {
-    return !!(
-      getCategory &&
-      (arr[i - 1] === undefined ||
-        getCategory(arr[i - 1].value) !== getCategory(c.value))
-    );
-  }
+export function AddItemButton({ children, ...props }: ButtonProps) {
+  return (
+    <Button disableElevation variant="outlined" startIcon={<Add />} {...props}>
+      {children}
+    </Button>
+  );
+}
+
+function CustomAddItemButton<T>({
+  label,
+  render,
+  onAdd,
+}: {
+  label: ReactNode;
+  render: (onAdd: (c?: Partial<T>) => void, button: ReactElement) => ReactNode;
+  onAdd: (c?: Partial<T>) => void;
+}) {
+  return render(
+    onAdd,
+    <AddItemButton onClick={() => onAdd()}>{label}</AddItemButton>
+  );
 }
 
 export function ListEditor<T extends { key: Key }>({
   onChange,
   value,
-  editor,
   create,
   onFocus,
   ...props
@@ -270,51 +229,37 @@ export function ListEditor<T extends { key: Key }>({
   items?: T[];
   onChange?: (value: Transaction<T[]>) => void;
   value?: T[];
-  editor?: (item: T) => ReactElement;
   create?: () => Omit<T, "key">;
   onFocus?: (key: Key) => void;
 }) {
-  const [state, setState] = useState(value ?? []);
-  function handleChange(next: Transaction<T[]>) {
-    setState(produce(state, next));
-    onChange?.(next);
-  }
-
-  useEffect(() => {
-    setState(value ?? []);
-  }, [value]);
-
   return (
-    <Box>
-      <Editor
-        deletable
-        editable={false}
-        {...props}
-        items={state.map((c) => ({
-          id: c.key,
-          value: c,
-          editor: editor?.(c),
-        }))}
-        onAddItem={() => {
-          const key = id();
-          handleChange?.((xs) => void xs.push({ ...(create?.() as T), key }));
-          defer(() => onFocus?.(key));
-        }}
-        onDeleteItem={(k) =>
-          handleChange?.((xs) => void pull(xs, find(xs, { key: k })))
-        }
-        onChangeItem={(k, v) =>
-          handleChange?.(
-            (xs) =>
-              void set(
-                xs,
-                findIndex(xs, (x) => x.key === k),
-                v
-              )
-          )
-        }
-        onChange={(k) => handleChange?.(k)}
-      />
-    </Box>
+    <Editor
+      deletable
+      editable={false}
+      {...props}
+      items={map(value, (c) => ({
+        id: c.key,
+        value: c,
+      }))}
+      onAddItem={(t) => {
+        const key = id();
+        onChange?.((xs) => void xs.push({ ...(create?.() as T), ...t, key }));
+        defer(() => onFocus?.(key));
+      }}
+      onDeleteItem={(k) =>
+        onChange?.((xs) => void pull(xs, find(xs, { key: k })))
+      }
+      onChangeItem={(k, v) =>
+        onChange?.(
+          (xs) =>
+            void set(
+              xs,
+              findIndex(xs, (x) => x.key === k),
+              v
+            )
+        )
+      }
+      onChange={(k) => onChange?.(k)}
+    />
   );
 }

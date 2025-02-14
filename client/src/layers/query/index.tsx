@@ -109,7 +109,7 @@ export const controller = {
                 description: find(connections, { url: c.source })?.name,
               }))}
               onChange={async (v) =>
-                produce((p) => set(p, "source.algorithm", v))
+                produce((p) => void set(p, "source.algorithm", v))
               }
             />
           }
