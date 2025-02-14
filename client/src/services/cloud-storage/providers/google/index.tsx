@@ -30,7 +30,7 @@ const driveApiUrl = "https://www.googleapis.com/drive/v3/files";
 const driveMultiPartApiUrl = "https://www.googleapis.com/upload/drive/v3/files";
 const folderMime = "application/vnd.google-apps.folder";
 const googleUserInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
-const oauthTokenUrl = "https://oauth2.googleapis.com/revoke";
+const oauthTokenUrl = "https://oauth2.googleapis.com";
 type GoogleDriveFileList = { files: WorkspaceMeta[] };
 
 const getFilePath = (fileId: string) =>
