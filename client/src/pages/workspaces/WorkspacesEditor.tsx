@@ -108,10 +108,6 @@ const FileList = ({
 };
 
 const UploadWorkspace = () => {
-  const { open, dialog } = useSurface(FileShareSurface, {
-    title: "Workspace details",
-  });
-
   const [uploading, setUploading] = useState(false);
   const notify = useSnackbar();
   const storage = useCloudStorageInstance();
@@ -123,36 +119,13 @@ const UploadWorkspace = () => {
     title: "Upload Workspace",
   });
 
-  const [{ instance: cloudService }] = useCloudStorageService();
-  const { generateWorkspaceFile } = useWorkspace();
-
-  //
   const handleUpload = async () => {
     try {
       setUploading(true);
       openUploadWorkspaceModal({
         uploadFile: storage?.instance.saveFile,
-        closePopup: closeUploadWorkspaceDialog
+        closePopup: closeUploadWorkspaceDialog,
       });
-      // const { compressedFile: file } = await generateWorkspaceFile();
-      // if (storage?.auth.authenticated && file) {
-      //   await cloudService?.saveFile(file);
-      //   if (file) {
-      //     open({
-      //       file: {
-      //         id: file.name,
-      //         name: file.name,
-      //         mimeType: file.type,
-      //         size: `${file.size}`,
-      //         modifiedTime: `${file.lastModified}`,
-      //       },
-      //     });
-      //     notify("Workspace uploaded");
-      //   }
-      // } else {
-      //   // ? allow empty workspace upload?
-      //   notify("Please start a workspace first");
-      // }
     } catch (error) {
       console.log(error);
       notify("Unable to upload workspace right now");
@@ -174,7 +147,6 @@ const UploadWorkspace = () => {
       >
         {uploading ? "Saving" : "Upload current workspace"}
       </Button>
-      {dialog}
       {uploadWorkspaceDialog}
     </Stack>
   );
@@ -193,9 +165,9 @@ const WorkspacesEditor = () => {
       try {
         setSavedFilesMetaData(true);
 
-        // const res = await storage.instance.getIndex();
+        const res = await storage.instance.getIndex();
         // * while dev, use empty list
-        const res = [];
+        // const res = [];
 
         if (res) setList(res);
       } catch (error) {

@@ -30,7 +30,7 @@ const driveApiUrl = "https://www.googleapis.com/drive/v3/files";
 const driveMultiPartApiUrl = "https://www.googleapis.com/upload/drive/v3/files";
 const folderMime = "application/vnd.google-apps.folder";
 const googleUserInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
-
+const oauthTokenUrl = "https://oauth2.googleapis.com/revoke";
 type GoogleDriveFileList = { files: WorkspaceMeta[] };
 
 const getFilePath = (fileId: string) =>
@@ -62,6 +62,9 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
 
   const userClient = createClient<HeaderOptions>(googleUserInfoUrl, getHeaders);
   const client = createClient<HeaderOptions>(driveApiUrl, getHeaders);
+  const oauthClient = createClient(oauthTokenUrl, async () => {
+    return {};
+  });
   const multiPartApiClient = createClient<HeaderOptions>(
     driveMultiPartApiUrl,
     getHeaders
@@ -171,17 +174,20 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
   };
 
   const getFile = async (fileId: string) => {
+    const { authenticated } = await getState();
     const [{ name, lastModified }, media] = await Promise.all([
       client.get<WorkspaceMeta>({
         label: "Get file metadata",
-        path: `/${fileId}?key=${apiKey}`,
+        path: `/${fileId}${authenticated ? "" : `?key=${apiKey}`}`,
         result: "json",
+        auth: authenticated,
       }),
 
       client.get({
         label: "Get file media",
-        path: `/${fileId}?alt=media&key=${apiKey}`,
+        path: `/${fileId}?alt=media${authenticated ? "" : `&key=${apiKey}`}`,
         result: "blob",
+        auth: authenticated,
       }),
     ]);
     // console.log(media);
@@ -209,7 +215,13 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
       });
       window.location.href = url.toString();
     },
-    logout: async () => {},
+    logout: async () => {
+      const { accessToken } = await getState();
+      await oauthClient.post({
+        path: `/revoke?token=${accessToken}`,
+      });
+      await setState({});
+    },
     saveFile: async (file: File) => {
       const parentId = await createRootFolder(rootFolderName);
       const form = new FormData();
