@@ -27,13 +27,13 @@ import {
   useCloudStorageService,
 } from "slices/cloudStorage";
 import { useLoadingState } from "slices/loading";
-import { useSnackbar } from "../../components/generic/Snackbar";
-import { Button } from "../../components/generic/inputs/Button";
-import { IconButtonWithTooltip } from "../../components/generic/inputs/IconButtonWithTooltip";
-import { Surface, useSurface } from "../../components/generic/surface";
-import { useSurfaceAvailableCssSize } from "../../components/generic/surface/useSurfaceSize";
-import { useViewTreeContext } from "../../components/inspector/ViewTree";
-import { FileShareSurface } from "../../components/FileShareSurface";
+import { useSnackbar } from "components/generic/Snackbar";
+import { Button } from "components/generic/inputs/Button";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
+import { Surface, useSurface } from "components/generic/surface";
+import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
+import { useViewTreeContext } from "components/inspector/ViewTree";
+import { FileShareSurface } from "components/FileShareSurface";
 
 const FileList = ({
   fileMetaDataList,

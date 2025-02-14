@@ -2,7 +2,7 @@ import { chunk, Dictionary, flatten, identity, maxBy, minBy } from "lodash";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
-import { usingMessageHandler } from "../../../../workers/usingWorker";
+import { usingMessageHandler } from "workers/usingWorker";
 
 export type Options = {
   color?: string;

@@ -10,10 +10,7 @@ import {
 } from "lodash";
 import { CompiledComponent } from "protocol";
 import { ComponentEntry } from "renderer";
-import {
-  usingMessageHandler,
-  usingWorkerTask,
-} from "../../../workers/usingWorker";
+import { usingMessageHandler, usingWorkerTask } from "workers/usingWorker";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,

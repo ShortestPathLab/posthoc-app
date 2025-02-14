@@ -3,7 +3,7 @@ import { chain as _, last, map, range } from "lodash";
 import { Point, Size } from "protocol";
 import { ParsedMap } from "../Parser";
 import { getGridSymbols } from "./getGridSymbols.worker";
-import { usingMessageHandler } from "../../../../workers/usingWorker";
+import { usingMessageHandler } from "workers/usingWorker";
 
 function map2D<R>(cells: string[], iterator: (t: string) => R) {
   return map(cells, (row) => map(row, (cell) => iterator(cell)));

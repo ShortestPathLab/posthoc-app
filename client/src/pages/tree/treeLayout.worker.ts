@@ -1,7 +1,7 @@
 import { graphlib, layout } from "@dagrejs/dagre";
 import { Dictionary, forEach, pick } from "lodash";
 import { Trace, TraceEvent } from "protocol";
-import { usingMessageHandler } from "../../workers/usingWorker";
+import { usingMessageHandler } from "workers/usingWorker";
 
 export function getFinalParents(trace: Trace | undefined) {
   const finalParent: Dictionary<Key> = {};

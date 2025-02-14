@@ -1,7 +1,7 @@
 import { chain } from "lodash";
 import { getValue } from "./gradient";
 import { ParseGridWorkerParameters } from "./parseGrid.worker";
-import { usingMessageHandler } from "../../../../workers/usingWorker";
+import { usingMessageHandler } from "workers/usingWorker";
 
 export type GetGridSymbolsReturnType = {
   symbols: { symbol: string; value: number }[];

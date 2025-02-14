@@ -3,7 +3,7 @@ import { find, startCase } from "lodash";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { UploadedTrace } from "slices/UIState";
 import { parseYamlAsync } from "workers/async";
-import { name, ext } from "../../utils/path";
+import { name, ext } from "utils/path";
 import { nanoid as id } from "nanoid";
 import { Trace as TraceLegacy } from "protocol";
 import { Trace } from "protocol/Trace-v140";

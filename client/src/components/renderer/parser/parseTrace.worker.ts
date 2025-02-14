@@ -1,8 +1,5 @@
 import { ceil, flatMap, flatten, map, range } from "lodash";
-import {
-  usingMessageHandler,
-  usingWorkerTask,
-} from "../../../workers/usingWorker";
+import { usingMessageHandler, usingWorkerTask } from "workers/usingWorker";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,

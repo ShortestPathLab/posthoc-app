@@ -12,7 +12,7 @@ import {
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
-import { usingMessageHandler } from "../../../../workers/usingWorker";
+import { usingMessageHandler } from "workers/usingWorker";
 
 export type Options = {
   color?: string;
@@ -63,7 +63,7 @@ function uniq<T extends any[]>(segments: T[]) {
 function optimizeNetworkEdges(segments: number[][]) {
   let xs = uniq(segments);
   // let xs = uniqBy(segments, join);
-   
+
   while (true) {
     const byHead = chain(xs).groupBy(first).mapValues(toSet).value();
     const byTail = chain(xs).groupBy(last).mapValues(toSet).value();

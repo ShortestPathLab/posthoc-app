@@ -33,8 +33,8 @@ import { Layer, WithLayer } from "slices/layers";
 import { Transaction } from "slices/selector";
 import { usePaper } from "theme";
 import { set } from "utils/set";
-import { useOptimisticTransaction } from "../../hooks/useOptimistic";
-import { idle } from "../../utils/idle";
+import { useOptimisticTransaction } from "hooks/useOptimistic";
+import { idle } from "utils/idle";
 
 const compositeOperations = [
   "color",

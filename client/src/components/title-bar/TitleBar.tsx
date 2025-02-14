@@ -38,7 +38,7 @@ import { cloneElement, ReactElement, ReactNode } from "react";
 import { useSyncStatus } from "services/SyncService";
 import { getDefaultViewTree, useView } from "slices/view";
 import { getShade } from "theme";
-import { useOverlayWindowControls } from "../../hooks/useOverlayWindowControls";
+import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
 import { ExportWorkspace } from "./ExportWorkspaceModal";
 import { openWindow } from "./window";
 

@@ -37,7 +37,7 @@ import { Connection, useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { Layer, WithLayer, useLayerPicker } from "slices/layers";
 import { set } from "utils/set";
-import { LayerPicker } from "../../components/generic/LayerPicker";
+import { LayerPicker } from "components/generic/LayerPicker";
 
 function mapValuesDeep<T, U>(v: T, callback: (t: unknown) => any): U {
   return isArray(v)
