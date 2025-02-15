@@ -30,7 +30,7 @@ export function SyncService() {
   const {
     isPrimary,
     isOnly,
-    participants: participants,
+    participants,
     peers,
   } = useSyncStatus();
   return null;

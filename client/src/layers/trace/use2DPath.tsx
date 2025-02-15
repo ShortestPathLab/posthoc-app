@@ -143,7 +143,7 @@ export function use2DPath(
             y: e.y - 2 * scale * labelScale,
             width: textWidth * 2,
             height: 1 * scale * labelScale,
-            label: label,
+            label,
             "label-size": labelSize * scale * labelScale,
             "label-x": (0.1 + 0.5) * scale * labelScale,
             "label-y": 1 * scale * labelScale,

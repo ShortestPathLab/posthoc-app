@@ -96,7 +96,7 @@ const WorkspaceChip = () => {
             ml: 1,
             flex: 0,
             WebkitAppRegion: "no-drag",
-            color: color,
+            color,
             background: alpha(color, 0.08),
           }}
           label={`Group ${a}`}
