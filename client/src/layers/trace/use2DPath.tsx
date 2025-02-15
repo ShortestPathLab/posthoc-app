@@ -7,7 +7,7 @@ import { parseProperty as parsePropertyLegacy } from "components/renderer/parser
 import { constant, head, last, map, startCase } from "lodash";
 import { TraceEvent } from "protocol";
 import { useMemo } from "react";
-import { TraceLayer } from "./index";
+import { TraceLayer } from "./TraceLayer";
 import { makePathIndex } from "./makePathIndex";
 
 const labelScale = 1.25;
@@ -50,7 +50,7 @@ export function use2DPath(
     const n = interpolate([palette.background.paper, palette.text.primary])(
       0.05
     );
-    const trace = layer?.source?.parsedTrace?.content;
+    const trace = layer?.source?.parsedTrace?.content as any;
     if (trace?.render?.path || trace?.pivot) {
       const pivot = trace?.render?.path?.pivot ?? trace?.pivot ?? {};
       const scale = trace?.render?.path?.scale

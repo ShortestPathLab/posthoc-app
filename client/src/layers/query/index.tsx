@@ -15,7 +15,8 @@ import { useMapContent } from "hooks/useMapContent";
 import { dump } from "js-yaml";
 import { LayerController, inferLayerName } from "layers";
 import { MapLayer, MapLayerData } from "layers/map";
-import { TraceLayerData, controller as traceController } from "layers/trace";
+import { controller as traceController } from "layers/trace";
+import { TraceLayerData } from "layers/trace/TraceLayer";
 import {
   chain as _,
   find,
