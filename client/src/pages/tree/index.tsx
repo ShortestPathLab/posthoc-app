@@ -43,7 +43,7 @@ import {
 import { usePlaybackControls } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
-import { TraceLayerData } from "layers/trace";
+import { TraceLayerData } from "layers/TraceLayer";
 import { entries, findLast, isEmpty, map, startCase } from "lodash";
 import { Size } from "protocol";
 import { Fragment, useState } from "react";

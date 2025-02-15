@@ -14,7 +14,7 @@ import { useMap } from "react-use";
 import { useScreenshots } from "slices/screenshots";
 import { usePaper } from "theme";
 
-const defaultScreenshotRenderer = (s?: string) => <img src={s}></img>;
+const defaultScreenshotRenderer = (s?: string) => <img src={s} />;
 function Screenshot({
   screenshot,
   renderScreenshot = defaultScreenshotRenderer,

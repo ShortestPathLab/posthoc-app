@@ -109,7 +109,7 @@ export function ViewControls({
                     state.close();
                   }}
                 >
-                  <ListItemIcon></ListItemIcon>
+                  <ListItemIcon />
                   <ListItemText>Duplicate to new window</ListItemText>
                 </MenuItem>
                 <Divider />

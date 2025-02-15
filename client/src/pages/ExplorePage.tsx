@@ -255,7 +255,7 @@ export function FeatureCard({
                     backgroundSize: "100%",
                     backgroundPosition: "center",
                   }}
-                ></Box>
+                />
               </Fade>
             </Box>
           }
@@ -378,7 +378,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
           opacity: 0.75,
           background: `radial-gradient(46.56% 45.08% at 56.04% 55.33%,rgba(0,50,255,.2) 0,transparent 100%),radial-gradient(46.69% 41.74% at 69.64% 60.81%,rgba(192,59,196,.2) 0,transparent 100%),radial-gradient(59.78% 45.73% at 30.42% 58.68%,rgba(0,120,212,.2) 0,transparent 100%),radial-gradient(32.53% 31.57% at 50% 66.82%,rgba(70,54,104,.2) 0,transparent 100%)`,
         }}
-      ></Box>
+      />
     );
   }
 
@@ -402,13 +402,13 @@ export function ExplorePage({ template: Page }: PageContentProps) {
             <Scroll y>
               <Box
                 sx={
-                  !narrow
-                    ? {
+                  narrow
+                    ? undefined
+                    : {
                         p: 4,
                         maxWidth: CONTENT_WIDTH,
                         mx: "auto",
                       }
-                    : undefined
                 }
               >
                 <Box pt={6}>
@@ -426,11 +426,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       </Type>
                     </Box>
                     {theme.palette.mode === "dark" && blur()}
-                    <Box
-                      px={2}
-                      pb={narrow ? 4 : 4}
-                      sx={{ textAlign: "center" }}
-                    >
+                    <Box px={2} pb={4} sx={{ textAlign: "center" }}>
                       <TextField
                         {...textFieldProps}
                         size={narrow ? "small" : "medium"}

@@ -1,4 +1,4 @@
-import { TraceLayerData } from "layers/trace";
+import { TraceLayerData } from "layers/TraceLayer";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { makePathIndex, Node } from "layers/trace/makePathIndex";
 import {

@@ -85,7 +85,7 @@ export function LazyNodeList({ nodes, end }: LazyNodeListProps) {
     <>
       {!!threshold && <NodeList nodes={cached} />}
       {uncached.map((c, i) => (
-        <NodeList2 key={threshold + i} nodes={c}></NodeList2>
+        <NodeList2 key={threshold + i} nodes={c} />
       ))}
     </>
   );

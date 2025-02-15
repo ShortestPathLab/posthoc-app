@@ -78,7 +78,7 @@ export function AboutContent() {
           <List sx={{ mx: -2 }}>
             <ListItemButton target="_blank" href={homepage}>
               <ListItemAvatar>
-                <Avatar sx={{ width: 24, height: 24 }} src={logo}></Avatar>
+                <Avatar sx={{ width: 24, height: 24 }} src={logo} />
               </ListItemAvatar>
               <ListItemText primary="Home" secondary={parseUrl(homepage)} />
             </ListItemButton>

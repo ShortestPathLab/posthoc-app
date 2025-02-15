@@ -8,7 +8,7 @@ export function Image(props: ComponentProps<"img">) {
       {({ open, isOpen }) => (
         <>
           <Fade in={isOpen}>
-            <img {...props} onLoad={open}></img>
+            <img {...props} onLoad={open} />
           </Fade>
         </>
       )}
