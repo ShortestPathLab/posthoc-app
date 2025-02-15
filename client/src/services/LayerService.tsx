@@ -11,7 +11,7 @@ function useLayerServices() {
   return useMemo(() => {
     return isPrimary
       ? map(layers, (layer) => {
-          const service = getController(layer).service;
+          const { service } = getController(layer);
           if (service) {
             return createElement(service, {
               key: layer.key,

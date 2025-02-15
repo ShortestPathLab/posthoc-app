@@ -37,7 +37,7 @@ export function degreeSeparation(tree: EventTree, radius: number) {
     return node;
   }
   function addPathToRoot(node: EventTree) {
-    const parent = node.parent;
+    const { parent } = node;
     if (parent) {
       parent.children = [node];
       return addPathToRoot(parent);

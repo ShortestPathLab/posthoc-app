@@ -51,7 +51,7 @@ export function Scroll({
   const handleRef = useCallback(
     (instance: OverlayScrollbars) => {
       if (ref && instance) {
-        const viewport = instance.elements().viewport;
+        const { viewport } = instance.elements();
         if (viewport) {
           if (typeof ref === "function") {
             ref?.(viewport as HTMLDivElement);
