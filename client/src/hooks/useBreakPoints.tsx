@@ -2,7 +2,7 @@ import { Breakpoint } from "components/breakpoint-editor/BreakpointEditor";
 import { TreeDict } from "components/breakpoint-editor/breakpoints/Breakpoint";
 import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { call } from "components/script-editor/call";
-import { chain, values } from "lodash";
+import { chain, map, values } from "lodash";
 import { EventTree } from "pages/tree/treeLayout.worker";
 import { useComputeTree } from "pages/tree/TreeUtility";
 import { useMemo } from "react";
@@ -19,8 +19,23 @@ export type DebugLayerData = {
     string,
     { step: number; result: string }[] | { error: string }
   >;
+  breakpointOutputDict: Record<string, { step: number; result: string }[]>;
   trace?: UploadedTrace;
 };
+
+export function useBreakpoint3(key?: string) {
+  "use no memo";
+  const one = slice.layers.one<Layer<DebugLayerData>>(key);
+  const dict = one.use((l) => l?.source?.breakpointOutputDict);
+  return useMemo(() => {
+    return {
+      shouldBreak: (step: number): { result?: string; error?: string } =>
+        dict?.[step]?.length
+          ? { result: map(dict[step], "result").join(", ") }
+          : {},
+    };
+  }, [dict]);
+}
 
 export function useBreakPoints2(key?: string) {
   "use no memo";

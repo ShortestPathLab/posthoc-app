@@ -1,5 +1,5 @@
 import { SelectField as Select } from "components/generic/inputs/Select";
-import { startCase } from "lodash";
+import { head, startCase } from "lodash";
 import { BreakpointFieldProps } from "../breakpoints/Breakpoint";
 
 export const ConditionSelect = (props: BreakpointFieldProps<string>) => {
@@ -13,7 +13,7 @@ export const ConditionSelect = (props: BreakpointFieldProps<string>) => {
         value: c,
         label: startCase(c),
       }))}
-      value={props.value}
+      value={props.value ?? head(props.conditions) ?? ""}
       onChange={(v) => {
         props.onChange?.(v);
       }}

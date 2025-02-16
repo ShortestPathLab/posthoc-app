@@ -17,8 +17,7 @@ export function Item({
   const { spacing } = useTheme();
 
   const { stepTo, playing } = useItemPlaybackState(layer);
-  const { event, isSelected } = useItemState({ layer, index });
-
+  const { event, isSelected, label } = useItemState({ layer, index });
   return (
     <Box
       sx={{
@@ -37,8 +36,7 @@ export function Item({
             event={event}
             index={index}
             selected={isSelected}
-            // TODO: Temporarily disabled breakpoint features
-            // label={shouldBreak(eventIndex)?.result}
+            label={label}
             onClick={() => stepTo(index)}
           />
         )}

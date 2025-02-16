@@ -4,10 +4,11 @@ import {
   TreeDict,
 } from "components/breakpoint-editor/breakpoints/Breakpoint";
 import { DebugLayerData } from "hooks/useBreakPoints";
-import { isEqual } from "lodash";
+import { chain, isEqual } from "lodash";
 import memo from "memoizee";
 import objectHash from "object-hash";
 import { useComputeTree } from "pages/tree/TreeUtility";
+import { useEffect } from "react";
 import { useAsyncAbortable } from "react-async-hook";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
@@ -17,7 +18,6 @@ import { UploadedTrace } from "slices/UIState";
 import { NonEmptyString } from "utils/Char";
 import { set } from "utils/set";
 import { usingWorkerTask } from "workers/usingWorker";
-
 import workerUrl from "./breakpoint.worker.ts?worker&url";
 
 async function attempt<T, U>(
@@ -77,28 +77,59 @@ export function BreakpointService({ value }: { value?: string }) {
     step: trace?.content?.events?.length,
     radius: undefined,
   });
+
   useAsyncAbortable(
     (signal) =>
       usingLoadingState(async () => {
         if (!dict || !tree || !trace || !trace.key) return;
         for (const breakpoint of inputs ?? []) {
-          if (!breakpoint.active) continue;
-          const res = await attempt(
-            () => processBreakpoint(breakpoint, trace.key, trace, tree, dict),
-            (e) => ({ error: `${e}` })
-          );
-          if (signal.aborted) return;
-          one.set(
-            (l) =>
-              void set(
-                l,
-                `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
-                res
-              )
-          );
+          if (breakpoint.active) {
+            const res = await attempt(
+              () => processBreakpoint(breakpoint, trace.key, trace, tree, dict),
+              (e) => ({ error: `${e}` })
+            );
+            if (signal.aborted) return;
+            one.set(
+              (l) =>
+                void set(
+                  l,
+                  `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
+                  res
+                )
+            );
+          } else {
+            one.set(
+              (l) =>
+                void set(
+                  l,
+                  `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
+                  []
+                )
+            );
+          }
         }
       }),
     [dict, tree, inputs, value]
   );
+
+  const outputs = one.use((l) => l?.source?.breakpointOutput, isEqual);
+
+  useEffect(() => {
+    one.set(
+      (l) =>
+        void set(
+          l,
+          "source.breakpointOutputDict",
+          chain(outputs)
+            .values()
+            .flatMap((v) => {
+              return "error" in v ? [] : v;
+            })
+            .groupBy("step")
+            .value()
+        )
+    );
+  }, [outputs]);
+
   return <></>;
 }

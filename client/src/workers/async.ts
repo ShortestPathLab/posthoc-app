@@ -20,6 +20,4 @@ export const decompressBinaryAsync = memo(
   usingWorkerTask<Uint8Array, string>(DecompressBinaryWorker)
 );
 
-export const parseYamlAsync = memo(
-  usingWorkerTask<string, unknown>(ParseYamlWorker)
-);
+export const parseYamlAsync = usingWorkerTask<string, unknown>(ParseYamlWorker);

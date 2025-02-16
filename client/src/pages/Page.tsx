@@ -12,6 +12,7 @@ import { pages } from "pages";
 import React, { ReactNode, Ref } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useMeasure } from "react-use";
+import { Transaction } from "slices/selector";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
 
@@ -49,7 +50,7 @@ export const divider = (
 export type PageProps = {
   stack?: PanelState;
   renderExtras?: (content?: PanelState) => ReactNode;
-  onChange?: (state: PanelState) => void;
+  onChange?: (state: Transaction<PanelState>) => void;
   controls?: ReactNode;
   children?: ReactNode;
 };
@@ -100,12 +101,7 @@ export const Page = withSlots<PageSlots, PageProps>(
                 // showArrow
                 icon={<WidgetsOutlined />}
                 label="Choose View"
-                onChange={(type) =>
-                  onChange?.({
-                    ...stack,
-                    type,
-                  })
-                }
+                onChange={(type) => onChange?.((s) => void (s.type = type))}
                 value={stack?.type}
                 items={values(pages)}
                 itemOrientation="vertical"
@@ -152,12 +148,7 @@ export const Page = withSlots<PageSlots, PageProps>(
                     // showArrow
                     icon={<WidgetsOutlined />}
                     label="Choose View"
-                    onChange={(type) =>
-                      onChange?.({
-                        ...stack,
-                        type,
-                      })
-                    }
+                    onChange={(type) => onChange?.((s) => void (s.type = type))}
                     value={stack?.type}
                     items={values(pages)}
                     itemOrientation="vertical"

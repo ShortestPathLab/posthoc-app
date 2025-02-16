@@ -26,6 +26,7 @@ import { useSurface } from "components/generic/surface";
 import { useFileImport } from "components/inspector/FileDropZone";
 import { shades } from "components/renderer/colors";
 import { fileDialog as file } from "file-select-dialog";
+import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
 import { useTitleBar } from "hooks/useTitleBar";
 import { useWorkspace } from "hooks/useWorkspace";
 import { get, startCase } from "lodash";
@@ -36,9 +37,9 @@ import logo from "public/logo512.png";
 import { changelog, docs, repository, version } from "public/manifest.json";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useSyncStatus } from "services/SyncService";
-import { getDefaultViewTree, useView } from "slices/view";
+import { slice } from "slices";
+import { getDefaultViewTree } from "slices/view";
 import { getShade } from "theme";
-import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
 import { ExportWorkspace } from "./ExportWorkspaceModal";
 import { openWindow } from "./window";
 
@@ -130,7 +131,6 @@ export const TitleBar = () => {
   // const push = useSnackbar();
   const { save, load } = useWorkspace();
   const { visible, rect } = useOverlayWindowControls();
-  const [, setView] = useView();
   const importFiles = useFileImport();
   // const sm = useSmallDisplay();
   // const prevSm = usePrevious(sm);
@@ -148,25 +148,23 @@ export const TitleBar = () => {
     title: "Export Workspace",
   });
   function handleOpenPanel(orientation: "horizontal" | "vertical") {
-    setView(({ view }) => {
-      return {
-        view: {
-          type: "branch",
-          orientation,
-          key: id(),
-          children: [
-            { ...view, size: 80 },
-            {
-              type: "leaf",
-              key: id(),
-              content: { type: "" },
-              size: 20,
-              acceptDrop: true,
-            },
-          ],
-        },
-      };
-    });
+    slice.view.set(({ view }) => ({
+      view: {
+        type: "branch",
+        orientation,
+        key: id(),
+        children: [
+          { ...view, size: 80 },
+          {
+            type: "leaf",
+            key: id(),
+            content: { type: "" },
+            size: 20,
+            acceptDrop: true,
+          },
+        ],
+      },
+    }));
   }
 
   return (
@@ -236,7 +234,7 @@ export const TitleBar = () => {
                       type: "action",
                       name: "Reset layout",
                       key: "panel-reset",
-                      action: () => setView(getDefaultViewTree),
+                      action: () => slice.view.set(getDefaultViewTree),
                     },
                     {
                       type: "action",
@@ -359,8 +357,8 @@ export const TitleBar = () => {
                 </PopupState>
               ))}
               {/* <Box sx={{ p: 0.75, height: "100%" }}>
-              <CommandsButton />
-            </Box> */}
+            <CommandsButton />
+          </Box> */}
             </Stack>
           </Box>
         </Scroll>

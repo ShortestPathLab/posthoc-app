@@ -11,11 +11,12 @@ import { LogProvider } from "slices/log";
 import { RendererProvider } from "slices/renderers";
 import { ScreenshotsProvider } from "slices/screenshots";
 import { SettingsProvider } from "slices/settings";
-import { ViewProvider } from "slices/view";
+import { viewStore } from "./view";
 
 export const slice = {
   layers: layersStore,
   ui: UIStore,
+  view: viewStore,
   loading: loadingStore,
 };
 
@@ -30,7 +31,6 @@ export const slices = [
   FeaturesProvider,
   RendererProvider,
   LogProvider,
-  ViewProvider,
   ScreenshotsProvider,
   CloudStorageServiceProvider,
   AuthProvider,

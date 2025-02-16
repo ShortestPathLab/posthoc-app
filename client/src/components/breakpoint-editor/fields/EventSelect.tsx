@@ -35,7 +35,7 @@ export const EventSelect = ({
         ...map(types, (c) => ({ value: c!, label: startCase(c) })),
       ]}
       onChange={(v) => props.onChange?.(v)}
-      value={props?.value}
+      value={props?.value ?? ""}
     />
   );
 };

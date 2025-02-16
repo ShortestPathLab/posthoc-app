@@ -49,7 +49,7 @@ export const PropertiesSelect = ({
       }))}
       defaultValue={props.properties?.[0]}
       onChange={(v) => props.onChange?.(v)}
-      value={props?.value}
+      value={props?.value ?? ""}
     />
   );
 };

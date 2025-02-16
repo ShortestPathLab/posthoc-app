@@ -3,6 +3,7 @@ import { getController } from "layers/layerControllers";
 import { slice } from "slices";
 import { equal } from "slices/selector";
 import { StepsLayer } from "./StepsLayer";
+import { useBreakpoint3 } from "hooks/useBreakPoints";
 
 export function useItemState({
   layer,
@@ -18,5 +19,6 @@ export function useItemState({
     equal("key")
   )?.steps?.[index];
   const isSelected = one.use((l) => l.source?.step === index);
-  return { event, isSelected };
+  const { shouldBreak } = useBreakpoint3(layer);
+  return { event, isSelected, label: shouldBreak(index)?.result };
 }

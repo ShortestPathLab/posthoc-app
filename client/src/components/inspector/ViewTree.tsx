@@ -15,7 +15,7 @@ import {
   sumBy,
 } from "lodash";
 import { nanoid } from "nanoid";
-import { produce, transaction } from "produce";
+import { produce } from "produce";
 import {
   Context,
   createContext,
@@ -34,7 +34,9 @@ import {
   OutPortal,
 } from "react-reverse-portal";
 import { useCss, useMap } from "react-use";
-import { Leaf, Root } from "slices/view";
+import { Transaction } from "slices/selector";
+import { Branch, Leaf, Root } from "slices/view";
+import { assert } from "utils/assert";
 import { ViewControls } from "./ViewControls";
 
 type TreeNode<S extends TreeNode = any> =
@@ -55,7 +57,7 @@ function findInTree<T extends TreeNode<T>>(
 type ViewTreeContextType<T = any> = {
   isViewTree?: true;
   controls?: ReactNode;
-  onChange?: (state: Partial<T>) => void;
+  onChange?: (state: Transaction<T>) => void;
   state?: T;
   dragHandle?: ReactNode;
 };
@@ -72,11 +74,13 @@ const ViewTreePortalsContext = createContext<
   Dictionary<HtmlPortalNode | undefined>
 >({});
 
-type ViewTreeProps<T> = {
+type ViewTreeProps<
+  T extends Record<string, unknown> = Record<string, unknown>
+> = {
   defaultContent?: T;
   root?: Root<T>;
   renderLeaf?: (leaf: Leaf<T>) => ReactNode;
-  onChange?: (root: Root<T>) => void;
+  onChange?: (root: Transaction<Root<T>>) => void;
   onClose?: () => void;
   depth?: number;
   onPopOut?: (leaf: Leaf<T>) => void;
@@ -85,13 +89,19 @@ type ViewTreeProps<T> = {
   onDrop?: (leaf: Leaf<any>, root: Leaf<T>) => void;
 };
 
-type ViewBranchProps<T> = ViewTreeProps<T> & {
+type ViewBranchProps<T extends Record<string, unknown>> = ViewTreeProps<T> & {
   onSwap?: (a: string, b: string) => void;
 };
 
-type ViewLeafProps<T> = ViewBranchProps<T> & { root?: Leaf<T> };
+type ViewLeafProps<T extends Record<string, unknown>> = ViewBranchProps<T> & {
+  root?: Leaf<T>;
+};
 
-function handleSwap<T>(root: Root<T>, a: string, b: string) {
+function handleSwap<T extends Record<string, unknown>>(
+  root: Root<T>,
+  a: string,
+  b: string
+) {
   const leafA = findInTree(root, (c) => c.key === a);
   const leafB = findInTree(root, (c) => c.key === b);
   if (leafA?.type === "leaf" && leafB?.type === "leaf") {
@@ -103,7 +113,9 @@ function handleSwap<T>(root: Root<T>, a: string, b: string) {
   return root;
 }
 
-function getLeaves<T>(root?: Root<T>): Leaf<T>[] {
+function getLeaves<T extends Record<string, unknown>>(
+  root?: Root<T>
+): Leaf<T>[] {
   return root
     ? root.type === "leaf"
       ? [root]
@@ -111,7 +123,7 @@ function getLeaves<T>(root?: Root<T>): Leaf<T>[] {
     : [];
 }
 
-function Panel<T>({
+function Panel<T extends Record<string, unknown>>({
   leaf: l,
   renderLeaf,
   onChange,
@@ -142,7 +154,9 @@ function Panel<T>({
   );
 }
 
-export function ViewTree<T>(props: ViewTreeProps<T>) {
+export function ViewTree<T extends Record<string, unknown>>(
+  props: ViewTreeProps<T>
+) {
   const { onChange, root, renderLeaf } = props;
   const leaves = getLeaves(root);
   const [portals, { set }] = useMap<Dictionary<HtmlPortalNode | undefined>>();
@@ -153,7 +167,7 @@ export function ViewTree<T>(props: ViewTreeProps<T>) {
           {...props}
           onSwap={(a, b) => {
             if (root) {
-              onChange?.(produce(root, (root) => handleSwap(root, a, b)));
+              onChange?.((l) => produce(l, (r) => void handleSwap(r, a, b)));
             }
           }}
         />
@@ -165,7 +179,7 @@ export function ViewTree<T>(props: ViewTreeProps<T>) {
   );
 }
 
-export function ViewLeaf<T>({
+export function ViewLeaf<T extends Record<string, unknown>>({
   root = { type: "leaf", key: "" },
   onChange,
   onClose,
@@ -203,22 +217,24 @@ export function ViewLeaf<T>({
 
   const context = useMemo(() => {
     const handleSplit = (orientation: "vertical" | "horizontal") =>
-      onChange?.(
-        transaction(root, (draft) => ({
-          key: nanoid(),
-          type: "branch",
-          orientation,
-          children: [
-            { ...structuredClone(draft), size: 50, key: root.key },
-            {
-              type: "leaf",
-              acceptDrop: true,
-              content: defaultContent,
-              size: 50,
-              key: nanoid(),
-            },
-          ],
-        }))
+      onChange?.((l) =>
+        produce(l, (draft) => {
+          return {
+            key: nanoid(),
+            type: "branch",
+            orientation,
+            children: [
+              { ...structuredClone(draft), size: 50, key: root.key },
+              {
+                type: "leaf",
+                acceptDrop: true,
+                content: defaultContent,
+                size: 50,
+                key: nanoid(),
+              },
+            ],
+          } as Branch<T>;
+        })
       );
     return root.type === "leaf"
       ? ({
@@ -251,13 +267,11 @@ export function ViewLeaf<T>({
               />
             </Box>
           ),
-          onChange: (c: any) =>
-            onChange?.(
-              produce(
-                root,
-                (draft) => void (draft.content = { ...draft.content, ...c })
-              )
-            ),
+          onChange: (c: Transaction<T>) =>
+            onChange?.((prev) => {
+              assert(prev.type === "leaf", "onChange is from leaf");
+              prev.content = produce(prev?.content ?? ({} as T), c);
+            }),
         } satisfies ViewTreeContextType<T>)
       : {};
   }, [onChange, onClose, depth, root, drag]);
@@ -291,7 +305,9 @@ export function ViewLeaf<T>({
   );
 }
 
-export function ViewBranch<T>(props: ViewBranchProps<T>) {
+export function ViewBranch<T extends Record<string, unknown>>(
+  props: ViewBranchProps<T>
+) {
   const { root = { type: "leaf", key: "" }, onChange, depth = 0 } = props;
   const { palette, spacing, transitions } = useTheme();
   const isLocked = root.type === "branch" && root.locked;
@@ -351,13 +367,11 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
           draggerClassName={dragCls}
           onResizeFinished={(_, sizes) =>
             onChange?.(
-              produce(
-                root,
-                (draft) =>
-                  void forEach(sizes, (size, i) => {
-                    draft.children[i].size = size;
-                  })
-              )
+              (l) =>
+                void forEach(sizes, (size, i) => {
+                  assert(l.type === "branch", "onChange is from branch");
+                  l.children[i].size = size;
+                })
             )
           }
           minHeights={map(root.children, () => getSpacing(6) - 8)}
@@ -371,47 +385,42 @@ export function ViewBranch<T>(props: ViewBranchProps<T>) {
           }
         >
           {map(root.children, (c, i) =>
-            !c.hidden ? (
+            c.hidden ? (
+              <Box key="placeholder" />
+            ) : (
               <ViewBranch
                 {...props}
                 key={c.key}
                 depth={depth + 1}
                 root={c}
-                onChange={(newChild) =>
-                  onChange?.(
-                    produce(
-                      root,
-                      (draft) => void (draft.children[i] = newChild)
-                    )
-                  )
+                onChange={(f) =>
+                  onChange?.((l) => {
+                    assert(l.type === "branch", "onChange is from branch");
+                    l.children[i] = produce(l.children[i], f);
+                  })
                 }
                 onClose={() =>
-                  onChange?.(
-                    transaction(root, (draft) => {
-                      draft.children.splice(i, 1);
-                      if (draft.children.length === 1) {
-                        if (draft.children[0].type === "leaf") {
-                          return {
+                  onChange?.((draft): Root<T> => {
+                    assert(draft.type === "branch", "root must be a branch");
+                    draft.children.splice(i, 1);
+                    if (draft.children.length === 1) {
+                      return draft.children[0].type === "leaf"
+                        ? {
                             type: "leaf",
                             key: draft.children[0].key,
                             content: draft.children[0].content,
-                          };
-                        } else {
-                          return draft.children[0];
-                        }
-                      } else {
-                        forEach(
-                          draft.children,
-                          (c, _, all) => (c.size = 100 / all.length)
-                        );
-                        return draft;
-                      }
-                    })
-                  )
+                          }
+                        : draft.children[0];
+                    } else {
+                      forEach(
+                        draft.children,
+                        (c, _, all) => (c.size = 100 / all.length)
+                      );
+                      return draft;
+                    }
+                  })
                 }
               />
-            ) : (
-              <Box key="placeholder" />
             )
           )}
         </Split>

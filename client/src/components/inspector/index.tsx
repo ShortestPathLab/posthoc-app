@@ -2,21 +2,28 @@ import { Box, Fade, LinearProgress } from "@mui/material";
 import { Sidebar } from "Sidebar";
 import { Block, BlockProps } from "components/generic/Block";
 import { openWindow } from "components/title-bar/window";
+import { isEqual } from "lodash";
+import { isMobile } from "mobile-device-detect";
 import { pages } from "pages";
 import { Page } from "pages/Page";
 import { PlaceholderPage } from "pages/PlaceholderPage";
+import { produce } from "produce";
 import { slice } from "slices";
 import { useAnyLoading } from "slices/loading";
-import { PanelState, useView } from "slices/view";
+import { PanelState } from "slices/view";
 import { FileDropZone } from "./FileDropZone";
 import { FullscreenModalHost } from "./FullscreenModalHost";
 import { FullscreenProgress } from "./FullscreenProgress";
 import { ViewTree } from "./ViewTree";
-import { isMobile } from "mobile-device-detect";
+
+function useView() {
+  "use no memo";
+  return slice.view.use((v) => v.view, isEqual);
+}
 
 export function Inspector(props: BlockProps) {
   const loading = useAnyLoading();
-  const [{ view }, setView] = useView();
+  const view = useView();
   return (
     <>
       <Block
@@ -38,7 +45,9 @@ export function Inspector(props: BlockProps) {
           }}
           canPopOut={(leaf) => !!pages[leaf.content!.type!]?.allowFullscreen}
           root={view}
-          onChange={(v) => setView(() => ({ view: v }))}
+          onChange={(v) =>
+            slice.view.set((l) => void (l.view = produce(l.view, v)))
+          }
           renderLeaf={({ content }) => {
             const Content =
               pages[content?.type ?? ""]?.content ?? PlaceholderPage;

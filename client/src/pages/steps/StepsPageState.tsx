@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLayerPicker } from "slices/layers";
+import { Transaction } from "slices/selector";
 import { isStepsLayer } from "./StepsLayer";
 
 export type StepsPageState = {
@@ -9,7 +10,7 @@ export type StepsPageState = {
 };
 export function useStepsPageState(
   state?: StepsPageState,
-  onChange?: (r: StepsPageState) => void
+  onChange?: (r: Transaction<StepsPageState & { type: string }>) => void
 ) {
   "use no memo";
 
@@ -19,12 +20,12 @@ export function useStepsPageState(
   const [selectedType, setLocalSelectedType] = useState(state?.selectedType);
 
   function setKey(k: string) {
-    onChange?.({ layer: k });
+    onChange?.((l) => void (l.layer = k));
     setLocalKey(k);
   }
 
   function setSelectedType(t: string) {
-    onChange?.({ selectedType: t });
+    onChange?.((l) => void (l.selectedType = t));
     setLocalSelectedType(t);
   }
 

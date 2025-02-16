@@ -114,7 +114,7 @@ export function useWorkspace() {
             if (!parsed) return;
             for (const l of parsed.layers?.layers ?? [])
               setLayerSource(l, origin);
-            slice.layers.set(() => parsed.layers.layers);
+            slice.layers.set(parsed.layers.layers);
             workspaceMeta.set(parsed.UIState?.workspaceMeta ?? {});
             slice.ui.isTrusted.set(false);
           }, `Opening workspace (${formatByte(f.size)})`);

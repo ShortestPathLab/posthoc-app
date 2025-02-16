@@ -1,23 +1,28 @@
+import { store } from "@davstack/store";
 import { nanoid as id } from "nanoid";
 import { minimal, page } from "services/SyncParticipant";
-import { createSlice } from "./createSlice";
 
 export type Node = { size?: number; key: string; hidden?: boolean };
 
-export type Branch<T> = Node & {
+export type Branch<
+  T extends Record<string, unknown> = Record<string, unknown>
+> = Node & {
   type: "branch";
   orientation: "vertical" | "horizontal";
   children: Root<T>[];
   locked?: boolean;
 };
 
-export type Leaf<T> = Node & {
-  type: "leaf";
-  acceptDrop?: boolean;
-  content?: T;
-};
+export type Leaf<T extends Record<string, unknown> = Record<string, unknown>> =
+  Node & {
+    type: "leaf";
+    acceptDrop?: boolean;
+    content?: T;
+  };
 
-export type Root<T> = Branch<T> | Leaf<T>;
+export type Root<T extends Record<string, unknown> = Record<string, unknown>> =
+  | Branch<T>
+  | Leaf<T>;
 
 export type ViewTreeState = { view: Root<PanelState> };
 
@@ -27,10 +32,7 @@ export type PanelState = {
 
 const isSm = () => window.innerWidth < 640;
 
-export const [useView, ViewProvider] = createSlice<
-  ViewTreeState,
-  Partial<ViewTreeState>
->(
+export const viewStore = store<ViewTreeState>(
   minimal
     ? {
         view: {
