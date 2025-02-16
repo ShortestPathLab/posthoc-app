@@ -7,13 +7,16 @@ type WorkerResult = { result: unknown } | { error: unknown };
 export const usingWorker = <R>(w: WorkerConstructor) => {
   const worker = new w();
   return async (task: (w: Worker) => Promise<R>) => {
-    const out = (await task(worker)) as WorkerResult;
-    if ("error" in out) {
-      console.error(out.error);
-      throw new Error(`${out.error}`);
+    try {
+      const out = (await task(worker)) as WorkerResult;
+      if ("error" in out) {
+        console.error(out.error);
+        throw new Error(`${out.error}`);
+      }
+      return out.result as R;
+    } finally {
+      worker.terminate();
     }
-    worker.terminate();
-    return out.result as R;
   };
 };
 
