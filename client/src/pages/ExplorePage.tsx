@@ -32,7 +32,6 @@ import { useSm } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
 import { chain as _, entries, first, map, round, upperCase } from "lodash";
 import memoizee from "memoizee";
-import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { docs, name } from "public/manifest.json";
 import { CSSProperties, ReactNode, useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
@@ -43,6 +42,7 @@ import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
+import { PosthocMetaData } from "services/cloud-storage";
 
 const paths = import.meta.glob<boolean, string, string>(
   "/public/recipes/*.workspace",
@@ -87,12 +87,6 @@ const getFileInfo = memoizee(
   },
   { normalizer: ([k]) => k }
 );
-
-type ExampleDescriptor = FeatureDescriptor & {
-  author?: string;
-  image?: string;
-  size?: number;
-};
 
 // eslint-disable-next-line react/display-name
 const makeAvatar = (children?: ReactNode) => (sx: SxProps) =>
@@ -187,7 +181,7 @@ export function FeatureCard({
   loading,
   children,
   ...rest
-}: Partial<ExampleDescriptor> &
+}: Partial<PosthocMetaData> &
   CardProps & { onOpenClick?: () => void; loading?: boolean }) {
   const [{ "appearance/acrylic": acrylic }] = useSettings();
   const paper = usePaper();

@@ -10,15 +10,17 @@ export function BootstrapCloudStorageFileService() {
   const service = useCloudStorageInstance();
   const { load } = useWorkspace();
   useAsync(async () => {
-    const params = new URLSearchParams(new URL(window.location.href).search);
-    const workspaceFile = params.get("workspaceFile");
-    const [providerId, fileId] = split(workspaceFile, ":");
-    assert(fileId, "");
-    assert(has(cloudStorageProviders, providerId), "");
-    if (service?.instance.id === providerId) {
-      load(await service.instance.getFile(fileId));
+    if (service) {
+      const params = new URLSearchParams(new URL(window.location.href).search);
+      const workspaceFile = params.get("workspaceFile");
+      const [providerId, fileId] = split(workspaceFile, ":");
+      assert(fileId, "");
+      assert(has(cloudStorageProviders, providerId), "");
+      if (service?.instance.id === providerId) {
+        load(await service.instance.getFile(fileId));
+      }
+      window.history.replaceState(null, "", window.location.origin);
     }
-    window.history.replaceState(null, "", window.location.origin);
   }, [service]);
   return null;
 }

@@ -7,12 +7,14 @@ import {
   AuthError,
   CloudStorageError,
   CloudStorageProviderMeta,
-  FileMetadata,
+  PosthocMetaData,
   ProviderFactory,
 } from "services/cloud-storage";
 import { AuthState } from "slices/auth";
 import { assert } from "utils/assert";
 import { GoogleLogo } from "./GoogleLogo";
+import { map } from "promise-tools";
+import { WorkspaceMeta } from "slices/UIState";
 
 const id = "google";
 
@@ -28,8 +30,8 @@ const driveApiUrl = "https://www.googleapis.com/drive/v3/files";
 const driveMultiPartApiUrl = "https://www.googleapis.com/upload/drive/v3/files";
 const folderMime = "application/vnd.google-apps.folder";
 const googleUserInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
-
-type GoogleDriveFileList = { files: FileMetadata[] };
+const oauthTokenUrl = "https://oauth2.googleapis.com";
+type GoogleDriveFileList = { files: WorkspaceMeta[] };
 
 const getFilePath = (fileId: string) =>
   `https://drive.google.com/uc?export=download&id=${fileId}`;
@@ -60,6 +62,9 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
 
   const userClient = createClient<HeaderOptions>(googleUserInfoUrl, getHeaders);
   const client = createClient<HeaderOptions>(driveApiUrl, getHeaders);
+  const oauthClient = createClient(oauthTokenUrl, async () => {
+    return {};
+  });
   const multiPartApiClient = createClient<HeaderOptions>(
     driveMultiPartApiUrl,
     getHeaders
@@ -81,6 +86,16 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
       name: user.name,
       profile: user.picture,
     };
+  };
+  const getFolderId = async (folderName: string) => {
+    const data = await client.get<GoogleDriveFileList>({
+      label: "Find folder by name",
+      path: `/?q=name='${folderName}'+and+mimeType='${folderMime}'&fields=files(id,name)`,
+      auth: true,
+      result: "json",
+    });
+    if (data.files.length) return head(data.files)?.id;
+    throw new CloudStorageError("No folder found with the specified name.");
   };
 
   // Should probably rename this to smth else since
@@ -141,7 +156,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     // ! in the future we can implement more complex handling for this case.
     const id = await rootFolderExists(folderName);
     if (id) return id;
-    const data = await client.post<FileMetadata>({
+    const data = await client.post<WorkspaceMeta>({
       label: "Create folder",
       body: { name: folderName, mimeType: folderMime },
       auth: true,
@@ -158,18 +173,41 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     return data.id;
   };
 
+  const getFile = async (fileId: string) => {
+    const { authenticated } = await getState();
+    const [{ name, lastModified }, media] = await Promise.all([
+      client.get<WorkspaceMeta>({
+        label: "Get file metadata",
+        path: `/${fileId}${authenticated ? "" : `?key=${apiKey}`}`,
+        result: "json",
+        auth: authenticated,
+      }),
+
+      client.get({
+        label: "Get file media",
+        path: `/${fileId}?alt=media${authenticated ? "" : `&key=${apiKey}`}`,
+        result: "blob",
+        auth: authenticated,
+      }),
+    ]);
+    // console.log(media);
+    return new File([media], name!, {
+      lastModified: new Date(lastModified!).valueOf(),
+    });
+  };
+
   return {
     id,
-    checkAuth: initialise,
+    authenticate: initialise,
     // Probably should be called log in
-    authenticate: async () => {
+    login: async () => {
       const url = new URL(authUrl);
       const params = {
         scope,
         include_granted_scopes: "true",
         response_type: "token",
         state: "testing",
-        redirect_uri: window.location.href,
+        redirect_uri: window.location.origin,
         client_id: clientId,
       };
       each(params, (value, key) => {
@@ -177,7 +215,13 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
       });
       window.location.href = url.toString();
     },
-    logout: async () => {},
+    logout: async () => {
+      const { accessToken } = await getState();
+      await oauthClient.post({
+        path: `/revoke?token=${accessToken}`,
+      });
+      await setState({});
+    },
     saveFile: async (file: File) => {
       const parentId = await createRootFolder(rootFolderName);
       const form = new FormData();
@@ -194,7 +238,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
         file,
       };
       each(metadata, (value, key) => void form.append(key, value));
-      const data = await multiPartApiClient.post<FileMetadata>({
+      const data = await multiPartApiClient.post<WorkspaceMeta>({
         label: "Save file",
         path: "?uploadType=multipart",
         body: form,
@@ -203,50 +247,37 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
       });
       return data.id;
     },
-    getFile: async (fileId: string) => {
-      const [{ name, modifiedTime }, media] = await Promise.all([
-        client.get<FileMetadata>({
-          label: "Get file metadata",
-          path: `/${fileId}?key=${apiKey}`,
-          result: "json",
-        }),
-
-        client.get({
-          label: "Get file media",
-          path: `/${fileId}?alt=media&key=${apiKey}`,
-          result: "blob",
-        }),
-      ]);
-      return new File([media], name, {
-        lastModified: new Date(modifiedTime).valueOf(),
-      });
-    },
-    getSavedFilesMetadata: async () => {
+    getFile: getFile,
+    getIndex: async () => {
       await createRootFolder(rootFolderName);
       // * change this to a global var
-      const folderId = await (async (folderName: string) => {
-        const data = await client.get<GoogleDriveFileList>({
-          label: "Find folder by name",
-          path: `/?q=name='${folderName}'+and+mimeType='${folderMime}'&fields=files(id,name)`,
-          auth: true,
-          result: "json",
-        });
-        if (data.files.length) return head(data.files)?.id;
-        throw new CloudStorageError("No folder found with the specified name.");
-      })(rootFolderName);
+      const folderId = await getFolderId(rootFolderName);
       const data = await client.get<GoogleDriveFileList>({
         label: "Get files in folder",
         path: `?q='${folderId}'+in+parents&fields=files(id,name,mimeType,modifiedTime,size)`,
         auth: true,
         result: "json",
       });
-      return data.files;
+
+      return await map(
+        data.files.filter((file) => file.name!.endsWith(".meta")),
+        async (file) => {
+          const metadataFile = await getFile(file.id);
+          const metadata = JSON.parse(await metadataFile.text());
+          const posthocFileGoogleId =
+            data.files.find((f) => {
+              const baseName = file.name!.split(".")[0];
+              return f.name!.startsWith(baseName) && !f.name!.endsWith(".meta");
+            })?.id ?? null;
+          return { ...metadata, id: posthocFileGoogleId };
+        }
+      );
     },
-    generateLink: (fileId: string) => {
+    getFileLink: async (fileId: string) => {
       return `${window.location.origin}?workspaceFile=${id}:${fileId}`;
     },
-    ///@ts-expect-error TODO: implement this
-    deleteFile: async () => new File(),
+    // TODO: implement this
+    deleteFile: async () => {},
   };
 };
 
@@ -264,7 +295,7 @@ export default {
         </Typography>
         <Button
           sx={{ width: 360, maxWidth: "100%" }}
-          onClick={cloudService.authenticate}
+          onClick={cloudService.login}
           variant="contained"
           color="primary"
           startIcon={<GoogleLogo />}

@@ -20,6 +20,19 @@ export const usingWorker = <R>(w: WorkerConstructor) => {
   };
 };
 
+export type OutErrorDetails = {
+  name: string;
+  reason: string;
+  mark: {
+    name: null | string;
+    buffer: string;
+    position: number;
+    line: number;
+    column: number;
+    snippet: string;
+  };
+};
+
 export const usingWorkerTask = <T, R>(w: WorkerConstructor) => {
   return (inp: T) =>
     usingWorker<R>(w)((worker) => {

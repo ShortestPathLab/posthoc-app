@@ -21,7 +21,7 @@ function useCloudStorageManager(provider: keyof typeof providers) {
       async () => state.current,
       async (s) => setAuthState(() => ({ [provider]: s }))
     );
-    await service.checkAuth();
+    await service.authenticate();
     return service;
   }, [provider, state, initialised]);
 

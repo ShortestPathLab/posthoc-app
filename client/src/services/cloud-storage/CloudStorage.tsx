@@ -1,6 +1,7 @@
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactElement, ReactNode } from "react";
 import { AuthState } from "slices/auth";
+import { WorkspaceMeta } from "slices/UIState";
 import TypedEmitter from "typed-emitter";
 
 export type FileMetaDataType = {
@@ -10,36 +11,30 @@ export type FileMetaDataType = {
 
 export type AccessToken = unknown;
 
-export type FileMetadata = {
-  id: string;
-  name: string;
-  mimeType: string;
-  modifiedTime: string;
-  size: string;
+export type PosthocMetaData = FeatureDescriptor & {
+  author?: string;
+  image?: string;
+  size?: number;
 };
-
 // Current
 export interface CloudStorageProvider<
   K extends string,
-  A extends AccessToken = unknown
+  A extends AccessToken = unknown,
 > {
   id: K;
-  /**
-   * Should probably rename this authenticate or initialise
-   */
-  checkAuth: () => Promise<AuthState<A>>;
-  authenticate: () => Promise<void>;
+  authenticate: () => Promise<AuthState<A>>;
+  login: () => Promise<void>;
   logout: () => Promise<void>;
   // todo: change the searchTrace to multiple/split files
   saveFile: (
     searchTrace: File,
     fileMetaData?: FileMetaDataType,
-    fileId?: string
+    fileId?: string,
   ) => Promise<string>;
   getFile: (fileId: string) => Promise<File>;
-  deleteFile: (fileId: string) => Promise<File>;
-  generateLink: (fileId: string) => string;
-  getSavedFilesMetadata: () => Promise<FileMetadata[]>;
+  deleteFile: (fileId: string) => Promise<void>;
+  getFileLink: (fileId: string) => Promise<string>;
+  getIndex: () => Promise<WorkspaceMeta[]>;
 }
 
 // Proposal
@@ -69,7 +64,7 @@ export interface CloudStorageProviderProposal<K extends string>
   saveFile: (
     searchTrace: File,
     fileMetaData?: FileMetaDataType,
-    fileId?: string
+    fileId?: string,
   ) => Promise<string>;
   getFile: (fileId: string) => Promise<File>;
   deleteFile: (fileId: string) => Promise<File>;
@@ -80,20 +75,20 @@ export interface CloudStorageProviderProposal<K extends string>
   /**
    * Get a list of all stored files.
    */
-  getIndex: () => Promise<FileMetadata[]>;
+  getIndex: () => Promise<WorkspaceMeta[]>;
 }
 
 export type ProviderFactory<
   K extends string,
-  A extends AccessToken = unknown
+  A extends AccessToken = unknown,
 > = (
   getAuthState: () => Promise<AuthState<A>>,
-  setAuthState: (v: AuthState<A>) => Promise<void>
+  setAuthState: (v: AuthState<A>) => Promise<void>,
 ) => CloudStorageProvider<K, A>;
 
 export type CloudStorageProviderMeta<
   K extends string,
-  A extends AccessToken = unknown
+  A extends AccessToken = unknown,
 > = {
   id: K;
   create: ProviderFactory<K, A>;

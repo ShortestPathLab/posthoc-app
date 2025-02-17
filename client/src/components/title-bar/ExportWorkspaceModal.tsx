@@ -1,14 +1,19 @@
-import { DownloadOutlined } from "@mui-symbols-material/w400";
+import { UploadOutlined } from "@mui-symbols-material/w400";
 import { Box, Stack, TextField, Typography } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
 import { useSnackbar } from "components/generic/Snackbar";
+import { SurfaceContentProps } from "components/generic/surface";
 import download from "downloadjs";
 import { useWorkspace } from "hooks/useWorkspace";
 import { Jimp } from "jimp";
 import { ceil, entries, kebabCase, reduce } from "lodash";
 import { nanoid as id } from "nanoid";
 import { map } from "promise-tools";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import {
+  CloudStorageProvider,
+  cloudStorageProviders,
+} from "services/cloud-storage";
 import { useLoadingState } from "slices/loading";
 import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
@@ -38,7 +43,14 @@ function getFilename(name: string = "") {
 const imageSize = 64;
 
 async function resizeImage(s: string) {
-  const a = await Jimp.read(Buffer.from(s.split(",")[1], "base64"));
+  const base64String = s.split(",")[1];
+  if (!base64String) throw new Error("Invalid base64 image data");
+
+  const binaryData = Uint8Array.from(atob(base64String), (c) =>
+    c.charCodeAt(0)
+  );
+
+  const a = await Jimp.read(binaryData.buffer);
   const b =
     a.width < a.height
       ? a.resize({ w: imageSize })
@@ -53,16 +65,25 @@ async function resizeImage(s: string) {
     .getBase64("image/jpeg");
 }
 
-export function ExportWorkspace() {
+export function ExportWorkspace({
+  uploadFile,
+  closePopup,
+}: {
+  uploadFile?: CloudStorageProvider<
+    keyof typeof cloudStorageProviders,
+    unknown
+  >["saveFile"];
+  closePopup: () => void;
+} & SurfaceContentProps) {
   "use no memo";
-  const fields = workspaceMeta.use();
   const paper = usePaper();
-  const { save, estimateWorkspaceSize } = useWorkspace();
+  const fields = workspaceMeta.use();
+  const { generateWorkspaceFile, estimateWorkspaceSize, save } = useWorkspace();
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();
-
+  // const storage = useCloudStorageInstance();
   const workspaceSize = useMemo(() => estimateWorkspaceSize(), []);
-
+  const [uploading, setUploading] = useState(false);
   async function getFields(size: number): Promise<WorkspaceMeta> {
     return {
       ...fields,
@@ -72,6 +93,7 @@ export function ExportWorkspace() {
       lastModified: Date.now(),
     };
   }
+
   return (
     <>
       <Box>
@@ -109,18 +131,44 @@ export function ExportWorkspace() {
         <Box sx={{ pt: 2, width: "100%" }}>
           <Button
             sx={{ justifyContent: "flex-start", width: "100%", ...paper(1) }}
+            disabled={uploading}
             onClick={() =>
               usingLoadingState(async () => {
                 const name = getFilename(fields.name);
-                const { size } = await save(false, name);
-                download(
-                  JSON.stringify(await getFields(size)),
-                  `${name}.workspace.meta`
+
+                setUploading(true);
+                const { file } = await generateWorkspaceFile(name);
+                const posthocMetadata = JSON.stringify(
+                  await getFields(file.size)
                 );
-                notify(`Metadata saved, ${name}.workspace.meta`);
+                const posthocMetaFile = new File(
+                  [posthocMetadata],
+                  `${name}.workspace.meta`,
+                  { type: "application/json" }
+                );
+
+                if (uploadFile) {
+                  await uploadFile(posthocMetaFile);
+                  // await storage?.instance.saveFile(posthocMetaFile);
+                } else {
+                  download(
+                    JSON.stringify(await getFields(file.size)),
+                    `${name}.workspace.meta`
+                  );
+                }
+                notify(`Metadata saved, ${name}.workspace.meta ✅`);
+
+                if (uploadFile) {
+                  await uploadFile(file);
+                  // await storage?.instance.saveFile(compressedFile);
+                } else {
+                  await save(false, name);
+                }
+                notify(`Posthoc file saved, ${name}.workspace ✅`);
+                closePopup();
               })
             }
-            startIcon={<DownloadOutlined />}
+            startIcon={<UploadOutlined />}
             size="large"
           >
             <Stack sx={{ ml: 1 }} alignItems="baseline">

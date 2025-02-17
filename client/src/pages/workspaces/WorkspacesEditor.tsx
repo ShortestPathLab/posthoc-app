@@ -10,35 +10,38 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  Menu,
+  MenuItem,
   Stack,
   Typography,
 } from "@mui/material";
 import { makeCaughtObjectReportJson } from "caught-object-report-json";
-import { useSm } from "hooks/useSmallDisplay";
-import { useWorkspace } from "hooks/useWorkspace";
-import { FeatureCard } from "pages/ExplorePage";
-import { Ref, useCallback, useState } from "react";
-import { useAsync } from "react-async-hook";
-import { useMeasure } from "react-use";
-import { FileMetadata } from "services/cloud-storage/CloudStorage";
-import { useAuth } from "slices/auth";
-import {
-  useCloudStorageInstance,
-  useCloudStorageService,
-} from "slices/cloudStorage";
-import { useLoadingState } from "slices/loading";
+import { FileShareSurface } from "components/FileShareSurface";
 import { useSnackbar } from "components/generic/Snackbar";
 import { Button } from "components/generic/inputs/Button";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Surface, useSurface } from "components/generic/surface";
 import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { FileShareSurface } from "components/FileShareSurface";
+import { ExportWorkspace } from "components/title-bar/ExportWorkspaceModal";
+import { useSm } from "hooks/useSmallDisplay";
+import { useWorkspace } from "hooks/useWorkspace";
+import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
+import { FeatureCard } from "pages/ExplorePage";
+import { Ref, useCallback, useState } from "react";
+import { useAsync } from "react-async-hook";
+import { useMeasure } from "react-use";
+import { WorkspaceMeta } from "slices/UIState";
+import {
+  useCloudStorageInstance,
+  useCloudStorageService,
+} from "slices/cloudStorage";
+import { useLoadingState } from "slices/loading";
 
 const FileList = ({
   fileMetaDataList,
 }: {
-  fileMetaDataList: FileMetadata[];
+  fileMetaDataList: WorkspaceMeta[];
 }) => {
   const usingLoadingState = useLoadingState();
   const [{ instance: cloudService }] = useCloudStorageService();
@@ -71,10 +74,11 @@ const FileList = ({
       {fileMetaDataList.map((file) => (
         <FeatureCard
           name={file.name}
-          description={JSON.stringify(file)}
+          description={file.description}
+          image={file.screenshots![0]}
           key={file.id}
           id={file.id}
-          size={+file.size}
+          size={file.size}
           onOpenClick={() => handleView(file.id)}
           loading={false}
         >
@@ -100,36 +104,24 @@ const FileList = ({
 };
 
 const UploadWorkspace = () => {
-  const { open, dialog } = useSurface(FileShareSurface, {
-    title: "Workspace details",
-  });
   const [uploading, setUploading] = useState(false);
   const notify = useSnackbar();
-  const [authState] = useAuth();
-  const [{ instance: cloudService }] = useCloudStorageService();
-  const { generateWorkspaceFile } = useWorkspace();
+  const storage = useCloudStorageInstance();
+  const {
+    open: openUploadWorkspaceModal,
+    dialog: uploadWorkspaceDialog,
+    close: closeUploadWorkspaceDialog,
+  } = useSurface(ExportWorkspace, {
+    title: "Upload Workspace",
+  });
+
   const handleUpload = async () => {
     try {
       setUploading(true);
-      const { file } = await generateWorkspaceFile();
-      if (authState.authenticated && file) {
-        await cloudService?.saveFile(file);
-        if (file) {
-          open({
-            file: {
-              id: file.name,
-              name: file.name,
-              mimeType: file.type,
-              size: `${file.size}`,
-              modifiedTime: `${file.lastModified}`,
-            },
-          });
-          notify("Workspace uploaded");
-        }
-      } else {
-        // ? allow empty workspace upload?
-        notify("Please start a workspace first");
-      }
+      openUploadWorkspaceModal({
+        uploadFile: storage?.instance.saveFile,
+        closePopup: closeUploadWorkspaceDialog,
+      });
     } catch (error) {
       console.log(error);
       notify("Unable to upload workspace right now");
@@ -151,7 +143,7 @@ const UploadWorkspace = () => {
       >
         {uploading ? "Saving" : "Upload current workspace"}
       </Button>
-      {dialog}
+      {uploadWorkspaceDialog}
     </Stack>
   );
 };
@@ -162,15 +154,18 @@ const WorkspacesEditor = () => {
   const [ref, { width }] = useMeasure();
   const height = useSurfaceAvailableCssSize()?.height;
   const storage = useCloudStorageInstance();
-  const [list, setList] = useState<FileMetadata[]>([]);
+  const [list, setList] = useState<WorkspaceMeta[]>([]);
   const [loadingSavedFilesMetaData, setSavedFilesMetaData] = useState(false);
   const f = useCallback(async () => {
     if (storage?.instance && storage?.auth?.authenticated) {
       try {
         setSavedFilesMetaData(true);
-        const res = await storage.instance.getSavedFilesMetadata();
+
+        const res = await storage.instance.getIndex();
+        // * while dev, use empty list
+        // const res = [];
+
         if (res) setList(res);
-        console.log(res);
       } catch (error) {
         console.log(error);
       } finally {
@@ -179,7 +174,6 @@ const WorkspacesEditor = () => {
     }
   }, [storage?.instance, storage]);
   useAsync(f, [f]);
-
   const padding = sm || isViewTree ? 2 : 3;
   const dual = width > 740;
 
@@ -226,11 +220,30 @@ const WorkspacesEditor = () => {
                   primary={storage?.auth?.user?.name}
                   secondary="Signed in"
                 />
-                <IconButtonWithTooltip
-                  label="Account options"
-                  edge="end"
-                  icon={<MoreVertOutlined color="action" fontSize="small" />}
-                />
+                <PopupState variant="popover">
+                  {(state) => (
+                    <>
+                      <IconButtonWithTooltip
+                        {...bindTrigger(state)}
+                        label="Account options"
+                        edge="end"
+                        icon={
+                          <MoreVertOutlined color="action" fontSize="small" />
+                        }
+                      />
+                      <Menu {...bindMenu(state)}>
+                        <MenuItem
+                          onClick={() => {
+                            // * this could be async
+                            storage.instance.logout();
+                          }}
+                        >
+                          Logout
+                        </MenuItem>
+                      </Menu>
+                    </>
+                  )}
+                </PopupState>
               </ListItem>
               <UploadWorkspace />
             </Stack>
