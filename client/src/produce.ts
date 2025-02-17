@@ -3,7 +3,7 @@ import { isDefined } from "pages/tree/TreeGraph";
 import { createElement, ReactElement } from "react";
 import { Transaction } from "slices/selector";
 
-function clone<T>(obj: T) {
+export function clone<T>(obj: T) {
   try {
     return structuredClone(obj);
   } catch {

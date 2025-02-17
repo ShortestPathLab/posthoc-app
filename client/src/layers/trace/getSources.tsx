@@ -1,5 +1,4 @@
 import { dump } from "js-yaml";
-import { editor } from "./editor";
 import { Controller } from "./types";
 
 export const getSources = ((layer) => {
@@ -8,10 +7,9 @@ export const getSources = ((layer) => {
     ? [
         {
           id: "trace",
-          name: `${trace.name}`,
-          language: "yaml",
+          name: `${trace.name ?? "Untitled trace"}`,
+          language: "yaml-js",
           content: dump(trace.content, { noCompatMode: true }),
-          editor,
         },
       ]
     : [];

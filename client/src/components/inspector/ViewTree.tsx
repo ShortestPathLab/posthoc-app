@@ -268,9 +268,9 @@ export function ViewLeaf<T extends Record<string, unknown>>({
             </Box>
           ),
           onChange: (c: Transaction<T>) =>
-            onChange?.((prev) => {
-              assert(prev.type === "leaf", "onChange is from leaf");
-              prev.content = produce(prev?.content ?? ({} as T), c);
+            onChange?.((l) => {
+              assert(l.type === "leaf", "onChange is from leaf");
+              l.content = produce(l?.content ?? ({} as T), c);
             }),
         } satisfies ViewTreeContextType<T>)
       : {};

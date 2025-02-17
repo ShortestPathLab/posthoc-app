@@ -7,6 +7,7 @@ import {
   ParseYamlWorker,
 } from ".";
 import { usingWorkerTask } from "./usingWorker";
+import { YAMLException } from "js-yaml";
 
 export const hashAsync = memo(usingWorkerTask<string, string>(HashWorker));
 
@@ -20,4 +21,8 @@ export const decompressBinaryAsync = memo(
   usingWorkerTask<Uint8Array, string>(DecompressBinaryWorker)
 );
 
-export const parseYamlAsync = usingWorkerTask<string, unknown>(ParseYamlWorker);
+export const parseYamlAsync = usingWorkerTask<
+  string,
+  | { result: unknown; error: undefined }
+  | { error: YAMLException; result: undefined }
+>(ParseYamlWorker);

@@ -12,6 +12,7 @@ import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { formatByte, useBusyState } from "slices/busy";
 import { Layer, layers } from "slices/layers";
 import { generateUsername as id } from "unique-username-generator";
+import { cast } from "utils/assert";
 import {
   compressBinaryAsync as compress,
   decompressBinaryAsync as decompress,
@@ -108,14 +109,14 @@ export function useWorkspace() {
             const content = isCompressedFile(f)
               ? await decompress(new Uint8Array(await f.arrayBuffer()))
               : await f.text();
-            const parsed = (await parseYamlAsync(content)) as
-              | Workspace
-              | undefined;
+            const { result: parsed, error } = await parseYamlAsync(content);
+            if (error) throw error;
+            cast<Workspace | undefined>(parsed);
             if (!parsed) return;
-            for (const l of parsed.layers?.layers ?? [])
+            for (const l of parsed?.layers?.layers ?? [])
               setLayerSource(l, origin);
-            slice.layers.set(parsed.layers.layers);
-            workspaceMeta.set(parsed.UIState?.workspaceMeta ?? {});
+            slice.layers.set(parsed?.layers.layers);
+            workspaceMeta.set(parsed?.UIState?.workspaceMeta ?? {});
             slice.ui.isTrusted.set(false);
           }, `Opening workspace (${formatByte(f.size)})`);
           return true;

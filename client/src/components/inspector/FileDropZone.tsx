@@ -25,11 +25,12 @@ export function useFileImport() {
         if (outcome?.claimed) {
           await usingBusyState(async () => {
             const layer = await outcome.layer(notify);
-            slice.layers.set((l) =>
-              l.push({
-                key: id(),
-                source: { type, ...layer },
-              })
+            slice.layers.set(
+              (l) =>
+                void l.push({
+                  key: id(),
+                  source: { type, ...layer },
+                })
             );
           }, `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`);
           totalClaimed++;

@@ -49,19 +49,19 @@ export function readUploadedTrace(f: File) {
     read: async () => {
       if (isTraceFormat(f)) {
         const content = await f.text();
-        const parsed = (await parseYamlAsync(content)) as Trace | TraceLegacy;
+        const { result: parsed, error } = await parseYamlAsync(content);
+        if (error) throw error;
         return {
           ...custom(),
-          content: parsed,
+          content: parsed as TraceLegacy | Trace | undefined,
           name: startCase(name(f.name)),
           type: customId,
           key: id(),
         };
-      } else {
-        throw new Error(
-          `The file should have one of these extensions: ${FORMATS.join(", ")}`
-        );
       }
+      throw new Error(
+        `The file should have one of these extensions: ${FORMATS.join(", ")}`
+      );
     },
   };
 }

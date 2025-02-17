@@ -45,5 +45,8 @@ export type LayerController<K extends string = string, Data = never> = {
     layer: Layer<Data>,
     id?: string,
     content?: string
-  ) => Promise<Layer<Data>>;
+  ) => Promise<
+    | { result: Layer<Data>; error: undefined }
+    | { result: undefined; error: unknown }
+  >;
 };
