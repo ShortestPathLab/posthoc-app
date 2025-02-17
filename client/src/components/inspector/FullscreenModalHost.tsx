@@ -161,7 +161,7 @@ export function FullscreenModalHost() {
             sm
               ? {}
               : {
-                  paper: { sx: { maxWidth: "80vw" } },
+                  paper: { sx: { maxWidth: { md: "90vw", lg: "80vw" } } },
                 }
           }
         >

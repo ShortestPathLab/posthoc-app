@@ -1,20 +1,18 @@
-import { Typography } from "@mui/material";
 import { createClient, RequestOptions } from "client/createHttpClient";
 import { Button } from "components/generic/inputs/Button";
 import { Lawnicon } from "components/generic/Lawnicon";
 import { defer, each, head, isString, now, once } from "lodash";
+import { map } from "promise-tools";
 import {
   AuthError,
   CloudStorageError,
   CloudStorageProviderMeta,
-  PosthocMetaData,
   ProviderFactory,
 } from "services/cloud-storage";
 import { AuthState } from "slices/auth";
+import { WorkspaceMeta } from "slices/UIState";
 import { assert } from "utils/assert";
 import { GoogleLogo } from "./GoogleLogo";
-import { map } from "promise-tools";
-import { WorkspaceMeta } from "slices/UIState";
 
 const id = "google";
 
@@ -289,20 +287,15 @@ export default {
   create: createGoogleStorageService,
   loginUI: (cloudService) => {
     return (
-      <>
-        <Typography variant="body2" align="center" color="text.secondary">
-          Sign in to save and share your visualisations via Google Drive
-        </Typography>
-        <Button
-          sx={{ width: 360, maxWidth: "100%" }}
-          onClick={cloudService.login}
-          variant="contained"
-          color="primary"
-          startIcon={<GoogleLogo />}
-        >
-          Sign in with Google
-        </Button>
-      </>
+      <Button
+        sx={{ width: 360, maxWidth: "100%" }}
+        onClick={cloudService.login}
+        variant="contained"
+        color="primary"
+        startIcon={<GoogleLogo />}
+      >
+        Sign in with Google
+      </Button>
     );
   },
 } satisfies CloudStorageProviderMeta<"google">;

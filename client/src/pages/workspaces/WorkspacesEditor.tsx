@@ -3,8 +3,10 @@ import {
   MoreVertOutlined,
   UploadOutlined,
 } from "@mui-symbols-material/w400";
+import share from "./share.svg";
 import {
   Avatar,
+  Box,
   CircularProgress,
   Divider,
   ListItem,
@@ -150,6 +152,7 @@ const UploadWorkspace = () => {
 
 const WorkspacesEditor = () => {
   const sm = useSm();
+  const notify = useSnackbar();
   const { isViewTree } = useViewTreeContext();
   const [ref, { width }] = useMeasure();
   const height = useSurfaceAvailableCssSize()?.height;
@@ -231,14 +234,27 @@ const WorkspacesEditor = () => {
                           <MoreVertOutlined color="action" fontSize="small" />
                         }
                       />
-                      <Menu {...bindMenu(state)}>
+                      <Menu
+                        {...bindMenu(state)}
+                        transformOrigin={{
+                          horizontal: "right",
+                          vertical: "top",
+                        }}
+                        anchorOrigin={{
+                          horizontal: "right",
+                          vertical: "top",
+                        }}
+                      >
                         <MenuItem
-                          onClick={() => {
+                          dense
+                          onClick={async () => {
+                            notify("Logging out");
                             // * this could be async
-                            storage.instance.logout();
+                            await storage.instance.logout();
+                            notify("Logged out");
                           }}
                         >
-                          Logout
+                          Log out
                         </MenuItem>
                       </Menu>
                     </>
@@ -266,8 +282,35 @@ const WorkspacesEditor = () => {
             </Stack>
           </Stack>
         ) : (
-          <Stack sx={{ p: sm ? 2 : 3, gap: 2, alignItems: "center" }}>
+          <Stack
+            sx={{
+              p: sm ? 2 : 3,
+              gap: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              pb: 24,
+              textAlign: "center",
+              minHeight: (t) =>
+                `calc(${height} - ${t.spacing(isViewTree ? 0 : 6)})`,
+            }}
+          >
+            <Box
+              sx={{ width: "100%", maxWidth: 380, p: 4 }}
+              component="img"
+              src={share}
+            />
+            <Stack sx={{ gap: 1, mb: 8, alignItems: "center", maxWidth: 460 }}>
+              <Typography variant="h6">
+                Store your visualisations in the cloud
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Share, collaborate, and showcase your work effortlessly. Save
+                your workspaces to the cloud to easily share with others—or
+                simply use it for secure file storage.
+              </Typography>
+            </Stack>
             {storage.meta.loginUI?.(storage.instance)}
+            <Button variant="text">Other sign in options</Button>
           </Stack>
         ))}
     </Stack>
