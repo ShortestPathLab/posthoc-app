@@ -2,7 +2,11 @@ import { useTheme } from "@mui/material";
 import interpolate from "color-interpolate";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
-import { highlightNodesOptions, Subtree } from "hooks/useHighlight";
+import {
+  Highlighting,
+  highlightNodesOptions,
+  Subtree,
+} from "hooks/useHighlight";
 import {
   Dictionary,
   forEach,
@@ -31,13 +35,8 @@ import {
 
 export function useGraphColoring(
   graph: MultiDirectedGraph,
-  {
-    highlightEdges,
-    showAllEdges,
-    trackedProperty,
-    trace,
-    step = 0,
-  }: TreeGraphProps
+  { showAllEdges, trackedProperty, trace, step = 0 }: TreeGraphProps,
+  highlightEdges?: Highlighting
 ) {
   const theme = useTheme();
 

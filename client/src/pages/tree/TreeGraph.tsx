@@ -22,7 +22,15 @@ import { Scroll } from "components/generic/Scrollbars";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
 import { highlightNodesOptions } from "hooks/useHighlight";
-import { forOwn, isEmpty, isNull, isUndefined, pick, startCase } from "lodash";
+import {
+  forOwn,
+  isEmpty,
+  isEqual,
+  isNull,
+  isUndefined,
+  pick,
+  startCase,
+} from "lodash";
 import { Trace } from "protocol";
 import { ReactNode, useEffect, useState } from "react";
 import { layers } from "slices/layers";
@@ -102,6 +110,11 @@ export type TreeGraphProps = {
 export type NodeType = { x: number; y: number; label: string; size: number };
 export type EdgeType = { label: string };
 
+function useHighlighting(key?: string) {
+  "use no memo";
+  return layers.one<TreeLayer>(key).use((l) => l.source?.highlighting, isEqual);
+}
+
 export function TreeGraph(props: TreeGraphProps) {
   const {
     trace,
@@ -112,10 +125,6 @@ export function TreeGraph(props: TreeGraphProps) {
     width,
     height,
   } = props;
-
-  const highlightEdges = layers
-    .one<TreeLayer>(key)
-    .use((l) => l.source?.highlighting);
 
   const paper = usePaper();
   const acrylic = useAcrylic();
@@ -132,7 +141,8 @@ export function TreeGraph(props: TreeGraphProps) {
     orientation
   );
 
-  const graph = useGraphColoring(baseGraph, props);
+  const highlightEdges = useHighlighting(key);
+  const graph = useGraphColoring(baseGraph, props, highlightEdges);
 
   useEffect(() => {
     load?.(graph.graph);

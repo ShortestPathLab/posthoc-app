@@ -43,7 +43,7 @@ import {
 import { usePlaybackControls } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
-import { TraceLayerData } from "layers/TraceLayer";
+import { TraceLayerData } from "layers/trace/TraceLayer";
 import { entries, findLast, isEmpty, map, startCase } from "lodash";
 import { Size } from "protocol";
 import { Fragment, useState } from "react";
@@ -51,6 +51,8 @@ import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
 import { Layer, useLayerPicker, WithLayer } from "slices/layers";
+import { equal } from "slices/selector";
+import { UploadedTrace } from "slices/UIState";
 import { PanelState } from "slices/view";
 import { getShade } from "theme";
 import { set } from "utils/set";
@@ -61,8 +63,6 @@ import { useTreeLayout } from "./TreeLayoutWorker";
 import { useGraphSettings } from "./useGraphSettings";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
-import { equal } from "slices/selector";
-import { UploadedTrace } from "slices/UIState";
 
 type TreePageContext = PanelState;
 

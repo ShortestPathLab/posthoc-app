@@ -1,6 +1,6 @@
-import { TraceLayerData } from "layers/TraceLayer";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { makePathIndex, Node } from "layers/trace/makePathIndex";
+import { TraceLayerData } from "layers/trace/TraceLayer";
 import {
   chain,
   find,
@@ -40,12 +40,14 @@ export const highlightNodesOptions = [
   },
 ] as const;
 
+export type Highlighting = {
+  step?: number;
+  type?: string;
+  path?: number[] | Subtree;
+};
+
 export type HighlightLayerData = {
-  highlighting?: {
-    step?: number;
-    type?: string;
-    path?: number[] | Subtree;
-  };
+  highlighting?: Highlighting;
 };
 
 export interface Subtree {
