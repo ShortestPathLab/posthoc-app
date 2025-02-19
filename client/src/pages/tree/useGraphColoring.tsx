@@ -151,7 +151,7 @@ export function useGraphColoring(
     // highlight nodes: SubTree
     if (
       (highlightEdges?.type === "subtree" ||
-        highlightEdges?.type === "precedent") &&
+        highlightEdges?.type === "ancestor") &&
       typeof highlightEdges?.path === "object" &&
       !Array.isArray(highlightEdges?.path)
     ) {

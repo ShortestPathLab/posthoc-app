@@ -24,7 +24,7 @@ export const highlightNodesOptions = [
       "Show all events from the root to the currently selected event",
   },
   {
-    type: "precedent",
+    type: "ancestor",
     color: "lime" satisfies AccentColor,
     description: "Show all precedents of the currently selected node",
   },
@@ -33,11 +33,11 @@ export const highlightNodesOptions = [
     color: "green" satisfies AccentColor,
     description: "Show all consequences of the currently selected node",
   },
-  {
-    type: "bounds-relevant",
-    color: "deepPurple" satisfies AccentColor,
-    description: "",
-  },
+  // {
+  //   type: "bounds-relevant",
+  //   color: "deepPurple" satisfies AccentColor,
+  //   description: "",
+  // },
 ] as const;
 
 export type Highlighting = {
@@ -141,7 +141,7 @@ export function useHighlightNodes(key?: string): {
             "source.highlighting",
             keys(path[current.step]).length > 0
               ? {
-                  type: "precedent",
+                  type: "ancestor",
                   step,
                   path,
                 }
@@ -207,8 +207,8 @@ export function useHighlightNodes(key?: string): {
   return {
     backtracking: showBacktracking,
     subtree: showSubtree,
-    precedent: showPrecedent,
-    ["bounds-relevant"]: noop,
+    ancestor: showPrecedent,
+    // ["bounds-relevant"]: noop,
   };
 }
 
