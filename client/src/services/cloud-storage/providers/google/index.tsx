@@ -39,7 +39,7 @@ const isAuthenticated = (t: AuthState<unknown>): t is AuthState<string> =>
 
 export const createGoogleStorageService: ProviderFactory<typeof id> = (
   getState,
-  setState
+  setState,
 ) => {
   //
   // ─── Create Http Clients ─────────────────────────────────────────────
@@ -53,7 +53,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     const state = await getState();
     assert(
       isAuthenticated(state),
-      new AuthError("User not authenticated (did you call initialise?)")
+      new AuthError("User not authenticated (did you call initialise?)"),
     );
     return { Authorization: `Bearer ${state.accessToken}` };
   };
@@ -65,7 +65,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
   });
   const multiPartApiClient = createClient<HeaderOptions>(
     driveMultiPartApiUrl,
-    getHeaders
+    getHeaders,
   );
 
   // ─────────────────────────────────────────────────────────────────────
@@ -116,7 +116,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
             await setState({
               ...(await getState()),
               user: await getUserInfo(),
-            })
+            }),
         );
       }
     }
@@ -172,7 +172,8 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
   };
 
   const getFile = async (fileId: string) => {
-    const { authenticated } = await getState();
+    const authState = await getState();
+    const authenticated = !!authState;
     const [{ name, lastModified }, media] = await Promise.all([
       client.get<WorkspaceMeta>({
         label: "Get file metadata",
@@ -214,10 +215,13 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
       window.location.href = url.toString();
     },
     logout: async () => {
-      const { accessToken } = await getState();
-      await oauthClient.post({
-        path: `/revoke?token=${accessToken}`,
-      });
+      const authState = await getState();
+      const accessToken = authState?.accessToken;
+      if (accessToken) {
+        await oauthClient.post({
+          path: `/revoke?token=${accessToken}`,
+        });
+      }
       await setState({});
     },
     saveFile: async (file: File) => {
@@ -231,7 +235,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
               parents: [parentId],
             }),
           ],
-          { type: "application/json" }
+          { type: "application/json" },
         ),
         file,
       };
@@ -268,7 +272,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
               return f.name!.startsWith(baseName) && !f.name!.endsWith(".meta");
             })?.id ?? null;
           return { ...metadata, id: posthocFileGoogleId };
-        }
+        },
       );
     },
     getFileLink: async (fileId: string) => {
