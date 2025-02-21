@@ -24,9 +24,9 @@ export const highlightNodesOptions = [
       "Show all events from the root to the currently selected event",
   },
   {
-    type: "ancestor",
+    type: "ancestors",
     color: "lime" satisfies AccentColor,
-    description: "Show all precedents of the currently selected node",
+    description: "Show all ancestors of the currently selected node",
   },
   {
     type: "subtree",
@@ -90,7 +90,7 @@ export function useHighlightNodes(key?: string): {
     .groupBy("id")
     .value();
 
-  const getPrecedentEvents = (
+  const getAncestorEvents = (
     root: Node,
     visited = new Set<number | string>()
   ) => {
@@ -102,7 +102,7 @@ export function useHighlightNodes(key?: string): {
     // get all the parent nodes of current node (different events)
     const parentEvents = groupedTraceById[root.id];
     if (!parentEvents || parentEvents?.length < 1) return {};
-    const precedentTree: Subtree = {};
+    const ancestors: Subtree = {};
 
     if (parentEvents) {
       const groupedParents = chain(parentEvents)
@@ -112,7 +112,7 @@ export function useHighlightNodes(key?: string): {
 
       forOwn(groupedParents, (parent) => {
         const event = find(parent, (c) => c.step <= root!.step);
-        if (event && !precedentTree[event.step]) {
+        if (event && !ancestors[event.step]) {
           // Use lodash findLastIndex to make TypeScript happy
           const index = findLastIndex(
             trace?.events,
@@ -120,20 +120,20 @@ export function useHighlightNodes(key?: string): {
           );
           if (!isUndefined(index) && index >= 0) {
             const pEvent = { ...trace?.events?.[index], step: index } as Node;
-            precedentTree[pEvent.step] = getPrecedentEvents(pEvent, visited);
+            ancestors[pEvent.step] = getAncestorEvents(pEvent, visited);
           }
         }
       });
     }
-    return precedentTree;
+    return ancestors;
   };
 
-  const showPrecedent = useCallback(
+  const showAncestors = useCallback(
     (step: number) => {
       if (trace) {
         const current: Node = { ...(trace?.events ?? [])[step], step };
         const path = {
-          [current.step]: getPrecedentEvents(current, new Set<number>()),
+          [current.step]: getAncestorEvents(current, new Set<number>()),
         };
         setLayer((l) =>
           set(
@@ -141,7 +141,7 @@ export function useHighlightNodes(key?: string): {
             "source.highlighting",
             keys(path[current.step]).length > 0
               ? {
-                  type: "ancestor",
+                  type: "ancestors",
                   step,
                   path,
                 }
@@ -207,7 +207,7 @@ export function useHighlightNodes(key?: string): {
   return {
     backtracking: showBacktracking,
     subtree: showSubtree,
-    ancestor: showPrecedent,
+    ancestors: showAncestors,
     // ["bounds-relevant"]: noop,
   };
 }
