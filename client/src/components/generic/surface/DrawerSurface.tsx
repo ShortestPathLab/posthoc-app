@@ -75,7 +75,7 @@ export function DrawerSurface({
   // ─────────────────────────────────────────────────────────────────────
 
   const theme = useTheme();
-  const { setHandle, setPaper } = useDrawerHandle(state.close);
+  const { setHandle, setPaper, setScroll } = useDrawerHandle(state.close);
   const [ref, { width }] = useMeasure();
   const maxHeight = `calc(100dvh - ${gap + 32}px)`;
 
@@ -134,7 +134,13 @@ export function DrawerSurface({
     >
       <Handle ref={setHandle} />
       <Box onTouchStart={stopPropagation} ref={ref}>
-        <Scroll y px={0} style={{ maxHeight }} {...slotProps?.scroll}>
+        <Scroll
+          y
+          px={0}
+          style={{ maxHeight }}
+          ref={setScroll}
+          {...slotProps?.scroll}
+        >
           <SurfaceSizeContext.Provider value={{ width, height: maxHeight }}>
             {children}
           </SurfaceSizeContext.Provider>
