@@ -50,7 +50,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
   const { types, selectedType, isHighlighting } = useMemo(() => {
     if (steps) {
       const stepTypes = _(steps.map((a, b) => [a, b] as const))
-        .map(([e]) => e.type)
+        .map(([e]) => e?.type)
         .filter()
         .uniq()
         .value();
@@ -63,8 +63,8 @@ export function StepsPage({ template: Page }: PageContentProps) {
         selectedType: showHighlighting
           ? SYMBOL_HIGHLIGHTED
           : allSelected
-          ? SYMBOL_ALL
-          : _selectedType,
+            ? SYMBOL_ALL
+            : _selectedType,
         isHighlighting: !isUndefined(highlighting?.path),
       };
     }

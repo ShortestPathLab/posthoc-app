@@ -123,6 +123,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
                     }
                     options={{
                       hover: { above: false },
+                      fixedOverflowWidgets: true,
                       bracketPairColorization: { enabled: true },
                       readOnly: !!selected?.source?.readonly,
                       renderValidationDecorations: "on",

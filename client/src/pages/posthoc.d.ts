@@ -4,16 +4,28 @@ declare type Theme = {
   /**
    * The system foreground (text) color.
    * This color automatically adapts to Posthoc UI's light/dark mode.
+   *
+   * ---
+   *
+   * _Posthoc_
    */
   foreground: CSSColor;
   /**
    * The system background color.
    * This color automatically adapts to Posthoc UI's light/dark mode.
+   *
+   * ---
+   *
+   * _Posthoc_
    */
   background: CSSColor;
   /**
    * The user-defined accent color.
    * This color automatically adapts to Posthoc UI's light/dark mode.
+   *
+   * ---
+   *
+   * _Posthoc_
    */
   accent: CSSColor;
 };

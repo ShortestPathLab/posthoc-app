@@ -67,7 +67,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
     if (rawSteps) {
       const steps = rawSteps.map((a, b) => [a, b] as const);
       const stepTypes = _(steps)
-        .map(([e]) => e.type)
+        .map(([e]) => e?.type)
         .filter()
         .uniq()
         .value();
@@ -88,8 +88,8 @@ export function PageContent({ layer: key }: { layer?: string }) {
         showHighlighting
           ? steps.filter(([, step]) => highlightedSet.has(step))
           : allSelected
-          ? steps
-          : steps.filter(([a]) => a.type === _selectedType),
+            ? steps
+            : steps.filter(([a]) => a.type === _selectedType),
         ([, step]) => step
       );
 
