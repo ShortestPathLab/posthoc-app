@@ -46,6 +46,8 @@
     "mobile-device-detect": "^0.4.3",
     "moderndash": "^4.0.0",
     "monaco-editor": "^0.52.2",
+    "monaco-marker-data-provider": "^1.2.4",
+    "monaco-yaml": "^5.3.1",
     "nanoid": "^5.0.9",
     "nearest-pantone": "^1.0.1",
     "object-hash": "^3.0.0",

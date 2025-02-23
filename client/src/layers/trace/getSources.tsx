@@ -8,7 +8,7 @@ export const getSources = ((layer) => {
         {
           id: "trace",
           name: `${trace.name ?? "Untitled trace"}`,
-          language: "yaml-js",
+          language: "yaml",
           content: dump(trace.content, { noCompatMode: true }),
         },
       ]

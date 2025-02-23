@@ -35,8 +35,8 @@ body {
 
 code {
   font-family: "Roboto Mono", "Consolas", "Courier New", Courier, monospace;
-  transform: translateY(-0.75px);
-  display: block;
+  /* transform: translateY(-0.75px);
+  display: block; */
 }
 
 .icon-glyph {

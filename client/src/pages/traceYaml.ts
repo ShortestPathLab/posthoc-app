@@ -1,12 +1,23 @@
 import type { Monaco } from "@monaco-editor/react";
-import { isUndefined, last } from "lodash";
-import { editor, Position, Range, type languages } from "monaco-editor";
-import type { CompletionInfo } from "typescript";
+import { flatMap, isUndefined, join, last, map } from "lodash";
+import {
+  MarkerSeverity,
+  Position,
+  Range,
+  type editor,
+  type languages,
+} from "monaco-editor";
+import { registerMarkerDataProvider } from "monaco-marker-data-provider";
+import { configureMonacoYaml } from "monaco-yaml";
+import { map as mapAsync } from "promise-tools";
+import type { CompletionInfo, QuickInfo } from "typescript";
 import { assert } from "utils/assert";
 import { get } from "utils/set";
+import rendererDefinitions from "./posthoc.d.ts?raw";
+import definitions from "./trace.d.ts?raw";
 
 export const language: languages.IMonarchLanguage = {
-  tokenPostfix: ".yaml-js",
+  tokenPostfix: ".yaml",
 
   brackets: [
     { token: "delimiter.template", open: "${{", close: "}}" },
@@ -160,8 +171,8 @@ export const language: languages.IMonarchLanguage = {
 
     templateString: [
       { include: "@templateStringBase" },
+      [/#(.*)/, { token: "comment", next: "@pop" }],
       [/^/, { token: "string", next: "@pop" }],
-      [/#(.*)^/, { token: "comment", next: "@pop" }],
       [/./, "string"],
     ],
 
@@ -283,6 +294,7 @@ export const language: languages.IMonarchLanguage = {
           next: "@templateStringDoubleQuoted",
         },
       ],
+      [/#(.*)/, { token: "comment", next: "@pop" }],
     ],
 
     doubleQuotedString: [
@@ -314,20 +326,20 @@ export const language: languages.IMonarchLanguage = {
 
 function matchCurrentExpression(model: editor.ITextModel, position: Position) {
   const preRange = model.getValueInRange({
-    startLineNumber: position.lineNumber,
+    startLineNumber: 1,
     startColumn: 1,
     endColumn: position.column,
     endLineNumber: position.lineNumber,
   });
-  const pre = preRange.match(/\$\{\{(.*)/);
+  const pre = preRange.match(/\$\{\{((?:[\s\S](?!\$\{\{))*)$/);
   if (pre && pre.length > 1) {
     const postRange = model.getValueInRange({
       startLineNumber: position.lineNumber,
       startColumn: position.column,
       endColumn: 9999,
-      endLineNumber: position.lineNumber,
+      endLineNumber: 9999,
     });
-    const post = postRange.match(/(.*)\}\}/);
+    const post = postRange.match(/^([\s\S]*?)\s*(?=\}\})/);
     if (post && pre.length > 1) {
       return {
         match: `${last(pre)}${post[1]}`,
@@ -338,10 +350,78 @@ function matchCurrentExpression(model: editor.ITextModel, position: Position) {
   }
   return undefined;
 }
+
+function createFile(
+  monaco: Monaco,
+  model: editor.ITextModel,
+  id: string,
+  contents: string,
+  extension: string = ".ts"
+) {
+  const uri = monaco.Uri.file(`${model.uri.path}-${id}${extension}`);
+  (
+    monaco.editor.getModel(uri) ??
+    monaco.editor.createModel("", "typescript", uri)
+  ).setValue(contents);
+  return uri;
+}
+async function getInstance(
+  monaco: Monaco,
+  model: editor.ITextModel,
+  id: string,
+  contents: string
+) {
+  const uri = createFile(monaco, model, id, contents);
+  const worker = await (
+    await monaco.languages.typescript.getTypeScriptWorker()
+  )(uri);
+  return {
+    uri,
+    worker,
+    dispose: () => monaco.editor.getModel(uri)?.setValue?.(""),
+  };
+}
+function findBracketedValues(
+  text: string
+): { value: string; line: number; column: number }[] {
+  const matches: { value: string; line: number; column: number }[] = [];
+  const regex = /\$\{\{(.*?)\}\}/g;
+  const lines = text.split(/\r?\n/);
+
+  lines.forEach((line, lineIndex) => {
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(line)) !== null) {
+      matches.push({
+        value: match[1],
+        line: lineIndex + 1, // Convert to 1-based index
+        column: match.index + 3 + 1, // Convert to 1-based index
+      });
+    }
+  });
+
+  return matches;
+}
+async function generateDefinitions(
+  monaco: Monaco,
+  model: editor.ITextModel,
+  id: string = "global"
+) {
+  createFile(monaco, model, `${id}-definitions`, definitions, ".d.ts");
+  // TODO: Decouple
+  createFile(
+    monaco,
+    model,
+    `${id}-d2-renderer-definitions`,
+    rendererDefinitions,
+    ".d.ts"
+  );
+}
+
 export const register = (monaco: Monaco) => {
   monaco.languages.register({ id: "typescript" });
-  monaco.languages.register({ id: "yaml-js" });
-  monaco.languages.setLanguageConfiguration("yaml-js", {
+  monaco.languages.register({ id: "yaml" });
+
+  monaco.languages.setLanguageConfiguration("yaml", {
     comments: {
       lineComment: "#",
     },
@@ -379,7 +459,7 @@ export const register = (monaco: Monaco) => {
     ],
   });
   const tokensProvider = monaco.languages.setMonarchTokensProvider(
-    "yaml-js",
+    "yaml",
     language
   );
 
@@ -390,29 +470,35 @@ export const register = (monaco: Monaco) => {
     function: monaco.languages.CompletionItemKind.Function,
     module: monaco.languages.CompletionItemKind.Module,
     class: monaco.languages.CompletionItemKind.Class,
+    property: monaco.languages.CompletionItemKind.Property,
     method: monaco.languages.CompletionItemKind.Method,
   };
 
+  monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+    ...monaco.languages.typescript.typescriptDefaults.getCompilerOptions(),
+    lib: ["esnext"],
+  });
+
   const completionItemProvider =
-    monaco.languages.registerCompletionItemProvider("yaml-js", {
+    monaco.languages.registerCompletionItemProvider("yaml", {
       triggerCharacters: [".", "("],
       provideCompletionItems: async (model, position) => {
         const expr = matchCurrentExpression(model, position);
         if (isUndefined(expr)) return { suggestions: [] };
-        const uri = monaco.Uri.file(`${model.uri.path}.ts`);
-        (
-          monaco.editor.getModel(uri) ??
-          monaco.editor.createModel("", "typescript", uri)
-        ).setValue(expr.match);
-        const worker = await (
-          await monaco.languages.typescript.getTypeScriptWorker()
-        )(uri);
+        generateDefinitions(monaco, model);
+        const { uri, worker, dispose } = await getInstance(
+          monaco,
+          model,
+          "completion",
+          expr.match
+        );
         const suggestions = (await worker.getCompletionsAtPosition(
           uri.toString(),
           expr.at + 1
         )) as CompletionInfo | undefined;
         assert(suggestions, "suggestions is defined");
-
+        const word = model.getWordUntilPosition(position);
+        dispose();
         return {
           suggestions: suggestions.entries.map((suggestion) => ({
             insertText: suggestion.name,
@@ -424,14 +510,119 @@ export const register = (monaco: Monaco) => {
             label: suggestion.name,
             range: new Range(
               position.lineNumber,
-              position.column,
+              word.startColumn,
               position.lineNumber,
-              position.column
+              word.endColumn
             ),
           })),
         };
       },
     });
-  return () =>
-    [tokensProvider, completionItemProvider].forEach((d) => d.dispose());
+
+  const hoverProvider = monaco.languages.registerHoverProvider("yaml", {
+    provideHover: async (model, position) => {
+      const expr = matchCurrentExpression(model, position);
+      if (isUndefined(expr)) return { contents: [] };
+      generateDefinitions(monaco, model);
+      const { worker, uri, dispose } = await getInstance(
+        monaco,
+        model,
+        "hover",
+        expr.match
+      );
+      const info = (await worker.getQuickInfoAtPosition(
+        uri.toString(),
+        expr.at + 1
+      )) as QuickInfo | undefined;
+      if (!info) return { contents: [] };
+      dispose();
+      return {
+        contents: [
+          {
+            value: `\`\`\`ts\n${join(
+              map(info.displayParts, "text"),
+              ""
+            )}\n\`\`\`\n${join(map(info.documentation, "text"), "\n")}`,
+          },
+        ],
+      };
+    },
+  });
+
+  const markerProvider = registerMarkerDataProvider(monaco, "yaml", {
+    owner: "trace-expression-markers",
+    provideMarkerData: async (model): Promise<editor.IMarkerData[]> => {
+      const text = model.getValue();
+      const allMatches = findBracketedValues(text);
+      generateDefinitions(monaco, model);
+      const out = flatMap(
+        await mapAsync(allMatches, async ({ value, line, column }) => {
+          const { worker, uri, dispose } = await getInstance(
+            monaco,
+            model,
+            "diagnostics",
+            value
+          );
+          const a = await worker.getSyntacticDiagnostics(uri.toString());
+          const b = await worker.getSemanticDiagnostics(uri.toString());
+          const c = await worker.getSuggestionDiagnostics(uri.toString());
+          dispose();
+          return { diagnostics: [...a, ...b, ...c], line, column, value };
+        }),
+        ({ diagnostics, ...rest }) =>
+          map(diagnostics, (d) => ({
+            diagnostic: d,
+            source: rest,
+          }))
+      );
+      return map(out, ({ diagnostic, source }) => ({
+        severity: MarkerSeverity.Error,
+        message: `${diagnostic.messageText}`,
+        code: `${diagnostic.code}`,
+        startLineNumber: source.line,
+        endLineNumber: source.line,
+        startColumn: source.column + (diagnostic.start ?? 0),
+        endColumn:
+          source.column + (diagnostic.start ?? 0) + (diagnostic.length ?? 0),
+      }));
+    },
+  });
+
+  const yaml = configureMonacoYaml(monaco, {
+    enableSchemaRequest: true,
+    schemas: [
+      {
+        fileMatch: ["*"],
+        schema: {
+          type: "object",
+          properties: {
+            version: {
+              type: "string",
+              enum: ["1.4.0"],
+              description: "The search trace version.",
+            },
+            events: { type: "array", items: { type: "object" } },
+            views: {
+              type: "object",
+              description: "View definitions.",
+              properties: {
+                main: { type: "array" },
+              },
+            },
+          },
+        },
+        uri: "https://posthoc.pathfinding.ai/docs/search-trace",
+      },
+    ],
+  });
+
+  return () => {
+    yaml.dispose();
+    [
+      markerProvider,
+      tokensProvider,
+      completionItemProvider,
+      hoverProvider,
+    ].forEach((d) => d.dispose());
+  };
 };

@@ -70,6 +70,7 @@ export function parse({
                   ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
                   : undefined,
                 events: esx,
+                event: e,
               },
             },
             e

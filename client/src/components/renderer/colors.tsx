@@ -62,13 +62,13 @@ export const searchEventAliases = thru(
 );
 
 export const colorsHex: EventTypeColors = {
-  source: green["A400"],
-  destination: red["A400"],
+  source: green.A400,
+  destination: red.A400,
   updating: orange[tint],
   expanding: deepPurple[tint],
   generating: amber[tint],
   closing: pink[tint],
-  end: blue["A400"],
+  end: blue.A400,
 };
 
 export const colors: { [K in TraceEventType]: number } = mapValues(

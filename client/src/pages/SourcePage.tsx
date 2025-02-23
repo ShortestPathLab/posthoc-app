@@ -7,8 +7,8 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 import { useOptimistic } from "hooks/useOptimistic";
 import { getController } from "layers/layerControllers";
-import { capitalize, find, first, flatMap, isObject, map } from "lodash";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { find, first, flatMap, isObject, map } from "lodash";
+import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
@@ -23,11 +23,10 @@ import { clone } from "produce";
 import { set } from "utils/set";
 import { register } from "./traceYaml";
 
-import * as monaco from "monaco-editor";
 import { useAsync } from "react-async-hook";
 import { load } from "./load";
 
-function isYamlException(e: unknown): e is YAMLException {
+export function isYamlException(e: unknown): e is YAMLException {
   return isObject(e) && "name" in e && e.name === "YAMLException";
 }
 
@@ -59,10 +58,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   const { result: instance } = useAsync(() => load(), []);
 
-  const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
-  const monacoRef = useRef<null | Monaco>(null);
-  const [decorationsRef, setDecorationsRef] =
-    useState<null | monaco.editor.IEditorDecorationsCollection>(null);
+  const [monaco, setMonaco] = useState<Monaco>();
 
   const usingLoading = useLoadingState("layers");
 
@@ -75,11 +71,9 @@ export function SourcePage({ template: Page }: PageContentProps) {
     [sources, state?.source, state?.layer]
   );
   const handleEditorContentChange = useMemo(
-    // eslint-disable-next-line react-compiler/react-compiler
     () =>
       debounceLifo((v?: string) =>
         usingLoading(async () => {
-          decorationsRef?.clear();
           if (!selected?.source?.id || !selected?.layer) return;
           const one = slice.layers.one<SourceLayer>(selected.layer);
           const l = one.get();
@@ -90,69 +84,24 @@ export function SourcePage({ template: Page }: PageContentProps) {
               selected.source.id,
               v
             )) ?? {};
-          clearParserErrorDecorations();
-          if (error) {
-            if (isYamlException(error)) {
-              console.log(error);
-              setParserErrorDecorations(error);
-            }
-            return;
-          } else {
+          if (!error) {
             assert(next, "updated source is defined");
             one.set(next);
           }
         })
       ),
-    [usingLoading, selected?.source?.id, decorationsRef]
+    [usingLoading, selected?.source?.id]
   );
 
   const [value, setValue] = useOptimistic(selected?.source?.content, (v) =>
     idle(() => handleEditorContentChange(v))
   );
 
-  const handleEditorMount = (
-    editor: monaco.editor.IStandaloneCodeEditor,
-    monacoInstance: Monaco
-  ) => {
-    editorRef.current = editor;
-    monacoRef.current = monacoInstance;
-    setDecorationsRef(editor.createDecorationsCollection());
-  };
-
   useEffect(() => {
-    if (monacoRef.current) {
-      const dipose = register(monacoRef.current);
-      return dipose;
+    if (monaco) {
+      return register(monaco);
     }
-  }, [monacoRef.current]);
-
-  const clearParserErrorDecorations = () => {
-    monacoRef.current?.editor.setModelMarkers(
-      editorRef.current!.getModel()!,
-      "owner",
-      []
-    );
-  };
-
-  const setParserErrorDecorations = (error: YAMLException) => {
-    const startLine = error.mark.line + 1;
-    const startColumn = error.mark.column + 1;
-
-    monacoRef.current?.editor.setModelMarkers(
-      editorRef.current!.getModel()!,
-      "owner",
-      [
-        {
-          severity: monaco.MarkerSeverity.Error,
-          startLineNumber: startLine,
-          startColumn,
-          endLineNumber: startLine,
-          endColumn: startColumn,
-          message: `YAMLException: ${capitalize(error.reason)}`,
-        },
-      ]
-    );
-  };
+  }, [monaco]);
 
   return (
     <Page onChange={onChange} stack={state}>
@@ -166,13 +115,14 @@ export function SourcePage({ template: Page }: PageContentProps) {
               {(size: { width: number; height: number }) =>
                 instance && (
                   <Editor
-                    onMount={handleEditorMount}
+                    onMount={(_, m) => setMonaco(m)}
                     // Refresh the editor when the id changes
                     key={selected?.source?.id}
                     theme={
                       theme.palette.mode === "dark" ? "posthoc-dark" : "light"
                     }
                     options={{
+                      hover: { above: false },
                       bracketPairColorization: { enabled: true },
                       readOnly: !!selected?.source?.readonly,
                       renderValidationDecorations: "on",
