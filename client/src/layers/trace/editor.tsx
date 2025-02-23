@@ -1,7 +1,6 @@
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { TracePicker } from "components/app-bar/Input";
-import { Heading, Option } from "components/layer-editor/Option";
-import { TracePreview } from "components/layer-editor/TracePreview";
+import { Option } from "components/layer-editor/Option";
 import { withProduce } from "produce";
 import { set } from "utils/set";
 import { Controller } from "./types";
@@ -46,10 +45,6 @@ export const editor = withProduce(({ value, produce }) => {
           <code>{value?.source?.parsedTrace?.error}</code>
         </Typography>
       )}
-      <Heading label="Preview" />
-      <Box sx={{ height: 240, mx: -2 }}>
-        <TracePreview trace={value?.source?.parsedTrace?.content} />
-      </Box>
     </>
   );
 }) satisfies Controller["editor"];

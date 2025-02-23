@@ -1,18 +1,17 @@
 import { CodeOutlined } from "@mui-symbols-material/w400";
-import { Box, Typography as Type } from "@mui/material";
+import { Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { LayerPicker } from "components/generic/LayerPicker";
-import { Heading, Option } from "components/layer-editor/Option";
-import { TracePreview } from "components/layer-editor/TracePreview";
+import { Option } from "components/layer-editor/Option";
 import { inferLayerName } from "layers";
 import { MapLayerData } from "layers/map";
-import { Controller } from ".";
 import { find } from "lodash";
 import { withProduce } from "produce";
 import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";
 import { Layer, WithLayer, useLayerPicker } from "slices/layers";
 import { set } from "utils/set";
+import { Controller } from ".";
 import { isMapLayer } from "./isMapLayer";
 
 export const editor = withProduce(({ value, produce }) => {
@@ -75,11 +74,6 @@ export const editor = withProduce(({ value, produce }) => {
           </Type>
         )}
       </WithLayer>
-
-      <Heading label="Preview" />
-      <Box sx={{ height: 240, mx: -2 }}>
-        <TracePreview trace={value?.source?.trace?.content} />
-      </Box>
     </>
   );
 }) satisfies Controller["editor"];

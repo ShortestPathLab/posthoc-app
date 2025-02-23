@@ -1,12 +1,13 @@
 import { MoreVertOutlined } from "@mui-symbols-material/w400";
 import { Box, IconButton, Menu, MenuItem, MenuList } from "@mui/material";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { each, head, isEqual, map, pick } from "lodash";
+import { each, head, isEqual, keys, map, pick } from "lodash";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { nanoid as id } from "nanoid";
 import { startTransition } from "react";
 import { slice } from "slices";
 import { LayerEditor } from "./LayerEditor";
+import { getControllers } from "layers/layerControllers";
 
 export function LayerListEditor() {
   "use no memo";
@@ -32,7 +33,7 @@ export function LayerListEditor() {
             </>
           )}
           create={() => ({
-            source: { type: "trace", trace: {} },
+            source: { type: head(keys(getControllers())) },
           })}
           onChange={(v) => startTransition(() => slice.layers.set(v))}
           addItemLabel="Layer"

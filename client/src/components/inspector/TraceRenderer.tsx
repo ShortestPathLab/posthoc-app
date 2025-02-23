@@ -214,7 +214,13 @@ export function TraceRenderer({
                   }}
                 >
                   {layers.map((l, i) => (
-                    <RenderLayer index={i} key={l.key} layer={l} />
+                    <RenderLayer
+                      index={i}
+                      key={l.key}
+                      layer={l}
+                      width={width}
+                      height={height}
+                    />
                   ))}
                 </Box>
               )}

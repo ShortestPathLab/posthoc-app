@@ -20,6 +20,9 @@ export function Placeholder({
       justifyContent="center"
       alignItems="center"
       color="text.secondary"
+      {...rest}
+      textAlign="center"
+      vertical
       sx={{
         gap: 2,
         p: 6,
@@ -31,10 +34,8 @@ export function Placeholder({
           transparent 7px,
           ${t.palette.background.default} 8px
         )`,
+        ...rest.sx,
       }}
-      textAlign="center"
-      vertical
-      {...rest}
     >
       {icon}
       <Type component="div">{label}</Type>

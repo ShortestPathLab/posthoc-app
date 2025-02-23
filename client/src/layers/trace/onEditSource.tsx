@@ -15,6 +15,7 @@ export const onEditSource = (async (layer, id, content) => {
     set(layer, "source.trace.content", result as Trace | undefined);
     // To get things to change, we also need to change the trace key
     set(layer, "source.trace.key", nanoid());
+    set(layer, "source.trace.id", id);
   } catch (error) {
     console.error(error);
   }

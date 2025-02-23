@@ -23,7 +23,7 @@ self.MonacoEnvironment = {
     if (label === "typescript" || label === "javascript") {
       return new tsWorker();
     }
-    if (label === "yaml" || label === "yaml") return new yamlWorker();
+    if (label === "yaml") return new yamlWorker();
 
     return new editorWorker();
   },

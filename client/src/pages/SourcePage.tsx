@@ -7,7 +7,7 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 import { useOptimistic } from "hooks/useOptimistic";
 import { getController } from "layers/layerControllers";
-import { find, first, flatMap, isObject, map } from "lodash";
+import { find, first, flatMap, isEqual, isObject, map } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
@@ -19,12 +19,11 @@ import { idle } from "utils/idle";
 import { PageContentProps } from "./PageMeta";
 
 import { YAMLException } from "js-yaml";
+import { load, register } from "language";
 import { clone } from "produce";
 import { set } from "utils/set";
-import { register } from "./traceYaml";
 
 import { useAsync } from "react-async-hook";
-import { load } from "./load";
 
 export function isYamlException(e: unknown): e is YAMLException {
   return isObject(e) && "name" in e && e.name === "YAMLException";
@@ -37,13 +36,15 @@ type SourceLayerState = { source?: string; layer?: string };
 function useSources() {
   "use no memo";
   // TODO: Slightly not performance
-  return slice.layers.use((l) =>
-    flatMap(l, (l) =>
-      map(getController(l)?.getSources?.(l), (s) => ({
-        layer: l.key,
-        source: s,
-      }))
-    )
+  return slice.layers.use(
+    (l) =>
+      flatMap(l, (l) =>
+        map(getController(l)?.getSources?.(l), (s) => ({
+          layer: l.key,
+          source: s,
+        }))
+      ),
+    isEqual
   );
 }
 
@@ -90,7 +91,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
           }
         })
       ),
-    [usingLoading, selected?.source?.id]
+    [usingLoading, selected?.layer, selected?.source?.id]
   );
 
   const [value, setValue] = useOptimistic(selected?.source?.content, (v) =>
@@ -117,7 +118,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
                   <Editor
                     onMount={(_, m) => setMonaco(m)}
                     // Refresh the editor when the id changes
-                    key={selected?.source?.id}
+                    key={`${selected?.layer}::${selected?.source?.id}`}
                     theme={
                       theme.palette.mode === "dark" ? "posthoc-dark" : "light"
                     }
