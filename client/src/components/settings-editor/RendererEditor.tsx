@@ -114,12 +114,11 @@ export function RendererEditor({
             <Tooltip
               title={`${value.disabled ? "Enable" : "Disable"} Renderer`}
             >
-              <Box mr={-3}>
-                <Switch
-                  checked={!value.disabled}
-                  onChange={(_, v) => handleChange({ disabled: !v })}
-                />
-              </Box>
+              <Switch
+                sx={{ mr: 0 }}
+                checked={!value.disabled}
+                onChange={(_, v) => handleChange({ disabled: !v })}
+              />
             </Tooltip>
           </>
         )}

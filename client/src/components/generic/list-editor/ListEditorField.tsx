@@ -168,7 +168,7 @@ function ListItem<T extends { key: Key }>({
             ref: (e: HTMLElement | null) => setField(e),
           },
           extras: (
-            <Block sx={{ flex: 0, px: 1 }}>
+            <Block sx={{ flex: 0, pr: 1 }}>
               {toggleable && (
                 <Switch
                   color="primary"

@@ -54,12 +54,7 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
           }}
           popover
           trigger={({ open }) => (
-            <Stack
-              direction="row"
-              flex={1}
-              alignItems="center"
-              sx={{ py: 1, mr: -3 }}
-            >
+            <Stack direction="row" flex={1} alignItems="center" sx={{ py: 1 }}>
               <Stack
                 className={value.key}
                 direction="row"
