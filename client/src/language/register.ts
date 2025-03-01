@@ -40,11 +40,22 @@ export const register = (monaco: typeof Monaco) => {
   monaco.languages.register({ id: "typescript" });
   monaco.languages.register({ id: "yaml" });
 
-  monaco.languages.setLanguageConfiguration("yaml", languageConfig(monaco));
+  const yaml = configureMonacoYaml(monaco, {
+    enableSchemaRequest: true,
+    schemas: [
+      {
+        fileMatch: ["*"],
+        schema,
+        uri: "https://posthoc.pathfinding.ai/docs/search-trace",
+      },
+    ],
+  });
+
   const tokensProvider = monaco.languages.setMonarchTokensProvider(
     "yaml",
     language
   );
+  monaco.languages.setLanguageConfiguration("yaml", languageConfig(monaco));
 
   const completionItemKind = {
     const: monaco.languages.CompletionItemKind.Constant,
@@ -169,17 +180,6 @@ export const register = (monaco: typeof Monaco) => {
           source.column + (diagnostic.start ?? 0) + (diagnostic.length ?? 0),
       }));
     },
-  });
-
-  const yaml = configureMonacoYaml(monaco, {
-    enableSchemaRequest: true,
-    schemas: [
-      {
-        fileMatch: ["*"],
-        schema,
-        uri: "https://posthoc.pathfinding.ai/docs/search-trace",
-      },
-    ],
   });
 
   const dispose = () => {
