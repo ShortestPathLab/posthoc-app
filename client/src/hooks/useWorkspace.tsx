@@ -77,7 +77,6 @@ export function useWorkspace() {
       const filename = name ?? id("-");
       if (raw) {
         const name = `${filename}.workspace.json`;
-        download(content, name, "application/json");
         notify("Workspace saved", name);
         return {
           name,
@@ -88,7 +87,6 @@ export function useWorkspace() {
       } else {
         const name = `${filename}.workspace`;
         const compressed = await compress(content);
-        download(compressed, name, "application/octet-stream");
         notify("Workspace saved", name);
         return {
           name,
@@ -105,20 +103,23 @@ export function useWorkspace() {
           : await pickFile(origin2);
 
         if (f && isWorkspaceFile(f)) {
-          await usingBusyState(async () => {
-            const content = isCompressedFile(f)
-              ? await decompress(new Uint8Array(await f.arrayBuffer()))
-              : await f.text();
-            const { result: parsed, error } = await parseYamlAsync(content);
-            if (error) throw error;
-            cast<Workspace | undefined>(parsed);
-            if (!parsed) return;
-            for (const l of parsed?.layers?.layers ?? [])
-              setLayerSource(l, origin);
-            slice.layers.set(parsed?.layers.layers);
-            workspaceMeta.set(parsed?.UIState?.workspaceMeta ?? {});
-            slice.ui.isTrusted.set(false);
-          }, `Opening workspace (${formatByte(f.size)})`);
+          await usingBusyState(
+            async () => {
+              const content = isCompressedFile(f)
+                ? await decompress(new Uint8Array(await f.arrayBuffer()))
+                : await f.text();
+              const { result: parsed, error } = await parseYamlAsync(content);
+              if (error) throw error;
+              cast<Workspace | undefined>(parsed);
+              if (!parsed) return;
+              for (const l of parsed?.layers?.layers ?? [])
+                setLayerSource(l, origin);
+              slice.layers.set(parsed?.layers.layers);
+              workspaceMeta.set(parsed?.UIState?.workspaceMeta ?? {});
+              slice.ui.isTrusted.set(false);
+            },
+            `Opening workspace (${formatByte(f.size)})`
+          );
           return true;
         }
         return false;
