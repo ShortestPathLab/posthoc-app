@@ -25,16 +25,19 @@ import { useScreenshots } from "slices/screenshots";
 import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
 import { TrustedContent } from "./TrustedContent";
+import { isMobile } from "mobile-device-detect";
 
 const TILE_RESOLUTION = 128;
 
 const tileSize = (playing: boolean = false) =>
-  (playing ? devicePixelRatio * 1.5 : devicePixelRatio * 2) * TILE_RESOLUTION;
+  (playing ? devicePixelRatio * 1.5 : devicePixelRatio * 2) *
+  TILE_RESOLUTION *
+  (isMobile ? 0.5 : 1);
 
 const rendererOptions = {
   tileSubdivision: 2,
-  // Use 50% of available CPUs
-  workerCount: clamp(floor((navigator.hardwareConcurrency - 1) / 2), 1, 12),
+  // Use 25% of available CPUs
+  workerCount: clamp(floor(navigator.hardwareConcurrency / 4), 1, 12),
   tileResolution: {
     width: tileSize(),
     height: tileSize(),
