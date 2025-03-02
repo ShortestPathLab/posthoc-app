@@ -4,7 +4,6 @@ import {
   Dictionary,
   chain as _,
   ceil,
-  debounce,
   floor,
   get,
   head,
@@ -17,6 +16,7 @@ import {
   range,
   shuffle,
   sortBy,
+  throttle,
   truncate,
   values,
 } from "lodash";
@@ -267,7 +267,7 @@ export class D2RendererWorker extends EventEmitter<
   }
 
   #getRenderQueue = once(() =>
-    debounce(() => this.render(), this.#options.refreshInterval, {
+    throttle(() => this.render(), this.#options.refreshInterval, {
       leading: false,
       trailing: true,
     })
