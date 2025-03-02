@@ -19,15 +19,9 @@ import { ReactNode } from "react";
 import { PageContentProps } from "./PageMeta";
 
 const contacts = [
+  { name: "Kevin Zheng", email: "kevin.zheng@monash.edu" },
   { name: "Dr Daniel Harabor", email: "daniel.harabor@monash.edu" },
   { name: "Dr Michael Wybrow", email: "michael.wybrow@monash.edu" },
-  { name: "Kevin Zheng", email: "kevin.zheng@monash.edu" },
-  { name: "Francis Anthony", email: "fant0003@student.monash.edu" },
-  { name: "Karan Batta", email: "krnbatta@gmail.com" },
-  { name: "Jay Wingate", email: "jaypeterwingate@gmail.com" },
-  { name: "Leo Whitehead", email: "leo@whiteheadsoftware.dev" },
-  { name: "Can Wang", email: "camwang@outlook.com" },
-  { name: "Rory Tobin-Underwood", email: "rorytu@gmail.com" },
 ];
 function parseUrl(path: string) {
   const url = new URL(path);
