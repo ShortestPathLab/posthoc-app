@@ -166,7 +166,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
             label="Renderer"
             icon={<BlurCircularOutlined />}
             value={state?.renderer ?? "internal:auto"}
-            onChange={(v) => onChange?.({ renderer: v })}
+            onChange={(v) => onChange?.((p) => void (p.renderer = v))}
             items={[
               {
                 id: "internal:auto",

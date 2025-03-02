@@ -116,7 +116,7 @@ export function DrawerSurface({
             ref: setPaper,
             sx: {
               overflow: "hidden",
-              maxWidth: 640,
+              maxWidth: "min(640px, 100%)",
               mx: "auto",
               bgcolor: "background.paper",
               "--Paper-overlay": "none !important",

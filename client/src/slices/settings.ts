@@ -52,6 +52,11 @@ export const defaultRenderers = [
     key: "d2-renderer",
     transport: "native",
   },
+  {
+    url: `internal://d2-minimal-renderer/`,
+    key: "d2-minimal-renderer",
+    transport: "native",
+  },
 ];
 
 export const defaultPlaybackRate = 1;
