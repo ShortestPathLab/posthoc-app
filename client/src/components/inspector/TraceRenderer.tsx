@@ -29,7 +29,7 @@ import { TrustedContent } from "./TrustedContent";
 const TILE_RESOLUTION = 128;
 
 const tileSize = (playing: boolean = false) =>
-  (playing ? 0.75 : devicePixelRatio * 2) * TILE_RESOLUTION;
+  (playing ? devicePixelRatio * 1.5 : devicePixelRatio * 2) * TILE_RESOLUTION;
 
 const rendererOptions = {
   tileSubdivision: 2,

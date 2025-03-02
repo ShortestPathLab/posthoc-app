@@ -3,7 +3,7 @@ import {
   CompiledD2IntrinsicComponent as CompiledD2Component,
   D2InstrinsicComponents as D2Components,
 } from "./D2IntrinsicComponents";
-import { Dictionary, maxBy, minBy } from "lodash";
+import { Dictionary, head, maxBy, minBy } from "lodash";
 import { Bounds, Point, Size } from "protocol";
 import { defaultContext } from "./EventContext";
 import dist from "@turf/point-to-line-distance";
@@ -178,7 +178,18 @@ export const path: Primitive<"path"> = {
   },
   narrow(c, p) {
     return (
-      dist(point([p.x, p.y]), lineString(c.points.map(({ x, y }) => [x, y]))) <
+      (c.points.length > 1
+        ? dist(
+            point([p.x, p.y]),
+            lineString(c.points.map(({ x, y }) => [x, y]))
+          )
+        : dist(
+            point([p.x, p.y]),
+            lineString([
+              [head(c.points)?.x ?? 0, head(c.points)?.y ?? 0],
+              [head(c.points)?.x ?? 0, head(c.points)?.y ?? 0],
+            ])
+          )) <
       500 * c.lineWidth
     );
   },

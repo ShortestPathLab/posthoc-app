@@ -1,27 +1,26 @@
+import interpolate from "color-interpolate";
 import combinate from "combinate";
 import {
   Dictionary,
-  ceil,
   chain as _,
+  ceil,
   debounce,
   floor,
+  get,
   head,
+  identity,
   isEqual,
+  isNumber,
   map,
   once,
   pick,
   range,
   shuffle,
   sortBy,
-  get,
   truncate,
-  isNumber,
   values,
-  isUndefined,
-  negate,
-  identity,
 } from "lodash";
-import memo from "memoizee";
+import { nanoid } from "nanoid";
 import type { Bounds, Point, Size } from "protocol";
 import { ComponentEntry } from "renderer";
 import { Bush } from "./Bush";
@@ -33,11 +32,9 @@ import {
 } from "./D2RendererOptions";
 import { EventEmitter } from "./EventEmitter";
 import { draw } from "./draw";
+import { hash } from "./hash";
 import { pointToIndex } from "./pointToIndex";
 import { primitives } from "./primitives";
-import interpolate from "color-interpolate";
-
-const hash = JSON.stringify;
 
 const { log2, max } = Math;
 
@@ -99,7 +96,7 @@ export function getTiles(
 }
 
 export type D2WorkerRequest<
-  T extends keyof D2RendererWorker = keyof D2RendererWorker
+  T extends keyof D2RendererWorker = keyof D2RendererWorker,
 > = {
   action: T;
   payload: Parameters<D2RendererWorker[T]>;
@@ -108,12 +105,13 @@ export type D2WorkerRequest<
 export type D2WorkerEvents = {
   update: {
     bounds: Bounds;
-    bitmap: ImageBitmap;
+    bitmap?: ImageBitmap;
+    hash: string;
   };
 };
 
 export type D2WorkerEvent<
-  T extends keyof D2WorkerEvents = keyof D2WorkerEvents
+  T extends keyof D2WorkerEvents = keyof D2WorkerEvents,
 > = {
   action: T;
   payload: D2WorkerEvents[T];
@@ -131,8 +129,6 @@ export type Body<T> = Bounds &
     index: number;
   };
 
-const TILE_CACHE_SIZE = 200;
-
 export const isValue = (a: any) => isNumber(a) && !isNaN(a);
 
 export class D2RendererWorker extends EventEmitter<
@@ -140,6 +136,7 @@ export class D2RendererWorker extends EventEmitter<
     message: (event: D2WorkerEvent, transfer: Transferable[]) => void;
   }
 > {
+  #now: number = 0;
   #options: D2RendererOptions = defaultD2RendererOptions;
   #frustum: Bounds = { bottom: 256, top: 0, left: 0, right: 256 };
   #system: Bush<CompiledD2IntrinsicComponent> = new Bush(16);
@@ -167,10 +164,17 @@ export class D2RendererWorker extends EventEmitter<
     return this.#count++;
   }
 
-  #cache: { [K in string]: { hash: string; tile: ImageBitmap } } = {};
+  #cache: {
+    [K in string]: { hash: string; tile: { width: number; height: number } };
+  } = {};
   #errors: { [K in string]: string } = {};
 
-  add(components: ComponentEntry<CompiledD2IntrinsicComponent>[], id: string) {
+  add(
+    components: ComponentEntry<CompiledD2IntrinsicComponent>[],
+    id: string,
+    now: number
+  ) {
+    this.#now = now;
     const bodies = map(components, ({ component, meta }) => ({
       ...primitives[component.$].test(component),
       component,
@@ -190,9 +194,8 @@ export class D2RendererWorker extends EventEmitter<
         !isValue(c.right)
     );
     if (b) {
-      this.#errors[
-        id
-      ] = `Component '${b.component.$}' is missing properties. Check these: width, height, x, y.`;
+      this.#errors[id] =
+        `Component '${b.component.$}' is missing properties. Check these: width, height, x, y.`;
       return;
     }
     this.#system.load(bodies);
@@ -200,7 +203,8 @@ export class D2RendererWorker extends EventEmitter<
     this.#invalidate();
   }
 
-  remove(id: string) {
+  remove(id: string, now: number) {
+    this.#now = now;
     map(this.#children[id], (c) => {
       this.#system.remove(c);
     });
@@ -215,7 +219,6 @@ export class D2RendererWorker extends EventEmitter<
   }
 
   #invalidate() {
-    this.renderTile.clear();
     this.#getRenderQueue()();
   }
 
@@ -244,18 +247,19 @@ export class D2RendererWorker extends EventEmitter<
       this.#options.tileSubdivision
     ).tiles) {
       if (this.#shouldRender(tile)) {
-        const bitmap = this.renderTile(bounds, this.#options.tileResolution);
-        if (bitmap) {
+        const out = this.renderTile(bounds, this.#options.tileResolution);
+        if (out) {
           this.emit(
             "message",
             {
               action: "update",
               payload: {
                 bounds,
-                bitmap,
+                bitmap: out.bitmap,
+                hash: out.hash,
               },
             },
-            []
+            out.bitmap ? [out.bitmap] : []
           );
         }
       }
@@ -271,13 +275,10 @@ export class D2RendererWorker extends EventEmitter<
 
   #shouldRender({ x, y }: Point) {
     const { workerCount, workerIndex } = this.#options;
-    return pointToIndex({ x, y }) % workerCount === workerIndex;
+    return (this.#now + pointToIndex({ x, y })) % workerCount === workerIndex;
   }
 
-  renderTile = memo((b: Bounds, t: Size) => this.#renderTile(b, t), {
-    normalizer: JSON.stringify,
-    max: TILE_CACHE_SIZE,
-  });
+  renderTile = (b: Bounds, t: Size) => this.#renderTile(b, t);
 
   #getPx() {
     const { tileResolution, tileSubdivision } = this.#options;
@@ -291,6 +292,7 @@ export class D2RendererWorker extends EventEmitter<
     const { errorColor, backgroundColor } = this.#options;
     const g = new OffscreenCanvas(tile.width, tile.height);
     const ctx = g.getContext("2d", { alpha: false })!;
+    ctx.imageSmoothingQuality = "high";
     const px = this.#getPx();
 
     ctx.fillStyle = interpolate([backgroundColor, errorColor])(0.05);
@@ -338,7 +340,12 @@ export class D2RendererWorker extends EventEmitter<
       const nextHash = hash(map(bodies, "index"));
       const tileKey = hash([top, right, bottom, left, tile.width, tile.height]);
       const prevTile = this.#cache[tileKey];
-      if (!prevTile || nextHash !== prevTile.hash) {
+      if (
+        !prevTile ||
+        nextHash !== prevTile.hash ||
+        // If previous tile had less resolution than current
+        prevTile.tile.width + prevTile.tile.height < tile.width + tile.height
+      ) {
         const g = new OffscreenCanvas(tile.width, tile.height);
         const ctx = g.getContext("2d", { alpha: false })!;
         ctx.imageSmoothingEnabled = false;
@@ -384,16 +391,22 @@ export class D2RendererWorker extends EventEmitter<
           .value();
 
         const bitmap = g.transferToImageBitmap();
-        this.#cache[tileKey] = { hash: nextHash, tile: bitmap };
+        this.#cache[tileKey] = {
+          hash: nextHash,
+          tile: {
+            width: bitmap.width,
+            height: bitmap.height,
+          },
+        };
 
-        return bitmap;
+        return { hash: nextHash, bitmap };
       } else {
-        return prevTile.tile;
+        return { hash: prevTile.hash };
       }
     } catch (e) {
       console.error(e);
       const g = this.#drawError(tile, get(e, "message"));
-      return g.transferToImageBitmap();
+      return { hash: nanoid(), bitmap: g.transferToImageBitmap() };
     }
   }
 }

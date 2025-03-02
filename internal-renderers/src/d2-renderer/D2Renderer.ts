@@ -1,21 +1,23 @@
-import { D2RendererBase } from "../d2-renderer-base/D2RendererBase";
 import {
   ceil,
   clamp,
+  defer,
   find,
   floor,
   forEach,
   isEqual,
   map,
+  now,
   once,
   throttle,
   times,
 } from "lodash";
-import { nanoid } from "nanoid";
+import { nanoid, random } from "nanoid";
 import { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";
 import { Bounds } from "protocol";
 import { ComponentEntry, makeRenderer } from "renderer";
+import { D2RendererBase } from "../d2-renderer-base/D2RendererBase";
 import { Bush } from "./Bush";
 import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 import {
@@ -24,26 +26,60 @@ import {
 } from "./D2RendererOptions";
 import { D2WorkerEvent, getTiles } from "./D2RendererWorker";
 import { D2RendererWorkerAdapter } from "./D2RendererWorkerAdapter";
-import { intersect } from "./intersect";
+import { hash } from "./hash";
 import { primitives } from "./primitives";
+
+function tileHash(bounds: Bounds) {
+  return hash([bounds.top, bounds.right, bounds.bottom, bounds.left]);
+}
 
 class Tile extends PIXI.Sprite {
   static age: number = 0;
-  age: number;
-  destroying: boolean = false;
-  constructor(texture?: PIXI.Texture, public bounds?: Bounds) {
-    super(texture);
+  age: number = Tile.age++;
+  #update(texture: PIXI.Texture, hash: string) {
+    const bounds = {
+      ...this.bounds,
+      width: this.bounds.right - this.bounds.left,
+      height: this.bounds.bottom - this.bounds.top,
+    };
+    const scale = {
+      x: bounds.width / texture.width,
+      y: bounds.height / texture.height,
+    };
+    this.texture = texture;
+    this.setTransform(this.bounds.left, this.bounds.top, scale.x, scale.y);
     this.age = Tile.age++;
+    this.hash = hash;
+  }
+  reuse(texture: PIXI.Texture, hash: string) {
+    // Return if hash did not change
+    if (
+      this.hash === hash &&
+      this.texture.width * this.texture.height > texture.width * texture.height
+    )
+      return;
+    this.#update(texture, hash);
+  }
+  constructor(
+    texture: PIXI.Texture,
+    public bounds: Bounds,
+    public key: string,
+    public hash?: string
+  ) {
+    super(texture);
+    this.name = this.key;
+    this.#update(texture, hash ?? nanoid());
   }
 }
 
 export class D2Renderer extends D2RendererBase {
   protected app?: PIXI.Application<HTMLCanvasElement>;
   protected options: D2RendererOptions = defaultD2RendererOptions;
-  protected system: Bush<CompiledD2IntrinsicComponent> = new Bush(16);
+  protected system: Bush<CompiledD2IntrinsicComponent> = new Bush(9);
   protected viewport?: Viewport;
   protected overlay?: PIXI.Graphics;
 
+  #resolved: Record<string, boolean> = {};
   #tiles?: PIXI.Container<Tile>;
   #workers: D2RendererWorkerAdapter[] = [];
   #grid?: PIXI.Graphics;
@@ -53,6 +89,7 @@ export class D2Renderer extends D2RendererBase {
     if (!this.viewport) return;
 
     this.#tiles = new PIXI.Container();
+    this.#tiles.sortableChildren = true;
     this.viewport.addChild(this.#tiles);
 
     this.#grid = new PIXI.Graphics();
@@ -72,17 +109,16 @@ export class D2Renderer extends D2RendererBase {
 
   add(components: ComponentEntry<CompiledD2IntrinsicComponent>[]) {
     const id = nanoid();
+    const idx = now();
     const remove = super.add(components);
-    this.#workers?.forEach?.((w) => w.call("add", [components, id]));
-    return () => {
-      requestIdleCallback(
-        () => {
-          remove();
-          this.#workers?.forEach?.((w) => w.call("remove", [id]));
-        },
-        { timeout: this.options.animationDuration }
-      );
-    };
+    this.#workers?.forEach?.((w) => w.call("add", [components, id, idx]));
+    this.#resolved = {};
+    return () =>
+      defer(() => {
+        remove();
+        this.#workers?.forEach?.((w) => w.call("remove", [id, idx]));
+        this.#resolved = {};
+      });
   }
 
   setOptions(o: D2RendererOptions) {
@@ -127,8 +163,8 @@ export class D2Renderer extends D2RendererBase {
           adt >= dtMax
             ? scale + increment
             : adt <= dtMin
-            ? scale - increment
-            : scale,
+              ? scale - increment
+              : scale,
           minScale,
           maxScale
         );
@@ -172,9 +208,13 @@ export class D2Renderer extends D2RendererBase {
     });
   }
 
-  #handleUpdate({ bounds, bitmap }: D2WorkerEvent<"update">["payload"]) {
-    const texture = PIXI.Texture.from(bitmap);
-    this.#addToWorld(texture, bounds);
+  #handleUpdate({
+    bounds,
+    bitmap,
+    hash: nextHash,
+  }: D2WorkerEvent<"update">["payload"]) {
+    const texture = bitmap ? PIXI.Texture.from(bitmap) : undefined;
+    this.#addToWorld(bounds, nextHash, texture);
   }
 
   protected override handleFrustumChange() {
@@ -193,10 +233,25 @@ export class D2Renderer extends D2RendererBase {
     this.#grid?.clear();
     this.#grid?.lineStyle(1 * px, accentColor, 0.5);
     this.#grid?.beginFill(accentColor, 0.05);
+    forEach(this.#tiles?.children, (t) => (t.zIndex = 0));
+    let numResolved = 0;
     for (const { bounds: b } of tiles) {
-      if (!find(this.#tiles?.children, (c) => isEqual(c.bounds, b))) {
+      const key = tileHash(b);
+      const t = find(this.#tiles?.children, (c) => c.key === key);
+      const resolved = this.#resolved[key];
+      if (t && resolved) {
+        t.zIndex = 1;
+        t.visible = true;
+        numResolved++;
+      }
+      if (!t) {
         this.#grid?.drawRect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       }
+    }
+    if (numResolved === tiles.length) {
+      forEach(this.#tiles?.children, (t) => {
+        if (t.zIndex === 0) t.visible = false;
+      });
     }
   }
 
@@ -223,64 +278,21 @@ export class D2Renderer extends D2RendererBase {
     }
   }
 
-  async #addToWorld(texture: PIXI.Texture, bounds: Bounds) {
+  async #addToWorld(bounds: Bounds, nextHash: string, texture?: PIXI.Texture) {
     if (!this.viewport) return;
-    const { tileSubdivision } = this.options;
-    const { tiles } = getTiles(this.viewport, tileSubdivision);
 
-    if (!find(tiles, (t) => isEqual(t.bounds, bounds))) return;
-
-    const scale = {
-      x: (bounds.right - bounds.left) / texture.width,
-      y: (bounds.bottom - bounds.top) / texture.height,
-    };
-    const tile = new Tile(texture, bounds);
-    this.#tiles
-      ?.addChild(tile)
-      .setTransform(bounds.left, bounds.top, scale.x, scale.y);
-    this.#getUpdateGridQueue()();
-    await this.#show(tile);
-    forEach(this.#tiles?.children, async (c) => {
-      if (!(intersect(c.bounds!, bounds) && c.age < tile.age && !c.destroying))
-        return;
-      c.destroying = true;
-      await this.#hide(c);
-      if (!c.destroyed) {
-        c.destroy({ texture: true, baseTexture: true });
+    const tileKey = tileHash(bounds);
+    const existing = find(this.#tiles?.children, (c) => c.key === tileKey);
+    if (texture) {
+      if (existing) {
+        existing.reuse(texture, nextHash);
+      } else {
+        const tile = new Tile(texture, bounds, tileKey, nextHash);
+        this.#tiles!.addChild(tile);
       }
-    });
-  }
-
-  #show(tile: Tile) {
-    const ticker = this.app!.ticker;
-    return new Promise<void>((res) => {
-      const f = (dt: number) => {
-        tile.alpha +=
-          dt / PIXI.Ticker.targetFPMS / this.options.animationDuration;
-        if (tile.alpha > 1) {
-          ticker.remove(f);
-          res();
-        }
-      };
-      tile.alpha = 0;
-      ticker.add(f);
-    });
-  }
-
-  #hide(tile: Tile) {
-    const ticker = this.app!.ticker;
-    return new Promise<void>((res) => {
-      const f = (dt: number) => {
-        tile.alpha -=
-          dt / PIXI.Ticker.targetFPMS / this.options.animationDuration;
-        if (tile.alpha < 0) {
-          ticker.remove(f);
-          res();
-        }
-      };
-      tile.alpha = 1;
-      ticker.add(f);
-    });
+    }
+    this.#resolved[tileKey] = true;
+    this.#updateGrid();
   }
 }
 
