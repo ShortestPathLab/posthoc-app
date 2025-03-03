@@ -1,7 +1,7 @@
 import { flatMap, isUndefined, join, map } from "lodash";
 import {
   MarkerSeverity,
-  default as Monaco,
+  type default as Monaco,
   Range,
   type editor,
 } from "monaco-editor";

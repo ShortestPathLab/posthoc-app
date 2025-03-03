@@ -32,10 +32,10 @@ const TILE_RESOLUTION = 128;
 const tileSize = (playing: boolean = false) =>
   (playing ? devicePixelRatio * 1.5 : devicePixelRatio * 2) *
   TILE_RESOLUTION *
-  (isMobile ? 0.5 : 1);
+  (isMobile ? 0.25 : 1);
 
 const rendererOptions = {
-  tileSubdivision: 2,
+  tileSubdivision: isMobile ? 1 : 2,
   // Use 25% of available CPUs
   workerCount: clamp(floor(navigator.hardwareConcurrency / 4), 1, 12),
   tileResolution: {
