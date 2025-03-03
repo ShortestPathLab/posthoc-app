@@ -1,5 +1,4 @@
 import renderers from "internal-renderers";
-import { Dictionary } from "lodash-es";
 import { useAsync } from "react-async-hook";
 import { RendererDefinition, RendererEvents, RendererOptions } from "renderer";
 import url from "url-parse";

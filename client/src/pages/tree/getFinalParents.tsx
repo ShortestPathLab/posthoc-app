@@ -1,4 +1,4 @@
-import { Dictionary, forEach } from "lodash-es";
+import { forEach } from "lodash-es";
 import { Trace } from "protocol";
 import { Key } from "./treeLayout.worker";
 

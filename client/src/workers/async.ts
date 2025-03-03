@@ -1,24 +1,36 @@
-import { memoize as memo } from "lodash-es";
+import { YAMLException } from "js-yaml";
+import memoizee from "memoizee";
+import objectHash from "object-hash";
 import {
-  CompressWorker,
   CompressBinaryWorker,
+  CompressWorker,
   DecompressBinaryWorker,
   HashWorker,
   ParseYamlWorker,
 } from ".";
 import { usingWorkerTask } from "./usingWorker";
-import { YAMLException } from "js-yaml";
 
-export const hashAsync = memo(usingWorkerTask<string, string>(HashWorker));
+export const hashAsync = memoizee(usingWorkerTask<string, string>(HashWorker), {
+  normalizer: (args) => objectHash([...args]),
+});
 
-export const compressAsync = memo(
-  usingWorkerTask<string, string>(CompressWorker)
+export const compressAsync = memoizee(
+  usingWorkerTask<string, string>(CompressWorker),
+  {
+    normalizer: (args) => objectHash([...args]),
+  }
 );
-export const compressBinaryAsync = memo(
-  usingWorkerTask<string, Uint8Array>(CompressBinaryWorker)
+export const compressBinaryAsync = memoizee(
+  usingWorkerTask<string, Uint8Array>(CompressBinaryWorker),
+  {
+    normalizer: (args) => objectHash([...args]),
+  }
 );
-export const decompressBinaryAsync = memo(
-  usingWorkerTask<Uint8Array, string>(DecompressBinaryWorker)
+export const decompressBinaryAsync = memoizee(
+  usingWorkerTask<Uint8Array, string>(DecompressBinaryWorker),
+  {
+    normalizer: (args) => objectHash([...args]),
+  }
 );
 
 export const parseYamlAsync = usingWorkerTask<

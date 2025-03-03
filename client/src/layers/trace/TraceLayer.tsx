@@ -1,6 +1,6 @@
 import { PlaybackLayerData } from "components/app-bar/Playback";
 import { ParseTraceWorkerReturnType } from "components/renderer/parser/ParseTraceSlaveWorker";
-import { DebugLayerData } from "hooks/useBreakpointsOld";
+import { DebugLayerData } from "hooks/DebugLayerData";
 import { Trace as TraceLegacy } from "protocol";
 import { Trace } from "protocol/Trace-v140";
 import { Layer } from "slices/layers";

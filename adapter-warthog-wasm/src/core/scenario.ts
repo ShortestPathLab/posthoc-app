@@ -1,10 +1,10 @@
-import { Dictionary, first, floor, join, last, map, split } from "lodash";
+import { first, floor, join, last, map, split } from "lodash";
 import { nanoid as id } from "nanoid";
+import { Trace } from "protocol";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask, PathfindingTaskInstance } from "protocol/SolveTask";
 import { roadhog, warthog } from "warthog-bin";
 import { gridTemplate, xyTemplate } from "./templates";
-import { Trace } from "protocol";
 
 export type MapTypeKey = keyof typeof handlers;
 

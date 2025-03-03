@@ -1,8 +1,8 @@
-import { chunk, Dictionary, flatten, identity, maxBy, minBy } from "lodash-es";
+import { chunk, flatten, identity, maxBy, minBy } from "lodash-es";
 import pluralize from "pluralize";
 import { Point } from "protocol";
-import { ParsedMap } from "../Parser";
 import { usingMessageHandler } from "workers/usingWorker";
+import { ParsedMap } from "../Parser";
 
 export type Options = {
   color?: string;

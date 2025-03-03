@@ -1,13 +1,4 @@
-import {
-  Dictionary,
-  ceil,
-  filter,
-  flatten,
-  get,
-  map,
-  range,
-  values,
-} from "lodash-es";
+import { ceil, filter, flatten, get, map, range, values } from "lodash-es";
 import { CompiledComponent } from "protocol";
 import { ComponentEntry } from "renderer";
 import { usingMessageHandler, usingWorkerTask } from "workers/usingWorker";

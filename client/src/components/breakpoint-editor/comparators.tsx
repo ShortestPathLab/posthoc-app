@@ -1,4 +1,4 @@
-import type { Comparator } from "hooks/useBreakpointsOld";
+import type { Comparator } from "hooks/Comparator";
 import { findLast, get } from "lodash-es";
 
 export const comparators: Comparator[] = [

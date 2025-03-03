@@ -4,7 +4,7 @@ import {
   AddItemButton,
   ListEditor,
 } from "components/generic/list-editor/ListEditor";
-import { DebugLayerData } from "hooks/useBreakpointsOld";
+import { DebugLayerData } from "hooks/DebugLayerData";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { isEqual, startCase, values } from "lodash-es";
 import { produce } from "produce";

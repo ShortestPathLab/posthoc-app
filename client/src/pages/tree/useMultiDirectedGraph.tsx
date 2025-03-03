@@ -1,7 +1,7 @@
 import { useTheme } from "@mui/material";
 import { useLoadGraph } from "@react-sigma/core";
 import { MultiDirectedGraph } from "graphology";
-import { Dictionary, forEach } from "lodash-es";
+import { forEach } from "lodash-es";
 import { Trace } from "protocol";
 import { useMemo } from "react";
 import { TreeWorkerReturnType } from "./treeLayout.worker";

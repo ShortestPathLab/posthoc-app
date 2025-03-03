@@ -1,5 +1,4 @@
 export * from "./src/d2-renderer";
-import { Dictionary } from "lodash";
 import { D2Renderer } from "./src/d2-renderer";
 import { D2MinimalRenderer } from "./src/d2-minimal-renderer";
 import { RendererDefinition } from "renderer";

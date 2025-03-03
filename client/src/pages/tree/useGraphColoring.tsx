@@ -8,7 +8,6 @@ import {
   Subtree,
 } from "hooks/useHighlight";
 import {
-  Dictionary,
   forEach,
   forEachRight,
   forOwn,

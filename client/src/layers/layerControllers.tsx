@@ -1,4 +1,4 @@
-import { Dictionary, once } from "lodash-es";
+import { once } from "lodash-es";
 import { Layer } from "slices/layers";
 import { LayerController } from "./LayerController";
 import { controller as mapController } from "./map";

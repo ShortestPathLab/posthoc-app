@@ -1,4 +1,4 @@
-import { Dictionary, first, keys } from "lodash-es";
+import { first, keys } from "lodash-es";
 import { IPCTransport } from "./IPCTransport";
 import { NativeTransport } from "./NativeTransport";
 import { SocketIOTransport } from "./SocketIOTransport";

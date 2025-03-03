@@ -1,4 +1,4 @@
-import { Dictionary as Dict, flatMap, map, mapValues, range } from "lodash-es";
+import { flatMap, map, mapValues, range } from "lodash-es";
 import {
   CompiledComponent,
   ComponentDefinition,
@@ -12,7 +12,7 @@ import { mapProperties } from "./mapProperties";
 import { normalize } from "./normalize";
 import { parseProperty } from "./parseProperty";
 
-function transformOne(component: TraceComponent<string, Dict<any>>) {
+function transformOne(component: TraceComponent<string, Record<string, any>>) {
   const { $for, $if, ...rest } = component;
   if ($for || $if) {
     const { $let = "i", $from = 0, $to = 1, $step = 1 } = $for ?? {};
@@ -37,7 +37,7 @@ function transformOne(component: TraceComponent<string, Dict<any>>) {
 
 type Compiled<T extends string> = (
   context: Context
-) => Compiled<T>[] | CompiledComponent<T, Dict<any>>[];
+) => Compiled<T>[] | CompiledComponent<T, Record<string, any>>[];
 
 /**
  * A parser for a list of Components
@@ -46,12 +46,12 @@ type Compiled<T extends string> = (
  * @returns a list of parsed Components
  */
 export function parse<T extends IntrinsicComponentMap>(
-  definition: ComponentDefinition<string, Dict<any>>,
+  definition: ComponentDefinition<string, Record<string, any>>,
   components: ComponentDefinitionMap
 ): (
   context: Context
 ) => CompiledComponent<Extract<keyof T, string>, Record<string, any>>[] {
-  const parseOne = (element: TraceComponent<string, Dict<any>>) => {
+  const parseOne = (element: TraceComponent<string, Record<string, any>>) => {
     const { $ } = element;
     const scoped = transformOne(element);
     return $ in components
@@ -65,7 +65,7 @@ export function parse<T extends IntrinsicComponentMap>(
             )
           );
   };
-  const store: Dict<Compiled<Extract<keyof T, string>>[]> = mapValues(
+  const store: Record<string, Compiled<Extract<keyof T, string>>[]> = mapValues(
     components,
     (elements) => map(elements, parseOne)
   );

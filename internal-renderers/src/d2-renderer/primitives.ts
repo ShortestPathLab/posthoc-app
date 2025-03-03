@@ -1,13 +1,13 @@
+import { lineString, point } from "@turf/helpers";
+import dist from "@turf/point-to-line-distance";
 import { ColorTranslator } from "colortranslator";
+import { head, maxBy, minBy } from "lodash-es";
+import { Bounds, Point, Size } from "protocol";
 import {
   CompiledD2IntrinsicComponent as CompiledD2Component,
   D2InstrinsicComponents as D2Components,
 } from "./D2IntrinsicComponents";
-import { Dictionary, head, maxBy, minBy } from "lodash-es";
-import { Bounds, Point, Size } from "protocol";
 import { defaultContext } from "./EventContext";
-import dist from "@turf/point-to-line-distance";
-import { point, lineString } from "@turf/helpers";
 
 const { ceil, PI } = Math;
 

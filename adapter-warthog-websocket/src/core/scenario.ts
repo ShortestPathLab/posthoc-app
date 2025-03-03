@@ -1,14 +1,5 @@
 import { exec } from "helpers/exec";
-import {
-  constant,
-  Dictionary,
-  first,
-  floor,
-  join,
-  last,
-  map,
-  split,
-} from "lodash";
+import { constant, first, floor, join, last, map, split } from "lodash";
 import { roadhog, warthog } from "pathfinding-binaries";
 import { Trace } from "protocol";
 import { ParamsOf } from "protocol/Message";

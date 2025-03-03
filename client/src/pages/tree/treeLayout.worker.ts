@@ -1,5 +1,5 @@
 import { graphlib, layout } from "@dagrejs/dagre";
-import { Dictionary, forEach, pick } from "lodash-es";
+import { forEach, pick } from "lodash-es";
 import { Trace, TraceEvent } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";
 

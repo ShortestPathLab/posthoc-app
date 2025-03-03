@@ -1,4 +1,3 @@
-import { Dictionary as Dict } from "lodash-es";
 import { CompiledComponent, EventContext, Properties as Props } from "protocol";
 
 export type Context<T extends Props = Record<string, any>> =
@@ -10,4 +9,4 @@ export type Key<T> = Extract<keyof T, string>;
 
 export type Prop<T extends Props> = (ctx: Context<T>) => T[keyof T];
 
-export type PropMap<T extends Props> = Dict<Prop<T>>;
+export type PropMap<T extends Props> = Record<string, Prop<T>>;

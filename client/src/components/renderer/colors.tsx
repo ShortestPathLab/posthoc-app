@@ -9,7 +9,6 @@ import {
 } from "@mui/material/colors";
 import { ColorTranslator } from "colortranslator";
 import {
-  Dictionary,
   entries,
   keys,
   lowerCase,
