@@ -3,7 +3,7 @@ import {
   TypographyProps as TypeProps,
 } from "@mui/material";
 import beautify from "json-beautify";
-import { get, isNull, round, truncate } from "lodash";
+import { get, isNull, round, truncate } from "lodash-es";
 import { CSSProperties, ReactNode } from "react";
 import { Block } from "./Block";
 import { Space } from "./Space";
@@ -47,7 +47,7 @@ export function renderProperty(obj: unknown, simple: boolean = false) {
     default:
       return simple ? (
         <code>
-          {isNull(obj) ? "null" : get(obj, "constructor.name") ?? typeof obj}
+          {isNull(obj) ? "null" : (get(obj, "constructor.name") ?? typeof obj)}
         </code>
       ) : (
         <code style={{ whiteSpace: "pre" }}>

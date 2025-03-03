@@ -1,6 +1,6 @@
 import { CloseOutlined as CloseIcon } from "@mui-symbols-material/w400";
 import { Button, IconButton, Snackbar } from "@mui/material";
-import { filter, noop } from "lodash";
+import { filter, noop } from "lodash-es";
 import { Label } from "./Label";
 import { useLog } from "slices/log";
 import {

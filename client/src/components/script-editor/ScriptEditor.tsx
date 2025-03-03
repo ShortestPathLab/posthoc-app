@@ -1,7 +1,7 @@
 import Editor, { useMonaco } from "@monaco-editor/react";
 import { CircularProgress, Theme, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { ComponentProps } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 

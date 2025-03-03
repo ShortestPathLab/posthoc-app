@@ -3,7 +3,7 @@ import download from "downloadjs";
 import { fileDialog as file } from "file-select-dialog";
 import { setLayerSource } from "layers/TrustedLayerData";
 import { getController } from "layers/layerControllers";
-import { find, map } from "lodash";
+import { find, map } from "lodash-es";
 import memo from "memoizee";
 import sizeOf from "object-sizeof";
 import { useMemo } from "react";

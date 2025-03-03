@@ -1,4 +1,4 @@
-import { zip } from "lodash";
+import { zip } from "lodash-es";
 import { useEffect, useState } from "react";
 import { useAsyncAbortable } from "react-async-hook";
 import { usePrevious } from "react-use";

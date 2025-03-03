@@ -1,4 +1,4 @@
-import { find, forEach, map } from "lodash";
+import { find, forEach, map } from "lodash-es";
 import { TraceEvent } from "protocol";
 import { BreakpointProcessor } from "../Breakpoint";
 import { Fields } from "./Fields";

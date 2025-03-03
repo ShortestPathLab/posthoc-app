@@ -1,4 +1,4 @@
-import { flow, map, reduce } from "lodash";
+import { flow, map, reduce } from "lodash-es";
 import {
   cloneElement,
   createElement,

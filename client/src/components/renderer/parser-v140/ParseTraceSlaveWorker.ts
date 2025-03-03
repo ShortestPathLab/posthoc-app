@@ -1,11 +1,12 @@
-import { chain, findLast, groupBy, mapValues, range } from "lodash";
+import { findLast, groupBy, mapValues, range } from "lodash-es";
 import { CompiledComponent, EventContext, TraceEvent } from "protocol";
 import { Trace } from "protocol/Trace-v140";
 import { ComponentEntry } from "renderer";
+import { _ } from "utils/chain";
 import { normalizeConstant } from "./normalize";
 import { parse as parseComponents } from "./parse";
 
-type C = CompiledComponent<string, Record<string, any>>;
+type C = CompiledComponent<string, Record<string, unknown>>;
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
 type Key = string | number;
@@ -14,10 +15,10 @@ const getPersistence = (c: C) =>
   !c.clear
     ? "persistent"
     : typeof c.clear === "string"
-    ? "special"
-    : "transient";
+      ? "special"
+      : "transient";
 type Persistence = ReturnType<typeof getPersistence>;
-function mergePrototype<T>(target: T, source: any) {
+function mergePrototype<T>(target: T, source: object) {
   Object.setPrototypeOf(target, source);
   return target;
 }
@@ -48,12 +49,13 @@ export function parse({
     };
   };
 
-  const r = chain(trace?.events)
-    .map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId }))
-    .groupBy("id")
-    .value();
+  const r = _(
+    trace?.events ?? [],
+    (r) => r.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
+    (r) => groupBy(r, "id")
+  );
 
-  return chain(range(from, to))
+  return range(from, to)
     .map((i) => {
       const e = trace!.events![i]!;
       const esx = trace!.events!;
@@ -87,8 +89,7 @@ export function parse({
     .map((c, i) => ({
       event: c.event,
       components: mapValues(c.components, (c2) => c2.map(makeEntryIteratee(i))),
-    }))
-    .value();
+    }));
 }
 
 export type ParseTraceWorkerParameters = {

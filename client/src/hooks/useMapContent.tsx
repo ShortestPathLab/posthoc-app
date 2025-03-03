@@ -5,6 +5,7 @@ import { useConnectionResolver } from "./useConnectionResolver";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useLoadingState } from "slices/loading";
 import { Map } from "slices/UIState";
+import objectHash from "object-hash";
 
 export function useMapContent(map?: Map) {
   const notify = useSnackbar();
@@ -26,7 +27,7 @@ export function useMapContent(map?: Map) {
             }
           }
         },
-        { normalizer: JSON.stringify }
+        { normalizer: (args) => objectHash([...args]) }
       ),
     [resolve, notify]
   );

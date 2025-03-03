@@ -44,7 +44,7 @@ import { usePlaybackControls } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
 import { TraceLayerData } from "layers/trace/TraceLayer";
-import { entries, findLast, isEmpty, map, startCase } from "lodash";
+import { entries, findLast, isEmpty, map, startCase } from "lodash-es";
 import { Size } from "protocol";
 import { Fragment, useState } from "react";
 import { useThrottle } from "react-use";

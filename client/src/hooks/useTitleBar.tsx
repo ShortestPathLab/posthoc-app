@@ -1,10 +1,11 @@
 import interpolate from "color-interpolate";
-import { times } from "lodash";
+import { times } from "lodash-es";
 import memo from "memoizee";
 import { name } from "public/manifest.json";
 import { useEffect, useState } from "react";
 import { slice } from "slices";
 import { getForegroundColor } from "./getForegroundColor";
+import objectHash from "object-hash";
 
 interface Electron {
   invoke(name: "title-bar", bg: string, fg: string): void;
@@ -38,7 +39,7 @@ const stackColors = memo(
 
     return `rgb(${r},${g},${b})`; // 139,124,37
   },
-  { normalizer: JSON.stringify }
+  { normalizer: (args) => objectHash([...args]) }
 );
 
 export function useTitleBar(color: string) {

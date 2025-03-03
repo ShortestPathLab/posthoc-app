@@ -9,7 +9,7 @@ import { getColorHex, tint } from "components/renderer/colors";
 import { useEffectWhen } from "hooks/useEffectWhen";
 import { Steps } from "layers";
 import { getController } from "layers/layerControllers";
-import { chain as _, isEqual, isUndefined, map, startCase } from "lodash";
+import { filter, isEqual, isUndefined, map, startCase, uniq } from "lodash-es";
 import { nanoid as id } from "nanoid";
 import { useMemo } from "react";
 import { slice } from "slices";
@@ -18,6 +18,7 @@ import { PageContentProps } from "../PageMeta";
 import { PageContent } from "./PageContent";
 import { StepsLayer, isStepsLayer } from "./StepsLayer";
 import { StepsPageState, useStepsPageState } from "./StepsPageState";
+import { _ } from "utils/chain";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -49,11 +50,13 @@ export function StepsPage({ template: Page }: PageContentProps) {
 
   const { types, selectedType, isHighlighting } = useMemo(() => {
     if (steps) {
-      const stepTypes = _(steps.map((a, b) => [a, b] as const))
-        .map(([e]) => e?.type)
-        .filter()
-        .uniq()
-        .value();
+      const stepTypes = _(
+        steps,
+        (s) => s.map((a, b) => [a, b] as const),
+        (s) => s.map(([e]) => e?.type),
+        (s) => filter(s),
+        uniq
+      );
 
       const allSelected = !stepTypes.includes(_selectedType);
       const showHighlighting = _selectedType === SYMBOL_HIGHLIGHTED;

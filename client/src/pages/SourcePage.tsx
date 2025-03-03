@@ -7,7 +7,7 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 import { useOptimistic } from "hooks/useOptimistic";
 import { getController } from "layers/layerControllers";
-import { find, first, flatMap, isEqual, isObject, map } from "lodash";
+import { find, first, flatMap, isEqual, isObject, map } from "lodash-es";
 import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";

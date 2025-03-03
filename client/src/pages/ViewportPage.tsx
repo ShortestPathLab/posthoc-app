@@ -17,16 +17,7 @@ import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import download from "downloadjs";
 import { inferLayerName } from "layers/inferLayerName";
-import {
-  Dictionary,
-  chain as _,
-  delay,
-  every,
-  filter,
-  find,
-  keyBy,
-  map,
-} from "lodash";
+import { delay, every, filter, find, keyBy, map } from "lodash-es";
 import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
@@ -37,7 +28,7 @@ import { useAcrylic, usePaper } from "theme";
 import { generateUsername as id } from "unique-username-generator";
 import { PageContentProps } from "./PageMeta";
 import { useRendererResolver } from "./useRendererResolver";
-
+import { _ } from "utils/chain";
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 type ViewportPageContext = PanelState & {
@@ -64,7 +55,9 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   const paper = usePaper();
   const acrylic = useAcrylic();
   const layers = slice.layers.use();
-  const [layerSet, setLayerSet] = useState<Dictionary<boolean | undefined>>({});
+  const [layerSet, setLayerSet] = useState<Record<string, boolean | undefined>>(
+    {}
+  );
   const selectedLayers = useMemo(
     () => filter(layers, (l) => layerSet?.[l.key] ?? true),
     [layerSet, layers, layers?.length]
@@ -78,16 +71,17 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   useEffect(() => {
     delay(() => {
       rendererInstance?.fitCamera?.((b) =>
-        _(selectedLayers)
-          .filter("viewKey")
-          .map("key")
-          .includes(b.meta?.sourceLayer ?? "")
-          .value()
+        _(
+          selectedLayers,
+          (s) => filter(s, "viewKey"),
+          (s) => map(s, "key"),
+          (s) => s.includes(b.meta?.sourceLayer ?? "")
+        )
       );
     }, 150);
   }, [
     rendererInstance,
-    _(selectedLayers).map("viewKey").sort().join(".").value(),
+    _(selectedLayers, (s) => map(s, "key").sort().join(".")),
   ]);
 
   const size = useSurfaceAvailableCssSize();

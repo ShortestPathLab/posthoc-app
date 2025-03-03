@@ -7,7 +7,7 @@ import {
   map,
   range,
   values,
-} from "lodash";
+} from "lodash-es";
 import { CompiledComponent } from "protocol";
 import { ComponentEntry } from "renderer";
 import { usingMessageHandler, usingWorkerTask } from "workers/usingWorker";
@@ -27,8 +27,8 @@ export const getPersistence = (c: C) =>
   !c.clear
     ? "persistent"
     : typeof c.clear === "string"
-    ? "special"
-    : "transient";
+      ? "special"
+      : "transient";
 
 const isVisible = ({ component: c }: ComponentEntry) =>
   c && Object.hasOwn(c, "alpha") ? get(c, "alpha")! > 0 : true;
@@ -72,7 +72,7 @@ async function parse({
     )
   );
 
-  const stack: Dictionary<ComponentEntry[]> = {};
+  const stack: Record<string, ComponentEntry[]> = {};
 
   const out: {
     [K in Exclude<Persistence, "special">]: ComponentEntry[];

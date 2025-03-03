@@ -13,15 +13,7 @@ import {
   PropertyList,
 } from "components/inspector/PropertyList";
 import { inferLayerName } from "layers";
-import {
-  chain,
-  isUndefined,
-  keyBy,
-  last,
-  map,
-  negate,
-  startCase,
-} from "lodash";
+import { isUndefined, keyBy, last, map, negate, startCase } from "lodash-es";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { set } from "utils/set";
@@ -33,16 +25,14 @@ export const provideSelectionInfo = (({ layer: key, event, children }) => {
   const layer = one.use();
   const menu = useMemo(() => {
     const events = layer?.source?.parsedTrace?.content?.events ?? [];
-    const steps = chain(event?.info?.components)
+    const steps = (event?.info?.components ?? [])
       .filter((c) => c.meta?.sourceLayer === layer?.key)
       .map((c) => c.meta?.step)
       .filter(negate(isUndefined))
-      .sort((a, b) => a! - b!)
-      .value() as number[];
-    const info = chain(event?.info?.components)
+      .sort((a, b) => a! - b!);
+    const info = (event?.info?.components ?? [])
       .filter((c) => c.meta?.sourceLayer === layer?.key)
-      .filter((c) => c.meta?.info)
-      .value();
+      .filter((c) => c.meta?.info);
     if (steps.length && layer) {
       const step = last(steps)!;
       const event = events[step];

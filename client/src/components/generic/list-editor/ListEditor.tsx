@@ -14,7 +14,7 @@ import {
   pull,
   set,
   sortBy,
-} from "lodash";
+} from "lodash-es";
 import { nanoid as id } from "nanoid";
 
 import { EditorProps } from "components/Editor";

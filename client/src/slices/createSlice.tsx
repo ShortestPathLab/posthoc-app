@@ -1,4 +1,4 @@
-import { noop } from "lodash";
+import { noop } from "lodash-es";
 import { nanoid } from "nanoid";
 import {
   ReactNode,
@@ -28,7 +28,7 @@ type Slice<T, U = T> = [
   /**
    * The current commit id.
    */
-  string
+  string,
 ];
 
 type Options<T, U> = {

@@ -19,7 +19,7 @@ import {
   pickBy,
   reduce,
   values,
-} from "lodash";
+} from "lodash-es";
 import * as PIXI from "pixi.js";
 import { primitives } from "../d2-renderer/primitives";
 

@@ -1,4 +1,4 @@
-import { flatMap, isUndefined, join, map } from "lodash";
+import { flatMap, isUndefined, join, map } from "lodash-es";
 import {
   MarkerSeverity,
   type default as Monaco,

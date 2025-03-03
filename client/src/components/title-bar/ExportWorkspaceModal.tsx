@@ -6,7 +6,7 @@ import { SurfaceContentProps } from "components/generic/surface";
 import download from "downloadjs";
 import { useWorkspace } from "hooks/useWorkspace";
 import { Jimp } from "jimp";
-import { ceil, entries, kebabCase, reduce } from "lodash";
+import { ceil, entries, kebabCase, reduce } from "lodash-es";
 import { nanoid as id } from "nanoid";
 import { map } from "promise-tools";
 import { useMemo, useState } from "react";
@@ -67,13 +67,11 @@ async function resizeImage(s: string) {
 
 export function ExportWorkspace({
   uploadFile,
-  closePopup,
 }: {
   uploadFile?: CloudStorageProvider<
     keyof typeof cloudStorageProviders,
     unknown
   >["saveFile"];
-  closePopup: () => void;
 } & SurfaceContentProps) {
   "use no memo";
   const paper = usePaper();
@@ -165,7 +163,6 @@ export function ExportWorkspace({
                   await save(false, name);
                 }
                 notify(`Posthoc file saved, ${name}.workspace ✅`);
-                closePopup();
               })
             }
             startIcon={<UploadOutlined />}

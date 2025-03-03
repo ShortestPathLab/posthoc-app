@@ -18,7 +18,7 @@ import {
 import { IconButtonWithTooltip as IconButton } from "components/generic/inputs/IconButtonWithTooltip";
 import { useSurface } from "components/generic/surface";
 import { getColorHex } from "components/renderer/colors";
-import { omit, pick, startCase } from "lodash";
+import { omit, pick, startCase } from "lodash-es";
 import { TraceEvent } from "protocol/Trace";
 import { ReactNode, useMemo } from "react";
 import { useCss } from "react-use";

@@ -7,7 +7,7 @@ import {
   alpha,
 } from "@mui/material";
 import { Scroll } from "components/generic/Scrollbars";
-import { head, values } from "lodash";
+import { head, values } from "lodash-es";
 import { ReactNode, useEffect } from "react";
 import { useAsync } from "react-async-hook";
 import { useMap } from "react-use";

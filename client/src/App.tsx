@@ -11,12 +11,12 @@ import { SnackbarProvider } from "components/generic/Snackbar";
 import { Inspector } from "components/inspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { TitleBar, TitleBarPlaceholder } from "components/title-bar/TitleBar";
-import { Image } from "pages/Image";
-import logo from "public/logo192.png";
+import { isMobile } from "mobile-device-detect";
 import { useMemo } from "react";
 import { services } from "services";
 import { minimal } from "services/SyncParticipant";
 import { useSyncStatus } from "services/SyncService";
+import { SidebarPlaceholder } from "Sidebar";
 import { useSettings } from "slices/settings";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
 import { makeTheme } from "theme";
@@ -32,46 +32,48 @@ function App() {
         bgcolor: color,
         color: "text.primary",
         WebkitAppRegion: "no-drag",
+        "> *": {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        },
       }}
     >
-      {!loading ? (
-        <>
+      {!loading && (
+        <Stack>
           <TitleBar />
           <Block flex={1}>
             <Inspector flex={1} />
           </Block>
-        </>
-      ) : minimal ? (
-        <Fade in>
-          <Stack
-            sx={{
-              WebkitAppRegion: "drag",
-              background: (t) => t.palette.background.paper,
-              width: "100vw",
-              height: "100dvh",
-            }}
-          >
-            <TitleBarPlaceholder />
-            <Placeholder icon={<CircularProgress />} />
-          </Stack>
-        </Fade>
-      ) : (
-        <Fade in>
-          <Stack
-            sx={{
-              WebkitAppRegion: "drag",
-              width: "100vw",
-              height: "100dvh",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-            }}
-          >
-            <Image src={logo} style={{ height: 64, width: 64 }} />
-            <CircularProgress />
-          </Stack>
-        </Fade>
+        </Stack>
       )}
+      <Fade in={loading} unmountOnExit>
+        <Stack
+          sx={{
+            WebkitAppRegion: "drag",
+            background: (t) => t.palette.background.paper,
+            width: "100vw",
+            height: "100dvh",
+          }}
+        >
+          {minimal || isMobile ? (
+            <>
+              <TitleBarPlaceholder />
+              <Placeholder icon={<CircularProgress />} />
+            </>
+          ) : (
+            <>
+              <TitleBarPlaceholder />
+              <Stack direction="row" sx={{ flex: 1 }}>
+                <SidebarPlaceholder />
+                <Placeholder icon={<></>} />
+              </Stack>
+            </>
+          )}
+        </Stack>
+      </Fade>
     </Block>
   );
 }

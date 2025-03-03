@@ -3,7 +3,7 @@ import { Backdrop, Stack, Typography as Type } from "@mui/material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useWorkspace } from "hooks/useWorkspace";
 import { getControllers } from "layers/layerControllers";
-import { entries, head } from "lodash";
+import { entries, head } from "lodash-es";
 import { nanoid as id } from "nanoid";
 import pluralize from "pluralize";
 import { useState } from "react";
@@ -23,16 +23,19 @@ export function useFileImport() {
       for (const [type, { claimImportedFile }] of entries(getControllers())) {
         const outcome = await claimImportedFile?.(file);
         if (outcome?.claimed) {
-          await usingBusyState(async () => {
-            const layer = await outcome.layer(notify);
-            slice.layers.set(
-              (l) =>
-                void l.push({
-                  key: id(),
-                  source: { type, ...layer },
-                })
-            );
-          }, `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`);
+          await usingBusyState(
+            async () => {
+              const layer = await outcome.layer(notify);
+              slice.layers.set(
+                (l) =>
+                  void l.push({
+                    key: id(),
+                    source: { type, ...layer },
+                  })
+              );
+            },
+            `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`
+          );
           totalClaimed++;
           continue;
         }

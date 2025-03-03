@@ -2,20 +2,32 @@ import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { makePathIndex, Node } from "layers/trace/makePathIndex";
 import { TraceLayerData } from "layers/trace/TraceLayer";
 import {
-  chain,
   find,
   findLastIndex,
   forEach,
   forOwn,
+  groupBy,
   isUndefined,
   keys,
   noop,
-} from "lodash";
+} from "lodash-es";
 import { useCallback } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { AccentColor } from "theme";
 import { set } from "utils/set";
+import { _ } from "utils/chain";
+import { TraceEvent } from "protocol";
+export const index = <T extends TraceEvent>(
+  a: T[] = [],
+  by: "id" | "pId" = "id"
+) =>
+  _(
+    a,
+    (c) => c.map((c) => ({ step: c.step, id: c.id, pId: c.pId })),
+    (c) => groupBy(c, by)
+  );
+
 export const highlightNodesOptions = [
   {
     type: "backtracking",
@@ -85,10 +97,7 @@ export function useHighlightNodes(key?: string): {
     [layer?.source?.highlighting, trace]
   );
 
-  const groupedTraceById = chain(trace?.events)
-    .map((c, i) => ({ step: i, id: c.id, pId: c.pId }))
-    .groupBy("id")
-    .value();
+  const groupedTraceById = index(trace?.events);
 
   const getPrecedentEvents = (
     root: Node,
@@ -105,10 +114,7 @@ export function useHighlightNodes(key?: string): {
     const precedentTree: Subtree = {};
 
     if (parentEvents) {
-      const groupedParents = chain(parentEvents)
-        .map((c) => ({ step: c.step, id: c.id, pId: c.pId }))
-        .groupBy("pId")
-        .value();
+      const groupedParents = index(parentEvents, "pId");
 
       forOwn(groupedParents, (parent) => {
         const event = find(parent, (c) => c.step <= root!.step);
@@ -153,10 +159,7 @@ export function useHighlightNodes(key?: string): {
     [layer?.source?.highlighting, trace]
   );
 
-  const groupedTraceBypId = chain(trace?.events)
-    .map((c, i) => ({ step: i, id: c.id, pId: c.pId }))
-    .groupBy("pId")
-    .value();
+  const groupedTraceBypId = index(trace?.events, "pId");
 
   const getAllSubtreeNodes = (
     root: Node,
@@ -172,10 +175,7 @@ export function useHighlightNodes(key?: string): {
     const subtree: Subtree = {};
 
     if (children) {
-      const groupedChildren = chain(children)
-        .map((c) => ({ step: c.step, id: c.id, pId: c.pId }))
-        .groupBy("id")
-        .value();
+      const groupedChildren = index(children);
 
       forEach(groupedChildren, (child) => {
         const event = find(child, (c) => c.step >= root!.step);

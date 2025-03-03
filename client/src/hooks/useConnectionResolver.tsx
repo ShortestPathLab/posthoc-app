@@ -1,4 +1,4 @@
-import { find } from "lodash";
+import { find } from "lodash-es";
 import { useCallback } from "react";
 import { Connection, useConnections } from "slices/connections";
 

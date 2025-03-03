@@ -20,7 +20,7 @@ import {
 import { EditorSetterProps } from "components/Editor";
 import { IconButtonWithTooltip as IconButton } from "components/generic/inputs/IconButtonWithTooltip";
 import { computed, usePlaybackControls } from "hooks/usePlaybackState";
-import { ceil, noop } from "lodash";
+import { ceil, noop } from "lodash-es";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { useEffect, useState } from "react";
 import { slice } from "slices";

@@ -1,5 +1,5 @@
 import interpolate from "color-interpolate";
-import { chain as _, last, map, range } from "lodash";
+import { last, map, range } from "lodash-es";
 import { Point, Size } from "protocol";
 import { ParsedMap } from "../Parser";
 import { getGridSymbols } from "./getGridSymbols.worker";
@@ -117,7 +117,7 @@ function parseGrid({
 
   const gradient = interpolate([background, color]);
 
-  const nodes = _(symbols)
+  const nodes = symbols
     .filter(({ value, symbol }) => !!value || !!colors[symbol])
     .map(({ symbol, value }) =>
       [undefined, "auto"].includes(colors[symbol])
@@ -137,8 +137,7 @@ function parseGrid({
         ...node,
       }));
     })
-    .flatten()
-    .value();
+    .flat();
 
   return {
     log: [

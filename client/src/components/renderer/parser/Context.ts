@@ -1,4 +1,4 @@
-import { Dictionary as Dict } from "lodash";
+import { Dictionary as Dict } from "lodash-es";
 import { CompiledComponent, EventContext, Properties as Props } from "protocol";
 
 export type Context<T extends Props = Record<string, any>> =

@@ -3,8 +3,6 @@ import { DragIndicatorOutlined } from "@mui-symbols-material/w400";
 import { Box, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
 import {
-  chain as _,
-  Dictionary,
   filter,
   find,
   flatMap,
@@ -12,8 +10,9 @@ import {
   isUndefined,
   map,
   pick,
+  sum,
   sumBy,
-} from "lodash";
+} from "lodash-es";
 import { nanoid } from "nanoid";
 import { produce } from "produce";
 import {
@@ -38,8 +37,9 @@ import { Transaction } from "slices/selector";
 import { Branch, Leaf, Root } from "slices/view";
 import { assert } from "utils/assert";
 import { ViewControls } from "./ViewControls";
+import { _ } from "utils/chain";
 
-type TreeNode<S extends TreeNode = any> =
+type TreeNode<S extends TreeNode = never> =
   | {
       children?: S[];
     }
@@ -54,7 +54,7 @@ function findInTree<T extends TreeNode<T>>(
   return find(f(data), iterator);
 }
 
-type ViewTreeContextType<T = any> = {
+type ViewTreeContextType<T = unknown> = {
   isViewTree?: true;
   controls?: ReactNode;
   onChange?: (state: Transaction<T>) => void;
@@ -64,18 +64,18 @@ type ViewTreeContextType<T = any> = {
 
 const ViewTreeContext = createContext<ViewTreeContextType>({});
 
-export function useViewTreeContext<T = any>() {
+export function useViewTreeContext<T = unknown>() {
   return useContext(
     ViewTreeContext as Context<ViewTreeContextType<T & { type: string }>>
   );
 }
 
 const ViewTreePortalsContext = createContext<
-  Dictionary<HtmlPortalNode | undefined>
+  Record<string, HtmlPortalNode | undefined>
 >({});
 
 type ViewTreeProps<
-  T extends Record<string, unknown> = Record<string, unknown>
+  T extends Record<string, unknown> = Record<string, unknown>,
 > = {
   defaultContent?: T;
   root?: Root<T>;
@@ -86,7 +86,7 @@ type ViewTreeProps<
   onPopOut?: (leaf: Leaf<T>) => void;
   onMaximise?: (leaf: Leaf<T>) => void;
   canPopOut?: (leaf: Leaf<T>) => boolean;
-  onDrop?: (leaf: Leaf<any>, root: Leaf<T>) => void;
+  onDrop?: (leaf: Leaf<Record<string, unknown>>, root: Leaf<T>) => void;
 };
 
 type ViewBranchProps<T extends Record<string, unknown>> = ViewTreeProps<T> & {
@@ -159,7 +159,8 @@ export function ViewTree<T extends Record<string, unknown>>(
 ) {
   const { onChange, root, renderLeaf } = props;
   const leaves = getLeaves(root);
-  const [portals, { set }] = useMap<Dictionary<HtmlPortalNode | undefined>>();
+  const [portals, { set }] =
+    useMap<Record<string, HtmlPortalNode | undefined>>();
   return (
     <ViewTreePortalsContext.Provider value={portals}>
       <DndProvider backend={HTML5Backend}>
@@ -192,21 +193,23 @@ export function ViewLeaf<T extends Record<string, unknown>>({
   defaultContent,
 }: ViewLeafProps<T>) {
   const view = useContext(ViewTreePortalsContext);
-  const [{ isOver }, drop] = useDrop<Leaf<any>, void, { isOver: boolean }>(
-    () => ({
-      accept: ["panel"],
-      collect: (monitor) => ({
-        isOver:
-          monitor.isOver() &&
-          monitor.getItem().key !== root.key &&
-          !!root.acceptDrop,
-      }),
-      drop: (item) => {
-        onDrop?.(item, root);
-        onSwap?.(item.key, root.key);
-      },
-    })
-  );
+  const [{ isOver }, drop] = useDrop<
+    Leaf<Record<string, unknown>>,
+    void,
+    { isOver: boolean }
+  >(() => ({
+    accept: ["panel"],
+    collect: (monitor) => ({
+      isOver:
+        monitor.isOver() &&
+        monitor.getItem().key !== root.key &&
+        !!root.acceptDrop,
+    }),
+    drop: (item) => {
+      onDrop?.(item, root);
+      onSwap?.(item.key, root.key);
+    },
+  }));
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "panel",
     item: root,
@@ -350,11 +353,12 @@ export function ViewBranch<T extends Record<string, unknown>>(
   }
 
   function share(n?: number, root: Root<T>[] = []) {
-    const all = _(root)
-      .map((c) => (isUndefined(c.size) || isNaN(c.size) ? 0 : c.size))
-      .sum()
-      .value();
-    return !isUndefined(n) ? n : 100 - all || inferSize(root);
+    const all = _(
+      root,
+      (r) => r.map((c) => (isUndefined(c.size) || isNaN(c.size) ? 0 : c.size)),
+      sum
+    );
+    return isUndefined(n) ? 100 - all || inferSize(root) : n;
   }
 
   return (

@@ -1,7 +1,8 @@
-import { chain } from "lodash";
+import { _ } from "utils/chain";
 import { getValue } from "./gradient";
 import { ParseGridWorkerParameters } from "./parseGrid.worker";
 import { usingMessageHandler } from "workers/usingWorker";
+import { join, map, split, trim, uniq } from "lodash-es";
 
 export type GetGridSymbolsReturnType = {
   symbols: { symbol: string; value: number }[];
@@ -15,16 +16,18 @@ export function getGridSymbols({
   const lines = m.split(/\r?\n/);
   const [, , , , ...grid] = lines;
   return {
-    symbols: chain(grid)
-      .join("")
-      .trim()
-      .split("")
-      .uniq()
-      .map((symbol) => ({
-        symbol,
-        value: getValue(symbol),
-      }))
-      .value(),
+    symbols: _(
+      grid,
+      (g) => join(g, ""),
+      trim,
+      (g) => split(g, ""),
+      uniq,
+      (g) =>
+        map(g, (symbol) => ({
+          symbol,
+          value: getValue(symbol),
+        }))
+    ),
   };
 }
 

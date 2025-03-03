@@ -1,4 +1,4 @@
-import { lowerFirst, merge } from "lodash";
+import { lowerFirst, merge } from "lodash-es";
 import { Overloads } from "utils/Overloads";
 import { ResponseCodeError } from "./ResponseCodeError";
 
@@ -22,7 +22,7 @@ export type RequestOptions<T = string> = {
 };
 
 type RequestHandler<
-  O extends Record<string, unknown> = Record<string, unknown>
+  O extends Record<string, unknown> = Record<string, unknown>,
 > = {
   (options: O & RequestOptions<"raw">): Response | Promise<Response>;
   (options: O & RequestOptions<"blob">): Promise<Blob>;
@@ -76,7 +76,7 @@ type Method = "get" | "post" | "put" | "delete" | "patch" | "head" | "options";
  * an `Error` is thrown with the original error as the `cause` property.
  */
 export const createClient = <
-  O extends Record<string, unknown> = Record<string, unknown>
+  O extends Record<string, unknown> = Record<string, unknown>,
 >(
   base: string,
   getHeaders: (options: O & RequestOptions) => Promise<Record<string, string>>

@@ -1,5 +1,5 @@
 import renderers from "internal-renderers";
-import { Dictionary } from "lodash";
+import { Dictionary } from "lodash-es";
 import { useAsync } from "react-async-hook";
 import { RendererDefinition, RendererEvents, RendererOptions } from "renderer";
 import url from "url-parse";
@@ -31,7 +31,7 @@ export class NativeRendererTransport implements RendererTransport {
   }
 }
 
-export const transports: Dictionary<RendererTransportEntry> = {
+export const transports: Record<string, RendererTransportEntry> = {
   native: {
     name: "Internal",
     constructor: NativeRendererTransport,

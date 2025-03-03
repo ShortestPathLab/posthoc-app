@@ -1,4 +1,4 @@
-import { Dictionary as Dict, flatMap, map, mapValues, range } from "lodash";
+import { Dictionary as Dict, flatMap, map, mapValues, range } from "lodash-es";
 import {
   CompiledComponent,
   ComponentDefinition,

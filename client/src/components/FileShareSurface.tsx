@@ -6,7 +6,7 @@ import {
 import { Box, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import copy from "clipboard-copy";
 import { useSm } from "hooks/useSmallDisplay";
-import { round } from "lodash";
+import { round } from "lodash-es";
 import { useEffect, useState } from "react";
 import { useCloudStorageService } from "slices/cloudStorage";
 import { usePaper } from "theme";

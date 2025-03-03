@@ -1,4 +1,4 @@
-import { noop, now } from "lodash";
+import { noop, now } from "lodash-es";
 import { useRef, useState } from "react";
 
 export function useDebouncedState<T>(

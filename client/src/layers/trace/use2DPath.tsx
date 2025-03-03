@@ -4,7 +4,7 @@ import { getColorHex } from "components/renderer/colors";
 import { NodeList } from "components/renderer/NodeList";
 import { parseProperty } from "components/renderer/parser-v140/parseProperty";
 import { parseProperty as parsePropertyLegacy } from "components/renderer/parser/parseProperty";
-import { constant, head, last, map, startCase } from "lodash";
+import { constant, head, last, map, startCase } from "lodash-es";
 import { TraceEvent } from "protocol";
 import { useMemo } from "react";
 import { TraceLayer } from "./TraceLayer";
@@ -55,7 +55,7 @@ export function use2DPath(
       const pivot = trace?.render?.path?.pivot ?? trace?.pivot ?? {};
       const scale = trace?.render?.path?.scale
         ? trace.render.path.scale * (1 / 0.3)
-        : trace?.pivot?.scale ?? 1;
+        : (trace?.pivot?.scale ?? 1);
       const { x, y } = pivot;
 
       const f =

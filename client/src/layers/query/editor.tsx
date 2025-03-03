@@ -5,7 +5,7 @@ import { LayerPicker } from "components/generic/LayerPicker";
 import { Option } from "components/layer-editor/Option";
 import { inferLayerName } from "layers";
 import { MapLayerData } from "layers/map";
-import { find } from "lodash";
+import { find } from "lodash-es";
 import { withProduce } from "produce";
 import { useConnections } from "slices/connections";
 import { useFeatures } from "slices/features";

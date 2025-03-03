@@ -2,14 +2,14 @@ import { Breakpoint } from "components/breakpoint-editor/BreakpointEditor";
 import { TreeDict } from "components/breakpoint-editor/breakpoints/Breakpoint";
 import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { call } from "components/script-editor/call";
-import { chain, map, values } from "lodash";
+import { flattenDepth, groupBy, map, values } from "lodash-es";
 import { EventTree } from "pages/tree/treeLayout.worker";
 import { useComputeTree } from "pages/tree/TreeUtility";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { UploadedTrace } from "slices/UIState";
-
+import { _ } from "utils/chain";
 export type DebugLayerData = {
   code?: string;
   monotonicF?: boolean;
@@ -52,12 +52,12 @@ export function useBreakPoints2(key?: string) {
 
   const shouldBreak = useMemo(() => {
     if (!dict) return;
-    const steps =
-      chain(layer?.source?.breakpointOutput)
-        .map((s) => values(s))
-        .flattenDepth(2)
-        .groupBy("step")
-        .value() ?? [];
+    const steps = _(
+      layer?.source?.breakpointOutput,
+      (b) => map(b, (s) => values(s)),
+      (b) => flattenDepth(b, 2),
+      (b) => groupBy(b, "step")
+    );
 
     return (step: number) => {
       const event = events[step];

@@ -1,4 +1,4 @@
-import { map } from "lodash";
+import { map } from "lodash-es";
 import { BreakpointHandler } from "../Breakpoint";
 import { comparators } from "../../comparators";
 import {

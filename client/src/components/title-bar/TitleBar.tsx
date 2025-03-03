@@ -14,6 +14,7 @@ import {
   Menu,
   MenuItem,
   MenuList,
+  Skeleton,
   Stack,
   Tooltip,
   Typography as Type,
@@ -29,7 +30,7 @@ import { fileDialog as file } from "file-select-dialog";
 import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
 import { useTitleBar } from "hooks/useTitleBar";
 import { useWorkspace } from "hooks/useWorkspace";
-import { get, startCase } from "lodash";
+import { get, startCase, times } from "lodash-es";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { isMobile } from "mobile-device-detect";
 import { nanoid as id } from "nanoid";
@@ -113,14 +114,27 @@ export const TitleBarPlaceholder = () => {
   const color = palette.background.default;
   useTitleBar(color);
   return (
-    <Box
+    <Stack
+      direction="row"
       sx={{
+        gap: 2,
+        px: 2,
+        py: 1,
+        flex: 0,
         bgcolor: "background.default",
         minHeight: 36,
         width: "100%",
         height: visible ? "env(titlebar-area-height, 50px)" : 0,
       }}
-    />
+    >
+      {times(4, () => (
+        <Skeleton
+          variant="text"
+          animation={false}
+          sx={{ opacity: 0.5, width: 48 }}
+        />
+      ))}
+    </Stack>
   );
 };
 

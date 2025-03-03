@@ -1,5 +1,5 @@
 import { useSnackbar } from "components/generic/Snackbar";
-import { find } from "lodash";
+import { find } from "lodash-es";
 import memo from "memoizee";
 import { useMemo } from "react";
 import { useAsync } from "react-async-hook";
@@ -7,6 +7,7 @@ import { UploadedTrace } from "slices/UIState";
 import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { useConnectionResolver } from "./useConnectionResolver";
+import objectHash from "object-hash";
 
 export function useTraceContent(trace?: UploadedTrace) {
   const notify = useSnackbar();
@@ -29,7 +30,7 @@ export function useTraceContent(trace?: UploadedTrace) {
             }
           }
         },
-        { normalizer: JSON.stringify }
+        { normalizer: (args) => objectHash([...args]) }
       ),
     [resolve, notify]
   );

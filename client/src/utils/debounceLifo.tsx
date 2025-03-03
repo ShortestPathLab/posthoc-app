@@ -1,4 +1,4 @@
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 
 /**
  * Creates a debounced version of an asynchronous function that ensures

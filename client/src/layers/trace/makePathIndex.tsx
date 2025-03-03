@@ -1,4 +1,5 @@
-import { chain, findLast, forEach, isNull, isUndefined, last } from "lodash";
+import { index } from "hooks/useHighlight";
+import { findLast, forEach, isNull, isUndefined, last } from "lodash-es";
 import { Trace } from "protocol/Trace";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
@@ -24,10 +25,7 @@ export function makePathIndex(trace: Trace) {
     [K in number]?: Node;
   } = {};
 
-  const r = chain(trace?.events)
-    .map((c, i) => ({ step: i, id: c.id, pId: c.pId }))
-    .groupBy("id")
-    .value();
+  const r = index(trace?.events);
 
   forEach(trace?.events, ({ id, pId }, i) => {
     if (!isNullish(pId) && allChanges[id] !== pId) {

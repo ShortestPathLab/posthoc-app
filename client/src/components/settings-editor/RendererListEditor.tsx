@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { head } from "lodash";
+import { head } from "lodash-es";
 import { useSetting } from "pages/SettingsPage";
 import { Renderer, defaultRenderers } from "slices/settings";
 import { RendererEditor } from "./RendererEditor";

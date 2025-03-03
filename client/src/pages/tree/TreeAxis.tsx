@@ -1,9 +1,10 @@
 import { useTheme } from "@mui/material";
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
-import { chain, each, forOwn, groupBy, map, max, min } from "lodash";
+import { each, forOwn, groupBy, map, max, min } from "lodash-es";
 import { sort } from "moderndash";
 import { Trace } from "protocol";
 import { useCallback, useEffect, useState } from "react";
+import { _ } from "utils/chain";
 import { TreeWorkerReturnType } from "./treeLayout.worker";
 
 const digits = {
@@ -42,7 +43,7 @@ type Node = {
   step?: number;
   f?: number;
   g?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export function TreeAxis(props: TreeAxisProps) {
@@ -137,10 +138,11 @@ export function TreeAxis(props: TreeAxisProps) {
   );
 
   useEffect(() => {
-    const nodesData = chain(events)
-      .map((c, i) => ({ step: i, id: c.id, pId: c.pId, g: c.g }))
-      .groupBy("id")
-      .value();
+    const nodesData = _(
+      events ?? [],
+      (c) => c.map((c, i) => ({ step: i, id: c.id, pId: c.pId, g: c.g })),
+      (c) => groupBy(c, "id")
+    );
 
     function updateTree() {
       drawAxis(

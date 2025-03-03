@@ -4,7 +4,7 @@ import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { colorsHex } from "components/renderer/colors";
 import { useTraceParser } from "components/renderer/parser-v140/parseTrace";
 import { useTraceContent } from "hooks/useTraceContent";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { nanoid } from "nanoid";
 import { withProduce } from "produce";
 import { useEffect } from "react";

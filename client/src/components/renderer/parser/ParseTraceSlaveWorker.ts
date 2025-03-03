@@ -1,9 +1,9 @@
-import { chain, findLast, map, mapValues, negate, range } from "lodash";
+import { findLast, groupBy, map, mapValues, negate, range } from "lodash-es";
 import { CompiledComponent, EventContext, Trace } from "protocol";
 import { ComponentEntry } from "renderer";
+import { _ } from "utils/chain";
 import { normalizeConstant } from "./normalize";
 import { parse as parseComponents } from "./parse";
-
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
   x === undefined || x === null;
 type Key = string | number;
@@ -27,19 +27,20 @@ export function parse({
 
   const makeEntryIteratee =
     (step: number) =>
-    (component: CompiledComponent<string, Record<string, any>>) => {
+    (component: CompiledComponent<string, Record<string, unknown>>) => {
       return {
         component,
         meta: { source: "trace", step: from + step, info: component.$info },
       };
     };
 
-  const r = chain(trace?.events)
-    .map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId }))
-    .groupBy("id")
-    .value();
+  const r = _(
+    trace?.events ?? [],
+    (t) => t.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
+    (t) => groupBy(t, "id")
+  );
 
-  const steps = chain(range(from, to))
+  const steps = range(from, to)
     .map((i) => {
       const e = trace!.events![i]!;
       const esx = trace!.events!;
@@ -48,9 +49,9 @@ export function parse({
           alpha: 1,
           ...context,
           step: i,
-          parent: !isNullish(e.pId)
-            ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
-            : undefined,
+          parent: isNullish(e.pId)
+            ? undefined
+            : esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0],
           event: e,
           events: esx,
         })
@@ -60,8 +61,7 @@ export function parse({
       return { persistent, transient };
     })
     .map((c) => mapValues(c, (b) => b.filter(isVisible)))
-    .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(i))))
-    .value();
+    .map((c, i) => mapValues(c, (b) => b.map(makeEntryIteratee(i))));
   return {
     stepsPersistent: map(steps, (c) => c.persistent),
     stepsTransient: map(steps, (c) => c.transient),

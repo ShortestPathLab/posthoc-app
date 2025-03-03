@@ -4,7 +4,7 @@ import {
   Tooltip,
   TooltipProps,
 } from "@mui/material";
-import { startCase } from "lodash";
+import { startCase } from "lodash-es";
 import { ReactNode } from "react";
 
 type IconButtonWithTooltipProps = {

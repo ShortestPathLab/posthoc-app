@@ -30,7 +30,7 @@ import { useFullscreenModalContext } from "components/inspector/FullscreenModalH
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useSm } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
-import { chain as _, entries, first, map, round, upperCase } from "lodash";
+import { entries, first, map, round, startCase, upperCase } from "lodash-es";
 import memoizee from "memoizee";
 import { docs, name } from "public/manifest.json";
 import { CSSProperties, ReactNode, useMemo, useState } from "react";
@@ -43,6 +43,7 @@ import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
 import { PosthocMetaData } from "services/cloud-storage";
+import { _ } from "utils/chain";
 
 const paths = import.meta.glob<boolean, string, string>(
   "/public/recipes/*.workspace",
@@ -80,7 +81,7 @@ async function getMeta(k: string) {
 const getFileInfo = memoizee(
   async (k: string, f: () => Promise<string>) => {
     return {
-      name: _(k).thru(basename).thru(stripExtension).startCase().value(),
+      name: _(k, basename, stripExtension, startCase),
       path: await f(),
       ...(await getMeta(k)),
     };
@@ -89,8 +90,9 @@ const getFileInfo = memoizee(
 );
 
 // eslint-disable-next-line react/display-name
-const makeAvatar = (children?: ReactNode) => (sx: SxProps) =>
-  <Avatar sx={sx}>{children}</Avatar>;
+const makeAvatar = (children?: ReactNode) => (sx: SxProps) => (
+  <Avatar sx={sx}>{children}</Avatar>
+);
 
 function getAuthor(s?: string): {
   name: ReactNode;

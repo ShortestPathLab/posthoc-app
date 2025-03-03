@@ -4,7 +4,7 @@ import {
   TreeDict,
 } from "components/breakpoint-editor/breakpoints/Breakpoint";
 import { DebugLayerData } from "hooks/useBreakPoints";
-import { chain, isEqual } from "lodash";
+import { groupBy, isEqual, values } from "lodash-es";
 import memo from "memoizee";
 import objectHash from "object-hash";
 import { useComputeTree } from "pages/tree/TreeUtility";
@@ -19,7 +19,7 @@ import { NonEmptyString } from "utils/Char";
 import { set } from "utils/set";
 import { usingWorkerTask } from "workers/usingWorker";
 import workerUrl from "./breakpoint.worker.ts?worker&url";
-
+import { _ } from "utils/chain";
 async function attempt<T, U>(
   f: () => Promise<T>,
   c: (e: unknown) => U
@@ -120,13 +120,15 @@ export function BreakpointService({ value }: { value?: string }) {
         void set(
           l,
           "source.breakpointOutputDict",
-          chain(outputs)
-            .values()
-            .flatMap((v) => {
-              return "error" in v ? [] : v;
-            })
-            .groupBy("step")
-            .value()
+          _(
+            outputs,
+            values,
+            (s) =>
+              s.flatMap((v) => {
+                return "error" in v ? [] : v;
+              }),
+            (s) => groupBy(s, "step")
+          )
         )
     );
   }, [outputs]);

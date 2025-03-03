@@ -11,7 +11,7 @@ import { ScriptEditor } from "components/script-editor/ScriptEditor";
 import { templates } from "components/script-editor/templates";
 import { DebugLayerData } from "hooks/useBreakpointsOld";
 import { getController } from "layers/layerControllers";
-import { set, values } from "lodash";
+import { set, values } from "lodash-es";
 import { useState } from "react";
 import { slice } from "slices";
 import { Layer, useLayerPicker } from "slices/layers";

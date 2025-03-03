@@ -1,5 +1,5 @@
 import { fileDialog as file } from "file-select-dialog";
-import { find, startCase } from "lodash";
+import { find, startCase } from "lodash-es";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { UploadedTrace } from "slices/UIState";
 import { parseYamlAsync } from "workers/async";

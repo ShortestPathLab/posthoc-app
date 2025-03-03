@@ -11,7 +11,7 @@ import {
   once,
   throttle,
   times,
-} from "lodash";
+} from "lodash-es";
 import { nanoid, random } from "nanoid";
 import { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";

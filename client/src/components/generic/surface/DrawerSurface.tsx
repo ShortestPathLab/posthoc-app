@@ -8,7 +8,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
-import { merge, noop } from "lodash";
+import { merge, noop } from "lodash-es";
 import { bindDialog, PopupState as State } from "material-ui-popup-state/hooks";
 import { createContext, ReactNode } from "react";
 import { useMeasure } from "react-use";

@@ -7,7 +7,7 @@ import {
   Theme,
   ThemeOptions,
 } from "@mui/material";
-import { constant, floor, times } from "lodash";
+import { constant, floor, times } from "lodash-es";
 import { useSettings } from "slices/settings";
 
 export type AccentColor = Exclude<keyof typeof colors, "common" | undefined>;
@@ -153,7 +153,7 @@ export function usePaper() {
         palette.mode === "dark"
           ? `1px solid ${alpha(palette.text.primary, elevation * 0.08)}`
           : `1px solid ${alpha(palette.text.primary, elevation * 0.12)}`,
-    } satisfies SxProps<Theme>);
+    }) satisfies SxProps<Theme>;
 }
 
 export const textFieldProps = {

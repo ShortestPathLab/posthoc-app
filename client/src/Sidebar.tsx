@@ -1,7 +1,15 @@
 import { TabContext, TabList } from "@mui/lab";
-import { Box, Divider, Stack, Tab, Tooltip, useTheme } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Skeleton,
+  Stack,
+  Tab,
+  Tooltip,
+  useTheme,
+} from "@mui/material";
 import interpolate from "color-interpolate";
-import { values } from "lodash";
+import { times, values } from "lodash-es";
 import { isMobile } from "mobile-device-detect";
 import { pages } from "pages";
 import { useMemo } from "react";
@@ -18,6 +26,31 @@ export function useSidebarBackground() {
           0.25
         );
   }, [palette]);
+}
+
+export function SidebarPlaceholder() {
+  const bgcolor = useSidebarBackground();
+  return (
+    <Stack
+      sx={{
+        minWidth: 64,
+        width: 64,
+        flex: 0,
+        height: "100%",
+        bgcolor,
+        gap: 2,
+        p: 2,
+      }}
+    >
+      {times(3, () => (
+        <Skeleton
+          variant="circular"
+          animation={false}
+          sx={{ opacity: 0.5, height: 32 }}
+        />
+      ))}
+    </Stack>
+  );
 }
 
 function Divider2() {

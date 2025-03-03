@@ -12,7 +12,7 @@ import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { DebugLayerData } from "hooks/useBreakPoints";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
-import { find, isEqual, map } from "lodash";
+import { find, isEqual, map } from "lodash-es";
 import { produce } from "produce";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { slice } from "slices";
@@ -34,7 +34,7 @@ export const breakpointType = [
 ];
 
 export type Breakpoint<
-  P extends Record<string, unknown> = Record<string, unknown>
+  P extends Record<string, unknown> = Record<string, unknown>,
 > = {
   key: string;
   type?: keyof typeof handlersCollection;

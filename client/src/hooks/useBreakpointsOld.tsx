@@ -1,7 +1,7 @@
 import { Breakpoint } from "components/breakpoint-editor/BreakpointEditor";
 import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { call } from "components/script-editor/call";
-import { get, isEqual, toLower as lower, startCase } from "lodash";
+import { get, isEqual, toLower as lower, startCase } from "lodash-es";
 import memo from "memoizee";
 import { useComputeTree } from "pages/tree/TreeUtility";
 import { EventTree } from "pages/tree/treeUtility.worker";

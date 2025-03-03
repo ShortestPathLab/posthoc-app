@@ -1,5 +1,5 @@
 import type { $, Booleans, Objects, Strings } from "hotscript";
-import { get as lodashGet } from "lodash";
+import { get as lodashGet } from "lodash-es";
 import type { PlainObject } from "moderndash";
 import { set as moderndashSet } from "moderndash";
 
@@ -13,7 +13,7 @@ export function get<U, TPath extends $<Objects.AllPaths, U>>(a: U, b: TPath) {
 }
 export function set<
   TObj extends PlainObject,
-  TPath extends $<Objects.AllPaths, TObj>
+  TPath extends $<Objects.AllPaths, TObj>,
 >(obj: TObj, path: TPath, value: $<Objects.Get<TPath>, TObj>): TObj {
   return moderndashSet(obj, path, value);
 }

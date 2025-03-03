@@ -12,7 +12,7 @@ import {
 import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { head, trimEnd } from "lodash";
+import { head, trimEnd } from "lodash-es";
 import logo from "public/logo512.png";
 import { homepage, name, repository, version_name } from "public/manifest.json";
 import { ReactNode } from "react";

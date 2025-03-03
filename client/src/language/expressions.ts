@@ -1,4 +1,4 @@
-import { last } from "lodash";
+import { last } from "lodash-es";
 import { type editor, Position } from "monaco-editor";
 
 export function getExpression(model: editor.ITextModel, position: Position) {

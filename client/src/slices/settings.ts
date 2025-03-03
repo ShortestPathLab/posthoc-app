@@ -2,7 +2,7 @@ import type { pages } from "pages";
 import { createSlice, withLocalStorage } from "./createSlice";
 import { AccentColor } from "theme";
 import { cloudStorageProviders } from "services/cloud-storage";
-import { keys } from "lodash";
+import { keys } from "lodash-es";
 
 export type Sources = {
   trustedOrigins?: string[];

@@ -7,4 +7,4 @@ import { RendererDefinition } from "renderer";
 export default {
   "d2-renderer": D2Renderer,
   "d2-minimal-renderer": D2MinimalRenderer,
-} as Dictionary<RendererDefinition<any, any, any>>;
+} as Record<string, RendererDefinition<any, any, any>>;

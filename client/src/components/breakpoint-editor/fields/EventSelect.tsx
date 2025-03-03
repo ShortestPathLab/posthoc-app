@@ -2,7 +2,8 @@ import { SelectField as Select } from "components/generic/inputs/Select";
 import { DebugLayerData } from "hooks/useBreakPoints";
 import { Steps } from "layers/LayerController";
 import { getController } from "layers/layerControllers";
-import { chain, map, startCase } from "lodash";
+import { map, startCase, uniq } from "lodash-es";
+import { _ } from "utils/chain";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
@@ -20,7 +21,7 @@ export const EventSelect = ({
       (l) => getController(l)?.steps?.(l),
       equal("key")
     ) ?? {};
-  const types = useMemo(() => chain(steps).map("type").uniq().value(), [steps]);
+  const types = useMemo(() => _(steps, (v) => map(v, "type"), uniq), [steps]);
   return (
     <Select
       disabled={props.disabled}

@@ -7,7 +7,7 @@ import { Space } from "components/generic/Space";
 import { SurfaceSizeContext } from "components/generic/surface/DrawerSurface";
 import { Placeholder } from "components/inspector/Placeholder";
 import { withSlots } from "components/withSlots";
-import { merge, values } from "lodash";
+import { merge, values } from "lodash-es";
 import { pages } from "pages";
 import React, { ReactNode, Ref } from "react";
 import { ErrorBoundary } from "react-error-boundary";

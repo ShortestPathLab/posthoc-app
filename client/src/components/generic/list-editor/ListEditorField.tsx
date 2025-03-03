@@ -17,7 +17,7 @@ import { useAcrylic, usePaper } from "theme";
 import { Block } from "../Block";
 import { Item, Key, Props } from "./ListEditor";
 
-import { noop } from "lodash";
+import { noop } from "lodash-es";
 import { ComponentProps, forwardRef } from "react";
 
 export const DefaultListEditorInput = forwardRef(function StyledInputBase(

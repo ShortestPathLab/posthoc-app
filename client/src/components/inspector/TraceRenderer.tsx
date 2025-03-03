@@ -5,7 +5,7 @@ import {
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { RenderLayer } from "layers/RenderLayer";
-import { clamp, find, floor, get, map, some } from "lodash";
+import { clamp, find, floor, get, map, some } from "lodash-es";
 import { nanoid } from "nanoid";
 import { isStepsLayer } from "pages/steps/StepsLayer";
 import { Size } from "protocol";

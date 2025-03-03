@@ -17,7 +17,7 @@ import {
   sortBy,
   thru,
   values,
-} from "lodash";
+} from "lodash-es";
 import { EventTypeColors } from "protocol";
 import { TraceEventType } from "protocol/Trace";
 import { AccentColor, accentColors, getShade } from "theme";
@@ -53,7 +53,7 @@ export const searchEventAliases = thru(
     end: ["finish", "end", "solution"],
   },
   (dict) => {
-    const out: Dictionary<string> = {};
+    const out: Record<string, string> = {};
     for (const [k, v] of entries(dict)) {
       for (const v1 of v) out[v1] = k;
     }

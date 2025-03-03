@@ -1,4 +1,4 @@
-import { merge } from "lodash";
+import { merge } from "lodash-es";
 import { usePopupState } from "material-ui-popup-state/hooks";
 import { ReactNode, useState } from "react";
 import { SurfaceBase, SurfaceBaseProps, SurfaceProps } from "./Surface";

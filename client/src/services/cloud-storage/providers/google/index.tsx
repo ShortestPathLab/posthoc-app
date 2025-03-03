@@ -1,7 +1,7 @@
 import { createClient, RequestOptions } from "client/createHttpClient";
 import { Button } from "components/generic/inputs/Button";
 import { Lawnicon } from "components/generic/Lawnicon";
-import { defer, each, head, isString, now, once } from "lodash";
+import { defer, each, head, isString, now, once } from "lodash-es";
 import { map } from "promise-tools";
 import {
   AuthError,

@@ -1,6 +1,6 @@
 import { Box, IconProps } from "@mui/material";
 import { request } from "client/createHttpClient";
-import { merge } from "lodash";
+import { merge } from "lodash-es";
 import memo from "memoizee";
 import { useState } from "react";
 import { useAsync } from "react-async-hook";

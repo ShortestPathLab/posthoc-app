@@ -4,7 +4,7 @@ import { useMapContent } from "hooks/useMapContent";
 import { inferLayerName } from "layers";
 import { MapLayer } from "layers/map";
 import { controller as traceController } from "layers/trace";
-import { find } from "lodash";
+import { find } from "lodash-es";
 import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";

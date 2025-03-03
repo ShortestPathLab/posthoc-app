@@ -1,5 +1,5 @@
 import { store } from "@davstack/store";
-import { some, values } from "lodash";
+import { some, values } from "lodash-es";
 import { useCallback } from "react";
 
 const defaultLoadingStore = {

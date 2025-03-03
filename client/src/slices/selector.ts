@@ -1,5 +1,5 @@
 import { EqualityChecker, StoreApi } from "@davstack/store";
-import { find, findIndex, get, identity, isEqual, isFunction } from "lodash";
+import { find, findIndex, get, identity, isEqual, isFunction } from "lodash-es";
 import { ReactNode } from "react";
 
 type KeyOf<T> = keyof Exclude<T, undefined | null>;
@@ -49,7 +49,7 @@ export const createSelector = <Item extends { key: string }>(
       store.set((s) => {
         const i = findIndex(s, (k) => k.key === key);
         if (i >= 0) {
-          s[i] = typeof m === "function" ? m(s[i] as T) ?? s[i] : m;
+          s[i] = typeof m === "function" ? (m(s[i] as T) ?? s[i]) : m;
         }
       }),
     get: <O = T>(selector: (l: T) => O = identity) =>

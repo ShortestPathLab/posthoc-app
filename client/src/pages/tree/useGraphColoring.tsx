@@ -21,7 +21,7 @@ import {
   startCase,
   trimStart,
   truncate,
-} from "lodash";
+} from "lodash-es";
 import memoizee from "memoizee";
 import { useMemo } from "react";
 import { AccentColor, getShade } from "theme";
@@ -66,8 +66,8 @@ export function useGraphColoring(
         label: "",
       });
     });
-    const isSetNode: Dictionary<boolean> = {};
-    const isSet: Dictionary<boolean> = {};
+    const isSetNode: Record<string, boolean> = {};
+    const isSet: Record<string, boolean> = {};
 
     (showAllEdges ? forEach : forEachRight)(
       slice(trace?.events, 0, step + 1),

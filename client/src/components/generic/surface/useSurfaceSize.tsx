@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { SurfaceSizeContext } from "./DrawerSurface";
 import { drawerTitleHeight } from "./DrawerTitle";
-import { isNumber } from "lodash";
+import { isNumber } from "lodash-es";
 
 export function useSurfaceSize() {
   return useContext(SurfaceSizeContext);

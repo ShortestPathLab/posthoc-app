@@ -1,6 +1,6 @@
 import { useForkRef, useTheme } from "@mui/material";
 import { TransitionProps as MuiTransitionProps } from "@mui/material/transitions";
-import { get } from "lodash";
+import { get } from "lodash-es";
 import { cloneElement, ElementType, isValidElement, Ref, useRef } from "react";
 import { Transition } from "react-transition-group";
 import { EnterHandler, ExitHandler } from "react-transition-group/Transition";

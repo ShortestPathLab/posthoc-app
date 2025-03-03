@@ -1,4 +1,5 @@
-import { Dictionary, chain as _, entries, find, map } from "lodash";
+import { entries, find, map, startCase } from "lodash-es";
+import { _ } from "utils/chain";
 import memoizee from "memoizee";
 import { Scheme } from "protocol/SolveTask";
 import url from "url-parse";
@@ -24,7 +25,7 @@ const getFileInfo = memoizee(
   async (k: string, f: () => Promise<string>) => {
     return {
       id: `basic-maps${k}`,
-      name: _(k).thru(basename).thru(stripExtension).startCase().value(),
+      name: _(k, basename, stripExtension, startCase),
       path: await f(),
       format: ext(k),
     };
@@ -43,7 +44,7 @@ export function parseURI(uri: string) {
   };
 }
 
-export const internal: Dictionary<Transport["call"]> = {
+export const internal: Record<string, Transport["call"]> = {
   "basic-maps": async (name, params) => {
     switch (name) {
       case "about": {

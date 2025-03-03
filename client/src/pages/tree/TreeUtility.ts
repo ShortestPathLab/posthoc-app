@@ -1,23 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { treeToDict } from "hooks/useBreakPoints";
 import {
-  chain,
   entries,
   every,
   flatMap,
+  groupBy,
   head,
   isInteger,
   isPlainObject,
+  mapValues,
   uniqBy,
-} from "lodash";
+} from "lodash-es";
 import { Trace } from "protocol/Trace";
+import { _ } from "utils/chain";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import {
   TreeWorkerParameters,
   TreeWorkerReturnType,
 } from "./treeUtility.worker";
 import treeWorkerUrl from "./treeUtility.worker.ts?worker&url";
-
 export class TreeWorker extends Worker {
   constructor() {
     super(treeWorkerUrl, { type: "module" });
@@ -60,7 +61,7 @@ function computeLabelsOne(t: unknown, root: string = ""): Y[] {
   return [{ path: root, type: "mixed", value: undefined }];
 }
 
-function computeLabels(t?: unknown[]) {
+function computeLabels(labels?: unknown[]) {
   function resolveType(v: Y[]) {
     const unique = uniqBy(v, "type");
     if (unique.length === 1) {
@@ -78,13 +79,12 @@ function computeLabels(t?: unknown[]) {
     return "mixed";
   }
 
-  return chain(t)
-    .flatMap((v) => computeLabelsOne(v))
-    .groupBy("path")
-    .mapValues((v) => ({
-      type: resolveType(v),
-    }))
-    .value();
+  return _(
+    labels ?? [],
+    (t) => t.flatMap((v) => computeLabelsOne(v)),
+    (t) => groupBy(t, "path"),
+    (t) => mapValues(t, (v) => ({ type: resolveType(v) }))
+  );
 }
 
 export function useComputeLabels({

@@ -2,7 +2,7 @@ import { Box, Fade, LinearProgress } from "@mui/material";
 import { Sidebar } from "Sidebar";
 import { Block, BlockProps } from "components/generic/Block";
 import { openWindow } from "components/title-bar/window";
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 import { isMobile } from "mobile-device-detect";
 import { pages } from "pages";
 import { Page } from "pages/Page";

@@ -3,7 +3,7 @@ import {
   isTraceFormat,
   readUploadedTrace,
 } from "components/app-bar/upload";
-import { get, startCase } from "lodash";
+import { get, startCase } from "lodash-es";
 import { nanoid } from "nanoid";
 import { name } from "utils/path";
 import { Controller } from "./types";

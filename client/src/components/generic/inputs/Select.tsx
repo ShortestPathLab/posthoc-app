@@ -6,7 +6,7 @@ import {
   TextFieldProps,
   Tooltip,
 } from "@mui/material";
-import { map } from "lodash";
+import { map } from "lodash-es";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { ReactElement, ReactNode } from "react";
 

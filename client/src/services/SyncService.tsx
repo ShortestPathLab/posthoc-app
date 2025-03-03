@@ -1,5 +1,5 @@
 import { useEffectWhen } from "hooks/useEffectWhen";
-import { throttle } from "lodash";
+import { throttle } from "lodash-es";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { usePrevious } from "react-use";
 import { Layer } from "slices/layers";
@@ -27,12 +27,7 @@ type SyncedData = {
 };
 
 export function SyncService() {
-  const {
-    isPrimary,
-    isOnly,
-    participants,
-    peers,
-  } = useSyncStatus();
+  const { isPrimary, isOnly, participants, peers } = useSyncStatus();
   return null;
   const [settings, setSettings, , c1] = useSettings();
 

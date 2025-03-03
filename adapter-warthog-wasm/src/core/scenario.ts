@@ -80,7 +80,7 @@ export const handlers = {
       return stdout;
     },
   },
-} satisfies Dictionary<Handler>;
+} satisfies Record<string, Handler>;
 
 type Handler = {
   template: Partial<Trace>;

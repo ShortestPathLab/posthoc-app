@@ -26,7 +26,7 @@ import {
   pick,
   startCase,
   truncate,
-} from "lodash";
+} from "lodash-es";
 import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
 import { slice } from "slices";
 import { Layer, WithLayer } from "slices/layers";

@@ -1,6 +1,6 @@
 import { ORIGIN_UNKNOWN } from "hooks/useWorkspace";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
-import { find, map } from "lodash";
+import { find, map } from "lodash-es";
 import { slice } from "slices";
 import { useSettings } from "slices/settings";
 

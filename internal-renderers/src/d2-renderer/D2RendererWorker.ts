@@ -1,11 +1,11 @@
 import interpolate from "color-interpolate";
 import combinate from "combinate";
 import {
-  Dictionary,
-  chain as _,
   ceil,
   floor,
+  forEach,
   get,
+  groupBy,
   head,
   identity,
   isEqual,
@@ -19,7 +19,7 @@ import {
   throttle,
   truncate,
   values,
-} from "lodash";
+} from "lodash-es";
 import { nanoid } from "nanoid";
 import type { Bounds, Point, Size } from "protocol";
 import { ComponentEntry } from "renderer";
@@ -31,6 +31,7 @@ import {
   defaultD2RendererOptions,
 } from "./D2RendererOptions";
 import { EventEmitter } from "./EventEmitter";
+import { _ } from "./chain";
 import { draw } from "./draw";
 import { hash } from "./hash";
 import { pointToIndex } from "./pointToIndex";
@@ -41,22 +42,24 @@ const { log2, max } = Math;
 const z = (x: number) => floor(log2(x + 1));
 
 function wordWrap(text: string, width: number) {
-  return _(text)
-    .split(" ")
-    .reduce(
-      (prev, next) =>
-        next.length + prev.width > width
-          ? {
-              text: `${prev.text}\n${next} `,
-              width: next.length + 1,
-            }
-          : {
-              text: `${prev.text}${next} `,
-              width: prev.width + next.length + 1,
-            },
-      { width: 0, text: "" }
-    )
-    .value().text;
+  return _(
+    text,
+    (t) => t.split(" "),
+    (t) =>
+      t.reduce(
+        (prev, next) =>
+          next.length + prev.width > width
+            ? {
+                text: `${prev.text}\n${next} `,
+                width: next.length + 1,
+              }
+            : {
+                text: `${prev.text}${next} `,
+                width: prev.width + next.length + 1,
+              },
+        { width: 0, text: "" }
+      )
+  ).text;
 }
 
 export function getTiles(
@@ -140,7 +143,7 @@ export class D2RendererWorker extends EventEmitter<
   #options: D2RendererOptions = defaultD2RendererOptions;
   #frustum: Bounds = { bottom: 256, top: 0, left: 0, right: 256 };
   #system: Bush<CompiledD2IntrinsicComponent> = new Bush(16);
-  #children: Dictionary<Body<CompiledD2IntrinsicComponent>[]> = {};
+  #children: Record<string, Body<CompiledD2IntrinsicComponent>[]> = {};
 
   getView() {
     return { system: this.#system, world: this.#children };
@@ -368,27 +371,29 @@ export class D2RendererWorker extends EventEmitter<
           thickness,
           length
         );
-        _(bodies)
-          .sortBy((c) => -(c.meta?.sourceLayerIndex ?? 0))
-          .groupBy((c) => c.meta?.sourceLayerIndex ?? 0)
-          .forEach((group) => {
-            const g2 = new OffscreenCanvas(tile.width, tile.height);
-            const ctx2 = g2.getContext("2d")!;
-            for (const { component } of group) {
-              draw(component, ctx2, {
-                scale,
-                x: -left * scale.x,
-                y: -top * scale.y,
-              });
-            }
-            const alpha = head(group)?.meta?.sourceLayerAlpha ?? 1;
-            const displayMode =
-              head(group)?.meta?.sourceLayerDisplayMode ?? "source-over";
-            ctx.globalCompositeOperation = displayMode;
-            ctx.globalAlpha = alpha;
-            ctx.drawImage(g2, 0, 0);
-          })
-          .value();
+        _(
+          bodies,
+          (b) => sortBy(b, (c) => -(c.meta?.sourceLayerIndex ?? 0)),
+          (b) => groupBy(b, (c) => c.meta?.sourceLayerIndex ?? 0),
+          (b) =>
+            forEach(b, (group) => {
+              const g2 = new OffscreenCanvas(tile.width, tile.height);
+              const ctx2 = g2.getContext("2d")!;
+              for (const { component } of group) {
+                draw(component, ctx2, {
+                  scale,
+                  x: -left * scale.x,
+                  y: -top * scale.y,
+                });
+              }
+              const alpha = head(group)?.meta?.sourceLayerAlpha ?? 1;
+              const displayMode =
+                head(group)?.meta?.sourceLayerDisplayMode ?? "source-over";
+              ctx.globalCompositeOperation = displayMode;
+              ctx.globalAlpha = alpha;
+              ctx.drawImage(g2, 0, 0);
+            })
+        );
 
         const bitmap = g.transferToImageBitmap();
         this.#cache[tileKey] = {

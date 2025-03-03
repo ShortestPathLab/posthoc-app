@@ -2,7 +2,7 @@ import { Typography } from "@mui/material";
 import { SelectField as Select } from "components/generic/inputs/Select";
 import { Space } from "components/generic/Space";
 import { DebugLayerData } from "hooks/useBreakPoints";
-import { entries, map, trimStart } from "lodash";
+import { entries, map, trimStart } from "lodash-es";
 import { useComputeLabels } from "pages/tree/TreeUtility";
 import { slice } from "slices";
 import { Layer } from "slices/layers";

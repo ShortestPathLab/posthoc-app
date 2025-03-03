@@ -1,4 +1,4 @@
-import { delay, isUndefined, omitBy } from "lodash";
+import { delay, isUndefined, omitBy } from "lodash-es";
 import { useCallback } from "react";
 import { createSlice } from "./createSlice";
 import { merge } from "./reducers";

@@ -1,5 +1,5 @@
 import { useWorkspace } from "hooks/useWorkspace";
-import { split } from "lodash";
+import { split } from "lodash-es";
 import { useAsync } from "react-async-hook";
 import { useCloudStorageInstance } from "slices/cloudStorage";
 import { assert } from "utils/assert";

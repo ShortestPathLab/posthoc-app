@@ -71,7 +71,7 @@ export const handlers = {
         true
       ),
   },
-} satisfies Dictionary<Handler>;
+} satisfies Record<string, Handler>;
 
 type Handler = {
   template: Partial<Trace>;

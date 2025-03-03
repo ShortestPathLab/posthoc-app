@@ -1,5 +1,5 @@
 import { comparators } from "components/breakpoint-editor/comparators";
-import { find, get, lowerCase as lower, startCase } from "lodash";
+import { find, get, lowerCase as lower, startCase } from "lodash-es";
 import { assert } from "utils/assert";
 import { Fields } from "./Fields";
 import { BreakpointProcessor } from "../Breakpoint";

@@ -5,7 +5,7 @@ import {
 import { getParser } from "components/renderer";
 import { inferLayerName } from "layers";
 import { controller as traceController } from "layers/trace";
-import { chain as _, merge, reduce } from "lodash";
+import { identity, merge, reduce } from "lodash-es";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { set } from "utils/set";
@@ -20,7 +20,7 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
   const layers = slice.layers.use();
   const mapLayerData = useMemo(
     () =>
-      _(layers)
+      layers
         .map((l) => {
           if (!isMapLayer(l)) return;
           const { parsedMap } = l?.source ?? {};
@@ -39,8 +39,7 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
             name: inferLayerName(l),
           };
         })
-        .filter()
-        .value(),
+        .filter(identity),
     [layers]
   );
   const menu = useMemo(

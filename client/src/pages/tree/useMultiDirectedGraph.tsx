@@ -1,7 +1,7 @@
 import { useTheme } from "@mui/material";
 import { useLoadGraph } from "@react-sigma/core";
 import { MultiDirectedGraph } from "graphology";
-import { Dictionary, forEach } from "lodash";
+import { Dictionary, forEach } from "lodash-es";
 import { Trace } from "protocol";
 import { useMemo } from "react";
 import { TreeWorkerReturnType } from "./treeLayout.worker";
@@ -31,7 +31,7 @@ export function useMultiDirectedGraph(
       });
     });
 
-    const numParents: Dictionary<Set<string | number>> = {};
+    const numParents: Record<string, Set<string | number>> = {};
     forEach(trace?.events, ({ id, pId }) => {
       if (id && pId) {
         numParents[id] = numParents[id] ?? new Set();

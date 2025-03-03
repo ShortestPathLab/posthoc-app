@@ -22,7 +22,6 @@ import {
   ViewInArOutlined as ViewportIcon,
   WorkspacesOutlined as WorkspaceIcon,
 } from "@mui-symbols-material/w400";
-import { Dictionary } from "lodash";
 import { DebugPage } from "./DebugPage";
 import { ExplorePage } from "./ExplorePage";
 import { InfoPage } from "./InfoPage";
@@ -35,7 +34,7 @@ import { TreePage } from "./tree";
 import { ViewportPage } from "./ViewportPage";
 import { WorkspacesPage } from "./workspaces";
 
-export const pages: Dictionary<PageMeta> = {
+export const pages: Record<string, PageMeta> = {
   explore: {
     id: "explore",
     name: "Explore Posthoc",

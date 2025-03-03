@@ -1,6 +1,6 @@
 import CaptureConsole from "capture-console-logs";
 import { useSnackbar } from "components/generic/Snackbar";
-import { join, truncate } from "lodash";
+import { join, truncate } from "lodash-es";
 import { useEffect } from "react";
 
 const captureOn = false;

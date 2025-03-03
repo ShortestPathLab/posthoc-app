@@ -1,4 +1,4 @@
-import { find } from "lodash";
+import { find } from "lodash-es";
 import { slice } from "slices";
 import { useSettings } from "slices/settings";
 import { useConnectionResolver } from "./useConnectionResolver";
@@ -24,9 +24,9 @@ export function useConnectionStatus(url?: string): ConnectionStatus {
     ? resolve({ url })
       ? "connected"
       : loading
-      ? "connecting"
-      : url
-      ? "error"
-      : "not-connected"
+        ? "connecting"
+        : url
+          ? "error"
+          : "not-connected"
     : "not-connected";
 }

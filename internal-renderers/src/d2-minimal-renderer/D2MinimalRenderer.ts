@@ -1,4 +1,4 @@
-import { ceil, clamp, debounce, once, round } from "lodash";
+import { ceil, clamp, debounce, once, round } from "lodash-es";
 import * as PIXI from "pixi.js";
 import { Bounds } from "protocol";
 import { ComponentEntry, makeRenderer, RemoveElementCallback } from "renderer";

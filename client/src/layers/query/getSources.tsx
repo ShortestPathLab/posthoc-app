@@ -1,5 +1,5 @@
 import { dump } from "js-yaml";
-import { truncate } from "lodash";
+import { truncate } from "lodash-es";
 import { maxStringPropLength, Controller } from ".";
 import { mapValuesDeep } from "./mapValuesDeep";
 

@@ -30,7 +30,7 @@ import {
   isUndefined,
   pick,
   startCase,
-} from "lodash";
+} from "lodash-es";
 import { Trace } from "protocol";
 import { ReactNode, useEffect, useState } from "react";
 import { layers } from "slices/layers";

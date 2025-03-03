@@ -22,7 +22,7 @@ import {
   round,
   set,
   startCase,
-} from "lodash";
+} from "lodash-es";
 import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";

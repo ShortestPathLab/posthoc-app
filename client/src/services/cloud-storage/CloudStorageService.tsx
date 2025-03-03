@@ -1,4 +1,4 @@
-import { has } from "lodash";
+import { has } from "lodash-es";
 import { useEffect } from "react";
 import { useAsync } from "react-async-hook";
 import { useLatest } from "react-use";

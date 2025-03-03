@@ -1,4 +1,4 @@
-import { chunk, Dictionary, flatten, identity, maxBy, minBy } from "lodash";
+import { chunk, Dictionary, flatten, identity, maxBy, minBy } from "lodash-es";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
@@ -18,10 +18,10 @@ export type ParsePolyWorkerReturnType = Pick<
   "log" | "bounds" | "nodes"
 >;
 
-const minAt = (c: Dictionary<number>[], index: string) =>
+const minAt = (c: Record<string, number>[], index: string) =>
   minBy(c, index)?.[index];
 
-const maxAt = (c: Dictionary<number>[], index: string) =>
+const maxAt = (c: Record<string, number>[], index: string) =>
   maxBy(c, index)?.[index];
 
 function aabb(verts: Point[]) {

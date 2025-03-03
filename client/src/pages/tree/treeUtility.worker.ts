@@ -1,8 +1,8 @@
-import { chain, Dictionary, find, forEach, sumBy, times } from "lodash";
+import { entries, find, forEach, groupBy, sumBy, times } from "lodash-es";
 import { arrayToTree } from "performant-array-to-tree";
 import { Trace, TraceEvent } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";
-
+import { _ } from "utils/chain";
 export type EventTree = {
   id: Key;
   name: string;
@@ -71,12 +71,14 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
     }
     return tree;
   }
-  if (trace) {
-    const r = chain(trace.events)
-      .map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId }))
-      .groupBy("id")
-      .entries()
-      .map(([k, v]) => ({
+  if (!trace) return;
+  const nodes = _(
+    trace.events ?? [],
+    (t) => t.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
+    (t) => groupBy(t, "id"),
+    entries,
+    (t) =>
+      t.map(([k, v]) => ({
         id: k,
         name: k,
         events: v,
@@ -84,32 +86,31 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
           find(v, (s) => !!s.pId && s.step <= step)?.pId ||
           find(v, (s) => !!s.pId)?.pId,
       }))
-      .value();
+  );
 
-    const tree = arrayToTree(r, {
-      dataField: null,
-      parentId: "pId",
-    }) as EventTree[];
+  const tree = arrayToTree(nodes, {
+    dataField: null,
+    parentId: "pId",
+  }) as EventTree[];
 
-    forEach(tree, addParents);
+  forEach(tree, addParents);
 
-    const idToNode: Dictionary<EventTree> = {};
+  const idToNode: Record<string, EventTree> = {};
 
-    forEach(tree, (tr) =>
-      traverse((t) => {
-        if (t.id !== null && t.id !== undefined) {
-          idToNode[t.id] = t;
-        }
-      }, tr)
-    );
+  forEach(tree, (tr) =>
+    traverse((t) => {
+      if (t.id != null) {
+        idToNode[t.id] = t;
+      }
+    }, tr)
+  );
 
-    forEach(tree, addChildCount);
-    const id = trace?.events?.[step]?.id;
-    if (id && radius !== undefined) {
-      const node = idToNode[id];
-      return { tree: degreeSeparation(node, radius) };
-    } else return { tree };
-  }
+  forEach(tree, addChildCount);
+  const id = trace?.events?.[step]?.id;
+  if (id && radius !== undefined) {
+    const node = idToNode[id];
+    return { tree: degreeSeparation(node, radius) };
+  } else return { tree };
 }
 export type TreeWorkerParameters = {
   trace?: Trace;

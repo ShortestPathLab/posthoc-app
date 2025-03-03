@@ -1,4 +1,4 @@
-import { delay, now } from "lodash";
+import { delay, now } from "lodash-es";
 
 export function wait(ms: number) {
   return new Promise((res) => delay(res, ms));

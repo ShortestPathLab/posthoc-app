@@ -14,7 +14,7 @@ import { Surface } from "components/generic/surface";
 import { SelectField as Select } from "components/generic/inputs/Select";
 import { useConnection } from "hooks/useConnectionResolver";
 import { useConnectionStatus } from "hooks/useConnectionStatus";
-import { entries, omit, startCase } from "lodash";
+import { entries, omit, startCase } from "lodash-es";
 import { useMemo } from "react";
 import { merge } from "slices/reducers";
 import { Remote } from "slices/settings";

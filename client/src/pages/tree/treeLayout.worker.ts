@@ -1,10 +1,10 @@
 import { graphlib, layout } from "@dagrejs/dagre";
-import { Dictionary, forEach, pick } from "lodash";
+import { Dictionary, forEach, pick } from "lodash-es";
 import { Trace, TraceEvent } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";
 
 export function getFinalParents(trace: Trace | undefined) {
-  const finalParent: Dictionary<Key> = {};
+  const finalParent: Record<string, Key> = {};
   forEach(trace?.events, ({ id, pId }) => {
     finalParent[id] = pId;
   });
@@ -57,7 +57,7 @@ function parse({ trace, mode, orientation }: TreeWorkerParameters) {
 
     case "tree":
       {
-        const finalParent: Dictionary<Key> = getFinalParents(trace);
+        const finalParent: Record<string, Key> = getFinalParents(trace);
 
         forEach(trace?.events, ({ id }) => {
           if (id) {

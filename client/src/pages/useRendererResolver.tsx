@@ -1,4 +1,4 @@
-import { head } from "lodash";
+import { head } from "lodash-es";
 import { useMemo } from "react";
 import { useRenderers } from "slices/renderers";
 

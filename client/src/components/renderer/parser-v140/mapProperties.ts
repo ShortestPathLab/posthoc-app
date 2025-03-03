@@ -1,4 +1,4 @@
-import { ObjectIterator } from "lodash";
+import { ObjectIterator } from "lodash-es";
 import { Properties as Props } from "protocol";
 import { Context } from "./Context";
 

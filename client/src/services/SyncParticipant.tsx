@@ -10,7 +10,7 @@ import {
   sortBy,
   throttle,
   uniq,
-} from "lodash";
+} from "lodash-es";
 import sysend from "sysend";
 
 export const instance = sysend.id;

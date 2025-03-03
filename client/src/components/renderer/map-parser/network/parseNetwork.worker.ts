@@ -1,18 +1,19 @@
 import {
-  chain,
   clamp,
-  Dictionary,
   first,
+  groupBy,
   last,
+  mapValues,
   maxBy,
   mean,
   minBy,
   noop,
-} from "lodash";
+} from "lodash-es";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
 import { usingMessageHandler } from "workers/usingWorker";
+import { _ } from "utils/chain";
 
 export type Options = {
   color?: string;
@@ -30,10 +31,10 @@ export type ParseNetworkWorkerReturnType = Pick<
   "log" | "bounds" | "nodes"
 >;
 
-const minAt = (c: Dictionary<number>[], index: string) =>
+const minAt = (c: Record<string, number>[], index: string) =>
   minBy(c, index)?.[index];
 
-const maxAt = (c: Dictionary<number>[], index: string) =>
+const maxAt = (c: Record<string, number>[], index: string) =>
   maxBy(c, index)?.[index];
 
 function aabb(verts: Point[]) {
@@ -65,8 +66,16 @@ function optimizeNetworkEdges(segments: number[][]) {
   // let xs = uniqBy(segments, join);
 
   while (true) {
-    const byHead = chain(xs).groupBy(first).mapValues(toSet).value();
-    const byTail = chain(xs).groupBy(last).mapValues(toSet).value();
+    const byHead = _(
+      xs,
+      (x) => groupBy(x, first),
+      (x) => mapValues(x, toSet)
+    );
+    const byTail = _(
+      xs,
+      (x) => groupBy(x, last),
+      (x) => mapValues(x, toSet)
+    );
     const merged: Set<number[]> = new Set();
     for (const x of xs) {
       if (!merged.has(x)) {

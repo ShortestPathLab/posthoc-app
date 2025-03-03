@@ -1,6 +1,6 @@
 import { FileOpenOutlined } from "@mui-symbols-material/w400";
 import { useSnackbar } from "components/generic/Snackbar";
-import { find, get, startCase } from "lodash";
+import { find, get, startCase } from "lodash-es";
 import { slice } from "slices";
 import { Map, UploadedTrace } from "slices/UIState";
 import { LARGE_FILE_B, formatByte, useBusyState } from "slices/busy";

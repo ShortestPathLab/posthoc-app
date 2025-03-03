@@ -3,7 +3,7 @@ import {
   CompiledD2IntrinsicComponent as CompiledD2Component,
   D2InstrinsicComponents as D2Components,
 } from "./D2IntrinsicComponents";
-import { Dictionary, head, maxBy, minBy } from "lodash";
+import { Dictionary, head, maxBy, minBy } from "lodash-es";
 import { Bounds, Point, Size } from "protocol";
 import { defaultContext } from "./EventContext";
 import dist from "@turf/point-to-line-distance";
@@ -195,7 +195,7 @@ export const path: Primitive<"path"> = {
   },
 };
 
-export const primitives: Dictionary<Primitive> = {
+export const primitives: Record<string, Primitive> = {
   text,
   path,
   rect,

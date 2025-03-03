@@ -1,4 +1,4 @@
-import { memoize as memo } from "lodash";
+import { memoize as memo } from "lodash-es";
 import {
   CompressWorker,
   CompressBinaryWorker,

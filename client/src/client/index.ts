@@ -1,4 +1,4 @@
-import { Dictionary, first, keys } from "lodash";
+import { Dictionary, first, keys } from "lodash-es";
 import { IPCTransport } from "./IPCTransport";
 import { NativeTransport } from "./NativeTransport";
 import { SocketIOTransport } from "./SocketIOTransport";
@@ -9,7 +9,7 @@ type TransportEntry = {
   constructor: TransportConstructor;
 };
 
-export const transports: Dictionary<TransportEntry> = {
+export const transports: Record<string, TransportEntry> = {
   native: { name: "Internal", constructor: NativeTransport },
   socketio: { name: "socket.io", constructor: SocketIOTransport },
   ipc: { name: "Web Worker", constructor: IPCTransport },

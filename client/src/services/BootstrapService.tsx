@@ -1,5 +1,5 @@
 import { isWorkspace, useWorkspace } from "hooks/useWorkspace";
-import { now } from "lodash";
+import { now } from "lodash-es";
 import { useAsync } from "react-async-hook";
 
 export function BootstrapService() {

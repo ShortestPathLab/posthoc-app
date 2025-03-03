@@ -1,4 +1,4 @@
-import { delay, now, once } from "lodash";
+import { delay, now, once } from "lodash-es";
 import { Request, Response } from "protocol/Message";
 import { Transport } from "client/Transport";
 

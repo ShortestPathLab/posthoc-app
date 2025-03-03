@@ -1,5 +1,5 @@
 import { store } from "@davstack/store";
-import { filter, head, isEqual, map } from "lodash";
+import { filter, head, isEqual, map } from "lodash-es";
 import { useEffect, useState } from "react";
 import { createOne, createSelector } from "./selector";
 import hash from "object-hash";

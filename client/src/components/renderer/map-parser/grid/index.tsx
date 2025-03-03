@@ -12,7 +12,7 @@ import { EditorProps } from "components/Editor";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Option } from "components/layer-editor/Option";
 import { useDebouncedState } from "hooks/useDebouncedState";
-import { find, flow, round, set, sortBy, startCase } from "lodash";
+import { find, flow, round, set, sortBy, startCase } from "lodash-es";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import memo from "memoizee";
 import { getClosestColor } from "nearest-pantone";
@@ -23,6 +23,7 @@ import { MapEditor, MapParser, ParsedMapHydrator } from "../Parser";
 import { getGridSymbolsAsync } from "./getGridSymbolsAsync";
 import { Options } from "./parseGrid.worker";
 import { parseGridAsync } from "./parseGridAsync";
+import objectHash from "object-hash";
 
 function between(v: number, min: number, max: number) {
   return v >= min && v < max;
@@ -38,7 +39,7 @@ export const parse: MapParser = memo(
       })),
     };
   },
-  { normalizer: JSON.stringify }
+  { normalizer: (args) => objectHash([...args]) }
 );
 
 export function SymbolColorPicker({

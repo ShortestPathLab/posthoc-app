@@ -10,7 +10,7 @@ import {
 } from "react";
 import { useCss, useToggle } from "react-use";
 
-import { set } from "lodash";
+import { set } from "lodash-es";
 import { useOverlayScrollbars } from "overlayscrollbars-react";
 import {
   VirtuosoHandle as Handle,

@@ -2,7 +2,7 @@ import { Stack } from "@mui/material";
 import WorkspacesEditor from "pages/workspaces/WorkspacesEditor";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { values } from "lodash";
+import { values } from "lodash-es";
 import { cloudStorageProviders } from "services/cloud-storage";
 import { useCloudStorageInstance } from "slices/cloudStorage";
 import { PageContentProps } from "../PageMeta";

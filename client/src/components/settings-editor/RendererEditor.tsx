@@ -9,7 +9,7 @@ import {
 import { Block } from "components/generic/Block";
 import { Surface } from "components/generic/surface";
 import { SelectField as Select } from "components/generic/inputs/Select";
-import { entries, find, join, omit, startCase } from "lodash";
+import { entries, find, join, omit, startCase } from "lodash-es";
 import { transports } from "services/RendererService";
 import { merge } from "slices/reducers";
 import { useRenderers } from "slices/renderers";
@@ -47,8 +47,8 @@ export function RendererEditor({
   const status = value.disabled
     ? "disabled"
     : current?.renderer
-    ? "connected"
-    : "error";
+      ? "connected"
+      : "error";
 
   return (
     <Block alignItems="center" py={1}>

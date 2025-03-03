@@ -14,13 +14,14 @@ import { Steps } from "layers";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
 import {
-  chain as _,
+  filter,
   findIndex,
   isEqual,
   isUndefined,
   reduce,
   sortBy,
-} from "lodash";
+  uniq,
+} from "lodash-es";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { slice } from "slices";
 import { WithLayer } from "slices/layers";
@@ -33,7 +34,7 @@ import { ITEM_HEIGHT, PADDING_TOP, pxToInt } from "./constants";
 import { StepsLayer } from "./StepsLayer";
 import { StepsPageState } from "./StepsPageState";
 import { Item } from "./Item";
-
+import { _ } from "utils/chain";
 export function PageContent({ layer: key }: { layer?: string }) {
   const { spacing } = useTheme();
   const paper = usePaper();
@@ -66,11 +67,12 @@ export function PageContent({ layer: key }: { layer?: string }) {
   const { steps, stepToFilteredStep, isDisabled } = useMemo(() => {
     if (rawSteps) {
       const steps = rawSteps.map((a, b) => [a, b] as const);
-      const stepTypes = _(steps)
-        .map(([e]) => e?.type)
-        .filter()
-        .uniq()
-        .value();
+      const stepTypes = _(
+        steps,
+        (s) => s.map(([e]) => e?.type),
+        (s) => filter(s),
+        uniq
+      );
 
       const allSelected = !stepTypes.includes(_selectedType);
 

@@ -12,9 +12,8 @@ import { Property, renderProperty } from "components/generic/Property";
 import { Surface, SurfaceProps } from "components/generic/surface";
 import { useSm } from "hooks/useSmallDisplay";
 import {
-  Dictionary,
-  chain as _,
   constant,
+  entries,
   filter,
   indexOf,
   isNumber,
@@ -22,9 +21,12 @@ import {
   isUndefined,
   map,
   merge,
+  slice,
+  sortBy,
   startCase,
-} from "lodash";
+} from "lodash-es";
 import { Fragment } from "react";
+import { _ } from "utils/chain";
 
 export const COMMON_PROPS = ["type"];
 
@@ -39,14 +41,16 @@ export const HEURISTIC_PROPS = ["f", "g", "h"];
 const ALL_PROPS = [...OMIT_PROPS, ...GRAPH_PROPS, ...HEURISTIC_PROPS];
 
 const sortEventKeys = (e: PropertyListProps["event"]) =>
-  _(e)
-    .entries()
-    .filter(([, v]) => !isUndefined(v))
-    .sortBy(([k]) => indexOf(ALL_PROPS, k) + 1 || Number.MAX_SAFE_INTEGER)
-    .value();
+  _(
+    e,
+    (v) => entries(v),
+    (v) => filter(v, ([, v]) => !isUndefined(v)),
+    (v) =>
+      sortBy(v, ([k]) => indexOf(ALL_PROPS, k) + 1 || Number.MAX_SAFE_INTEGER)
+  );
 
 type PropertyListProps = {
-  event?: Dictionary<unknown>;
+  event?: Record<string, unknown>;
   max?: number;
   simple?: boolean;
   primitives?: boolean;
@@ -155,19 +159,22 @@ export function PropertyList({
   const sorted = sortEventKeys(event);
   return (
     <Block {...rest}>
-      {_(sorted)
-        .filter(primitives ? ([, v]) => isPrimitive(v) : constant(true))
-        .slice(0, max)
-        .map(([k, v], i) => (
-          <Property
-            label={k}
-            value={v}
-            key={i}
-            type={{ variant }}
-            simple={simple}
-          />
-        ))
-        .value()}
+      {_(
+        sorted,
+        (v) =>
+          filter(v, primitives ? ([, v]) => isPrimitive(v) : constant(true)),
+        (v) => slice(v, 0, max),
+        (v) =>
+          map(v, ([k, v], i) => (
+            <Property
+              label={k}
+              value={v}
+              key={i}
+              type={{ variant }}
+              simple={simple}
+            />
+          ))
+      )}
       {sorted.length > max && !simple && (
         <PropertyDialog event={event} max={max} />
       )}

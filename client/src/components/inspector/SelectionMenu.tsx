@@ -12,10 +12,10 @@ import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer
 import { useCache } from "hooks/useCache";
 import { SelectionInfoProvider } from "layers/LayerController";
 import { getController } from "layers/layerControllers";
-import { chain, Dictionary, entries, map, merge } from "lodash";
+import { entries, map, merge, reduce, sortBy } from "lodash-es";
 import { ComponentProps, ReactNode, useMemo } from "react";
 import { slice } from "slices";
-
+import { _ } from "utils/chain";
 type Props = {
   selection?: RendererSelectEvent;
   onClose?: () => void;
@@ -33,10 +33,10 @@ export type SelectionMenuEntry = {
 type SelectionMenuSection = {
   index?: number;
   primary?: ReactNode;
-  items?: Dictionary<SelectionMenuEntry>;
+  items?: Record<string, SelectionMenuEntry>;
 };
 
-export type SelectionMenuContent = Dictionary<SelectionMenuSection>;
+export type SelectionMenuContent = Record<string, SelectionMenuSection>;
 
 export function SelectionMenu({ selection, onClose }: Props) {
   const MenuContent = useSelectionMenu();
@@ -61,81 +61,86 @@ export function SelectionMenu({ selection, onClose }: Props) {
             {(menu) => {
               const entries2 = entries(menu);
               return entries2.length ? (
-                chain(entries2)
-                  .sortBy(([, v]) => v.index)
-                  .map(([, { items, primary }], i) => (
-                    <>
-                      {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
-                      {primary && (
-                        <ListItem sx={{ py: 0 }}>
-                          <Typography
-                            component="div"
-                            color="text.secondary"
-                            variant="overline"
-                          >
-                            {primary}
-                          </Typography>
-                        </ListItem>
-                      )}
-                      {chain(items)
-                        .entries()
-                        .sortBy(([, v]) => v.index)
-                        .map(
-                          ([
-                            k,
-                            { action, icon, primary, secondary, extras },
-                          ]) => (
-                            <>
-                              {!!(action || primary || secondary) &&
-                                (action ? (
-                                  <MenuItem
-                                    key={k}
-                                    onClick={() => {
-                                      action?.();
-                                      onClose?.();
-                                    }}
-                                  >
-                                    {icon && (
-                                      <ListItemIcon>{icon}</ListItemIcon>
-                                    )}
-                                    <ListItemText
-                                      primary={primary}
-                                      sx={{ mr: 4 }}
-                                    />
-                                    <Typography
-                                      component="div"
-                                      variant="body2"
-                                      color="text.secondary"
-                                    >
-                                      {secondary}
-                                    </Typography>
-                                  </MenuItem>
-                                ) : (
-                                  <ListItem key={k}>
-                                    {icon && (
-                                      <ListItemIcon>{icon}</ListItemIcon>
-                                    )}
-                                    <ListItemText
-                                      primary={primary}
-                                      sx={{ mr: 4 }}
-                                    />
-                                    <Typography
-                                      component="div"
-                                      variant="body2"
-                                      color="text.secondary"
-                                    >
-                                      {secondary}
-                                    </Typography>
-                                  </ListItem>
-                                ))}
-                              {!!extras && extras}
-                            </>
-                          )
-                        )
-                        .value()}
-                    </>
-                  ))
-                  .value()
+                _(
+                  entries2,
+                  (v) => sortBy(v, ([, v]) => v.index),
+                  (v) =>
+                    map(v, ([, { items, primary }], i) => (
+                      <>
+                        {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
+                        {primary && (
+                          <ListItem sx={{ py: 0 }}>
+                            <Typography
+                              component="div"
+                              color="text.secondary"
+                              variant="overline"
+                            >
+                              {primary}
+                            </Typography>
+                          </ListItem>
+                        )}
+                        {_(
+                          items,
+                          entries,
+                          (v) => sortBy(v, ([, v]) => v.index),
+                          (v) =>
+                            map(
+                              v,
+                              ([
+                                k,
+                                { action, icon, primary, secondary, extras },
+                              ]) => (
+                                <>
+                                  {!!(action || primary || secondary) &&
+                                    (action ? (
+                                      <MenuItem
+                                        key={k}
+                                        onClick={() => {
+                                          action?.();
+                                          onClose?.();
+                                        }}
+                                      >
+                                        {icon && (
+                                          <ListItemIcon>{icon}</ListItemIcon>
+                                        )}
+                                        <ListItemText
+                                          primary={primary}
+                                          sx={{ mr: 4 }}
+                                        />
+                                        <Typography
+                                          component="div"
+                                          variant="body2"
+                                          color="text.secondary"
+                                        >
+                                          {secondary}
+                                        </Typography>
+                                      </MenuItem>
+                                    ) : (
+                                      <ListItem key={k}>
+                                        {icon && (
+                                          <ListItemIcon>{icon}</ListItemIcon>
+                                        )}
+                                        <ListItemText
+                                          primary={primary}
+                                          sx={{ mr: 4 }}
+                                        />
+                                        <Typography
+                                          component="div"
+                                          variant="body2"
+                                          color="text.secondary"
+                                        >
+                                          {secondary}
+                                        </Typography>
+                                      </ListItem>
+                                    ))}
+                                  {!!extras && extras}
+                                </>
+                              )
+                            )
+                        )}
+                      </>
+                    ))
+                )
               ) : (
                 <>
                   <ListItem>
@@ -167,17 +172,21 @@ function useSelectionMenu() {
   );
   return useMemo(
     () =>
-      chain(layers)
-        .reduce((A, l) => {
+      reduce(
+        layers,
+        (A, l) => {
           const B = getController(l.type)?.provideSelectionInfo ?? identity;
           // eslint-disable-next-line react/display-name
           return ({ children, event }: SelectionInfoProviderProps) => (
             <B layer={l.key} event={event}>
-              {(a) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}
+              {(a: SelectionMenuContent) => (
+                <A event={event}>{(b) => children?.(merge(a, b))}</A>
+              )}
             </B>
           );
-        }, identity)
-        .value(),
+        },
+        identity
+      ),
     [layers]
   );
 }
