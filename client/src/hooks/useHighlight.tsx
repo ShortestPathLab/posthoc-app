@@ -20,11 +20,17 @@ import { _ } from "utils/chain";
 import { TraceEvent } from "protocol";
 export const index = <T extends TraceEvent>(
   a: T[] = [],
+  id: "step" | "index" = "step",
   by: "id" | "pId" = "id"
 ) =>
   _(
     a,
-    (c) => c.map((c) => ({ step: c.step, id: c.id, pId: c.pId })),
+    (c) =>
+      c.map((c, i) => ({
+        step: id === "index" ? i : c.step,
+        id: c.id,
+        pId: c.pId,
+      })),
     (c) => groupBy(c, by)
   );
 
@@ -97,7 +103,7 @@ export function useHighlightNodes(key?: string): {
     [layer?.source?.highlighting, trace]
   );
 
-  const groupedTraceById = index(trace?.events);
+  const groupedTraceById = index(trace?.events, "index");
 
   const getPrecedentEvents = (
     root: Node,
@@ -114,7 +120,7 @@ export function useHighlightNodes(key?: string): {
     const precedentTree: Subtree = {};
 
     if (parentEvents) {
-      const groupedParents = index(parentEvents, "pId");
+      const groupedParents = index(parentEvents, "step", "pId");
 
       forOwn(groupedParents, (parent) => {
         const event = find(parent, (c) => c.step <= root!.step);
@@ -159,7 +165,7 @@ export function useHighlightNodes(key?: string): {
     [layer?.source?.highlighting, trace]
   );
 
-  const groupedTraceBypId = index(trace?.events, "pId");
+  const groupedTraceBypId = index(trace?.events, "index", "pId");
 
   const getAllSubtreeNodes = (
     root: Node,
@@ -175,7 +181,7 @@ export function useHighlightNodes(key?: string): {
     const subtree: Subtree = {};
 
     if (children) {
-      const groupedChildren = index(children);
+      const groupedChildren = index(children, "step");
 
       forEach(groupedChildren, (child) => {
         const event = find(child, (c) => c.step >= root!.step);

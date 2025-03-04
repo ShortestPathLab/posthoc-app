@@ -25,7 +25,7 @@ export function makePathIndex(trace: Trace) {
     [K in number]?: Node;
   } = {};
 
-  const r = index(trace?.events);
+  const r = index(trace?.events, "index");
 
   forEach(trace?.events, ({ id, pId }, i) => {
     if (!isNullish(pId) && allChanges[id] !== pId) {
