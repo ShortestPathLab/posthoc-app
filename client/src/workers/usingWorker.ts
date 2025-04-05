@@ -34,9 +34,9 @@ export type OutErrorDetails = {
 };
 
 export const usingWorkerTask = <T, R>(w: WorkerConstructor) => {
-  return (inp: T) =>
+  return (inp: T, transferrables?: Transferable[]) =>
     usingWorker<R>(w)((worker) => {
-      worker.postMessage(inp);
+      worker.postMessage(inp, { transfer: transferrables });
       return new Promise<R>((res, rej) => {
         worker.onmessage = (out) => {
           res(out.data as R);

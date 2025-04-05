@@ -32,6 +32,7 @@
     "file-select-dialog": "^1.5.4",
     "graphology": "^0.26.0",
     "hotscript": "^1.0.13",
+    "immer": "^10.1.1",
     "internal-renderers": "workspace:*",
     "jimp": "^1.6.0",
     "js-yaml": "^4.1.0",

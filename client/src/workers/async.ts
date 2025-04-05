@@ -14,24 +14,14 @@ export const hashAsync = memoizee(usingWorkerTask<string, string>(HashWorker), {
   normalizer: (args) => objectHash([...args]),
 });
 
-export const compressAsync = memoizee(
-  usingWorkerTask<string, string>(CompressWorker),
-  {
-    normalizer: (args) => objectHash([...args]),
-  }
+export const compressAsync = usingWorkerTask<string, string>(CompressWorker);
+export const compressBinaryAsync = usingWorkerTask<string, Uint8Array>(
+  CompressBinaryWorker
 );
-export const compressBinaryAsync = memoizee(
-  usingWorkerTask<string, Uint8Array>(CompressBinaryWorker),
-  {
-    normalizer: (args) => objectHash([...args]),
-  }
-);
-export const decompressBinaryAsync = memoizee(
-  usingWorkerTask<Uint8Array, string>(DecompressBinaryWorker),
-  {
-    normalizer: (args) => objectHash([...args]),
-  }
-);
+export const decompressBinaryAsync = usingWorkerTask<
+  ReadableStream<Uint8Array> | Uint8Array,
+  string
+>(DecompressBinaryWorker);
 
 export const parseYamlAsync = usingWorkerTask<
   string,

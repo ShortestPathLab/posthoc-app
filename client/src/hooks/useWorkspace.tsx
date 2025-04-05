@@ -105,8 +105,9 @@ export function useWorkspace() {
         if (f && isWorkspaceFile(f)) {
           await usingBusyState(
             async () => {
+              const stream = f.stream();
               const content = isCompressedFile(f)
-                ? await decompress(new Uint8Array(await f.arrayBuffer()))
+                ? await decompress(stream, [stream])
                 : await f.text();
               const { result: parsed, error } = await parseYamlAsync(content);
               if (error) throw error;

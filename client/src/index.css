@@ -18,8 +18,9 @@ body,
   height: 100%;
   user-select: none;
   overflow: hidden;
-  font-family: "Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", "Arial", sans-serif !important;
+  font-family:
+    "Inter", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", "Arial", sans-serif !important;
 }
 
 body {

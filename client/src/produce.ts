@@ -1,5 +1,5 @@
 import { EditorSetterProps } from "components/Editor";
-import { isDefined } from "pages/tree/TreeGraph";
+import * as immer from "immer";
 import { createElement, ReactElement } from "react";
 import { Transaction } from "slices/selector";
 
@@ -12,42 +12,44 @@ export function clone<T>(obj: T) {
 }
 
 export function produce<T>(obj: T, f: Transaction<T>) {
-  const b = clone(obj);
-  const out = f(b);
-  return isDefined(out) ? out! : b;
+  return immer.produce(obj, f);
+  // const out = f(b);
+  // return isDefined(out) ? out! : b;
 }
 
-export async function produceAsync<T>(obj: T, f: (obj: T) => Promise<void>) {
-  const b = clone(obj);
-  await f(b);
-  return b;
+export async function produceAsync<T extends object>(
+  obj: T,
+  f: (obj: T) => Promise<void>
+) {
+  const draft = immer.createDraft(obj);
+  await f(draft as T);
+  return immer.finishDraft(draft);
 }
 
-export function transaction<T, U>(obj: T, f: (obj: T) => U) {
-  return f(clone(obj));
+export function transaction<
+  T extends object,
+  U extends ValidRecipeReturnType<T>,
+>(obj: T, f: (obj: T) => U) {
+  return immer.produce(obj, f);
 }
 
 export async function transactionAsync<T, U>(
   obj: T,
   f: (obj: T) => Promise<U>
 ) {
-  return await f(clone(obj));
+  return await produceAsync(obj, f);
 }
 
 export const producifyAsync =
   <T>(f: (obj: T) => Promise<void>) =>
   async (obj: T) => {
-    const b = clone(obj);
-    await f(b);
-    return b;
+    return await produceAsync(obj, f);
   };
 
 export const producify =
   <T>(f: (obj: T) => void) =>
   (obj: T) => {
-    const b = clone(obj);
-    f(b);
-    return b;
+    return produce(obj, f);
   };
 
 export type ServiceProps<T> = EditorSetterProps<T> & {

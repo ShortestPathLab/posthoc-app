@@ -28,7 +28,7 @@ type Persistence = ReturnType<typeof getPersistence>;
 
 const { min } = Math;
 
-const SLAVE_COUNT = navigator.hardwareConcurrency ?? 8;
+const SLAVE_COUNT = 1;
 
 const parseTraceWorker = usingWorkerTask<
   ParseTraceWorkerParameters,

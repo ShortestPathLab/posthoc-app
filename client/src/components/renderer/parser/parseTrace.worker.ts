@@ -8,7 +8,7 @@ import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";
 
 const { min } = Math;
 
-const SLAVE_COUNT = navigator.hardwareConcurrency ?? 8;
+const SLAVE_COUNT = 1;
 
 export class ParseTraceWorker extends Worker {
   constructor() {
