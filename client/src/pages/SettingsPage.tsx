@@ -178,7 +178,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
         </Page.Options>
         <Page.Content>
           <Stack sx={{ pt: 6 }} ref={ref as Ref<HTMLDivElement>}>
-            <TabPanel value="general">
+            <TabPanel value="general" sx={{ p: sm ? 2 : 3 }}>
               <Stack direction="row" sx={{ gap: 2 }}>
                 {width > 840 && (
                   <Stack
@@ -277,7 +277,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     icon={<PaletteRounded />}
                     description="The accent color used in the app"
                   >
-                    <Box sx={{ px: 1 }}>
+                    <Box sx={{ my: -0.5 }}>
                       <FeaturePicker
                         paper
                         value={accentColor}
@@ -374,7 +374,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       trigger={({ open }) => (
                         <Button
                           size="small"
-                          sx={{ mx: 1, minWidth: "max-content" }}
+                          sx={{ minWidth: "max-content" }}
                           color="error"
                           startIcon={<RestartAltOutlined />}
                           onClick={open}
