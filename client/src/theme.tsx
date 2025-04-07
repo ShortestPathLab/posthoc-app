@@ -113,6 +113,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
         },
       },
     },
+    shape: { borderRadius: 8 },
     shadows: [
       "none",
       ...times(24, constant(shadow)),
@@ -138,7 +139,7 @@ export function useAcrylic(color?: string) {
 export function usePaper() {
   return (elevation: number = 1) =>
     ({
-      borderRadius: 1.5,
+      borderRadius: 1,
       transition: ({ transitions }) =>
         transitions.create(["background-color", "box-shadow"]),
       boxShadow: ({ shadows, palette }) =>

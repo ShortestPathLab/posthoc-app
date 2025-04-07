@@ -64,7 +64,7 @@ export function FeaturePicker({
         <FeaturePickerButton
           {...props}
           {...ButtonProps}
-          sx={_paper ? { ...paper(1), my: 0.5, px: 1.25, py: 0.5 } : {}}
+          sx={_paper ? { ...paper(1), my: 0.5, px: 1.5, py: 0.75 } : {}}
           disabled={!filter(items, (item) => !item.hidden)?.length || disabled}
           icon={selected?.icon ? getIcon(selected.icon, selected.color) : icon}
           arrow={arrow}

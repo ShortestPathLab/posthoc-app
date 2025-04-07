@@ -65,12 +65,12 @@ code {
   width: 100%;
 }
 .MuiTouchRipple-root > * {
-  filter: blur(12px);
+  filter: blur(14px);
   opacity: 0.1 !important;
 }
 
 .MuiFilledInput-root {
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
 }
 .MuiFilledInput-root::before,
