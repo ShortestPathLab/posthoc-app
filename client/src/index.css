@@ -58,6 +58,26 @@ code {
 .error-text {
   background: #483736;
 }
+
+.MuiTabs-root:not(.MuiTabs-vertical) span.MuiTabs-indicator {
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  width: 100%;
+}
+.MuiTouchRipple-root > * {
+  filter: blur(12px);
+  opacity: 0.1 !important;
+}
+
+.MuiFilledInput-root {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.MuiFilledInput-root::before,
+.MuiFilledInput-root::after {
+  display: none !important;
+}
+
 @property --scrollbar-size {
   syntax: "<length>";
   inherits: true;

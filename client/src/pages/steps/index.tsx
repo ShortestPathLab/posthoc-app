@@ -14,11 +14,12 @@ import { nanoid as id } from "nanoid";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { equal } from "slices/selector";
+import { _ } from "utils/chain";
+import { result } from "utils/result";
 import { PageContentProps } from "../PageMeta";
 import { PageContent } from "./PageContent";
 import { StepsLayer, isStepsLayer } from "./StepsLayer";
 import { StepsPageState, useStepsPageState } from "./StepsPageState";
-import { _ } from "utils/chain";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -48,31 +49,35 @@ export function StepsPage({ template: Page }: PageContentProps) {
   // TODO: low performance `isEqual`
   const highlighting = one.use((c) => c?.source?.highlighting, isEqual);
 
-  const { types, selectedType, isHighlighting } = useMemo(() => {
-    if (steps) {
-      const stepTypes = _(
-        steps,
-        (s) => s.map((a, b) => [a, b] as const),
-        (s) => s.map(([e]) => e?.type),
-        (s) => filter(s),
-        uniq
-      );
+  const { types, selectedType, isHighlighting } = useMemo(
+    () =>
+      result(() => {
+        if (steps) {
+          const stepTypes = _(
+            steps,
+            (s) => s.map((a, b) => [a, b] as const),
+            (s) => s.map(([e]) => e?.type),
+            (s) => filter(s),
+            uniq
+          );
 
-      const allSelected = !stepTypes.includes(_selectedType);
-      const showHighlighting = _selectedType === SYMBOL_HIGHLIGHTED;
+          const allSelected = !stepTypes.includes(_selectedType);
+          const showHighlighting = _selectedType === SYMBOL_HIGHLIGHTED;
 
-      return {
-        types: stepTypes,
-        selectedType: showHighlighting
-          ? SYMBOL_HIGHLIGHTED
-          : allSelected
-            ? SYMBOL_ALL
-            : _selectedType,
-        isHighlighting: !isUndefined(highlighting?.path),
-      };
-    }
-    return {};
-  }, [steps, _selectedType, highlighting?.path]);
+          return {
+            types: stepTypes,
+            selectedType: showHighlighting
+              ? SYMBOL_HIGHLIGHTED
+              : allSelected
+                ? SYMBOL_ALL
+                : _selectedType,
+            isHighlighting: !isUndefined(highlighting?.path),
+          };
+        }
+        return {};
+      }).result ?? {},
+    [steps, _selectedType, highlighting?.path]
+  );
 
   useEffectWhen(
     () => {

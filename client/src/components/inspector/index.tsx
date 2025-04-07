@@ -2,18 +2,20 @@ import { Box, Fade, LinearProgress } from "@mui/material";
 import { Sidebar } from "Sidebar";
 import { Block, BlockProps } from "components/generic/Block";
 import { openWindow } from "components/title-bar/window";
+import { produce } from "immer";
 import { isEqual } from "lodash-es";
 import { isMobile } from "mobile-device-detect";
 import { pages } from "pages";
 import { Page } from "pages/Page";
 import { PlaceholderPage } from "pages/PlaceholderPage";
-import { produce } from "immer";
+import { ErrorBoundary } from "react-error-boundary";
 import { slice } from "slices";
 import { useAnyLoading } from "slices/loading";
 import { PanelState } from "slices/view";
 import { FileDropZone } from "./FileDropZone";
 import { FullscreenModalHost } from "./FullscreenModalHost";
 import { FullscreenProgress } from "./FullscreenProgress";
+import { ErrorPlaceholder } from "./Placeholder";
 import { ViewTree } from "./ViewTree";
 
 function useView() {
@@ -53,7 +55,22 @@ export function Inspector(props: BlockProps) {
               pages[content?.type ?? ""]?.content ?? PlaceholderPage;
             return (
               <Box sx={{ width: "100%", height: "100%" }}>
-                <Content template={Page} />
+                <ErrorBoundary
+                  fallbackRender={({ error, resetErrorBoundary }) => (
+                    <ErrorPlaceholder
+                      sx={{ width: "100%", height: "100%" }}
+                      label={`An error occurred`}
+                      secondary={
+                        "message" in error
+                          ? error.message
+                          : "Couldn't render this view"
+                      }
+                      onReset={resetErrorBoundary}
+                    />
+                  )}
+                >
+                  <Content template={Page} />
+                </ErrorBoundary>
               </Box>
             );
           }}

@@ -35,6 +35,7 @@ import { StepsLayer } from "./StepsLayer";
 import { StepsPageState } from "./StepsPageState";
 import { Item } from "./Item";
 import { _ } from "utils/chain";
+import { result } from "utils/result";
 export function PageContent({ layer: key }: { layer?: string }) {
   const { spacing } = useTheme();
   const paper = usePaper();
@@ -64,58 +65,62 @@ export function PageContent({ layer: key }: { layer?: string }) {
   const highlighting = one.use((c) => c?.source?.highlighting, isEqual);
   const isHighlighting = _selectedType === SYMBOL_HIGHLIGHTED;
 
-  const { steps, stepToFilteredStep, isDisabled } = useMemo(() => {
-    if (rawSteps) {
-      const steps = rawSteps.map((a, b) => [a, b] as const);
-      const stepTypes = _(
-        steps,
-        (s) => s.map(([e]) => e?.type),
-        (s) => filter(s),
-        uniq
-      );
+  const { steps, stepToFilteredStep, isDisabled } = useMemo(
+    () =>
+      result(() => {
+        if (rawSteps) {
+          const steps = rawSteps.map((a, b) => [a, b] as const);
+          const stepTypes = _(
+            steps,
+            (s) => s.map(([e]) => e?.type),
+            (s) => filter(s),
+            uniq
+          );
 
-      const allSelected = !stepTypes.includes(_selectedType);
+          const allSelected = !stepTypes.includes(_selectedType);
 
-      const path = highlighting?.path;
+          const path = highlighting?.path;
 
-      const highlighted = path
-        ? path instanceof Array
-          ? path
-          : flattenSubtree(path)
-        : [];
+          const highlighted = path
+            ? path instanceof Array
+              ? path
+              : flattenSubtree(path)
+            : [];
 
-      const highlightedSet = new Set(highlighted);
+          const highlightedSet = new Set(highlighted);
 
-      const filtered = sortBy(
-        showHighlighting
-          ? steps.filter(([, step]) => highlightedSet.has(step))
-          : allSelected
-            ? steps
-            : steps.filter(([a]) => a.type === _selectedType),
-        ([, step]) => step
-      );
+          const filtered = sortBy(
+            showHighlighting
+              ? steps.filter(([, step]) => highlightedSet.has(step))
+              : allSelected
+                ? steps
+                : steps.filter(([a]) => a.type === _selectedType),
+            ([, step]) => step
+          );
 
-      const { stepMap } = reduce(
-        steps,
-        (prev, [, i]) => {
-          const j = findIndex(filtered, ([, j]) => j >= i, prev.from);
-          const k = j === -1 ? filtered.length : j;
-          prev.from = k;
-          prev.stepMap.push(k);
-          return prev;
-        },
-        { from: 0, stepMap: [] as number[] }
-      );
+          const { stepMap } = reduce(
+            steps,
+            (prev, [, i]) => {
+              const j = findIndex(filtered, ([, j]) => j >= i, prev.from);
+              const k = j === -1 ? filtered.length : j;
+              prev.from = k;
+              prev.stepMap.push(k);
+              return prev;
+            },
+            { from: 0, stepMap: [] as number[] }
+          );
 
-      return {
-        steps: filtered,
-        stepToFilteredStep: (i: number) => stepMap[i],
-        isDisabled: (i: number) =>
-          isHighlighting ? !highlightedSet.has(i) : false,
-      };
-    }
-    return {};
-  }, [rawSteps, _selectedType, highlighting, showHighlighting]);
+          return {
+            steps: filtered,
+            stepToFilteredStep: (i: number) => stepMap[i],
+            isDisabled: (i: number) =>
+              isHighlighting ? !highlightedSet.has(i) : false,
+          };
+        }
+        return {};
+      }).result ?? {},
+    [rawSteps, _selectedType, highlighting, showHighlighting]
+  );
 
   useEffect(() => {
     if (stepToFilteredStep && scrollerRef && ref.current) {

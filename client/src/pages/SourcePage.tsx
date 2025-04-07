@@ -22,7 +22,7 @@ import { load, register } from "language";
 import { produceAsync as produce } from "produce";
 import { set } from "utils/set";
 import { useAsync } from "react-async-hook";
-import { result } from "utils/result";
+import { resultAsync } from "utils/result";
 
 export function isYamlException(e: unknown): e is YAMLException {
   return isObject(e) && "name" in e && e.name === "YAMLException";
@@ -78,7 +78,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
           const one = slice.layers.one<SourceLayer>(selected.layer);
           const layer = one.get();
           assert(layer, "layer is defined");
-          const a = await result<SourceLayer, Error>(() =>
+          const a = await resultAsync<SourceLayer, Error>(() =>
             produce(
               layer,
               async (l) =>
@@ -102,7 +102,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   useEffect(() => {
     if (monaco) {
-      return register(monaco);
+      register(monaco);
     }
   }, [monaco]);
 

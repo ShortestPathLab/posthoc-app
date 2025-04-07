@@ -12,7 +12,7 @@ export function FeaturePickerButton({
     <Button
       {...props}
       sx={{
-        minWidth: 0,
+        minWidth: "max-content",
         ...props.sx,
       }}
       startIcon={icon}

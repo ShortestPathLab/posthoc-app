@@ -109,7 +109,9 @@ export function useWorkspace() {
               const content = isCompressedFile(f)
                 ? await decompress(stream, [stream])
                 : await f.text();
-              const { result: parsed, error } = await parseYamlAsync(content);
+              const { result: parsed, error } = await parseYamlAsync({
+                content,
+              });
               if (error) throw error;
               cast<Workspace | undefined>(parsed);
               if (!parsed) return;

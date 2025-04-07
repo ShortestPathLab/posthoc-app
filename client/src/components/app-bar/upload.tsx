@@ -1,12 +1,12 @@
 import { fileDialog as file } from "file-select-dialog";
 import { find, startCase } from "lodash-es";
-import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
-import { UploadedTrace } from "slices/UIState";
-import { parseYamlAsync } from "workers/async";
-import { name, ext } from "utils/path";
 import { nanoid as id } from "nanoid";
 import { Trace as TraceLegacy } from "protocol";
+import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { Trace } from "protocol/Trace-v140";
+import { UploadedTrace } from "slices/UIState";
+import { ext, name } from "utils/path";
+import { parseYamlAsync } from "workers/async";
 
 const customId = "internal/custom";
 
@@ -49,7 +49,9 @@ export function readUploadedTrace(f: File) {
     read: async () => {
       if (isTraceFormat(f)) {
         const content = await f.text();
-        const { result: parsed, error } = await parseYamlAsync(content);
+        const { result: parsed, error } = await parseYamlAsync({
+          content,
+        });
         if (error) throw error;
         return {
           ...custom(),

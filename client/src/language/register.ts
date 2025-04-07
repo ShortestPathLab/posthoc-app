@@ -1,4 +1,4 @@
-import { flatMap, isUndefined, join, map } from "lodash-es";
+import { flatMap, isUndefined, join, map, once } from "lodash-es";
 import {
   MarkerSeverity,
   type default as Monaco,
@@ -29,18 +29,18 @@ async function generateDts(
 }
 
 const registered = new Map<typeof Monaco, () => void>();
-const count = new Map<typeof Monaco, number>();
+const usage = new Map<typeof Monaco, number>();
 
-export const register = (monaco: typeof Monaco) => {
+export const register = once((monaco: typeof Monaco) => {
   if (registered.has(monaco)) {
-    count.set(monaco, (count.get(monaco) ?? 0) + 1);
+    usage.set(monaco, (usage.get(monaco) ?? 0) + 1);
     return registered.get(monaco)!;
   }
 
   monaco.languages.register({ id: "typescript" });
   monaco.languages.register({ id: "yaml" });
 
-  const yaml = configureMonacoYaml(monaco, {
+  configureMonacoYaml(monaco, {
     enableSchemaRequest: true,
     schemas: [
       {
@@ -51,10 +51,7 @@ export const register = (monaco: typeof Monaco) => {
     ],
   });
 
-  const tokensProvider = monaco.languages.setMonarchTokensProvider(
-    "yaml",
-    language
-  );
+  monaco.languages.setMonarchTokensProvider("yaml", language);
   monaco.languages.setLanguageConfiguration("yaml", languageConfig(monaco));
 
   const completionItemKind = {
@@ -73,47 +70,46 @@ export const register = (monaco: typeof Monaco) => {
     lib: ["esnext"],
   });
 
-  const completionItemProvider =
-    monaco.languages.registerCompletionItemProvider("yaml", {
-      triggerCharacters: [".", "("],
-      provideCompletionItems: async (model, position) => {
-        const expr = getExpression(model, position);
-        if (isUndefined(expr)) return { suggestions: [] };
-        generateDts(monaco, model);
-        const { uri, worker, dispose } = await getInstance(
-          monaco,
-          model,
-          "completion",
-          expr.match
-        );
-        const suggestions = (await worker.getCompletionsAtPosition(
-          uri.toString(),
-          expr.at + 1
-        )) as CompletionInfo | undefined;
-        assert(suggestions, "suggestions is defined");
-        const word = model.getWordUntilPosition(position);
-        dispose();
-        return {
-          suggestions: suggestions.entries.map((suggestion) => ({
-            insertText: suggestion.name,
-            sortText: suggestion.sortText,
-            kind: get(
-              completionItemKind,
-              suggestion.kind as keyof typeof completionItemKind
-            ),
-            label: suggestion.name,
-            range: new Range(
-              position.lineNumber,
-              word.startColumn,
-              position.lineNumber,
-              word.endColumn
-            ),
-          })),
-        };
-      },
-    });
+  monaco.languages.registerCompletionItemProvider("yaml", {
+    triggerCharacters: [".", "("],
+    provideCompletionItems: async (model, position) => {
+      const expr = getExpression(model, position);
+      if (isUndefined(expr)) return { suggestions: [] };
+      generateDts(monaco, model);
+      const { uri, worker, dispose } = await getInstance(
+        monaco,
+        model,
+        "completion",
+        expr.match
+      );
+      const suggestions = (await worker.getCompletionsAtPosition(
+        uri.toString(),
+        expr.at + 1
+      )) as CompletionInfo | undefined;
+      assert(suggestions, "suggestions is defined");
+      const word = model.getWordUntilPosition(position);
+      dispose();
+      return {
+        suggestions: suggestions.entries.map((suggestion) => ({
+          insertText: suggestion.name,
+          sortText: suggestion.sortText,
+          kind: get(
+            completionItemKind,
+            suggestion.kind as keyof typeof completionItemKind
+          ),
+          label: suggestion.name,
+          range: new Range(
+            position.lineNumber,
+            word.startColumn,
+            position.lineNumber,
+            word.endColumn
+          ),
+        })),
+      };
+    },
+  });
 
-  const hoverProvider = monaco.languages.registerHoverProvider("yaml", {
+  monaco.languages.registerHoverProvider("yaml", {
     provideHover: async (model, position) => {
       const expr = getExpression(model, position);
       if (isUndefined(expr)) return { contents: [] };
@@ -143,7 +139,7 @@ export const register = (monaco: typeof Monaco) => {
     },
   });
 
-  const markerProvider = registerMarkerDataProvider(monaco, "yaml", {
+  registerMarkerDataProvider(monaco, "yaml", {
     owner: "trace-expression-markers",
     provideMarkerData: async (model): Promise<editor.IMarkerData[]> => {
       const text = model.getValue();
@@ -181,19 +177,4 @@ export const register = (monaco: typeof Monaco) => {
       }));
     },
   });
-
-  const dispose = () => {
-    count.set(monaco, count.get(monaco) ?? 1 - 1);
-    if (count.get(monaco)! > 0) return;
-    registered.delete(monaco);
-    yaml.dispose();
-    [
-      markerProvider,
-      tokensProvider,
-      completionItemProvider,
-      hoverProvider,
-    ].forEach((d) => d.dispose());
-  };
-  registered.set(monaco, dispose);
-  return dispose;
-};
+});

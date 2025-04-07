@@ -69,14 +69,16 @@ function computeLabels(labels?: unknown[]) {
       switch (type) {
         case "text":
           // Infer categorical if more than 50% of labels are reused
-          return v.length > unique.length * 2 ? "text/categorical" : "text";
+          return v.length > unique.length * 2
+            ? ("text/categorical" as const)
+            : ("text" as const);
         case "number":
           return every(v, (c) => isInteger(c.value))
-            ? "number/discrete"
-            : "number/continuous";
+            ? ("number/discrete" as const)
+            : ("number/continuous" as const);
       }
     }
-    return "mixed";
+    return "mixed" as const;
   }
 
   return _(

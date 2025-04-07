@@ -9,6 +9,7 @@ import {
   ParseYamlWorker,
 } from ".";
 import { usingWorkerTask } from "./usingWorker";
+import { Schema } from "ajv";
 
 export const hashAsync = memoizee(usingWorkerTask<string, string>(HashWorker), {
   normalizer: (args) => objectHash([...args]),
@@ -24,7 +25,15 @@ export const decompressBinaryAsync = usingWorkerTask<
 >(DecompressBinaryWorker);
 
 export const parseYamlAsync = usingWorkerTask<
-  string,
+  { content: string; schema?: Schema },
   | { result: unknown; error: undefined }
   | { error: YAMLException; result: undefined }
->(ParseYamlWorker);
+>(ParseYamlWorker) as <T>({
+  content,
+  schema,
+}: {
+  content: string;
+  schema?: Schema;
+}) => Promise<
+  { result: T; error: undefined } | { error: YAMLException; result: undefined }
+>;

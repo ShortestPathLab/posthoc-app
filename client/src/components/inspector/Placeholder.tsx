@@ -1,7 +1,11 @@
-import { WidgetsOutlined } from "@mui-symbols-material/w400";
-import { Box, Typography as Type } from "@mui/material";
+import {
+  CancelOutlined,
+  RefreshOutlined,
+  WidgetsOutlined,
+} from "@mui-symbols-material/w400";
+import { Box, Button, Typography as Type } from "@mui/material";
 import { Block, BlockProps } from "components/generic/Block";
-import { ReactElement, ReactNode } from "react";
+import { ComponentProps, ReactElement, ReactNode } from "react";
 
 export function Placeholder({
   label,
@@ -46,5 +50,30 @@ export function Placeholder({
       )}
       {!!action && <Box pt={2}>{action}</Box>}
     </Block>
+  );
+}
+
+export function ErrorPlaceholder({
+  onReset,
+  ...props
+}: ComponentProps<typeof Placeholder> & { onReset?: () => void }) {
+  return (
+    <Placeholder
+      icon={<CancelOutlined />}
+      action={
+        <Button
+          variant="text"
+          onClick={() => onReset?.()}
+          startIcon={<RefreshOutlined />}
+        >
+          Reload
+        </Button>
+      }
+      {...props}
+      sx={{
+        bgcolor: "background.paper",
+        ...props.sx,
+      }}
+    />
   );
 }

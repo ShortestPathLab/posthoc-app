@@ -1,23 +1,33 @@
-import { RestartAltOutlined } from "@mui-symbols-material/w400";
+import {
+  BlurOnRounded,
+  DarkModeRounded,
+  ExploreRounded,
+  FastForwardRounded,
+  MemoryAltRounded,
+  PaletteRounded,
+  RestartAltOutlined,
+  RestartAltRounded,
+} from "@mui-symbols-material/w400";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Box,
   Divider,
+  ListItem,
+  ListItemIcon,
   ListItemText,
   Slider,
   Stack,
   Switch,
   Tab,
+  Tabs,
+  Tooltip,
   Typography as Type,
   Typography,
 } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { Block } from "components/generic/Block";
 import { Button } from "components/generic/inputs/Button";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { Scroll } from "components/generic/Scrollbars";
 import { useSnackbar } from "components/generic/Snackbar";
-import { Space } from "components/generic/Space";
 import { Surface } from "components/generic/surface";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { shades } from "components/renderer/colors";
@@ -27,9 +37,10 @@ import { ServerListEditor } from "components/settings-editor/ServerListEditor";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { useSm } from "hooks/useSmallDisplay";
 import { $, Objects } from "hotscript";
-import { keys, map, startCase } from "lodash-es";
 import { produce } from "immer";
-import { ReactNode, useMemo, useState } from "react";
+import { findLast, keys, map, startCase } from "lodash-es";
+import { ReactNode, Ref, useMemo, useRef, useState } from "react";
+import { useMeasure, useRafLoop } from "react-use";
 import { slice } from "slices";
 import { useBusyState } from "slices/busy";
 import { Transaction } from "slices/selector";
@@ -39,13 +50,62 @@ import {
   Settings,
   useSettings,
 } from "slices/settings";
-import { AccentColor, getShade } from "theme";
+import { AccentColor, getShade, usePaper } from "theme";
 import { idle } from "utils/idle";
+import { Get, get } from "utils/set";
 import { wait } from "utils/timed";
 import { AboutContent } from "./AboutPage";
 import { PageContentProps } from "./PageMeta";
-import { Get, get } from "utils/set";
 const formatLabel = (v: number) => `${v}x`;
+
+function Item({
+  label,
+  icon,
+  description,
+  children,
+}: {
+  label: string;
+  icon: ReactNode;
+  description: string;
+  children: ReactNode;
+}) {
+  const paper = usePaper();
+  const [ref, { width }] = useMeasure();
+  const sm = width < 320;
+  return (
+    <Stack
+      ref={ref as Ref<HTMLDivElement>}
+      direction={sm ? "column" : "row"}
+      sx={{
+        px: 2,
+        py: sm ? 2 : 1,
+        gap: sm ? 1 : 4,
+        alignItems: sm ? "flex-end" : "center",
+        justifyContent: "space-between",
+        ...paper(1),
+      }}
+    >
+      <Tooltip placement="top-start" title={`${label}: ${description}`}>
+        <ListItem disableGutters disablePadding>
+          <ListItemIcon sx={{ mr: -2 }}>{icon}</ListItemIcon>
+          <ListItemText
+            sx={{
+              textOverflow: "ellipsis",
+              WebkitLineClamp: 3,
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              whiteSpace: "break-spaces",
+            }}
+            primary={label}
+            secondary={description}
+          />
+        </ListItem>
+      </Tooltip>
+      {children}
+    </Stack>
+  );
+}
 
 export function SettingsPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle, isViewTree } =
@@ -60,33 +120,42 @@ export function SettingsPage({ template: Page }: PageContentProps) {
       "appearance/theme": theme = "light",
       "appearance/accentColor": accentColor = "teal",
       "behaviour/showOnStart": showOnStart,
+      "performance/workerCount": workerCount = 1,
     },
     setSettings,
   ] = useSettings();
   const [tab, setTab] = useState("general");
+  const [ref, { width }] = useMeasure();
   function renderHeading(label: ReactNode) {
     return (
-      <Type component="div" variant="overline" color="text.secondary">
-        {label}
-      </Type>
-    );
-  }
-  function renderLabel(label: ReactNode) {
-    return (
       <Type
-        component="div"
-        variant="body1"
         sx={{
-          mr: 4,
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis",
+          scrollMarginTop: (t) => t.spacing(7),
         }}
+        data-label={label}
+        component="div"
+        variant="overline"
+        color="text.secondary"
       >
         {label}
       </Type>
     );
   }
+  const items = useRef<HTMLDivElement | null>(null);
+  const menu = useRef<HTMLDivElement | null>(null);
+  const [generalTab, setGeneralTab] = useState("Playback");
+  useRafLoop(() => {
+    if (!(items.current && menu.current)) return;
+    const itemLabels = Array.from(
+      items.current.querySelectorAll<HTMLElement>("[data-label]")
+    );
+    const menuTop = menu.current.getBoundingClientRect().top;
+    const firstTop = findLast(
+      itemLabels,
+      (l) => l.getBoundingClientRect().top < menuTop + 9
+    );
+    setGeneralTab(firstTop?.dataset.label ?? "Playback");
+  });
   return (
     <TabContext value={tab}>
       <Page onChange={onChange} stack={state}>
@@ -97,7 +166,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
           <TabList
             onChange={(_, v) => setTab(v)}
             sx={{
-              mx: isViewTree ? 0 : -1,
+              mx: 0,
               "& button": { minWidth: 0 },
             }}
           >
@@ -108,211 +177,305 @@ export function SettingsPage({ template: Page }: PageContentProps) {
           </TabList>
         </Page.Options>
         <Page.Content>
-          <Block vertical>
-            <Scroll y>
-              <Block vertical pt={6}>
-                <TabPanel value="general" sx={{ p: 2 }}>
-                  <Box>
-                    {renderHeading("Playback")}
-                    <Block alignItems="center" justifyContent="space-between">
-                      {renderLabel("Playback rate")}
-                      <Slider
-                        sx={{ maxWidth: 320, mr: 2 }}
-                        marks={[1, 2, 5, 10].map((v) => ({
-                          value: v * baseRate,
-                          label: formatLabel(v),
-                        }))}
-                        step={1 * baseRate}
-                        min={1 * baseRate}
-                        max={10 * baseRate}
-                        valueLabelFormat={(v) => formatLabel(v / baseRate)}
-                        valueLabelDisplay="auto"
-                        defaultValue={playbackRate}
-                        onChangeCommitted={(_, v) =>
-                          setSettings(() => ({
-                            "playback/playbackRate": v as number,
-                          }))
-                        }
-                      />
-                    </Block>
-                    {renderHeading("Appearance")}
-                    <Block alignItems="center" justifyContent="space-between">
-                      {renderLabel("Acrylic")}
-                      <Switch
-                        defaultChecked={!!acrylic}
-                        onChange={(_, v) =>
-                          setSettings(() => ({ "appearance/acrylic": v }))
-                        }
-                      />
-                    </Block>
-                    <Block alignItems="center" justifyContent="space-between">
-                      {renderLabel("Dark mode")}
-                      <Space flex={1} />
-                      <Switch
-                        defaultChecked={theme === "dark"}
-                        onChange={(_, v) =>
-                          setSettings(() => ({
-                            "appearance/theme": v ? "dark" : "light",
-                          }))
-                        }
-                      />
-                    </Block>
-                    <Block alignItems="center" justifyContent="space-between">
-                      {renderLabel("Accent")}
-                      <Box sx={{ p: 1 }}>
-                        <FeaturePicker
-                          paper
-                          value={accentColor}
-                          items={map(shades, (c) => ({
-                            id: c,
-                            name: startCase(c),
-                            icon: (
-                              <Box>
-                                <Box
-                                  sx={{
-                                    ml: 0.5,
-                                    width: 12,
-                                    height: 12,
-                                    backgroundColor: getShade(c, theme),
-                                    borderRadius: 4,
-                                  }}
-                                />
-                              </Box>
-                            ),
-                          }))}
-                          arrow
-                          onChange={(v) =>
-                            setSettings(() => ({
-                              "appearance/accentColor": v as AccentColor,
-                            }))
-                          }
+          <Stack sx={{ pt: 6 }} ref={ref as Ref<HTMLDivElement>}>
+            <TabPanel value="general">
+              <Stack direction="row" sx={{ gap: 2 }}>
+                {width > 840 && (
+                  <Stack
+                    ref={menu}
+                    sx={{
+                      width: 260,
+                      ml: isViewTree ? -3 : -2,
+                      my: isViewTree ? -3 : -2,
+                      py: isViewTree ? 1 : 2,
+                      position: "sticky",
+                      top: (t) => t.spacing(6),
+                      height: "max-content",
+                    }}
+                  >
+                    <Tabs
+                      orientation="vertical"
+                      sx={{
+                        height: "100%",
+                        "& button": {
+                          alignItems: "flex-start",
+                        },
+                      }}
+                      value={generalTab}
+                    >
+                      {[
+                        "Playback",
+                        "Appearance",
+                        "Behaviour",
+                        "Performance",
+                        "Advanced",
+                      ].map((name) => (
+                        <Tab
+                          key={name}
+                          label={name}
+                          value={name}
+                          onClick={() => {
+                            const el = document.querySelector(
+                              `[data-label="${name}"]`
+                            );
+                            if (el) {
+                              el.scrollIntoView({
+                                block: "start",
+                                inline: "start",
+                                behavior: "smooth",
+                              });
+                            }
+                          }}
                         />
-                      </Box>
-                    </Block>
-                    {renderHeading("Behaviour")}
-                    <Block alignItems="center" justifyContent="space-between">
-                      {renderLabel("Show explore on start-up")}
-                      <Switch
-                        defaultChecked={!!showOnStart}
-                        onChange={(_, v) =>
+                      ))}
+                    </Tabs>
+                  </Stack>
+                )}
+                <Stack sx={{ gap: 1, flex: 1, pb: "100%" }} ref={items}>
+                  {renderHeading("Playback")}
+                  <Item
+                    label="Playback rate"
+                    icon={<FastForwardRounded />}
+                    description="The speed at which events are played back, 1x is 60 per second"
+                  >
+                    <Slider
+                      sx={{ width: "fill-available", mx: 2, maxWidth: 320 }}
+                      marks={[1, 2, 5, 10].map((v) => ({
+                        value: v * baseRate,
+                        label: formatLabel(v),
+                      }))}
+                      step={1 * baseRate}
+                      min={1 * baseRate}
+                      max={10 * baseRate}
+                      valueLabelFormat={(v) => formatLabel(v / baseRate)}
+                      valueLabelDisplay="auto"
+                      defaultValue={playbackRate}
+                      onChangeCommitted={(_, v) =>
+                        setSettings(() => ({
+                          "playback/playbackRate": v as number,
+                        }))
+                      }
+                    />
+                  </Item>
+                  {renderHeading("Appearance")}
+                  <Item
+                    label="Dark mode"
+                    icon={<DarkModeRounded />}
+                    description="Whether the app should use a dark theme"
+                  >
+                    <Switch
+                      defaultChecked={theme === "dark"}
+                      onChange={(_, v) =>
+                        setSettings(() => ({
+                          "appearance/theme": v ? "dark" : "light",
+                        }))
+                      }
+                    />
+                  </Item>
+                  <Item
+                    label="Accent"
+                    icon={<PaletteRounded />}
+                    description="The accent color used in the app"
+                  >
+                    <Box sx={{ px: 1 }}>
+                      <FeaturePicker
+                        paper
+                        value={accentColor}
+                        items={map(shades, (c) => ({
+                          id: c,
+                          name: startCase(c),
+                          icon: (
+                            <Box>
+                              <Box
+                                sx={{
+                                  ml: 0.5,
+                                  width: 12,
+                                  height: 12,
+                                  backgroundColor: getShade(c, theme),
+                                  borderRadius: 4,
+                                }}
+                              />
+                            </Box>
+                          ),
+                        }))}
+                        arrow
+                        onChange={(v) =>
                           setSettings(() => ({
-                            "behaviour/showOnStart": v ? "explore" : undefined,
+                            "appearance/accentColor": v as AccentColor,
                           }))
                         }
                       />
-                    </Block>
-                    {renderHeading("Advanced")}
-                    <Block alignItems="center" justifyContent="space-between">
-                      {renderLabel("Reset settings and extensions")}
-                      <Surface
-                        trigger={({ open }) => (
-                          <Button
-                            size="small"
-                            sx={{ mx: 1 }}
-                            color="error"
-                            startIcon={<RestartAltOutlined />}
-                            onClick={open}
+                    </Box>
+                  </Item>
+                  <Item
+                    label="Acrylic"
+                    icon={<BlurOnRounded />}
+                    description="Use a subtle transparency effect on UI elements"
+                  >
+                    <Switch
+                      defaultChecked={!!acrylic}
+                      onChange={(_, v) =>
+                        setSettings(() => ({ "appearance/acrylic": v }))
+                      }
+                    />
+                  </Item>
+                  {renderHeading("Behaviour")}
+                  <Item
+                    label="Show explore on start-up"
+                    icon={<ExploreRounded />}
+                    description="Whether the explore page should show on start-up"
+                  >
+                    <Switch
+                      defaultChecked={!!showOnStart}
+                      onChange={(_, v) =>
+                        setSettings(() => ({
+                          "behaviour/showOnStart": v ? "explore" : undefined,
+                        }))
+                      }
+                    />
+                  </Item>
+                  {renderHeading("Performance")}
+                  <Item
+                    label="Preferred worker count"
+                    icon={<MemoryAltRounded />}
+                    description="Set the preferred number of workers. A higher number will improve performance, but also increase memory usage"
+                  >
+                    <Slider
+                      sx={{ width: "fill-available", mx: 2, maxWidth: 320 }}
+                      step={1}
+                      valueLabelDisplay="auto"
+                      min={1}
+                      max={navigator.hardwareConcurrency}
+                      marks={[
+                        {
+                          value: 1,
+                          label: "1",
+                        },
+                        {
+                          value: navigator.hardwareConcurrency,
+                          label: `${navigator.hardwareConcurrency}`,
+                        },
+                      ]}
+                      defaultValue={workerCount}
+                      onChangeCommitted={(_, v) =>
+                        setSettings(() => ({
+                          "performance/workerCount": v as number,
+                        }))
+                      }
+                    />
+                  </Item>
+                  {renderHeading("Advanced")}
+                  <Item
+                    label="Reset settings and extensions"
+                    icon={<RestartAltRounded />}
+                    description="If something's not working correctly, you can try to reset all settings and extensions. This cannot be undone."
+                  >
+                    <Surface
+                      trigger={({ open }) => (
+                        <Button
+                          size="small"
+                          sx={{ mx: 1, minWidth: "max-content" }}
+                          color="error"
+                          startIcon={<RestartAltOutlined />}
+                          onClick={open}
+                        >
+                          Reset now
+                        </Button>
+                      )}
+                      title="Reset settings and extensions"
+                    >
+                      {({ close }) => (
+                        <Stack sx={{ p: sm ? 2 : 3, pt: 2, gap: 4 }}>
+                          <Typography component="div" color="text.secondary">
+                            If something&apos;s not working correctly, you can
+                            try to reset all settings and extensions. This
+                            cannot be undone.
+                          </Typography>
+                          <Stack
+                            direction={sm ? "column-reverse" : "row"}
+                            justifyContent="flex-end"
+                            gap={sm ? 1 : 2}
                           >
-                            Reset now
-                          </Button>
-                        )}
-                        title="Reset settings and extensions"
-                      >
-                        {({ close }) => (
-                          <Stack sx={{ p: sm ? 2 : 3, pt: 2, gap: 4 }}>
-                            <Typography component="div" color="text.secondary">
-                              If something&apos;s not working correctly, you can
-                              try to reset all settings and extensions. This
-                              cannot be undone.
-                            </Typography>
-                            <Stack
-                              direction={sm ? "column-reverse" : "row"}
-                              justifyContent="flex-end"
-                              gap={sm ? 1 : 2}
+                            <Button
+                              variant="text"
+                              onClick={() => {
+                                close();
+                              }}
                             >
-                              <Button
-                                variant="text"
-                                onClick={() => {
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={() => {
+                                usingBusyState(async () => {
+                                  await wait(300);
+                                  setSettings(() => defaults);
                                   close();
-                                }}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                onClick={() => {
-                                  usingBusyState(async () => {
-                                    await wait(300);
-                                    setSettings(() => defaults);
-                                    close();
-                                    slice.ui.sidebarOpen.set(false);
-                                    slice.ui.fullscreenModal.set(undefined);
-                                    push("Reset complete");
-                                  }, "Resetting settings and extensions");
-                                }}
-                                color="error"
-                                startIcon={<RestartAltOutlined />}
-                              >
-                                Reset settings and extensions
-                              </Button>
-                            </Stack>
+                                  slice.ui.sidebarOpen.set(false);
+                                  slice.ui.fullscreenModal.set(undefined);
+                                  push("Reset complete");
+                                }, "Resetting settings and extensions");
+                              }}
+                              color="error"
+                              startIcon={<RestartAltOutlined />}
+                            >
+                              Reset settings and extensions
+                            </Button>
                           </Stack>
-                        )}
-                      </Surface>
-                    </Block>
-                  </Box>
-                </TabPanel>
-                <TabPanel value="connections" sx={{ p: 2 }}>
-                  <Box>
-                    {renderHeading("Adapters")}
-                    <ServerListEditor />
-                  </Box>
-                  <Box>
-                    <Divider sx={{ mb: 2 }} />
-                    {renderHeading("Renderers")}
-                    <RendererListEditor />
-                  </Box>
-                  <Box>
-                    <Divider sx={{ mb: 2 }} />
-                    {renderHeading("Map support")}
-                    <MapParserListEditor />
-                  </Box>
-                </TabPanel>
-                <TabPanel value="security" sx={{ p: 2 }}>
-                  {renderHeading("Trusted origins")}
-                  <Box sx={{ maxWidth: 480 }}>
-                    <Typography
-                      component="div"
-                      color="text.secondary"
-                      variant="caption"
-                      sx={{ pt: 2 }}
-                    >
-                      Rendering traces in the viewport and using advanced
-                      debugger features sometimes requires running third-party
-                      code.
-                    </Typography>
-                    <Typography
-                      component="div"
-                      color="text.secondary"
-                      variant="caption"
-                      sx={{ pt: 2 }}
-                    >
-                      You&apos;ll be prompted to add origins when necessary, and
-                      you can stop trusting origins by removing them from this
-                      list.
-                    </Typography>
-                  </Box>
-                  <Box sx={{ pt: 2 }}>
-                    <TrustedOriginListEditor />
-                  </Box>
-                </TabPanel>
-                <TabPanel value="about" sx={{ p: 2 }}>
-                  <Box>
-                    <AboutContent />
-                  </Box>
-                </TabPanel>
-              </Block>
-            </Scroll>
-          </Block>
+                        </Stack>
+                      )}
+                    </Surface>
+                  </Item>
+                </Stack>
+              </Stack>
+            </TabPanel>
+            <TabPanel value="connections" sx={{ p: 2 }}>
+              <Box>
+                {renderHeading("Adapters")}
+                <ServerListEditor />
+              </Box>
+              <Box>
+                <Divider sx={{ mb: 2 }} />
+                {renderHeading("Renderers")}
+                <RendererListEditor />
+              </Box>
+              <Box>
+                <Divider sx={{ mb: 2 }} />
+                {renderHeading("Map support")}
+                <MapParserListEditor />
+              </Box>
+            </TabPanel>
+            <TabPanel value="security" sx={{ p: 2 }}>
+              {renderHeading("Trusted origins")}
+              <Box sx={{ maxWidth: 480 }}>
+                <Typography
+                  component="div"
+                  color="text.secondary"
+                  variant="caption"
+                  sx={{ pt: 2 }}
+                >
+                  Rendering traces in the viewport and using advanced debugger
+                  features sometimes requires running third-party code.
+                </Typography>
+                <Typography
+                  component="div"
+                  color="text.secondary"
+                  variant="caption"
+                  sx={{ pt: 2 }}
+                >
+                  You&apos;ll be prompted to add origins when necessary, and you
+                  can stop trusting origins by removing them from this list.
+                </Typography>
+              </Box>
+              <Box sx={{ pt: 2 }}>
+                <TrustedOriginListEditor />
+              </Box>
+            </TabPanel>
+            <TabPanel value="about" sx={{ p: 2 }}>
+              <Box>
+                <AboutContent />
+              </Box>
+            </TabPanel>
+          </Stack>
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>
       </Page>

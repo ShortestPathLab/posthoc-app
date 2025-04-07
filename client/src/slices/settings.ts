@@ -31,6 +31,7 @@ export type Settings = {
   "appearance/theme"?: "dark" | "light";
   "appearance/accentColor"?: AccentColor;
   "behaviour/showOnStart"?: keyof typeof pages;
+  "performance/workerCount"?: number;
 } & Sources;
 
 export const defaultRemotes = [
@@ -81,6 +82,7 @@ export const defaults = {
   "appearance/acrylic": true,
   "appearance/accentColor": "blue",
   "behaviour/showOnStart": "explore",
+  "performance/workerCount": 1,
 } as Settings;
 
 export const [useSettings, SettingsProvider] = createSlice<Settings>(
