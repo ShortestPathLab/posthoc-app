@@ -7,7 +7,7 @@ import { isMobile } from "mobile-device-detect";
 import { pages } from "pages";
 import { Page } from "pages/Page";
 import { PlaceholderPage } from "pages/PlaceholderPage";
-import { produce } from "produce";
+import { produce } from "immer";
 import { slice } from "slices";
 import { useAnyLoading } from "slices/loading";
 import { PanelState } from "slices/view";

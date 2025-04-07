@@ -5,12 +5,12 @@ import {
 } from "@mui-symbols-material/w400";
 import { Link, Stack } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
-import { producify } from "produce";
+import { produce } from "immer";
 import { ReactNode } from "react";
+import { slice } from "slices";
 import { useSettings } from "slices/settings";
 import { Placeholder } from "./Placeholder";
 import { useUntrustedLayers as useUntrustedLayer } from "./useUntrustedLayers";
-import { slice } from "slices";
 
 export function TrustedContent({ children }: { children?: ReactNode }) {
   const { isTrusted, origin } = useUntrustedLayer();
@@ -45,7 +45,7 @@ export function TrustedContent({ children }: { children?: ReactNode }) {
               startIcon={<DoneAllOutlined />}
               onClick={() => {
                 setSettings(
-                  producify((f) => {
+                  produce((f) => {
                     f.trustedOrigins = f.trustedOrigins ?? [];
                     f.trustedOrigins?.push(origin);
                   })

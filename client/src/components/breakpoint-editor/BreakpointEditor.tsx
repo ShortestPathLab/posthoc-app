@@ -13,7 +13,7 @@ import { Scroll } from "components/generic/Scrollbars";
 import { DebugLayerData } from "hooks/useBreakPoints";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { find, isEqual, map } from "lodash-es";
-import { produce } from "produce";
+import { produce } from "immer";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";

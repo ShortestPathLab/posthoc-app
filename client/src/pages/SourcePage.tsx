@@ -14,16 +14,15 @@ import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
 import { assert } from "utils/assert";
-import { debounceLifo } from "utils/debounceLifo";
+import { debounceLifo as lifo } from "utils/debounceLifo";
 import { idle } from "utils/idle";
 import { PageContentProps } from "./PageMeta";
-
 import { YAMLException } from "js-yaml";
 import { load, register } from "language";
-import { clone } from "produce";
+import { produceAsync as produce } from "produce";
 import { set } from "utils/set";
-
 import { useAsync } from "react-async-hook";
+import { result } from "utils/result";
 
 export function isYamlException(e: unknown): e is YAMLException {
   return isObject(e) && "name" in e && e.name === "YAMLException";
@@ -61,7 +60,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   const [monaco, setMonaco] = useState<Monaco>();
 
-  const usingLoading = useLoadingState("layers");
+  const progress = useLoadingState("layers");
 
   const selected = useMemo(
     () =>
@@ -73,25 +72,28 @@ export function SourcePage({ template: Page }: PageContentProps) {
   );
   const handleEditorContentChange = useMemo(
     () =>
-      debounceLifo((v?: string) =>
-        usingLoading(async () => {
+      lifo((value?: string) =>
+        progress(async () => {
           if (!selected?.source?.id || !selected?.layer) return;
           const one = slice.layers.one<SourceLayer>(selected.layer);
-          const l = one.get();
-          assert(l, "layer is defined");
-          const { result: next, error } =
-            (await getController(l)?.onEditSource?.(
-              clone(l),
-              selected.source.id,
-              v
-            )) ?? {};
-          if (!error) {
-            assert(next, "updated source is defined");
-            one.set(next);
-          }
+          const layer = one.get();
+          assert(layer, "layer is defined");
+          const a = await result<SourceLayer, Error>(() =>
+            produce(
+              layer,
+              async (l) =>
+                void (await getController(l)?.onEditSource?.(
+                  l,
+                  selected.source.id,
+                  value
+                ))
+            )
+          );
+          assert(!a.error, a.error!);
+          one.set(a.result);
         })
       ),
-    [usingLoading, selected?.layer, selected?.source?.id]
+    [selected?.layer, selected?.source?.id]
   );
 
   const [value, setValue] = useOptimistic(selected?.source?.content, (v) =>

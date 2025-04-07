@@ -1,4 +1,12 @@
-import { entries, find, forEach, groupBy, sumBy, times } from "lodash-es";
+import {
+  clone,
+  entries,
+  find,
+  forEach,
+  groupBy,
+  sumBy,
+  times,
+} from "lodash-es";
 import { arrayToTree } from "performant-array-to-tree";
 import { Trace, TraceEvent } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";
@@ -45,7 +53,7 @@ export function degreeSeparation(tree: EventTree, radius: number) {
       return node;
     }
   }
-  const pruned = prune(structuredClone(root));
+  const pruned = prune(clone(root));
   return addPathToRoot(pruned);
 }
 

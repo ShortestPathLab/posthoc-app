@@ -28,7 +28,7 @@ import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { useSm } from "hooks/useSmallDisplay";
 import { $, Objects } from "hotscript";
 import { keys, map, startCase } from "lodash-es";
-import { produce } from "produce";
+import { produce } from "immer";
 import { ReactNode, useMemo, useState } from "react";
 import { slice } from "slices";
 import { useBusyState } from "slices/busy";

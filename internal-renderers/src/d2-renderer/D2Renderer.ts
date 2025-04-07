@@ -36,7 +36,7 @@ function tileHash(bounds: Bounds) {
 class Tile extends PIXI.Sprite {
   static age: number = 0;
   age: number = Tile.age++;
-  #update(texture: PIXI.Texture, hash: string) {
+  #update(texture: PIXI.Texture, hash: string, isError: boolean) {
     const bounds = {
       ...this.bounds,
       width: this.bounds.right - this.bounds.left,
@@ -46,29 +46,34 @@ class Tile extends PIXI.Sprite {
       x: bounds.width / texture.width,
       y: bounds.height / texture.height,
     };
+    this.isError = isError;
     this.texture = texture;
     this.setTransform(this.bounds.left, this.bounds.top, scale.x, scale.y);
     this.age = Tile.age++;
     this.hash = hash;
   }
-  reuse(texture: PIXI.Texture, hash: string) {
+  reuse(texture: PIXI.Texture, hash: string, isError: boolean) {
     // Return if hash did not change
     if (
       this.hash === hash &&
-      this.texture.width * this.texture.height > texture.width * texture.height
+      this.texture.width * this.texture.height >
+        texture.width * texture.height &&
+      !isError &&
+      !this.isError // if the texture is not an error, and the current texture is not an error
     )
       return;
-    this.#update(texture, hash);
+    this.#update(texture, hash, isError);
   }
   constructor(
     texture: PIXI.Texture,
     public bounds: Bounds,
     public key: string,
-    public hash?: string
+    public hash?: string,
+    public isError: boolean = false
   ) {
     super(texture);
     this.name = this.key;
-    this.#update(texture, hash ?? nanoid());
+    this.#update(texture, hash ?? nanoid(), isError);
   }
 }
 
@@ -212,9 +217,10 @@ export class D2Renderer extends D2RendererBase {
     bounds,
     bitmap,
     hash: nextHash,
+    isError,
   }: D2WorkerEvent<"update">["payload"]) {
     const texture = bitmap ? PIXI.Texture.from(bitmap) : undefined;
-    this.#addToWorld(bounds, nextHash, texture);
+    this.#addToWorld(bounds, nextHash, texture, isError);
   }
 
   protected override handleFrustumChange() {
@@ -278,16 +284,21 @@ export class D2Renderer extends D2RendererBase {
     }
   }
 
-  async #addToWorld(bounds: Bounds, nextHash: string, texture?: PIXI.Texture) {
+  async #addToWorld(
+    bounds: Bounds,
+    nextHash: string,
+    texture?: PIXI.Texture,
+    isError: boolean = false
+  ) {
     if (!this.viewport) return;
 
     const tileKey = tileHash(bounds);
     const existing = find(this.#tiles?.children, (c) => c.key === tileKey);
     if (texture) {
       if (existing) {
-        existing.reuse(texture, nextHash);
+        existing.reuse(texture, nextHash, isError);
       } else {
-        const tile = new Tile(texture, bounds, tileKey, nextHash);
+        const tile = new Tile(texture, bounds, tileKey, nextHash, isError);
         this.#tiles!.addChild(tile);
       }
     }

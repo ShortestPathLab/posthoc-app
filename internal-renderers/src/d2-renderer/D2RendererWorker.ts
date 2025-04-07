@@ -110,6 +110,7 @@ export type D2WorkerEvents = {
     bounds: Bounds;
     bitmap?: ImageBitmap;
     hash: string;
+    isError?: boolean;
   };
 };
 
@@ -260,6 +261,7 @@ export class D2RendererWorker extends EventEmitter<
                 bounds,
                 bitmap: out.bitmap,
                 hash: out.hash,
+                isError: out.isError,
               },
             },
             out.bitmap ? [out.bitmap] : []
@@ -411,7 +413,11 @@ export class D2RendererWorker extends EventEmitter<
     } catch (e) {
       console.error(e);
       const g = this.#drawError(tile, get(e, "message"));
-      return { hash: nanoid(), bitmap: g.transferToImageBitmap() };
+      return {
+        hash: nanoid(),
+        bitmap: g.transferToImageBitmap(),
+        isError: true,
+      };
     }
   }
 }

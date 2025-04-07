@@ -2,7 +2,9 @@ import Split, { SplitDirection } from "@devbookhq/splitter";
 import { DragIndicatorOutlined } from "@mui-symbols-material/w400";
 import { Box, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
+import { produce } from "immer";
 import {
+  clone,
   filter,
   find,
   flatMap,
@@ -14,7 +16,6 @@ import {
   sumBy,
 } from "lodash-es";
 import { nanoid } from "nanoid";
-import { produce } from "produce";
 import {
   Context,
   createContext,
@@ -34,10 +35,10 @@ import {
 } from "react-reverse-portal";
 import { useCss, useMap } from "react-use";
 import { Transaction } from "slices/selector";
-import { Branch, Leaf, Root } from "slices/view";
+import { Leaf, Root } from "slices/view";
 import { assert } from "utils/assert";
-import { ViewControls } from "./ViewControls";
 import { _ } from "utils/chain";
+import { ViewControls } from "./ViewControls";
 
 type TreeNode<S extends TreeNode = never> =
   | {
@@ -220,25 +221,21 @@ export function ViewLeaf<T extends Record<string, unknown>>({
 
   const context = useMemo(() => {
     const handleSplit = (orientation: "vertical" | "horizontal") =>
-      onChange?.((l) =>
-        produce(l, (draft) => {
-          return {
+      onChange?.((l) => ({
+        key: nanoid(),
+        type: "branch",
+        orientation,
+        children: [
+          { ...clone(l), size: 50, key: root.key },
+          {
+            type: "leaf",
+            acceptDrop: true,
+            content: defaultContent,
+            size: 50,
             key: nanoid(),
-            type: "branch",
-            orientation,
-            children: [
-              { ...structuredClone(draft), size: 50, key: root.key },
-              {
-                type: "leaf",
-                acceptDrop: true,
-                content: defaultContent,
-                size: 50,
-                key: nanoid(),
-              },
-            ],
-          } as Branch<T>;
-        })
-      );
+          },
+        ],
+      }));
     return root.type === "leaf"
       ? ({
           isViewTree: true,
@@ -404,23 +401,23 @@ export function ViewBranch<T extends Record<string, unknown>>(
                   })
                 }
                 onClose={() =>
-                  onChange?.((draft): Root<T> => {
-                    assert(draft.type === "branch", "root must be a branch");
-                    draft.children.splice(i, 1);
-                    if (draft.children.length === 1) {
-                      return draft.children[0].type === "leaf"
+                  onChange?.((d): Root<T> => {
+                    assert(d.type === "branch", "root must be a branch");
+                    const d1 = produce(d, (d) => void d.children.splice(i, 1));
+                    if (d1.children.length === 1) {
+                      return d1.children[0].type === "leaf"
                         ? {
                             type: "leaf",
-                            key: draft.children[0].key,
-                            content: draft.children[0].content,
+                            key: d1.children[0].key,
+                            content: d1.children[0].content,
                           }
-                        : draft.children[0];
+                        : d1.children[0];
                     } else {
                       forEach(
-                        draft.children,
+                        d1.children,
                         (c, _, all) => (c.size = 100 / all.length)
                       );
-                      return draft;
+                      return d1;
                     }
                   })
                 }

@@ -7,7 +7,7 @@ import {
 import { DebugLayerData } from "hooks/DebugLayerData";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { isEqual, startCase, values } from "lodash-es";
-import { produce } from "produce";
+import { produce } from "immer";
 import { startTransition } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
