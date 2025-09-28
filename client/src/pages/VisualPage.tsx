@@ -4,7 +4,8 @@ import { Box, Divider, Tab } from "@mui/material";
 import { LayerPicker } from "components/generic/LayerPicker";
 import { Scroll } from "components/generic/Scrollbars";
 import { Placeholder } from "components/inspector/Placeholder";
-import { TextUpdaterNode } from "components/flow-nodes/CustomNode";
+import { ConfigurableNode } from "components/visual-scripting/ConfigurableNode";
+import { exampleMathNode } from "components/visual-scripting/NodeConfigs";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { DebugLayerData } from "hooks/DebugLayerData";
 import { getController } from "layers/layerControllers";
@@ -15,11 +16,20 @@ import { Layer, useLayerPicker } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { PageContentProps } from "./PageMeta";
 
-
-import { ReactFlow, Node, applyNodeChanges, applyEdgeChanges, addEdge, NodeChange, EdgeChange, Connection, Background, Controls } from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
-import NodeMenu from "components/flow-nodes/NodeMenu";
-
+import {
+  ReactFlow,
+  Node,
+  applyNodeChanges,
+  applyEdgeChanges,
+  addEdge,
+  NodeChange,
+  EdgeChange,
+  Connection,
+  Background,
+  Controls,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import NodeMenu from "components/visual-scripting/NodeMenu";
 
 const stepsLayerGuard = (l: Layer<unknown>): l is Layer<DebugLayerData> =>
   !!getController(l).steps;
@@ -31,25 +41,44 @@ const divider = (
     sx={{ m: 1, height: (t) => t.spacing(3), alignSelf: "auto" }}
   />
 );
-    function useDebugPageState(key?: string) {
-    const layer = slice.layers.one<Layer<DebugLayerData>>(key).use();
-    return { layer };
-    }
-    const initialNodes: Node[] = [
-    { id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1' }, type: 'textUpdater'},
-    { id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2' } },
-    { id: 'n3', position: { x: 0, y: 200 }, data: { label: 'Node 3' } },
-    ];
-
-const initialEdges = [
-   { id: 'n1-n2', source: 'n1', target: 'n2' }
+function useDebugPageState(key?: string) {
+  const layer = slice.layers.one<Layer<DebugLayerData>>(key).use();
+  return { layer };
+}
+const initialNodes: Node[] = [
+  {
+    id: "n1",
+    type: "configurable",
+    position: { x: 0, y: 0 },
+    data: { config: exampleMathNode },
+  },
+  { id: "n2", position: { x: 0, y: 300 }, data: { label: "Node 3" } },
+  { id: "n3", position: { x: 0, y: 600 }, data: { label: "Node 4" } },
 ];
 
-const nodeTypes = { textUpdater: TextUpdaterNode };
+const initialEdges = [{ id: "n1-n2", source: "n1", target: "n2" }];
 
+const nodeTypes = {
+  configurable: ConfigurableNode,
+};
 
-export function VisualPage({ template: Page }: PageContentProps) {
-
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * VisualPage renders a ReactFlow graph for visualizing the debug data from a layer.
+ *
+ * The page displays a graph with nodes and edges, and allows the user to interact with the graph.
+ * The graph is rendered using the ReactFlow library.
+ *
+ * The page also includes a tab bar with two tabs: "Standard" and "Advanced".
+ * The "Standard" tab shows the graph with the standard node and edge types.
+ * The "Advanced" tab shows the graph with the advanced node and edge types.
+ *
+ * @param {Page} template The template for the page.
+ * @returns {ReactElement} The rendered page.
+ */
+/*******  f3daf0df-0034-47a2-8ace-15c58ff0390d  *******/ export function VisualPage({
+  template: Page,
+}: PageContentProps) {
   console.log("Rendering VisualPage");
 
   const { controls, onChange, state, dragHandle, isViewTree } =
@@ -63,22 +92,24 @@ export function VisualPage({ template: Page }: PageContentProps) {
 
   const { layer } = useDebugPageState(key);
   const { code } = layer?.source ?? {};
-  
-  
+
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
- 
+
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
-    [],
+    (changes: NodeChange[]) =>
+      setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
+    []
   );
   const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
-    [],
+    (changes: EdgeChange[]) =>
+      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
+    []
   );
   const onConnect = useCallback(
-    (params: Connection) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    [],
+    (params: Connection) =>
+      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+    []
   );
 
   return (
@@ -102,28 +133,24 @@ export function VisualPage({ template: Page }: PageContentProps) {
           </TabList>
         </Page.Options>
         <Page.Content>
-            <div style={{ width: '100vw', height: '100vh' }}>
+          <div style={{ width: "100vw", height: "100vh" }}>
             <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                fitView
-                nodeTypes={nodeTypes}
-            >
-                <Background />
-                <Controls />
-            </ReactFlow>
-            </div>
-            <NodeMenu />
+              nodes={nodes}
+              edges={edges}
+              nodeTypes={nodeTypes}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              fitView
+            ></ReactFlow>
+          </div>
+          <NodeMenu />
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>
       </Page>
     </TabContext>
   );
 }
-
 
 // MUI menu
 

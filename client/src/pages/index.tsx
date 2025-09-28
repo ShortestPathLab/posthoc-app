@@ -33,6 +33,7 @@ import { StepsPage } from "./steps";
 import { TreePage } from "./tree";
 import { ViewportPage } from "./ViewportPage";
 import { WorkspacesPage } from "./workspaces";
+import { VisualPage } from "./VisualPage";
 
 export const pages: Record<string, PageMeta> = {
   explore: {
@@ -106,6 +107,16 @@ export const pages: Record<string, PageMeta> = {
     icon: <CodeOutlined />,
     iconThin: <CodeOutlinedThin />,
     content: SourcePage,
+    allowFullscreen: true,
+  },
+  visual: {
+    id: "visual",
+    name: "Visual Scripting",
+    description: "",
+    color: "deepPurple",
+    icon: <CodeOutlined />,
+    iconThin: <CodeOutlinedThin />,
+    content: VisualPage,
     allowFullscreen: true,
   },
   debug: {
