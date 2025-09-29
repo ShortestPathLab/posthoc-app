@@ -1,8 +1,9 @@
-import { Typography, Box } from "@mui/material";
-import { Handle, Position, HandleProps } from "@xyflow/react";
+import { Stack, Tooltip, Typography } from "@mui/material";
+import { Handle, HandleProps, Position } from "@xyflow/react";
 
 export type LabeledHandleProps = HandleProps & {
   label: string;
+  description?: string;
 };
 
 export function LabeledHandle({
@@ -11,26 +12,27 @@ export function LabeledHandle({
   ...handleProps
 }: LabeledHandleProps) {
   return (
-    <div>
-    {type === "target" && (
-      <Typography
-        variant="caption"
-        sx={{ mr: 2.0, color: "text.secondary", whiteSpace: "nowrap" }}
-      >
-        {label}
-      </Typography>
-    )}
-
-    <Handle type={type} {...handleProps} />
-
-    {type === "source" && (
-      <Typography
-        variant="caption"
-        sx={{ ml: 2.0, color: "text.secondary", whiteSpace: "nowrap" }}
-      >
-        {label}
-      </Typography>
-    )}
-  </div>
+    <Stack
+      direction={type === "source" ? "row-reverse" : "row"}
+      sx={{
+        alignItems: "center",
+        justifyContent: "flex-start",
+        width: "100%",
+      }}
+    >
+      <Handle
+        type={type}
+        {...handleProps}
+        position={type === "source" ? Position.Right : Position.Left}
+      />
+      <Tooltip title={handleProps.description}>
+        <Typography
+          variant="body2"
+          sx={{ color: "text.secondary", whiteSpace: "nowrap" }}
+        >
+          {label}
+        </Typography>
+      </Tooltip>
+    </Stack>
   );
 }

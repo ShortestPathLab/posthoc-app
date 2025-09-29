@@ -1,21 +1,12 @@
-import * as React from "react";
-import { useCallback, useMemo, useState } from "react";
-import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
-import {
-  Card,
-  CardContent,
-  Stack,
-  TextField,
-  Typography,
-  Box,
-  Checkbox,
-} from "@mui/material";
-import { usePaper } from "theme";
-import { Button } from "components/generic/inputs/Button";
+/* eslint-disable react/display-name */
+import { Card, Checkbox, Stack, TextField, Typography } from "@mui/material";
+import { NodeResizer, type Node, type NodeProps } from "@xyflow/react";
 import { useSurface } from "components/generic/surface";
-import type { XYPosition } from "@xyflow/react";
+import * as React from "react";
+import { Fragment, useCallback } from "react";
+import { useAcrylic, usePaper } from "theme";
 
-import TransformationMenu from "./TransformationMenu";
+import { map } from "lodash-es";
 import { LabeledHandle, LabeledHandleProps } from "./LabeledHandle";
 
 // Optional: don’t shadow MUI’s Dialog type name
@@ -36,8 +27,8 @@ export type NodeConfig = {
 
 type ConfigurableNode = Node<{ config: NodeConfig }, "config">;
 
-const HANDLE_SPACE_FROM_TOP = 60;
-const HANDLE_SPACING = 25;
+const ITEM_HEIGHT = 56;
+const MIN_WIDTH = 240;
 
 export function ConfigurableNode(props: NodeProps<ConfigurableNode>) {
   const { config } = props.data;
@@ -47,6 +38,7 @@ export function ConfigurableNode(props: NodeProps<ConfigurableNode>) {
     title: "Event properties",
   });
 
+  const acrylic = useAcrylic();
   const paper = usePaper();
 
   const onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,77 +46,110 @@ export function ConfigurableNode(props: NodeProps<ConfigurableNode>) {
     // You can call a prop to update node data if you wired it up via onNodesChange
   }, []);
 
-  return (
-    <Card
-      variant="outlined"
-      sx={{
-        minWidth: 160,
-        borderRadius: 2,
-        boxShadow: 2,
-        position: "relative",
-        overflow: "visible", // so handles can poke out
-      }}
-    >
-      <CardContent>
-        {/* Title */}
-        <Typography variant="subtitle2" gutterBottom>
+  const items = [
+    () => (
+      <Stack>
+        <Typography key="title" variant="subtitle2" sx={{}}>
           {config.title}
         </Typography>
-
-        {/* Input handles */}
-        {config.inputs?.map((labeledHandle, i) => (
-          <LabeledHandle
-            {...labeledHandle}
-            key={`in-${i}`}
-            id={`in-${i}`}
-            type="target"
-            position={Position.Left}
-            style={{ top: HANDLE_SPACE_FROM_TOP + i * HANDLE_SPACING }}
-          />
-        ))}
-
-        {/* Output handles */}
-        {config.outputs?.map((labeledHandle, i) => (
-          <LabeledHandle
-            {...labeledHandle}
-            key={`out-${i}`}
-            id={`out-${i}`}
-            type="source"
-            position={Position.Right}
-            style={{ top: HANDLE_SPACE_FROM_TOP + i * HANDLE_SPACING }}
-          />
-        ))}
-
-        {/* Fields */}
-        {config.fields?.map((field, idx) => (
-          <Box key={idx} mb={1}>
-            {field.type === "text" && (
+      </Stack>
+    ),
+    ...map(config.inputs, (labeledHandle, i) => (idy: number) => (
+      <LabeledHandle
+        {...labeledHandle}
+        key={`in-${i}`}
+        id={`in-${i}`}
+        type="target"
+        style={{ top: ITEM_HEIGHT * (idy + 0.5) }}
+      />
+    )),
+    ...map(config.outputs, (labeledHandle, i) => (idy: number) => (
+      <LabeledHandle
+        {...labeledHandle}
+        key={`out-${i}`}
+        id={`out-${i}`}
+        type="source"
+        style={{ top: ITEM_HEIGHT * (idy + 0.5) }}
+      />
+    )),
+    ...map(config.fields, (field, idx) => () => (
+      <Fragment key={`field-${idx}`}>
+        {
+          {
+            text: () => (
               <TextField
                 size="small"
+                variant="filled"
                 label={field.label}
                 defaultValue={field.value}
                 fullWidth
               />
-            )}
-            {field.type === "number" && (
+            ),
+            number: () => (
               <TextField
                 type="number"
                 size="small"
+                variant="filled"
                 label={field.label}
                 defaultValue={field.value}
                 fullWidth
               />
-            )}
-            {field.type === "checkbox" && (
-              <Box display="flex" alignItems="center">
-                <Checkbox defaultChecked={field.value} size="small" />
+            ),
+            checkbox: () => (
+              <Stack flexDirection="row" sx={{ gap: 1 }}>
+                <Checkbox
+                  defaultChecked={field.value}
+                  size="small"
+                  sx={{
+                    p: 0,
+                  }}
+                />
                 <Typography variant="body2">{field.label}</Typography>
-              </Box>
-            )}
-          </Box>
+              </Stack>
+            ),
+          }[field.type]() /* lookup the right renderer based on field.type */
+        }
+      </Fragment>
+    )),
+  ];
+
+  return (
+    <>
+      <NodeResizer
+        lineStyle={{ opacity: 0 }}
+        handleStyle={{ opacity: 0 }}
+        minWidth={MIN_WIDTH}
+        minHeight={items.length * ITEM_HEIGHT}
+      />
+      <Card
+        variant="outlined"
+        sx={{
+          ...acrylic,
+          ...paper(),
+          position: "relative",
+          overflow: "visible", // so handles can poke out
+          width: "100%",
+          height: "100%",
+          p: 0,
+        }}
+      >
+        {items.map((f, i) => (
+          <Stack
+            key={i}
+            direction="row"
+            sx={{
+              maxHeight: ITEM_HEIGHT,
+              height: ITEM_HEIGHT,
+              width: "100%",
+              alignItems: "center",
+              px: 2,
+            }}
+          >
+            {f(i)}
+          </Stack>
         ))}
-      </CardContent>
-    </Card>
+      </Card>
+    </>
     // <>
     //   <Typography variant="h3">{config.title}</Typography>
     //   <Stack
