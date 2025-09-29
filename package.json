@@ -35,8 +35,5 @@
     "adapter-warthog-websocket",
     "adapter-iron-harvest",
     "resources"
-  ],
-  "dependencies": {
-    "@xyflow/react": "^12.8.5"
-  }
+  ]
 }
