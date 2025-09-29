@@ -52,8 +52,8 @@ const initialNodes: Node[] = [
     position: { x: 0, y: 0 },
     data: { config: exampleMathNode },
   },
-  { id: "n2", position: { x: 0, y: 300 }, data: { label: "Node 3" } },
-  { id: "n3", position: { x: 0, y: 600 }, data: { label: "Node 4" } },
+  { id: "n2", position: { x: 300, y: 0 }, data: { label: "Node 3" } },
+  { id: "n3", position: { x: 600, y: 200 }, data: { label: "Node 4" } },
 ];
 
 const initialEdges = [{ id: "n1-n2", source: "n1", target: "n2" }];

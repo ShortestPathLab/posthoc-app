@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import { Handle, Position, HandleProps } from "@xyflow/react";
 
 export type LabeledHandleProps = HandleProps & {
@@ -7,23 +7,30 @@ export type LabeledHandleProps = HandleProps & {
 
 export function LabeledHandle({
   label,
+  type,
   ...handleProps
 }: LabeledHandleProps) {
   return (
-    <div className="relative flex items-center">
-      {handleProps.type === "target" && (
-        <Typography variant="caption" sx={{ mr: 0.5, color: "text.secondary" }}>
-            {label}
-        </Typography>
-      )}
-      
-      <Handle {...handleProps} />
+    <div>
+    {type === "target" && (
+      <Typography
+        variant="caption"
+        sx={{ mr: 2.0, color: "text.secondary", whiteSpace: "nowrap" }}
+      >
+        {label}
+      </Typography>
+    )}
 
-      {handleProps.type === "source" && (
-        <Typography variant="caption" sx={{ ml: 0.5, color: "text.secondary" }}>
-            {label}
-        </Typography>
-      )}
-    </div>
+    <Handle type={type} {...handleProps} />
+
+    {type === "source" && (
+      <Typography
+        variant="caption"
+        sx={{ ml: 2.0, color: "text.secondary", whiteSpace: "nowrap" }}
+      >
+        {label}
+      </Typography>
+    )}
+  </div>
   );
 }
