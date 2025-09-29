@@ -1,4 +1,4 @@
-import { isString } from "lodash-es";
+import { isNull, isString, isUndefined } from "lodash";
 
 export class AssertionError extends Error {
   constructor(message: string) {
@@ -24,4 +24,19 @@ export function assert(
   if (!condition) {
     throw isString(message) ? new AssertionError(message) : message;
   }
+}
+
+/**
+ * Asserts that the given object is not undefined.
+ *
+ * @param item the object to assert
+ * @param message the error to throw if the condition is false
+ * @returns the same object if it is defined
+ */
+export function required<T>(
+  item: T | null | undefined,
+  message: string | Error = "Object is undefined"
+): T {
+  assert(!isNull(item) && !isUndefined(item), message);
+  return item;
 }
