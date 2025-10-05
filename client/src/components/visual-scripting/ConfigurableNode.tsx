@@ -54,21 +54,21 @@ export function ConfigurableNode(props: NodeProps<ConfigurableNode>) {
         </Typography>
       </Stack>
     ),
-    ...map(config.inputs, (labeledHandle, i) => (idy: number) => (
-      <LabeledHandle
-        {...labeledHandle}
-        key={`in-${i}`}
-        id={`in-${i}`}
-        type="target"
-        style={{ top: ITEM_HEIGHT * (idy + 0.5) }}
-      />
-    )),
     ...map(config.outputs, (labeledHandle, i) => (idy: number) => (
       <LabeledHandle
         {...labeledHandle}
         key={`out-${i}`}
         id={`out-${i}`}
         type="source"
+        style={{ top: ITEM_HEIGHT * (idy + 0.5) }}
+      />
+    )),
+    ...map(config.inputs, (labeledHandle, i) => (idy: number) => (
+      <LabeledHandle
+        {...labeledHandle}
+        key={`in-${i}`}
+        id={`in-${i}`}
+        type="target"
         style={{ top: ITEM_HEIGHT * (idy + 0.5) }}
       />
     )),
