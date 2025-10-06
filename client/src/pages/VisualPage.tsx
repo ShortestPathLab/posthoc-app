@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import { LayerPicker } from "components/generic/LayerPicker";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { ConfigurableNode } from "components/visual-scripting/ConfigurableNode";
@@ -19,9 +19,12 @@ import {
   Node,
   NodeChange,
   ReactFlow,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import NodeMenu from "components/visual-scripting/NodeMenu";
+
+const flowKey = "visual-flow";
 
 const visualScriptingLayerGuard = (
   l: Layer<unknown>
@@ -59,6 +62,8 @@ export function VisualPage({ template: Page }: PageContentProps) {
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+  const [rfInstance, setRfInstance] = useState<any>(null);
+  // const { setViewport } = useReactFlow();
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -75,6 +80,40 @@ export function VisualPage({ template: Page }: PageContentProps) {
       setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
     []
   );
+  
+  const onSave = useCallback(() => {
+    if (rfInstance) {
+      const flow = rfInstance.toObject();
+      localStorage.setItem(flowKey, JSON.stringify(flow));
+    }
+  }, [rfInstance]);
+  
+  const onRestore = useCallback(() => {
+    const restoreFlow = async () => {
+      const flow = localStorage.getItem(flowKey) ? JSON.parse(localStorage.getItem(flowKey)!) : null;
+      if (flow) {
+        // const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+        // setViewport({ x, y, zoom });
+      }
+    };
+ 
+    restoreFlow();
+  }, [setNodes]);
+  
+  const onAdd = useCallback(() => {
+    const newNode: Node = {
+      id: `n${+new Date()}`,
+      type: "configurable",
+      data: { config: exampleMathNode },
+      position: {
+        x: Math.random() * 400,
+        y: Math.random() * 400,
+      },
+    };
+    setNodes((nds) => nds.concat(newNode));
+  }, [setNodes]);
 
   return (
     <Page onChange={onChange} stack={state}>
@@ -97,10 +136,42 @@ export function VisualPage({ template: Page }: PageContentProps) {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onInit={setRfInstance}
             fitView
           >
             <Background />
           </ReactFlow>
+          <Stack
+            direction="row-reverse"
+            spacing={1}
+            sx={{
+              position: "absolute",
+              top: 60,
+              right: 16,
+              zIndex: 4,
+          }}
+          >
+            <Button
+              variant="contained"
+              onClick={onAdd}
+            >
+              Add Node
+            </Button>
+            
+            <Button
+              variant="contained"
+              onClick={onRestore}
+            >
+              Restore
+            </Button>
+            
+            <Button
+              variant="contained"
+              onClick={onSave}
+            >
+              Save
+            </Button>
+          </Stack>
         </Box>
         <NodeMenu />
       </Page.Content>
