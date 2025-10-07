@@ -1,7 +1,8 @@
-import { NodeConfig } from "./ConfigurableNode";
+import { TransformationNodeConfig } from "./ConfigurableTransformationNode";
+import { ComponentNodeConfig } from "./ConfigurableComponentNode";
 import { LabeledHandleProps } from "./LabeledHandle";
 
-export const exampleMathNode: NodeConfig = {
+export const exampleMathTransformation: TransformationNodeConfig = {
   title: "Math Node",
   inputs: [
     { label: "Value A", description: "First number" },
@@ -17,4 +18,9 @@ export const exampleMathNode: NodeConfig = {
     { label: "Enabled", type: "checkbox", value: true },
   ],
   // TODO: Add logic, e.g what this node actually does, any validation etc
+};
+
+export const exampleTileComponent: ComponentNodeConfig = {
+  title: "Tile",
+  vars: ["row", "col"],
 };

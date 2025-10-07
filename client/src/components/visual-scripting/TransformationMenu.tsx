@@ -1,14 +1,13 @@
 import React from 'react';
-import { Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { useSurface } from 'components/generic/surface';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { addEdge, Node, ReactFlow, ReactFlowProvider, useNodesState, useEdgesState, OnConnect, Background, Controls} from '@xyflow/react';
 import { Button } from 'components/generic/inputs/Button';
 
 type TransformationMenuProps = {
-  node?: Node;
+  variable: string;
 };
 
-export default function TransformationMenu({ node }: TransformationMenuProps) {
+export default function TransformationMenu({ variable }: TransformationMenuProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = React.useCallback(
@@ -26,28 +25,30 @@ export default function TransformationMenu({ node }: TransformationMenuProps) {
       <FlowPopup
         isOpen={open}
         onClose={handleClose}
-        node={node}
+        nodeName={variable}
         onNodeChange={() => {}}
       />
     </>
   );
 }
 function FlowPopup({
-      node,
+      nodeName,
       onNodeChange,
       isOpen,
       onClose,
     }: {
-      node?: Node;
+      nodeName?: string;
       onNodeChange: (node: Node) => void;
       isOpen: boolean;
       onClose: () => void;
     }) {
 
-      const sourceNode: Node = node ? node :{ id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2' } };
+      const sourceNode: Node = nodeName ? 
+                      { id: nodeName, position: {x: window.innerWidth * 0.65 , y: window.innerHeight * 0.45}, data: {label: nodeName} } :
+                      { id: 'n2', position: { x: 0, y: 100 }, data: { label: 'Node 2' } };
         return (
             <Dialog open={isOpen} onClose={onClose} keepMounted maxWidth="lg" fullWidth>
-            <DialogTitle>{sourceNode.data.label}</DialogTitle>
+            <DialogTitle>{String(sourceNode.data.label)}</DialogTitle>
             <DialogContent
               sx={{
                 height: 800,

@@ -14,7 +14,7 @@ function SurfaceDialogStub() {
   return <div>Dialog</div>;
 }
 
-export type NodeConfig = {
+export type TransformationNodeConfig = {
   title: string;
   inputs?: LabeledHandleProps[]; // list of handles on the left
   outputs?: LabeledHandleProps[]; // list of handles on the right
@@ -25,12 +25,12 @@ export type NodeConfig = {
   }[];
 };
 
-type ConfigurableNode = Node<{ config: NodeConfig }, "config">;
+type ConfigurableTransformationNode = Node<{ config: TransformationNodeConfig }, "config">;
 
 const ITEM_HEIGHT = 56;
 const MIN_WIDTH = 240;
 
-export function ConfigurableNode(props: NodeProps<ConfigurableNode>) {
+export function ConfigurableTransformationNode(props: NodeProps<ConfigurableTransformationNode>) {
   const { config } = props.data;
 
   // If you use useSurface elsewhere, you can still keep it:

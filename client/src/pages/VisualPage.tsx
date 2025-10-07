@@ -1,13 +1,14 @@
 import { Box, Button, Stack } from "@mui/material";
 import { LayerPicker } from "components/generic/LayerPicker";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { ConfigurableNode } from "components/visual-scripting/ConfigurableNode";
-import { exampleMathNode } from "components/visual-scripting/NodeConfigs";
+import { ConfigurableTransformationNode } from "components/visual-scripting/ConfigurableTransformationNode";
+import { exampleMathTransformation, exampleTileComponent } from "components/visual-scripting/NodeConfigs";
 import { DebugLayerData } from "hooks/DebugLayerData";
 import { getController } from "layers/layerControllers";
 import { useCallback, useState } from "react";
 import { Layer, useLayerPicker } from "slices/layers";
 import { PageContentProps } from "./PageMeta";
+import { ConfigurableComponentNode } from "components/visual-scripting/ConfigurableComponentNode";
 
 import {
   addEdge,
@@ -34,19 +35,34 @@ const visualScriptingLayerGuard = (
 
 const initialNodes: Node[] = [
   {
-    id: "n1",
-    type: "configurable",
+    id: "main",
+    type: "input",
     position: { x: 0, y: 0 },
-    data: { config: exampleMathNode },
+    data: { label: "Main" },
+    deletable: false,
   },
-  { id: "n2", position: { x: 300, y: 0 }, data: { label: "Node 3" } },
-  { id: "n3", position: { x: 600, y: 200 }, data: { label: "Node 4" } },
+  {
+    id: "math",
+    type: "configurableTransformation",
+    position: { x: 300, y: 0 },
+    data: { config: exampleMathTransformation },
+  },
+  {
+    id: "tile",
+    type: "configurableComponent",
+    position: { x: -100, y: 100},
+    data: { config: exampleTileComponent },
+  }
 ];
+
+
+
 
 const initialEdges = [{ id: "n1-n2", source: "n1", target: "n2" }];
 
 const nodeTypes = {
-  configurable: ConfigurableNode,
+  configurableTransformation: ConfigurableTransformationNode,
+  configurableComponent: ConfigurableComponentNode,
 };
 
 /**
@@ -63,7 +79,6 @@ export function VisualPage({ template: Page }: PageContentProps) {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [rfInstance, setRfInstance] = useState<any>(null);
-  // const { setViewport } = useReactFlow();
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -92,21 +107,22 @@ export function VisualPage({ template: Page }: PageContentProps) {
     const restoreFlow = async () => {
       const flow = localStorage.getItem(flowKey) ? JSON.parse(localStorage.getItem(flowKey)!) : null;
       if (flow) {
-        // const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
         setNodes(flow.nodes || []);
         setEdges(flow.edges || []);
+        rfInstance?.setViewport?.({ x, y, zoom });
         // setViewport({ x, y, zoom });
       }
     };
  
     restoreFlow();
-  }, [setNodes]);
+  }, [rfInstance]);
   
   const onAdd = useCallback(() => {
     const newNode: Node = {
       id: `n${+new Date()}`,
       type: "configurable",
-      data: { config: exampleMathNode },
+      data: { config: exampleMathTransformation },
       position: {
         x: Math.random() * 400,
         y: Math.random() * 400,
