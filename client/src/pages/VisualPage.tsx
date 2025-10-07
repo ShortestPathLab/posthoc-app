@@ -8,6 +8,9 @@ import { getController } from "layers/layerControllers";
 import { useCallback, useState } from "react";
 import { Layer, useLayerPicker } from "slices/layers";
 import { PageContentProps } from "./PageMeta";
+import { slice } from "slices";
+import { Steps, StepsLayer } from "./steps/StepsLayer";
+import { viewsToNodes } from "components/visual-scripting/ViewNodeMapper";
 
 import {
   addEdge,
@@ -22,10 +25,13 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import NodeMenu from "components/visual-scripting/NodeMenu";
+import { equal } from "slices/selector";
+
+
 
 const visualScriptingLayerGuard = (
   l: Layer<unknown>
-): l is Layer<DebugLayerData> =>
+): l is Layer<DebugLayerData> => 
   // TODO: This needs to be a function that determines if the layer supports visual scripting
   !!getController(l).steps;
 
@@ -46,6 +52,7 @@ const nodeTypes = {
   configurable: ConfigurableNode,
 };
 
+
 /**
  * VisualPage renders a ReactFlow graph for visualizing the debug data from a layer.
  *
@@ -56,6 +63,15 @@ export function VisualPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
 
   const { key, setKey } = useLayerPicker(visualScriptingLayerGuard);
+
+  const one = slice.layers.one<StepsLayer>(key);
+
+  const data = one.use((c) => getController(c)?.getSources?.(c)[0]?.content ?? null);
+  
+  // viewsToNodes(data ?? "").then((nodes) => {
+  //   // console.log("nodes", nodes);
+  //   setNodes(nodes);
+  // });
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
@@ -109,7 +125,4 @@ export function VisualPage({ template: Page }: PageContentProps) {
   );
 }
 
-// MUI menu
 
-// TODO: Button to add nodes
-// TODO: Second view for editing transformations of inputs to component
