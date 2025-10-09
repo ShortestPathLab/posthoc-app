@@ -9,6 +9,7 @@ import { useCallback, useState } from "react";
 import { Layer, useLayerPicker } from "slices/layers";
 import { PageContentProps } from "./PageMeta";
 import { ConfigurableComponentNode } from "components/visual-scripting/ConfigurableComponentNode";
+import { viewsToNodes } from "components/visual-scripting/viewNodeMapper"
 
 import {
   addEdge,

@@ -1,9 +1,9 @@
 /* eslint-disable react/display-name */
-import { Box, Card, Checkbox, Stack, TextField, Typography } from "@mui/material";
+import { Box, Card, Checkbox, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { Handle, NodeResizer, Position, type Node, type NodeProps } from "@xyflow/react";
 import { useSurface } from "components/generic/surface";
 import * as React from "react";
-import { Fragment, useCallback } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { useAcrylic, usePaper } from "theme";
 
 import { map } from "lodash-es";
@@ -32,6 +32,9 @@ export function ConfigurableComponentNode(
   props: NodeProps<ConfigurableComponentNode>
 ) {
   const { config } = props.data;
+  
+  const [mode, setMode] = useState<"flow" | "code">("flow");
+  const [textValue, setTextValue] = useState("");
 
   // If you use useSurface elsewhere, you can still keep it:
   const { open, dialog } = useSurface(SurfaceDialogStub, {
@@ -60,6 +63,21 @@ export function ConfigurableComponentNode(
         <Handle type="target" position={Position.Right} id="out" key="out" style={{ top: ITEM_HEIGHT }} />
       </>
     ),
+    () => (
+      <FormControl className="nodrag">
+        <InputLabel>Mode</InputLabel>
+        <Select
+          size="small"
+          value={mode}
+          label="Mode"
+          onChange={(e) => setMode(e.target.value as "flow" | "code")}
+          sx={{ width: 110 }}
+        >
+          <MenuItem value="flow">Flow</MenuItem>
+          <MenuItem value="code">Code</MenuItem>
+        </Select>
+      </FormControl>
+    ),
     ...map(config.vars, (varName, i) => (idy: number) => (
       // use TransformationMenu, should be var name on the left with transformation menu button on the right
       // dont use a handle, just text is fine
@@ -71,7 +89,22 @@ export function ConfigurableComponentNode(
         sx={{ top: ITEM_HEIGHT * (idy + 0.5), px: 1, columnGap: 2 }}
       >
         <Typography variant="body2">{`${varName}: `} </Typography>
-        <TransformationMenu variable={varName} />
+        
+        <Stack direction="row" alignItems="center" spacing={1}>
+          {mode === "flow" ? (
+            <TransformationMenu variable={varName} />
+          ) : (
+            <TextField
+              size="small"
+              variant="outlined"
+              label="value"
+              value={textValue}
+              onChange={(e) => setTextValue(e.target.value)}
+              sx={{ width: 120 }}
+              onMouseDown={(e) => e.stopPropagation()}
+            />
+          )}
+        </Stack>
       </Stack>
     )),
   ];
