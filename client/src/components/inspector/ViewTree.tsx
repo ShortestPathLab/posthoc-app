@@ -65,9 +65,9 @@ type ViewTreeContextType<T = unknown> = {
 
 const ViewTreeContext = createContext<ViewTreeContextType>({});
 
-export function useViewTreeContext<T = unknown>() {
+export function useViewTreeContext<State = unknown>() {
   return useContext(
-    ViewTreeContext as Context<ViewTreeContextType<T & { type: string }>>
+    ViewTreeContext as Context<ViewTreeContextType<State & { type: string }>>
   );
 }
 

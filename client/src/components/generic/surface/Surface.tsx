@@ -9,8 +9,10 @@ import { DrawerTitle } from "./DrawerTitle";
 import { ModalAppBar } from "./ModalAppBar";
 import { PopoverSurface } from "./PopoverSurface";
 import { SlotProps } from "./SlotProps";
+import { createPortal } from "react-dom";
 
 export type SurfaceGeneralProps = {
+  portal?: Element;
   title?: ReactNode;
   children?: ((state: State) => ReactNode) | ReactNode;
   popover?: boolean;
@@ -39,6 +41,7 @@ export function SurfaceBase({
   popover,
   slotProps,
   state,
+  portal,
 }: SurfaceBaseProps) {
   const sm = useSm();
   const isPopover = popover && !sm;
@@ -68,9 +71,8 @@ export function SurfaceBase({
     ),
     popover: children,
   }[type];
-  return (
-    <>
-      {<SurfaceVariant {...{ slotProps, state, children: childrenVariant }} />}
-    </>
+  const element = (
+    <SurfaceVariant {...{ slotProps, state, children: childrenVariant }} />
   );
+  return <>{portal ? createPortal(element, portal) : element}</>;
 }
