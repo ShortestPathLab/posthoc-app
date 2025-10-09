@@ -33,8 +33,12 @@ export function ConfigurableComponentNode(
 ) {
   const { config } = props.data;
   
-  const [mode, setMode] = useState<"flow" | "code">("flow");
-  const [textValue, setTextValue] = useState("");
+  const [mode, setMode] = useState<"flow" | "code">("code");
+  const [textValues, setTextValues] = useState<Record<string, string>>({});
+
+  const handleTextChange = (varName: string, value: string) => {
+    setTextValues((prev) => ({ ...prev, [varName]: value }));
+  };
 
   // If you use useSurface elsewhere, you can still keep it:
   const { open, dialog } = useSurface(SurfaceDialogStub, {
@@ -97,11 +101,10 @@ export function ConfigurableComponentNode(
             <TextField
               size="small"
               variant="outlined"
-              label="value"
-              value={textValue}
-              onChange={(e) => setTextValue(e.target.value)}
+              label="expression"
+              value={textValues[varName] ?? ""}
+              onChange={(e) => handleTextChange(varName, e.target.value)}
               sx={{ width: 120 }}
-              onMouseDown={(e) => e.stopPropagation()}
             />
           )}
         </Stack>
