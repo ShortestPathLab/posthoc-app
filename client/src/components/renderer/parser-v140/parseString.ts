@@ -11,7 +11,7 @@ const openBrace = /^\$\{\{\s*/;
 const closeBrace = /^\s*\}\}/;
 const neverMatch = /\b\B/;
 
-const parser = makeParser({
+export const parser = makeParser({
   VARIABLE_START: openBrace,
   VARIABLE_END: closeBrace,
   PIPE_START: neverMatch,

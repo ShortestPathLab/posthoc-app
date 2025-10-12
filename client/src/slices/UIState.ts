@@ -4,7 +4,7 @@ import { pages } from "pages";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { ParamsOf } from "protocol/Message";
 import { PathfindingTask } from "protocol/SolveTask";
-import { Trace } from "protocol/Trace";
+import { Trace } from "protocol/Trace-v140";
 
 export type Map = Partial<
   Feature & {

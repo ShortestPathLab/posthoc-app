@@ -6,7 +6,6 @@ import {
 } from "@mui-symbols-material/w400";
 import {
   Box,
-  CircularProgress,
   Divider,
   ListItem,
   ListItemIcon,
@@ -26,6 +25,7 @@ import { PlaybackLayerData, useStep } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
 import { Label } from "components/generic/Label";
 import { LayerPicker } from "components/generic/LayerPicker";
+import { Spinner } from "components/generic/Spinner";
 import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { Placeholder } from "components/inspector/Placeholder";
 import {
@@ -312,23 +312,7 @@ export function TreePage({ template: Page }: PageContentProps) {
         <Block sx={size}>
           {trace ? (
             loading ? (
-              <Block
-                sx={{
-                  flexDirection: "column",
-                  gap: 4,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <CircularProgress />
-                <Typography
-                  component="div"
-                  variant="body2"
-                  sx={{ px: 8, maxWidth: 480 }}
-                >
-                  Generating layout
-                </Typography>
-              </Block>
+              <Spinner message="Generating layout" />
             ) : tree?.length ? (
               <>
                 <AutoSize>

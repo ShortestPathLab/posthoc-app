@@ -7,7 +7,7 @@ import {
 import { startCase } from "lodash-es";
 import { ReactNode } from "react";
 
-type IconButtonWithTooltipProps = {
+export type IconButtonWithTooltipProps = {
   label: string;
   icon: ReactNode;
   slotProps?: {
@@ -23,9 +23,7 @@ export function IconButtonWithTooltip({
 }: IconButtonWithTooltipProps) {
   return (
     <Tooltip title={startCase(label)} key={label} {...slotProps?.tooltip}>
-      <span>
-        <IconButton {...rest}>{icon}</IconButton>
-      </span>
+      <IconButton {...rest}>{icon}</IconButton>
     </Tooltip>
   );
 }

@@ -33,7 +33,7 @@ import { StepsPage } from "./steps";
 import { TreePage } from "./tree";
 import { ViewportPage } from "./ViewportPage";
 import { WorkspacesPage } from "./workspaces";
-import { VisualPage } from "./VisualPage";
+import { VisualPage } from "./visual-scripting";
 
 export const pages: Record<string, PageMeta> = {
   explore: {
@@ -111,8 +111,8 @@ export const pages: Record<string, PageMeta> = {
   },
   visual: {
     id: "visual",
-    name: "Visual Scripting",
-    description: "",
+    name: "Flow",
+    description: "Compose views visually",
     color: "deepPurple",
     icon: <CodeOutlined />,
     iconThin: <CodeOutlinedThin />,
