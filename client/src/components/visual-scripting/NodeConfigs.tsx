@@ -18,6 +18,7 @@ export type MathData = FlowData<
   }
 >;
 
+
 export const math = createFlowNodeDefinition<MathData>(() => ({
   key: "math",
   title: "Math",
@@ -77,7 +78,13 @@ export const expression = createFlowNodeDefinition<ExpressionData>((v) => ({
   ],
   fields: [
     { key: "property", label: "Expression", type: "text", value: v?.property },
-    { key: "type", label: "type", type: "text", value: "string" },
+    {
+      key: "type",
+      label: "type",
+      type: "select",
+      value: v?.type ?? "any",
+      options: ["string", "number", "boolean", "any"].map((t) => ({ label: t, value: t })),
+    },
   ],
 }));
 
