@@ -15,11 +15,11 @@ import { Layer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
 import { equal } from "slices/selector";
 import { UploadedTrace } from "slices/UIState";
+import { _ } from "utils/chain";
 import { NonEmptyString } from "utils/Char";
 import { set } from "utils/set";
 import { usingWorkerTask } from "workers/usingWorker";
 import workerUrl from "./breakpoint.worker.ts?worker&url";
-import { _ } from "utils/chain";
 async function attempt<T, U>(
   f: () => Promise<T>,
   c: (e: unknown) => U
@@ -82,6 +82,7 @@ export function BreakpointService({ value }: { value?: string }) {
     (signal) =>
       usingLoadingState(async () => {
         if (!dict || !tree || !trace || !trace.key) return;
+        one.set((l) => void set(l, "source.breakpointOutput", {}));
         for (const breakpoint of inputs ?? []) {
           if (breakpoint.active) {
             const res = await attempt(
