@@ -2094,7 +2094,7 @@
 
     "pathe": ["pathe@1.1.2", "", {}, "sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ=="],
 
-    "pathfinding-binaries": ["pathfinding-binaries@github:ShortestPathLab/posthoc-adapter-warthog#d480217", { "dependencies": { "typescript": "^4.4.3" } }, "ShortestPathLab-posthoc-adapter-warthog-d480217"],
+    "pathfinding-binaries": ["pathfinding-binaries@github:ShortestPathLab/posthoc-adapter-warthog#bb16d8f", { "dependencies": { "typescript": "^4.4.3" } }, "ShortestPathLab-posthoc-adapter-warthog-bb16d8f"],
 
     "pathval": ["pathval@1.1.1", "", {}, "sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ=="],
 
