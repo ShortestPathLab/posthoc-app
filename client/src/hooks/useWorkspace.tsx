@@ -128,8 +128,13 @@ export function useWorkspace() {
         return false;
       },
       save: async (raw?: boolean, name?: string) => {
-        const { content, size, type } = await generateFile(raw, name);
-        download(content, name, type);
+        const {
+          content,
+          size,
+          type,
+          name: filename,
+        } = await generateFile(raw, name);
+        download(content, filename, type);
         return { name, size };
       },
       generateWorkspaceFile: async (suggestedName?: string) => {

@@ -160,7 +160,7 @@ export function ExportWorkspace({
                   await uploadFile(file);
                   // await storage?.instance.saveFile(compressedFile);
                 } else {
-                  await save(false, name);
+                  await save(false, `${name}.workspace`);
                 }
                 notify(`Posthoc file saved, ${name}.workspace ✅`);
               })
