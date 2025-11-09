@@ -35,15 +35,15 @@ import memoizee from "memoizee";
 import { docs, name } from "public/manifest.json";
 import { CSSProperties, ReactNode, useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
+import { PosthocMetaData } from "services/cloud-storage";
+import { slice } from "slices";
 import { useLoadingState } from "slices/loading";
-import { useSettings } from "slices/settings";
 import { textFieldProps, usePaper } from "theme";
+import { _ } from "utils/chain";
 import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
-import { PosthocMetaData } from "services/cloud-storage";
-import { _ } from "utils/chain";
 
 const paths = import.meta.glob<boolean, string, string>(
   "/public/recipes/*.workspace",
@@ -185,7 +185,7 @@ export function FeatureCard({
   ...rest
 }: Partial<PosthocMetaData> &
   CardProps & { onOpenClick?: () => void; loading?: boolean }) {
-  const [{ "appearance/acrylic": acrylic }] = useSettings();
+  const { "appearance/acrylic": acrylic } = slice.settings.use();
   const paper = usePaper();
   const theme = useTheme();
 
@@ -313,7 +313,7 @@ const entries2 = entries(paths);
 
 export function ExplorePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
-  const [{ "behaviour/showOnStart": showOnStart }, setSettings] = useSettings();
+  const { "behaviour/showOnStart": showOnStart } = slice.settings.use();
   const notify = useSnackbar();
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
@@ -350,9 +350,9 @@ export function ExplorePage({ template: Page }: PageContentProps) {
   const showOnStartUpChecked = showOnStart === "explore";
 
   function onShowOnStartUpCheckedChange(v: boolean) {
-    setSettings(() => ({
-      "behaviour/showOnStart": v ? "explore" : undefined,
-    }));
+    slice.settings.set((f) => {
+      f["behaviour/showOnStart"] = v ? "explore" : undefined;
+    });
   }
 
   function blur() {

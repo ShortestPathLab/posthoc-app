@@ -2,9 +2,10 @@ import { has } from "lodash-es";
 import { useEffect } from "react";
 import { useAsync } from "react-async-hook";
 import { useLatest } from "react-use";
+import { slice } from "slices";
 import { useAuth } from "slices/auth";
 import { useCloudStorageService } from "slices/cloudStorage";
-import { defaultCloudStorage, useSettings } from "slices/settings";
+import { defaultCloudStorage } from "slices/settings";
 import { assert } from "utils/assert";
 import providers from "./providers";
 
@@ -34,6 +35,6 @@ function useCloudStorageManager(provider: keyof typeof providers) {
 }
 
 export function CloudStorageService() {
-  const [{ cloudStorageType = defaultCloudStorage }] = useSettings();
+  const { cloudStorageType = defaultCloudStorage } = slice.settings.use();
   useCloudStorageManager(cloudStorageType);
 }

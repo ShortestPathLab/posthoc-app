@@ -1,9 +1,9 @@
 import renderers from "internal-renderers";
 import { useAsync } from "react-async-hook";
 import { RendererDefinition, RendererEvents, RendererOptions } from "renderer";
-import url from "url-parse";
+import { slice } from "slices";
 import { Renderer, useRenderers } from "slices/renderers";
-import { useSettings } from "slices/settings";
+import url from "url-parse";
 
 type RendererTransportOptions = { url: string };
 
@@ -38,7 +38,7 @@ export const transports: Record<string, RendererTransportEntry> = {
 };
 
 export function RendererService() {
-  const [{ renderer }] = useSettings();
+  const { renderer } = slice.settings.use();
   const [, setRenderers] = useRenderers();
 
   useAsync(async () => {

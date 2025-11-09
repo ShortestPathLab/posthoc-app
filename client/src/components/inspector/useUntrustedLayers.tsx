@@ -2,11 +2,10 @@ import { ORIGIN_UNKNOWN } from "hooks/useWorkspace";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { find, map } from "lodash-es";
 import { slice } from "slices";
-import { useSettings } from "slices/settings";
 
 export function useUntrustedLayers() {
   "use no memo";
-  const [{ trustedOrigins }] = useSettings();
+  const { trustedOrigins } = slice.settings.use();
   const isTrusted = slice.ui.isTrusted.use();
   const layers = slice.layers.use((s) =>
     map(s, (l) =>

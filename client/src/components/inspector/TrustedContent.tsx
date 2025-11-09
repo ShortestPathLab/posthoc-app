@@ -5,17 +5,14 @@ import {
 } from "@mui-symbols-material/w400";
 import { Link, Stack } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
-import { produce } from "immer";
 import { ReactNode } from "react";
 import { slice } from "slices";
-import { useSettings } from "slices/settings";
 import { Placeholder } from "./Placeholder";
 import { useUntrustedLayers as useUntrustedLayer } from "./useUntrustedLayers";
 
 export function TrustedContent({ children }: { children?: ReactNode }) {
   const { isTrusted, origin } = useUntrustedLayer();
 
-  const [, setSettings] = useSettings();
   return isTrusted ? (
     <>{children}</>
   ) : (
@@ -44,12 +41,10 @@ export function TrustedContent({ children }: { children?: ReactNode }) {
               variant="text"
               startIcon={<DoneAllOutlined />}
               onClick={() => {
-                setSettings(
-                  produce((f) => {
-                    f.trustedOrigins = f.trustedOrigins ?? [];
-                    f.trustedOrigins?.push(origin);
-                  })
-                );
+                slice.settings.set((f) => {
+                  f.trustedOrigins = f.trustedOrigins ?? [];
+                  f.trustedOrigins?.push(origin);
+                });
               }}
             >
               Always trust workspaces from this origin

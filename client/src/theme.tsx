@@ -8,7 +8,7 @@ import {
   ThemeOptions,
 } from "@mui/material";
 import { constant, floor, times } from "lodash-es";
-import { useSettings } from "slices/settings";
+import { slice } from "slices";
 
 export type AccentColor = Exclude<keyof typeof colors, "common" | undefined>;
 
@@ -121,7 +121,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   });
 
 export function useAcrylic(color?: string) {
-  const [{ "appearance/acrylic": acrylic }] = useSettings();
+  const { "appearance/acrylic": acrylic } = slice.settings.use();
   return (
     acrylic
       ? {

@@ -1,6 +1,5 @@
 import { find } from "lodash-es";
 import { slice } from "slices";
-import { useSettings } from "slices/settings";
 import { useConnectionResolver } from "./useConnectionResolver";
 
 export type ConnectionStatus =
@@ -17,7 +16,7 @@ export function useConnectionsLoading() {
 export function useConnectionStatus(url?: string): ConnectionStatus {
   const loading = useConnectionsLoading();
   const resolve = useConnectionResolver();
-  const [{ remote }] = useSettings();
+  const { remote } = slice.settings.use();
   const entry = find(remote, { url });
 
   return entry && !entry?.disabled

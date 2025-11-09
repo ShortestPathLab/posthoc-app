@@ -36,7 +36,6 @@ import { RendererListEditor } from "components/settings-editor/RendererListEdito
 import { ServerListEditor } from "components/settings-editor/ServerListEditor";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { useSm } from "hooks/useSmallDisplay";
-import { $, Objects } from "hotscript";
 import { produce } from "immer";
 import { findLast, keys, map, startCase } from "lodash-es";
 import { ReactNode, Ref, useMemo, useRef, useState } from "react";
@@ -48,7 +47,6 @@ import {
   defaultPlaybackRate as baseRate,
   defaults,
   Settings,
-  useSettings,
 } from "slices/settings";
 import { AccentColor, getShade, usePaper } from "theme";
 import { idle } from "utils/idle";
@@ -108,22 +106,20 @@ function Item({
 }
 
 export function SettingsPage({ template: Page }: PageContentProps) {
+  "use no memo";
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
   const sm = useSm();
   const push = useSnackbar();
   const usingBusyState = useBusyState("reset");
-  const [
-    {
-      "playback/playbackRate": playbackRate = 1,
-      "appearance/acrylic": acrylic,
-      "appearance/theme": theme = "light",
-      "appearance/accentColor": accentColor = "teal",
-      "behaviour/showOnStart": showOnStart,
-      "performance/workerCount": workerCount = 1,
-    },
-    setSettings,
-  ] = useSettings();
+  const {
+    "playback/playbackRate": playbackRate = 1,
+    "appearance/acrylic": acrylic,
+    "appearance/theme": theme = "light",
+    "appearance/accentColor": accentColor = "teal",
+    "behaviour/showOnStart": showOnStart,
+    "performance/workerCount": workerCount = 1,
+  } = slice.settings.use();
   const [tab, setTab] = useState("general");
   const [ref, { width }] = useMeasure();
   function renderHeading(label: ReactNode) {
@@ -251,9 +247,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       valueLabelDisplay="auto"
                       defaultValue={playbackRate}
                       onChangeCommitted={(_, v) =>
-                        setSettings(() => ({
-                          "playback/playbackRate": v as number,
-                        }))
+                        slice.settings.set((f) => {
+                          f["playback/playbackRate"] = +v;
+                        })
                       }
                     />
                   </Item>
@@ -266,9 +262,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     <Switch
                       defaultChecked={theme === "dark"}
                       onChange={(_, v) =>
-                        setSettings(() => ({
-                          "appearance/theme": v ? "dark" : "light",
-                        }))
+                        slice.settings.set((f) => {
+                          f["appearance/theme"] = v ? "dark" : "light";
+                        })
                       }
                     />
                   </Item>
@@ -300,9 +296,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                         }))}
                         arrow
                         onChange={(v) =>
-                          setSettings(() => ({
-                            "appearance/accentColor": v as AccentColor,
-                          }))
+                          slice.settings.set((f) => {
+                            f["appearance/accentColor"] = v as AccentColor;
+                          })
                         }
                       />
                     </Box>
@@ -315,7 +311,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     <Switch
                       defaultChecked={!!acrylic}
                       onChange={(_, v) =>
-                        setSettings(() => ({ "appearance/acrylic": v }))
+                        slice.settings.set((f) => {
+                          f["appearance/acrylic"] = v;
+                        })
                       }
                     />
                   </Item>
@@ -328,9 +326,11 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     <Switch
                       defaultChecked={!!showOnStart}
                       onChange={(_, v) =>
-                        setSettings(() => ({
-                          "behaviour/showOnStart": v ? "explore" : undefined,
-                        }))
+                        slice.settings.set((f) => {
+                          f["behaviour/showOnStart"] = v
+                            ? "explore"
+                            : undefined;
+                        })
                       }
                     />
                   </Item>
@@ -358,9 +358,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       ]}
                       defaultValue={workerCount}
                       onChangeCommitted={(_, v) =>
-                        setSettings(() => ({
-                          "performance/workerCount": v as number,
-                        }))
+                        slice.settings.set((f) => {
+                          f["performance/workerCount"] = +v;
+                        })
                       }
                     />
                   </Item>
@@ -408,7 +408,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                               onClick={() => {
                                 usingBusyState(async () => {
                                   await wait(300);
-                                  setSettings(() => defaults);
+                                  slice.settings.set(() => defaults);
                                   close();
                                   slice.ui.sidebarOpen.set(false);
                                   slice.ui.fullscreenModal.set(undefined);
@@ -486,18 +486,19 @@ export function SettingsPage({ template: Page }: PageContentProps) {
 const a = keys(mapParsers).map((c) => ({ key: c }));
 type A = (typeof a)[number];
 
-export function useSetting<TPath extends $<Objects.AllPaths, Settings>>(
+export function useSetting<TPath extends keyof Settings>(
   key: TPath,
   def: Exclude<Get<Settings, TPath>, undefined | void>
 ) {
-  const [settings, setSettings] = useSettings();
+  "use no memo";
+  const settings = slice.settings.use();
   return useOptimisticTransaction(
     get(settings, key)! ?? def,
     (f: Transaction<Exclude<Get<Settings, TPath>, undefined | void>>) =>
       idle(() =>
-        setSettings((prev) => ({
-          [key]: produce(get(prev, key) ?? def, f),
-        }))
+        slice.settings.set((prev) => {
+          prev[key] = produce(get(prev, key) ?? def, f) as any;
+        })
       )
   );
 }
@@ -575,7 +576,7 @@ export function MapParserListEditor() {
         )}
         icon={null}
         value={a}
-        // onChange={debounce((v) => setSettings(() => ({ remote: v })), 300)}
+        // onChange={debounce((v) => slice.settings.set(() => ({ remote: v })), 300)}
         create={() => ({
           key: "",
         })}

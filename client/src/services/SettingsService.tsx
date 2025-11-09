@@ -1,16 +1,15 @@
 import { useEffect } from "react";
-import { useSettings } from "slices/settings";
 import { minimal } from "./SyncParticipant";
 import { slice } from "slices";
 
 export function SettingsService() {
-  const [{ "behaviour/showOnStart": showOnStart }, , initialised] =
-    useSettings();
+  "use no memo";
+  const { "behaviour/showOnStart": showOnStart } = slice.settings.use();
   useEffect(() => {
     const workspace = new URLSearchParams(location.search).get("workspace");
-    if (!minimal && showOnStart && initialised && !workspace) {
+    if (!minimal && showOnStart && !workspace) {
       slice.ui.fullscreenModal.set(showOnStart);
     }
-  }, [initialised, minimal]);
+  }, [minimal]);
   return <></>;
 }

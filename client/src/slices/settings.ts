@@ -1,8 +1,8 @@
-import type { pages } from "pages";
-import { createSlice, withLocalStorage } from "./createSlice";
-import { AccentColor } from "theme";
-import { cloudStorageProviders } from "services/cloud-storage";
+import { store } from "@davstack/store";
 import { keys } from "lodash-es";
+import type { pages } from "pages";
+import { cloudStorageProviders } from "services/cloud-storage";
+import { AccentColor } from "theme";
 
 export type Sources = {
   trustedOrigins?: string[];
@@ -85,7 +85,10 @@ export const defaults = {
   "performance/workerCount": 1,
 } as Settings;
 
-export const [useSettings, SettingsProvider] = createSlice<Settings>(
+export const settings = store<Settings>(
   {},
-  withLocalStorage("settings", defaults)
+  {
+    name: "settings",
+    persist: { enabled: true },
+  }
 );

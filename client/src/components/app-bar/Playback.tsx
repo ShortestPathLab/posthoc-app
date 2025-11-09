@@ -25,7 +25,6 @@ import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { useEffect, useState } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
-import { useSettings } from "slices/settings";
 import { usePaper } from "theme";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
@@ -54,11 +53,12 @@ export function PlaybackService({
   children,
   value,
 }: EditorSetterProps<Layer<PlaybackLayerData>>) {
+  "use no memo";
   const { playing, step = 0, end = 0 } = usePlaybackServiceState(value?.key);
 
   const { pause, stepWithBreakpointCheck } = usePlaybackControls(value?.key);
 
-  const [{ "playback/playbackRate": playbackRate = 1 }] = useSettings();
+  const { "playback/playbackRate": playbackRate = 1 } = slice.settings.use();
 
   useEffect(() => {
     if (playing) {
