@@ -43,7 +43,7 @@ export function FlowNode(props: NodeProps<Node<FlowData<string, Properties>>>) {
     );
   };
 
-  const config = resolveNodeConfig(type)(fields as any);
+  const config = resolveNodeConfig(type)?.(fields as any);
 
   return <NodeBase items={getItems(config, updateField)} />;
 }
@@ -51,10 +51,13 @@ export function FlowNode(props: NodeProps<Node<FlowData<string, Properties>>>) {
 export function getHeight(
   config?: TransformationNodeConfig<string, Properties>
 ) {
-  return sumBy(getItems(config), (item) => item.height);  
+  return sumBy(getItems(config), (item) => item.height);
 }
 
-function getItems(config?: TransformationNodeConfig<string, Properties>, updateField?: (key: string, value: any) => void) {
+function getItems(
+  config?: TransformationNodeConfig<string, Properties>,
+  updateField?: (key: string, value: any) => void
+) {
   return [
     {
       height: 48,
@@ -145,9 +148,9 @@ function getItems(config?: TransformationNodeConfig<string, Properties>, updateF
                   label={field.label}
                   value={field.value ?? ""}
                   fullWidth
-                  onChange={(
-                    e 
-                  ) => updateField?.(String(field.key), e.target.value)}
+                  onChange={(e) =>
+                    updateField?.(String(field.key), e.target.value)
+                  }
                 >
                   {field.options?.length ? (
                     field.options.map((opt) => (

@@ -48,7 +48,7 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { traceToNodes } from "components/visual-scripting/traceToNodes";
 import { TraceLayerData } from "layers/trace/TraceLayer";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
-import { chain, head, keys, map, startCase } from "lodash-es";
+import { chain, entries, head, keys, map, startCase } from "lodash-es";
 import { bindTrigger } from "material-ui-popup-state";
 import { nanoid } from "nanoid";
 import { TraceComponent } from "protocol/Trace-v140";
@@ -272,8 +272,20 @@ export function VisualPage({ template: Page }: PageContentProps) {
                     >
                       {(state) => (
                         <MenuList>
-                          {chain(transforms)
-                            .entries()
+                          {chain([
+                            ...entries(transforms),
+                            ...entries(content?.views).map(
+                              ([k, v]) =>
+                                [
+                                  k,
+                                  () => ({
+                                    key: "component",
+                                    title: k,
+                                    group: "components",
+                                  }),
+                                ] as const
+                            ),
+                          ])
                             .map(([k, v]) => [k, v()] as const)
                             .groupBy(([, v]) => v.group)
                             .omitBy((vs, k) => k === "hidden")
@@ -284,9 +296,9 @@ export function VisualPage({ template: Page }: PageContentProps) {
                                     {startCase(group)}
                                   </Typography>
                                 </MenuItem>
-                                {map(vs, ([k, v]) => (
+                                {map(vs, ([k, v], i) => (
                                   <MenuItem
-                                    key={k}
+                                    key={i}
                                     onClick={() => {
                                       state.close();
                                       onChange?.((s) => {
