@@ -13,6 +13,7 @@ import { BreakpointService } from "services/BreakpointService";
 import { AccentColor, accentColors, getShade } from "theme";
 import { set } from "utils/set";
 import { Controller } from "./types";
+import useWindowFocus from "use-window-focus";
 
 export const service = withProduce(({ value, produce }) => {
   const { palette } = useTheme();

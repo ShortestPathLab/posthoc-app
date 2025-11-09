@@ -1,15 +1,15 @@
 import { getController } from "layers/layerControllers";
 import { map } from "lodash-es";
 import { createElement, useMemo } from "react";
-import { useSyncStatus } from "./SyncService";
 import { slice } from "slices";
+import { useActive } from "./SyncService";
 
 function useLayerServices() {
   "use no memo";
-  const { isPrimary } = useSyncStatus();
+  const isActive = useActive();
   const layers = slice.layers.use();
   return useMemo(() => {
-    return isPrimary
+    return isActive
       ? map(layers, (layer) => {
           const { service } = getController(layer);
           if (service) {
@@ -23,7 +23,7 @@ function useLayerServices() {
           }
         })
       : [];
-  }, [isPrimary, layers]);
+  }, [isActive, layers]);
 }
 
 export function LayerService() {

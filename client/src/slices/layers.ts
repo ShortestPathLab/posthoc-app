@@ -1,8 +1,8 @@
 import { store } from "@davstack/store";
 import { filter, head, isEqual, map } from "lodash-es";
+import hash from "object-hash";
 import { useEffect, useState } from "react";
 import { createOne, createSelector } from "./selector";
-import hash from "object-hash";
 
 export type Layer<T = Record<string, unknown>> = {
   key: string;
@@ -20,11 +20,13 @@ export type LayerGuard<T> = (
 export const defaultGuard = ((l) => !!l) as LayerGuard<never>;
 
 export const layers = store<Layer[]>([], {
-  devtools: { enabled: import.meta.env.DEV },
   name: "layers",
-}).extend((store) => ({
-  one: createSelector(store),
-}));
+  devtools: { enabled: import.meta.env.DEV },
+}).extend((store) => {
+  return {
+    one: createSelector(store),
+  };
+});
 
 export const WithLayer = createOne(layers.one);
 export function useLayers<T extends Record<string, unknown>>(

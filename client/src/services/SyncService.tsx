@@ -1,11 +1,10 @@
-import { useEffectWhen } from "hooks/useEffectWhen";
 import { throttle } from "lodash-es";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
-import { usePrevious } from "react-use";
-import { Layer } from "slices/layers";
-import { Settings, useSettings } from "slices/settings";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { slice } from "slices";
 import sysend from "sysend";
-import { instance, participant } from "./SyncParticipant";
+import useWindowFocus from "use-window-focus";
+import { participant } from "./SyncParticipant";
+import { Layer } from "slices/layers";
 
 export function useSyncStatus() {
   return useSyncExternalStore(
@@ -17,89 +16,66 @@ export function useSyncStatus() {
   );
 }
 
-type SyncedData = {
-  initiator: string;
-  commit: string;
-  state: {
-    settings?: Settings;
-    layers?: Layer[];
-  };
+type Data = {
+  layers: Layer[];
 };
 
 export function SyncService() {
-  const { isPrimary, isOnly, participants, peers } = useSyncStatus();
-  return null;
-  const [settings, setSettings, , c1] = useSettings();
-
-  // Apply
+  const isFocused = useWindowFocus();
+  const { isOnly, isPrimary, loading } = useSyncStatus();
+  // Init query
+  useEffect(
+    () => void (!loading && !isOnly && sysend.broadcast("sync")),
+    [loading]
+  );
+  // Init response
   useEffect(() => {
-    sysend.on<SyncedData>("settings", ({ initiator, state, commit: c3 }) => {
-      // Sync settings across everyone
-      if (initiator !== instance && c3 !== c1)
-        setSettings((prev) => state.settings ?? prev, true);
-    });
-    sysend.on<SyncedData>("layers", ({ initiator, state, commit: c3 }) => {
-      // Sync layers only across same channel
-      if (
-        initiator !== instance &&
-        participants.includes(initiator) &&
-        c3 !== c2
-      )
-        setLayers((prev) => state.layers ?? prev, true);
-    });
-    return () => {
-      sysend.off("settings");
-      sysend.off("layers");
-    };
-  }, [c1, c2, setSettings, setLayers, participants]);
+    if (loading) return;
+    if (isPrimary) {
+      const f = () => sysend.broadcast("init", { layers: slice.layers.get() });
+      sysend.on("sync", f);
+      return () => sysend.off("sync", f);
+    } else {
+      const f = ({ layers }: Data) => slice.layers.set(layers);
+      sysend.on("init", f);
+      return () => sysend.off("init", f);
+    }
+  }, [isPrimary, loading]);
   // Broadcast
   useEffect(() => {
-    if (peers.length) {
-      sysend.broadcast<SyncedData>("settings", {
-        initiator: instance,
-        state: { settings },
-        commit: c1,
-      });
-    }
-  }, [c1, peers.length]);
-  const previous = usePrevious(c2);
-  const broadCastLayers = useMemo(
-    () =>
-      throttle(
-        (...args: Parameters<typeof sysend.broadcast<SyncedData>>) =>
-          sysend.broadcast(...args),
-        300
-      ),
-    []
-  );
-  // Any changes
-  useEffectWhen(
-    () => {
-      if (previous && participants.length && c2 !== previous) {
-        broadCastLayers("layers", {
-          initiator: instance,
-          state: { layers },
-          commit: c2,
-        });
-      }
-    },
-    [layers, c2, participants.length],
-    [previous, c2]
-  );
-  // Primary broadcasts to new
-  useEffectWhen(
-    () => {
-      if (!isOnly && isPrimary) {
-        broadCastLayers("layers", {
-          initiator: instance,
-          state: { layers },
-          commit: c2,
-        });
-      }
-    },
-    [layers, c2, participants.length, isOnly, isPrimary],
-    [participants.length]
-  );
+    if (isOnly) return;
+    return slice.layers.onChange((layers) =>
+      sysend.broadcast("update", { layers })
+    );
+  }, [isOnly]);
+  // Receive
+  useEffect(() => {
+    if (isOnly) return;
+    if (isFocused) return;
+    const f = throttle(
+      ({ layers }: Data) => slice.layers.set(layers),
+      1000 / 24
+    );
+    sysend.on("update", f);
+    return () => sysend.off("update", f);
+  }, [isOnly, isFocused]);
 
   return <></>;
+}
+
+export function useActive() {
+  const [isActive, setActive] = useState(false);
+  const isFocused = useWindowFocus();
+  useEffect(() => {
+    if (isFocused) {
+      sysend.broadcast("active", sysend.id);
+      setActive(true);
+    }
+  }, [isFocused]);
+  useEffect(() => {
+    const f = (id: string) => setActive(id === sysend.id);
+    sysend.on("active", f);
+    return () => sysend.off("active", f);
+  });
+  return isActive;
 }
