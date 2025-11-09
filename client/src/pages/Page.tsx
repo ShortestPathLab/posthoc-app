@@ -12,6 +12,7 @@ import { pages } from "pages";
 import React, { ReactNode, Ref } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useMeasure } from "react-use";
+import { slice } from "slices";
 import { Transaction } from "slices/selector";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
@@ -76,7 +77,9 @@ export type PageSlots = {
 
 export const Page = withSlots<PageSlots, PageProps>(
   ({ slotProps, onChange, stack }) => {
+    "use no memo";
     const acrylic = useAcrylic();
+    const settings = slice.settings.use();
     return (
       <ErrorBoundary
         fallbackRender={(error) => (
@@ -103,7 +106,9 @@ export const Page = withSlots<PageSlots, PageProps>(
                 label="Choose View"
                 onChange={(type) => onChange?.((s) => void (s.type = type))}
                 value={stack?.type}
-                items={values(pages)}
+                items={values(pages).filter((p) =>
+                  p.experiment ? settings[p.experiment] : true
+                )}
                 itemOrientation="vertical"
               />
               <Space sx={{ mx: "auto" }} />
@@ -150,7 +155,9 @@ export const Page = withSlots<PageSlots, PageProps>(
                     label="Choose View"
                     onChange={(type) => onChange?.((s) => void (s.type = type))}
                     value={stack?.type}
-                    items={values(pages)}
+                    items={values(pages).filter((p) =>
+                      p.experiment ? settings[p.experiment] : true
+                    )}
                     itemOrientation="vertical"
                   />
                   {slotProps.Options?.children && (

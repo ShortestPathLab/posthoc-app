@@ -1,5 +1,6 @@
 import {
   BlurOnRounded,
+  CodeRounded,
   DarkModeRounded,
   ExploreRounded,
   FastForwardRounded,
@@ -7,6 +8,7 @@ import {
   PaletteRounded,
   RestartAltOutlined,
   RestartAltRounded,
+  WorkspacesRounded,
 } from "@mui-symbols-material/w400";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
@@ -119,6 +121,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
     "appearance/accentColor": accentColor = "teal",
     "behaviour/showOnStart": showOnStart,
     "performance/workerCount": workerCount = 1,
+    "experiments/cloudStorage": cloudStorage = false,
+    "experiments/visualScripting": visualScripting = false,
   } = slice.settings.use();
   const [tab, setTab] = useState("general");
   const [ref, { width }] = useMeasure();
@@ -360,6 +364,35 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       onChangeCommitted={(_, v) =>
                         slice.settings.set((f) => {
                           f["performance/workerCount"] = +v;
+                        })
+                      }
+                    />
+                  </Item>
+                  {renderHeading("Experiments")}
+                  <Item
+                    label="Workspace storage API"
+                    icon={<WorkspacesRounded />}
+                    description="Work in progress. Store your visualisations on GitHub, Google Drive, or locally"
+                  >
+                    <Switch
+                      defaultChecked={cloudStorage}
+                      onChange={(_, v) =>
+                        slice.settings.set((f) => {
+                          f["experiments/cloudStorage"] = v;
+                        })
+                      }
+                    />
+                  </Item>
+                  <Item
+                    label="Flow editor"
+                    icon={<CodeRounded />}
+                    description="Work in progress. Edit your search traces with a node based editor"
+                  >
+                    <Switch
+                      defaultChecked={visualScripting}
+                      onChange={(_, v) =>
+                        slice.settings.set((f) => {
+                          f["experiments/visualScripting"] = v;
                         })
                       }
                     />

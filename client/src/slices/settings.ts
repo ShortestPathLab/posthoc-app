@@ -32,6 +32,8 @@ export type Settings = {
   "appearance/accentColor"?: AccentColor;
   "behaviour/showOnStart"?: keyof typeof pages;
   "performance/workerCount"?: number;
+  "experiments/cloudStorage"?: boolean;
+  "experiments/visualScripting"?: boolean;
 } & Sources;
 
 export const defaultRemotes = [
@@ -83,6 +85,8 @@ export const defaults = {
   "appearance/accentColor": "blue",
   "behaviour/showOnStart": "explore",
   "performance/workerCount": 1,
+  "experiments/cloudStorage": false,
+  "experiments/visualScripting": false,
 } as Settings;
 
 export const settings = store<Settings>(

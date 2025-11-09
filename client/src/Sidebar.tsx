@@ -58,10 +58,12 @@ function Divider2() {
 }
 
 export function Sidebar() {
+  "use no memo";
   const { isPrimary } = useSyncStatus();
   const bgcolor = useSidebarBackground();
   const sm2 = isMobile;
   const sm = !isPrimary || sm2;
+  const settings = slice.settings.use();
   return (
     <TabContext value={false as unknown as string}>
       <Stack
@@ -86,6 +88,7 @@ export function Sidebar() {
           sx={sm ? { height: 64, width: "100%" } : { width: 64 }}
         >
           {values(pages)
+            .filter((p) => (p.experiment ? settings[p.experiment] : true))
             .filter((c) =>
               sm
                 ? c.showInSidebar === "always" ||

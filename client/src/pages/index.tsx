@@ -57,6 +57,7 @@ export const pages: Record<string, PageMeta> = {
     content: WorkspacesPage,
     allowFullscreen: true,
     showInSidebar: "always",
+    experiment: "experiments/cloudStorage",
   },
   layers: {
     id: "layers",
@@ -118,6 +119,7 @@ export const pages: Record<string, PageMeta> = {
     iconThin: <CodeOutlinedThin />,
     content: VisualPage,
     allowFullscreen: true,
+    experiment: "experiments/visualScripting",
   },
   debug: {
     id: "debug",
