@@ -169,6 +169,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
                     disabled={isDisabled(i)}
                     key={i}
                     index={i}
+                    event={steps[i][1]}
                     layer={key}
                   />
                 ),

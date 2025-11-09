@@ -8,16 +8,21 @@ import { useItemState } from "./useItemState";
 export function Item({
   layer,
   index = 0,
+  event: eventIndex = 0,
   disabled,
 }: {
+  index?: number;
   disabled?: boolean;
   layer?: string;
-  index?: number;
+  event?: number;
 }) {
   const { spacing } = useTheme();
 
   const { stepTo, playing } = useItemPlaybackState(layer);
-  const { event, isSelected, label } = useItemState({ layer, index });
+  const { event, isSelected, label } = useItemState({
+    layer,
+    index: eventIndex,
+  });
   return (
     <Box
       sx={{
@@ -34,10 +39,10 @@ export function Item({
               opacity: disabled ? 0.25 : 1,
             }}
             event={event}
-            index={index}
+            index={eventIndex}
             selected={isSelected}
             label={label}
-            onClick={() => stepTo(index)}
+            onClick={() => stepTo(eventIndex)}
           />
         )}
       </WhenIdle>
