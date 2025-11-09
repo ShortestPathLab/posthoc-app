@@ -6,7 +6,7 @@ import {
 } from "./treeLayout.worker";
 import treeWorkerUrl from "./treeLayout.worker.ts?worker&url";
 
-export class TreeWorkerUrl extends Worker {
+export class TreeLayoutWorker extends Worker {
   constructor() {
     super(treeWorkerUrl, { type: "module" });
   }
@@ -15,7 +15,7 @@ export class TreeWorkerUrl extends Worker {
 export const treeAsync = usingMemoizedWorkerTask<
   TreeLayoutWorkerParameters,
   TreeLayoutWorkerReturnType
->(TreeWorkerUrl);
+>(TreeLayoutWorker);
 
 export function useTreeLayout({
   key,

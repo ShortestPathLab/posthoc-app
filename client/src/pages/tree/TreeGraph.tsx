@@ -161,7 +161,8 @@ export function TreeGraph(props: TreeGraphProps) {
 
   const event = trace?.events?.[highlightEdges?.step ?? 0];
 
-  const isAxisEnabled = !isEmpty(trackedProperty);
+  // const isAxisEnabled = !isEmpty(trackedProperty);
+  const isAxisEnabled = false;
 
   return (
     <>
