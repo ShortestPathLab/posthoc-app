@@ -140,5 +140,6 @@
     "vitest-canvas-mock": "^0.3.3"
   },
   "homepage": ".",
-  "main": "main.js"
+  "main": "main.mjs",
+  "type": "module"
 }
