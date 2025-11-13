@@ -89,10 +89,7 @@ export const defaults = {
   "experiments/visualScripting": false,
 } as Settings;
 
-export const settings = store<Settings>(
-  {},
-  {
-    name: "settings",
-    persist: { enabled: true },
-  }
-);
+export const settings = store<Settings>(defaults, {
+  name: "settings",
+  persist: { enabled: true },
+});
