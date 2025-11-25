@@ -2,13 +2,15 @@ import {
   AccountTreeOutlined,
   DataObjectOutlined,
   ModeStandbyOutlined,
-  TimelineOutlined,
+  TimelineOutlined
 } from "@mui-symbols-material/w400";
+import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import {
   Box,
   Divider,
   ListItem,
   ListItemIcon,
+  TextField,
   Menu,
   MenuItem,
   MenuList,
@@ -16,7 +18,7 @@ import {
   Stack,
   Tooltip,
   Typography,
-  useTheme,
+  useTheme
 } from "@mui/material";
 import { SigmaContainer } from "@react-sigma/core";
 import "@react-sigma/core/lib/style.css";
@@ -30,7 +32,7 @@ import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfac
 import { Placeholder } from "components/inspector/Placeholder";
 import {
   PropertyDialog,
-  PropertyList,
+  PropertyList
 } from "components/inspector/PropertyList";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
@@ -38,7 +40,7 @@ import { MultiDirectedGraph } from "graphology";
 import {
   HighlightLayerData,
   highlightNodesOptions,
-  useHighlightNodes,
+  useHighlightNodes
 } from "hooks/useHighlight";
 import { usePlaybackControls } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
@@ -56,6 +58,7 @@ import { UploadedTrace } from "slices/UIState";
 import { PanelState } from "slices/view";
 import { getShade } from "theme";
 import { set } from "utils/set";
+import { Switch } from "../../components/generic/inputs/Switch";
 import { PageContentProps } from "../PageMeta";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
@@ -71,14 +74,20 @@ const layoutModes = {
     value: "directed-graph",
     name: "Directed Graph",
     description: "Show all edges",
-    showAllEdges: true,
+    showAllEdges: true
   },
   tree: {
     value: "tree",
     name: "Tree",
     description: "Show only edges between each node and their final parents",
-    showAllEdges: false,
+    showAllEdges: false
   },
+  scatterplot: {
+    value: "scatterplot",
+    name: "Scatterplot",
+    description: "Show only edges between each node and their final parents",
+    showAllEdges: false
+  }
 };
 
 export type TreeLayer = Layer<
@@ -121,7 +130,7 @@ function TreeMenu({
                   sx={{
                     height: 32,
                     flex: 1,
-                    borderLeft: `4px solid ${getColorHex(entry.event.type)}`,
+                    borderLeft: `4px solid ${getColorHex(entry.event.type)}`
                   }}
                   onClick={() => {
                     // setMenuOpen(false);
@@ -218,7 +227,7 @@ function TreeMenu({
                           sx={{
                             height: 32,
                             flex: 1,
-                            borderLeft: `4px solid ${highlightColor}`,
+                            borderLeft: `4px solid ${highlightColor}`
                           }}
                           onClick={(e) => {
                             showHighlight[highlight.type](
@@ -259,11 +268,35 @@ function useTreePageState(key?: string) {
 export function TreePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
 
+  // Scatterplot
+  const [scatterplotMode, setScatterplotMode] = useState<boolean>(false);
+  const [formInput, setFormInput] = useState<{
+    xMetric: string;
+    yMetric: string;
+  }>({ xMetric: "", yMetric: "" });
+
   // ─── Layer Data ──────────────────────────────────────────────────────
 
   const { key, setKey } = useLayerPicker(isTreeLayer);
   const one = slice.layers.one<TreeLayer>(key);
   const { trace, step } = useTreePageState(key);
+  console.log("TRACE DATA:", trace);
+  const metricOptions = () => {
+    const traceData = trace?.content?.events;
+    if (!traceData || trace?.content?.events?.length === 0) {
+      return [];
+    }
+
+    const numericMetrics = new Set<string>();
+    for (const event of traceData) {
+      for (const key in event) {
+        if (typeof event[key] === "number" && key !== "id" && key !== "pId") {
+          numericMetrics.add(key);
+        } 
+      }
+    }
+    return Array.from(numericMetrics).sort();
+  };
 
   // ─── Playback ────────────────────────────────────────────────────────
 
@@ -298,7 +331,7 @@ export function TreePage({ template: Page }: PageContentProps) {
   const { data: tree, isLoading: loading } = useTreeLayout({
     trace: trace?.content,
     mode,
-    key: trace?.key,
+    key: trace?.key
   });
 
   const graphSettings = useGraphSettings();
@@ -313,6 +346,67 @@ export function TreePage({ template: Page }: PageContentProps) {
           {trace ? (
             loading ? (
               <Spinner message="Generating layout" />
+            ) : scatterplotMode ? (
+              <>
+                {" "}
+                <AutoSize>
+                  {(size: Size) => (
+                    <SigmaContainer
+                      style={{
+                        ...size,
+                        background: theme.palette.background.paper
+                      }}
+                      graph={MultiDirectedGraph}
+                      settings={graphSettings}
+                    ></SigmaContainer>
+                  )}
+                </AutoSize>
+                <Box mt={2} px={2}>
+                  <Stack direction="row" spacing={2}>
+                    <TextField
+                      select
+                      fullWidth
+                      size="small"
+                      label="X axis"
+                      name="xMetric"
+                      value={formInput.xMetric}
+                      onChange={() => {
+                        console.log();
+                      }}
+                    >
+                      {/* "step" always available */}
+                      <MenuItem value="step">step</MenuItem>
+
+                      {metricOptions().map((metric) => (
+                        <MenuItem key={metric} value={metric}>
+                          {metric}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
+                    <TextField
+                      select
+                      fullWidth
+                      size="small"
+                      label="X axis"
+                      name="xMetric"
+                      value={formInput.xMetric}
+                      onChange={() => {
+                        console.log();
+                      }}
+                    >
+                      {/* "step" always available */}
+                      <MenuItem value="step">step</MenuItem>
+
+                      {metricOptions().map((metric) => (
+                        <MenuItem key={metric} value={metric}>
+                          {metric}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Stack>
+                </Box>
+              </>
             ) : tree?.length ? (
               <>
                 <AutoSize>
@@ -320,7 +414,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                     <SigmaContainer
                       style={{
                         ...size,
-                        background: theme.palette.background.paper,
+                        background: theme.palette.background.paper
                       }}
                       graph={MultiDirectedGraph}
                       settings={graphSettings}
@@ -356,11 +450,11 @@ export function TreePage({ template: Page }: PageContentProps) {
                   anchorReference="anchorPosition"
                   anchorPosition={{
                     left: point.x,
-                    top: point.y,
+                    top: point.y
                   }}
                   transformOrigin={{
                     horizontal: "left",
-                    vertical: "top",
+                    vertical: "top"
                   }}
                   open={menuOpen}
                   layer={key}
@@ -401,8 +495,8 @@ export function TreePage({ template: Page }: PageContentProps) {
                 onChange: setMode,
                 items: map(entries(layoutModes), ([k, v]) => ({
                   id: k,
-                  ...v,
-                })),
+                  ...v
+                }))
               },
               {
                 icon: <TimelineOutlined />,
@@ -414,9 +508,9 @@ export function TreePage({ template: Page }: PageContentProps) {
                   ...map(entries(properties), ([k, v]) => ({
                     id: k,
                     name: `$${k}`,
-                    description: v.type,
-                  })),
-                ],
+                    description: v.type
+                  }))
+                ]
               },
               // {
               //   icon: <LineAxisOutlined />,
@@ -428,19 +522,53 @@ export function TreePage({ template: Page }: PageContentProps) {
               //     ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
               //   ],
               // },
+              {
+                icon: <ScatterPlotIcon />,
+                label: "Scatterplot",
+                value: scatterplotMode,
+                onChange: setTrackedProperty,
+                items: [
+                  { id: "", name: "Off" },
+                  ...map(entries(properties), ([k, v]) => ({
+                    id: k,
+                    name: `$${k}`,
+                    description: v.type
+                  }))
+                ]
+              }
             ],
             ({ icon, label, value, items, onChange }, i) => (
               <Fragment key={i}>
                 {!!i && divider}
-                <FeaturePicker
-                  icon={icon}
-                  label={label}
-                  value={value}
-                  items={items}
-                  /// @ts-expect-error poor type inference
-                  onChange={onChange}
-                  arrow
-                />
+                {label !== "Scatterplot" && (
+                  <FeaturePicker
+                    icon={icon}
+                    label={label}
+                    value={value}
+                    items={items}
+                    /// @ts-expect-error poor type inference
+                    onChange={onChange}
+                    arrow
+                  />
+                )}
+
+                {label === "Scatterplot" && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px"
+                    }}
+                  >
+                    <ScatterPlotIcon />
+                    <Switch
+                      label=""
+                      size="small"
+                      checked={scatterplotMode}
+                      onChange={(_, checked) => setScatterplotMode(checked)}
+                    />
+                  </Box>
+                )}
               </Fragment>
             )
           )}
@@ -449,4 +577,79 @@ export function TreePage({ template: Page }: PageContentProps) {
       <Page.Extras>{controls}</Page.Extras>
     </Page>
   );
+}
+type MetricsBag = {
+  [key: string]: number;
+};
+
+type ScatterPlot = {
+  id: string;
+  label: string;
+  step: number;
+  eventType: string;
+  metrics: MetricsBag;
+};
+
+type MetricType = keyof MetricsBag;
+
+export type ScatterPlotOutput = {
+  x: number;
+  y: number;
+  point: ScatterPlot;
+};
+
+export enum EventType {
+  Source = "source",
+  Destination = "destination",
+  Generating = "generating",
+  Expanding = "expanding",
+  Closing = "closing"
+}
+
+const buildScatterPlotData = (
+  traceData,
+  xMetricName: MetricType,
+  yMetricName: MetricType,
+  eventType: EventType = EventType.Closing
+): ScatterPlotOutput[] => {
+  const scatterPlotData: ScatterPlotOutput[] = [];
+
+  if (!traceData || !traceData.events) {
+    return [];
+  }
+
+  traceData.events.forEach((event, step) => {
+    if (event.type === eventType) {
+      const metrics: MetricsBag = {};
+      for (const key in event) {
+        const num = Number(event[key]);
+        if (!isNaN(num)) {
+          metrics[key] = num;
+          continue;
+          // check that metric name selected has numeric values
+        }
+      }
+
+      const x = metrics[xMetricName] ?? 0;
+      const y = metrics[yMetricName] ?? 0;
+
+      scatterPlotData.push({
+        x,
+        y,
+        point: {
+          id: event.id,
+          label: event.id,
+          step,
+          eventType: event.type,
+          metrics
+        }
+      });
+    }
+  });
+
+  return scatterPlotData || [];
+};
+
+export function ScatterplotPage(props: PageContentProps) {
+  return <TreePage {...props} />;
 }
