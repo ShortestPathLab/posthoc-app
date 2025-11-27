@@ -48,7 +48,7 @@ import { getController } from "layers/layerControllers";
 import { TraceLayerData } from "layers/trace/TraceLayer";
 import { entries, findLast, isEmpty, map, startCase } from "lodash-es";
 import { Size } from "protocol";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
@@ -270,10 +270,12 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   // Scatterplot
   const [scatterplotMode, setScatterplotMode] = useState<boolean>(false);
+  // TODO need to set default values for xMetric and yMetric when scatterplotMode is enabled
+  // need to set
   const [formInput, setFormInput] = useState<{
     xMetric: string;
     yMetric: string;
-  }>({ xMetric: "", yMetric: "" });
+  }>({ xMetric: "step", yMetric: "step" });
 
   // ─── Layer Data ──────────────────────────────────────────────────────
 
@@ -292,12 +294,27 @@ export function TreePage({ template: Page }: PageContentProps) {
       for (const key in event) {
         if (typeof event[key] === "number" && key !== "id" && key !== "pId") {
           numericMetrics.add(key);
-        } 
+        }
       }
     }
     return Array.from(numericMetrics).sort();
   };
 
+  const data = buildScatterPlotData(
+    trace?.content,
+    formInput.xMetric as MetricType,
+    formInput.yMetric as MetricType,
+    EventType.Closing
+  )?.data?.slice(0, 5);
+  console.log(data, "data for scatterplot");
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormInput((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
   // ─── Playback ────────────────────────────────────────────────────────
 
   const throttled = useThrottle(step ?? 0, 1000 / 24);
@@ -361,7 +378,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                     ></SigmaContainer>
                   )}
                 </AutoSize>
-                <Box mt={2} px={2}>
+                <Box mt={26} px={2} sx={{}}>
                   <Stack direction="row" spacing={2}>
                     <TextField
                       select
@@ -370,9 +387,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                       label="X axis"
                       name="xMetric"
                       value={formInput.xMetric}
-                      onChange={() => {
-                        console.log();
-                      }}
+                      onChange={handleOnChange}
                     >
                       {/* "step" always available */}
                       <MenuItem value="step">step</MenuItem>
@@ -388,12 +403,10 @@ export function TreePage({ template: Page }: PageContentProps) {
                       select
                       fullWidth
                       size="small"
-                      label="X axis"
-                      name="xMetric"
-                      value={formInput.xMetric}
-                      onChange={() => {
-                        console.log();
-                      }}
+                      label="Y axis"
+                      name="yMetric"
+                      value={formInput.yMetric}
+                      onChange={handleOnChange}
                     >
                       {/* "step" always available */}
                       <MenuItem value="step">step</MenuItem>
@@ -598,6 +611,14 @@ export type ScatterPlotOutput = {
   point: ScatterPlot;
 };
 
+type ScatterPlotScaleAndData = {
+  data: ScatterPlotOutput[];
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+};
+
 export enum EventType {
   Source = "source",
   Destination = "destination",
@@ -611,25 +632,34 @@ const buildScatterPlotData = (
   xMetricName: MetricType,
   yMetricName: MetricType,
   eventType: EventType = EventType.Closing
-): ScatterPlotOutput[] => {
+): ScatterPlotScaleAndData => {
   const scatterPlotData: ScatterPlotOutput[] = [];
-
+  console.log("xMetricName:", xMetricName, "yMetricName:", yMetricName);
   if (!traceData || !traceData.events) {
-    return [];
+    return {
+      data: [],
+      xMin: 0,
+      xMax: 0,
+      yMin: 0,
+      yMax: 0
+    };
   }
-
+  let xMin = Infinity;
+  let xMax = -Infinity;
+  let yMin = Infinity;
+  let yMax = -Infinity;
+  // TODO Also find max and min value for both x and y metric to determine scale
+  // TODO also need to assign default values to the metrics if they do not exist
   traceData.events.forEach((event, step) => {
     if (event.type === eventType) {
       const metrics: MetricsBag = {};
       for (const key in event) {
         const num = Number(event[key]);
-        if (!isNaN(num)) {
+        if (!isNaN(num) && key !== "id" && key !== "pId") {
           metrics[key] = num;
-          continue;
-          // check that metric name selected has numeric values
         }
       }
-
+      metrics.step = step;
       const x = metrics[xMetricName] ?? 0;
       const y = metrics[yMetricName] ?? 0;
 
@@ -647,7 +677,7 @@ const buildScatterPlotData = (
     }
   });
 
-  return scatterPlotData || [];
+  return { data: scatterPlotData, xMin, xMax, yMin, yMax };
 };
 
 export function ScatterplotPage(props: PageContentProps) {
