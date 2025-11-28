@@ -20,7 +20,7 @@ import {
   Typography,
   useTheme
 } from "@mui/material";
-import { SigmaContainer } from "@react-sigma/core";
+import { SigmaContainer, useLoadGraph } from "@react-sigma/core";
 import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { PlaybackLayerData, useStep } from "components/app-bar/Playback";
@@ -36,7 +36,7 @@ import {
 } from "components/inspector/PropertyList";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
-import { MultiDirectedGraph } from "graphology";
+import { Graph, MultiDirectedGraph } from "graphology";
 import {
   HighlightLayerData,
   highlightNodesOptions,
@@ -222,7 +222,7 @@ function TreeMenu({
                           selected={
                             l.source?.highlighting?.type === highlight.type &&
                             l.source?.highlighting?.step ===
-                              selected?.current?.step
+                            selected?.current?.step
                           }
                           sx={{
                             height: 32,
@@ -300,14 +300,15 @@ export function TreePage({ template: Page }: PageContentProps) {
     return Array.from(numericMetrics).sort();
   };
 
-  const data = buildScatterPlotData(
-    trace?.content,
-    formInput.xMetric as MetricType,
-    formInput.yMetric as MetricType,
-    EventType.Closing
-  )?.data?.slice(0, 5);
-  console.log(data, "data for scatterplot");
+  const processedData =
+    buildScatterPlotData(
+      trace?.content,
+      formInput.xMetric as MetricType,
+      formInput.yMetric as MetricType,
+      ""
+    );
 
+  console.log(processedData, "data for scatterplot");
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormInput((prev) => ({
@@ -315,6 +316,24 @@ export function TreePage({ template: Page }: PageContentProps) {
       [name]: value
     }));
   };
+
+  const handleAxisChange =
+    (axis: "xMetric" | "yMetric") => (value: string | number) => {
+      setFormInput((prev) => ({
+        ...prev,
+        [axis]: value,
+      }));
+    };
+
+  const metricItems = [
+    { id: "step", name: "step", description: "Search step" },
+    ...metricOptions().map((metric) => ({
+      id: metric,
+      name: metric,
+      description: "", // or something nicer if you want
+    })),
+  ]
+
   // ─── Playback ────────────────────────────────────────────────────────
 
   const throttled = useThrottle(step ?? 0, 1000 / 24);
@@ -364,62 +383,21 @@ export function TreePage({ template: Page }: PageContentProps) {
             loading ? (
               <Spinner message="Generating layout" />
             ) : scatterplotMode ? (
-              <>
-                {" "}
-                <AutoSize>
-                  {(size: Size) => (
-                    <SigmaContainer
-                      style={{
-                        ...size,
-                        background: theme.palette.background.paper
-                      }}
-                      graph={MultiDirectedGraph}
-                      settings={graphSettings}
-                    ></SigmaContainer>
-                  )}
-                </AutoSize>
-                <Box mt={26} px={2} sx={{}}>
-                  <Stack direction="row" spacing={2}>
-                    <TextField
-                      select
-                      fullWidth
-                      size="small"
-                      label="X axis"
-                      name="xMetric"
-                      value={formInput.xMetric}
-                      onChange={handleOnChange}
-                    >
-                      {/* "step" always available */}
-                      <MenuItem value="step">step</MenuItem>
+              <AutoSize>
+                {(size: Size) => (
+                  <SigmaContainer
+                    style={{
+                      ...size,
+                      background: theme.palette.background.paper,
+                    }}
+                    graph={Graph}
+                    settings={graphSettings}
+                  >
+                    <ScatterPlotGraph processedData={processedData} />
+                  </SigmaContainer>
+                )}
+              </AutoSize>
 
-                      {metricOptions().map((metric) => (
-                        <MenuItem key={metric} value={metric}>
-                          {metric}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-
-                    <TextField
-                      select
-                      fullWidth
-                      size="small"
-                      label="Y axis"
-                      name="yMetric"
-                      value={formInput.yMetric}
-                      onChange={handleOnChange}
-                    >
-                      {/* "step" always available */}
-                      <MenuItem value="step">step</MenuItem>
-
-                      {metricOptions().map((metric) => (
-                        <MenuItem key={metric} value={metric}>
-                          {metric}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Stack>
-                </Box>
-              </>
             ) : tree?.length ? (
               <>
                 <AutoSize>
@@ -540,14 +518,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 label: "Scatterplot",
                 value: scatterplotMode,
                 onChange: setTrackedProperty,
-                items: [
-                  { id: "", name: "Off" },
-                  ...map(entries(properties), ([k, v]) => ({
-                    id: k,
-                    name: `$${k}`,
-                    description: v.type
-                  }))
-                ]
+                items: []
               }
             ],
             ({ icon, label, value, items, onChange }, i) => (
@@ -570,17 +541,38 @@ export function TreePage({ template: Page }: PageContentProps) {
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "8px"
+                      gap: "8px",
                     }}
                   >
                     <ScatterPlotIcon />
                     <Switch
-                      label=""
                       size="small"
                       checked={scatterplotMode}
                       onChange={(_, checked) => setScatterplotMode(checked)}
                     />
                   </Box>
+                )}
+
+                {label === "Scatterplot" && scatterplotMode && (
+                  <Stack direction="row" spacing={2} >
+                    <FeaturePicker
+                      label="X axis"
+                      value={formInput.xMetric}
+                      items={metricItems}
+                      onChange={handleAxisChange("xMetric")}
+                      arrow
+                      itemOrientation="horizontal"
+                    />
+
+                    <FeaturePicker
+                      label="Y axis"
+                      value={formInput.yMetric}
+                      items={metricItems}
+                      onChange={handleAxisChange("yMetric")}
+                      arrow
+                      itemOrientation="horizontal"
+                    />
+                  </Stack>
                 )}
               </Fragment>
             )
@@ -619,22 +611,16 @@ type ScatterPlotScaleAndData = {
   yMax: number;
 };
 
-export enum EventType {
-  Source = "source",
-  Destination = "destination",
-  Generating = "generating",
-  Expanding = "expanding",
-  Closing = "closing"
-}
 
 const buildScatterPlotData = (
   traceData,
   xMetricName: MetricType,
   yMetricName: MetricType,
-  eventType: EventType = EventType.Closing
+  eventType: string
 ): ScatterPlotScaleAndData => {
   const scatterPlotData: ScatterPlotOutput[] = [];
   console.log("xMetricName:", xMetricName, "yMetricName:", yMetricName);
+  console.log("traceData:", traceData);
   if (!traceData || !traceData.events) {
     return {
       data: [],
@@ -648,38 +634,95 @@ const buildScatterPlotData = (
   let xMax = -Infinity;
   let yMin = Infinity;
   let yMax = -Infinity;
-  // TODO Also find max and min value for both x and y metric to determine scale
-  // TODO also need to assign default values to the metrics if they do not exist
-  traceData.events.forEach((event, step) => {
-    if (event.type === eventType) {
-      const metrics: MetricsBag = {};
-      for (const key in event) {
-        const num = Number(event[key]);
-        if (!isNaN(num) && key !== "id" && key !== "pId") {
-          metrics[key] = num;
-        }
-      }
-      metrics.step = step;
-      const x = metrics[xMetricName] ?? 0;
-      const y = metrics[yMetricName] ?? 0;
 
-      scatterPlotData.push({
-        x,
-        y,
-        point: {
-          id: event.id,
-          label: event.id,
-          step,
-          eventType: event.type,
-          metrics
-        }
-      });
+  traceData.events.forEach((event, step) => {
+    const metrics: MetricsBag = {};
+    for (const key in event) {
+      const num = Number(event[key]);
+      if (!isNaN(num) && key !== "id" && key !== "pId") {
+        metrics[key] = num;
+      }
     }
+    metrics.step = step;
+    const x = metrics[xMetricName] ?? 0;
+    const y = metrics[yMetricName] ?? 0;
+
+    xMin = Math.min(xMin, x);
+    xMax = Math.max(xMax, x);
+    yMin = Math.min(yMin, y);
+    yMax = Math.max(yMax, y);
+
+    scatterPlotData.push({
+      x,
+      y,
+      point: {
+        id: event.id,
+        label: event.id,
+        step,
+        eventType: event.type,
+        metrics
+      }
+    });
   });
 
   return { data: scatterPlotData, xMin, xMax, yMin, yMax };
 };
 
-export function ScatterplotPage(props: PageContentProps) {
-  return <TreePage {...props} />;
+type ScatterPlotGraphProps = {
+  processedData: ScatterPlotScaleAndData;
+};
+
+function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
+
+  const loadGraph = useLoadGraph();
+  console.log("ScatterPlotGraph rendered with data:", processedData);
+
+  useEffect(() => {
+    const graph = new Graph();
+
+    const allPoints = processedData.data;
+    if (!allPoints.length) {
+      return;
+    }
+
+    const points = allPoints
+
+
+    points.forEach((p, idx) => {
+      const id = p.point.id ?? `scatter-${idx}`;
+      if (!graph.hasNode(id)) {
+        graph.addNode(id, {
+          x: p.x,
+          y: p.y,
+          size: 3,
+          label: p.point.label,
+          color: "#ff6384",
+        });
+      }
+    });
+    loadGraph(graph);
+  }, [processedData]);
+
+  if (!processedData) {
+    // This will appear on top of the canvas area
+    return (
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          No scatterplot data for the selected metrics.
+        </Typography>
+      </Box>
+    );
+  }
+
+  // Nothing to render; sigma uses the graph we just mutated
+  return null;
 }
