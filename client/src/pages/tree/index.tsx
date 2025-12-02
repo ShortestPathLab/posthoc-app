@@ -10,7 +10,7 @@ import {
   Divider,
   ListItem,
   ListItemIcon,
-  TextField,
+  Checkbox,
   Menu,
   MenuItem,
   MenuList,
@@ -88,6 +88,19 @@ const layoutModes = {
     description: "Show only edges between each node and their final parents",
     showAllEdges: false
   }
+};
+
+const CLEAN_CHECKBOX_SX = {
+  p: 0.5,
+  '&:hover': {
+    backgroundColor: 'transparent', // remove grey hover background
+  },
+  '&.Mui-focusVisible': {
+    outline: 'none',                // remove focus ring
+  },
+  '& .MuiSvgIcon-root': {
+    transition: 'none',             // remove icon hover animation
+  },
 };
 
 export type TreeLayer = Layer<
@@ -265,11 +278,14 @@ function useTreePageState(key?: string) {
   return { step, trace };
 }
 
+const sanitizeMetricKey = (key: string) => key.replace(/\./g, "");
+
 export function TreePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
 
   // Scatterplot
   const [scatterplotMode, setScatterplotMode] = useState<boolean>(false);
+  const [logAxis, setLogAxis] = useState<{ x: boolean; y: boolean }>({ x: false, y: false });
   // TODO need to set default values for xMetric and yMetric when scatterplotMode is enabled
   // need to set
   const [formInput, setFormInput] = useState<{
@@ -309,21 +325,21 @@ export function TreePage({ template: Page }: PageContentProps) {
     );
 
   console.log(processedData, "data for scatterplot");
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormInput((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
-  const handleAxisChange =
-    (axis: "xMetric" | "yMetric") => (value: string | number) => {
-      setFormInput((prev) => ({
-        ...prev,
-        [axis]: value,
-      }));
-    };
+
+    const handleAxisChange =
+    (axis: "xMetric" | "yMetric") =>
+      (value: any) => {
+        const raw = String(value ?? "");
+        const sanitized = raw ? sanitizeMetricKey(raw) : "";
+
+        console.log("Changing axis:", axis, "raw:", raw, "sanitized:", sanitized);
+
+        setFormInput((prev) => ({
+          ...prev,
+          [axis]: sanitized,
+        }));
+      };
 
   const metricItems = [
     { id: "step", name: "step", description: "Search step" },
@@ -556,22 +572,66 @@ export function TreePage({ template: Page }: PageContentProps) {
                 {label === "Scatterplot" && scatterplotMode && (
                   <Stack direction="row" spacing={2} >
                     <FeaturePicker
-                      label="X axis"
+                      label={formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"}
                       value={formInput.xMetric}
-                      items={metricItems}
+                      items={[
+                        { id: "", name: "Off" },
+                        ...map(entries(properties), ([k, v]) => ({
+                          id: k,
+                          name: `$${k}`,
+                          description: v.type,
+                        }))
+                      ]}
                       onChange={handleAxisChange("xMetric")}
                       arrow
                       itemOrientation="horizontal"
                     />
 
                     <FeaturePicker
-                      label="Y axis"
+                      label={formInput.yMetric ? `Y axis: $${formInput.yMetric}` : "Y axis"}
                       value={formInput.yMetric}
-                      items={metricItems}
+                      items={[
+                        { id: "", name: "Off" },
+                        ...map(entries(properties), ([k, v]) => ({
+                          id: k,
+                          name: `$${k}`,
+                          description: v.type,
+                        }))
+                      ]}
                       onChange={handleAxisChange("yMetric")}
                       arrow
                       itemOrientation="horizontal"
                     />
+                  </Stack>
+                )}
+
+                {label === "Scatterplot" && scatterplotMode && (
+                  <Stack direction="row" spacing={2} alignItems="center">
+
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Checkbox
+                        size="small"
+                        checked={logAxis.x}
+                        onChange={(e) =>
+                          setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
+                        }
+                        sx={CLEAN_CHECKBOX_SX}
+                      />
+                      <Typography variant="body2">Log X</Typography>
+                    </Stack>
+
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Checkbox
+                        size="small"
+                        checked={logAxis.y}
+                        onChange={(e) =>
+                          setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
+                        }
+                        sx={CLEAN_CHECKBOX_SX}
+                      />
+                      <Typography variant="body2">Log Y</Typography>
+                    </Stack>
+
                   </Stack>
                 )}
               </Fragment>
@@ -634,7 +694,7 @@ const buildScatterPlotData = (
   let xMax = -Infinity;
   let yMin = Infinity;
   let yMax = -Infinity;
-
+  console.log("Processing trace data for scatterplot...", traceData);
   traceData.events.forEach((event, step) => {
     const metrics: MetricsBag = {};
     for (const key in event) {
@@ -726,3 +786,4 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
   // Nothing to render; sigma uses the graph we just mutated
   return null;
 }
+
