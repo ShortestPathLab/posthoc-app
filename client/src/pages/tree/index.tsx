@@ -432,7 +432,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                     </SigmaContainer>
                   )}
                 </AutoSize>
-                {<>{!scatterplotMode && <TreeMenu
+                {<>{menuOpen && <TreeMenu
                   onClose={() => setMenuOpen(false)}
                   anchorReference="anchorPosition"
                   anchorPosition={{
@@ -658,8 +658,17 @@ const buildScatterPlotData = (
       }
     });
   });
+  if (!isNaN(xMax)) {
+    const spanX = xMax - xMin || 1;
+    xMax = xMax + spanX * 0.1;
+  }
 
-  return { data: scatterPlotData, xMin, xMax: !isNaN(xMax) ? xMax + 1 : xMax, yMin, yMax: !isNaN(yMax) ? yMax + 1 : yMax, xAxis: xMetricName, yAxis: yMetricName };
+  if (!isNaN(yMax)) {
+    const spanY = yMax - yMin || 1;
+    yMax = yMax + spanY * 0.1;
+  }
+
+  return { data: scatterPlotData, xMin, xMax, yMax, yMin, xAxis: xMetricName, yAxis: yMetricName };
 };
 
 export type ScatterPlotGraphProps = {
@@ -695,7 +704,7 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
           y: p.y,
           size: 3,
           label: p.point.label,
-          color: "#ff6384",
+          color: getColorHex(p.point.eventType),
         });
       }
     });
