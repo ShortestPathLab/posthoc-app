@@ -322,6 +322,14 @@ export function TreePage({ template: Page }: PageContentProps) {
 
         console.log("Changing axis:", axis, "raw:", raw, "sanitized:", sanitized);
 
+        if (!sanitized) {
+          setFormInput({
+            xMetric: "",
+            yMetric: "",
+          });
+          return;
+        }
+
         setFormInput((prev) => ({
           ...prev,
           [axis]: sanitized,
@@ -404,13 +412,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                           }
                         }}
                       />
-                        <GraphEvents
-                          layerKey={key}
-                          onSelection={(e) => {
-                            setSelection(e);
-                            setMenuOpen(true);
-                          }}
-                        /></>}
+                      </>}
 
                       {scatterplotMode && <><ScatterPlotGraph processedData={processedData} />
                         <AxisOverlay
@@ -418,6 +420,14 @@ export function TreePage({ template: Page }: PageContentProps) {
                           width={size.width}
                           height={size.height}
                         /></>}
+
+                      {<GraphEvents
+                        layerKey={key}
+                        onSelection={(e) => {
+                          setSelection(e);
+                          setMenuOpen(true);
+                        }}
+                      />}
 
                     </SigmaContainer>
                   )}
@@ -509,7 +519,7 @@ export function TreePage({ template: Page }: PageContentProps) {
           {divider}
 
           {/* Scatterplot controls – derived from axis selection */}
-          <Box sx={{ mt: 3}}>
+          <Box sx={{ mt: 3 }}>
             <Stack direction="row" spacing={1} alignItems="center" mb={1}>
               <ScatterPlotIcon fontSize="small" />
               <Typography variant="overline" color="text.secondary">
@@ -565,29 +575,29 @@ export function TreePage({ template: Page }: PageContentProps) {
             </Stack>
 
 
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Checkbox
-                  size="small"
-                  checked={logAxis.x}
-                  onChange={(e) =>
-                    setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
-                  }
-                  sx={CLEAN_CHECKBOX_SX}
-                />
-                <Typography variant="body2">Log X</Typography>
-              </Stack>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Checkbox
+                size="small"
+                checked={logAxis.x}
+                onChange={(e) =>
+                  setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
+                }
+                sx={CLEAN_CHECKBOX_SX}
+              />
+              <Typography variant="body2">Log X</Typography>
+            </Stack>
 
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Checkbox
-                  size="small"
-                  checked={logAxis.y}
-                  onChange={(e) =>
-                    setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
-                  }
-                  sx={CLEAN_CHECKBOX_SX}
-                />
-                <Typography variant="body2">Log Y</Typography>
-              </Stack>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Checkbox
+                size="small"
+                checked={logAxis.y}
+                onChange={(e) =>
+                  setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
+                }
+                sx={CLEAN_CHECKBOX_SX}
+              />
+              <Typography variant="body2">Log Y</Typography>
+            </Stack>
           </Box>
 
         </>
