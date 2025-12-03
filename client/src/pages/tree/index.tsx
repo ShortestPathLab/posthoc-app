@@ -305,8 +305,8 @@ export function TreePage({ template: Page }: PageContentProps) {
   const processedData =
     buildScatterPlotData(
       trace?.content,
-      formInput.xMetric as MetricType,
-      formInput.yMetric as MetricType,
+      formInput.xMetric ,
+      formInput.yMetric ,
     );
 
   console.log(processedData, "data for scatterplot");
@@ -657,8 +657,8 @@ export type ScatterPlotScaleAndData = {
 
 const buildScatterPlotData = (
   traceData,
-  xMetricName: MetricType,
-  yMetricName: MetricType,
+  xMetricName: string,
+  yMetricName: string,
 ): ScatterPlotScaleAndData => {
   const scatterPlotData: ScatterPlotOutput[] = [];
   console.log("xMetricName:", xMetricName, "yMetricName:", yMetricName);
@@ -707,7 +707,7 @@ const buildScatterPlotData = (
     });
   });
 
-  return { data: scatterPlotData, xMin, xMax: !isNaN(xMax) ? xMax + 1 : xMax, yMin, yMax: !isNaN(yMax) ? yMax + 1 : yMax };
+  return { data: scatterPlotData, xMin, xMax: !isNaN(xMax) ? xMax + 1 : xMax, yMin, yMax: !isNaN(yMax) ? yMax + 1 : yMax, xAxis: xMetricName, yAxis: yMetricName};
 };
 
 export type ScatterPlotGraphProps = {
