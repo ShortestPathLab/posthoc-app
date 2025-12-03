@@ -288,12 +288,14 @@ export function TreePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
 
   // Scatterplot
-  const [scatterplotMode, setScatterplotMode] = useState<boolean>(false);
   const [logAxis, setLogAxis] = useState<{ x: boolean; y: boolean }>({ x: false, y: false });
   const [formInput, setFormInput] = useState<{
     xMetric: string;
     yMetric: string;
   }>({ xMetric: "", yMetric: "" });
+
+  // Scatterplot is ON only if both axes are selected
+  const scatterplotMode = Boolean(formInput.xMetric && formInput.yMetric);
 
   // ─── Layer Data ──────────────────────────────────────────────────────
 
@@ -305,8 +307,8 @@ export function TreePage({ template: Page }: PageContentProps) {
   const processedData =
     buildScatterPlotData(
       trace?.content,
-      formInput.xMetric ,
-      formInput.yMetric ,
+      formInput.xMetric,
+      formInput.yMetric,
     );
 
   console.log(processedData, "data for scatterplot");
@@ -374,27 +376,6 @@ export function TreePage({ template: Page }: PageContentProps) {
           {trace ? (
             loading ? (
               <Spinner message="Generating layout" />
-            ) : scatterplotMode ? (
-              <AutoSize>
-                {(size: Size) => (
-                  <SigmaContainer
-                    style={{
-                      ...size,
-                      background: theme.palette.background.paper,
-                    }}
-                    graph={Graph}
-                    settings={graphSettings}
-                  >
-                    <ScatterPlotGraph processedData={processedData} />
-                    <AxisOverlay
-                      processedData={processedData}
-                      width={size.width}
-                      height={size.height}
-                    />
-                  </SigmaContainer>
-                )}
-              </AutoSize>
-
             ) : tree?.length ? (
               <>
                 <AutoSize>
@@ -407,7 +388,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                       graph={MultiDirectedGraph}
                       settings={graphSettings}
                     >
-                      <TreeGraph
+                      {!scatterplotMode && <> <TreeGraph
                         width={size.width}
                         height={size.height}
                         step={throttled}
@@ -423,17 +404,25 @@ export function TreePage({ template: Page }: PageContentProps) {
                           }
                         }}
                       />
-                      <GraphEvents
-                        layerKey={key}
-                        onSelection={(e) => {
-                          setSelection(e);
-                          setMenuOpen(true);
-                        }}
-                      />
+                        <GraphEvents
+                          layerKey={key}
+                          onSelection={(e) => {
+                            setSelection(e);
+                            setMenuOpen(true);
+                          }}
+                        /></>}
+
+                      {scatterplotMode && <><ScatterPlotGraph processedData={processedData} />
+                        <AxisOverlay
+                          processedData={processedData}
+                          width={size.width}
+                          height={size.height}
+                        /></>}
+
                     </SigmaContainer>
                   )}
                 </AutoSize>
-                <TreeMenu
+                {<>{!scatterplotMode && <TreeMenu
                   onClose={() => setMenuOpen(false)}
                   anchorReference="anchorPosition"
                   anchorPosition={{
@@ -448,10 +437,10 @@ export function TreePage({ template: Page }: PageContentProps) {
                   layer={key}
                   selected={selected}
                   selection={selection}
-                />
+                />}</>}
               </>
             ) : (
-              <WithLayer<TreeLayer> layer={key}>
+              <><WithLayer<TreeLayer> layer={key}>
                 {(l) => (
                   <Placeholder
                     icon={<AccountTreeOutlined />}
@@ -459,7 +448,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                     secondary={`${inferLayerName(l)} is not a graph.`}
                   />
                 )}
-              </WithLayer>
+              </WithLayer></>
             )
           ) : (
             <Placeholder
@@ -483,8 +472,8 @@ export function TreePage({ template: Page }: PageContentProps) {
                 onChange: setMode,
                 items: map(entries(layoutModes), ([k, v]) => ({
                   id: k,
-                  ...v
-                }))
+                  ...v,
+                })),
               },
               {
                 icon: <TimelineOutlined />,
@@ -496,164 +485,117 @@ export function TreePage({ template: Page }: PageContentProps) {
                   ...map(entries(properties), ([k, v]) => ({
                     id: k,
                     name: `$${k}`,
-                    description: v.type
-                  }))
-                ]
+                    description: v.type,
+                  })),
+                ],
               },
-              // {
-              //   icon: <LineAxisOutlined />,
-              //   label: "Axis Tracking",
-              //   value: axisTracking,
-              //   onChange: setAxisTracking,
-              //   items: [
-              //     { id: "", name: "Off" },
-              //     ...map(properties, (k) => ({ id: k, name: `$.${k}` })),
-              //   ],
-              // },
-              {
-                icon: <ScatterPlotIcon />,
-                label: "Scatterplot",
-                value: scatterplotMode,
-                onChange: setTrackedProperty,
-                items: []
-              }
             ],
             ({ icon, label, value, items, onChange }, i) => (
               <Fragment key={i}>
                 {!!i && divider}
-                {label !== "Scatterplot" && (
-                  <FeaturePicker
-                    icon={icon}
-                    label={label}
-                    value={value}
-                    items={items}
-                    /// @ts-expect-error poor type inference
-                    onChange={onChange}
-                    arrow
-                  />
-                )}
-
-                {label === "Scatterplot" && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <ScatterPlotIcon />
-                    <Switch
-                      size="small"
-                      checked={scatterplotMode}
-                      onChange={(_, checked) => setScatterplotMode(checked)}
-                    />
-                  </Box>
-                )}
-
-                {label === "Scatterplot" && scatterplotMode && (
-                  <Stack direction="row" spacing={2} >
-                    <FeaturePicker
-                      label={formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"}
-                      value={formInput.xMetric}
-                      items={[
-                        { id: "", name: "Off" },
-                        ...map(entries(properties), ([k, v]) => ({
-                          id: k,
-                          name: `$${k}`,
-                          description: v.type,
-                        }))
-                      ]}
-                      onChange={handleAxisChange("xMetric")}
-                      arrow
-                      itemOrientation="horizontal"
-                    />
-
-                    <FeaturePicker
-                      label={formInput.yMetric ? `Y axis: $${formInput.yMetric}` : "Y axis"}
-                      value={formInput.yMetric}
-                      items={[
-                        { id: "", name: "Off" },
-                        ...map(entries(properties), ([k, v]) => ({
-                          id: k,
-                          name: `$${k}`,
-                          description: v.type,
-                        }))
-                      ]}
-                      onChange={handleAxisChange("yMetric")}
-                      arrow
-                      itemOrientation="horizontal"
-                    />
-                  </Stack>
-                )}
-
-                {label === "Scatterplot" && scatterplotMode && (
-                  <Stack direction="row" spacing={2} alignItems="center">
-
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Checkbox
-                        size="small"
-                        checked={logAxis.x}
-                        onChange={(e) =>
-                          setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
-                        }
-                        sx={CLEAN_CHECKBOX_SX}
-                      />
-                      <Typography variant="body2">Log X</Typography>
-                    </Stack>
-
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Checkbox
-                        size="small"
-                        checked={logAxis.y}
-                        onChange={(e) =>
-                          setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
-                        }
-                        sx={CLEAN_CHECKBOX_SX}
-                      />
-                      <Typography variant="body2">Log Y</Typography>
-                    </Stack>
-
-                  </Stack>
-                )}
+                <FeaturePicker
+                  icon={icon}
+                  label={label}
+                  value={value}
+                  items={items}
+                  /// @ts-expect-error poor type inference
+                  onChange={onChange}
+                  arrow
+                />
               </Fragment>
             )
           )}
+
+          {divider}
+
+          {/* Scatterplot controls – derived from axis selection */}
+          <Box sx={{ mt: 3}}>
+            <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+              <ScatterPlotIcon fontSize="small" />
+              <Typography variant="overline" color="text.secondary">
+                Scatterplot
+              </Typography>
+              {scatterplotMode ? (
+                <Typography variant="caption" color="success.main">
+                  (active)
+                </Typography>
+              ) : (
+                <Typography variant="caption" color="text.secondary">
+                  (select X and Y)
+                </Typography>
+              )}
+            </Stack>
+
+            <Stack direction="row" spacing={2} mb={1.5}>
+              <FeaturePicker
+                label={
+                  formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"
+                }
+                value={formInput.xMetric}
+                items={[
+                  { id: "", name: "Off" },
+                  ...map(entries(properties), ([k, v]) => ({
+                    id: k,
+                    name: `$${k}`,
+                    description: v.type,
+                  })),
+                ]}
+                onChange={handleAxisChange("xMetric")}
+                arrow
+                itemOrientation="horizontal"
+              />
+
+              <FeaturePicker
+                label={
+                  formInput.yMetric ? `Y axis: $${formInput.yMetric}` : "Y axis"
+                }
+                value={formInput.yMetric}
+                items={[
+                  { id: "", name: "Off" },
+                  ...map(entries(properties), ([k, v]) => ({
+                    id: k,
+                    name: `$${k}`,
+                    description: v.type,
+                  })),
+                ]}
+                onChange={handleAxisChange("yMetric")}
+                arrow
+                itemOrientation="horizontal"
+              />
+            </Stack>
+
+
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Checkbox
+                  size="small"
+                  checked={logAxis.x}
+                  onChange={(e) =>
+                    setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
+                  }
+                  sx={CLEAN_CHECKBOX_SX}
+                />
+                <Typography variant="body2">Log X</Typography>
+              </Stack>
+
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Checkbox
+                  size="small"
+                  checked={logAxis.y}
+                  onChange={(e) =>
+                    setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
+                  }
+                  sx={CLEAN_CHECKBOX_SX}
+                />
+                <Typography variant="body2">Log Y</Typography>
+              </Stack>
+          </Box>
+
         </>
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
     </Page>
   );
 }
-type MetricsBag = {
-  [key: string]: number;
-};
-
-type ScatterPlot = {
-  id: string;
-  label: string;
-  step: number;
-  eventType: string;
-  metrics: MetricsBag;
-};
-
-type MetricType = keyof MetricsBag;
-
-export type ScatterPlotOutput = {
-  x: number;
-  y: number;
-  point: ScatterPlot;
-};
-
-export type ScatterPlotScaleAndData = {
-  data: ScatterPlotOutput[];
-  xMin: number;
-  xMax: number;
-  yMin: number;
-  yMax: number;
-  xAxis?: string;
-  yAxis?: string;
-};
-
 
 const buildScatterPlotData = (
   traceData,
@@ -707,7 +649,7 @@ const buildScatterPlotData = (
     });
   });
 
-  return { data: scatterPlotData, xMin, xMax: !isNaN(xMax) ? xMax + 1 : xMax, yMin, yMax: !isNaN(yMax) ? yMax + 1 : yMax, xAxis: xMetricName, yAxis: yMetricName};
+  return { data: scatterPlotData, xMin, xMax: !isNaN(xMax) ? xMax + 1 : xMax, yMin, yMax: !isNaN(yMax) ? yMax + 1 : yMax, xAxis: xMetricName, yAxis: yMetricName };
 };
 
 export type ScatterPlotGraphProps = {
@@ -800,3 +742,31 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
     </Stack>
   </Stack>;
 }
+
+type MetricsBag = {
+  [key: string]: number;
+};
+
+type ScatterPlot = {
+  id: string;
+  label: string;
+  step: number;
+  eventType: string;
+  metrics: MetricsBag;
+};
+
+export type ScatterPlotOutput = {
+  x: number;
+  y: number;
+  point: ScatterPlot;
+};
+
+export type ScatterPlotScaleAndData = {
+  data: ScatterPlotOutput[];
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  xAxis?: string;
+  yAxis?: string;
+};
