@@ -1,5 +1,6 @@
 import {
   AccountTreeOutlined,
+  CenterFocusWeakOutlined,
   DataObjectOutlined,
   ModeStandbyOutlined,
   TimelineOutlined
@@ -7,24 +8,26 @@ import {
 import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import {
   Box,
+  Checkbox,
   Divider,
   ListItem,
   ListItemIcon,
-  Checkbox,
   Menu,
   MenuItem,
   MenuList,
   MenuProps,
   Stack,
+  SxProps,
   Tooltip,
   Typography,
   useTheme
 } from "@mui/material";
-import { SigmaContainer, useLoadGraph } from "@react-sigma/core";
+import { SigmaContainer, useLoadGraph, useSigma } from "@react-sigma/core";
 import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { PlaybackLayerData, useStep } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Label } from "components/generic/Label";
 import { LayerPicker } from "components/generic/LayerPicker";
 import { Spinner } from "components/generic/Spinner";
@@ -56,10 +59,11 @@ import { Layer, useLayerPicker, WithLayer } from "slices/layers";
 import { equal } from "slices/selector";
 import { UploadedTrace } from "slices/UIState";
 import { PanelState } from "slices/view";
-import { getShade } from "theme";
+import { getShade, useAcrylic, usePaper } from "theme";
 import { set } from "utils/set";
 import { Switch } from "../../components/generic/inputs/Switch";
 import { PageContentProps } from "../PageMeta";
+import AxisOverlay from "./Axis";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeLayout } from "./TreeLayoutWorker";
@@ -286,12 +290,10 @@ export function TreePage({ template: Page }: PageContentProps) {
   // Scatterplot
   const [scatterplotMode, setScatterplotMode] = useState<boolean>(false);
   const [logAxis, setLogAxis] = useState<{ x: boolean; y: boolean }>({ x: false, y: false });
-  // TODO need to set default values for xMetric and yMetric when scatterplotMode is enabled
-  // need to set
   const [formInput, setFormInput] = useState<{
     xMetric: string;
     yMetric: string;
-  }>({ xMetric: "step", yMetric: "step" });
+  }>({ xMetric: "", yMetric: "" });
 
   // ─── Layer Data ──────────────────────────────────────────────────────
 
@@ -299,35 +301,18 @@ export function TreePage({ template: Page }: PageContentProps) {
   const one = slice.layers.one<TreeLayer>(key);
   const { trace, step } = useTreePageState(key);
   console.log("TRACE DATA:", trace);
-  const metricOptions = () => {
-    const traceData = trace?.content?.events;
-    if (!traceData || trace?.content?.events?.length === 0) {
-      return [];
-    }
-
-    const numericMetrics = new Set<string>();
-    for (const event of traceData) {
-      for (const key in event) {
-        if (typeof event[key] === "number" && key !== "id" && key !== "pId") {
-          numericMetrics.add(key);
-        }
-      }
-    }
-    return Array.from(numericMetrics).sort();
-  };
 
   const processedData =
     buildScatterPlotData(
       trace?.content,
       formInput.xMetric as MetricType,
       formInput.yMetric as MetricType,
-      ""
     );
 
   console.log(processedData, "data for scatterplot");
 
 
-    const handleAxisChange =
+  const handleAxisChange =
     (axis: "xMetric" | "yMetric") =>
       (value: any) => {
         const raw = String(value ?? "");
@@ -340,15 +325,6 @@ export function TreePage({ template: Page }: PageContentProps) {
           [axis]: sanitized,
         }));
       };
-
-  const metricItems = [
-    { id: "step", name: "step", description: "Search step" },
-    ...metricOptions().map((metric) => ({
-      id: metric,
-      name: metric,
-      description: "", // or something nicer if you want
-    })),
-  ]
 
   // ─── Playback ────────────────────────────────────────────────────────
 
@@ -410,6 +386,11 @@ export function TreePage({ template: Page }: PageContentProps) {
                     settings={graphSettings}
                   >
                     <ScatterPlotGraph processedData={processedData} />
+                    <AxisOverlay
+                      processedData={processedData}
+                      width={size.width}
+                      height={size.height}
+                    />
                   </SigmaContainer>
                 )}
               </AutoSize>
@@ -663,12 +644,14 @@ export type ScatterPlotOutput = {
   point: ScatterPlot;
 };
 
-type ScatterPlotScaleAndData = {
+export type ScatterPlotScaleAndData = {
   data: ScatterPlotOutput[];
   xMin: number;
   xMax: number;
   yMin: number;
   yMax: number;
+  xAxis?: string;
+  yAxis?: string;
 };
 
 
@@ -676,7 +659,6 @@ const buildScatterPlotData = (
   traceData,
   xMetricName: MetricType,
   yMetricName: MetricType,
-  eventType: string
 ): ScatterPlotScaleAndData => {
   const scatterPlotData: ScatterPlotOutput[] = [];
   console.log("xMetricName:", xMetricName, "yMetricName:", yMetricName);
@@ -725,15 +707,20 @@ const buildScatterPlotData = (
     });
   });
 
-  return { data: scatterPlotData, xMin, xMax, yMin, yMax };
+  return { data: scatterPlotData, xMin, xMax: !isNaN(xMax) ? xMax + 1 : xMax, yMin, yMax: !isNaN(yMax) ? yMax + 1 : yMax };
 };
 
-type ScatterPlotGraphProps = {
+export type ScatterPlotGraphProps = {
   processedData: ScatterPlotScaleAndData;
+  width?: number;
+  height?: number;
 };
 
 function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
+  const sigma = useSigma();
+  const acrylic = useAcrylic();
 
+  const paper = usePaper();
   const loadGraph = useLoadGraph();
   console.log("ScatterPlotGraph rendered with data:", processedData);
 
@@ -783,7 +770,33 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
     );
   }
 
-  // Nothing to render; sigma uses the graph we just mutated
-  return null;
-}
 
+  return <Stack sx={{
+    position: "absolute",
+    top: 0,
+    left: 0,
+    pt: 6,
+  }}>
+    <Stack
+      direction="row"
+      sx={
+        {
+          ...paper(1),
+          ...acrylic,
+          alignItems: "center",
+          px: 1,
+          m: 1,
+        } as SxProps<Theme>
+      }
+    >
+      <IconButtonWithTooltip
+        color="primary"
+        onClick={() => {
+          sigma?.getCamera?.()?.animatedReset?.();
+        }}
+        label="Fit"
+        icon={<CenterFocusWeakOutlined />}
+      />
+    </Stack>
+  </Stack>;
+}
