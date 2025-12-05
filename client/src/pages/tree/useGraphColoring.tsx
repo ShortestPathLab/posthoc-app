@@ -32,6 +32,35 @@ import {
   TreeGraphProps,
 } from "./TreeGraph";
 
+const getGradient = memoizee(
+  (from: string, to: string) => {
+    const gradient = interpolate([from, to]);
+
+    return memoizee(
+      (base: string) => interpolate([gradient(0.1), base]),
+      {
+        normalizer: ([base]) => base, // memo by base color
+      }
+    );
+  },
+  {
+    normalizer: ([a, b]) => JSON.stringify([a, b]), // memo by bg/fg pair
+  }
+);
+
+// 
+export function getGraphColorHex(
+  eventType: string,
+  strength: number,
+  backgroundHex: string,
+  foregroundHex: string
+): string {
+  const t = Math.max(0, Math.min(1, strength)); 
+  const blendFromNeutral = getGradient(backgroundHex, foregroundHex);
+  const base = getColorHex(eventType);
+  return blendFromNeutral(base)(t);
+}
+
 export function useGraphColoring(
   graph: MultiDirectedGraph,
   { showAllEdges, trackedProperty, trace, step = 0 }: TreeGraphProps,
@@ -39,48 +68,66 @@ export function useGraphColoring(
 ) {
   const theme = useTheme();
 
-  const gradient = interpolate([
-    theme.palette.background.paper,
-    theme.palette.text.primary,
-  ]);
+  const backgroundHex = theme.palette.background.paper;
+  const foregroundHex = theme.palette.text.primary;
 
   return useMemo(() => {
     const isHighlightEdges = !isEmpty(highlightEdges);
-    const r = memoizee((a: string) => interpolate([gradient(0.1), a]));
     const pastSteps = 400;
-    const n = gradient(0.1);
+
+    // Neutral base color for un-visited nodes/edges
+    const neutralColor = getGraphColorHex(
+      "neutral", // event type doesn’t matter when strength === 0
+      0,
+      backgroundHex,
+      foregroundHex
+    );
+
+    // Reset all nodes
     graph.forEachNode((v) => {
       setAttributes(graph, v, "node", {
-        color: n,
+        color: neutralColor,
         forceLabel: false,
         label: truncate(v, { length: 15 }),
       });
     });
+
+    // Reset all edges
     graph.forEachEdge((v) => {
       const isFinal = graph.getEdgeAttribute(v, "final");
       setAttributes(graph, v, "edge", {
-        color: n,
+        color: neutralColor,
         hidden: !showAllEdges && !isFinal,
         forceLabel: false,
         label: "",
       });
     });
+
     const isSetNode: Record<string, boolean> = {};
     const isSet: Record<string, boolean> = {};
 
+    // Walk events up to current step and apply fading color
     (showAllEdges ? forEach : forEachRight)(
       slice(trace?.events, 0, step + 1),
       ({ id, type, pId }, i) => {
-        const color = getColorHex(type);
-        const finalColor = r(color)(
-          isHighlightEdges ? 0.1 : max([1 - (step - i) / pastSteps, 0.3])!
+        const strength = isHighlightEdges
+          ? 0.1
+          : max([1 - (step - i) / pastSteps, 0.3])!;
+
+        const finalColor = getGraphColorHex(
+          type,
+          strength,
+          backgroundHex,
+          foregroundHex
         );
+
         if (graph.hasNode(`${id}`) && !isSetNode[id]) {
           setAttributes(graph, `${id}`, "node", {
             color: finalColor,
             label: truncate(`${startCase(type)} ${id}`, { length: 15 }),
             forceLabel: step === i,
           });
+
           const a = makeEdgeKey(id, pId);
           if (
             isDefined(pId) &&
@@ -101,13 +148,9 @@ export function useGraphColoring(
       }
     );
 
-    /**
-     * Get a high-contrast shade of a theme color for use on the graph
-     */
     const getThemeColor = (c: AccentColor = "grey") =>
       getShade(c, theme.palette.mode);
 
-    // Force show a label for the current highlighted node
     if (highlightEdges && isHighlightEdges) {
       const current = trace?.events?.[highlightEdges?.step];
       graph.setNodeAttribute(current?.id, "forceLabel", "true");
@@ -120,26 +163,26 @@ export function useGraphColoring(
       );
     }
 
-    // highlight nodes: backtracking
     if (
       highlightEdges?.type === "backtracking" &&
       Array.isArray(highlightEdges.path)
     ) {
       let prev =
-        trace?.events?.[highlightEdges?.path?.[highlightEdges?.path.length - 1]]
-          ?.id;
+        trace?.events?.[
+          highlightEdges?.path?.[highlightEdges?.path.length - 1]
+        ]?.id;
 
-      forEachRight(highlightEdges.path, (step) => {
-        const node = trace?.events?.[step].id;
-        const c = highlightNodesOptions.find(
+      forEachRight(highlightEdges.path, (stepIdx) => {
+        const node = trace?.events?.[stepIdx].id;
+        const opt = highlightNodesOptions.find(
           (t) => t.type === highlightEdges.type
         );
         if (graph.hasNode(`${node}`)) {
-          graph.setNodeAttribute(`${node}`, "color", getThemeColor(c?.color));
-          if (node != prev) {
+          graph.setNodeAttribute(`${node}`, "color", getThemeColor(opt?.color));
+          if (node !== prev) {
             const edge = makeEdgeKey(`${node}`, `${prev}`);
             if (graph.hasEdge(edge)) {
-              graph.setEdgeAttribute(edge, "color", getThemeColor(c?.color));
+              graph.setEdgeAttribute(edge, "color", getThemeColor(opt?.color));
             }
           }
           prev = node;
@@ -147,17 +190,15 @@ export function useGraphColoring(
       });
     }
 
-    // highlight nodes: SubTree
     if (
       (highlightEdges?.type === "subtree" ||
         highlightEdges?.type === "precedent") &&
       typeof highlightEdges?.path === "object" &&
       !Array.isArray(highlightEdges?.path)
     ) {
-      const c = highlightNodesOptions.find(
+      const opt = highlightNodesOptions.find(
         (t) => t.type === highlightEdges.type
       );
-
       const isSubtree = highlightEdges?.type === "subtree";
 
       function iterateSubtree(subtree: Subtree) {
@@ -167,7 +208,7 @@ export function useGraphColoring(
             graph.setNodeAttribute(
               `${pNode}`,
               "color",
-              getThemeColor(c?.color)
+              getThemeColor(opt?.color)
             );
           }
           forOwn(childs, (v, child) => {
@@ -176,13 +217,13 @@ export function useGraphColoring(
               graph.setNodeAttribute(
                 `${cNode}`,
                 "color",
-                getThemeColor(c?.color)
+                getThemeColor(opt?.color)
               );
               const edge = isSubtree
                 ? makeEdgeKey(`${cNode}`, `${pNode}`)
                 : makeEdgeKey(`${pNode}`, `${cNode}`);
               if (graph.hasEdge(edge)) {
-                graph.setEdgeAttribute(edge, "color", getThemeColor(c?.color));
+                graph.setEdgeAttribute(edge, "color", getThemeColor(opt?.color));
                 graph.setEdgeAttribute(edge, "hidden", false);
               }
             }
@@ -190,6 +231,7 @@ export function useGraphColoring(
           iterateSubtree(childs);
         });
       }
+
       iterateSubtree(highlightEdges?.path);
     }
 
@@ -216,6 +258,7 @@ export function useGraphColoring(
         }
       });
     }
+
     return { graph };
   }, [
     graph,
@@ -224,6 +267,8 @@ export function useGraphColoring(
     showAllEdges,
     highlightEdges,
     trackedProperty,
+    backgroundHex,
+    foregroundHex,
     theme,
   ]);
 }
