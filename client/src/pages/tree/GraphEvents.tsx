@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 export type Selection = {
   event: MouseEvent | TouchEvent;
-  node: string;
+  node: string;       // will be logicalId if available
 };
 
 export function GraphEvents({
@@ -17,10 +17,27 @@ export function GraphEvents({
   const registerEvents = useRegisterEvents();
 
   useEffect(() => {
+    const graph = sigma.getGraph();
+    // added logical node for scatter plot colouring
     registerEvents({
       clickNode: (e) => {
-        // const step = sigma.getGraph().getNodeAttribute(e.node, "step");
-        onSelection?.({ event: e.event.original, node: e.node });
+        const sigmaNodeKey = e.node; 
+        let logicalId = sigmaNodeKey;
+
+        if (graph.hasNode(sigmaNodeKey)) {
+          const maybeLogicalId = graph.getNodeAttribute(
+            sigmaNodeKey,
+            "logicalId"
+          );
+          if (maybeLogicalId !== undefined && maybeLogicalId !== null) {
+            logicalId = String(maybeLogicalId); 
+          }
+        }
+
+        onSelection?.({
+          event: e.event.original,
+          node: logicalId,
+        });
       },
       enterNode: () => {
         document.body.style.cursor = "pointer";
@@ -30,5 +47,6 @@ export function GraphEvents({
       },
     });
   }, [layerKey, registerEvents, sigma]);
+
   return null;
 }

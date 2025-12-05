@@ -99,7 +99,7 @@ function formatTickValue(value: number): string {
   const coef = Number(coefStr);
   const exp = Number(expStr);
 
-  return `${coef} × 10${numberToSuperscript(exp)}`;
+  return `${coef}e${numberToSuperscript(exp)}`;
 }
 
 // ─── Types ─────────────────────────────────────────────────────────────
@@ -136,11 +136,15 @@ function ScatterPlotAxisTickGeneration({
   // Control tick based on zoom in or out
   // In sigma when we zoom the ratio becomes smaller and when we zoom out ratio becomes larger
   // To prevent bottle necks the zoom will limited to a maximum of 100 ticks (When we zoom out and if the ratio is samller than 1e-2)
-  const zoomFactor = 1 / Math.max(ratio, 1e-2); 
-  const baseTickCount = 5;
+  const zoomFactor = 1 / Math.max(ratio, 1e-10); 
+  const baseTickCount = 10;
 
-  const countX = Math.max(2, Math.min(12, Math.round(baseTickCount * zoomFactor)));
-  const countY = Math.max(2, Math.min(12, Math.round(baseTickCount * zoomFactor)));
+  // console.log(zoomFactor, "zoomFactor")
+  
+  const countX = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
+  const countY = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
+
+  console.log(countX, "countX", countY, "zoomFactor", zoomFactor)
 
   const xValues = ticks(xMin, xMax, countX);
   const yValues = ticks(yMin, yMax, countY);
@@ -216,24 +220,30 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
     ctx.font = "12px Inter, system-ui, sans-serif";
 
     // axis positions in viewport coords
-    const { x: xAxisStartX, y: xAxisY } = sigma.graphToViewport({
+    const { x: xAxisStartX, y: xAxisY1 } = sigma.graphToViewport({
       x: xMin,
       y: yMin,
     });
+    const xAxisY = Math.min(xAxisY1, height - 36)
+    console.log(xAxisY, "xAxisY--")
+
     const { x: xAxisEndX } = sigma.graphToViewport({
       x: xMax,
       y: yMin,
     });
 
-    const { x: yAxisX, y: yAxisStartY } = sigma.graphToViewport({
+    const { x: yAxisX1, y: yAxisStartY } = sigma.graphToViewport({
       x: xMin,
       y: yMin,
     });
+    const yAxisX = Math.max(yAxisX1, 72)
+    console.log(yAxisX, "yAxisX--")
+    console.log("Distance in X axis ", width - yAxisX1)
     const { y: yAxisEndY } = sigma.graphToViewport({
       x: xMin,
       y: yMax,
     });
-
+    
     // x axis 
     ctx.beginPath();
     ctx.moveTo(xAxisStartX, xAxisY);
@@ -247,7 +257,9 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
     xAxisTickValues.forEach(({ value, label }) => {
       const { x } = sigma.graphToViewport({ x: value, y: yMin });
       const y = xAxisY;
-
+      if (x < 0 || x > width) {
+        return 
+      }
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(x, y + 6);
@@ -274,7 +286,9 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
     yAxisTickValues.forEach(({ value, label }) => {
       const { y } = sigma.graphToViewport({ x: xMin, y: value });
       const x = yAxisX;
-
+      if (y < 0 || y > height) {
+        return 
+      }
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(x - 6, y);
@@ -284,14 +298,14 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
       ctx.textBaseline = "middle";
       ctx.fillText(label, x - 8, y);
     });
-
+    
     // y axis label 
     ctx.save();
     ctx.translate(yAxisX - 24, (yAxisStartY + yAxisEndY) / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
-    ctx.fillText(yAxisLabel, 0, -40);
+    ctx.fillText(yAxisLabel, 0, -30);
     ctx.restore();
   }, [canvas, width, height, processedData, sigma, theme, xAxisLabel, yAxisLabel]);
 

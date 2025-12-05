@@ -1,6 +1,5 @@
 import {
   AccountTreeOutlined,
-  CenterFocusWeakOutlined,
   DataObjectOutlined,
   ModeStandbyOutlined,
   TimelineOutlined
@@ -17,17 +16,20 @@ import {
   MenuList,
   MenuProps,
   Stack,
-  SxProps,
   Tooltip,
   Typography,
-  useTheme
+  useTheme,
+  Theme,
+  SxProps
 } from "@mui/material";
+import {
+  CenterFocusWeakOutlined,
+} from "@mui-symbols-material/w300";
 import { SigmaContainer, useLoadGraph, useSigma } from "@react-sigma/core";
 import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { PlaybackLayerData, useStep } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
-import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Label } from "components/generic/Label";
 import { LayerPicker } from "components/generic/LayerPicker";
 import { Spinner } from "components/generic/Spinner";
@@ -40,6 +42,7 @@ import {
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
 import { Graph, MultiDirectedGraph } from "graphology";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import {
   HighlightLayerData,
   highlightNodesOptions,
@@ -61,12 +64,12 @@ import { UploadedTrace } from "slices/UIState";
 import { PanelState } from "slices/view";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { set } from "utils/set";
-import { Switch } from "../../components/generic/inputs/Switch";
 import { PageContentProps } from "../PageMeta";
 import AxisOverlay from "./Axis";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeLayout } from "./TreeLayoutWorker";
+import { getGraphColorHex } from "./useGraphColoring";
 import { useGraphSettings } from "./useGraphSettings";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
@@ -86,12 +89,6 @@ const layoutModes = {
     description: "Show only edges between each node and their final parents",
     showAllEdges: false
   },
-  scatterplot: {
-    value: "scatterplot",
-    name: "Scatterplot",
-    description: "Show only edges between each node and their final parents",
-    showAllEdges: false
-  }
 };
 
 const CLEAN_CHECKBOX_SX = {
@@ -373,7 +370,19 @@ export function TreePage({ template: Page }: PageContentProps) {
   });
 
   const graphSettings = useGraphSettings();
-
+  // Combined dropdown 
+  const scatterPlotAxis = [
+    { id: "", name: "Off" },
+    { id: "step", name: "Step", value: "step" },
+    ...map(
+      entries(properties).filter(([_, v]) => !v.type.toLowerCase().includes("text")),
+      ([k, v]) => ({
+        id: k,
+        name: `$${k}`,
+        description: v.type,
+      })
+    ),
+  ];
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>tree</Page.Key>
@@ -413,22 +422,25 @@ export function TreePage({ template: Page }: PageContentProps) {
                         }}
                       />
                       </>}
+                      {scatterplotMode && (
+                        <>
+                          <ScatterPlotOverlayToolbar />
+                          <ScatterPlotGraph processedData={processedData} />
+                          <AxisOverlay
+                            processedData={processedData}
+                            width={size.width}
+                            height={size.height}
+                          />
+                        </>
+                      )}
 
-                      {scatterplotMode && <><ScatterPlotGraph processedData={processedData} />
-                        <AxisOverlay
-                          processedData={processedData}
-                          width={size.width}
-                          height={size.height}
-                        /></>}
-
-                      {<GraphEvents
+                      <GraphEvents
                         layerKey={key}
                         onSelection={(e) => {
-                          setSelection(e);
+                          setSelection(e);// e.node is already logicalId if present
                           setMenuOpen(true);
                         }}
-                      />}
-
+                      />
                     </SigmaContainer>
                   )}
                 </AutoSize>
@@ -542,14 +554,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                   formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"
                 }
                 value={formInput.xMetric}
-                items={[
-                  { id: "", name: "Off" },
-                  ...map(entries(properties), ([k, v]) => ({
-                    id: k,
-                    name: `$${k}`,
-                    description: v.type,
-                  })),
-                ]}
+                items={scatterPlotAxis}
                 onChange={handleAxisChange("xMetric")}
                 arrow
                 itemOrientation="horizontal"
@@ -560,14 +565,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                   formInput.yMetric ? `Y axis: $${formInput.yMetric}` : "Y axis"
                 }
                 value={formInput.yMetric}
-                items={[
-                  { id: "", name: "Off" },
-                  ...map(entries(properties), ([k, v]) => ({
-                    id: k,
-                    name: `$${k}`,
-                    description: v.type,
-                  })),
-                ]}
+                items={scatterPlotAxis}
                 onChange={handleAxisChange("yMetric")}
                 arrow
                 itemOrientation="horizontal"
@@ -630,6 +628,7 @@ const buildScatterPlotData = (
   let yMax = -Infinity;
   console.log("Processing trace data for scatterplot...", traceData);
   traceData.events.forEach((event, step) => {
+    console.log("step", step)
     const metrics: MetricsBag = {};
     for (const key in event) {
       const num = Number(event[key]);
@@ -638,6 +637,7 @@ const buildScatterPlotData = (
       }
     }
     metrics.step = step;
+
     const x = metrics[xMetricName] ?? 0;
     const y = metrics[yMetricName] ?? 0;
 
@@ -645,19 +645,24 @@ const buildScatterPlotData = (
     xMax = Math.max(xMax, x);
     yMin = Math.min(yMin, y);
     yMax = Math.max(yMax, y);
+    // required to show unique node for each sub type of event per id
+    const logicalId = String(event.id);
+    const uniqueId = `${logicalId}-${step}`;
 
     scatterPlotData.push({
       x,
       y,
       point: {
-        id: event.id,
-        label: event.id,
+        id: uniqueId,
+        logicalId,
+        label: logicalId,
         step,
         eventType: event.type,
-        metrics
-      }
+        metrics,
+      },
     });
   });
+
   if (!isNaN(xMax)) {
     const spanX = xMax - xMin || 1;
     xMax = xMax + spanX * 0.1;
@@ -678,66 +683,64 @@ export type ScatterPlotGraphProps = {
 };
 
 function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
-  const sigma = useSigma();
-  const acrylic = useAcrylic();
-
-  const paper = usePaper();
+  const theme = useTheme();
   const loadGraph = useLoadGraph();
-  console.log("ScatterPlotGraph rendered with data:", processedData);
+
+  const backgroundHex = theme.palette.background.paper;
+  const foregroundHex = theme.palette.text.primary;
 
   useEffect(() => {
     const graph = new Graph();
 
     const allPoints = processedData.data;
-    if (!allPoints.length) {
-      return;
-    }
+    if (!allPoints.length) return;
 
-    const points = allPoints
+    const points = allPoints;
 
+    points.forEach((p) => {
+      const id = p.point.id; // unique
+      const logicalId = p.point.logicalId;
 
-    points.forEach((p, idx) => {
-      const id = p.point.id ?? `scatter-${idx}`;
       if (!graph.hasNode(id)) {
+        const color = getGraphColorHex(
+          p.point.eventType,
+          1, 
+          backgroundHex,
+          foregroundHex
+        );
+
         graph.addNode(id, {
           x: p.x,
           y: p.y,
           size: 3,
           label: p.point.label,
-          color: getColorHex(p.point.eventType),
+          color,
+          logicalId,
+          step: p.point.step,
+          eventType: p.point.eventType,
         });
       }
     });
+
     loadGraph(graph);
-  }, [processedData]);
+  }, [processedData, loadGraph, backgroundHex, foregroundHex]);
+}
 
-  if (!processedData) {
-    // This will appear on top of the canvas area
-    return (
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          pointerEvents: "none",
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          No scatterplot data for the selected metrics.
-        </Typography>
-      </Box>
-    );
-  }
+function ScatterPlotOverlayToolbar() {
+  const sigma = useSigma();
+  const paper = usePaper();
+  const acrylic = useAcrylic();
 
-
-  return <Stack sx={{
-    position: "absolute",
-    top: 0,
-    left: 0,
-    pt: 6,
-  }}>
+  return <Stack
+    sx={{
+      pt: 11,
+      transition: (t) => t.transitions.create("padding-top"),
+      position: "absolute",
+      top: 0,
+      left: 0,
+      zIndex: 1000
+    }}
+  >
     <Stack
       direction="row"
       sx={
@@ -745,6 +748,7 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
           ...paper(1),
           ...acrylic,
           alignItems: "center",
+          height: (t) => t.spacing(6),
           px: 1,
           m: 1,
         } as SxProps<Theme>
@@ -759,7 +763,7 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
         icon={<CenterFocusWeakOutlined />}
       />
     </Stack>
-  </Stack>;
+  </Stack>
 }
 
 type MetricsBag = {
@@ -767,7 +771,8 @@ type MetricsBag = {
 };
 
 type ScatterPlot = {
-  id: string;
+  id: string;// unique id for sigma
+  logicalId: string; // original id for this to work with selection code
   label: string;
   step: number;
   eventType: string;
@@ -779,6 +784,7 @@ export type ScatterPlotOutput = {
   y: number;
   point: ScatterPlot;
 };
+
 
 export type ScatterPlotScaleAndData = {
   data: ScatterPlotOutput[];
