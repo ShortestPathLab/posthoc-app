@@ -733,7 +733,7 @@ function ScatterPlotOverlayToolbar() {
 
   return <Stack
     sx={{
-      pt: 11,
+      pt: 6,
       transition: (t) => t.transitions.create("padding-top"),
       position: "absolute",
       top: 0,
