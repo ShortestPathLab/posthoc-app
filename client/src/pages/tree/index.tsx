@@ -349,7 +349,7 @@ export function TreePage({ template: Page }: PageContentProps) {
     trace?.key,
     trace?.content
   );
-
+  console.log(throttled, "throttled")
   // const [axisTracking, setAxisTracking] = useState<typeof properties | "">("");
 
   const { point, selected, selection, setSelection } = useSelection(
@@ -530,10 +530,9 @@ export function TreePage({ template: Page }: PageContentProps) {
 
           {divider}
 
-          {/* Scatterplot controls – derived from axis selection */}
-          <Box sx={{ mt: 3 }}>
-            <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-              <ScatterPlotIcon fontSize="small" />
+          <Box sx={{ mt: 2 }}>
+            <Stack direction="row" spacing={2} mb={1.5}>
+              <Stack direction="row" spacing={1} alignItems="center" mb={1} sx={{}}>
               <Typography variant="overline" color="text.secondary">
                 Scatterplot
               </Typography>
@@ -547,8 +546,6 @@ export function TreePage({ template: Page }: PageContentProps) {
                 </Typography>
               )}
             </Stack>
-
-            <Stack direction="row" spacing={2} mb={1.5}>
               <FeaturePicker
                 label={
                   formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"
@@ -573,7 +570,7 @@ export function TreePage({ template: Page }: PageContentProps) {
             </Stack>
 
 
-            <Stack direction="row" spacing={1} alignItems="center">
+            {/* <Stack direction="row" spacing={1} alignItems="center">
               <Checkbox
                 size="small"
                 checked={logAxis.x}
@@ -595,7 +592,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 sx={CLEAN_CHECKBOX_SX}
               />
               <Typography variant="body2">Log Y</Typography>
-            </Stack>
+            </Stack> */}
           </Box>
 
         </>
