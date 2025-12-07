@@ -16,7 +16,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "src",
+    "paths": {
+      "*": ["./src/*"]
+    },
     "downlevelIteration": true
   },
   "include": ["src", "src/components/app-bar/Title.test.tsx"]
