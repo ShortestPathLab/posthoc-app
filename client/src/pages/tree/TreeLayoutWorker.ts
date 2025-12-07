@@ -4,13 +4,9 @@ import {
   TreeWorkerParameters as TreeLayoutWorkerParameters,
   TreeWorkerReturnType as TreeLayoutWorkerReturnType,
 } from "./treeLayout.worker";
-import treeWorkerUrl from "./treeLayout.worker.ts?worker&url";
 
-export class TreeLayoutWorker extends Worker {
-  constructor() {
-    super(treeWorkerUrl, { type: "module" });
-  }
-}
+export const TreeLayoutWorker = () =>
+  new Worker("./treeLayout.worker.ts", { type: "module" });
 
 export const treeAsync = usingMemoizedWorkerTask<
   TreeLayoutWorkerParameters,

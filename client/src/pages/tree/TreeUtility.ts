@@ -18,12 +18,9 @@ import {
   TreeWorkerParameters,
   TreeWorkerReturnType,
 } from "./treeUtility.worker";
-import treeWorkerUrl from "./treeUtility.worker.ts?worker&url";
-export class TreeWorker extends Worker {
-  constructor() {
-    super(treeWorkerUrl, { type: "module" });
-  }
-}
+
+export const TreeWorker = () =>
+  new Worker("./treeUtility.worker.ts", { type: "module" });
 
 export const treeAsync = usingMemoizedWorkerTask<
   TreeWorkerParameters,
@@ -55,7 +52,7 @@ function computeLabelsOne(t: unknown, root: string = ""): Y[] {
     case "object":
       if (isPlainObject(t))
         return flatMap(entries(t!), ([k, v]) =>
-          computeLabelsOne(v, `${root}.${k}`)
+          computeLabelsOne(v, `${root}.${k}`),
         );
   }
   return [{ path: root, type: "mixed", value: undefined }];
@@ -85,7 +82,7 @@ function computeLabels(labels?: unknown[]) {
     labels ?? [],
     (t) => t.flatMap((v) => computeLabelsOne(v)),
     (t) => groupBy(t, "path"),
-    (t) => mapValues(t, (v) => ({ type: resolveType(v) }))
+    (t) => mapValues(t, (v) => ({ type: resolveType(v) })),
   );
 }
 

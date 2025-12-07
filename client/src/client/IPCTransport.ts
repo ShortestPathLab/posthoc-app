@@ -9,12 +9,12 @@ export class IPCTransport
   extends EventEmitter<TransportEvents>
   implements Transport
 {
-  worker: IPCWorker;
+  worker: Worker;
   rpc: JSONRPCClient;
 
   constructor(readonly options: TransportOptions) {
     super();
-    this.worker = new IPCWorker();
+    this.worker = IPCWorker();
     this.rpc = new JSONRPCClient(async (request: Request) => {
       const listener = ({ data }: MessageEvent<Response>) => {
         if (data.id === request.id) {
@@ -44,7 +44,7 @@ export class IPCTransport
 
   async call<T extends keyof NameMethodMap>(
     name: T,
-    params?: RequestOf<NameMethodMap[T]>["params"]
+    params?: RequestOf<NameMethodMap[T]>["params"],
   ): Promise<ResponseOf<NameMethodMap[T]>["result"]> {
     return await this.rpc.request(name, params);
   }

@@ -48,7 +48,7 @@ type TreeNode<S extends TreeNode = never> =
 
 function findInTree<T extends TreeNode<T>>(
   data: T,
-  iterator: (a: T) => boolean
+  iterator: (a: T) => boolean,
 ): T | undefined {
   const f = (a: T): T[] =>
     "children" in a && a.children?.length ? flatMap(a.children, f) : [a];
@@ -67,7 +67,7 @@ const ViewTreeContext = createContext<ViewTreeContextType>({});
 
 export function useViewTreeContext<State = unknown>() {
   return useContext(
-    ViewTreeContext as Context<ViewTreeContextType<State & { type: string }>>
+    ViewTreeContext as Context<ViewTreeContextType<State & { type: string }>>,
   );
 }
 
@@ -101,7 +101,7 @@ type ViewLeafProps<T extends Record<string, unknown>> = ViewBranchProps<T> & {
 function handleSwap<T extends Record<string, unknown>>(
   root: Root<T>,
   a: string,
-  b: string
+  b: string,
 ) {
   const leafA = findInTree(root, (c) => c.key === a);
   const leafB = findInTree(root, (c) => c.key === b);
@@ -115,7 +115,7 @@ function handleSwap<T extends Record<string, unknown>>(
 }
 
 function getLeaves<T extends Record<string, unknown>>(
-  root?: Root<T>
+  root?: Root<T>,
 ): Leaf<T>[] {
   return root
     ? root.type === "leaf"
@@ -138,7 +138,7 @@ function Panel<T extends Record<string, unknown>>({
       createHtmlPortalNode({
         attributes: { style: "width: 100%; height: 100%" },
       }),
-    []
+    [],
   );
   useEffect(() => {
     if (l.key && portal) {
@@ -156,7 +156,7 @@ function Panel<T extends Record<string, unknown>>({
 }
 
 export function ViewTree<T extends Record<string, unknown>>(
-  props: ViewTreeProps<T>
+  props: ViewTreeProps<T>,
 ) {
   const { onChange, root, renderLeaf } = props;
   const leaves = getLeaves(root);
@@ -306,7 +306,7 @@ export function ViewLeaf<T extends Record<string, unknown>>({
 }
 
 export function ViewBranch<T extends Record<string, unknown>>(
-  props: ViewBranchProps<T>
+  props: ViewBranchProps<T>,
 ) {
   const { root = { type: "leaf", key: "" }, onChange, depth = 0 } = props;
   const { palette, spacing, transitions } = useTheme();
@@ -353,7 +353,7 @@ export function ViewBranch<T extends Record<string, unknown>>(
     const all = _(
       root,
       (r) => r.map((c) => (isUndefined(c.size) || isNaN(c.size) ? 0 : c.size)),
-      sum
+      sum,
     );
     return isUndefined(n) ? 100 - all || inferSize(root) : n;
   }
@@ -372,7 +372,7 @@ export function ViewBranch<T extends Record<string, unknown>>(
                 void forEach(sizes, (size, i) => {
                   assert(l.type === "branch", "onChange is from branch");
                   l.children[i].size = size;
-                })
+                }),
             )
           }
           minHeights={map(root.children, () => getSpacing(6) - 8)}
@@ -390,8 +390,8 @@ export function ViewBranch<T extends Record<string, unknown>>(
               <Box key="placeholder" />
             ) : (
               <ViewBranch
-                {...props}
                 key={c.key}
+                {...props}
                 depth={depth + 1}
                 root={c}
                 onChange={(f) =>
@@ -415,14 +415,14 @@ export function ViewBranch<T extends Record<string, unknown>>(
                     } else {
                       forEach(
                         d1.children,
-                        (c, _, all) => (c.size = 100 / all.length)
+                        (c, _, all) => (c.size = 100 / all.length),
                       );
                       return d1;
                     }
                   })
                 }
               />
-            )
+            ),
           )}
         </Split>
       )}

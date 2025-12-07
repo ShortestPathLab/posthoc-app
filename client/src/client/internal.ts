@@ -5,10 +5,7 @@ import { Scheme } from "protocol/SolveTask";
 import url from "url-parse";
 import { Transport } from "./Transport";
 
-const paths = import.meta.glob<boolean, string, string>("/public/maps/*.grid", {
-  query: "?url",
-  import: "default",
-});
+const paths = {};
 
 function ext(path: string) {
   return path.split(".")[1];
@@ -30,7 +27,7 @@ const getFileInfo = memoizee(
       format: ext(k),
     };
   },
-  { normalizer: ([k]) => k }
+  { normalizer: ([k]) => k },
 );
 
 const getFiles = async () =>

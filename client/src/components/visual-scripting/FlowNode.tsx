@@ -38,8 +38,8 @@ export function FlowNode(props: NodeProps<Node<FlowData<string, Properties>>>) {
                 },
               },
             }
-          : n
-      )
+          : n,
+      ),
     );
   };
 
@@ -49,14 +49,14 @@ export function FlowNode(props: NodeProps<Node<FlowData<string, Properties>>>) {
 }
 
 export function getHeight(
-  config?: TransformationNodeConfig<string, Properties>
+  config?: TransformationNodeConfig<string, Properties>,
 ) {
   return sumBy(getItems(config), (item) => item.height);
 }
 
 function getItems(
   config?: TransformationNodeConfig<string, Properties>,
-  updateField?: (key: string, value: any) => void
+  updateField?: (key: string, value: any) => void,
 ) {
   return [
     {
@@ -75,9 +75,9 @@ function getItems(
       height: isUndefined(item.value) ? 48 : 56,
       render: ({ y, height }: ItemOptions) => (
         <LabeledHandle
+          key={item.key}
           {...item}
           value={item.value}
-          key={item.key}
           id={item.key}
           type="target"
           style={{ top: y + height * 0.5 }}
@@ -88,8 +88,8 @@ function getItems(
       height: 48,
       render: ({ y, height }: ItemOptions) => (
         <LabeledHandle
-          {...item}
           key={item.key}
+          {...item}
           id={item.key}
           type="source"
           style={{ top: y + height * 0.5 }}

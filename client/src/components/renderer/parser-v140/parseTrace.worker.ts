@@ -7,7 +7,6 @@ import {
   ParseTraceWorkerReturnType,
   ParseTraceWorkerSlaveReturnType,
 } from "./ParseTraceSlaveWorker";
-import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";
 
 type C = CompiledComponent<string, Record<string, any>>;
 
@@ -33,13 +32,7 @@ const SLAVE_COUNT = 1;
 const parseTraceWorker = usingWorkerTask<
   ParseTraceWorkerParameters,
   ParseTraceWorkerSlaveReturnType
->(
-  class ParseTraceWorker extends Worker {
-    constructor() {
-      super(parseTraceWorkerUrl, { type: "module" });
-    }
-  }
-);
+>(() => new Worker("./parseTraceSlave.worker.ts", { type: "module" }));
 
 async function parse({
   trace,
@@ -58,9 +51,9 @@ async function parse({
           view,
           from: i,
           to: min(i + chunkSize, trace?.events?.length ?? 0),
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );
 
   const stack: Record<string, ComponentEntry[]> = {};
@@ -91,5 +84,5 @@ async function parse({
 
 onmessage = usingMessageHandler(
   async ({ data }: MessageEvent<ParseTraceWorkerParameters>) =>
-    await parse(data)
+    await parse(data),
 );

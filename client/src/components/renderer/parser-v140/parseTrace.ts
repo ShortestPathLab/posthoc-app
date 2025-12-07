@@ -4,27 +4,19 @@ import pluralize from "pluralize";
 import { useMemo } from "react";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
-import parseTraceWorkerLegacyUrl from "../parser/parseTrace.worker.ts?worker&url";
 import {
   ParseTraceWorkerParameters as ParseTraceWorkerLegacyParameters,
   ParseTraceWorkerReturnType as ParseTraceWorkerLegacyReturnType,
 } from "../parser/ParseTraceSlaveWorker";
-import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
 import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
 } from "./ParseTraceSlaveWorker";
 
-export class ParseTraceWorker extends Worker {
-  constructor() {
-    super(parseTraceWorkerUrl, { type: "module" });
-  }
-}
-export class ParseTraceWorkerLegacy extends Worker {
-  constructor() {
-    super(parseTraceWorkerLegacyUrl, { type: "module" });
-  }
-}
+export const ParseTraceWorker = () =>
+  new Worker("./parseTrace.worker.ts", { type: "module" });
+export const ParseTraceWorkerLegacy = () =>
+  new Worker("../parser/parseTrace.worker.ts", { type: "module" });
 
 export const parseTraceAsync = usingMemoizedWorkerTask<
   ParseTraceWorkerParameters,
@@ -39,7 +31,7 @@ export const parseTraceLegacyAsync = usingMemoizedWorkerTask<
 export function useTraceParser(
   params: ParseTraceWorkerParameters | ParseTraceWorkerLegacyParameters,
   trusted: boolean,
-  deps: any[]
+  deps: any[],
 ) {
   const push = useSnackbar();
   const usingLoadingState = useLoadingState("layers");
@@ -53,14 +45,14 @@ export function useTraceParser(
                 const output =
                   params.trace?.version === "1.4.0"
                     ? await parseTraceAsync(
-                        params as ParseTraceWorkerParameters
+                        params as ParseTraceWorkerParameters,
                       )
                     : await parseTraceLegacyAsync(
-                        params as ParseTraceWorkerLegacyParameters
+                        params as ParseTraceWorkerLegacyParameters,
                       );
                 push(
                   "Trace loaded",
-                  pluralize("step", output?.stepsPersistent?.length ?? 0, true)
+                  pluralize("step", output?.stepsPersistent?.length ?? 0, true),
                 );
                 return { components: output, content: params.trace };
               } catch (e) {
@@ -73,7 +65,7 @@ export function useTraceParser(
             usingLoadingState(async () => {
               push(
                 "Trace loaded",
-                pluralize("step", params.trace?.events?.length ?? 0, true)
+                pluralize("step", params.trace?.events?.length ?? 0, true),
               );
               return {
                 content: params.trace,

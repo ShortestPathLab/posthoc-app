@@ -18,8 +18,8 @@ const id = "google";
 
 const rootFolderName = "posthoc-workspaces";
 
-const clientId = import.meta.env.VITE_CLIENT_ID;
-const apiKey = import.meta.env.VITE_API_KEY;
+const clientId = import.meta.env?.VITE_CLIENT_ID;
+const apiKey = import.meta.env?.VITE_API_KEY;
 
 const scope =
   "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile";
@@ -39,7 +39,7 @@ const isAuthenticated = (t: AuthState<unknown>): t is AuthState<string> =>
 
 export const createGoogleStorageService: ProviderFactory<typeof id> = (
   getState,
-  setState
+  setState,
 ) => {
   //
   // ─── Create Http Clients ─────────────────────────────────────────────
@@ -53,7 +53,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     const state = await getState();
     assert(
       isAuthenticated(state),
-      new AuthError("User not authenticated (did you call initialise?)")
+      new AuthError("User not authenticated (did you call initialise?)"),
     );
     return { Authorization: `Bearer ${state.accessToken}` };
   };
@@ -65,7 +65,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
   });
   const multiPartApiClient = createClient<HeaderOptions>(
     driveMultiPartApiUrl,
-    getHeaders
+    getHeaders,
   );
 
   // ─────────────────────────────────────────────────────────────────────
@@ -116,7 +116,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
             await setState({
               ...(await getState()),
               user: await getUserInfo(),
-            })
+            }),
         );
       }
     }
@@ -235,7 +235,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
               parents: [parentId],
             }),
           ],
-          { type: "application/json" }
+          { type: "application/json" },
         ),
         file,
       };
@@ -272,7 +272,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
               return f.name!.startsWith(baseName) && !f.name!.endsWith(".meta");
             })?.id ?? null;
           return { ...metadata, id: posthocFileGoogleId };
-        }
+        },
       );
     },
     getFileLink: async (fileId: string) => {

@@ -40,26 +40,14 @@ import { slice } from "slices";
 import { useLoadingState } from "slices/loading";
 import { textFieldProps, usePaper } from "theme";
 import { _ } from "utils/chain";
-import { parse, stringify } from "yaml";
+import { dump, load } from "js-yaml";
 import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
 
-const paths = import.meta.glob<boolean, string, string>(
-  "/public/recipes/*.workspace",
-  {
-    query: "?url",
-    import: "default",
-  }
-);
+const paths = {};
 
-const metaPaths = import.meta.glob<boolean, string, string>(
-  "/public/recipes/*.workspace.meta",
-  {
-    query: "?url",
-    import: "default",
-  }
-);
+const metaPaths = {};
 
 function stripExtension(path: string) {
   return path.split(".")[0];
@@ -74,7 +62,7 @@ async function getMeta(k: string) {
   const path = await metaKey?.();
   if (path) {
     const a = await fetch(path);
-    return parse(await a.text());
+    return load(await a.text());
   }
 }
 
@@ -86,7 +74,7 @@ const getFileInfo = memoizee(
       ...(await getMeta(k)),
     };
   },
-  { normalizer: ([k]) => k }
+  { normalizer: ([k]) => k },
 );
 
 // eslint-disable-next-line react/display-name
@@ -153,7 +141,7 @@ export function FeatureCardLoader({
     }
   }, [entry]);
   const { name, description, screenshots, author, path, size } = result ?? {};
-  const match = upperCase(stringify(result)).includes(upperCase(search));
+  const match = upperCase(load(result)).includes(upperCase(search));
   return match ? (
     <Box sx={{ p: 1 }}>
       <FeatureCard
@@ -191,7 +179,7 @@ export function FeatureCard({
 
   const { name: authorName, avatar } = useMemo(
     () => getAuthor(author),
-    [author]
+    [author],
   );
 
   return (

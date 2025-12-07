@@ -62,9 +62,9 @@ export type UIState = BusyState &
 export const workspaceMeta = store<WorkspaceMeta>(
   { id: id(), name: "", description: "", screenshots: [], author: "", size: 0 },
   {
-    devtools: { enabled: import.meta.env.DEV },
+    devtools: { enabled: false },
     name: "workspace-meta",
-  }
+  },
 );
 
 export const UI = store<Required<UIState>>(
@@ -77,7 +77,7 @@ export const UI = store<Required<UIState>>(
     origin: undefined,
   },
   {
-    devtools: { enabled: import.meta.env.DEV },
+    devtools: { enabled: false },
     name: "ui-state",
-  }
+  },
 );

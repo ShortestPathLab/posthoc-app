@@ -4,17 +4,13 @@ import {
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
 } from "./ParseTraceSlaveWorker";
-import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";
 
 const { min } = Math;
 
 const SLAVE_COUNT = 1;
 
-export class ParseTraceWorker extends Worker {
-  constructor() {
-    super(parseTraceWorkerUrl, { type: "module" });
-  }
-}
+export const ParseTraceWorker = () =>
+  new Worker("./parseTraceSlave.worker.ts", { type: "module" });
 
 const parseTraceWorker = usingWorkerTask<
   ParseTraceWorkerParameters,
@@ -37,9 +33,9 @@ async function parse({
           view,
           from: i,
           to: min(i + chunkSize, trace?.events?.length ?? 0),
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );
 
   return {
@@ -50,5 +46,5 @@ async function parse({
 
 onmessage = usingMessageHandler(
   async ({ data }: MessageEvent<ParseTraceWorkerParameters>) =>
-    await parse(data)
+    await parse(data),
 );

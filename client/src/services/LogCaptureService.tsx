@@ -8,7 +8,7 @@ const captureOn = false;
 export function LogCaptureService() {
   const notify = useSnackbar();
   useEffect(() => {
-    if (captureOn && import.meta.env.DEV) {
+    if (captureOn && false) {
       const cc = new CaptureConsole();
       cc.start(true);
       const interval = setInterval(() => {

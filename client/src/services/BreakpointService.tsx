@@ -19,10 +19,10 @@ import { _ } from "utils/chain";
 import { NonEmptyString } from "utils/Char";
 import { set } from "utils/set";
 import { usingWorkerTask } from "workers/usingWorker";
-import workerUrl from "./breakpoint.worker.ts?worker&url";
+
 async function attempt<T, U>(
   f: () => Promise<T>,
-  c: (e: unknown) => U
+  c: (e: unknown) => U,
 ): Promise<T | U> {
   try {
     return await f();
@@ -37,11 +37,8 @@ export type BreakpointWorkerParameters = {
   dict: TreeDict;
 };
 
-export class BreakpointWorker extends Worker {
-  constructor() {
-    super(workerUrl, { type: "module" });
-  }
-}
+export const BreakpointWorker = () =>
+  new Worker("./breakpoint.worker.ts", { type: "module" });
 
 export const processBreakpointAsync = usingWorkerTask<
   BreakpointWorkerParameters,
@@ -54,7 +51,7 @@ const processBreakpoint = memo(
   {
     normalizer: ([a, b]) => objectHash({ breakpoint: a, key: b }),
     primitive: true,
-  }
+  },
 );
 
 export function BreakpointService({ value }: { value?: string }) {
@@ -66,7 +63,7 @@ export function BreakpointService({ value }: { value?: string }) {
 
   const trace = one.use<UploadedTrace | undefined>(
     (l) => l?.source?.trace,
-    equal("key")
+    equal("key"),
   );
 
   const inputs = one.use((l) => l?.source?.breakpoints, isEqual);
@@ -87,7 +84,7 @@ export function BreakpointService({ value }: { value?: string }) {
           if (breakpoint.active) {
             const res = await attempt(
               () => processBreakpoint(breakpoint, trace.key, trace, tree, dict),
-              (e) => ({ error: `${e}` })
+              (e) => ({ error: `${e}` }),
             );
             if (signal.aborted) return;
             one.set(
@@ -95,8 +92,8 @@ export function BreakpointService({ value }: { value?: string }) {
                 void set(
                   l,
                   `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
-                  res
-                )
+                  res,
+                ),
             );
           } else {
             one.set(
@@ -104,13 +101,13 @@ export function BreakpointService({ value }: { value?: string }) {
                 void set(
                   l,
                   `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
-                  []
-                )
+                  [],
+                ),
             );
           }
         }
       }),
-    [dict, tree, inputs, value]
+    [dict, tree, inputs, value],
   );
 
   const outputs = one.use((l) => l?.source?.breakpointOutput, isEqual);
@@ -128,9 +125,9 @@ export function BreakpointService({ value }: { value?: string }) {
               s.flatMap((v) => {
                 return "error" in v ? [] : v;
               }),
-            (s) => groupBy(s, "step")
-          )
-        )
+            (s) => groupBy(s, "step"),
+          ),
+        ),
     );
   }, [outputs]);
 

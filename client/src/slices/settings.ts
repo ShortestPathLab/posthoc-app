@@ -71,7 +71,7 @@ export const defaultPlaybackRate = 1;
 // };
 
 export const defaultCloudStorage = keys(
-  cloudStorageProviders
+  cloudStorageProviders,
 )[0] as keyof typeof cloudStorageProviders;
 
 export const defaults = {

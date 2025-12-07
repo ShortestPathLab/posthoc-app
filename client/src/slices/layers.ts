@@ -14,14 +14,14 @@ export type Layer<T = Record<string, unknown>> = {
 };
 
 export type LayerGuard<T> = (
-  l: Layer<Record<string, unknown> | unknown>
+  l: Layer<Record<string, unknown> | unknown>,
 ) => l is Layer<T>;
 
 export const defaultGuard = ((l) => !!l) as LayerGuard<never>;
 
 export const layers = store<Layer[]>([], {
   name: "layers",
-  devtools: { enabled: import.meta.env.DEV },
+  devtools: { enabled: false },
 }).extend((store) => {
   return {
     one: createSelector(store),
@@ -30,7 +30,7 @@ export const layers = store<Layer[]>([], {
 
 export const WithLayer = createOne(layers.one);
 export function useLayers<T extends Record<string, unknown>>(
-  guard: LayerGuard<T> = defaultGuard
+  guard: LayerGuard<T> = defaultGuard,
 ) {
   "use no memo";
   const all = layers.use((c) => map(c, "key"), isEqual);
@@ -42,7 +42,7 @@ export function useLayers<T extends Record<string, unknown>>(
 }
 
 export function useLayerPicker<T extends Record<string, unknown>>(
-  guard: LayerGuard<T> = defaultGuard
+  guard: LayerGuard<T> = defaultGuard,
 ) {
   "use no memo";
   const { all, guarded } = useLayers<T>(guard);

@@ -1,11 +1,11 @@
 import memoize from "memoizee";
 
-type WorkerConstructor = new () => Worker;
+type WorkerConstructor = () => Worker;
 
 type WorkerResult = { result: unknown } | { error: unknown };
 
 export const usingWorker = <R>(w: WorkerConstructor) => {
-  const worker = new w();
+  const worker = w();
   return async (task: (w: Worker) => Promise<R>) => {
     try {
       const out = (await task(worker)) as WorkerResult;
@@ -54,7 +54,7 @@ export const usingMemoizedWorkerTask = <T, R>(
   o: memoize.Options<(t: T) => Promise<R>> = {
     async: true,
     length: 1,
-  }
+  },
 ) => memoize(usingWorkerTask(w), o);
 
 export const usingMessageHandler =
