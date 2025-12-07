@@ -90,7 +90,7 @@ export function useWorkspace() {
         notify("Workspace saved", name);
         return {
           name,
-          content,
+          content:compressed,
           size: compressed.byteLength,
           type: "application/octet-stream",
         };
