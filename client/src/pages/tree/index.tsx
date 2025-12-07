@@ -1,13 +1,14 @@
 import {
+  CenterFocusWeakOutlined,
+} from "@mui-symbols-material/w300";
+import {
   AccountTreeOutlined,
   DataObjectOutlined,
   ModeStandbyOutlined,
   TimelineOutlined
 } from "@mui-symbols-material/w400";
-import ScatterPlotIcon from "@mui/icons-material/ScatterPlot";
 import {
   Box,
-  Checkbox,
   Divider,
   ListItem,
   ListItemIcon,
@@ -16,20 +17,18 @@ import {
   MenuList,
   MenuProps,
   Stack,
+  SxProps,
+  Theme,
   Tooltip,
   Typography,
-  useTheme,
-  Theme,
-  SxProps
+  useTheme
 } from "@mui/material";
-import {
-  CenterFocusWeakOutlined,
-} from "@mui-symbols-material/w300";
 import { SigmaContainer, useLoadGraph, useSigma } from "@react-sigma/core";
 import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { PlaybackLayerData, useStep } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Label } from "components/generic/Label";
 import { LayerPicker } from "components/generic/LayerPicker";
 import { Spinner } from "components/generic/Spinner";
@@ -42,7 +41,6 @@ import {
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
 import { Graph, MultiDirectedGraph } from "graphology";
-import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import {
   HighlightLayerData,
   highlightNodesOptions,

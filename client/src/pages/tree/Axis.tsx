@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { ScatterPlotScaleAndData } from ".";
 import { useTheme } from "@mui/material";
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
+import { useCallback, useEffect, useState } from "react";
+import { ScatterPlotScaleAndData } from ".";
 
 
 // The tickSpec and ticks are obtained from d3-ticks at https://github.com/d3/d3-array/blob/main/src/ticks.js
