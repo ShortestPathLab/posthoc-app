@@ -49,7 +49,7 @@ export const controller = {
   error: (layer) => layer?.source?.parsedMap?.error,
   compress: (layer) => pick(layer, ["map", "options"]),
   claimImportedFile: async (file) =>
-    keys(mapParsers).includes(ext(file.name))
+    file && keys(mapParsers).includes(ext(file.name))
       ? {
           claimed: true,
           layer: async (notify) => {
@@ -59,7 +59,7 @@ export const controller = {
                 file,
                 entries(mapParsers).map(([k]) => ({
                   id: k,
-                }))
+                })),
               );
               return { map: { ...(await output.read()) } };
             } catch (e) {
@@ -117,8 +117,8 @@ export const controller = {
                       void set(
                         prev,
                         "source.options",
-                        v(prev.source?.options ?? {})
-                      )
+                        v(prev.source?.options ?? {}),
+                      ),
                   )
                 }
               />
@@ -145,7 +145,7 @@ export const controller = {
           },
         })),
       ],
-      [nodes, index, layer?.transparency, layer?.displayMode]
+      [nodes, index, layer?.transparency, layer?.displayMode],
     );
     return <NodeList nodes={nodes2} />;
   },
@@ -153,7 +153,7 @@ export const controller = {
     const { result: mapContent } = useMapContent(value?.source?.map);
     const { result: parsedMap, loading } = useParsedMap(
       mapContent,
-      value?.source?.options
+      value?.source?.options,
     );
     useEffectWhen(
       () => {
@@ -165,7 +165,7 @@ export const controller = {
         }
       },
       [parsedMap, loading, produce],
-      [parsedMap]
+      [parsedMap],
     );
     return <></>;
   }),
@@ -176,7 +176,7 @@ export const controller = {
     const { point, node } = useMemo(() => {
       if (parsedMap && event) {
         const hydratedMap = getParser(layer?.source?.map?.format)?.hydrate?.(
-          parsedMap
+          parsedMap,
         );
         if (hydratedMap) {
           const point = event?.world && hydratedMap.snap(event.world);
@@ -204,7 +204,7 @@ export const controller = {
             },
           }),
       }),
-      [point, node, layer]
+      [point, node, layer],
     );
     return <>{children?.(menu)}</>;
   },

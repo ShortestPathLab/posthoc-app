@@ -1,7 +1,14 @@
 import { useForkRef, useTheme } from "@mui/material";
 import { TransitionProps as MuiTransitionProps } from "@mui/material/transitions";
 import { get } from "lodash-es";
-import { cloneElement, ElementType, isValidElement, Ref, useRef } from "react";
+import {
+  cloneElement,
+  CSSProperties,
+  ElementType,
+  isValidElement,
+  Ref,
+  useRef,
+} from "react";
 import { Transition } from "react-transition-group";
 import { EnterHandler, ExitHandler } from "react-transition-group/Transition";
 
@@ -25,7 +32,7 @@ interface TransitionProps {
 
 export function getTransitionProps(
   props: ComponentProps1,
-  options: Options
+  options: Options,
 ): TransitionProps {
   const { timeout, easing, style = {} } = props;
 
@@ -58,7 +65,7 @@ const Swipe = (
   props: MuiTransitionProps & {
     TransitionComponent?: ElementType;
     ref?: Ref<HTMLElement>;
-  }
+  },
 ) => {
   const theme = useTheme();
   const defaultTimeout = {
@@ -93,7 +100,7 @@ const Swipe = (
     (
       callback?:
         | EnterHandler<HTMLElement | undefined>
-        | ExitHandler<HTMLElement | undefined>
+        | ExitHandler<HTMLElement | undefined>,
     ) =>
     (maybeIsAppearing: boolean) => {
       if (callback) {
@@ -118,18 +125,18 @@ const Swipe = (
         { style, timeout, easing },
         {
           mode: "enter",
-        }
+        },
       );
 
       node.style.transition = theme.transitions.create(
         ["opacity", "transform"],
-        transitionProps
+        transitionProps,
       );
 
       if (onEnter) {
         onEnter(node, isAppearing);
       }
-    }
+    },
   );
 
   const handleEntered = normalizedTransitionCallback(onEntered);
@@ -141,12 +148,12 @@ const Swipe = (
       { style, timeout, easing },
       {
         mode: "exit",
-      }
+      },
     );
 
     node.style.transition = theme.transitions.create(
       ["opacity", "transform"],
-      transitionProps
+      transitionProps,
     );
 
     if (onExit) {
@@ -189,7 +196,7 @@ const Swipe = (
               visibility: state === "exited" && !inProp ? "hidden" : undefined,
               ...styles[state],
               ...style,
-              ...children.props.style,
+              ...(get(children?.props, "style") as unknown as CSSProperties),
             },
             ref: handleRef,
             ...childProps,

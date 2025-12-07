@@ -1,4 +1,3 @@
-import { ObjectIterator } from "lodash-es";
 import { Properties as Props } from "protocol";
 import { Context } from "./Context";
 
@@ -11,9 +10,9 @@ import { Context } from "./Context";
  */
 export function mapProperties<T extends Props, TResult>(
   context: Context<T> = {},
-  f: ObjectIterator<Context<T>, TResult>
+  f: (value: T[keyof T], key: string, context: Context<T>) => TResult,
 ): Context<T> & { $: string } {
-  const out: any = {};
+  const out: Record<string, unknown> = {};
   for (const key of Object.keys(context)) {
     out[key] = key === "$" ? context[key] : f(context[key], key, context);
   }

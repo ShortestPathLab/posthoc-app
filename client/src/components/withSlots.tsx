@@ -16,7 +16,7 @@ type OwnPropsExtends = Record<string, any>;
 
 type WrappedComponent<
   Props extends OwnPropsExtends,
-  Components extends SlotPropsExtends
+  Components extends SlotPropsExtends,
 > = ComponentType<
   Props & {
     slotProps: Partial<Components>;
@@ -30,7 +30,7 @@ type ResultComponentExtraComponents<Components extends SlotPropsExtends> = {
 // Component with included extra components
 type ResultComponent<
   SlotProps extends SlotPropsExtends,
-  Props extends OwnPropsExtends = OwnPropsExtends
+  Props extends OwnPropsExtends = OwnPropsExtends,
 > = ComponentType<Props & { propagateSlotProps?: Partial<SlotProps> }> &
   ResultComponentExtraComponents<SlotProps>;
 
@@ -38,9 +38,9 @@ type ResultComponent<
 export type WithSlot = {
   <
     Slots extends SlotPropsExtends,
-    Props extends OwnPropsExtends = OwnPropsExtends
+    Props extends OwnPropsExtends = OwnPropsExtends,
   >(
-    Component: WrappedComponent<Props, Slots>
+    Component: WrappedComponent<Props, Slots>,
   ): ResultComponent<Slots, Props>;
 };
 
@@ -73,7 +73,7 @@ const getSlotProps = (children: any) =>
     if (isValidElement(child)) {
       const tag: string = (child.type as any).displayName;
 
-      curr[tag] = child.props;
+      curr[tag] = child.props as Record<string, unknown>;
     }
     return curr;
   }, {});
@@ -95,7 +95,7 @@ const isComponentName = (name: any) =>
   name.match(/^[A-Z0-9]/);
 
 const createResultComponent = (
-  Component: WrappedComponent<any, any>
+  Component: WrappedComponent<any, any>,
 ): WrappedComponent<any, any> => {
   const ResultComponent: WrappedComponent<any, any> = memo((props) => {
     const {
@@ -108,12 +108,12 @@ const createResultComponent = (
     // Find and get out all childProps
     const slotProps = useMemo(
       () => getSlotProps(children),
-      [slotKeys, children]
+      [slotKeys, children],
     );
     // Clean children from childProps components
     const cleanChildren = useMemo(
       () => getCleanChildren(children, slotKeys),
-      [slotKeys, children]
+      [slotKeys, children],
     );
 
     const passProps = useMemo(
@@ -121,7 +121,7 @@ const createResultComponent = (
         ...otherProps,
         slotProps: { ...propagateSlotProps, ...slotProps },
       }),
-      [otherProps, slotProps, propagateSlotProps]
+      [otherProps, slotProps, propagateSlotProps],
     );
 
     return createElement(Component, passProps, cleanChildren);

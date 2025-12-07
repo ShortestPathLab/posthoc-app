@@ -58,7 +58,7 @@ const FileList = ({
       } catch (e: unknown) {
         notify(
           "Couldn't open file",
-          makeCaughtObjectReportJson(e).message ?? ""
+          makeCaughtObjectReportJson(e).message ?? "",
         );
       }
     });
@@ -122,7 +122,7 @@ const UploadWorkspace = () => {
       setUploading(true);
       openUploadWorkspaceModal({
         uploadFile: storage?.instance.saveFile,
-        closePopup: closeUploadWorkspaceDialog,
+        onClose: closeUploadWorkspaceDialog,
       });
     } catch (error) {
       console.log(error);

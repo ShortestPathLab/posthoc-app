@@ -14,6 +14,7 @@ import { useFeatures } from "slices/features";
 import { set } from "utils/set";
 import { Controller } from ".";
 import { findConnection } from "./findConnection";
+import { Trace } from "protocol/Trace-v140";
 
 export const service = withProduce(({ value, produce, onChange }) => {
   "use no memo";
@@ -40,12 +41,12 @@ export const service = withProduce(({ value, produce, onChange }) => {
           const connection = await findConnection(
             connections,
             algorithm,
-            format
+            format,
           );
           const algorithmInfo = find(algorithms, { id: algorithm });
           if (connection) {
             notify(
-              `Executing ${inferLayerName(value)} using ${connection.name}...`
+              `Executing ${inferLayerName(value)} using ${connection.name}...`,
             );
             const args = {
               format,
@@ -65,7 +66,7 @@ export const service = withProduce(({ value, produce, onChange }) => {
               produce((v) => {
                 set(v, "source.trace", {
                   name: `${algorithmInfo?.name}`,
-                  content: result,
+                  content: result as Trace | undefined,
                   key: id(),
                   id: id(),
                 });
@@ -89,7 +90,7 @@ export const service = withProduce(({ value, produce, onChange }) => {
       value,
       algorithms,
     ],
-    [mapLayer, mapContent, connections, algorithm, start, end]
+    [mapLayer, mapContent, connections, algorithm, start, end],
   );
   return <>{<TraceLayerService value={value} onChange={onChange} />}</>;
 }) satisfies Controller["service"];

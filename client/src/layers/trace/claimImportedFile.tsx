@@ -8,8 +8,8 @@ import { nanoid } from "nanoid";
 import { name } from "utils/path";
 import { Controller } from "./types";
 
-export const claimImportedFile = (async (file: File) =>
-  isTraceFormat(file)
+export const claimImportedFile = (async (file?: File) =>
+  file && isTraceFormat(file)
     ? {
         claimed: true,
         layer: async (notify) => {

@@ -3,10 +3,9 @@ import {
   LinkOutlined,
   OpenInNewOutlined,
 } from "@mui-symbols-material/w400";
-import { Box, ListItemText, Stack, TextField, Typography } from "@mui/material";
+import { Box, ListItemText, Stack, TextField } from "@mui/material";
 import copy from "clipboard-copy";
 import { useSm } from "hooks/useSmallDisplay";
-import { round } from "lodash-es";
 import { useEffect, useState } from "react";
 import { useCloudStorageService } from "slices/cloudStorage";
 import { usePaper } from "theme";
@@ -14,7 +13,6 @@ import { useSnackbar } from "./generic/Snackbar";
 import { Button } from "./generic/inputs/Button";
 import { Surface } from "./generic/surface";
 
-import { PosthocMetaData } from "services/cloud-storage";
 import { WorkspaceMeta } from "slices/UIState";
 
 export const FileShareSurface = ({ file }: { file: WorkspaceMeta }) => {
@@ -69,22 +67,7 @@ export const FileShareSurface = ({ file }: { file: WorkspaceMeta }) => {
   return (
     <Stack sx={{ p: sm ? 2 : 3, gap: 2 }}>
       <Box sx={{ width: 128, height: 128, ...paper(1) }} />
-      <ListItemText
-        primary={file.name}
-        secondary={
-          <>
-            <Typography variant="body2" color="textSecondary">
-              Type: {file.mimeType}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Size: {round(+file.size / 1024 / 1024, 2)} MB
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Modified: {new Date(file.lastModified).toLocaleString()}
-            </Typography>
-          </>
-        }
-      />
+      <ListItemText primary={file.name} secondary={file.author} />
       <Stack sx={{ gap: 1 }}>
         <Surface
           title="Shareable link"

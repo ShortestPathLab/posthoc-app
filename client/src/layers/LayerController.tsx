@@ -32,7 +32,7 @@ export type LayerController<K extends string = string, Data = never> = {
   steps?: (layer?: Layer<Data>) => Steps;
   error?: (layer?: Layer<Data>) => string | boolean | undefined;
   provideSelectionInfo?: SelectionInfoProvider;
-  claimImportedFile?: (file: File) => Promise<
+  claimImportedFile?: (file?: File) => Promise<
     | {
         claimed: true;
         layer: (notify: (s: string) => void) => Promise<Data>;
@@ -44,6 +44,6 @@ export type LayerController<K extends string = string, Data = never> = {
   onEditSource?: (
     layer: Layer<Data>,
     id?: string,
-    content?: string
+    content?: string,
   ) => Promise<void>;
 };

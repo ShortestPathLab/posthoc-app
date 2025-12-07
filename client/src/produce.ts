@@ -4,7 +4,7 @@ import { createElement, ReactElement } from "react";
 
 export async function produceAsync<T extends object>(
   obj: T,
-  f: (obj: T) => Promise<void>
+  f: (obj: T) => Promise<void>,
 ) {
   const draft = createDraft(obj);
   await f(draft as T);
@@ -22,12 +22,12 @@ export type ServiceProps<T> = EditorSetterProps<T> & {
 };
 
 export function withProduce<T>(
-  component: (props: ServiceProps<T>) => ReactElement
+  component: (props: ServiceProps<T>) => ReactElement,
 ) {
   return function WithProduce(props: EditorSetterProps<T>) {
     return createElement(component, {
       ...props,
-      produce: (f) => props?.onChange?.(produce(f)),
+      produce: (f) => props?.onChange?.(produce(f) as (v: T) => T),
     });
   };
 }

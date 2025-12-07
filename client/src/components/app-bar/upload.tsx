@@ -1,18 +1,18 @@
 import { fileDialog as file } from "file-select-dialog";
 import { find, startCase } from "lodash-es";
 import { nanoid as id } from "nanoid";
-import { Trace as TraceLegacy } from "protocol";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { Trace } from "protocol/Trace-v140";
 import { UploadedTrace } from "slices/UIState";
 import { ext, name } from "utils/path";
 import { parseYamlAsync } from "workers/async";
+import { cast } from "utils/assert";
 
 const customId = "internal/custom";
 
 export const custom = (
   resource?: Partial<Pick<Feature, "id" | "name">>,
-  name = "resource"
+  name = "resource",
 ) => ({
   name:
     resource?.id === customId
@@ -52,17 +52,18 @@ export function readUploadedTrace(f: File) {
         const { result: parsed, error } = await parseYamlAsync({
           content,
         });
+        cast<Trace | undefined>(parsed);
         if (error) throw error;
         return {
           ...custom(),
-          content: parsed as TraceLegacy | Trace | undefined,
+          content: parsed,
           name: startCase(name(f.name)),
           type: customId,
           key: id(),
         };
       }
       throw new Error(
-        `The file should have one of these extensions: ${FORMATS.join(", ")}`
+        `The file should have one of these extensions: ${FORMATS.join(", ")}`,
       );
     },
   };
@@ -73,7 +74,7 @@ export function isTraceFormat(f: File) {
 }
 
 export async function uploadMap(
-  accept: FeatureDescriptor[]
+  accept: FeatureDescriptor[],
 ): Promise<
   FileHandle<(FeatureDescriptor & { content?: string }) | undefined> | undefined
 > {

@@ -1,4 +1,3 @@
-import { Dictionary } from "lodash-es";
 import * as grid from "./grid";
 import * as mesh from "./mesh";
 import * as xy from "./network";
