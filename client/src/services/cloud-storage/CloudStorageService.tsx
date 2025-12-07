@@ -10,6 +10,7 @@ import { assert } from "utils/assert";
 import providers from "./providers";
 
 function useCloudStorageManager(provider: keyof typeof providers) {
+  "use no memo";
   //
   // ─── Create Storage Provider ─────────────────────────────────────────
 
@@ -20,7 +21,7 @@ function useCloudStorageManager(provider: keyof typeof providers) {
     if (!initialised) return;
     const service = providers[provider].create(
       async () => state.current,
-      async (s) => setAuthState(() => ({ [provider]: s }))
+      async (s) => setAuthState(() => ({ [provider]: s })),
     );
     await service.authenticate();
     return service;
@@ -35,6 +36,7 @@ function useCloudStorageManager(provider: keyof typeof providers) {
 }
 
 export function CloudStorageService() {
+  "use no memo";
   const { cloudStorageType = defaultCloudStorage } = slice.settings.use();
   useCloudStorageManager(cloudStorageType);
 }
