@@ -2,7 +2,40 @@ import { useTheme } from "@mui/material";
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
 import { useCallback, useEffect, useState } from "react";
 import { ScatterPlotScaleAndData } from ".";
+import { scaleLinear } from "d3-scale";
 
+const MIN_SPAN = 1e-6;
+
+export function createScatterScale(min: number, max: number) {
+  let lo = min;
+  let hi = max;
+
+  // Edge cases
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) {
+    lo = 0;
+    hi = 1;
+  }
+
+  if (lo === hi) {
+    const mid = lo || 0;
+    lo = mid - 0.5;
+    hi = mid + 0.5;
+  }
+
+  let span = hi - lo;
+  if (span < MIN_SPAN) {
+    const mid = (lo + hi) / 2;
+    lo = mid - MIN_SPAN / 2;
+    hi = mid + MIN_SPAN / 2;
+    span = hi - lo;
+  }
+
+  // add 5% padding so points / axis don’t sit on the border
+  lo -= span * 0.05;
+  hi += span * 0.05;
+
+  return scaleLinear().domain([lo, hi]).nice();
+}
 
 // The tickSpec and ticks are obtained from d3-ticks at https://github.com/d3/d3-array/blob/main/src/ticks.js
 const e10 = Math.sqrt(50),
@@ -136,11 +169,11 @@ function ScatterPlotAxisTickGeneration({
   // Control tick based on zoom in or out
   // In sigma when we zoom the ratio becomes smaller and when we zoom out ratio becomes larger
   // To prevent bottle necks the zoom will limited to a maximum of 100 ticks (When we zoom out and if the ratio is samller than 1e-2)
-  const zoomFactor = 1 / Math.max(ratio, 1e-10); 
+  const zoomFactor = 1 / Math.max(ratio, 1e-10);
   const baseTickCount = 10;
 
   // console.log(zoomFactor, "zoomFactor")
-  
+
   const countX = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
   const countY = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
 
@@ -243,13 +276,13 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
       x: xMin,
       y: yMax,
     });
-    
+
     // x axis 
     ctx.beginPath();
     ctx.moveTo(xAxisStartX, xAxisY);
     ctx.lineTo(xAxisEndX, xAxisY);
     ctx.stroke();
-    
+
     // Draw arrow at the end X axis
     drawArrow(ctx, xAxisEndX, xAxisY, 0);
 
@@ -258,7 +291,7 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
       const { x } = sigma.graphToViewport({ x: value, y: yMin });
       const y = xAxisY;
       if (x < 0 || x > width) {
-        return 
+        return
       }
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -287,7 +320,7 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
       const { y } = sigma.graphToViewport({ x: xMin, y: value });
       const x = yAxisX;
       if (y < 0 || y > height) {
-        return 
+        return
       }
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -298,7 +331,7 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
       ctx.textBaseline = "middle";
       ctx.fillText(label, x - 8, y);
     });
-    
+
     // y axis label 
     ctx.save();
     ctx.translate(yAxisX - 24, (yAxisStartY + yAxisEndY) / 2);
@@ -313,7 +346,7 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
     if (!canvas) return;
 
     const update = () => drawAxis();
-    update(); 
+    update();
 
     registerEvents({ afterRender: update });
   }, [canvas, drawAxis, registerEvents]);
