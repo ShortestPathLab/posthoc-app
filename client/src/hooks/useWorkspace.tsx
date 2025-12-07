@@ -90,7 +90,7 @@ export function useWorkspace() {
         notify("Workspace saved", name);
         return {
           name,
-          content:compressed,
+          content:compressed as Uint8Array<ArrayBuffer>,
           size: compressed.byteLength,
           type: "application/octet-stream",
         };

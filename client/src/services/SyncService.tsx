@@ -64,18 +64,21 @@ export function SyncService() {
 }
 
 export function useActive() {
+  const { participants } = useSyncStatus();
   const [isActive, setActive] = useState(false);
   const isFocused = useWindowFocus();
   useEffect(() => {
-    if (isFocused) {
+    if (isFocused && !isActive) {
       sysend.broadcast("active", sysend.id);
       setActive(true);
     }
-  }, [isFocused]);
+  }, [isFocused, isActive]);
   useEffect(() => {
-    const f = (id: string) => setActive(id === sysend.id);
+    const f = (id: string) => {
+      if (participants.includes(id)) setActive(id === sysend.id);
+    };
     sysend.on("active", f);
     return () => sysend.off("active", f);
-  });
+  }, [JSON.stringify(participants)]);
   return isActive;
 }
