@@ -38,7 +38,6 @@
   ],
   "dependencies": {
     "baseline-browser-mapping": "^2.9.4",
-    "caniuse-lite": "^1.0.30001759",
-    "use-window-focus": "^1.4.4"
+    "caniuse-lite": "^1.0.30001759"
   }
 }

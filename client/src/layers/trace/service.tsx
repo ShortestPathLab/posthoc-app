@@ -13,7 +13,6 @@ import { BreakpointService } from "services/BreakpointService";
 import { AccentColor, accentColors, getShade } from "theme";
 import { set } from "utils/set";
 import { Controller } from "./types";
-import useWindowFocus from "use-window-focus";
 
 export const service = withProduce(({ value, produce }) => {
   const { palette } = useTheme();
@@ -22,7 +21,7 @@ export const service = withProduce(({ value, produce }) => {
   useEffect(() => {
     produce(
       (l) =>
-        void set(l, "source.playbackTo", trace?.content?.events?.length ?? 0)
+        void set(l, "source.playbackTo", trace?.content?.events?.length ?? 0),
     );
   }, [trace?.key]);
   const { isTrusted } = useUntrustedLayers();
@@ -39,7 +38,7 @@ export const service = withProduce(({ value, produce }) => {
         color: {
           ...colorsHex,
           ...mapValues(accentColors, (_, v: AccentColor) =>
-            getShade(v, palette.mode, 500, 400)
+            getShade(v, palette.mode, 500, 400),
           ),
         },
         themeAccent: palette.primary.main,
@@ -49,7 +48,7 @@ export const service = withProduce(({ value, produce }) => {
       view: "main",
     },
     isTrusted,
-    [trace?.key, palette.mode, isTrusted]
+    [trace?.key, palette.mode, isTrusted],
   );
   // Parse the trace
   useAsync(async () => {
