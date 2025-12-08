@@ -30,9 +30,14 @@ export function createScatterScale(min: number, max: number) {
     span = hi - lo;
   }
 
-  // add 5% padding so points / axis don’t sit on the border
+  // add padding to points
   lo -= span * 0.05;
   hi += span * 0.05;
+  // prevent padding from pushing the point to negative value if 
+  // all the number are 0
+  if (min >= 0 && lo < 0) {
+    lo = 0;
+  }
 
   return scaleLinear().domain([lo, hi]).nice();
 }
@@ -166,21 +171,22 @@ function ScatterPlotAxisTickGeneration({
   const camera = sigma.getCamera();
   const { ratio } = camera.getState();
 
-  // Control tick based on zoom in or out
-  // In sigma when we zoom the ratio becomes smaller and when we zoom out ratio becomes larger
-  // To prevent bottle necks the zoom will limited to a maximum of 100 ticks (When we zoom out and if the ratio is samller than 1e-2)
+  // Scaling to standardize extreme input ranges
+  const xDataScale = createScatterScale(xMin, xMax);
+  const yDataScale = createScatterScale(yMin, yMax);
+
+  const [xLo, xHi] = xDataScale.domain();
+  const [yLo, yHi] = yDataScale.domain();
+
   const zoomFactor = 1 / Math.max(ratio, 1e-10);
   const baseTickCount = 10;
-
-  // console.log(zoomFactor, "zoomFactor")
 
   const countX = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
   const countY = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
 
-  console.log(countX, "countX", countY, "zoomFactor", zoomFactor)
-
-  const xValues = ticks(xMin, xMax, countX);
-  const yValues = ticks(yMin, yMax, countY);
+  
+  const xValues = xDataScale.ticks(countX);
+  const yValues = yDataScale.ticks(countY);
 
   const xAxisTickValues: TickLabel[] = xValues.map((value) => ({
     value,
@@ -194,6 +200,7 @@ function ScatterPlotAxisTickGeneration({
 
   return { xAxisTickValues, yAxisTickValues };
 }
+
 // Draw arrow at the end of the lines
 function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, angle: number, size = 8) {
   ctx.save();
@@ -221,126 +228,144 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
   const xAxisLabel = processedData.xAxis ?? "X axis";
   const yAxisLabel = processedData.yAxis ?? "Y axis";
 
-  const drawAxis = useCallback(() => {
-    if (!canvas || !width || !height) return;
+const drawAxis = useCallback(() => {
+  if (!canvas || !width || !height) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
 
-    const { xMin, xMax, yMin, yMax } = processedData;
-    if (
-      xMin === undefined ||
-      xMax === undefined ||
-      yMin === undefined ||
-      yMax === undefined
-    ) {
-      return;
-    }
+  const { xMin, xMax, yMin, yMax } = processedData;
+  if (
+    xMin === undefined ||
+    xMax === undefined ||
+    yMin === undefined ||
+    yMax === undefined
+  ) {
+    return;
+  }
 
-    // compute tick values from current bounds + zoom
-    const { xAxisTickValues, yAxisTickValues } = ScatterPlotAxisTickGeneration({
-      processedData,
-      sigma,
+  const xDataScale = createScatterScale(xMin, xMax);
+  const yDataScale = createScatterScale(yMin, yMax);
+
+  const [xLo, xHi] = xDataScale.domain();
+  const [yLo, yHi] = yDataScale.domain();
+
+  const xGraphScale = xDataScale.copy().range([-1, 1]);
+  const yGraphScale = yDataScale.copy().range([-1, 1]);
+
+  const xAxisDataY =
+    yLo <= 0 && 0 <= yHi
+      ? 0
+      : yLo;
+
+  const yAxisDataX =
+    xLo <= 0 && 0 <= xHi
+      ? 0
+      : xLo;
+
+  const { xAxisTickValues, yAxisTickValues } = ScatterPlotAxisTickGeneration({
+    processedData,
+    sigma,
+  });
+
+  ctx.strokeStyle = theme.palette.text.secondary;
+  ctx.fillStyle = theme.palette.text.primary;
+  ctx.lineWidth = 1;
+  ctx.font = "12px Inter, system-ui, sans-serif";
+
+
+  const { x: xAxisStartX, y: xAxisYRaw } = sigma.graphToViewport({
+    x: xGraphScale(xLo),
+    y: yGraphScale(xAxisDataY),
+  });
+  let xAxisY = xAxisYRaw;
+
+  xAxisY = Math.min(xAxisY, height - 36);
+
+  const { x: xAxisEndX } = sigma.graphToViewport({
+    x: xGraphScale(xHi),
+    y: yGraphScale(xAxisDataY),
+  });
+
+
+  const { x: yAxisXRaw, y: yAxisStartY } = sigma.graphToViewport({
+    x: xGraphScale(yAxisDataX),
+    y: yGraphScale(yLo),
+  });
+  let yAxisX = yAxisXRaw;
+  yAxisX = Math.max(yAxisX, 72);
+
+  const { y: yAxisEndY } = sigma.graphToViewport({
+    x: xGraphScale(yAxisDataX),
+    y: yGraphScale(yHi),
+  });
+
+  ctx.beginPath();
+  ctx.moveTo(xAxisStartX, xAxisY);
+  ctx.lineTo(xAxisEndX, xAxisY);
+  ctx.stroke();
+  drawArrow(ctx, xAxisEndX, xAxisY, 0);
+
+  xAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
+    const { x } = sigma.graphToViewport({
+      x: xGraphScale(value),
+      y: yGraphScale(xAxisDataY),
     });
+    const y = xAxisY;
+    if (x < 0 || x > width) return;
 
-    ctx.strokeStyle = theme.palette.text.secondary;
-    ctx.fillStyle = theme.palette.text.primary;
-    ctx.lineWidth = 1;
-    ctx.font = "12px Inter, system-ui, sans-serif";
-
-    // axis positions in viewport coords
-    const { x: xAxisStartX, y: xAxisY1 } = sigma.graphToViewport({
-      x: xMin,
-      y: yMin,
-    });
-    const xAxisY = Math.min(xAxisY1, height - 36)
-    console.log(xAxisY, "xAxisY--")
-
-    const { x: xAxisEndX } = sigma.graphToViewport({
-      x: xMax,
-      y: yMin,
-    });
-
-    const { x: yAxisX1, y: yAxisStartY } = sigma.graphToViewport({
-      x: xMin,
-      y: yMin,
-    });
-    const yAxisX = Math.max(yAxisX1, 72)
-    console.log(yAxisX, "yAxisX--")
-    console.log("Distance in X axis ", width - yAxisX1)
-    const { y: yAxisEndY } = sigma.graphToViewport({
-      x: xMin,
-      y: yMax,
-    });
-
-    // x axis 
     ctx.beginPath();
-    ctx.moveTo(xAxisStartX, xAxisY);
-    ctx.lineTo(xAxisEndX, xAxisY);
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + 6);
     ctx.stroke();
 
-    // Draw arrow at the end X axis
-    drawArrow(ctx, xAxisEndX, xAxisY, 0);
-
-    // X ticks
-    xAxisTickValues.forEach(({ value, label }) => {
-      const { x } = sigma.graphToViewport({ x: value, y: yMin });
-      const y = xAxisY;
-      if (x < 0 || x > width) {
-        return
-      }
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x, y + 6);
-      ctx.stroke();
-
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-      ctx.fillText(label, x, y + 8);
-    });
-
-    // x axis label
     ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(xAxisLabel, (xAxisStartX + xAxisEndX) / 2, xAxisY + 40);
+    ctx.textBaseline = "top";
+    ctx.fillText(label, x, y + 8);
+  });
 
-    // y axis
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText(xAxisLabel, (xAxisStartX + xAxisEndX) / 2, xAxisY + 40);
+
+  ctx.beginPath();
+  ctx.moveTo(yAxisX, yAxisStartY);
+  ctx.lineTo(yAxisX, yAxisEndY);
+  ctx.stroke();
+  drawArrow(ctx, yAxisX, yAxisEndY, -Math.PI / 2);
+
+
+  yAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
+    const { y } = sigma.graphToViewport({
+      x: xGraphScale(yAxisDataX),
+      y: yGraphScale(value),
+    });
+    const x = yAxisX;
+    if (y < 0 || y > height) return;
+
     ctx.beginPath();
-    ctx.moveTo(yAxisX, yAxisStartY);
-    ctx.lineTo(yAxisX, yAxisEndY);
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - 6, y);
     ctx.stroke();
-    drawArrow(ctx, yAxisX, yAxisEndY, -Math.PI / 2);
 
-    // y ticks
-    yAxisTickValues.forEach(({ value, label }) => {
-      const { y } = sigma.graphToViewport({ x: xMin, y: value });
-      const x = yAxisX;
-      if (y < 0 || y > height) {
-        return
-      }
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x - 6, y);
-      ctx.stroke();
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, x - 8, y);
+  });
 
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      ctx.fillText(label, x - 8, y);
-    });
+  ctx.save();
+  ctx.translate(yAxisX - 24, (yAxisStartY + yAxisEndY) / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText(yAxisLabel, 0, -30);
+  ctx.restore();
+}, [canvas, width, height, processedData, sigma, theme, xAxisLabel, yAxisLabel]);
 
-    // y axis label 
-    ctx.save();
-    ctx.translate(yAxisX - 24, (yAxisStartY + yAxisEndY) / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(yAxisLabel, 0, -30);
-    ctx.restore();
-  }, [canvas, width, height, processedData, sigma, theme, xAxisLabel, yAxisLabel]);
 
   useEffect(() => {
     if (!canvas) return;
