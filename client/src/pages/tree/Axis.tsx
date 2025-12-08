@@ -185,162 +185,166 @@ function AxisOverlay({ width, height, processedData, logAxis }: AxisOverlayProps
   const xAxisLabel = processedData.xAxis ?? "X axis";
   const yAxisLabel = processedData.yAxis ?? "Y axis";
 
-  const drawAxis = useCallback(() => {
-    if (!canvas || !width || !height) return;
+  useEffect(() => {
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
+    const drawAxis = () => {
+      const dpr = window.devicePixelRatio || 1;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
 
-    const { xMin, xMax, yMin, yMax } = processedData;
-    if (
-      xMin === undefined ||
-      xMax === undefined ||
-      yMin === undefined ||
-      yMax === undefined
-    ) {
-      return;
-    }
+      const { xMin, xMax, yMin, yMax } = processedData;
+      if (
+        xMin === undefined ||
+        xMax === undefined ||
+        yMin === undefined ||
+        yMax === undefined
+      ) {
+        return;
+      }
 
-    const xDataScale = logAxis.x
-  ? createLogScatterScale(xMin, xMax)
-  : createScatterScale(xMin, xMax);
+      const xDataScale = logAxis.x
+        ? createLogScatterScale(xMin, xMax)
+        : createScatterScale(xMin, xMax);
 
-const yDataScale = logAxis.y
-  ? createLogScatterScale(yMin, yMax)
-  : createScatterScale(yMin, yMax);
+      const yDataScale = logAxis.y
+        ? createLogScatterScale(yMin, yMax)
+        : createScatterScale(yMin, yMax);
 
-    const [xLo, xHi] = xDataScale.domain();
-    const [yLo, yHi] = yDataScale.domain();
+      const [xLo, xHi] = xDataScale.domain();
+      const [yLo, yHi] = yDataScale.domain();
 
-    const xGraphScale = xDataScale.copy().range([-1, 1]);
-    const yGraphScale = yDataScale.copy().range([-1, 1]);
+      const xGraphScale = xDataScale.copy().range([-1, 1]);
+      const yGraphScale = yDataScale.copy().range([-1, 1]);
 
-    const xAxisDataY =
-      yLo <= 0 && 0 <= yHi
-        ? 0
-        : yLo;
+      const xAxisDataY = yLo <= 0 && 0 <= yHi ? 0 : yLo;
+      const yAxisDataX = xLo <= 0 && 0 <= xHi ? 0 : xLo;
+      
+      const { xAxisTickValues, yAxisTickValues } = ScatterPlotAxisTickGeneration({
+        processedData,
+        sigma,
+        logAxis,
+      });
 
-    const yAxisDataX =
-      xLo <= 0 && 0 <= xHi
-        ? 0
-        : xLo;
+      ctx.strokeStyle = theme.palette.text.secondary;
+      ctx.fillStyle = theme.palette.text.primary;
+      ctx.lineWidth = 1;
+      ctx.font = "12px Inter, system-ui, sans-serif";
 
-    const { xAxisTickValues, yAxisTickValues } = ScatterPlotAxisTickGeneration({
-      processedData,
-      sigma,
-      logAxis
-    });
-
-    ctx.strokeStyle = theme.palette.text.secondary;
-    ctx.fillStyle = theme.palette.text.primary;
-    ctx.lineWidth = 1;
-    ctx.font = "12px Inter, system-ui, sans-serif";
-
-
-    const { x: xAxisStartX, y: xAxisYRaw } = sigma.graphToViewport({
-      x: xGraphScale(xLo),
-      y: yGraphScale(xAxisDataY),
-    });
-    let xAxisY = xAxisYRaw;
-
-    xAxisY = Math.min(xAxisY, height - 36);
-
-    const { x: xAxisEndX } = sigma.graphToViewport({
-      x: xGraphScale(xHi),
-      y: yGraphScale(xAxisDataY),
-    });
-
-
-    const { x: yAxisXRaw, y: yAxisStartY } = sigma.graphToViewport({
-      x: xGraphScale(yAxisDataX),
-      y: yGraphScale(yLo),
-    });
-    let yAxisX = yAxisXRaw;
-    yAxisX = Math.max(yAxisX, 72);
-
-    const { y: yAxisEndY } = sigma.graphToViewport({
-      x: xGraphScale(yAxisDataX),
-      y: yGraphScale(yHi),
-    });
-
-    ctx.beginPath();
-    ctx.moveTo(xAxisStartX, xAxisY);
-    ctx.lineTo(xAxisEndX, xAxisY);
-    ctx.stroke();
-    drawArrow(ctx, xAxisEndX, xAxisY, 0);
-
-    xAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
-      const { x } = sigma.graphToViewport({
-        x: xGraphScale(value),
+      // X axis line
+      const { x: xAxisStartX, y: xAxisYRaw } = sigma.graphToViewport({
+        x: xGraphScale(xLo),
         y: yGraphScale(xAxisDataY),
       });
-      const y = xAxisY;
-      if (x < 0 || x > width) return;
+      let xAxisY = Math.min(xAxisYRaw, height - 36);
+
+      const { x: xAxisEndX } = sigma.graphToViewport({
+        x: xGraphScale(xHi),
+        y: yGraphScale(xAxisDataY),
+      });
 
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x, y + 6);
+      ctx.moveTo(xAxisStartX, xAxisY);
+      ctx.lineTo(xAxisEndX, xAxisY);
       ctx.stroke();
+      drawArrow(ctx, xAxisEndX, xAxisY, 0);
+
+      // X ticks
+      xAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
+        const { x } = sigma.graphToViewport({
+          x: xGraphScale(value),
+          y: yGraphScale(xAxisDataY),
+        });
+        const y = xAxisY;
+        if (x < 0 || x > width) return;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y + 6);
+        ctx.stroke();
+
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillText(label, x, y + 8);
+      });
 
       ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-      ctx.fillText(label, x, y + 8);
-    });
+      ctx.textBaseline = "bottom";
+      ctx.fillText(xAxisLabel, (xAxisStartX + xAxisEndX) / 2, xAxisY + 40);
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(xAxisLabel, (xAxisStartX + xAxisEndX) / 2, xAxisY + 40);
-
-    ctx.beginPath();
-    ctx.moveTo(yAxisX, yAxisStartY);
-    ctx.lineTo(yAxisX, yAxisEndY);
-    ctx.stroke();
-    drawArrow(ctx, yAxisX, yAxisEndY, -Math.PI / 2);
-
-
-    yAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
-      const { y } = sigma.graphToViewport({
+      // Y axis line
+      const { x: yAxisXRaw, y: yAxisStartY } = sigma.graphToViewport({
         x: xGraphScale(yAxisDataX),
-        y: yGraphScale(value),
+        y: yGraphScale(yLo),
       });
-      const x = yAxisX;
-      if (y < 0 || y > height) return;
+      let yAxisX = Math.max(yAxisXRaw, 72);
+
+      const { y: yAxisEndY } = sigma.graphToViewport({
+        x: xGraphScale(yAxisDataX),
+        y: yGraphScale(yHi),
+      });
 
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x - 6, y);
+      ctx.moveTo(yAxisX, yAxisStartY);
+      ctx.lineTo(yAxisX, yAxisEndY);
       ctx.stroke();
+      drawArrow(ctx, yAxisX, yAxisEndY, -Math.PI / 2);
 
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      ctx.fillText(label, x - 8, y);
-    });
+      // Y ticks
+      yAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
+        const { y } = sigma.graphToViewport({
+          x: xGraphScale(yAxisDataX),
+          y: yGraphScale(value),
+        });
+        const x = yAxisX;
+        if (y < 0 || y > height) return;
 
-    ctx.save();
-    ctx.translate(yAxisX - 24, (yAxisStartY + yAxisEndY) / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(yAxisLabel, 0, -30);
-    ctx.restore();
-  }, [canvas, width, height, processedData, sigma, theme, xAxisLabel, yAxisLabel, logAxis.x, logAxis.y]);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 6, y);
+        ctx.stroke();
 
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillText(label, x - 8, y);
+      });
 
-  useEffect(() => {
-    if (!canvas) return;
+      // Y label
+      ctx.save();
+      ctx.translate(yAxisX - 24, (yAxisStartY + yAxisEndY) / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(yAxisLabel, 0, -30);
+      ctx.restore();
+    };
 
-    const update = () => drawAxis();
-    update();
+    // draw immediately for latest props
+    drawAxis();
 
-    registerEvents({ afterRender: update });
-  }, [canvas, drawAxis, registerEvents]);
+    // also redraw whenever sigma renders
+    registerEvents({ afterRender: drawAxis });
+  }, [
+    canvas,
+    width,
+    height,
+    processedData.xMin,
+    processedData.xMax,
+    processedData.yMin,
+    processedData.yMax,
+    processedData.xAxis,
+    processedData.yAxis,
+    logAxis.x,
+    logAxis.y,
+    sigma,
+    theme,
+    registerEvents,
+  ]);
 
   return (
-    // explicitly set the width and height of the canvas based on container obtained from AutoSize
     <canvas
       ref={(el) => {
         if (!el) return;
