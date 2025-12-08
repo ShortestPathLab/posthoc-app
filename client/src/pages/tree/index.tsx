@@ -290,6 +290,8 @@ export function TreePage({ template: Page }: PageContentProps) {
     yMetric: string;
   }>({ xMetric: "", yMetric: "" });
 
+  const [eventTypeFilter, setEventTypeFilter] = useState<string>("");
+
   // Scatterplot is ON only if both axes are selected
   const scatterplotMode = Boolean(formInput.xMetric && formInput.yMetric);
 
@@ -309,7 +311,14 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   console.log(processedData, "data for scatterplot");
 
+  const eventTypes = Array.from(
+    new Set(processedData.data.map((p) => p.point.eventType))
+  );
 
+  const handleEventTypeChange = (value: any) => {
+    const v = String(value ?? "");
+    setEventTypeFilter(v);
+  };
   const handleAxisChange =
     (axis: "xMetric" | "yMetric") =>
       (value: any) => {
@@ -424,7 +433,11 @@ export function TreePage({ template: Page }: PageContentProps) {
                       {scatterplotMode && (
                         <>
                           <ScatterPlotOverlayToolbar />
-                          <ScatterPlotGraph processedData={processedData} logAxis={logAxis}/>
+                          <ScatterPlotGraph
+                            processedData={processedData}
+                            logAxis={logAxis}
+                            eventTypeFilter={eventTypeFilter}
+                          />
                           <AxisOverlay
                             processedData={processedData}
                             width={size.width}
@@ -544,7 +557,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                   (select X and Y)
                 </Typography>
               )}
-                          <FeaturePicker
+              <FeaturePicker
                 label={
                   formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"
                 }
@@ -562,6 +575,25 @@ export function TreePage({ template: Page }: PageContentProps) {
                 value={formInput.yMetric}
                 items={scatterPlotAxis}
                 onChange={handleAxisChange("yMetric")}
+                arrow
+                itemOrientation="horizontal"
+              />
+
+              <FeaturePicker
+                label={
+                  eventTypeFilter
+                    ? `Event: ${startCase(eventTypeFilter)}`
+                    : "Event type"
+                }
+                value={eventTypeFilter}
+                items={[
+                  { id: "", name: "All event types" },
+                  ...eventTypes.map((t) => ({
+                    id: t,
+                    name: startCase(t),
+                  })),
+                ]}
+                onChange={handleEventTypeChange}
                 arrow
                 itemOrientation="horizontal"
               />
@@ -670,28 +702,43 @@ export type ScatterPlotGraphProps = {
   width?: number;
   height?: number;
   logAxis: { x: boolean; y: boolean };
+  eventTypeFilter?: string;
 };
 
-function ScatterPlotGraph({ processedData, logAxis }: ScatterPlotGraphProps) {
+function ScatterPlotGraph({
+  processedData,
+  logAxis,
+  eventTypeFilter,
+}: ScatterPlotGraphProps) {
   const theme = useTheme();
   const loadGraph = useLoadGraph();
 
   const backgroundHex = theme.palette.background.paper;
   const foregroundHex = theme.palette.text.primary;
 
-
   useEffect(() => {
-    const {xMin, xMax, yMin, yMax} = processedData;
+    const { xMin, xMax, yMin, yMax } = processedData;
     const graph = new Graph();
-    const {x, y} = logAxis;
-    const allPoints = processedData.data;
-    if (!allPoints.length) return;
-    const scaleTypeX = x ? createLogScatterScale : createScatterScale
-    const scaleTypeY = y ? createLogScatterScale : createScatterScale
-    const xScale = scaleTypeX(xMin, xMax).range([-1, 1])
-    const yScale = scaleTypeY(yMin, yMax).range([-1, 1])
+    const { x, y } = logAxis;
 
-    const points = allPoints;
+    const allPoints = processedData.data;
+
+    // 👇 filter by event type if one is selected
+    const points =
+      eventTypeFilter && eventTypeFilter.length
+        ? allPoints.filter((p) => p.point.eventType === eventTypeFilter)
+        : allPoints;
+
+    if (!points.length) {
+      // nothing to show – clear graph
+      loadGraph(graph);
+      return;
+    }
+
+    const scaleTypeX = x ? createLogScatterScale : createScatterScale;
+    const scaleTypeY = y ? createLogScatterScale : createScatterScale;
+    const xScale = scaleTypeX(xMin, xMax).range([-1, 1]);
+    const yScale = scaleTypeY(yMin, yMax).range([-1, 1]);
 
     points.forEach((p) => {
       const id = p.point.id; // unique
@@ -700,7 +747,7 @@ function ScatterPlotGraph({ processedData, logAxis }: ScatterPlotGraphProps) {
       if (!graph.hasNode(id)) {
         const color = getGraphColorHex(
           p.point.eventType,
-          1, 
+          1,
           backgroundHex,
           foregroundHex
         );
@@ -719,11 +766,11 @@ function ScatterPlotGraph({ processedData, logAxis }: ScatterPlotGraphProps) {
     });
 
     loadGraph(graph);
-  }, [processedData, loadGraph, backgroundHex, foregroundHex, logAxis]);
+  }, [processedData, loadGraph, backgroundHex, foregroundHex, logAxis, eventTypeFilter]);
 
-
-  return null
+  return null;
 }
+
 
 function ScatterPlotOverlayToolbar() {
   const sigma = useSigma();
