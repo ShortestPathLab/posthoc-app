@@ -17,10 +17,10 @@ import { FullscreenModalHost } from "./FullscreenModalHost";
 import { FullscreenProgress } from "./FullscreenProgress";
 import { ErrorPlaceholder } from "./Placeholder";
 import { ViewTree } from "./ViewTree";
+import { useOne } from "slices/useOne";
 
 function useView() {
-  "use no memo";
-  return slice.view.use((v) => v.view, isEqual);
+  return useOne(slice.view, (v) => v.view, isEqual);
 }
 
 export function Inspector(props: BlockProps) {

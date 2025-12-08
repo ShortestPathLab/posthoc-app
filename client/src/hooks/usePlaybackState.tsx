@@ -24,7 +24,7 @@ const stepBy = (l: Layer<PlaybackLayerData>, n: number) => {
   set(
     l,
     "source.step",
-    clamp((min([playbackTo ?? 0, step]) ?? 0) + n, start, end)
+    clamp((min([playbackTo ?? 0, step]) ?? 0) + n, start, end),
   );
 };
 
@@ -41,7 +41,7 @@ type ComputedPlaybackLayerProperties = {
 };
 
 export function computed<T extends keyof ComputedPlaybackLayerProperties>(
-  k: T
+  k: T,
 ) {
   return (l?: Layer<PlaybackLayerData>) => {
     const { playback, playbackTo, step: _step } = l?.source ?? {};
@@ -67,8 +67,6 @@ export function computed<T extends keyof ComputedPlaybackLayerProperties>(
 }
 
 export function usePlaybackControls(key?: string) {
-  "use no memo";
-
   const notify = useSnackbar();
   const { shouldBreak } = useBreakpoint3(key);
 
@@ -77,7 +75,7 @@ export function usePlaybackControls(key?: string) {
 
     function get<T extends keyof PlaybackLayerData>(
       key: T,
-      fallback: PlaybackLayerData[T]
+      fallback: PlaybackLayerData[T],
     ) {
       return (one.get((l) => l.source?.[key]) ?? fallback)!;
     }
@@ -135,17 +133,17 @@ export function usePlaybackControls(key?: string) {
             if (error) {
               notify(
                 `${trimEnd(error, ".")}`,
-                `Step ${get("step", 0) + offset}`
+                `Step ${get("step", 0) + offset}`,
               );
               pause();
             } else if (result) {
               notify(
                 `Breakpoint hit: ${result}`,
-                `Step ${get("step", 0) + offset}`
+                `Step ${get("step", 0) + offset}`,
               );
               pause(offset);
             } else tick(count);
-          }
+          },
         ),
     };
   }, [key, shouldBreak]);

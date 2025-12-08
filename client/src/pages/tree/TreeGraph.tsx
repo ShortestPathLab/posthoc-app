@@ -40,12 +40,13 @@ import { TreeWorkerReturnType } from "./treeLayout.worker";
 import { TreeAxis } from "./TreeAxis";
 import { useGraphColoring } from "./useGraphColoring";
 import { useMultiDirectedGraph } from "./useMultiDirectedGraph";
+import { useOne } from "slices/useOne";
 
 export function setAttributes(
   graph: MultiDirectedGraph,
   id: string,
   type: "edge" | "node",
-  values: { [K in string]: string | number }
+  values: { [K in string]: string | number },
 ) {
   const a = {
     node: "setNodeAttribute" as const,
@@ -111,8 +112,11 @@ export type NodeType = { x: number; y: number; label: string; size: number };
 export type EdgeType = { label: string };
 
 function useHighlighting(key?: string) {
-  "use no memo";
-  return layers.one<TreeLayer>(key).use((l) => l.source?.highlighting, isEqual);
+  return useOne(
+    layers.one<TreeLayer>(key),
+    (l) => l.source?.highlighting,
+    isEqual,
+  );
 }
 
 export function TreeGraph(props: TreeGraphProps) {
@@ -138,7 +142,7 @@ export function TreeGraph(props: TreeGraphProps) {
   const { graph: baseGraph, load } = useMultiDirectedGraph(
     trace,
     tree,
-    orientation
+    orientation,
   );
 
   const highlightEdges = useHighlighting(key);
@@ -152,11 +156,11 @@ export function TreeGraph(props: TreeGraphProps) {
 
   const bg = getShade(
     highlightNodesOptions.find(
-      (highlight) => highlight.type === highlightEdges?.type
+      (highlight) => highlight.type === highlightEdges?.type,
     )?.color,
     theme.palette.mode,
     500,
-    400
+    400,
   );
 
   const event = trace?.events?.[highlightEdges?.step ?? 0];
@@ -204,7 +208,7 @@ export function TreeGraph(props: TreeGraphProps) {
             color="primary"
             onClick={() => {
               setOrientation(
-                orientation === "vertical" ? "horizontal" : "vertical"
+                orientation === "vertical" ? "horizontal" : "vertical",
               );
             }}
             label="Rotate"

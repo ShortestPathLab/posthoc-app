@@ -3,6 +3,7 @@ import { filter, head, isEqual, map } from "lodash-es";
 import hash from "object-hash";
 import { useEffect, useState } from "react";
 import { createOne, createSelector } from "./selector";
+import { useOne } from "./useOne";
 
 export type Layer<T = Record<string, unknown>> = {
   key: string;
@@ -14,7 +15,7 @@ export type Layer<T = Record<string, unknown>> = {
 };
 
 export type LayerGuard<T> = (
-  l: Layer<Record<string, unknown> | unknown>
+  l: Layer<Record<string, unknown> | unknown>,
 ) => l is Layer<T>;
 
 export const defaultGuard = ((l) => !!l) as LayerGuard<never>;
@@ -30,10 +31,9 @@ export const layers = store<Layer[]>([], {
 
 export const WithLayer = createOne(layers.one);
 export function useLayers<T extends Record<string, unknown>>(
-  guard: LayerGuard<T> = defaultGuard
+  guard: LayerGuard<T> = defaultGuard,
 ) {
-  "use no memo";
-  const all = layers.use((c) => map(c, "key"), isEqual);
+  const all = useOne(layers, (c) => map(c, "key"), isEqual);
   const guarded = filter(all, (k) => {
     const l = layers.one(k).get();
     return l ? guard(l) : false;
@@ -42,9 +42,8 @@ export function useLayers<T extends Record<string, unknown>>(
 }
 
 export function useLayerPicker<T extends Record<string, unknown>>(
-  guard: LayerGuard<T> = defaultGuard
+  guard: LayerGuard<T> = defaultGuard,
 ) {
-  "use no memo";
   const { all, guarded } = useLayers<T>(guard);
 
   const [key, setKey] = useState<string>();

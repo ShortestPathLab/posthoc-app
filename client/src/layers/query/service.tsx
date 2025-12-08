@@ -15,13 +15,13 @@ import { set } from "utils/set";
 import { Controller } from ".";
 import { findConnection } from "./findConnection";
 import { Trace } from "protocol/Trace-v140";
+import { useOne } from "slices/useOne";
 
 export const service = withProduce(({ value, produce, onChange }) => {
-  "use no memo";
   const TraceLayerService = traceController.service;
   const notify = useSnackbar();
   const { algorithm, mapLayerKey, start, end } = value?.source ?? {};
-  const layers = slice.layers.use();
+  const layers = useOne(slice.layers);
   const [connections] = useConnections();
   const [{ algorithms }] = useFeatures();
   const mapLayer = useMemo(() => {

@@ -6,7 +6,7 @@ import { usePrevious } from "react-use";
 export const useEffectWhen = <T, U>(
   effect: () => void,
   deps: T[],
-  watch: U[]
+  watch: U[],
 ) => {
   const prev = usePrevious(watch);
   return useEffect(() => {
@@ -23,7 +23,7 @@ function allSame<T>(a?: T[], b?: T[]) {
 export const useEffectWhenAsync = <T, U>(
   effect: (signal: AbortSignal) => Promise<void>,
   deps: T[] = [],
-  whenDeps: U[] = []
+  whenDeps: U[] = [],
 ) => {
   const [prevDeps, setDeps] = useState<T[]>(deps);
   const [prevWhenDeps, setWhenDeps] = useState<U[]>(whenDeps);

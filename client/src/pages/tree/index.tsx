@@ -51,7 +51,7 @@ import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
 import { Layer, useLayerPicker, WithLayer } from "slices/layers";
-import { equal } from "slices/selector";
+import { id } from "slices/selector";
 import { UploadedTrace } from "slices/UIState";
 import { PanelState } from "slices/view";
 import { getShade } from "theme";
@@ -63,6 +63,7 @@ import { useTreeLayout } from "./TreeLayoutWorker";
 import { useGraphSettings } from "./useGraphSettings";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
+import { useOne } from "slices/useOne";
 
 type TreePageContext = PanelState;
 
@@ -202,7 +203,7 @@ function TreeMenu({
                 highlight.color,
                 theme.palette.mode,
                 500,
-                400
+                400,
               );
               return (
                 <Stack direction="row">
@@ -222,7 +223,7 @@ function TreeMenu({
                           }}
                           onClick={(e) => {
                             showHighlight[highlight.type](
-                              selected!.current!.step!
+                              selected!.current!.step!,
                             );
                             props?.onClose?.(e, "backdropClick");
                           }}
@@ -245,14 +246,12 @@ function TreeMenu({
 }
 
 function useTreePageState(key?: string) {
-  "use no memo";
-
   const one = slice.layers.one<TreeLayer>(key);
   const trace = one.use<UploadedTrace | undefined>(
     (l) => l?.source?.trace,
-    equal("key")
+    id("key"),
   );
-  const step = one.use((l) => l?.source?.step);
+  const step = useOne(one, (l) => l?.source?.step);
   return { step, trace };
 }
 
@@ -279,14 +278,14 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const [trackedProperty, setTrackedProperty, properties] = useTrackedProperty(
     trace?.key,
-    trace?.content
+    trace?.content,
   );
 
   // const [axisTracking, setAxisTracking] = useState<typeof properties | "">("");
 
   const { point, selected, selection, setSelection } = useSelection(
     throttled,
-    trace?.content
+    trace?.content,
   );
 
   const [mode, setMode] = useState<"tree" | "directed-graph">("tree");
@@ -442,7 +441,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                   arrow
                 />
               </Fragment>
-            )
+            ),
           )}
         </>
       </Page.Options>

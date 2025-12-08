@@ -23,6 +23,7 @@ import { produceAsync as produce } from "produce";
 import { set } from "utils/set";
 import { useAsync } from "react-async-hook";
 import { resultAsync } from "utils/result";
+import { useOne } from "slices/useOne";
 
 export function isYamlException(e: unknown): e is YAMLException {
   return isObject(e) && "name" in e && e.name === "YAMLException";
@@ -33,17 +34,17 @@ type SourceLayer = Layer;
 type SourceLayerState = { source?: string; layer?: string };
 
 function useSources() {
-  "use no memo";
   // TODO: Slightly not performance
-  return slice.layers.use(
+  return useOne(
+    slice.layers,
     (l) =>
       flatMap(l, (l) =>
         map(getController(l)?.getSources?.(l), (s) => ({
           layer: l.key,
           source: s,
-        }))
+        })),
       ),
-    isEqual
+    isEqual,
   );
 }
 
@@ -66,9 +67,9 @@ export function SourcePage({ template: Page }: PageContentProps) {
     () =>
       find(
         sources,
-        (c) => c && c.source.id === state?.source && c.layer === state?.layer
+        (c) => c && c.source.id === state?.source && c.layer === state?.layer,
       ) ?? first(sources),
-    [sources, state?.source, state?.layer]
+    [sources, state?.source, state?.layer],
   );
   const handleEditorContentChange = useMemo(
     () =>
@@ -85,19 +86,19 @@ export function SourcePage({ template: Page }: PageContentProps) {
                 void (await getController(l)?.onEditSource?.(
                   l,
                   selected.source.id,
-                  value
-                ))
-            )
+                  value,
+                )),
+            ),
           );
           assert(!a.error, a.error!);
           one.set(a.result);
-        })
+        }),
       ),
-    [selected?.layer, selected?.source?.id]
+    [selected?.layer, selected?.source?.id],
   );
 
   const [value, setValue] = useOptimistic(selected?.source?.content, (v) =>
-    idle(() => handleEditorContentChange(v))
+    idle(() => handleEditorContentChange(v)),
   );
 
   useEffect(() => {

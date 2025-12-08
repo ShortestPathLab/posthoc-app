@@ -10,10 +10,8 @@ export type StepsPageState = {
 };
 export function useStepsPageState(
   state?: StepsPageState,
-  onChange?: (r: Transaction<StepsPageState & { type: string }>) => void
+  onChange?: (r: Transaction<StepsPageState & { type: string }>) => void,
 ) {
-  "use no memo";
-
   const { key, setKey: setLocalKey } = useLayerPicker(isStepsLayer);
   useEffect(() => setLocalKey(state?.layer), [state?.layer]);
 

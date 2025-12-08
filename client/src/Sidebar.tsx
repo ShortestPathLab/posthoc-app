@@ -15,6 +15,7 @@ import { pages } from "pages";
 import { useMemo } from "react";
 import { useSyncStatus } from "services/SyncService";
 import { slice } from "slices";
+import { useOne } from "slices/useOne";
 
 export function useSidebarBackground() {
   const { palette } = useTheme();
@@ -23,7 +24,7 @@ export function useSidebarBackground() {
     return dark
       ? interpolate([palette.background.paper, palette.text.primary])(0.025)
       : interpolate([palette.background.paper, palette.background.default])(
-          0.25
+          0.25,
         );
   }, [palette]);
 }
@@ -58,12 +59,11 @@ function Divider2() {
 }
 
 export function Sidebar() {
-  "use no memo";
   const { isPrimary } = useSyncStatus();
   const bgcolor = useSidebarBackground();
   const sm2 = isMobile;
   const sm = !isPrimary || sm2;
-  const settings = slice.settings.use();
+  const settings = useOne(slice.settings);
   return (
     <TabContext value={false as unknown as string}>
       <Stack
@@ -93,7 +93,7 @@ export function Sidebar() {
               sm
                 ? c.showInSidebar === "always" ||
                   c.showInSidebar === "mobile-only"
-                : c.showInSidebar === "always"
+                : c.showInSidebar === "always",
             )
             .flatMap((c, i, cx) => [
               !sm && !!i && c.color !== cx[i - 1].color && (

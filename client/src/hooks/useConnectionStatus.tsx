@@ -1,6 +1,7 @@
 import { find } from "lodash-es";
 import { slice } from "slices";
 import { useConnectionResolver } from "./useConnectionResolver";
+import { useOne } from "slices/useOne";
 
 export type ConnectionStatus =
   | "connected"
@@ -9,14 +10,13 @@ export type ConnectionStatus =
   | "not-connected";
 
 export function useConnectionsLoading() {
-  "use no memo";
-  return slice.loading.use((l) => !!l.connections);
+  return useOne(slice.loading, (l) => !!l.connections);
 }
 
 export function useConnectionStatus(url?: string): ConnectionStatus {
   const loading = useConnectionsLoading();
   const resolve = useConnectionResolver();
-  const { remote } = slice.settings.use();
+  const { remote } = useOne(slice.settings);
   const entry = find(remote, { url });
 
   return entry && !entry?.disabled

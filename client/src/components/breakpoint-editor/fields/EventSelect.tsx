@@ -7,19 +7,18 @@ import { _ } from "utils/chain";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
-import { equal } from "slices/selector";
+import { id } from "slices/selector";
 import { BreakpointFieldProps } from "../breakpoints/Breakpoint";
 
 export const EventSelect = ({
   layer,
   ...props
 }: BreakpointFieldProps<string>) => {
-  "use no memo";
   const one = slice.layers.one<Layer<DebugLayerData>>(layer);
   const { steps } =
     one.use<Steps | undefined>(
       (l) => getController(l)?.steps?.(l),
-      equal("key")
+      id("key"),
     ) ?? {};
   const types = useMemo(() => _(steps, (v) => map(v, "type"), uniq), [steps]);
   return (

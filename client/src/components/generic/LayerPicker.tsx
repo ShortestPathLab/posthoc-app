@@ -10,6 +10,7 @@ import { QueryLayerData } from "../../layers/query";
 
 import { ReactNode } from "react";
 import { slice } from "slices";
+import { useOne } from "slices/useOne";
 
 function WithLayer<T extends Record<string, unknown>>({
   children,
@@ -18,7 +19,7 @@ function WithLayer<T extends Record<string, unknown>>({
   layer?: string;
   children?: (layer: Layer<T>) => ReactNode;
 }) {
-  const l = slice.layers.one<Layer<T>>(key).use();
+  const l = useOne(slice.layers.one<Layer<T>>(key));
   return l && children?.(l);
 }
 

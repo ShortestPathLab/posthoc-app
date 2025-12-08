@@ -18,6 +18,7 @@ import { useLoadingState } from "slices/loading";
 import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
 import { Gallery } from "./Gallery";
+import { useOne } from "slices/useOne";
 
 const replacements = {
   "*": "star",
@@ -73,9 +74,8 @@ export function ExportWorkspace({
     unknown
   >["saveFile"];
 } & SurfaceContentProps) {
-  "use no memo";
   const paper = usePaper();
-  const fields = workspaceMeta.use();
+  const fields = useOne(workspaceMeta);
   const { generateWorkspaceFile, estimateWorkspaceSize, save } = useWorkspace();
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();

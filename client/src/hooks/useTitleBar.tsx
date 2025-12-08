@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { slice } from "slices";
 import { getForegroundColor } from "./getForegroundColor";
 import objectHash from "object-hash";
+import { useOne } from "slices/useOne";
 
 interface Electron {
   invoke(name: "title-bar", bg: string, fg: string): void;
@@ -39,12 +40,11 @@ const stackColors = memo(
 
     return `rgb(${r},${g},${b})`; // 139,124,37
   },
-  { normalizer: (args) => objectHash([...args]) }
+  { normalizer: (args) => objectHash([...args]) },
 );
 
 export function useTitleBar(color: string) {
-  "use no memo";
-  const depth = slice.ui.depth.use();
+  const depth = useOne(slice.ui.depth);
   const [current, setCurrent] = useState(color);
   const target = stackColors(color, "rgba(0,0,0,0.5)", depth);
   useEffect(() => {
@@ -59,7 +59,7 @@ export function useTitleBar(color: string) {
           window.electron.invoke(
             "title-bar",
             "#00000000",
-            getForegroundColor(mixed)
+            getForegroundColor(mixed),
           );
         }
         setCurrent(mixed);

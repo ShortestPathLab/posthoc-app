@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { constant, floor, times } from "lodash-es";
 import { slice } from "slices";
+import { useOne } from "slices/useOne";
 
 export type AccentColor = Exclude<keyof typeof colors, "common" | undefined>;
 
@@ -26,7 +27,7 @@ export const getShade = (
   color: AccentColor = "blue",
   mode: "light" | "dark" = "light",
   shadeLight: Shade = "A700",
-  shadeDark: Shade = "A100"
+  shadeDark: Shade = "A100",
 ) => {
   return colors[color][mode === "dark" ? shadeDark : shadeLight];
 };
@@ -121,7 +122,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
   });
 
 export function useAcrylic(color?: string) {
-  const { "appearance/acrylic": acrylic } = slice.settings.use();
+  const { "appearance/acrylic": acrylic } = useOne(slice.settings);
   return (
     acrylic
       ? {

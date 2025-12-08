@@ -6,16 +6,15 @@ import { entries, map, trimStart } from "lodash-es";
 import { useComputeLabels } from "pages/tree/TreeUtility";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
-import { equal } from "slices/selector";
+import { id } from "slices/selector";
 import { UploadedTrace } from "slices/UIState";
 import { BreakpointFieldProps } from "../breakpoints/Breakpoint";
 
 function useData(layer?: string) {
-  "use no memo";
   const one = slice.layers.one<Layer<DebugLayerData>>(layer);
   const trace = one.use<UploadedTrace | undefined>(
     (l) => l?.source?.trace,
-    equal("key")
+    id("key"),
   );
   return useComputeLabels({ key: trace?.key, trace: trace?.content });
 }

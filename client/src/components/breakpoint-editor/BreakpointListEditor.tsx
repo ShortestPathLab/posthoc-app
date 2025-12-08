@@ -15,6 +15,7 @@ import { idle } from "utils/idle";
 import { set } from "utils/set";
 import { Breakpoint, BreakpointEditor } from "./BreakpointEditor";
 import handlersCollection from "./breakpoints";
+import { useOne } from "slices/useOne";
 
 type BreakpointListEditorProps = {
   breakpoints?: Breakpoint[];
@@ -23,9 +24,8 @@ type BreakpointListEditorProps = {
 };
 
 function useBreakpoints(key?: string) {
-  "use no memo";
   const one = slice.layers.one<Layer<DebugLayerData>>(key);
-  const breakpoints = one.use((l) => l?.source?.breakpoints, isEqual);
+  const breakpoints = useOne(one, (l) => l?.source?.breakpoints, isEqual);
   const [optimistic, setOptimistic] = useOptimisticTransaction(
     breakpoints ?? [],
     (f) =>
@@ -35,11 +35,11 @@ function useBreakpoints(key?: string) {
             set(
               l,
               "source.breakpoints",
-              produce(l.source?.breakpoints ?? [], f)
-            )
-          )
-        )
-      )
+              produce(l.source?.breakpoints ?? [], f),
+            ),
+          ),
+        ),
+      ),
   );
   return [optimistic, setOptimistic] as const;
 }

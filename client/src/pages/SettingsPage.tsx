@@ -56,6 +56,7 @@ import { Get, get } from "utils/set";
 import { wait } from "utils/timed";
 import { AboutContent } from "./AboutPage";
 import { PageContentProps } from "./PageMeta";
+import { useOne } from "slices/useOne";
 const formatLabel = (v: number) => `${v}x`;
 
 function Item({
@@ -108,7 +109,6 @@ function Item({
 }
 
 export function SettingsPage({ template: Page }: PageContentProps) {
-  "use no memo";
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
   const sm = useSm();
@@ -123,7 +123,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
     "performance/workerCount": workerCount = 1,
     "experiments/cloudStorage": cloudStorage = false,
     "experiments/visualScripting": visualScripting = false,
-  } = slice.settings.use();
+  } = useOne(slice.settings);
   const [tab, setTab] = useState("general");
   const [ref, { width }] = useMeasure();
   function renderHeading(label: ReactNode) {
@@ -147,12 +147,12 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   useRafLoop(() => {
     if (!(items.current && menu.current)) return;
     const itemLabels = Array.from(
-      items.current.querySelectorAll<HTMLElement>("[data-label]")
+      items.current.querySelectorAll<HTMLElement>("[data-label]"),
     );
     const menuTop = menu.current.getBoundingClientRect().top;
     const firstTop = findLast(
       itemLabels,
-      (l) => l.getBoundingClientRect().top < menuTop + 9
+      (l) => l.getBoundingClientRect().top < menuTop + 9,
     );
     setGeneralTab(firstTop?.dataset.label ?? "Playback");
   });
@@ -216,7 +216,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           value={name}
                           onClick={() => {
                             const el = document.querySelector(
-                              `[data-label="${name}"]`
+                              `[data-label="${name}"]`,
                             );
                             if (el) {
                               el.scrollIntoView({
@@ -521,18 +521,17 @@ type A = (typeof a)[number];
 
 export function useSetting<TPath extends keyof Settings>(
   key: TPath,
-  def: Exclude<Get<Settings, TPath>, undefined | void>
+  def: Exclude<Get<Settings, TPath>, undefined | void>,
 ) {
-  "use no memo";
-  const settings = slice.settings.use();
+  const settings = useOne(slice.settings);
   return useOptimisticTransaction(
     get(settings, key)! ?? def,
     (f: Transaction<Exclude<Get<Settings, TPath>, undefined | void>>) =>
       idle(() =>
         slice.settings.set((prev) => {
           prev[key] = produce(get(prev, key) ?? def, f) as any;
-        })
-      )
+        }),
+      ),
   );
 }
 
@@ -543,7 +542,7 @@ export function TrustedOriginListEditor() {
       map(trustedOrigins, (t) => ({
         key: t,
       })),
-    [trustedOrigins]
+    [trustedOrigins],
   );
   return (
     // <List>

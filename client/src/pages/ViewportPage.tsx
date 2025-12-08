@@ -29,6 +29,7 @@ import { generateUsername as id } from "unique-username-generator";
 import { PageContentProps } from "./PageMeta";
 import { useRendererResolver } from "./useRendererResolver";
 import { _ } from "utils/chain";
+import { useOne } from "slices/useOne";
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 type ViewportPageContext = PanelState & {
@@ -39,7 +40,7 @@ export function autoSelectRenderer(
   renderers: Renderer[],
   //TODO:
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  components: string[]
+  components: string[],
 ) {
   return find(renderers, (r) => {
     const components = keyBy(r.renderer.meta.components);
@@ -48,19 +49,18 @@ export function autoSelectRenderer(
 }
 
 export function ViewportPage({ template: Page }: PageContentProps) {
-  "use no memo";
   const { controls, onChange, state, dragHandle } =
     useViewTreeContext<ViewportPageContext>();
   const [renderers] = useRenderers();
   const paper = usePaper();
   const acrylic = useAcrylic();
-  const layers = slice.layers.use();
+  const layers = useOne(slice.layers);
   const [layerSet, setLayerSet] = useState<Record<string, boolean | undefined>>(
-    {}
+    {},
   );
   const selectedLayers = useMemo(
     () => filter(layers, (l) => layerSet?.[l.key] ?? true),
-    [layerSet, layers, layers?.length]
+    [layerSet, layers, layers?.length],
   );
 
   const [rendererInstance, setRendererInstance] =
@@ -75,8 +75,8 @@ export function ViewportPage({ template: Page }: PageContentProps) {
           selectedLayers,
           (s) => filter(s, "viewKey"),
           (s) => map(s, "key"),
-          (s) => s.includes(b.meta?.sourceLayer ?? "")
-        )
+          (s) => s.includes(b.meta?.sourceLayer ?? ""),
+        ),
       );
     }, 150);
   }, [
@@ -172,7 +172,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
                   id: renderer?.meta?.id,
                   name: renderer?.meta?.name,
                   description: renderer?.meta?.id,
-                })
+                }),
               ),
             ]}
             arrow

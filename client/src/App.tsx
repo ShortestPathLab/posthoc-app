@@ -19,6 +19,7 @@ import { useSyncStatus } from "services/SyncService";
 import { SidebarPlaceholder } from "Sidebar";
 import { slice } from "slices";
 import { SliceProvider as EnvironmentProvider } from "slices/SliceProvider";
+import { useOne } from "slices/useOne";
 import { makeTheme } from "theme";
 
 function App() {
@@ -82,7 +83,7 @@ function ThemedApp() {
   const {
     "appearance/theme": mode = "dark",
     "appearance/accentColor": accent = "teal",
-  } = slice.settings.use();
+  } = useOne(slice.settings);
   const theme = useMemo(() => makeTheme(mode, accent), [mode, accent]);
   return (
     <ThemeProvider theme={theme}>

@@ -35,6 +35,7 @@ import { usePaper } from "theme";
 import { set } from "utils/set";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { idle } from "utils/idle";
+import { useOne } from "slices/useOne";
 
 const compositeOperations = [
   "color",
@@ -74,19 +75,19 @@ export function useDraft<T>(
   initial: T,
   commit?: (value: T) => void,
   ms: number = 300,
-  stayDraft: string[] = []
+  stayDraft: string[] = [],
 ) {
   const [state, setState] = useState(initial);
   useEffect(() => {
     if (initial) {
       requestIdleCallback(() =>
-        setState(merge({}, state, omit(initial, ...stayDraft)))
+        setState(merge({}, state, omit(initial, ...stayDraft))),
       );
     }
   }, [setState, initial]);
   const handleChange = useMemo(
     () => debounce((v: T) => commit?.(v), ms),
-    [commit, ms]
+    [commit, ms],
   );
   return [
     state,
@@ -99,13 +100,12 @@ export function useDraft<T>(
 }
 
 function useLayerProperties(layer?: string) {
-  "use no memo";
-
   const one = slice.layers.one(layer);
 
-  return one.use(
+  return useOne(
+    one,
     (l) => pick(l, "name", "transparency", "displayMode", "source.type"),
-    isEqual
+    isEqual,
   ) as Layer | undefined;
 }
 
@@ -243,7 +243,7 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               items={options(compositeOperations)}
               onChange={(e) =>
                 setOptimistic((d) =>
-                  set(d, "displayMode", e as GlobalCompositeOperation)
+                  set(d, "displayMode", e as GlobalCompositeOperation),
                 )
               }
             />
@@ -258,10 +258,10 @@ function Item({ layer, ...props }: { layer?: string } & StackProps) {
   const paper = usePaper();
   const one = slice.layers.one<Layer>(layer);
 
-  const { icon } = one.use((l) => getController(l)) ?? {};
-  const name = one.use((l) => inferLayerName(l));
-  const error = one.use((l) => getController(l)?.error?.(l));
-  const type = one.use((l) => l?.source?.type);
+  const { icon } = useOne(one, (l) => getController(l)) ?? {};
+  const name = useOne(one, (l) => inferLayerName(l));
+  const error = useOne(one, (l) => getController(l)?.error?.(l));
+  const type = useOne(one, (l) => l?.source?.type);
 
   return (
     <Stack

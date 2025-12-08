@@ -25,6 +25,7 @@ import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { useEffect, useState } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
+import { useOne } from "slices/useOne";
 import { usePaper } from "theme";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
@@ -40,12 +41,11 @@ export type PlaybackLayerData = {
 const FRAME_TIME_MS = 1000 / 60;
 
 function usePlaybackServiceState(layer?: string) {
-  "use no memo";
   const one = slice.layers.one<Layer<PlaybackLayerData>>(layer);
   return {
-    playing: one.use(computed("playing")),
-    step: one.use(computed("step")),
-    end: one.use(computed("end")),
+    playing: useOne(one, computed("playing")),
+    step: useOne(one, computed("step")),
+    end: useOne(one, computed("end")),
   };
 }
 
@@ -53,12 +53,11 @@ export function PlaybackService({
   children,
   value,
 }: EditorSetterProps<Layer<PlaybackLayerData>>) {
-  "use no memo";
   const { playing, step = 0, end = 0 } = usePlaybackServiceState(value?.key);
 
   const { pause, stepWithBreakpointCheck } = usePlaybackControls(value?.key);
 
-  const { "playback/playbackRate": playbackRate = 1 } = slice.settings.use();
+  const { "playback/playbackRate": playbackRate = 1 } = useOne(slice.settings);
 
   useEffect(() => {
     if (playing) {
@@ -93,15 +92,14 @@ export function PlaybackService({
 const centered = { horizontal: "center", vertical: "center" } as const;
 
 function usePlaybackControlsState(layer?: string) {
-  "use no memo";
   const one = slice.layers.one<Layer<PlaybackLayerData>>(layer);
   return {
-    canPause: one.use(computed("canPause")),
-    canPlay: one.use(computed("canPlay")),
-    canStepBackward: one.use(computed("canStepBackward")),
-    canStepForward: one.use(computed("canStepForward")),
-    canStop: one.use(computed("canStop")),
-    playing: one.use(computed("playing")),
+    canPause: useOne(one, computed("canPause")),
+    canPlay: useOne(one, computed("canPlay")),
+    canStepBackward: useOne(one, computed("canStepBackward")),
+    canStepForward: useOne(one, computed("canStepForward")),
+    canStop: useOne(one, computed("canStop")),
+    playing: useOne(one, computed("playing")),
   };
 }
 
@@ -171,10 +169,10 @@ export function Playback({ layer }: { layer?: string }) {
 }
 
 export function useStep(layer?: string) {
-  "use no memo";
-  return slice.layers
-    .one<Layer<PlaybackLayerData>>(layer)
-    .use(computed("step"));
+  return useOne(
+    slice.layers.one<Layer<PlaybackLayerData>>(layer),
+    computed("step"),
+  );
 }
 
 function JumpToStep({ layer }: { layer?: string }) {

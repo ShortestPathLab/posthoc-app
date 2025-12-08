@@ -15,6 +15,7 @@ import { getController } from "layers/layerControllers";
 import { entries, map, merge, reduce, sortBy } from "lodash-es";
 import { ComponentProps, ReactNode, useMemo } from "react";
 import { slice } from "slices";
+import { useOne } from "slices/useOne";
 import { _ } from "utils/chain";
 type Props = {
   selection?: RendererSelectEvent;
@@ -135,11 +136,11 @@ export function SelectionMenu({ selection, onClose }: Props) {
                                     ))}
                                   {!!extras && extras}
                                 </>
-                              )
-                            )
+                              ),
+                            ),
                         )}
                       </>
-                    ))
+                    )),
                 )
               ) : (
                 <>
@@ -163,12 +164,11 @@ const identity = ({ children }: SelectionInfoProviderProps) => (
 );
 
 function useSelectionMenu() {
-  "use no memo";
-  const layers = slice.layers.use((s) =>
+  const layers = useOne(slice.layers, (s) =>
     map(s, (l) => ({
       key: l.key,
       type: l.source?.type,
-    }))
+    })),
   );
   return useMemo(
     () =>
@@ -185,8 +185,8 @@ function useSelectionMenu() {
             </B>
           );
         },
-        identity
+        identity,
       ),
-    [layers]
+    [layers],
   );
 }

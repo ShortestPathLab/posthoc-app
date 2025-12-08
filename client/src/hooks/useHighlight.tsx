@@ -21,7 +21,7 @@ import { TraceEvent } from "protocol";
 export const index = <T extends TraceEvent>(
   a: T[] = [],
   id: "step" | "index" = "step",
-  by: "id" | "pId" = "id"
+  by: "id" | "pId" = "id",
 ) =>
   _(
     a,
@@ -31,7 +31,7 @@ export const index = <T extends TraceEvent>(
         id: c.id,
         pId: c.pId,
       })),
-    (c) => groupBy(c, by)
+    (c) => groupBy(c, by),
   );
 
 export const highlightNodesOptions = [
@@ -73,7 +73,7 @@ export interface Subtree {
 }
 
 export const isHighlightLayer = (
-  layer: Layer
+  layer: Layer,
 ): layer is Layer<HighlightLayerData & TraceLayerData> =>
   // For now, we'll define highlighting layers as any search trace layer.
   // It could be better to decouple this "highlight-able" idea from search traces.
@@ -96,18 +96,18 @@ export function useHighlightNodes(key?: string): {
         set(
           l,
           "source.highlighting",
-          path.length > 1 ? { type: "backtracking", step, path } : {}
-        )
+          path.length > 1 ? { type: "backtracking", step, path } : {},
+        ),
       );
     },
-    [layer?.source?.highlighting, trace]
+    [layer?.source?.highlighting, trace],
   );
 
   const groupedTraceById = index(trace?.events, "index");
 
   const getPrecedentEvents = (
     root: Node,
-    visited = new Set<number | string>()
+    visited = new Set<number | string>(),
   ) => {
     if (visited.has(root.step)) {
       return {};
@@ -128,7 +128,7 @@ export function useHighlightNodes(key?: string): {
           // Use lodash findLastIndex to make TypeScript happy
           const index = findLastIndex(
             trace?.events,
-            (e) => e?.id === event.pId
+            (e) => e?.id === event.pId,
           );
           if (!isUndefined(index) && index >= 0) {
             const pEvent = { ...trace?.events?.[index], step: index } as Node;
@@ -157,19 +157,19 @@ export function useHighlightNodes(key?: string): {
                   step,
                   path,
                 }
-              : {}
-          )
+              : {},
+          ),
         );
       }
     },
-    [layer?.source?.highlighting, trace]
+    [layer?.source?.highlighting, trace],
   );
 
   const groupedTraceBypId = index(trace?.events, "index", "pId");
 
   const getAllSubtreeNodes = (
     root: Node,
-    visited = new Set<number | string>()
+    visited = new Set<number | string>(),
   ): Subtree => {
     if (visited.has(root.id)) {
       return {};
@@ -204,10 +204,10 @@ export function useHighlightNodes(key?: string): {
           type: "subtree",
           step,
           path: keys(path[current.step]).length > 0 ? path : undefined,
-        })
+        }),
       );
     },
-    [layer?.source?.highlighting, trace]
+    [layer?.source?.highlighting, trace],
   );
 
   return {

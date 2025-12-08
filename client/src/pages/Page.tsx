@@ -14,6 +14,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { useMeasure } from "react-use";
 import { slice } from "slices";
 import { Transaction } from "slices/selector";
+import { useOne } from "slices/useOne";
 import { PanelState } from "slices/view";
 import { useAcrylic } from "theme";
 
@@ -26,7 +27,7 @@ export function PageContent({ children, ...props }: BoxProps) {
           {
             sx: { width: "100%", height: "100%", bgcolor: "background.paper" },
           },
-          props
+          props,
         )}
         ref={ref as Ref<HTMLDivElement>}
       >
@@ -77,9 +78,8 @@ export type PageSlots = {
 
 export const Page = withSlots<PageSlots, PageProps>(
   ({ slotProps, onChange, stack }) => {
-    "use no memo";
     const acrylic = useAcrylic();
-    const settings = slice.settings.use();
+    const settings = useOne(slice.settings);
     return (
       <ErrorBoundary
         fallbackRender={(error) => (
@@ -107,7 +107,7 @@ export const Page = withSlots<PageSlots, PageProps>(
                 onChange={(type) => onChange?.((s) => void (s.type = type))}
                 value={stack?.type}
                 items={values(pages).filter((p) =>
-                  p.experiment ? settings[p.experiment] : true
+                  p.experiment ? settings[p.experiment] : true,
                 )}
                 itemOrientation="vertical"
               />
@@ -156,7 +156,7 @@ export const Page = withSlots<PageSlots, PageProps>(
                     onChange={(type) => onChange?.((s) => void (s.type = type))}
                     value={stack?.type}
                     items={values(pages).filter((p) =>
-                      p.experiment ? settings[p.experiment] : true
+                      p.experiment ? settings[p.experiment] : true,
                     )}
                     itemOrientation="vertical"
                   />
@@ -175,5 +175,5 @@ export const Page = withSlots<PageSlots, PageProps>(
         </Block>
       </ErrorBoundary>
     );
-  }
+  },
 );
