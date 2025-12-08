@@ -19,7 +19,7 @@ const server = createServer((req, res) => {
   // extract URL path
   let pathname1 = `./${
     _parse(
-      join(app.isPackaged ? join(app.getAppPath(), "dist") : "dist", req.url)
+      join(app.isPackaged ? join(app.getAppPath(), "dist") : "dist", req.url),
     ).pathname
   }`;
   pathname1 = existsSync(pathname1)
@@ -70,7 +70,7 @@ const a = {
   resizable: true,
   webPreferences: {
     zoomFactor: 0.9,
-    preload: resolve(__dirname, "preload.js"),
+    preload: resolve(__dirname, "preload.mjs"),
   },
 };
 server.listen(0, () => {
@@ -87,7 +87,7 @@ server.listen(0, () => {
     });
     ipcMain.handle("title-bar", (_e, background, foreground) => {
       const win2 = BrowserWindow.getAllWindows().find(
-        (c) => c.webContents.id === _e.sender.id
+        (c) => c.webContents.id === _e.sender.id,
       );
       if (win2 && "setTitleBarOverlay" in win2) {
         win2.setTitleBarOverlay({
