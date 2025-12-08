@@ -64,7 +64,7 @@ import { PanelState } from "slices/view";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { set } from "utils/set";
 import { PageContentProps } from "../PageMeta";
-import AxisOverlay, { createScatterScale } from "./Axis";
+import AxisOverlay, { createLogScatterScale, createScatterScale } from "./Axis";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeLayout } from "./TreeLayoutWorker";
@@ -424,11 +424,12 @@ export function TreePage({ template: Page }: PageContentProps) {
                       {scatterplotMode && (
                         <>
                           <ScatterPlotOverlayToolbar />
-                          <ScatterPlotGraph processedData={processedData} />
+                          <ScatterPlotGraph processedData={processedData} logAxis={logAxis}/>
                           <AxisOverlay
                             processedData={processedData}
                             width={size.width}
                             height={size.height}
+                            logAxis={logAxis}
                           />
                         </>
                       )}
@@ -668,9 +669,10 @@ export type ScatterPlotGraphProps = {
   processedData: ScatterPlotScaleAndData;
   width?: number;
   height?: number;
+  logAxis: { x: boolean; y: boolean };
 };
 
-function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
+function ScatterPlotGraph({ processedData, logAxis }: ScatterPlotGraphProps) {
   const theme = useTheme();
   const loadGraph = useLoadGraph();
 
@@ -681,12 +683,13 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
   useEffect(() => {
     const {xMin, xMax, yMin, yMax} = processedData;
     const graph = new Graph();
-
+    const {x, y} = logAxis;
     const allPoints = processedData.data;
     if (!allPoints.length) return;
-
-    const xScale = createScatterScale(xMin, xMax).range([-1, 1])
-    const yScale = createScatterScale(yMin, yMax).range([-1, 1])
+    const scaleTypeX = x ? createLogScatterScale : createScatterScale
+    const scaleTypeY = y ? createLogScatterScale : createScatterScale
+    const xScale = scaleTypeX(xMin, xMax).range([-1, 1])
+    const yScale = scaleTypeY(yMin, yMax).range([-1, 1])
 
     const points = allPoints;
 
@@ -716,7 +719,10 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
     });
 
     loadGraph(graph);
-  }, [processedData, loadGraph, backgroundHex, foregroundHex]);
+  }, [processedData, loadGraph, backgroundHex, foregroundHex, logAxis]);
+
+
+  return null
 }
 
 function ScatterPlotOverlayToolbar() {

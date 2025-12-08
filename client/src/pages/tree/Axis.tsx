@@ -2,7 +2,7 @@ import { useTheme } from "@mui/material";
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
 import { useCallback, useEffect, useState } from "react";
 import { ScatterPlotScaleAndData } from ".";
-import { scaleLinear } from "d3-scale";
+import { scaleLinear, scaleLog } from "d3-scale";
 
 const MIN_SPAN = 1e-6;
 
@@ -42,71 +42,27 @@ export function createScatterScale(min: number, max: number) {
   return scaleLinear().domain([lo, hi]).nice();
 }
 
-// The tickSpec and ticks are obtained from d3-ticks at https://github.com/d3/d3-array/blob/main/src/ticks.js
-const e10 = Math.sqrt(50),
-  e5 = Math.sqrt(10),
-  e2 = Math.sqrt(2);
 
-function tickSpec(start: number, stop: number, count: number): [number, number, number] {
-  const step = (stop - start) / Math.max(1, count);
-  const power = Math.floor(Math.log10(step));
-  const error = step / Math.pow(10, power);
-  const factor = error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1;
+export function createLogScatterScale(min: number, max: number) {
+  let lo = min;
+  let hi = max;
 
-  let i1: number, i2: number, inc: number;
-
-  if (power < 0) {
-    inc = Math.pow(10, -power) / factor;
-    i1 = Math.round(start * inc);
-    i2 = Math.round(stop * inc);
-    if (i1 / inc < start) ++i1;
-    if (i2 / inc > stop) --i2;
-    inc = -inc;
-  } else {
-    inc = Math.pow(10, power) * factor;
-    i1 = Math.round(start / inc);
-    i2 = Math.round(stop / inc);
-    if (i1 * inc < start) ++i1;
-    if (i2 * inc > stop) --i2;
+  // If domain is invalid for log, fall back to linear.
+  if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi <= 0) {
+    console.warn("[scatter] Log scale invalid domain; using linear:", { lo, hi });
+    return createScatterScale(min, max);
   }
 
-  if (i2 < i1 && 0.5 <= count && count < 2) return tickSpec(start, stop, count * 2);
-  return [i1, i2, inc];
-}
-
-function ticks(start: number, stop: number, count: number): number[] {
-  stop = +stop;
-  start = +start;
-  count = +count;
-
-  if (!(count > 0)) return [];
-  if (start === stop) return [start];
-
-  const reverse = stop < start;
-  const [i1, i2, inc] = reverse
-    ? tickSpec(stop, start, count)
-    : tickSpec(start, stop, count);
-
-  if (!(i2 >= i1)) return [];
-
-  const n = i2 - i1 + 1;
-  const out = new Array<number>(n);
-
-  if (reverse) {
-    if (inc < 0) {
-      for (let i = 0; i < n; ++i) out[i] = (i2 - i) / -inc;
-    } else {
-      for (let i = 0; i < n; ++i) out[i] = (i2 - i) * inc;
-    }
-  } else {
-    if (inc < 0) {
-      for (let i = 0; i < n; ++i) out[i] = (i1 + i) / -inc;
-    } else {
-      for (let i = 0; i < n; ++i) out[i] = (i1 + i) * inc;
-    }
+  // Mixed sign or touches zero → not safe for log
+  if (lo <= 0) {
+    console.warn("[scatter] Log scale lo <= 0; using linear:", { lo, hi });
+    return createScatterScale(min, max);
   }
 
-  return out;
+  return scaleLog()
+    .base(10)
+    .domain([lo, hi])
+    .nice();
 }
 
 const digits = {
@@ -146,7 +102,9 @@ type AxisOverlayProps = {
   width: number;
   height: number;
   processedData: ScatterPlotScaleAndData;
+  logAxis: { x: boolean; y: boolean };
 };
+
 
 type TickLabel = {
   value: number;
@@ -156,12 +114,14 @@ type TickLabel = {
 type ScatterPlotTickGenerationArgs = {
   processedData: ScatterPlotScaleAndData;
   sigma: any;
+  logAxis: { x: boolean; y: boolean };
 };
 
 // Dynamic tick generation based on zoom factor
 function ScatterPlotAxisTickGeneration({
   processedData,
   sigma,
+  logAxis
 }: ScatterPlotTickGenerationArgs): {
   xAxisTickValues: TickLabel[];
   yAxisTickValues: TickLabel[];
@@ -172,11 +132,8 @@ function ScatterPlotAxisTickGeneration({
   const { ratio } = camera.getState();
 
   // Scaling to standardize extreme input ranges
-  const xDataScale = createScatterScale(xMin, xMax);
-  const yDataScale = createScatterScale(yMin, yMax);
-
-  const [xLo, xHi] = xDataScale.domain();
-  const [yLo, yHi] = yDataScale.domain();
+  const xDataScale = logAxis?.x ? createLogScatterScale(xMin, xMax) : createScatterScale(xMin, xMax);
+  const yDataScale = logAxis?.y ? createLogScatterScale(yMin, yMax) : createScatterScale(yMin, yMax);
 
   const zoomFactor = 1 / Math.max(ratio, 1e-10);
   const baseTickCount = 10;
@@ -184,7 +141,7 @@ function ScatterPlotAxisTickGeneration({
   const countX = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
   const countY = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
 
-  
+
   const xValues = xDataScale.ticks(countX);
   const yValues = yDataScale.ticks(countY);
 
@@ -218,7 +175,7 @@ function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, angle: n
 }
 
 
-function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
+function AxisOverlay({ width, height, processedData, logAxis }: AxisOverlayProps) {
   const theme = useTheme();
   const sigma = useSigma();
   const registerEvents = useRegisterEvents();
@@ -228,143 +185,149 @@ function AxisOverlay({ width, height, processedData }: AxisOverlayProps) {
   const xAxisLabel = processedData.xAxis ?? "X axis";
   const yAxisLabel = processedData.yAxis ?? "Y axis";
 
-const drawAxis = useCallback(() => {
-  if (!canvas || !width || !height) return;
+  const drawAxis = useCallback(() => {
+    if (!canvas || !width || !height) return;
 
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-  const dpr = window.devicePixelRatio || 1;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, width, height);
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
 
-  const { xMin, xMax, yMin, yMax } = processedData;
-  if (
-    xMin === undefined ||
-    xMax === undefined ||
-    yMin === undefined ||
-    yMax === undefined
-  ) {
-    return;
-  }
+    const { xMin, xMax, yMin, yMax } = processedData;
+    if (
+      xMin === undefined ||
+      xMax === undefined ||
+      yMin === undefined ||
+      yMax === undefined
+    ) {
+      return;
+    }
 
-  const xDataScale = createScatterScale(xMin, xMax);
-  const yDataScale = createScatterScale(yMin, yMax);
+    const xDataScale = logAxis.x
+  ? createLogScatterScale(xMin, xMax)
+  : createScatterScale(xMin, xMax);
 
-  const [xLo, xHi] = xDataScale.domain();
-  const [yLo, yHi] = yDataScale.domain();
+const yDataScale = logAxis.y
+  ? createLogScatterScale(yMin, yMax)
+  : createScatterScale(yMin, yMax);
 
-  const xGraphScale = xDataScale.copy().range([-1, 1]);
-  const yGraphScale = yDataScale.copy().range([-1, 1]);
+    const [xLo, xHi] = xDataScale.domain();
+    const [yLo, yHi] = yDataScale.domain();
 
-  const xAxisDataY =
-    yLo <= 0 && 0 <= yHi
-      ? 0
-      : yLo;
+    const xGraphScale = xDataScale.copy().range([-1, 1]);
+    const yGraphScale = yDataScale.copy().range([-1, 1]);
 
-  const yAxisDataX =
-    xLo <= 0 && 0 <= xHi
-      ? 0
-      : xLo;
+    const xAxisDataY =
+      yLo <= 0 && 0 <= yHi
+        ? 0
+        : yLo;
 
-  const { xAxisTickValues, yAxisTickValues } = ScatterPlotAxisTickGeneration({
-    processedData,
-    sigma,
-  });
+    const yAxisDataX =
+      xLo <= 0 && 0 <= xHi
+        ? 0
+        : xLo;
 
-  ctx.strokeStyle = theme.palette.text.secondary;
-  ctx.fillStyle = theme.palette.text.primary;
-  ctx.lineWidth = 1;
-  ctx.font = "12px Inter, system-ui, sans-serif";
+    const { xAxisTickValues, yAxisTickValues } = ScatterPlotAxisTickGeneration({
+      processedData,
+      sigma,
+      logAxis
+    });
 
-
-  const { x: xAxisStartX, y: xAxisYRaw } = sigma.graphToViewport({
-    x: xGraphScale(xLo),
-    y: yGraphScale(xAxisDataY),
-  });
-  let xAxisY = xAxisYRaw;
-
-  xAxisY = Math.min(xAxisY, height - 36);
-
-  const { x: xAxisEndX } = sigma.graphToViewport({
-    x: xGraphScale(xHi),
-    y: yGraphScale(xAxisDataY),
-  });
+    ctx.strokeStyle = theme.palette.text.secondary;
+    ctx.fillStyle = theme.palette.text.primary;
+    ctx.lineWidth = 1;
+    ctx.font = "12px Inter, system-ui, sans-serif";
 
 
-  const { x: yAxisXRaw, y: yAxisStartY } = sigma.graphToViewport({
-    x: xGraphScale(yAxisDataX),
-    y: yGraphScale(yLo),
-  });
-  let yAxisX = yAxisXRaw;
-  yAxisX = Math.max(yAxisX, 72);
-
-  const { y: yAxisEndY } = sigma.graphToViewport({
-    x: xGraphScale(yAxisDataX),
-    y: yGraphScale(yHi),
-  });
-
-  ctx.beginPath();
-  ctx.moveTo(xAxisStartX, xAxisY);
-  ctx.lineTo(xAxisEndX, xAxisY);
-  ctx.stroke();
-  drawArrow(ctx, xAxisEndX, xAxisY, 0);
-
-  xAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
-    const { x } = sigma.graphToViewport({
-      x: xGraphScale(value),
+    const { x: xAxisStartX, y: xAxisYRaw } = sigma.graphToViewport({
+      x: xGraphScale(xLo),
       y: yGraphScale(xAxisDataY),
     });
-    const y = xAxisY;
-    if (x < 0 || x > width) return;
+    let xAxisY = xAxisYRaw;
+
+    xAxisY = Math.min(xAxisY, height - 36);
+
+    const { x: xAxisEndX } = sigma.graphToViewport({
+      x: xGraphScale(xHi),
+      y: yGraphScale(xAxisDataY),
+    });
+
+
+    const { x: yAxisXRaw, y: yAxisStartY } = sigma.graphToViewport({
+      x: xGraphScale(yAxisDataX),
+      y: yGraphScale(yLo),
+    });
+    let yAxisX = yAxisXRaw;
+    yAxisX = Math.max(yAxisX, 72);
+
+    const { y: yAxisEndY } = sigma.graphToViewport({
+      x: xGraphScale(yAxisDataX),
+      y: yGraphScale(yHi),
+    });
 
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x, y + 6);
+    ctx.moveTo(xAxisStartX, xAxisY);
+    ctx.lineTo(xAxisEndX, xAxisY);
     ctx.stroke();
+    drawArrow(ctx, xAxisEndX, xAxisY, 0);
+
+    xAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
+      const { x } = sigma.graphToViewport({
+        x: xGraphScale(value),
+        y: yGraphScale(xAxisDataY),
+      });
+      const y = xAxisY;
+      if (x < 0 || x > width) return;
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + 6);
+      ctx.stroke();
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillText(label, x, y + 8);
+    });
 
     ctx.textAlign = "center";
-    ctx.textBaseline = "top";
-    ctx.fillText(label, x, y + 8);
-  });
-
-  ctx.textAlign = "center";
-  ctx.textBaseline = "bottom";
-  ctx.fillText(xAxisLabel, (xAxisStartX + xAxisEndX) / 2, xAxisY + 40);
-
-  ctx.beginPath();
-  ctx.moveTo(yAxisX, yAxisStartY);
-  ctx.lineTo(yAxisX, yAxisEndY);
-  ctx.stroke();
-  drawArrow(ctx, yAxisX, yAxisEndY, -Math.PI / 2);
-
-
-  yAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
-    const { y } = sigma.graphToViewport({
-      x: xGraphScale(yAxisDataX),
-      y: yGraphScale(value),
-    });
-    const x = yAxisX;
-    if (y < 0 || y > height) return;
+    ctx.textBaseline = "bottom";
+    ctx.fillText(xAxisLabel, (xAxisStartX + xAxisEndX) / 2, xAxisY + 40);
 
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x - 6, y);
+    ctx.moveTo(yAxisX, yAxisStartY);
+    ctx.lineTo(yAxisX, yAxisEndY);
     ctx.stroke();
+    drawArrow(ctx, yAxisX, yAxisEndY, -Math.PI / 2);
 
-    ctx.textAlign = "right";
-    ctx.textBaseline = "middle";
-    ctx.fillText(label, x - 8, y);
-  });
 
-  ctx.save();
-  ctx.translate(yAxisX - 24, (yAxisStartY + yAxisEndY) / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "bottom";
-  ctx.fillText(yAxisLabel, 0, -30);
-  ctx.restore();
-}, [canvas, width, height, processedData, sigma, theme, xAxisLabel, yAxisLabel]);
+    yAxisTickValues.slice(0, -1).forEach(({ value, label }) => {
+      const { y } = sigma.graphToViewport({
+        x: xGraphScale(yAxisDataX),
+        y: yGraphScale(value),
+      });
+      const x = yAxisX;
+      if (y < 0 || y > height) return;
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - 6, y);
+      ctx.stroke();
+
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, x - 8, y);
+    });
+
+    ctx.save();
+    ctx.translate(yAxisX - 24, (yAxisStartY + yAxisEndY) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(yAxisLabel, 0, -30);
+    ctx.restore();
+  }, [canvas, width, height, processedData, sigma, theme, xAxisLabel, yAxisLabel, logAxis.x, logAxis.y]);
 
 
   useEffect(() => {
