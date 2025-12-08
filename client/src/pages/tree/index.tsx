@@ -9,6 +9,7 @@ import {
 } from "@mui-symbols-material/w400";
 import {
   Box,
+  Checkbox,
   Divider,
   ListItem,
   ListItemIcon,
@@ -63,7 +64,7 @@ import { PanelState } from "slices/view";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { set } from "utils/set";
 import { PageContentProps } from "../PageMeta";
-import AxisOverlay from "./Axis";
+import AxisOverlay, { createScatterScale } from "./Axis";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeLayout } from "./TreeLayoutWorker";
@@ -528,9 +529,8 @@ export function TreePage({ template: Page }: PageContentProps) {
 
           {divider}
 
-          <Box sx={{ mt: 2 }}>
-            <Stack direction="row" spacing={2} mb={1.5}>
-              <Stack direction="row" spacing={1} alignItems="center" mb={1} sx={{}}>
+          <Box sx={{ mt: 0 }}>
+            <Stack direction="row" spacing={2} >
               <Typography variant="overline" color="text.secondary">
                 Scatterplot
               </Typography>
@@ -543,8 +543,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                   (select X and Y)
                 </Typography>
               )}
-            </Stack>
-              <FeaturePicker
+                          <FeaturePicker
                 label={
                   formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"
                 }
@@ -565,10 +564,6 @@ export function TreePage({ template: Page }: PageContentProps) {
                 arrow
                 itemOrientation="horizontal"
               />
-            </Stack>
-
-
-            {/* <Stack direction="row" spacing={1} alignItems="center">
               <Checkbox
                 size="small"
                 checked={logAxis.x}
@@ -578,9 +573,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 sx={CLEAN_CHECKBOX_SX}
               />
               <Typography variant="body2">Log X</Typography>
-            </Stack>
 
-            <Stack direction="row" spacing={1} alignItems="center">
               <Checkbox
                 size="small"
                 checked={logAxis.y}
@@ -590,7 +583,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 sx={CLEAN_CHECKBOX_SX}
               />
               <Typography variant="body2">Log Y</Typography>
-            </Stack> */}
+            </Stack>
           </Box>
 
         </>
@@ -684,11 +677,16 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
   const backgroundHex = theme.palette.background.paper;
   const foregroundHex = theme.palette.text.primary;
 
+
   useEffect(() => {
+    const {xMin, xMax, yMin, yMax} = processedData;
     const graph = new Graph();
 
     const allPoints = processedData.data;
     if (!allPoints.length) return;
+
+    const xScale = createScatterScale(xMin, xMax).range([-1, 1])
+    const yScale = createScatterScale(yMin, yMax).range([-1, 1])
 
     const points = allPoints;
 
@@ -705,8 +703,8 @@ function ScatterPlotGraph({ processedData }: ScatterPlotGraphProps) {
         );
 
         graph.addNode(id, {
-          x: p.x,
-          y: p.y,
+          x: xScale(p.x),
+          y: yScale(p.y),
           size: 3,
           label: p.point.label,
           color,
