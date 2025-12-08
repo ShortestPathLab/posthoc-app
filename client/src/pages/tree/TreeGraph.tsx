@@ -46,7 +46,7 @@ export function setAttributes(
   graph: MultiDirectedGraph,
   id: string,
   type: "edge" | "node",
-  values: { [K in string]: string | number },
+  values: { [K in string]: string | number | boolean },
 ) {
   const a = {
     node: "setNodeAttribute" as const,
@@ -120,15 +120,8 @@ function useHighlighting(key?: string) {
 }
 
 export function TreeGraph(props: TreeGraphProps) {
-  const {
-    trace,
-    tree,
-    layer: key,
-    onExit,
-    trackedProperty,
-    width,
-    height,
-  } = props;
+  const { trace, tree, layer: key, onExit, width, height } = props;
+  console.log(props.step);
 
   const paper = usePaper();
   const acrylic = useAcrylic();

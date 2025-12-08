@@ -63,10 +63,7 @@ export function BreakpointService({ value }: { value?: string }) {
 
   const usingLoadingState = useLoadingState("general");
 
-  const trace = one.use<UploadedTrace | undefined>(
-    (l) => l?.source?.trace,
-    id("key"),
-  );
+  const trace = useOne(one, (l) => l?.source?.trace, id("key"));
 
   const inputs = useOne(one, (l) => l?.source?.breakpoints, isEqual);
 

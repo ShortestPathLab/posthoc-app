@@ -58,10 +58,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
   const playing = useOne(one, computed("playing"));
 
   const { steps: rawSteps } =
-    one.use<Steps | undefined>(
-      (c) => getController(c)?.steps?.(c),
-      id("key"),
-    ) ?? {};
+    useOne(one, (c) => getController(c)?.steps?.(c), id("key")) ?? {};
 
   // TODO: low performance `isEqual`
   const highlighting = useOne(one, (c) => c?.source?.highlighting, isEqual);

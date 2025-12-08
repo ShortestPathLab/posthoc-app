@@ -247,10 +247,7 @@ function TreeMenu({
 
 function useTreePageState(key?: string) {
   const one = slice.layers.one<TreeLayer>(key);
-  const trace = one.use<UploadedTrace | undefined>(
-    (l) => l?.source?.trace,
-    id("key"),
-  );
+  const trace = useOne(one, (l) => l?.source?.trace, id("key"));
   const step = useOne(one, (l) => l?.source?.step);
   return { step, trace };
 }

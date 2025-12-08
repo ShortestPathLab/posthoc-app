@@ -13,6 +13,7 @@ import {
   forOwn,
   get,
   isEmpty,
+  isNumber,
   map,
   max,
   min,
@@ -31,12 +32,16 @@ import {
   SEVEN_CLASS_GNBU,
   TreeGraphProps,
 } from "./TreeGraph";
+import { assert } from "utils/assert";
 
 export function useGraphColoring(
   graph: MultiDirectedGraph,
   { showAllEdges, trackedProperty, trace, step = 0 }: TreeGraphProps,
-  highlightEdges?: Highlighting
+  highlightEdges?: Highlighting,
 ) {
+  "use no memo";
+  // This hook modifies `graph`, which is against the rules of React.
+  // TODO: fix this in the future.
   const theme = useTheme();
 
   const gradient = interpolate([
@@ -73,7 +78,7 @@ export function useGraphColoring(
       ({ id, type, pId }, i) => {
         const color = getColorHex(type);
         const finalColor = r(color)(
-          isHighlightEdges ? 0.1 : max([1 - (step - i) / pastSteps, 0.3])!
+          isHighlightEdges ? 0.1 : max([1 - (step - i) / pastSteps, 0.3])!,
         );
         if (graph.hasNode(`${id}`) && !isSetNode[id]) {
           setAttributes(graph, `${id}`, "node", {
@@ -98,7 +103,7 @@ export function useGraphColoring(
           }
           if (!showAllEdges) isSetNode[id] = true;
         }
-      }
+      },
     );
 
     /**
@@ -109,14 +114,16 @@ export function useGraphColoring(
 
     // Force show a label for the current highlighted node
     if (highlightEdges && isHighlightEdges) {
-      const current = trace?.events?.[highlightEdges?.step];
-      graph.setNodeAttribute(current?.id, "forceLabel", "true");
+      assert(isNumber(highlightEdges?.step), "No step");
+      const current = trace?.events?.[highlightEdges.step];
+      assert(current, "No current event");
+      graph.setNodeAttribute(current.id, "forceLabel", "true");
       graph.setNodeAttribute(
         current?.id,
         "label",
-        `${graph.getNodeAttribute(current?.id, "label")} (${startCase(
-          highlightEdges.type
-        )})`
+        `${graph.getNodeAttribute(current.id, "label")} (${startCase(
+          highlightEdges.type,
+        )})`,
       );
     }
 
@@ -132,7 +139,7 @@ export function useGraphColoring(
       forEachRight(highlightEdges.path, (step) => {
         const node = trace?.events?.[step].id;
         const c = highlightNodesOptions.find(
-          (t) => t.type === highlightEdges.type
+          (t) => t.type === highlightEdges.type,
         );
         if (graph.hasNode(`${node}`)) {
           graph.setNodeAttribute(`${node}`, "color", getThemeColor(c?.color));
@@ -155,7 +162,7 @@ export function useGraphColoring(
       !Array.isArray(highlightEdges?.path)
     ) {
       const c = highlightNodesOptions.find(
-        (t) => t.type === highlightEdges.type
+        (t) => t.type === highlightEdges.type,
       );
 
       const isSubtree = highlightEdges?.type === "subtree";
@@ -167,7 +174,7 @@ export function useGraphColoring(
             graph.setNodeAttribute(
               `${pNode}`,
               "color",
-              getThemeColor(c?.color)
+              getThemeColor(c?.color),
             );
           }
           forOwn(childs, (v, child) => {
@@ -176,7 +183,7 @@ export function useGraphColoring(
               graph.setNodeAttribute(
                 `${cNode}`,
                 "color",
-                getThemeColor(c?.color)
+                getThemeColor(c?.color),
               );
               const edge = isSubtree
                 ? makeEdgeKey(`${cNode}`, `${pNode}`)

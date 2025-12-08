@@ -9,13 +9,11 @@ import { Layer } from "slices/layers";
 import { id } from "slices/selector";
 import { UploadedTrace } from "slices/UIState";
 import { BreakpointFieldProps } from "../breakpoints/Breakpoint";
+import { useOne } from "slices/useOne";
 
 function useData(layer?: string) {
   const one = slice.layers.one<Layer<DebugLayerData>>(layer);
-  const trace = one.use<UploadedTrace | undefined>(
-    (l) => l?.source?.trace,
-    id("key"),
-  );
+  const trace = useOne(one, (l) => l?.source?.trace, id("key"));
   return useComputeLabels({ key: trace?.key, trace: trace?.content });
 }
 
