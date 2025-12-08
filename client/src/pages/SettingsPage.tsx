@@ -331,9 +331,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       defaultChecked={!!showOnStart}
                       onChange={(_, v) =>
                         slice.settings.set((f) => {
-                          f["behaviour/showOnStart"] = v
-                            ? "explore"
-                            : undefined;
+                          f["behaviour/showOnStart"] = v ? "explore" : false;
                         })
                       }
                     />

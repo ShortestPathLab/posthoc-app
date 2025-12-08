@@ -30,7 +30,7 @@ export type Settings = {
   "appearance/acrylic"?: boolean;
   "appearance/theme"?: "dark" | "light";
   "appearance/accentColor"?: AccentColor;
-  "behaviour/showOnStart"?: keyof typeof pages;
+  "behaviour/showOnStart"?: keyof typeof pages | false;
   "performance/workerCount"?: number;
   "experiments/cloudStorage"?: boolean;
   "experiments/visualScripting"?: boolean;
@@ -71,7 +71,7 @@ export const defaultPlaybackRate = 1;
 // };
 
 export const defaultCloudStorage = keys(
-  cloudStorageProviders
+  cloudStorageProviders,
 )[0] as keyof typeof cloudStorageProviders;
 
 export const defaults = {

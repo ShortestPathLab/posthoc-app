@@ -355,7 +355,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
 
   function onShowOnStartUpCheckedChange(v: boolean) {
     slice.settings.set((f) => {
-      f["behaviour/showOnStart"] = v ? "explore" : undefined;
+      f["behaviour/showOnStart"] = v ? "explore" : false;
     });
   }
 
