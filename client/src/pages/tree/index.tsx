@@ -437,6 +437,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                             processedData={processedData}
                             logAxis={logAxis}
                             eventTypeFilter={eventTypeFilter}
+                            step={throttled}
                           />
                           <AxisOverlay
                             processedData={processedData}
@@ -703,12 +704,14 @@ export type ScatterPlotGraphProps = {
   height?: number;
   logAxis: { x: boolean; y: boolean };
   eventTypeFilter?: string;
+  step?: number;
 };
 
 function ScatterPlotGraph({
   processedData,
   logAxis,
   eventTypeFilter,
+  step
 }: ScatterPlotGraphProps) {
   const theme = useTheme();
   const loadGraph = useLoadGraph();
@@ -716,21 +719,19 @@ function ScatterPlotGraph({
   const backgroundHex = theme.palette.background.paper;
   const foregroundHex = theme.palette.text.primary;
 
-  useEffect(() => {
+ useEffect(() => {
     const { xMin, xMax, yMin, yMax } = processedData;
     const graph = new Graph();
     const { x, y } = logAxis;
 
     const allPoints = processedData.data;
 
-    // 👇 filter by event type if one is selected
     const points =
       eventTypeFilter && eventTypeFilter.length
         ? allPoints.filter((p) => p.point.eventType === eventTypeFilter)
         : allPoints;
 
     if (!points.length) {
-      // nothing to show – clear graph
       loadGraph(graph);
       return;
     }
@@ -741,8 +742,9 @@ function ScatterPlotGraph({
     const yScale = scaleTypeY(yMin, yMax).range([-1, 1]);
 
     points.forEach((p) => {
-      const id = p.point.id; // unique
+      const id = p.point.id;
       const logicalId = p.point.logicalId;
+
 
       if (!graph.hasNode(id)) {
         const color = getGraphColorHex(
@@ -755,7 +757,7 @@ function ScatterPlotGraph({
         graph.addNode(id, {
           x: xScale(p.x),
           y: yScale(p.y),
-          size: 3,
+          size: p.point.step === step ? 12 : 3,
           label: p.point.label,
           color,
           logicalId,
@@ -766,7 +768,15 @@ function ScatterPlotGraph({
     });
 
     loadGraph(graph);
-  }, [processedData, loadGraph, backgroundHex, foregroundHex, logAxis, eventTypeFilter]);
+  }, [
+    processedData,
+    loadGraph,
+    backgroundHex,
+    foregroundHex,
+    logAxis,
+    eventTypeFilter,
+    step,                        
+  ]);
 
   return null;
 }
