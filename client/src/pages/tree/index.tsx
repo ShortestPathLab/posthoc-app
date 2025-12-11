@@ -544,8 +544,8 @@ export function TreePage({ template: Page }: PageContentProps) {
 
           {divider}
 
-          <Box sx={{ mt: 0 }}>
-            <Stack direction="row" spacing={2} >
+          
+            <Stack direction="row" spacing={2} alignItems="center">
               <Typography variant="overline" color="text.secondary">
                 Scatterplot
               </Typography>
@@ -554,7 +554,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                   (active)
                 </Typography>
               ) : (
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" >
                   (select X and Y)
                 </Typography>
               )}
@@ -618,7 +618,7 @@ export function TreePage({ template: Page }: PageContentProps) {
               />
               <Typography variant="body2">Log Y</Typography>
             </Stack>
-          </Box>
+       
 
         </>
       </Page.Options>
