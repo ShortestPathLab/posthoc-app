@@ -64,7 +64,7 @@ import { PanelState } from "slices/view";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { set } from "utils/set";
 import { PageContentProps } from "../PageMeta";
-import AxisOverlay, { createLogScatterScale, createScatterScale } from "./Axis";
+import AxisOverlay, { createSymlogScatterScale, createScatterScale } from "./Axis";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeLayout } from "./TreeLayoutWorker";
@@ -855,8 +855,8 @@ function ScatterPlotGraph({
       return;
     }
 
-    const scaleTypeX = x ? createLogScatterScale : createScatterScale;
-    const scaleTypeY = y ? createLogScatterScale : createScatterScale;
+    const scaleTypeX = x ? createSymlogScatterScale : createScatterScale;
+    const scaleTypeY = y ? createSymlogScatterScale : createScatterScale;
     const xScale = scaleTypeX(xMin, xMax).range([-1, 1]);
     const yScale = scaleTypeY(yMin, yMax).range([-1, 1]);
 

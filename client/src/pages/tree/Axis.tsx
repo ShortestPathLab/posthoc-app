@@ -1,8 +1,8 @@
 import { useTheme } from "@mui/material";
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
-import { useCallback, useEffect, useState } from "react";
+import { scaleLinear, scaleSymlog } from "d3-scale";
+import { useEffect, useState } from "react";
 import { ScatterPlotScaleAndData } from ".";
-import { scaleLinear, scaleLog } from "d3-scale";
 
 const MIN_SPAN = 1e-6;
 
@@ -43,24 +43,23 @@ export function createScatterScale(min: number, max: number) {
 }
 
 
-export function createLogScatterScale(min: number, max: number) {
+
+export function createSymlogScatterScale(
+  min: number,
+  max: number,
+  constant = 1 // controls linear region around 0
+) {
   let lo = min;
   let hi = max;
 
-  // If domain is invalid for log, fall back to linear.
-  if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi <= 0) {
-    console.warn("[scatter] Log scale invalid domain; using linear:", { lo, hi });
+  // Invalid domain → fall back to linear
+  if (!Number.isFinite(lo) || !Number.isFinite(hi) || lo === hi) {
+    console.warn("[scatter] Symlog scale invalid domain; using linear:", { lo, hi });
     return createScatterScale(min, max);
   }
 
-  // Mixed sign or touches zero → not safe for log
-  if (lo <= 0) {
-    console.warn("[scatter] Log scale lo <= 0; using linear:", { lo, hi });
-    return createScatterScale(min, max);
-  }
-
-  return scaleLog()
-    .base(10)
+  return scaleSymlog()
+    .constant(constant) 
     .domain([lo, hi])
     .nice();
 }
@@ -132,8 +131,8 @@ function ScatterPlotAxisTickGeneration({
   const { ratio } = camera.getState();
 
   // Scaling to standardize extreme input ranges
-  const xDataScale = logAxis?.x ? createLogScatterScale(xMin, xMax) : createScatterScale(xMin, xMax);
-  const yDataScale = logAxis?.y ? createLogScatterScale(yMin, yMax) : createScatterScale(yMin, yMax);
+  const xDataScale = logAxis?.x ? createSymlogScatterScale(xMin, xMax) : createScatterScale(xMin, xMax);
+  const yDataScale = logAxis?.y ? createSymlogScatterScale(yMin, yMax) : createScatterScale(yMin, yMax);
 
   const zoomFactor = 1 / Math.max(ratio, 1e-10);
   const baseTickCount = 10;
@@ -207,11 +206,11 @@ function AxisOverlay({ width, height, processedData, logAxis }: AxisOverlayProps
       }
 
       const xDataScale = logAxis.x
-        ? createLogScatterScale(xMin, xMax)
+        ? createSymlogScatterScale(xMin, xMax)
         : createScatterScale(xMin, xMax);
 
       const yDataScale = logAxis.y
-        ? createLogScatterScale(yMin, yMax)
+        ? createSymlogScatterScale(yMin, yMax)
         : createScatterScale(yMin, yMax);
 
       const [xLo, xHi] = xDataScale.domain();
