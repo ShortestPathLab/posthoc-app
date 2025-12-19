@@ -725,7 +725,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 }
                 sx={CLEAN_CHECKBOX_SX}
               />
-              <Typography variant="body2">Log X</Typography>
+              <Typography variant="body2">Log X (Symlog)</Typography>
 
               <Checkbox
                 size="small"
@@ -735,7 +735,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                 }
                 sx={CLEAN_CHECKBOX_SX}
               />
-              <Typography variant="body2">Log Y</Typography>
+              <Typography variant="body2">Log Y (Symlog)</Typography>
             </Stack>
        
 
