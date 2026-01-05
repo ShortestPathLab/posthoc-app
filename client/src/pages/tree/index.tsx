@@ -53,7 +53,7 @@ import { getController } from "layers/layerControllers";
 import { TraceLayerData } from "layers/trace/TraceLayer";
 import { entries, findLast, isEmpty, map, startCase } from "lodash-es";
 import { Size } from "protocol";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
@@ -421,12 +421,15 @@ export function TreePage({ template: Page }: PageContentProps) {
   const { trace, step } = useTreePageState(key);
   console.log("TRACE DATA:", trace);
 
-  const processedData =
+const processedData = useMemo(
+  () =>
     buildScatterPlotData(
       trace?.content,
       formInput.xMetric,
-      formInput.yMetric,
-    );
+      formInput.yMetric
+    ),
+  [trace?.content, formInput.xMetric, formInput.yMetric]
+);
 
   console.log(processedData, "data for scatterplot");
 
@@ -833,72 +836,146 @@ function ScatterPlotGraph({
   step
 }: ScatterPlotGraphProps) {
   const theme = useTheme();
+  const sigma = useSigma();               
   const loadGraph = useLoadGraph();
 
   const backgroundHex = theme.palette.background.paper;
   const foregroundHex = theme.palette.text.primary;
 
- useEffect(() => {
-    const { xMin, xMax, yMin, yMax } = processedData;
-    const graph = new Graph();
-    const { x, y } = logAxis;
+  const stepBucketsRef = useRef<string[][]>([]);
+  const prevStepRef = useRef<number | null>(null);
+  const baseColorByIdRef = useRef<Record<string, string>>({});
 
-    const allPoints = processedData.data;
+  // Inital Graph load
+  useEffect(() => {
+    const graph = new MultiDirectedGraph();  
 
-    const points =
-      eventTypeFilter && eventTypeFilter.length
-        ? allPoints.filter((p) => p.point.eventType === eventTypeFilter)
-        : allPoints;
+    stepBucketsRef.current = [];
+    baseColorByIdRef.current = {};
+    prevStepRef.current = null;
 
-    if (!points.length) {
-      loadGraph(graph);
-      return;
-    }
+    const neutralColor = getGraphColorHex(
+      "neutral",
+      0,
+      backgroundHex,
+      foregroundHex
+    );
 
-    const scaleTypeX = x ? createSymlogScatterScale : createScatterScale;
-    const scaleTypeY = y ? createSymlogScatterScale : createScatterScale;
-    const xScale = scaleTypeX(xMin, xMax).range([-1, 1]);
-    const yScale = scaleTypeY(yMin, yMax).range([-1, 1]);
+    const points = eventTypeFilter
+      ? processedData.data.filter(
+          (p) => p.point.eventType === eventTypeFilter
+        )
+      : processedData.data;
 
-    points.forEach((p) => {
+    const xScale = (
+      logAxis.x ? createSymlogScatterScale : createScatterScale
+    )(processedData.xMin, processedData.xMax).range([-1, 1]);
+
+    const yScale = (
+      logAxis.y ? createSymlogScatterScale : createScatterScale
+    )(processedData.yMin, processedData.yMax).range([-1, 1]);
+
+    for (const p of points) {
       const id = p.point.id;
-      const logicalId = p.point.logicalId;
+      const s = p.point.step;
 
+      const baseColor = getGraphColorHex(
+        p.point.eventType,
+        1,
+        backgroundHex,
+        foregroundHex
+      );
 
-      if (!graph.hasNode(id)) {
-        const color = getGraphColorHex(
-          p.point.eventType,
-          1,
-          backgroundHex,
-          foregroundHex
-        );
+      baseColorByIdRef.current[id] = baseColor;
+      (stepBucketsRef.current[s] ??= []).push(id);
 
-        graph.addNode(id, {
-          x: xScale(p.x),
-          y: yScale(p.y),
-          size: p.point.step === step ? 12 : 3,
-          label: p.point.label,
-          color,
-          logicalId,
-          step: p.point.step,
-          eventType: p.point.eventType,
-        });
-      }
-    });
+      graph.addNode(id, {
+        x: xScale(p.x),
+        y: yScale(p.y),
+        size: 3,
+        label: p.point.label,
+        color: neutralColor,     // start gray
+        logicalId: p.point.logicalId,
+        step: s,
+        eventType: p.point.eventType,
+      });
+    }
 
     loadGraph(graph);
   }, [
-    processedData,
     loadGraph,
-    backgroundHex,
-    foregroundHex,
+    processedData,
     logAxis,
     eventTypeFilter,
-    step,                        
+    backgroundHex,
+    foregroundHex,
   ]);
+
+  // Graph load with each color update
+  useEffect(() => {
+    const graph = sigma.getGraph();
+    if (!graph) return;
+
+    const buckets = stepBucketsRef.current;
+    const baseColorById = baseColorByIdRef.current;
+
+    const neutralColor = getGraphColorHex(
+      "neutral",
+      0,
+      backgroundHex,
+      foregroundHex
+    );
+
+    const next = step ?? 0;
+    const prev = prevStepRef.current;
+
+    // First run → replay 0..step once
+    if (prev == null) {
+      for (let s = 0; s <= next; s++) {
+        const ids = buckets[s];
+        if (!ids) continue;
+        for (const id of ids) {
+          graph.setNodeAttribute(id, "color", baseColorById[id]);
+        }
+      }
+    } else if (next > prev) {
+      // forward
+      for (let s = prev + 1; s <= next; s++) {
+        const ids = buckets[s];
+        if (!ids) continue;
+        for (const id of ids) {
+          graph.setNodeAttribute(id, "color", baseColorById[id]);
+        }
+      }
+    } else if (next < prev) {
+      // backward
+      for (let s = next + 1; s <= prev; s++) {
+        const ids = buckets[s];
+        if (!ids) continue;
+        for (const id of ids) {
+          graph.setNodeAttribute(id, "color", neutralColor);
+        }
+      }
+    }
+    
+    if (prev != null && buckets[prev]) {
+      for (const id of buckets[prev]) {
+        graph.setNodeAttribute(id, "size", 3);
+      }
+    }
+    if (buckets[next]) {
+      for (const id of buckets[next]) {
+        graph.setNodeAttribute(id, "size", 12);
+      }
+    }
+
+    prevStepRef.current = next;
+    sigma.refresh();
+  }, [sigma, step, backgroundHex, foregroundHex]);
 
   return null;
 }
+
 
 
 function ScatterPlotOverlayToolbar() {
