@@ -462,6 +462,14 @@ export function TreePage({ template: Page }: PageContentProps) {
         }));
       };
 
+  const [groupByAttribute, setGroupByAttribute] = useState<string>("");
+
+  const handleGroupByChange = (newValue: string) => {
+    setGroupByAttribute(newValue);
+
+    console.log("Selected grouping attribute:", newValue);
+
+  };
   // ─── Playback ────────────────────────────────────────────────────────
 
   const throttled = useThrottle(step ?? 0, 1000 / 24);
@@ -711,6 +719,21 @@ export function TreePage({ template: Page }: PageContentProps) {
             />
             {scatterplotMode && (
               <>
+                <FeaturePicker
+                  label={groupByAttribute ? `Group by: ${startCase(groupByAttribute)}` : "Group by"}
+                  value={groupByAttribute}
+                  items={[
+                    { id: "", name: "No Grouping", description: "Show all nodes individually" },
+                    { id: "type", name: "Type", description: "Group by node type/status" },
+                    { id: "g", name: "g-value", description: "Group by cost from start (ranges)" },
+                    { id: "h", name: "h-value", description: "Group by heuristic to goal (ranges)" },
+                    { id: "f", name: "f-value", description: "Group by total cost f=g+h (ranges)" },
+                    { id: "step", name: "Step", description: "Group by exploration step (ranges)" },
+                  ]}
+                  onChange={handleGroupByChange}
+                  arrow
+                  itemOrientation="horizontal"
+                />
                 <FeaturePicker
                   label={
                     eventTypeFilter
