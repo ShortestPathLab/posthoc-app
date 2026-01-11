@@ -418,7 +418,6 @@ export function TreePage({ template: Page }: PageContentProps) {
   const { key, setKey } = useLayerPicker(isTreeLayer);
   const one = slice.layers.one<TreeLayer>(key);
   const { trace, step } = useTreePageState(key);
-  console.log("TRACE DATA:", trace);
 
   const processedData = useMemo(
     () =>
@@ -429,8 +428,6 @@ export function TreePage({ template: Page }: PageContentProps) {
       ),
     [trace?.content, formInput.xMetric, formInput.yMetric]
   );
-
-  console.log(processedData, "data for scatterplot");
 
   const eventTypes = Array.from(
     new Set(processedData.data.map((p) => p.point.eventType))
@@ -445,8 +442,6 @@ export function TreePage({ template: Page }: PageContentProps) {
       (value: any) => {
         const raw = String(value ?? "");
         const sanitized = raw ? sanitizeMetricKey(raw) : "";
-
-        console.log("Changing axis:", axis, "raw:", raw, "sanitized:", sanitized);
 
         if (!sanitized) {
           setFormInput({
@@ -466,9 +461,6 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const handleGroupByChange = (newValue: string) => {
     setGroupByAttribute(newValue);
-
-    console.log("Selected grouping attribute:", newValue);
-
   };
   // ─── Playback ────────────────────────────────────────────────────────
 
@@ -486,7 +478,6 @@ export function TreePage({ template: Page }: PageContentProps) {
     trace?.key,
     trace?.content
   );
-  console.log(throttled, "throttled")
   // const [axisTracking, setAxisTracking] = useState<typeof properties | "">("");
 
   const { point, selected, selection, setSelection } = useSelection(
@@ -789,8 +780,6 @@ const buildScatterPlotData = (
   yMetricName: string,
 ): ScatterPlotScaleAndData => {
   const scatterPlotData: ScatterPlotOutput[] = [];
-  console.log("xMetricName:", xMetricName, "yMetricName:", yMetricName);
-  console.log("traceData:", traceData);
   if (!traceData || !traceData.events) {
     return {
       data: [],
@@ -804,9 +793,7 @@ const buildScatterPlotData = (
   let xMax = -Infinity;
   let yMin = Infinity;
   let yMax = -Infinity;
-  console.log("Processing trace data for scatterplot...", traceData);
   traceData.events.forEach((event, step) => {
-    console.log("step", step)
     const metrics: MetricsBag = {};
     for (const key in event) {
       const num = Number(event[key]);
