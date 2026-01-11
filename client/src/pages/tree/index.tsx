@@ -709,44 +709,47 @@ export function TreePage({ template: Page }: PageContentProps) {
               arrow
               itemOrientation="horizontal"
             />
+            {scatterplotMode && (
+              <>
+                <FeaturePicker
+                  label={
+                    eventTypeFilter
+                      ? `Event: ${startCase(eventTypeFilter)}`
+                      : "Event type"
+                  }
+                  value={eventTypeFilter}
+                  items={[
+                    { id: "", name: "All event types" },
+                    ...eventTypes.map((t) => ({
+                      id: t,
+                      name: startCase(t),
+                    })),
+                  ]}
+                  onChange={handleEventTypeChange}
+                  arrow
+                  itemOrientation="horizontal"
+                />
+                <Checkbox
+                  size="small"
+                  checked={logAxis.x}
+                  onChange={(e) =>
+                    setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
+                  }
+                  sx={CLEAN_CHECKBOX_SX}
+                />
+                <Typography variant="body2">Log X (Symlog)</Typography>
 
-            <FeaturePicker
-              label={
-                eventTypeFilter
-                  ? `Event: ${startCase(eventTypeFilter)}`
-                  : "Event type"
-              }
-              value={eventTypeFilter}
-              items={[
-                { id: "", name: "All event types" },
-                ...eventTypes.map((t) => ({
-                  id: t,
-                  name: startCase(t),
-                })),
-              ]}
-              onChange={handleEventTypeChange}
-              arrow
-              itemOrientation="horizontal"
-            />
-            <Checkbox
-              size="small"
-              checked={logAxis.x}
-              onChange={(e) =>
-                setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
-              }
-              sx={CLEAN_CHECKBOX_SX}
-            />
-            <Typography variant="body2">Log X (Symlog)</Typography>
-
-            <Checkbox
-              size="small"
-              checked={logAxis.y}
-              onChange={(e) =>
-                setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
-              }
-              sx={CLEAN_CHECKBOX_SX}
-            />
-            <Typography variant="body2">Log Y (Symlog)</Typography>
+                <Checkbox
+                  size="small"
+                  checked={logAxis.y}
+                  onChange={(e) =>
+                    setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
+                  }
+                  sx={CLEAN_CHECKBOX_SX}
+                />
+                <Typography variant="body2">Log Y (Symlog)</Typography>
+              </>
+            )}
           </Stack>
 
 
