@@ -36,12 +36,11 @@ import { Spinner } from "components/generic/Spinner";
 import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { Placeholder } from "components/inspector/Placeholder";
 import {
-  PropertyDialog,
-  PropertyList
+  PropertyDialog
 } from "components/inspector/PropertyList";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
-import { Graph, MultiDirectedGraph } from "graphology";
+import { MultiDirectedGraph } from "graphology";
 import {
   HighlightLayerData,
   highlightNodesOptions,
@@ -64,12 +63,12 @@ import { PanelState } from "slices/view";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { set } from "utils/set";
 import { PageContentProps } from "../PageMeta";
-import AxisOverlay, { createSymlogScatterScale, createScatterScale } from "./Axis";
+import AxisOverlay, { createScatterScale, createSymlogScatterScale } from "./Axis";
 import { GraphEvents } from "./GraphEvents";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
 import { useTreeLayout } from "./TreeLayoutWorker";
 import { getGraphColorHex } from "./useGraphColoring";
-import { useGraphSettings } from "./useGraphSettings";
+import { useGraphSettings, useNodeCulling } from "./useGraphSettings";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
 
@@ -295,7 +294,7 @@ function TreeMenu({
                     </Box>
                   )}
 
-                  
+
                   <ListItem sx={{ py: 0 }}>
                     <Typography
                       component="div"
@@ -352,7 +351,7 @@ function TreeMenu({
                           selected={
                             l.source?.highlighting?.type === highlight.type &&
                             l.source?.highlighting?.step ===
-                              selected?.current?.step
+                            selected?.current?.step
                           }
                           sx={{
                             height: 32,
@@ -421,15 +420,15 @@ export function TreePage({ template: Page }: PageContentProps) {
   const { trace, step } = useTreePageState(key);
   console.log("TRACE DATA:", trace);
 
-const processedData = useMemo(
-  () =>
-    buildScatterPlotData(
-      trace?.content,
-      formInput.xMetric,
-      formInput.yMetric
-    ),
-  [trace?.content, formInput.xMetric, formInput.yMetric]
-);
+  const processedData = useMemo(
+    () =>
+      buildScatterPlotData(
+        trace?.content,
+        formInput.xMetric,
+        formInput.yMetric
+      ),
+    [trace?.content, formInput.xMetric, formInput.yMetric]
+  );
 
   console.log(processedData, "data for scatterplot");
 
@@ -492,7 +491,14 @@ const processedData = useMemo(
   // ─────────────────────────────────────────────────────────────────────
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [axisBounds, setAxisBounds] = useState<AxisBounds | null>(null);
 
+  const stableAxisBounds = useMemo(() => axisBounds, [
+    axisBounds?.xMin,
+    axisBounds?.xMax,
+    axisBounds?.yMin,
+    axisBounds?.yMax,
+  ]);
   const { data: tree, isLoading: loading } = useTreeLayout({
     trace: trace?.content,
     mode,
@@ -560,12 +566,14 @@ const processedData = useMemo(
                             logAxis={logAxis}
                             eventTypeFilter={eventTypeFilter}
                             step={throttled}
+                            axisBounds={stableAxisBounds}
                           />
                           <AxisOverlay
                             processedData={processedData}
                             width={size.width}
                             height={size.height}
                             logAxis={logAxis}
+                            onBoundsChange={setAxisBounds}
                           />
                         </>
                       )}
@@ -573,7 +581,7 @@ const processedData = useMemo(
                       <GraphEvents
                         layerKey={key}
                         onSelection={(e) => {
-                          setSelection(e);// e.node is already logicalId if present
+                          setSelection(e);
                           setMenuOpen(true);
                         }}
                       />
@@ -666,81 +674,81 @@ const processedData = useMemo(
 
           {divider}
 
-          
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Typography variant="overline" color="text.secondary">
-                Scatterplot
+
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Typography variant="overline" color="text.secondary">
+              Scatterplot
+            </Typography>
+            {scatterplotMode ? (
+              <Typography variant="caption" color="success.main">
+                (active)
               </Typography>
-              {scatterplotMode ? (
-                <Typography variant="caption" color="success.main">
-                  (active)
-                </Typography>
-              ) : (
-                <Typography variant="caption" color="text.secondary" >
-                  (select X and Y)
-                </Typography>
-              )}
-              <FeaturePicker
-                label={
-                  formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"
-                }
-                value={formInput.xMetric}
-                items={scatterPlotAxis}
-                onChange={handleAxisChange("xMetric")}
-                arrow
-                itemOrientation="horizontal"
-              />
+            ) : (
+              <Typography variant="caption" color="text.secondary" >
+                (select X and Y)
+              </Typography>
+            )}
+            <FeaturePicker
+              label={
+                formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"
+              }
+              value={formInput.xMetric}
+              items={scatterPlotAxis}
+              onChange={handleAxisChange("xMetric")}
+              arrow
+              itemOrientation="horizontal"
+            />
 
-              <FeaturePicker
-                label={
-                  formInput.yMetric ? `Y axis: $${formInput.yMetric}` : "Y axis"
-                }
-                value={formInput.yMetric}
-                items={scatterPlotAxis}
-                onChange={handleAxisChange("yMetric")}
-                arrow
-                itemOrientation="horizontal"
-              />
+            <FeaturePicker
+              label={
+                formInput.yMetric ? `Y axis: $${formInput.yMetric}` : "Y axis"
+              }
+              value={formInput.yMetric}
+              items={scatterPlotAxis}
+              onChange={handleAxisChange("yMetric")}
+              arrow
+              itemOrientation="horizontal"
+            />
 
-              <FeaturePicker
-                label={
-                  eventTypeFilter
-                    ? `Event: ${startCase(eventTypeFilter)}`
-                    : "Event type"
-                }
-                value={eventTypeFilter}
-                items={[
-                  { id: "", name: "All event types" },
-                  ...eventTypes.map((t) => ({
-                    id: t,
-                    name: startCase(t),
-                  })),
-                ]}
-                onChange={handleEventTypeChange}
-                arrow
-                itemOrientation="horizontal"
-              />
-              <Checkbox
-                size="small"
-                checked={logAxis.x}
-                onChange={(e) =>
-                  setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
-                }
-                sx={CLEAN_CHECKBOX_SX}
-              />
-              <Typography variant="body2">Log X (Symlog)</Typography>
+            <FeaturePicker
+              label={
+                eventTypeFilter
+                  ? `Event: ${startCase(eventTypeFilter)}`
+                  : "Event type"
+              }
+              value={eventTypeFilter}
+              items={[
+                { id: "", name: "All event types" },
+                ...eventTypes.map((t) => ({
+                  id: t,
+                  name: startCase(t),
+                })),
+              ]}
+              onChange={handleEventTypeChange}
+              arrow
+              itemOrientation="horizontal"
+            />
+            <Checkbox
+              size="small"
+              checked={logAxis.x}
+              onChange={(e) =>
+                setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
+              }
+              sx={CLEAN_CHECKBOX_SX}
+            />
+            <Typography variant="body2">Log X (Symlog)</Typography>
 
-              <Checkbox
-                size="small"
-                checked={logAxis.y}
-                onChange={(e) =>
-                  setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
-                }
-                sx={CLEAN_CHECKBOX_SX}
-              />
-              <Typography variant="body2">Log Y (Symlog)</Typography>
-            </Stack>
-       
+            <Checkbox
+              size="small"
+              checked={logAxis.y}
+              onChange={(e) =>
+                setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
+              }
+              sx={CLEAN_CHECKBOX_SX}
+            />
+            <Typography variant="body2">Log Y (Symlog)</Typography>
+          </Stack>
+
 
         </>
       </Page.Options>
@@ -820,23 +828,23 @@ const buildScatterPlotData = (
   return { data: scatterPlotData, xMin, xMax, yMax, yMin, xAxis: xMetricName, yAxis: yMetricName };
 };
 
-export type ScatterPlotGraphProps = {
+type ScatterPlotGraphProps = {
   processedData: ScatterPlotScaleAndData;
-  width?: number;
-  height?: number;
   logAxis: { x: boolean; y: boolean };
   eventTypeFilter?: string;
   step?: number;
+  axisBounds?: AxisBounds | null;
 };
 
-function ScatterPlotGraph({
+export function ScatterPlotGraph({
   processedData,
   logAxis,
   eventTypeFilter,
-  step
+  step,
+  axisBounds
 }: ScatterPlotGraphProps) {
   const theme = useTheme();
-  const sigma = useSigma();               
+  const sigma = useSigma();
   const loadGraph = useLoadGraph();
 
   const backgroundHex = theme.palette.background.paper;
@@ -846,9 +854,12 @@ function ScatterPlotGraph({
   const prevStepRef = useRef<number | null>(null);
   const baseColorByIdRef = useRef<Record<string, string>>({});
 
-  // Inital Graph load
+  // The graying out logic when the node is out of bounds
+  useNodeCulling(axisBounds);
+
+  // Initial Graph load
   useEffect(() => {
-    const graph = new MultiDirectedGraph();  
+    const graph = new MultiDirectedGraph();
 
     stepBucketsRef.current = [];
     baseColorByIdRef.current = {};
@@ -863,8 +874,8 @@ function ScatterPlotGraph({
 
     const points = eventTypeFilter
       ? processedData.data.filter(
-          (p) => p.point.eventType === eventTypeFilter
-        )
+        (p) => p.point.eventType === eventTypeFilter
+      )
       : processedData.data;
 
     const xScale = (
@@ -894,7 +905,8 @@ function ScatterPlotGraph({
         y: yScale(p.y),
         size: 3,
         label: p.point.label,
-        color: neutralColor,     // start gray
+        color: neutralColor,
+        originalColor: baseColor,
         logicalId: p.point.logicalId,
         step: s,
         eventType: p.point.eventType,
@@ -911,7 +923,7 @@ function ScatterPlotGraph({
     foregroundHex,
   ]);
 
-  // Graph load with each color update
+  // Graph color update on step change
   useEffect(() => {
     const graph = sigma.getGraph();
     if (!graph) return;
@@ -935,7 +947,8 @@ function ScatterPlotGraph({
         const ids = buckets[s];
         if (!ids) continue;
         for (const id of ids) {
-          graph.setNodeAttribute(id, "color", baseColorById[id]);
+          const color = baseColorById[id];
+          graph.setNodeAttribute(id, "color", color);
         }
       }
     } else if (next > prev) {
@@ -944,7 +957,8 @@ function ScatterPlotGraph({
         const ids = buckets[s];
         if (!ids) continue;
         for (const id of ids) {
-          graph.setNodeAttribute(id, "color", baseColorById[id]);
+          const color = baseColorById[id];
+          graph.setNodeAttribute(id, "color", color);
         }
       }
     } else if (next < prev) {
@@ -957,7 +971,8 @@ function ScatterPlotGraph({
         }
       }
     }
-    
+
+    // Size changes for current step
     if (prev != null && buckets[prev]) {
       for (const id of buckets[prev]) {
         graph.setNodeAttribute(id, "size", 3);
@@ -1046,4 +1061,11 @@ export type ScatterPlotScaleAndData = {
   yMax: number;
   xAxis?: string;
   yAxis?: string;
+};
+
+export type AxisBounds = {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
 };
