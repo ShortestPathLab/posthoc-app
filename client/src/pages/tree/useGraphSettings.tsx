@@ -52,8 +52,8 @@ export function useNodeCulling(stableAxisBounds?: AxisBounds | null) {
 
     const xRange = xMax - xMin;
     const yRange = yMax - yMin;
-    const actualXMin = xMin + (xRange * 0.048);
-    const actualYMin = yMin + (yRange * 0.048);
+    const actualXMin = xMin + (xRange * 0.09);
+    const actualYMin = yMin + (yRange * 0.05);
 
     graph.forEachNode((node, attrs) => {
       const insideX = attrs.x >= actualXMin && attrs.x <= xMax;
