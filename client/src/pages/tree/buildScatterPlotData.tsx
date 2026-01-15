@@ -38,7 +38,7 @@ export const buildScatterPlotData = (
     yMax = Math.max(yMax, y);
     // required to show unique node for each sub type of event per id
     const logicalId = String(event.id);
-    const uniqueId = `${logicalId}-${step}`;
+    const uniqueId = getScatterPlotUniqueId(logicalId, step);
 
     scatterPlotData.push({
       x,
@@ -74,3 +74,10 @@ export const buildScatterPlotData = (
     yAxis: yMetricName,
   };
 };
+
+export function getScatterPlotUniqueId(
+  logicalId: string | number | null | undefined,
+  step: number,
+) {
+  return `${logicalId}-${step}`;
+}

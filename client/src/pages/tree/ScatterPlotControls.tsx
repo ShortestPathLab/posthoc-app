@@ -1,5 +1,9 @@
 import { KeyboardArrowDownOutlined } from "@mui-symbols-material/w300";
 import {
+  ModeStandbyOutlined,
+  TimelineOutlined,
+} from "@mui-symbols-material/w400";
+import {
   Checkbox,
   Collapse,
   IconButton,
@@ -8,6 +12,7 @@ import {
   Theme,
   Typography,
 } from "@mui/material";
+import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Heading, Option } from "components/layer-editor/Option";
 import { entries, map, startCase } from "lodash-es";
@@ -60,6 +65,28 @@ const GROUP_BY_OPTIONS = [
     description: "Group by exploration step (ranges)",
   },
 ];
+
+export const layoutModes = {
+  "directed-graph": {
+    value: "directed-graph",
+    name: "Directed Graph",
+    description: "Show all edges",
+    showAllEdges: true,
+  },
+  tree: {
+    value: "tree",
+    name: "Tree",
+    description: "Show only edges between each node and their final parents",
+    showAllEdges: false,
+  },
+  plot: {
+    value: "plot",
+    name: "Scatter Plot",
+    description: "Show scatterplot",
+    showAllEdges: false,
+  },
+};
+
 export function ScatterPlotControls({
   eventTypes,
   scatterplotMode,
@@ -72,7 +99,15 @@ export function ScatterPlotControls({
   logAxis,
   properties,
   setLogAxis,
+  mode,
+  setMode,
+  trackedProperty,
+  setTrackedProperty,
 }: {
+  mode: string;
+  setMode: (value: keyof typeof layoutModes) => void;
+  trackedProperty: string;
+  setTrackedProperty: (value: string) => void;
   eventTypes: string[];
   properties: Record<string, { type: string }>;
   scatterplotMode: boolean;
@@ -136,7 +171,7 @@ export function ScatterPlotControls({
             alignItems: "center",
           }}
         >
-          <Typography>Plot Options</Typography>
+          <Typography>Display Options</Typography>
           <IconButton
             edge="end"
             onClick={() => setOpen((prev) => !prev)}
@@ -154,14 +189,60 @@ export function ScatterPlotControls({
             }
           </IconButton>
         </Stack>
+        {map(
+          [
+            {
+              icon: <ModeStandbyOutlined />,
+              label: "Layout",
+              value: mode,
+              onChange: setMode,
+              items: map(entries(layoutModes), ([k, v]) => ({
+                id: k,
+                ...v,
+              })),
+            },
+            {
+              icon: <TimelineOutlined />,
+              label: "Colouring",
+              value: trackedProperty,
+              onChange: setTrackedProperty,
+              items: [
+                { id: "", name: "Event Type" },
+                ...map(entries(properties), ([k, v]) => ({
+                  id: k,
+                  name: `$${k}`,
+                  description: v.type,
+                })),
+              ],
+            },
+          ],
+          ({ icon, label, value, items, onChange }) => (
+            <Option
+              key={label}
+              label={label}
+              content={
+                <FeaturePicker
+                  paper
+                  icon={icon}
+                  label={label}
+                  value={value}
+                  items={items}
+                  onChange={onChange}
+                  arrow
+                />
+              }
+            />
+          ),
+        )}
         <Collapse in={open}>
           <Stack>
-            <Heading label="Axis" />
+            <Heading label="Plot Options" />
             <Option
               label="X axis"
               content={
                 <FeaturePicker
                   paper
+                  disabled={mode !== "plot"}
                   label={formInput.xMetric ? `$.${formInput.xMetric}` : "Auto"}
                   value={formInput.xMetric}
                   items={scatterPlotAxis}
@@ -176,6 +257,7 @@ export function ScatterPlotControls({
               content={
                 <FeaturePicker
                   paper
+                  disabled={mode !== "plot"}
                   label={formInput.yMetric ? `$.${formInput.yMetric}` : "Auto"}
                   value={formInput.yMetric}
                   items={scatterPlotAxis}
@@ -189,7 +271,7 @@ export function ScatterPlotControls({
               label="Logarithmic X axis"
               content={
                 <Checkbox
-                  disabled={!scatterplotMode}
+                  disabled={mode !== "plot"}
                   size="small"
                   checked={logAxis.x}
                   onChange={(e) =>
@@ -204,7 +286,7 @@ export function ScatterPlotControls({
               content={
                 <Checkbox
                   size="small"
-                  disabled={!scatterplotMode}
+                  disabled={mode !== "plot"}
                   checked={logAxis.y}
                   onChange={(e) =>
                     setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
@@ -219,7 +301,7 @@ export function ScatterPlotControls({
               content={
                 <FeaturePicker
                   paper
-                  disabled={!scatterplotMode}
+                  disabled={mode !== "plot"}
                   ButtonProps={{ fullWidth: true }}
                   label={
                     eventTypeFilter
@@ -246,7 +328,7 @@ export function ScatterPlotControls({
               content={
                 <FeaturePicker
                   paper
-                  disabled={!scatterplotMode}
+                  disabled={mode !== "plot"}
                   ButtonProps={{ fullWidth: true }}
                   label={
                     groupByAttribute

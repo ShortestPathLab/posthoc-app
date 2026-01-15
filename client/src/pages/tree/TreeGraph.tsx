@@ -25,22 +25,19 @@ import { highlightNodesOptions } from "hooks/useHighlight";
 import {
   forOwn,
   isEmpty,
-  isEqual,
   isNull,
   isUndefined,
   pick,
   startCase,
 } from "lodash-es";
-import { Trace } from "protocol";
 import { ReactNode, useEffect, useState } from "react";
-import { layers } from "slices/layers";
 import { getShade, useAcrylic, usePaper } from "theme";
-import { TreeLayer } from "./TreeLayer";
 import { TreeWorkerReturnType } from "./treeLayout.worker";
 import { TreeAxis } from "./TreeAxis";
 import { useGraphColoring } from "./useGraphColoring";
 import { useMultiDirectedGraph } from "./useMultiDirectedGraph";
-import { useOne } from "slices/useOne";
+import { useHighlighting } from "./useHighlighting";
+import { SharedGraphProps } from "./SharedGraphProps";
 
 export function setAttributes(
   graph: MultiDirectedGraph,
@@ -97,37 +94,18 @@ function Dot({ label, color }: { label?: ReactNode; color?: string }) {
 }
 
 export type TreeGraphProps = {
-  trace?: Trace;
   tree?: TreeWorkerReturnType;
-  step?: number;
-  layer?: string;
-  showAllEdges?: boolean;
-  trackedProperty?: string;
   onExit?: () => void;
-  width?: number;
-  height?: number;
-};
+} & SharedGraphProps;
 
 export type NodeType = { x: number; y: number; label: string; size: number };
 export type EdgeType = { label: string };
 
-function useHighlighting(key?: string) {
-  return useOne(
-    layers.one<TreeLayer>(key),
-    (l) => l.source?.highlighting,
-    isEqual,
-  );
-}
-
 export function TreeGraph(props: TreeGraphProps) {
   const { trace, tree, layer: key, onExit, width, height } = props;
-  console.log(props.step);
 
-  const paper = usePaper();
   const acrylic = useAcrylic();
   const theme = useTheme();
-
-  const sigma = useSigma();
 
   const [orientation, setOrientation] =
     useState<keyof typeof orientationOptions>("vertical");
@@ -166,51 +144,12 @@ export function TreeGraph(props: TreeGraphProps) {
       {isAxisEnabled && (
         <TreeAxis tree={tree} trace={trace} height={height} width={width} />
       )}
-      <Stack
-        sx={{
-          pt: isHighlightingEnabled ? 11 : 6,
-          transition: (t) => t.transitions.create("padding-top"),
-          position: "absolute",
-          top: 0,
-          left: 0,
-        }}
-      >
-        <Stack
-          direction="row"
-          sx={
-            {
-              ...paper(1),
-              ...acrylic,
-              alignItems: "center",
-              height: (t) => t.spacing(6),
-              px: 1,
-              m: 1,
-            } as SxProps<Theme>
-          }
-        >
-          <IconButtonWithTooltip
-            color="primary"
-            onClick={() => {
-              sigma?.getCamera?.()?.animatedReset?.();
-            }}
-            label="Fit"
-            icon={<CenterFocusWeakOutlined />}
-          />
-          {divider}
-          <IconButtonWithTooltip
-            color="primary"
-            onClick={() => {
-              setOrientation(
-                orientation === "vertical" ? "horizontal" : "vertical",
-              );
-            }}
-            label="Rotate"
-            icon={<RotateIcon />}
-          />
-          {divider}
-          {<MinimisedPlaybackControls layer={key} />}
-        </Stack>
-      </Stack>
+      <TreeControls
+        layer={key}
+        isHighlightingEnabled={isHighlightingEnabled}
+        setOrientation={setOrientation}
+        orientation={orientation}
+      />
       <Stack
         sx={{
           width: "100%",
@@ -274,5 +213,72 @@ export function TreeGraph(props: TreeGraphProps) {
         </Stack>
       </Stack>
     </>
+  );
+}
+
+export function TreeControls({
+  layer: key,
+  isHighlightingEnabled,
+  setOrientation,
+  orientation,
+}: {
+  layer?: string;
+  isHighlightingEnabled: boolean;
+  setOrientation?: (orientation: "horizontal" | "vertical") => void;
+  orientation?: "horizontal" | "vertical";
+}) {
+  const paper = usePaper();
+  const acrylic = useAcrylic();
+  const sigma = useSigma();
+  return (
+    <Stack
+      sx={{
+        pt: isHighlightingEnabled ? 11 : 6,
+        transition: (t) => t.transitions.create("padding-top"),
+        position: "absolute",
+        top: 0,
+        left: 0,
+      }}
+    >
+      <Stack
+        direction="row"
+        sx={
+          {
+            ...paper(1),
+            ...acrylic,
+            alignItems: "center",
+            height: (t) => t.spacing(6),
+            px: 1,
+            m: 1,
+          } as SxProps<Theme>
+        }
+      >
+        <IconButtonWithTooltip
+          color="primary"
+          onClick={() => {
+            sigma?.getCamera?.()?.animatedReset?.();
+          }}
+          label="Fit"
+          icon={<CenterFocusWeakOutlined />}
+        />
+        {divider}
+        {orientation && (
+          <>
+            <IconButtonWithTooltip
+              color="primary"
+              onClick={() => {
+                setOrientation?.(
+                  orientation === "vertical" ? "horizontal" : "vertical",
+                );
+              }}
+              label="Rotate"
+              icon={<RotateIcon />}
+            />
+            {divider}
+          </>
+        )}
+        {<MinimisedPlaybackControls layer={key} />}
+      </Stack>
+    </Stack>
   );
 }

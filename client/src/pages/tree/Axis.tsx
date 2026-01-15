@@ -1,9 +1,8 @@
-import { useTheme } from "@mui/material";
+import { alpha, useTheme } from "@mui/material";
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
 import { scaleLinear, scaleSymlog } from "d3-scale";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ScatterPlotScaleAndData } from ".";
-import { AxisBounds } from ".";
 const MIN_SPAN = 1e-6;
 
 export function createScatterScale(min: number, max: number) {
@@ -33,7 +32,7 @@ export function createScatterScale(min: number, max: number) {
   // add padding to points
   lo -= span * 0.05;
   hi += span * 0.05;
-  // prevent padding from pushing the point to negative value if 
+  // prevent padding from pushing the point to negative value if
   // all the number are 0
   if (min >= 0 && lo < 0) {
     lo = 0;
@@ -42,26 +41,24 @@ export function createScatterScale(min: number, max: number) {
   return scaleLinear().domain([lo, hi]).nice();
 }
 
-
-
 export function createSymlogScatterScale(
   min: number,
   max: number,
-  constant = 1 // controls linear region around 0
+  constant = 1, // controls linear region around 0
 ) {
-  let lo = min;
-  let hi = max;
+  const lo = min;
+  const hi = max;
 
   // Invalid domain → fall back to linear
   if (!Number.isFinite(lo) || !Number.isFinite(hi) || lo === hi) {
-    console.warn("[scatter] Symlog scale invalid domain; using linear:", { lo, hi });
+    console.warn("[scatter] Symlog scale invalid domain; using linear:", {
+      lo,
+      hi,
+    });
     return createScatterScale(min, max);
   }
 
-  return scaleSymlog()
-    .constant(constant)
-    .domain([lo, hi])
-    .nice();
+  return scaleSymlog().constant(constant).domain([lo, hi]).nice();
 }
 
 const digits = {
@@ -102,9 +99,7 @@ type AxisOverlayProps = {
   height: number;
   processedData: ScatterPlotScaleAndData;
   logAxis: { x: boolean; y: boolean };
-  onBoundsChange: (bounds: AxisBounds) => void
 };
-
 
 type TickLabel = {
   value: number;
@@ -121,7 +116,7 @@ type ScatterPlotTickGenerationArgs = {
 function ScatterPlotAxisTickGeneration({
   processedData,
   sigma,
-  logAxis
+  logAxis,
 }: ScatterPlotTickGenerationArgs): {
   xAxisTickValues: TickLabel[];
   yAxisTickValues: TickLabel[];
@@ -132,15 +127,24 @@ function ScatterPlotAxisTickGeneration({
   const { ratio } = camera.getState();
 
   // Scaling to standardize extreme input ranges
-  const xDataScale = logAxis?.x ? createSymlogScatterScale(xMin, xMax) : createScatterScale(xMin, xMax);
-  const yDataScale = logAxis?.y ? createSymlogScatterScale(yMin, yMax) : createScatterScale(yMin, yMax);
+  const xDataScale = logAxis?.x
+    ? createSymlogScatterScale(xMin, xMax)
+    : createScatterScale(xMin, xMax);
+  const yDataScale = logAxis?.y
+    ? createSymlogScatterScale(yMin, yMax)
+    : createScatterScale(yMin, yMax);
 
   const zoomFactor = 1 / Math.max(ratio, 1e-10);
   const baseTickCount = 10;
 
-  const countX = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
-  const countY = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
-
+  const countX = Math.max(
+    2,
+    Math.min(100, Math.round(baseTickCount * zoomFactor)),
+  );
+  const countY = Math.max(
+    2,
+    Math.min(100, Math.round(baseTickCount * zoomFactor)),
+  );
 
   const xValues = xDataScale.ticks(countX);
   const yValues = yDataScale.ticks(countY);
@@ -159,7 +163,13 @@ function ScatterPlotAxisTickGeneration({
 }
 
 // Draw arrow at the end of the lines
-function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, angle: number, size = 8) {
+function drawArrow(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  angle: number,
+  size = 8,
+) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);
@@ -169,13 +179,20 @@ function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, angle: n
   ctx.lineTo(-size, size / 2);
   ctx.lineTo(-size, -size / 2);
   ctx.closePath();
-  ctx.fill()
+  ctx.fill();
 
   ctx.restore();
 }
 
+const X_AXIS_HEIGHT = 64;
+const Y_AXIS_WIDTH = 80;
 
-function AxisOverlay({ width, height, processedData, logAxis, onBoundsChange }: AxisOverlayProps) {
+function AxisOverlay({
+  width,
+  height,
+  processedData,
+  logAxis,
+}: AxisOverlayProps) {
   const theme = useTheme();
   const sigma = useSigma();
   const registerEvents = useRegisterEvents();
@@ -184,8 +201,6 @@ function AxisOverlay({ width, height, processedData, logAxis, onBoundsChange }: 
 
   const xAxisLabel = processedData.xAxis ?? "X axis";
   const yAxisLabel = processedData.yAxis ?? "Y axis";
-
-  const lastBoundsRef = useRef<AxisBounds | null>(null);
 
   useEffect(() => {
     if (!canvas) return;
@@ -199,6 +214,11 @@ function AxisOverlay({ width, height, processedData, logAxis, onBoundsChange }: 
       ctx.clearRect(0, 0, width, height);
 
       const { xMin, xMax, yMin, yMax } = processedData;
+
+      ctx.fillStyle = alpha(theme.palette.background.paper, 0.8);
+      ctx.fillRect(0, 0, Y_AXIS_WIDTH, height);
+      ctx.fillRect(Y_AXIS_WIDTH, height - X_AXIS_HEIGHT, width, height);
+
       if (
         xMin === undefined ||
         xMax === undefined ||
@@ -219,40 +239,18 @@ function AxisOverlay({ width, height, processedData, logAxis, onBoundsChange }: 
       const [xLo, xHi] = xDataScale.domain();
       const [yLo, yHi] = yDataScale.domain();
 
-
       const xGraphScale = xDataScale.copy().range([-1, 1]);
       const yGraphScale = yDataScale.copy().range([-1, 1]);
 
       const xAxisDataY = yLo <= 0 && 0 <= yHi ? 0 : yLo;
       const yAxisDataX = xLo <= 0 && 0 <= xHi ? 0 : xLo;
-      const topLeft = sigma.viewportToGraph({ x: 0, y: 0 });
-      const bottomRight = sigma.viewportToGraph({ x: width, y: height });
 
-      const nextBounds: AxisBounds = {
-        xMin: Math.min(topLeft.x, bottomRight.x),
-        xMax: Math.max(topLeft.x, bottomRight.x),
-        yMin: Math.min(topLeft.y, bottomRight.y),
-        yMax: Math.max(topLeft.y, bottomRight.y),
-      };
-
-      const prev = lastBoundsRef.current;
-
-      const changed =
-        !prev ||
-        prev.xMin !== nextBounds.xMin ||
-        prev.xMax !== nextBounds.xMax ||
-        prev.yMin !== nextBounds.yMin ||
-        prev.yMax !== nextBounds.yMax;
-
-      if (changed) {
-        lastBoundsRef.current = nextBounds;
-        onBoundsChange(nextBounds);
-      }
-      const { xAxisTickValues, yAxisTickValues } = ScatterPlotAxisTickGeneration({
-        processedData,
-        sigma,
-        logAxis,
-      });
+      const { xAxisTickValues, yAxisTickValues } =
+        ScatterPlotAxisTickGeneration({
+          processedData,
+          sigma,
+          logAxis,
+        });
 
       ctx.strokeStyle = theme.palette.text.secondary;
       ctx.fillStyle = theme.palette.text.primary;
@@ -264,7 +262,7 @@ function AxisOverlay({ width, height, processedData, logAxis, onBoundsChange }: 
         x: xGraphScale(xLo),
         y: yGraphScale(xAxisDataY),
       });
-      let xAxisY = Math.min(xAxisYRaw, height - 36);
+      const xAxisY = Math.min(xAxisYRaw, height - X_AXIS_HEIGHT);
 
       const { x: xAxisEndX } = sigma.graphToViewport({
         x: xGraphScale(xHi),
@@ -305,7 +303,7 @@ function AxisOverlay({ width, height, processedData, logAxis, onBoundsChange }: 
         x: xGraphScale(yAxisDataX),
         y: yGraphScale(yLo),
       });
-      let yAxisX = Math.max(yAxisXRaw, 72);
+      const yAxisX = Math.max(yAxisXRaw, Y_AXIS_WIDTH);
 
       const { y: yAxisEndY } = sigma.graphToViewport({
         x: xGraphScale(yAxisDataX),

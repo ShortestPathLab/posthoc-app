@@ -2,8 +2,6 @@ import { CenterFocusWeakOutlined } from "@mui-symbols-material/w300";
 import {
   AccountTreeOutlined,
   DataObjectOutlined,
-  ModeStandbyOutlined,
-  TimelineOutlined,
 } from "@mui-symbols-material/w400";
 import {
   Box,
@@ -23,7 +21,6 @@ import {
 } from "@mui/material";
 import { SigmaContainer, useSigma } from "@react-sigma/core";
 import "@react-sigma/core/lib/style.css";
-import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { useStep } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
@@ -39,9 +36,17 @@ import { MultiDirectedGraph } from "graphology";
 import { highlightNodesOptions, useHighlightNodes } from "hooks/useHighlight";
 import { usePlaybackControls } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
-import { entries, findLast, isEmpty, map, startCase } from "lodash-es";
+import {
+  defer,
+  findLast,
+  head,
+  isEmpty,
+  keys,
+  map,
+  startCase,
+} from "lodash-es";
 import { Size } from "protocol";
-import { Fragment, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
@@ -53,9 +58,9 @@ import { PageContentProps } from "../PageMeta";
 import AxisOverlay from "./Axis";
 import { buildScatterPlotData } from "./buildScatterPlotData";
 import { GraphEvents } from "./GraphEvents";
-import { ScatterPlotControls } from "./ScatterPlotControls";
+import { layoutModes, ScatterPlotControls } from "./ScatterPlotControls";
 import { ScatterPlotGraph } from "./ScatterPlotGraph";
-import { divider, isDefined, TreeGraph } from "./TreeGraph";
+import { isDefined, TreeGraph } from "./TreeGraph";
 import { isTreeLayer, TreeLayer } from "./TreeLayer";
 import { useTreeLayout } from "./TreeLayoutWorker";
 import { useGraphSettings } from "./useGraphSettings";
@@ -65,20 +70,6 @@ import { useTreePageState } from "./useTreePageState";
 
 type TreePageContext = PanelState;
 
-const layoutModes = {
-  "directed-graph": {
-    value: "directed-graph",
-    name: "Directed Graph",
-    description: "Show all edges",
-    showAllEdges: true,
-  },
-  tree: {
-    value: "tree",
-    name: "Tree",
-    description: "Show only edges between each node and their final parents",
-    showAllEdges: false,
-  },
-};
 function TreeMenu({
   layer: key,
   selected,
@@ -353,26 +344,40 @@ const sanitizeMetricKey = (key: string) => key.replace(/\./g, "");
 export function TreePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
 
-  // Scatterplot
-  const [logAxis, setLogAxis] = useState<{ x: boolean; y: boolean }>({
-    x: false,
-    y: false,
-  });
-  const [formInput, setFormInput] = useState<{
-    xMetric: string;
-    yMetric: string;
-  }>({ xMetric: "", yMetric: "" });
-
-  const [eventTypeFilter, setEventTypeFilter] = useState<string>("");
-
-  // Scatterplot is ON only if both axes are selected
-  const scatterplotMode = Boolean(formInput.xMetric && formInput.yMetric);
-
   // ─── Layer Data ──────────────────────────────────────────────────────
 
   const { key, setKey } = useLayerPicker(isTreeLayer);
   const one = slice.layers.one<TreeLayer>(key);
   const { trace, step } = useTreePageState(key);
+
+  // ─── Options ─────────────────────────────────────────────────────────
+
+  const [trackedProperty, setTrackedProperty, properties] = useTrackedProperty(
+    trace?.key,
+    trace?.content,
+  );
+
+  // Scatterplot
+  const [logAxis, setLogAxis] = useState<{ x: boolean; y: boolean }>({
+    x: false,
+    y: false,
+  });
+  console.log(properties);
+  const [formInput, setFormInput] = useState<{
+    xMetric: string;
+    yMetric: string;
+  }>({ xMetric: "step", yMetric: "step" });
+
+  useEffect(() => {
+    defer(() =>
+      setFormInput(() => ({
+        xMetric: "step",
+        yMetric: ".g" in properties ? "g" : (head(keys(properties)) ?? "step"),
+      })),
+    );
+  }, [setFormInput, properties]);
+
+  const [eventTypeFilter, setEventTypeFilter] = useState<string>("");
 
   const processedData = useMemo(
     () =>
@@ -425,33 +430,20 @@ export function TreePage({ template: Page }: PageContentProps) {
     useViewTreeContext<TreePageContext>();
   const size = useSurfaceAvailableCssSize();
 
-  // ─── Options ─────────────────────────────────────────────────────────
-
-  const [trackedProperty, setTrackedProperty, properties] = useTrackedProperty(
-    trace?.key,
-    trace?.content,
-  );
-
   const { point, selected, selection, setSelection } = useSelection(
     throttled,
     trace?.content,
   );
 
-  const [mode, setMode] = useState<"tree" | "directed-graph">("tree");
+  const [mode, setMode] = useState<keyof typeof layoutModes>("tree");
 
   // ─────────────────────────────────────────────────────────────────────
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [axisBounds, setAxisBounds] = useState<AxisBounds | null>(null);
-
-  const stableAxisBounds = useMemo(
-    () => axisBounds,
-    [axisBounds?.xMin, axisBounds?.xMax, axisBounds?.yMin, axisBounds?.yMax],
-  );
 
   const { data: tree, isLoading: loading } = useTreeLayout({
     trace: trace?.content,
-    mode,
+    mode: mode === "plot" ? "tree" : mode,
     key: trace?.key,
   });
 
@@ -464,118 +456,117 @@ export function TreePage({ template: Page }: PageContentProps) {
       <Page.Content>
         <Block sx={size}>
           {trace ? (
-            loading ? (
-              <Spinner message="Generating layout" />
-            ) : tree?.length ? (
-              <>
-                <AutoSize>
-                  {(size: Size) => (
-                    <SigmaContainer
-                      style={{
-                        ...size,
-                        background: theme.palette.background.paper,
-                      }}
-                      graph={MultiDirectedGraph}
-                      settings={graphSettings}
-                    >
-                      {!scatterplotMode && (
-                        <>
-                          {" "}
-                          <TreeGraph
-                            width={size.width}
-                            height={size.height}
-                            step={throttled}
-                            tree={tree}
-                            trace={trace?.content}
-                            layer={key}
-                            showAllEdges={layoutModes[mode].showAllEdges}
-                            trackedProperty={trackedProperty}
-                            onExit={() => {
-                              const layer = one.get();
-                              if (!isEmpty(layer?.source?.highlighting)) {
-                                one.set((l) =>
-                                  set(l, "source.highlighting", {}),
-                                );
-                              }
-                            }}
-                          />
-                        </>
-                      )}
-                      {scatterplotMode && (
-                        <>
-                          <ScatterPlotOverlayToolbar />
-                          <ScatterPlotGraph
-                            processedData={processedData}
-                            logAxis={logAxis}
-                            eventTypeFilter={eventTypeFilter}
-                            step={throttled}
-                            axisBounds={stableAxisBounds}
-                          />
-                          <AxisOverlay
-                            processedData={processedData}
-                            width={size.width}
-                            height={size.height}
-                            logAxis={logAxis}
-                            onBoundsChange={setAxisBounds}
-                          />
-                        </>
-                      )}
-
-                      <GraphEvents
-                        layerKey={key}
-                        onSelection={(e) => {
-                          setSelection(e);
-                          setMenuOpen(true);
+            <>
+              {loading ? (
+                <Spinner message="Generating layout" />
+              ) : tree?.length ? (
+                <>
+                  <AutoSize>
+                    {(size: Size) => (
+                      <SigmaContainer
+                        style={{
+                          ...size,
+                          background: theme.palette.background.paper,
                         }}
-                      />
-                    </SigmaContainer>
-                  )}
-                </AutoSize>
-                {menuOpen && (
-                  <TreeMenu
-                    onClose={() => setMenuOpen(false)}
-                    anchorReference="anchorPosition"
-                    anchorPosition={{
-                      left: point.x,
-                      top: point.y,
-                    }}
-                    transformOrigin={{
-                      horizontal: "left",
-                      vertical: "top",
-                    }}
-                    open={menuOpen}
-                    layer={key}
-                    selected={selected}
-                    selection={selection}
-                  />
-                )}
-                <ScatterPlotControls
-                  eventTypes={eventTypes}
-                  scatterplotMode={scatterplotMode}
-                  handleAxisChange={handleAxisChange}
-                  handleEventTypeChange={handleEventTypeChange}
-                  handleGroupByChange={handleGroupByChange}
-                  formInput={formInput}
-                  groupByAttribute={groupByAttribute}
-                  eventTypeFilter={eventTypeFilter}
-                  logAxis={logAxis}
-                  properties={properties}
-                  setLogAxis={setLogAxis}
-                />
-              </>
-            ) : (
-              <>
-                <WithLayer<TreeLayer> layer={key}>
-                  {(l) => (
-                    <Placeholder
-                      icon={<AccountTreeOutlined />}
-                      label="Graph"
-                      secondary={`${inferLayerName(l)} is not a graph.`}
+                        graph={MultiDirectedGraph}
+                        settings={graphSettings}
+                      >
+                        {mode !== "plot" ? (
+                          <>
+                            <TreeGraph
+                              width={size.width}
+                              height={size.height}
+                              step={throttled}
+                              tree={tree}
+                              trace={trace?.content}
+                              layer={key}
+                              showAllEdges={layoutModes[mode].showAllEdges}
+                              trackedProperty={trackedProperty}
+                              onExit={() => {
+                                const layer = one.get();
+                                if (!isEmpty(layer?.source?.highlighting)) {
+                                  one.set((l) =>
+                                    set(l, "source.highlighting", {}),
+                                  );
+                                }
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <ScatterPlotGraph
+                              width={size.width}
+                              height={size.height}
+                              trace={trace?.content}
+                              layer={key}
+                              trackedProperty={trackedProperty}
+                              processedData={processedData}
+                              logAxis={logAxis}
+                              eventTypeFilter={eventTypeFilter}
+                              step={throttled}
+                            />
+                          </>
+                        )}
+                        <GraphEvents
+                          layerKey={key}
+                          onSelection={(e) => {
+                            setSelection(e);
+                            setMenuOpen(true);
+                          }}
+                        />
+                      </SigmaContainer>
+                    )}
+                  </AutoSize>
+                  {menuOpen && (
+                    <TreeMenu
+                      onClose={() => setMenuOpen(false)}
+                      anchorReference="anchorPosition"
+                      anchorPosition={{
+                        left: point.x,
+                        top: point.y,
+                      }}
+                      transformOrigin={{
+                        horizontal: "left",
+                        vertical: "top",
+                      }}
+                      open={menuOpen}
+                      layer={key}
+                      selected={selected}
+                      selection={selection}
                     />
                   )}
-                </WithLayer>
-              </>
-            )
+                </>
+              ) : (
+                <>
+                  <WithLayer<TreeLayer> layer={key}>
+                    {(l) => (
+                      <Placeholder
+                        icon={<AccountTreeOutlined />}
+                        label="Graph"
+                        secondary={`${inferLayerName(l)} is not a graph.`}
+                      />
+                    )}
+                  </WithLayer>
+                </>
+              )}
+              <ScatterPlotControls
+                eventTypes={eventTypes}
+                scatterplotMode={mode === "plot"}
+                handleAxisChange={handleAxisChange}
+                handleEventTypeChange={handleEventTypeChange}
+                handleGroupByChange={handleGroupByChange}
+                formInput={formInput}
+                groupByAttribute={groupByAttribute}
+                eventTypeFilter={eventTypeFilter}
+                logAxis={logAxis}
+                properties={properties}
+                setLogAxis={setLogAxis}
+                mode={mode}
+                setMode={setMode}
+                trackedProperty={trackedProperty}
+                setTrackedProperty={setTrackedProperty}
+              />
+            </>
           ) : (
             <Placeholder
               icon={<AccountTreeOutlined />}
@@ -588,51 +579,6 @@ export function TreePage({ template: Page }: PageContentProps) {
       <Page.Options>
         <>
           <LayerPicker onChange={setKey} value={key} guard={isTreeLayer} />
-          {divider}
-          {map(
-            [
-              {
-                icon: <ModeStandbyOutlined />,
-                label: "Layout",
-                value: mode,
-                onChange: setMode,
-                items: map(entries(layoutModes), ([k, v]) => ({
-                  id: k,
-                  ...v,
-                })),
-              },
-              {
-                icon: <TimelineOutlined />,
-                label: "Tracked Property",
-                value: trackedProperty,
-                onChange: setTrackedProperty,
-                items: [
-                  { id: "", name: "Off" },
-                  ...map(entries(properties), ([k, v]) => ({
-                    id: k,
-                    name: `$${k}`,
-                    description: v.type,
-                  })),
-                ],
-              },
-            ],
-            ({ icon, label, value, items, onChange }, i) => (
-              <Fragment key={i}>
-                {!!i && divider}
-                <FeaturePicker
-                  icon={icon}
-                  label={label}
-                  value={value}
-                  items={items}
-                  /// @ts-expect-error poor type inference
-                  onChange={onChange}
-                  arrow
-                />
-              </Fragment>
-            ),
-          )}
-
-          {divider}
         </>
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
@@ -645,7 +591,6 @@ export type ScatterPlotGraphProps = {
   logAxis: { x: boolean; y: boolean };
   eventTypeFilter?: string;
   step?: number;
-  axisBounds?: AxisBounds | null;
 };
 
 export function ScatterPlotOverlayToolbar() {

@@ -33,6 +33,7 @@ import {
   TreeGraphProps,
 } from "./TreeGraph";
 import { assert } from "utils/assert";
+import { TraceEvent } from "protocol/Trace-v140";
 
 const getGradient = memoizee(
   (from: string, to: string) => {
@@ -60,10 +61,14 @@ export function getGraphColorHex(
   return blendFromNeutral(base)(t);
 }
 
+const defaultGetGraphId = (step: number, event: TraceEvent) => event.id;
+const defaultGetGraphPId = (step: number, event: TraceEvent) => event.pId;
 export function useGraphColoring(
   graph: MultiDirectedGraph,
   { showAllEdges, trackedProperty, trace, step = 0 }: TreeGraphProps,
   highlightEdges?: Highlighting,
+  getGraphId = defaultGetGraphId,
+  getGraphPId = defaultGetGraphPId,
 ) {
   "use no memo";
   // This hook modifies `graph`, which is against the rules of React.
@@ -111,7 +116,10 @@ export function useGraphColoring(
     // Walk events up to current step and apply fading color
     (showAllEdges ? forEach : forEachRight)(
       slice(trace?.events, 0, step + 1),
-      ({ id, type, pId }, i) => {
+      (event, i) => {
+        const { type } = event;
+        const graphId = getGraphId(i, event);
+        const graphPId = getGraphPId(i, event);
         const strength = isHighlightEdges
           ? 0.1
           : max([1 - (step - i) / pastSteps, 0.3])!;
@@ -123,17 +131,17 @@ export function useGraphColoring(
           foregroundHex,
         );
 
-        if (graph.hasNode(`${id}`) && !isSetNode[id]) {
-          setAttributes(graph, `${id}`, "node", {
+        if (graph.hasNode(`${graphId}`) && !isSetNode[graphId]) {
+          setAttributes(graph, `${graphId}`, "node", {
             color: finalColor,
-            label: truncate(`${startCase(type)} ${id}`, { length: 15 }),
+            label: truncate(`${startCase(type)} ${graphId}`, { length: 15 }),
             forceLabel: step === i,
           });
 
-          const a = makeEdgeKey(id, pId);
+          const a = makeEdgeKey(graphId, graphPId);
           if (
-            isDefined(pId) &&
-            graph.hasNode(`${pId}`) &&
+            isDefined(graphPId) &&
+            graph.hasNode(`${graphPId}`) &&
             graph.hasEdge(a) &&
             !isSet[a]
           ) {
@@ -145,7 +153,7 @@ export function useGraphColoring(
             });
             if (!showAllEdges) isSet[a] = true;
           }
-          if (!showAllEdges) isSetNode[id] = true;
+          if (!showAllEdges) isSetNode[graphId] = true;
         }
       },
     );
@@ -252,12 +260,14 @@ export function useGraphColoring(
         } else return (x - minVal) / (maxVal - minVal);
       };
       const scale = interpolate(SEVEN_CLASS_GNBU);
-      forEach(slice(trace?.events, 0, step + 1), (e) => {
-        if (graph.hasNode(`${e.id}`)) {
+      forEach(slice(trace?.events, 0, step + 1), (e, i) => {
+        const graphId = getGraphId(i, e);
+        const graphPId = getGraphPId(i, e);
+        if (graph.hasNode(`${graphId}`)) {
           const s = scale(f(get(e, p)));
-          graph.setNodeAttribute(`${e.id}`, "color", s);
-          if (isDefined(e.pId)) {
-            const a = makeEdgeKey(`${e.id}`, `${e.pId}`);
+          graph.setNodeAttribute(`${graphId}`, "color", s);
+          if (isDefined(graphPId) && graph.hasNode(`${graphPId}`)) {
+            const a = makeEdgeKey(`${graphId}`, `${graphPId}`);
             if (graph.hasDirectedEdge(a)) {
               graph.setEdgeAttribute(a, "color", s);
             }
@@ -266,8 +276,10 @@ export function useGraphColoring(
       });
     }
 
-    return { graph };
+    return { graph, graphKey: step };
   }, [
+    getGraphId,
+    getGraphPId,
     graph,
     step,
     trace,
