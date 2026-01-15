@@ -1,15 +1,12 @@
-import {
-  CenterFocusWeakOutlined,
-} from "@mui-symbols-material/w300";
+import { CenterFocusWeakOutlined } from "@mui-symbols-material/w300";
 import {
   AccountTreeOutlined,
   DataObjectOutlined,
   ModeStandbyOutlined,
-  TimelineOutlined
+  TimelineOutlined,
 } from "@mui-symbols-material/w400";
 import {
   Box,
-  Checkbox,
   Divider,
   ListItem,
   ListItemIcon,
@@ -22,12 +19,12 @@ import {
   Theme,
   Tooltip,
   Typography,
-  useTheme
+  useTheme,
 } from "@mui/material";
-import { SigmaContainer, useLoadGraph, useSigma } from "@react-sigma/core";
+import { SigmaContainer, useSigma } from "@react-sigma/core";
 import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
-import { PlaybackLayerData, useStep } from "components/app-bar/Playback";
+import { useStep } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Label } from "components/generic/Label";
@@ -35,42 +32,36 @@ import { LayerPicker } from "components/generic/LayerPicker";
 import { Spinner } from "components/generic/Spinner";
 import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { Placeholder } from "components/inspector/Placeholder";
-import {
-  PropertyDialog
-} from "components/inspector/PropertyList";
+import { PropertyDialog } from "components/inspector/PropertyList";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
-import {
-  HighlightLayerData,
-  highlightNodesOptions,
-  useHighlightNodes
-} from "hooks/useHighlight";
+import { highlightNodesOptions, useHighlightNodes } from "hooks/useHighlight";
 import { usePlaybackControls } from "hooks/usePlaybackState";
 import { inferLayerName } from "layers/inferLayerName";
-import { getController } from "layers/layerControllers";
-import { TraceLayerData } from "layers/trace/TraceLayer";
 import { entries, findLast, isEmpty, map, startCase } from "lodash-es";
 import { Size } from "protocol";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useThrottle } from "react-use";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
-import { Layer, useLayerPicker, WithLayer } from "slices/layers";
-import { equal } from "slices/selector";
-import { UploadedTrace } from "slices/UIState";
+import { useLayerPicker, WithLayer } from "slices/layers";
 import { PanelState } from "slices/view";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { set } from "utils/set";
 import { PageContentProps } from "../PageMeta";
-import AxisOverlay, { createScatterScale, createSymlogScatterScale } from "./Axis";
+import AxisOverlay from "./Axis";
+import { buildScatterPlotData } from "./buildScatterPlotData";
 import { GraphEvents } from "./GraphEvents";
+import { ScatterPlotControls } from "./ScatterPlotControls";
+import { ScatterPlotGraph } from "./ScatterPlotGraph";
 import { divider, isDefined, TreeGraph } from "./TreeGraph";
+import { isTreeLayer, TreeLayer } from "./TreeLayer";
 import { useTreeLayout } from "./TreeLayoutWorker";
-import { getGraphColorHex } from "./useGraphColoring";
-import { useGraphSettings, useNodeCulling } from "./useGraphSettings";
+import { useGraphSettings } from "./useGraphSettings";
 import { useSelection } from "./useSelection";
 import { useTrackedProperty } from "./useTrackedProperty";
+import { useTreePageState } from "./useTreePageState";
 
 type TreePageContext = PanelState;
 
@@ -79,36 +70,15 @@ const layoutModes = {
     value: "directed-graph",
     name: "Directed Graph",
     description: "Show all edges",
-    showAllEdges: true
+    showAllEdges: true,
   },
   tree: {
     value: "tree",
     name: "Tree",
     description: "Show only edges between each node and their final parents",
-    showAllEdges: false
+    showAllEdges: false,
   },
 };
-
-const CLEAN_CHECKBOX_SX = {
-  p: 0.5,
-  '&:hover': {
-    backgroundColor: 'transparent', // remove grey hover background
-  },
-  '&.Mui-focusVisible': {
-    outline: 'none',                // remove focus ring
-  },
-  '& .MuiSvgIcon-root': {
-    transition: 'none',             // remove icon hover animation
-  },
-};
-
-export type TreeLayer = Layer<
-  PlaybackLayerData & TraceLayerData & HighlightLayerData
->;
-
-const isTreeLayer = (l: Layer<unknown>): l is TreeLayer =>
-  !!getController(l)?.steps;
-
 function TreeMenu({
   layer: key,
   selected,
@@ -137,11 +107,7 @@ function TreeMenu({
   };
 
   const Row = ({ k, v }: { k: string; v: unknown }) => (
-    <Stack
-      direction="row"
-      spacing={1}
-      sx={{ py: 0.25, overflowX: "hidden" }}
-    >
+    <Stack direction="row" spacing={1} sx={{ py: 0.25, overflowX: "hidden" }}>
       <Typography
         variant="body2"
         color="text.secondary"
@@ -200,7 +166,11 @@ function TreeMenu({
             findLast(es, (c) => c.step <= step)?.step === entry.step;
 
           return (
-            <Stack key={entry.step} direction="row" sx={{ overflowX: "hidden" }}>
+            <Stack
+              key={entry.step}
+              direction="row"
+              sx={{ overflowX: "hidden" }}
+            >
               <Tooltip title={`Go to step ${entry.step}`} placement="left">
                 <MenuItem
                   selected={isSelected}
@@ -260,11 +230,11 @@ function TreeMenu({
 
               // ID props first in order
               const idProps = Object.entries(event).filter(
-                ([k]) => k !== "type" && isIdLabel(k)
+                ([k]) => k !== "type" && isIdLabel(k),
               );
 
               const otherProps = Object.entries(event).filter(
-                ([k]) => k !== "type" && !isIdLabel(k)
+                ([k]) => k !== "type" && !isIdLabel(k),
               );
 
               return (
@@ -281,9 +251,7 @@ function TreeMenu({
                   </ListItem>
 
                   <Box px={2} pb={1}>
-                    <Typography variant="body2">
-                      {startCase(type)}
-                    </Typography>
+                    <Typography variant="body2">{startCase(type)}</Typography>
                   </Box>
 
                   {!!idProps.length && (
@@ -293,7 +261,6 @@ function TreeMenu({
                       ))}
                     </Box>
                   )}
-
 
                   <ListItem sx={{ py: 0 }}>
                     <Typography
@@ -307,9 +274,7 @@ function TreeMenu({
 
                   <Box px={2} py={1}>
                     {otherProps.length ? (
-                      otherProps.map(([k, v]) => (
-                        <Row key={k} k={k} v={v} />
-                      ))
+                      otherProps.map(([k, v]) => <Row key={k} k={k} v={v} />)
                     ) : (
                       <Typography variant="body2" color="text.secondary">
                         None
@@ -339,7 +304,7 @@ function TreeMenu({
                 highlight.color,
                 theme.palette.mode,
                 500,
-                400
+                400,
               );
 
               return (
@@ -351,7 +316,7 @@ function TreeMenu({
                           selected={
                             l.source?.highlighting?.type === highlight.type &&
                             l.source?.highlighting?.step ===
-                            selected?.current?.step
+                              selected?.current?.step
                           }
                           sx={{
                             height: 32,
@@ -361,7 +326,7 @@ function TreeMenu({
                           }}
                           onClick={(e) => {
                             showHighlight[highlight.type](
-                              selected!.current!.step!
+                              selected!.current!.step!,
                             );
                             props?.onClose?.(e, "backdropClick");
                           }}
@@ -383,26 +348,16 @@ function TreeMenu({
   );
 }
 
-
-function useTreePageState(key?: string) {
-  "use no memo";
-
-  const one = slice.layers.one<TreeLayer>(key);
-  const trace = one.use<UploadedTrace | undefined>(
-    (l) => l?.source?.trace,
-    equal("key")
-  );
-  const step = one.use((l) => l?.source?.step);
-  return { step, trace };
-}
-
 const sanitizeMetricKey = (key: string) => key.replace(/\./g, "");
 
 export function TreePage({ template: Page }: PageContentProps) {
   const theme = useTheme();
 
   // Scatterplot
-  const [logAxis, setLogAxis] = useState<{ x: boolean; y: boolean }>({ x: false, y: false });
+  const [logAxis, setLogAxis] = useState<{ x: boolean; y: boolean }>({
+    x: false,
+    y: false,
+  });
   const [formInput, setFormInput] = useState<{
     xMetric: string;
     yMetric: string;
@@ -424,38 +379,36 @@ export function TreePage({ template: Page }: PageContentProps) {
       buildScatterPlotData(
         trace?.content,
         formInput.xMetric,
-        formInput.yMetric
+        formInput.yMetric,
       ),
-    [trace?.content, formInput.xMetric, formInput.yMetric]
+    [trace?.content, formInput.xMetric, formInput.yMetric],
   );
 
   const eventTypes = Array.from(
-    new Set(processedData.data.map((p) => p.point.eventType))
+    new Set(processedData.data.map((p) => p.point.eventType)),
   );
 
   const handleEventTypeChange = (value: any) => {
     const v = String(value ?? "");
     setEventTypeFilter(v);
   };
-  const handleAxisChange =
-    (axis: "xMetric" | "yMetric") =>
-      (value: any) => {
-        const raw = String(value ?? "");
-        const sanitized = raw ? sanitizeMetricKey(raw) : "";
+  const handleAxisChange = (axis: "xMetric" | "yMetric") => (value: any) => {
+    const raw = String(value ?? "");
+    const sanitized = raw ? sanitizeMetricKey(raw) : "";
 
-        if (!sanitized) {
-          setFormInput({
-            xMetric: "",
-            yMetric: "",
-          });
-          return;
-        }
+    if (!sanitized) {
+      setFormInput({
+        xMetric: "",
+        yMetric: "",
+      });
+      return;
+    }
 
-        setFormInput((prev) => ({
-          ...prev,
-          [axis]: sanitized,
-        }));
-      };
+    setFormInput((prev) => ({
+      ...prev,
+      [axis]: sanitized,
+    }));
+  };
 
   const [groupByAttribute, setGroupByAttribute] = useState<string>("");
 
@@ -476,13 +429,12 @@ export function TreePage({ template: Page }: PageContentProps) {
 
   const [trackedProperty, setTrackedProperty, properties] = useTrackedProperty(
     trace?.key,
-    trace?.content
+    trace?.content,
   );
-  // const [axisTracking, setAxisTracking] = useState<typeof properties | "">("");
 
   const { point, selected, selection, setSelection } = useSelection(
     throttled,
-    trace?.content
+    trace?.content,
   );
 
   const [mode, setMode] = useState<"tree" | "directed-graph">("tree");
@@ -492,32 +444,18 @@ export function TreePage({ template: Page }: PageContentProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [axisBounds, setAxisBounds] = useState<AxisBounds | null>(null);
 
-  const stableAxisBounds = useMemo(() => axisBounds, [
-    axisBounds?.xMin,
-    axisBounds?.xMax,
-    axisBounds?.yMin,
-    axisBounds?.yMax,
-  ]);
+  const stableAxisBounds = useMemo(
+    () => axisBounds,
+    [axisBounds?.xMin, axisBounds?.xMax, axisBounds?.yMin, axisBounds?.yMax],
+  );
+
   const { data: tree, isLoading: loading } = useTreeLayout({
     trace: trace?.content,
     mode,
-    key: trace?.key
+    key: trace?.key,
   });
 
   const graphSettings = useGraphSettings();
-  // Combined dropdown 
-  const scatterPlotAxis = [
-    { id: "", name: "Off" },
-    { id: "step", name: "Step", value: "step" },
-    ...map(
-      entries(properties).filter(([_, v]) => !v.type.toLowerCase().includes("text")),
-      ([k, v]) => ({
-        id: k,
-        name: `$${k}`,
-        description: v.type,
-      })
-    ),
-  ];
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>tree</Page.Key>
@@ -535,28 +473,34 @@ export function TreePage({ template: Page }: PageContentProps) {
                     <SigmaContainer
                       style={{
                         ...size,
-                        background: theme.palette.background.paper
+                        background: theme.palette.background.paper,
                       }}
                       graph={MultiDirectedGraph}
                       settings={graphSettings}
                     >
-                      {!scatterplotMode && <> <TreeGraph
-                        width={size.width}
-                        height={size.height}
-                        step={throttled}
-                        tree={tree}
-                        trace={trace?.content}
-                        layer={key}
-                        showAllEdges={layoutModes[mode].showAllEdges}
-                        trackedProperty={trackedProperty}
-                        onExit={() => {
-                          const layer = one.get();
-                          if (!isEmpty(layer?.source?.highlighting)) {
-                            one.set((l) => set(l, "source.highlighting", {}));
-                          }
-                        }}
-                      />
-                      </>}
+                      {!scatterplotMode && (
+                        <>
+                          {" "}
+                          <TreeGraph
+                            width={size.width}
+                            height={size.height}
+                            step={throttled}
+                            tree={tree}
+                            trace={trace?.content}
+                            layer={key}
+                            showAllEdges={layoutModes[mode].showAllEdges}
+                            trackedProperty={trackedProperty}
+                            onExit={() => {
+                              const layer = one.get();
+                              if (!isEmpty(layer?.source?.highlighting)) {
+                                one.set((l) =>
+                                  set(l, "source.highlighting", {}),
+                                );
+                              }
+                            }}
+                          />
+                        </>
+                      )}
                       {scatterplotMode && (
                         <>
                           <ScatterPlotOverlayToolbar />
@@ -587,33 +531,50 @@ export function TreePage({ template: Page }: PageContentProps) {
                     </SigmaContainer>
                   )}
                 </AutoSize>
-                {<>{menuOpen && <TreeMenu
-                  onClose={() => setMenuOpen(false)}
-                  anchorReference="anchorPosition"
-                  anchorPosition={{
-                    left: point.x,
-                    top: point.y
-                  }}
-                  transformOrigin={{
-                    horizontal: "left",
-                    vertical: "top"
-                  }}
-                  open={menuOpen}
-                  layer={key}
-                  selected={selected}
-                  selection={selection}
-                />}</>}
-              </>
-            ) : (
-              <><WithLayer<TreeLayer> layer={key}>
-                {(l) => (
-                  <Placeholder
-                    icon={<AccountTreeOutlined />}
-                    label="Graph"
-                    secondary={`${inferLayerName(l)} is not a graph.`}
+                {menuOpen && (
+                  <TreeMenu
+                    onClose={() => setMenuOpen(false)}
+                    anchorReference="anchorPosition"
+                    anchorPosition={{
+                      left: point.x,
+                      top: point.y,
+                    }}
+                    transformOrigin={{
+                      horizontal: "left",
+                      vertical: "top",
+                    }}
+                    open={menuOpen}
+                    layer={key}
+                    selected={selected}
+                    selection={selection}
                   />
                 )}
-              </WithLayer></>
+                <ScatterPlotControls
+                  eventTypes={eventTypes}
+                  scatterplotMode={scatterplotMode}
+                  handleAxisChange={handleAxisChange}
+                  handleEventTypeChange={handleEventTypeChange}
+                  handleGroupByChange={handleGroupByChange}
+                  formInput={formInput}
+                  groupByAttribute={groupByAttribute}
+                  eventTypeFilter={eventTypeFilter}
+                  logAxis={logAxis}
+                  properties={properties}
+                  setLogAxis={setLogAxis}
+                />
+              </>
+            ) : (
+              <>
+                <WithLayer<TreeLayer> layer={key}>
+                  {(l) => (
+                    <Placeholder
+                      icon={<AccountTreeOutlined />}
+                      label="Graph"
+                      secondary={`${inferLayerName(l)} is not a graph.`}
+                    />
+                  )}
+                </WithLayer>
+              </>
             )
           ) : (
             <Placeholder
@@ -668,105 +629,10 @@ export function TreePage({ template: Page }: PageContentProps) {
                   arrow
                 />
               </Fragment>
-            )
+            ),
           )}
 
           {divider}
-
-
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography variant="overline" color="text.secondary">
-              Scatterplot
-            </Typography>
-            {scatterplotMode ? (
-              <Typography variant="caption" color="success.main">
-                (active)
-              </Typography>
-            ) : (
-              <Typography variant="caption" color="text.secondary" >
-                (select X and Y)
-              </Typography>
-            )}
-            <FeaturePicker
-              label={
-                formInput.xMetric ? `X axis: $${formInput.xMetric}` : "X axis"
-              }
-              value={formInput.xMetric}
-              items={scatterPlotAxis}
-              onChange={handleAxisChange("xMetric")}
-              arrow
-              itemOrientation="horizontal"
-            />
-
-            <FeaturePicker
-              label={
-                formInput.yMetric ? `Y axis: $${formInput.yMetric}` : "Y axis"
-              }
-              value={formInput.yMetric}
-              items={scatterPlotAxis}
-              onChange={handleAxisChange("yMetric")}
-              arrow
-              itemOrientation="horizontal"
-            />
-            {scatterplotMode && (
-              <>
-                <FeaturePicker
-                  label={groupByAttribute ? `Group by: ${startCase(groupByAttribute)}` : "Group by"}
-                  value={groupByAttribute}
-                  items={[
-                    { id: "", name: "No Grouping", description: "Show all nodes individually" },
-                    { id: "type", name: "Type", description: "Group by node type/status" },
-                    { id: "g", name: "g-value", description: "Group by cost from start (ranges)" },
-                    { id: "h", name: "h-value", description: "Group by heuristic to goal (ranges)" },
-                    { id: "f", name: "f-value", description: "Group by total cost f=g+h (ranges)" },
-                    { id: "step", name: "Step", description: "Group by exploration step (ranges)" },
-                  ]}
-                  onChange={handleGroupByChange}
-                  arrow
-                  itemOrientation="horizontal"
-                />
-                <FeaturePicker
-                  label={
-                    eventTypeFilter
-                      ? `Event: ${startCase(eventTypeFilter)}`
-                      : "Event type"
-                  }
-                  value={eventTypeFilter}
-                  items={[
-                    { id: "", name: "All event types" },
-                    ...eventTypes.map((t) => ({
-                      id: t,
-                      name: startCase(t),
-                    })),
-                  ]}
-                  onChange={handleEventTypeChange}
-                  arrow
-                  itemOrientation="horizontal"
-                />
-                <Checkbox
-                  size="small"
-                  checked={logAxis.x}
-                  onChange={(e) =>
-                    setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
-                  }
-                  sx={CLEAN_CHECKBOX_SX}
-                />
-                <Typography variant="body2">Log X (Symlog)</Typography>
-
-                <Checkbox
-                  size="small"
-                  checked={logAxis.y}
-                  onChange={(e) =>
-                    setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
-                  }
-                  sx={CLEAN_CHECKBOX_SX}
-                />
-                <Typography variant="body2">Log Y (Symlog)</Typography>
-              </>
-            )}
-          </Stack>
-
-
         </>
       </Page.Options>
       <Page.Extras>{controls}</Page.Extras>
@@ -774,74 +640,7 @@ export function TreePage({ template: Page }: PageContentProps) {
   );
 }
 
-const buildScatterPlotData = (
-  traceData,
-  xMetricName: string,
-  yMetricName: string,
-): ScatterPlotScaleAndData => {
-  const scatterPlotData: ScatterPlotOutput[] = [];
-  if (!traceData || !traceData.events) {
-    return {
-      data: [],
-      xMin: 0,
-      xMax: 0,
-      yMin: 0,
-      yMax: 0
-    };
-  }
-  let xMin = Infinity;
-  let xMax = -Infinity;
-  let yMin = Infinity;
-  let yMax = -Infinity;
-  traceData.events.forEach((event, step) => {
-    const metrics: MetricsBag = {};
-    for (const key in event) {
-      const num = Number(event[key]);
-      if (!isNaN(num) && key !== "id" && key !== "pId") {
-        metrics[key] = num;
-      }
-    }
-    metrics.step = step;
-
-    const x = metrics[xMetricName] ?? 0;
-    const y = metrics[yMetricName] ?? 0;
-
-    xMin = Math.min(xMin, x);
-    xMax = Math.max(xMax, x);
-    yMin = Math.min(yMin, y);
-    yMax = Math.max(yMax, y);
-    // required to show unique node for each sub type of event per id
-    const logicalId = String(event.id);
-    const uniqueId = `${logicalId}-${step}`;
-
-    scatterPlotData.push({
-      x,
-      y,
-      point: {
-        id: uniqueId,
-        logicalId,
-        label: logicalId,
-        step,
-        eventType: event.type,
-        metrics,
-      },
-    });
-  });
-
-  if (!isNaN(xMax)) {
-    const spanX = xMax - xMin || 1;
-    xMax = xMax + spanX * 0.1;
-  }
-
-  if (!isNaN(yMax)) {
-    const spanY = yMax - yMin || 1;
-    yMax = yMax + spanY * 0.1;
-  }
-
-  return { data: scatterPlotData, xMin, xMax, yMax, yMin, xAxis: xMetricName, yAxis: yMetricName };
-};
-
-type ScatterPlotGraphProps = {
+export type ScatterPlotGraphProps = {
   processedData: ScatterPlotScaleAndData;
   logAxis: { x: boolean; y: boolean };
   eventTypeFilter?: string;
@@ -849,209 +648,54 @@ type ScatterPlotGraphProps = {
   axisBounds?: AxisBounds | null;
 };
 
-export function ScatterPlotGraph({
-  processedData,
-  logAxis,
-  eventTypeFilter,
-  step,
-  axisBounds
-}: ScatterPlotGraphProps) {
-  const theme = useTheme();
-  const sigma = useSigma();
-  const loadGraph = useLoadGraph();
-
-  const backgroundHex = theme.palette.background.paper;
-  const foregroundHex = theme.palette.text.primary;
-
-  const stepBucketsRef = useRef<string[][]>([]);
-  const prevStepRef = useRef<number | null>(null);
-  const baseColorByIdRef = useRef<Record<string, string>>({});
-
-  // The graying out logic when the node is out of bounds
-  useNodeCulling(axisBounds);
-
-  // Initial Graph load
-  useEffect(() => {
-    const graph = new MultiDirectedGraph();
-
-    stepBucketsRef.current = [];
-    baseColorByIdRef.current = {};
-    prevStepRef.current = null;
-
-    const neutralColor = getGraphColorHex(
-      "neutral",
-      0,
-      backgroundHex,
-      foregroundHex
-    );
-
-    const points = eventTypeFilter
-      ? processedData.data.filter(
-        (p) => p.point.eventType === eventTypeFilter
-      )
-      : processedData.data;
-
-    const xScale = (
-      logAxis.x ? createSymlogScatterScale : createScatterScale
-    )(processedData.xMin, processedData.xMax).range([-1, 1]);
-
-    const yScale = (
-      logAxis.y ? createSymlogScatterScale : createScatterScale
-    )(processedData.yMin, processedData.yMax).range([-1, 1]);
-
-    for (const p of points) {
-      const id = p.point.id;
-      const s = p.point.step;
-
-      const baseColor = getGraphColorHex(
-        p.point.eventType,
-        1,
-        backgroundHex,
-        foregroundHex
-      );
-
-      baseColorByIdRef.current[id] = baseColor;
-      (stepBucketsRef.current[s] ??= []).push(id);
-
-      graph.addNode(id, {
-        x: xScale(p.x),
-        y: yScale(p.y),
-        size: 3,
-        label: p.point.label,
-        color: neutralColor,
-        originalColor: baseColor,
-        logicalId: p.point.logicalId,
-        step: s,
-        eventType: p.point.eventType,
-      });
-    }
-
-    loadGraph(graph);
-  }, [
-    loadGraph,
-    processedData,
-    logAxis,
-    eventTypeFilter,
-    backgroundHex,
-    foregroundHex,
-  ]);
-
-  // Graph color update on step change
-  useEffect(() => {
-    const graph = sigma.getGraph();
-    if (!graph) return;
-
-    const buckets = stepBucketsRef.current;
-    const baseColorById = baseColorByIdRef.current;
-
-    const neutralColor = getGraphColorHex(
-      "neutral",
-      0,
-      backgroundHex,
-      foregroundHex
-    );
-
-    const next = step ?? 0;
-    const prev = prevStepRef.current;
-
-    // First run → replay 0..step once
-    if (prev == null) {
-      for (let s = 0; s <= next; s++) {
-        const ids = buckets[s];
-        if (!ids) continue;
-        for (const id of ids) {
-          const color = baseColorById[id];
-          graph.setNodeAttribute(id, "color", color);
-        }
-      }
-    } else if (next > prev) {
-      // forward
-      for (let s = prev + 1; s <= next; s++) {
-        const ids = buckets[s];
-        if (!ids) continue;
-        for (const id of ids) {
-          const color = baseColorById[id];
-          graph.setNodeAttribute(id, "color", color);
-        }
-      }
-    } else if (next < prev) {
-      // backward
-      for (let s = next + 1; s <= prev; s++) {
-        const ids = buckets[s];
-        if (!ids) continue;
-        for (const id of ids) {
-          graph.setNodeAttribute(id, "color", neutralColor);
-        }
-      }
-    }
-
-    // Size changes for current step
-    if (prev != null && buckets[prev]) {
-      for (const id of buckets[prev]) {
-        graph.setNodeAttribute(id, "size", 3);
-      }
-    }
-    if (buckets[next]) {
-      for (const id of buckets[next]) {
-        graph.setNodeAttribute(id, "size", 12);
-      }
-    }
-
-    prevStepRef.current = next;
-    sigma.refresh();
-  }, [sigma, step, backgroundHex, foregroundHex]);
-
-  return null;
-}
-
-
-
-function ScatterPlotOverlayToolbar() {
+export function ScatterPlotOverlayToolbar() {
   const sigma = useSigma();
   const paper = usePaper();
   const acrylic = useAcrylic();
 
-  return <Stack
-    sx={{
-      pt: 6,
-      transition: (t) => t.transitions.create("padding-top"),
-      position: "absolute",
-      top: 0,
-      left: 0,
-      zIndex: 1000
-    }}
-  >
+  return (
     <Stack
-      direction="row"
-      sx={
-        {
-          ...paper(1),
-          ...acrylic,
-          alignItems: "center",
-          height: (t) => t.spacing(6),
-          px: 1,
-          m: 1,
-        } as SxProps<Theme>
-      }
+      sx={{
+        pt: 6,
+        transition: (t) => t.transitions.create("padding-top"),
+        position: "absolute",
+        top: 0,
+        left: 0,
+        zIndex: 1000,
+      }}
     >
-      <IconButtonWithTooltip
-        color="primary"
-        onClick={() => {
-          sigma?.getCamera?.()?.animatedReset?.();
-        }}
-        label="Fit"
-        icon={<CenterFocusWeakOutlined />}
-      />
+      <Stack
+        direction="row"
+        sx={
+          {
+            ...paper(1),
+            ...acrylic,
+            alignItems: "center",
+            height: (t) => t.spacing(6),
+            px: 1,
+            m: 1,
+          } as SxProps<Theme>
+        }
+      >
+        <IconButtonWithTooltip
+          color="primary"
+          onClick={() => {
+            sigma?.getCamera?.()?.animatedReset?.();
+          }}
+          label="Fit"
+          icon={<CenterFocusWeakOutlined />}
+        />
+      </Stack>
     </Stack>
-  </Stack>
+  );
 }
 
-type MetricsBag = {
+export type MetricsBag = {
   [key: string]: number;
 };
 
 type ScatterPlot = {
-  id: string;// unique id for sigma
+  id: string; // unique id for sigma
   logicalId: string; // original id for this to work with selection code
   label: string;
   step: number;
@@ -1064,7 +708,6 @@ export type ScatterPlotOutput = {
   y: number;
   point: ScatterPlot;
 };
-
 
 export type ScatterPlotScaleAndData = {
   data: ScatterPlotOutput[];

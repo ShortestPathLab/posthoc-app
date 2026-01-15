@@ -16,7 +16,7 @@ root.render(
   <EnvironmentProvider slices={slices}>
     <QueryClientProvider client={queryClient}>
       <App />
-      <ReactQueryDevtools />
+      <ReactQueryDevtools buttonPosition="bottom-left" />
     </QueryClientProvider>
-  </EnvironmentProvider>
+  </EnvironmentProvider>,
 );
