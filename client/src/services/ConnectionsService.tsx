@@ -4,11 +4,12 @@ import { useEffect } from "react";
 import { slice } from "slices";
 import { Connection, useConnections } from "slices/connections";
 import { useLoadingState } from "slices/loading";
+import { useOne } from "slices/useOne";
 import { timed } from "utils/timed";
 
 export function ConnectionsService() {
   const notify = useSnackbar();
-  const { remote } = slice.settings.use();
+  const { remote } = useOne(slice.settings);
   const [, setConnections] = useConnections();
   const usingLoadingState = useLoadingState("connections");
 

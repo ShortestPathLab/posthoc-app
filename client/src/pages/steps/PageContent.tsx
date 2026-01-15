@@ -25,7 +25,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { slice } from "slices";
 import { WithLayer } from "slices/layers";
-import { equal } from "slices/selector";
+import { id } from "slices/selector";
 import { useAcrylic, usePaper } from "theme";
 import { SYMBOL_HIGHLIGHTED } from ".";
 import { lerp } from "utils/lerp";
@@ -36,13 +36,15 @@ import { StepsPageState } from "./StepsPageState";
 import { Item } from "./Item";
 import { _ } from "utils/chain";
 import { result } from "utils/result";
+import { useOne } from "slices/useOne";
+
 export function PageContent({ layer: key }: { layer?: string }) {
   const { spacing } = useTheme();
   const paper = usePaper();
   const acrylic = useAcrylic();
   const ref = useRef<ListHandle | null>(null);
   const [scrollerRef, setScrollerRef] = useState<HTMLElement | Window | null>(
-    null
+    null,
   );
 
   const {
@@ -52,17 +54,14 @@ export function PageContent({ layer: key }: { layer?: string }) {
 
   const one = slice.layers.one<StepsLayer>(key);
 
-  const step = one.use(computed("step"));
-  const playing = one.use(computed("playing"));
+  const step = useOne(one, computed("step"));
+  const playing = useOne(one, computed("playing"));
 
   const { steps: rawSteps } =
-    one.use<Steps | undefined>(
-      (c) => getController(c)?.steps?.(c),
-      equal("key")
-    ) ?? {};
+    useOne(one, (c) => getController(c)?.steps?.(c), id("key")) ?? {};
 
   // TODO: low performance `isEqual`
-  const highlighting = one.use((c) => c?.source?.highlighting, isEqual);
+  const highlighting = useOne(one, (c) => c?.source?.highlighting, isEqual);
   const isHighlighting = _selectedType === SYMBOL_HIGHLIGHTED;
 
   const { steps, stepToFilteredStep, isDisabled } = useMemo(
@@ -74,7 +73,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
             steps,
             (s) => s.map(([e]) => e?.type),
             (s) => filter(s),
-            uniq
+            uniq,
           );
 
           const allSelected = !stepTypes.includes(_selectedType);
@@ -95,7 +94,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
               : allSelected
                 ? steps
                 : steps.filter(([a]) => a.type === _selectedType),
-            ([, step]) => step
+            ([, step]) => step,
           );
 
           const { stepMap } = reduce(
@@ -107,7 +106,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
               prev.stepMap.push(k);
               return prev;
             },
-            { from: 0, stepMap: [] as number[] }
+            { from: 0, stepMap: [] as number[] },
           );
 
           return {
@@ -119,7 +118,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
         }
         return {};
       }).result ?? {},
-    [rawSteps, _selectedType, highlighting, showHighlighting]
+    [rawSteps, _selectedType, highlighting, showHighlighting],
   );
 
   useEffect(() => {

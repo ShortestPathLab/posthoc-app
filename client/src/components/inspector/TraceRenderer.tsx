@@ -26,6 +26,7 @@ import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
 import { TrustedContent } from "./TrustedContent";
 import { isMobile } from "mobile-device-detect";
+import { useOne } from "slices/useOne";
 
 const TILE_RESOLUTION = 128;
 
@@ -101,14 +102,13 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
       }
     },
     theme.transitions.duration.standard,
-    [instance, width, height]
+    [instance, width, height],
   );
   return { instance, ref, error };
 }
 
 function useLoading() {
-  "use no memo";
-  return slice.loading.use((l) => !!l.layers);
+  return useOne(slice.loading, (l) => !!l.layers);
 }
 
 function TraceRendererCircularProgress() {
@@ -128,8 +128,8 @@ const VIEWPORT_PAGE_DESCRIPTION =
   "When you create a layer, you'll see it visualised here.";
 
 function useAnyLayerPlaying() {
-  return slice.layers.use((l) =>
-    some(l, (l) => isStepsLayer(l) && l.source?.playback === "playing")
+  return useOne(slice.layers, (l) =>
+    some(l, (l) => isStepsLayer(l) && l.source?.playback === "playing"),
   );
 }
 

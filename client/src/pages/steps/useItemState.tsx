@@ -1,9 +1,10 @@
 import { Steps } from "layers";
 import { getController } from "layers/layerControllers";
 import { slice } from "slices";
-import { equal } from "slices/selector";
+import { id } from "slices/selector";
 import { StepsLayer } from "./StepsLayer";
 import { useBreakpoint3 } from "hooks/useBreakPoints";
+import { useOne } from "slices/useOne";
 
 export function useItemState({
   layer,
@@ -12,13 +13,13 @@ export function useItemState({
   layer?: string;
   index?: number;
 }) {
-  "use no memo";
   const one = slice.layers.one<StepsLayer>(layer);
-  const event = one.use<Steps | undefined>(
+  const event = useOne(
+    one,
     (l) => getController(l)?.steps?.(l),
-    equal("key")
+    id<Steps | undefined>("key"),
   )?.steps?.[index];
-  const isSelected = one.use((l) => l.source?.step === index);
+  const isSelected = useOne(one, (l) => l.source?.step === index);
   const { shouldBreak } = useBreakpoint3(layer);
   return { event, isSelected, label: shouldBreak(index)?.result };
 }

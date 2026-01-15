@@ -29,6 +29,7 @@ import { useMemo } from "react";
 import { slice } from "slices";
 import { Map } from "slices/UIState";
 import { Layer } from "slices/layers";
+import { useOne } from "slices/useOne";
 import { ext, name } from "utils/path";
 
 export type MapLayerData = {
@@ -171,7 +172,7 @@ export const controller = {
   }),
   provideSelectionInfo: ({ children, event, layer: key }) => {
     const one = slice.layers.one<MapLayer>(key);
-    const layer = one.use();
+    const layer = useOne(one);
     const { parsedMap } = layer?.source ?? {};
     const { point, node } = useMemo(() => {
       if (parsedMap && event) {

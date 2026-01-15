@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { UploadedTrace } from "slices/UIState";
+import { useOne } from "slices/useOne";
 import { _ } from "utils/chain";
 export type DebugLayerData = {
   code?: string;
@@ -24,9 +25,8 @@ export type DebugLayerData = {
 };
 
 export function useBreakpoint3(key?: string) {
-  "use no memo";
   const one = slice.layers.one<Layer<DebugLayerData>>(key);
-  const dict = one.use((l) => l?.source?.breakpointOutputDict);
+  const dict = useOne(one, (l) => l?.source?.breakpointOutputDict);
   return useMemo(() => {
     return {
       shouldBreak: (step: number): { result?: string; error?: string } =>
@@ -38,9 +38,7 @@ export function useBreakpoint3(key?: string) {
 }
 
 export function useBreakPoints2(key?: string) {
-  "use no memo";
-
-  const layer = slice.layers.one<Layer<DebugLayerData>>(key).use();
+  const layer = useOne(slice.layers.one<Layer<DebugLayerData>>(key));
   const { code = "" } = layer?.source ?? {};
   const { isTrusted } = useUntrustedLayers();
   const events = layer?.source?.trace?.content?.events ?? [];
@@ -56,7 +54,7 @@ export function useBreakPoints2(key?: string) {
       layer?.source?.breakpointOutput,
       (b) => map(b, (s) => values(s)),
       (b) => flattenDepth(b, 2),
-      (b) => groupBy(b, "step")
+      (b) => groupBy(b, "step"),
     );
 
     return (step: number) => {
@@ -87,7 +85,7 @@ export function useBreakPoints2(key?: string) {
 
 export function treeToDict(
   trees: EventTree[] = [],
-  dict: TreeDict = {}
+  dict: TreeDict = {},
 ): TreeDict {
   for (const tree of trees) {
     for (const event of tree.events) {

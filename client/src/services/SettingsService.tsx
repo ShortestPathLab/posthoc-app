@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { minimal } from "./SyncParticipant";
 import { slice } from "slices";
+import { useOne } from "slices/useOne";
 
 export function SettingsService() {
-  "use no memo";
-  const { "behaviour/showOnStart": showOnStart } = slice.settings.use();
+  const { "behaviour/showOnStart": showOnStart } = useOne(slice.settings);
   useEffect(() => {
     const workspace = new URLSearchParams(location.search).get("workspace");
     if (!minimal && showOnStart && !workspace) {

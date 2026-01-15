@@ -3,11 +3,11 @@ import { map } from "lodash-es";
 import { createElement, useMemo } from "react";
 import { slice } from "slices";
 import { useActive } from "./SyncService";
+import { useOne } from "slices/useOne";
 
 function useLayerServices() {
-  "use no memo";
   const isActive = useActive();
-  const layers = slice.layers.use();
+  const layers = useOne(slice.layers);
   return useMemo(() => {
     return isActive
       ? map(layers, (layer) => {

@@ -11,13 +11,13 @@ import { slice } from "slices";
 import { set } from "utils/set";
 import { Controller } from ".";
 import { isMapLayer } from "./isMapLayer";
+import { useOne } from "slices/useOne";
 
 export const provideSelectionInfo = (({ children, event, layer: key }) => {
-  "use no memo";
   const TraceLayerSelectionInfoProvider = traceController.provideSelectionInfo;
   const { use: useLayer, set: setLayer } = slice.layers.one(key);
   const layer = useLayer();
-  const layers = slice.layers.use();
+  const layers = useOne(slice.layers);
   const mapLayerData = useMemo(
     () =>
       layers
@@ -26,7 +26,7 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
           const { parsedMap } = l?.source ?? {};
           if (!parsedMap || !event) return;
           const hydratedMap = getParser(l?.source?.map?.format)?.hydrate?.(
-            parsedMap
+            parsedMap,
           );
           if (!hydratedMap) return;
           const point = event?.world && hydratedMap.snap(event.world);
@@ -40,7 +40,7 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
           };
         })
         .filter(identity),
-    [layers]
+    [layers],
   );
   const menu = useMemo(
     () =>
@@ -78,12 +78,12 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
                   icon: <DestinationIcon />,
                 },
               }),
-              {}
+              {},
             ),
           },
         },
       },
-    [mapLayerData, layer, layers, setLayer]
+    [mapLayerData, layer, layers, setLayer],
   );
   return (
     <TraceLayerSelectionInfoProvider event={event} layer={key}>

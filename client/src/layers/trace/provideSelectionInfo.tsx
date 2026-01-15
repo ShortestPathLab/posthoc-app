@@ -19,10 +19,11 @@ import { slice } from "slices";
 import { set } from "utils/set";
 import { TraceLayer } from "./TraceLayer";
 import { Controller } from "./types";
+import { useOne } from "slices/useOne";
 
 export const provideSelectionInfo = (({ layer: key, event, children }) => {
   const one = slice.layers.one<TraceLayer>(key);
-  const layer = one.use();
+  const layer = useOne(one);
   const menu = useMemo(() => {
     const events = layer?.source?.parsedTrace?.content?.events ?? [];
     const steps = (event?.info?.components ?? [])
@@ -49,7 +50,7 @@ export const provideSelectionInfo = (({ layer: key, event, children }) => {
                 },
               },
             })),
-            "key"
+            "key",
           ),
           [layer.key]: {
             primary: inferLayerName(layer),

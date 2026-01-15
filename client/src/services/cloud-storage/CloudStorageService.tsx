@@ -8,9 +8,9 @@ import { useCloudStorageService } from "slices/cloudStorage";
 import { defaultCloudStorage } from "slices/settings";
 import { assert } from "utils/assert";
 import providers from "./providers";
+import { useOne } from "slices/useOne";
 
 function useCloudStorageManager(provider: keyof typeof providers) {
-  "use no memo";
   //
   // ─── Create Storage Provider ─────────────────────────────────────────
 
@@ -36,7 +36,6 @@ function useCloudStorageManager(provider: keyof typeof providers) {
 }
 
 export function CloudStorageService() {
-  "use no memo";
-  const { cloudStorageType = defaultCloudStorage } = slice.settings.use();
+  const { cloudStorageType = defaultCloudStorage } = useOne(slice.settings);
   useCloudStorageManager(cloudStorageType);
 }

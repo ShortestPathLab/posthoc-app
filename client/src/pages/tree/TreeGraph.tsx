@@ -40,12 +40,13 @@ import { TreeWorkerReturnType } from "./treeLayout.worker";
 import { TreeAxis } from "./TreeAxis";
 import { useGraphColoring } from "./useGraphColoring";
 import { useMultiDirectedGraph } from "./useMultiDirectedGraph";
+import { useOne } from "slices/useOne";
 
 export function setAttributes(
   graph: MultiDirectedGraph,
   id: string,
   type: "edge" | "node",
-  values: { [K in string]: string | number },
+  values: { [K in string]: string | number | boolean },
 ) {
   const a = {
     node: "setNodeAttribute" as const,
@@ -111,20 +112,16 @@ export type NodeType = { x: number; y: number; label: string; size: number };
 export type EdgeType = { label: string };
 
 function useHighlighting(key?: string) {
-  "use no memo";
-  return layers.one<TreeLayer>(key).use((l) => l.source?.highlighting, isEqual);
+  return useOne(
+    layers.one<TreeLayer>(key),
+    (l) => l.source?.highlighting,
+    isEqual,
+  );
 }
 
 export function TreeGraph(props: TreeGraphProps) {
-  const {
-    trace,
-    tree,
-    layer: key,
-    onExit,
-    trackedProperty,
-    width,
-    height,
-  } = props;
+  const { trace, tree, layer: key, onExit, width, height } = props;
+  console.log(props.step);
 
   const paper = usePaper();
   const acrylic = useAcrylic();

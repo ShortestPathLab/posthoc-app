@@ -1,6 +1,7 @@
 import { store } from "@davstack/store";
 import { some, values } from "lodash-es";
 import { useCallback } from "react";
+import { useOne } from "./useOne";
 
 const defaultLoadingStore = {
   layers: 0,
@@ -20,8 +21,7 @@ export const loading = store<Record<Loading, number>>(defaultLoadingStore, {
 }));
 
 export function useAnyLoading() {
-  "use no memo";
-  return loading.use((l) => some(values(l)));
+  return useOne(loading, (l) => some(values(l)));
 }
 
 export function useLoadingState(key: Loading = "general") {
@@ -36,6 +36,6 @@ export function useLoadingState(key: Loading = "general") {
         loading.end(key);
       }
     },
-    [key]
+    [key],
   );
 }

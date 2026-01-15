@@ -13,16 +13,17 @@ import { useAsyncAbortable } from "react-async-hook";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
-import { equal } from "slices/selector";
+import { id } from "slices/selector";
 import { UploadedTrace } from "slices/UIState";
 import { _ } from "utils/chain";
 import { NonEmptyString } from "utils/Char";
 import { set } from "utils/set";
 import { usingWorkerTask } from "workers/usingWorker";
 import workerUrl from "./breakpoint.worker.ts?worker&url";
+import { useOne } from "slices/useOne";
 async function attempt<T, U>(
   f: () => Promise<T>,
-  c: (e: unknown) => U
+  c: (e: unknown) => U,
 ): Promise<T | U> {
   try {
     return await f();
@@ -54,22 +55,17 @@ const processBreakpoint = memo(
   {
     normalizer: ([a, b]) => objectHash({ breakpoint: a, key: b }),
     primitive: true,
-  }
+  },
 );
 
 export function BreakpointService({ value }: { value?: string }) {
-  "use no memo";
-
   const one = slice.layers.one<Layer<DebugLayerData>>(value);
 
   const usingLoadingState = useLoadingState("general");
 
-  const trace = one.use<UploadedTrace | undefined>(
-    (l) => l?.source?.trace,
-    equal("key")
-  );
+  const trace = useOne(one, (l) => l?.source?.trace, id("key"));
 
-  const inputs = one.use((l) => l?.source?.breakpoints, isEqual);
+  const inputs = useOne(one, (l) => l?.source?.breakpoints, isEqual);
 
   const { data: { dict, tree } = {} } = useComputeTree({
     key: trace?.key,
@@ -87,7 +83,7 @@ export function BreakpointService({ value }: { value?: string }) {
           if (breakpoint.active) {
             const res = await attempt(
               () => processBreakpoint(breakpoint, trace.key, trace, tree, dict),
-              (e) => ({ error: `${e}` })
+              (e) => ({ error: `${e}` }),
             );
             if (signal.aborted) return;
             one.set(
@@ -95,8 +91,8 @@ export function BreakpointService({ value }: { value?: string }) {
                 void set(
                   l,
                   `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
-                  res
-                )
+                  res,
+                ),
             );
           } else {
             one.set(
@@ -104,16 +100,16 @@ export function BreakpointService({ value }: { value?: string }) {
                 void set(
                   l,
                   `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
-                  []
-                )
+                  [],
+                ),
             );
           }
         }
       }),
-    [dict, tree, inputs, value]
+    [dict, tree, inputs, value],
   );
 
-  const outputs = one.use((l) => l?.source?.breakpointOutput, isEqual);
+  const outputs = useOne(one, (l) => l?.source?.breakpointOutput, isEqual);
 
   useEffect(() => {
     one.set(
@@ -128,9 +124,9 @@ export function BreakpointService({ value }: { value?: string }) {
               s.flatMap((v) => {
                 return "error" in v ? [] : v;
               }),
-            (s) => groupBy(s, "step")
-          )
-        )
+            (s) => groupBy(s, "step"),
+          ),
+        ),
     );
   }, [outputs]);
 

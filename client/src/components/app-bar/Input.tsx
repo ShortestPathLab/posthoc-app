@@ -10,6 +10,7 @@ import { useLoadingState } from "slices/loading";
 import { EditorProps } from "../Editor";
 import { FeaturePicker } from "./FeaturePicker";
 import { custom, uploadMap, uploadTrace } from "./upload";
+import { useOne } from "slices/useOne";
 
 function name(s: string) {
   return s.split(".").shift();
@@ -18,8 +19,7 @@ function name(s: string) {
 export const mapDefaults = { start: undefined, end: undefined };
 
 function useLoading() {
-  "use no memo";
-  return slice.loading.use((l) => !!(l.features || l.connections));
+  return useOne(slice.loading, (l) => !!(l.features || l.connections));
 }
 
 export function MapPicker({ onChange, value }: EditorProps<Map>) {
@@ -58,7 +58,7 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
                     f.file.size > LARGE_FILE_B
                       ? await usingBusyState(
                           f.read,
-                          `Opening map (${formatByte(f.file.size)})`
+                          `Opening map (${formatByte(f.file.size)})`,
                         )
                       : await f.read();
                   if (output) {
@@ -120,7 +120,7 @@ export function TracePicker({
                         f.file.size > LARGE_FILE_B
                           ? await usingBusyState(
                               f.read,
-                              `Opening trace (${formatByte(f.file.size)})`
+                              `Opening trace (${formatByte(f.file.size)})`,
                             )
                           : await f.read();
                       if (output) {

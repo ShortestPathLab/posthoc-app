@@ -44,13 +44,14 @@ import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
+import { useOne, useOne as useSelector } from "slices/useOne";
 
 const paths = import.meta.glob<boolean, string, string>(
   "/public/recipes/*.workspace",
   {
     query: "?url",
     import: "default",
-  }
+  },
 );
 
 const metaPaths = import.meta.glob<boolean, string, string>(
@@ -58,7 +59,7 @@ const metaPaths = import.meta.glob<boolean, string, string>(
   {
     query: "?url",
     import: "default",
-  }
+  },
 );
 
 function stripExtension(path: string) {
@@ -86,7 +87,7 @@ const getFileInfo = memoizee(
       ...(await getMeta(k)),
     };
   },
-  { normalizer: ([k]) => k }
+  { normalizer: ([k]) => k },
 );
 
 // eslint-disable-next-line react/display-name
@@ -185,13 +186,13 @@ export function FeatureCard({
   ...rest
 }: Partial<PosthocMetaData> &
   CardProps & { onOpenClick?: () => void; loading?: boolean }) {
-  const { "appearance/acrylic": acrylic } = slice.settings.use();
+  const { "appearance/acrylic": acrylic } = useOne(slice.settings);
   const paper = usePaper();
   const theme = useTheme();
 
   const { name: authorName, avatar } = useMemo(
     () => getAuthor(author),
-    [author]
+    [author],
   );
 
   return (
@@ -312,8 +313,11 @@ const CONTENT_WIDTH = 740;
 const entries2 = entries(paths);
 
 export function ExplorePage({ template: Page }: PageContentProps) {
+  const showOnStart = useSelector(
+    slice.settings,
+    (s) => s["behaviour/showOnStart"],
+  );
   const theme = useTheme();
-  const { "behaviour/showOnStart": showOnStart } = slice.settings.use();
   const notify = useSnackbar();
   const { controls, onChange, state, dragHandle, isViewTree } =
     useViewTreeContext();
@@ -351,7 +355,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
 
   function onShowOnStartUpCheckedChange(v: boolean) {
     slice.settings.set((f) => {
-      f["behaviour/showOnStart"] = v ? "explore" : undefined;
+      f["behaviour/showOnStart"] = v ? "explore" : false;
     });
   }
 

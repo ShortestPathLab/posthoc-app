@@ -3,6 +3,7 @@ import { useAsync } from "react-async-hook";
 import { RendererDefinition, RendererEvents, RendererOptions } from "renderer";
 import { slice } from "slices";
 import { Renderer, useRenderers } from "slices/renderers";
+import { useOne } from "slices/useOne";
 import url from "url-parse";
 
 type RendererTransportOptions = { url: string };
@@ -14,7 +15,7 @@ interface RendererTransport {
 }
 
 export type RendererTransportConstructor = new (
-  options: RendererTransportOptions
+  options: RendererTransportOptions,
 ) => RendererTransport;
 
 type RendererTransportEntry = {
@@ -38,7 +39,7 @@ export const transports: Record<string, RendererTransportEntry> = {
 };
 
 export function RendererService() {
-  const { renderer } = slice.settings.use();
+  const { renderer } = useOne(slice.settings);
   const [, setRenderers] = useRenderers();
 
   useAsync(async () => {

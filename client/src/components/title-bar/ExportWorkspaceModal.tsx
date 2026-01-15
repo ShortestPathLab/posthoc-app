@@ -18,6 +18,7 @@ import { useLoadingState } from "slices/loading";
 import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
 import { Gallery } from "./Gallery";
+import { useOne } from "slices/useOne";
 
 const replacements = {
   "*": "star",
@@ -34,8 +35,8 @@ function getFilename(name: string = "") {
       reduce(
         entries(replacements),
         (prev, [a, b]) => prev.replace(a, ` ${b} `),
-        name
-      )
+        name,
+      ),
     ) || "untitled"
   );
 }
@@ -47,7 +48,7 @@ async function resizeImage(s: string) {
   if (!base64String) throw new Error("Invalid base64 image data");
 
   const binaryData = Uint8Array.from(atob(base64String), (c) =>
-    c.charCodeAt(0)
+    c.charCodeAt(0),
   );
 
   const a = await Jimp.read(binaryData.buffer);
@@ -73,22 +74,24 @@ export function ExportWorkspace({
     unknown
   >["saveFile"];
 } & SurfaceContentProps) {
-  "use no memo";
   const paper = usePaper();
-  const fields = workspaceMeta.use();
+  const fields = useOne(workspaceMeta);
   const { generateWorkspaceFile, estimateWorkspaceSize, save } = useWorkspace();
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();
   // const storage = useCloudStorageInstance();
   const workspaceSize = useMemo(() => estimateWorkspaceSize(), []);
   const [uploading, setUploading] = useState(false);
-  async function getFields(size: number): Promise<WorkspaceMeta> {
+  async function getFields(
+    size: number,
+    lastModified: number,
+  ): Promise<WorkspaceMeta> {
     return {
       ...fields,
       id: id(),
       size,
       screenshots: await map(fields?.screenshots ?? [], resizeImage),
-      lastModified: Date.now(),
+      lastModified,
     };
   }
 
@@ -137,22 +140,19 @@ export function ExportWorkspace({
                 setUploading(true);
                 const { file } = await generateWorkspaceFile(name);
                 const posthocMetadata = JSON.stringify(
-                  await getFields(file.size)
+                  await getFields(file.size, Date.now()),
                 );
                 const posthocMetaFile = new File(
                   [posthocMetadata],
                   `${name}.workspace.meta`,
-                  { type: "application/json" }
+                  { type: "application/json" },
                 );
 
                 if (uploadFile) {
                   await uploadFile(posthocMetaFile);
                   // await storage?.instance.saveFile(posthocMetaFile);
                 } else {
-                  download(
-                    JSON.stringify(await getFields(file.size)),
-                    `${name}.workspace.meta`
-                  );
+                  download(posthocMetadata, `${name}.workspace.meta`);
                 }
                 notify(`Metadata saved, ${name}.workspace.meta ✅`);
 

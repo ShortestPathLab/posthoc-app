@@ -35,11 +35,5 @@
     "adapter-warthog-websocket",
     "adapter-iron-harvest",
     "resources"
-  ],
-  "dependencies": {
-    "baseline-browser-mapping": "^2.9.4",
-    "caniuse-lite": "^1.0.30001754",
-    "d3-scale": "^4.0.2",
-    "use-window-focus": "^1.4.4"
-  }
+  ]
 }

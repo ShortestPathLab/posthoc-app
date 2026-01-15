@@ -8,12 +8,13 @@ import { startTransition } from "react";
 import { slice } from "slices";
 import { LayerEditor } from "./LayerEditor";
 import { getControllers } from "layers/layerControllers";
+import { useOne } from "slices/useOne";
 
 export function LayerListEditor() {
-  "use no memo";
-  const layers = slice.layers.use(
+  const layers = useOne(
+    slice.layers,
     (l) => map(l, (l) => pick(l, "key")),
-    isEqual
+    isEqual,
   );
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>
@@ -81,8 +82,8 @@ function LayerListEditorExtras({ layer }: { layer?: string }) {
                         void each(
                           l,
                           (s) =>
-                            (s.viewKey = s.key === layer ? id() : undefined)
-                        )
+                            (s.viewKey = s.key === layer ? id() : undefined),
+                        ),
                     ),
                 },
               ].map(({ name, key, action }) => (

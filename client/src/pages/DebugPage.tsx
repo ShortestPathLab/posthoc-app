@@ -17,6 +17,7 @@ import { slice } from "slices";
 import { Layer, useLayerPicker } from "slices/layers";
 import { BreakpointListEditor } from "../components/breakpoint-editor/BreakpointListEditor";
 import { PageContentProps } from "./PageMeta";
+import { useOne } from "slices/useOne";
 
 const stepsLayerGuard = (l: Layer<unknown>): l is Layer<DebugLayerData> =>
   !!getController(l).steps;
@@ -30,7 +31,7 @@ const divider = (
 );
 
 function useDebugPageState(key?: string) {
-  const layer = slice.layers.one<Layer<DebugLayerData>>(key).use();
+  const layer = useOne(slice.layers.one<Layer<DebugLayerData>>(key));
   return { layer };
 }
 

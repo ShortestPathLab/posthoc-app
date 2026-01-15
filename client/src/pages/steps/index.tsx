@@ -10,21 +10,22 @@ import { useEffectWhen } from "hooks/useEffectWhen";
 import { Steps } from "layers";
 import { getController } from "layers/layerControllers";
 import { filter, isEqual, isUndefined, map, startCase, uniq } from "lodash-es";
-import { nanoid as id } from "nanoid";
+import { nanoid } from "nanoid";
 import { useMemo } from "react";
 import { slice } from "slices";
-import { equal } from "slices/selector";
+import { id } from "slices/selector";
 import { _ } from "utils/chain";
 import { result } from "utils/result";
 import { PageContentProps } from "../PageMeta";
 import { PageContent } from "./PageContent";
 import { StepsLayer, isStepsLayer } from "./StepsLayer";
 import { StepsPageState, useStepsPageState } from "./StepsPageState";
+import { useOne } from "slices/useOne";
 
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
-const SYMBOL_ALL = id();
-export const SYMBOL_HIGHLIGHTED = id();
+const SYMBOL_ALL = nanoid();
+export const SYMBOL_HIGHLIGHTED = nanoid();
 
 export function StepsPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } =
@@ -41,13 +42,10 @@ export function StepsPage({ template: Page }: PageContentProps) {
 
   const one = slice.layers.one<StepsLayer>(key);
   const { steps } =
-    one.use<Steps | undefined>(
-      (c) => getController(c)?.steps?.(c),
-      equal("key")
-    ) ?? {};
+    useOne(one, (c) => getController(c)?.steps?.(c), id<Steps>("key")) ?? {};
 
   // TODO: low performance `isEqual`
-  const highlighting = one.use((c) => c?.source?.highlighting, isEqual);
+  const highlighting = useOne(one, (c) => c?.source?.highlighting, isEqual);
 
   const { types, selectedType, isHighlighting } = useMemo(
     () =>
@@ -58,7 +56,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
             (s) => s.map((a, b) => [a, b] as const),
             (s) => s.map(([e]) => e?.type),
             (s) => filter(s),
-            uniq
+            uniq,
           );
 
           const allSelected = !stepTypes.includes(_selectedType);
@@ -76,7 +74,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
         }
         return {};
       }).result ?? {},
-    [steps, _selectedType, highlighting?.path]
+    [steps, _selectedType, highlighting?.path],
   );
 
   useEffectWhen(
@@ -84,7 +82,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
       setSelectedType(isHighlighting ? SYMBOL_HIGHLIGHTED : SYMBOL_ALL);
     },
     [isHighlighting, setSelectedType],
-    [isHighlighting]
+    [isHighlighting],
   );
 
   return (
@@ -121,7 +119,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
               name: "Focused Events",
               description: isHighlighting
                 ? `${startCase(highlighting?.type)}, ${startCase(
-                    steps?.[highlighting?.step ?? 0]?.type
+                    steps?.[highlighting?.step ?? 0]?.type,
                   )} ${steps?.[highlighting?.step ?? 0]?.id}, Step ${
                     highlighting?.step
                   }`

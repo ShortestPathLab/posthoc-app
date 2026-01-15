@@ -56,6 +56,7 @@ import { useAsync } from "react-async-hook";
 import { slice } from "slices";
 import { useAcrylic, usePaper } from "theme";
 import { getLayoutedElements } from "./autoLayout";
+import { useOne } from "slices/useOne";
 
 const flowKey = "visual-flow";
 
@@ -104,9 +105,10 @@ export function VisualPage({ template: Page }: PageContentProps) {
 
   const { key, setKey } = useLayerPicker(isTraceLayer);
 
-  const content = slice.layers
-    .one<Layer<TraceLayerData>>(key)
-    .use((l) => l.source?.trace?.content);
+  const content = useOne(
+    slice.layers.one<Layer<TraceLayerData>>(key),
+    (l) => l.source?.trace?.content,
+  );
 
   const tabs = keys(content?.views);
 
@@ -135,21 +137,21 @@ export function VisualPage({ template: Page }: PageContentProps) {
       onChange?.((v) => {
         v.nodes = applyNodeChanges(changes, v.nodes ?? []);
       }),
-    []
+    [],
   );
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) =>
       onChange?.((v) => {
         v.edges = applyEdgeChanges(changes, v.edges ?? []);
       }),
-    []
+    [],
   );
   const onConnect = useCallback(
     (params: Connection) =>
       onChange?.((v) => {
         v.edges = addEdge(params, v.edges ?? []);
       }),
-    []
+    [],
   );
 
   const onSave = useCallback(() => {
@@ -183,7 +185,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
       hasDefinition: (s: string) => !!content?.views?.[s],
       goToDefinition: (s: string) => onChange?.((v) => void (v.tab = s)),
     }),
-    [content]
+    [content],
   );
 
   const theme = useTheme();
@@ -283,7 +285,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
                                     title: k,
                                     group: "components",
                                   }),
-                                ] as const
+                                ] as const,
                             ),
                           ])
                             .map(([k, v]) => [k, v()] as const)

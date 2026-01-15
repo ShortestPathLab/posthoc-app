@@ -25,6 +25,7 @@ import handlersCollection from "./breakpoints";
 import { BreakpointFieldProps } from "./breakpoints/Breakpoint";
 import pluralize from "pluralize";
 import { FiberManualRecord } from "@mui/icons-material";
+import { useOne } from "slices/useOne";
 
 export const breakpointType = [
   "Breakpoint",
@@ -64,12 +65,15 @@ function BreakpointStatusDisplay<L extends Layer<DebugLayerData>>({
   layer?: string;
   breakpoint?: string;
 }) {
-  "use no memo";
   const one = slice.layers.one<L>(layer);
-  const active = one.use((l) => find(l?.source?.breakpoints, { key })?.active);
-  const output = one.use(
+  const active = useOne(
+    one,
+    (l) => find(l?.source?.breakpoints, { key })?.active,
+  );
+  const output = useOne(
+    one,
     (l) => (layer && key ? l?.source?.breakpointOutput?.[key] : []),
-    isEqual
+    isEqual,
   );
   return active ? (
     output ? (
@@ -106,7 +110,7 @@ export function BreakpointEditor({
 
   const [{ type, active, properties }, setOptimistic, isPending] =
     useOptimisticTransaction(value, (f) =>
-      idle(() => onChange?.(produce(value!, f)))
+      idle(() => onChange?.(produce(value!, f))),
     );
 
   const handler = handlersCollection[type as keyof typeof handlersCollection];
@@ -192,12 +196,12 @@ export function BreakpointEditor({
                               void set(
                                 t,
                                 `properties.${key as NonEmptyString}`,
-                                v
-                              )
+                                v,
+                              ),
                           ),
                         disabled: !active,
-                      }
-                    )
+                      },
+                    ),
                 )
               ) : (
                 <Typography color="text.secondary">No options</Typography>
