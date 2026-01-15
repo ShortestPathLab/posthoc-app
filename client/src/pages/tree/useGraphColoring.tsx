@@ -93,6 +93,7 @@ export function useGraphColoring(
     // Reset all nodes
     graph.forEachNode((v) => {
       setAttributes(graph, v, "node", {
+        zIndex: 0,
         color: neutralColor,
         forceLabel: false,
         label: truncate(v, { length: 15 }),
@@ -133,6 +134,7 @@ export function useGraphColoring(
 
         if (graph.hasNode(`${graphId}`) && !isSetNode[graphId]) {
           setAttributes(graph, `${graphId}`, "node", {
+            zIndex: 1 + i,
             color: finalColor,
             label: truncate(`${startCase(type)} ${graphId}`, { length: 15 }),
             forceLabel: step === i,

@@ -10,26 +10,27 @@ export function useGraphSettings() {
   const theme = useTheme();
   return useMemo(
     () =>
-    ({
-      stagePadding: 8 * 8,
-      allowInvalidContainer: true,
-      edgeLabelColor: { color: theme.palette.text.secondary },
-      labelFont: "Inter",
-      labelSize: 14,
-      labelDensity: 0.1,
-      renderEdgeLabels: true,
-      edgeLabelFont: "Inter",
-      edgeLabelSize: 12,
-      defaultDrawNodeHover: () => { },
-      labelColor: { color: theme.palette.text.primary },
-      edgeLabelWeight: "500",
-      defaultEdgeType: "arrow",
-      edgeProgramClasses: {
-        straight: EdgeArrowProgram,
-        curvedArrow: EdgeCurvedArrowProgram,
-      },
-    } as ComponentProps<typeof SigmaContainer>["settings"]),
-    [theme]
+      ({
+        zIndex: true,
+        stagePadding: 8 * 8,
+        allowInvalidContainer: true,
+        edgeLabelColor: { color: theme.palette.text.secondary },
+        labelFont: "Inter",
+        labelSize: 14,
+        labelDensity: 0.1,
+        renderEdgeLabels: true,
+        edgeLabelFont: "Inter",
+        edgeLabelSize: 12,
+        defaultDrawNodeHover: () => {},
+        labelColor: { color: theme.palette.text.primary },
+        edgeLabelWeight: "500",
+        defaultEdgeType: "arrow",
+        edgeProgramClasses: {
+          straight: EdgeArrowProgram,
+          curvedArrow: EdgeCurvedArrowProgram,
+        },
+      }) as ComponentProps<typeof SigmaContainer>["settings"],
+    [theme],
   );
 }
 
@@ -52,8 +53,8 @@ export function useNodeCulling(stableAxisBounds?: AxisBounds | null) {
 
     const xRange = xMax - xMin;
     const yRange = yMax - yMin;
-    const actualXMin = xMin + (xRange * 0.09);
-    const actualYMin = yMin + (yRange * 0.05);
+    const actualXMin = xMin + xRange * 0.09;
+    const actualYMin = yMin + yRange * 0.05;
 
     graph.forEachNode((node, attrs) => {
       const insideX = attrs.x >= actualXMin && attrs.x <= xMax;
@@ -62,19 +63,19 @@ export function useNodeCulling(stableAxisBounds?: AxisBounds | null) {
 
       if (!isInside) {
         if (!attrs.storedColor) {
-          graph.setNodeAttribute(node, 'storedColor', attrs.color);
+          graph.setNodeAttribute(node, "storedColor", attrs.color);
         }
         const grayColor = getGraphColorHex(
           attrs.eventType || "neutral",
           0.15,
           backgroundHex,
-          foregroundHex
+          foregroundHex,
         );
-        graph.setNodeAttribute(node, 'color', grayColor);
+        graph.setNodeAttribute(node, "color", grayColor);
       } else {
         if (attrs.storedColor) {
-          graph.setNodeAttribute(node, 'color', attrs.storedColor);
-          graph.setNodeAttribute(node, 'storedColor', undefined);
+          graph.setNodeAttribute(node, "color", attrs.storedColor);
+          graph.setNodeAttribute(node, "storedColor", undefined);
         }
       }
     });
