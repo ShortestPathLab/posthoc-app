@@ -94,17 +94,13 @@ function Dot({ label, color }: { label?: ReactNode; color?: string }) {
 
 export type TreeGraphProps = {
   tree?: TreeWorkerReturnType;
-  onExit?: () => void;
 } & SharedGraphProps;
 
 export type NodeType = { x: number; y: number; label: string; size: number };
 export type EdgeType = { label: string };
 
 export function TreeGraph(props: TreeGraphProps) {
-  const { trace, tree, layer: key, onExit } = props;
-
-  const acrylic = useAcrylic();
-  const theme = useTheme();
+  const { trace, tree, layer: key } = props;
 
   const [orientation, setOrientation] =
     useState<keyof typeof orientationOptions>("vertical");
@@ -122,6 +118,29 @@ export function TreeGraph(props: TreeGraphProps) {
 
   const isHighlightingEnabled = !isEmpty(highlightEdges);
 
+  return (
+    <>
+      <TreeControls
+        layer={key}
+        isHighlightingEnabled={isHighlightingEnabled}
+        setOrientation={setOrientation}
+        orientation={orientation}
+      />
+      <FocusedView {...props} />
+    </>
+  );
+}
+
+export function FocusedView(props: SharedGraphProps) {
+  const { trace, layer: key, onExit } = props;
+
+  const acrylic = useAcrylic();
+  const theme = useTheme();
+
+  const highlightEdges = useHighlighting(key);
+
+  const isHighlightingEnabled = !isEmpty(highlightEdges);
+
   const bg = getShade(
     highlightNodesOptions.find(
       (highlight) => highlight.type === highlightEdges?.type,
@@ -134,76 +153,68 @@ export function TreeGraph(props: TreeGraphProps) {
   const event = trace?.events?.[highlightEdges?.step ?? 0];
 
   return (
-    <>
-      <TreeControls
-        layer={key}
-        isHighlightingEnabled={isHighlightingEnabled}
-        setOrientation={setOrientation}
-        orientation={orientation}
-      />
+    <Stack
+      sx={{
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        pt: 6,
+        pointerEvents: "none",
+      }}
+    >
       <Stack
         sx={{
           width: "100%",
           height: "100%",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          pt: 6,
-          pointerEvents: "none",
+          border: isHighlightingEnabled ? `2px solid ${bg}` : "none",
+          // The top bar has a 0.5px border, so the top border of the graph needs to be 0.5 pixels thicker
+          borderTopWidth: "2.5px",
+          transition: (t) => t.transitions.create("box-shadow"),
         }}
       >
-        <Stack
-          sx={{
-            width: "100%",
-            height: "100%",
-            border: isHighlightingEnabled ? `2px solid ${bg}` : "none",
-            // The top bar has a 0.5px border, so the top border of the graph needs to be 0.5 pixels thicker
-            borderTopWidth: "2.5px",
-            transition: (t) => t.transitions.create("box-shadow"),
-          }}
-        >
-          {isHighlightingEnabled && (
-            <Scroll x style={{ height: theme.spacing(5) }}>
-              <Box
+        {isHighlightingEnabled && (
+          <Scroll x style={{ height: theme.spacing(5) }}>
+            <Box
+              sx={{
+                ...pick(acrylic, "backdropFilter"),
+                transition: (t) => t.transitions.create("background-color"),
+                pointerEvents: "all",
+                alignItems: "center",
+                p: 2,
+                height: "100%",
+                bgcolor: alpha(bg, 0.05) || "info.main",
+                display: "flex",
+                justifyContent: "space-between",
+                minWidth: "max-content",
+                gap: 2,
+              }}
+            >
+              <Typography variant="overline">
+                {startCase(highlightEdges?.type)}{" "}
+                <Box sx={{ opacity: 0.7 }} component="span">
+                  <Dot color={getColorHex(event?.type)} />{" "}
+                  {startCase(event?.type)} {event?.id}
+                  {", "}
+                  Step {highlightEdges?.step}{" "}
+                </Box>
+              </Typography>
+              <Button
+                onClick={onExit}
+                variant="outlined"
                 sx={{
-                  ...pick(acrylic, "backdropFilter"),
-                  transition: (t) => t.transitions.create("background-color"),
-                  pointerEvents: "all",
-                  alignItems: "center",
-                  p: 2,
-                  height: "100%",
-                  bgcolor: alpha(bg, 0.05) || "info.main",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  minWidth: "max-content",
-                  gap: 2,
+                  mr: -1,
+                  height: theme.spacing(4),
                 }}
               >
-                <Typography variant="overline">
-                  {startCase(highlightEdges?.type)}{" "}
-                  <Box sx={{ opacity: 0.7 }} component="span">
-                    <Dot color={getColorHex(event?.type)} />{" "}
-                    {startCase(event?.type)} {event?.id}
-                    {", "}
-                    Step {highlightEdges?.step}{" "}
-                  </Box>
-                </Typography>
-                <Button
-                  onClick={onExit}
-                  variant="outlined"
-                  sx={{
-                    mr: -1,
-                    height: theme.spacing(4),
-                  }}
-                >
-                  Exit focused view
-                </Button>
-              </Box>
-            </Scroll>
-          )}
-        </Stack>
+                Exit focused view
+              </Button>
+            </Box>
+          </Scroll>
+        )}
       </Stack>
-    </>
+    </Stack>
   );
 }
 

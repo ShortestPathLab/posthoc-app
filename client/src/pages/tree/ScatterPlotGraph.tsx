@@ -8,7 +8,7 @@ import AxisOverlay, {
   createSymlogScatterScale,
 } from "./Axis";
 import { SharedGraphProps } from "./SharedGraphProps";
-import { TreeControls } from "./TreeGraph";
+import { FocusedView, TreeControls } from "./TreeGraph";
 import { getScatterPlotUniqueId, useComputePlot } from "./useComputePlot";
 import { useGraphColoring } from "./useGraphColoring";
 import { useHighlighting } from "./useHighlighting";
@@ -18,19 +18,22 @@ const getScatterPlotGraphId = (step: number, event: TraceEvent): string =>
 const getScatterPlotGraphPId = (step: number, event: TraceEvent): string =>
   getScatterPlotUniqueId(event.pId, step);
 
-export function ScatterPlotGraph({
-  width = 1,
-  height = 1,
-  logAxis,
-  eventTypeFilter,
-  step,
-  trackedProperty,
-  trace,
-  layer,
-  traceKey,
-  xMetric,
-  yMetric,
-}: ScatterPlotGraphProps & SharedGraphProps) {
+export function ScatterPlotGraph(
+  props: ScatterPlotGraphProps & SharedGraphProps,
+) {
+  const {
+    width = 1,
+    height = 1,
+    logAxis,
+    eventTypeFilter,
+    step,
+    trackedProperty,
+    trace,
+    layer,
+    traceKey,
+    xMetric,
+    yMetric,
+  } = props;
   const { data: plot } = useComputePlot({
     key: traceKey,
     trace: trace,
@@ -114,6 +117,7 @@ export function ScatterPlotGraph({
         layer={layer}
         isHighlightingEnabled={isHighlightingEnabled}
       />
+      <FocusedView {...props} />
     </>
   );
 }

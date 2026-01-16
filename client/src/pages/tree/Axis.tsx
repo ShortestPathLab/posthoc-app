@@ -258,7 +258,17 @@ function AxisOverlay({
         y: yGraphScale(xAxisDataY),
       });
       const xAxisY = Math.min(xAxisYRaw, height - X_AXIS_HEIGHT);
+      // Y axis line
+      const { x: yAxisXRaw, y: yAxisStartY } = sigma.graphToViewport({
+        x: xGraphScale(yAxisDataX),
+        y: yGraphScale(yLo),
+      });
+      const yAxisX = Math.max(yAxisXRaw, Y_AXIS_WIDTH);
 
+      const { y: yAxisEndY } = sigma.graphToViewport({
+        x: xGraphScale(yAxisDataX),
+        y: yGraphScale(yHi),
+      });
       const { x: xAxisEndX } = sigma.graphToViewport({
         x: xGraphScale(xHi),
         y: yGraphScale(xAxisDataY),
@@ -284,6 +294,13 @@ function AxisOverlay({
         ctx.lineTo(x, y + 6);
         ctx.stroke();
 
+        ctx.strokeStyle = alpha(theme.palette.divider, 0.15);
+        ctx.setLineDash([2]);
+        ctx.lineTo(x, yAxisEndY);
+        ctx.stroke();
+        ctx.strokeStyle = theme.palette.text.primary;
+        ctx.setLineDash([]);
+
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.fillText(label, x, y + 8);
@@ -292,18 +309,6 @@ function AxisOverlay({
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(xAxisLabel, (xAxisStartX + xAxisEndX) / 2, xAxisY + 40);
-
-      // Y axis line
-      const { x: yAxisXRaw, y: yAxisStartY } = sigma.graphToViewport({
-        x: xGraphScale(yAxisDataX),
-        y: yGraphScale(yLo),
-      });
-      const yAxisX = Math.max(yAxisXRaw, Y_AXIS_WIDTH);
-
-      const { y: yAxisEndY } = sigma.graphToViewport({
-        x: xGraphScale(yAxisDataX),
-        y: yGraphScale(yHi),
-      });
 
       ctx.beginPath();
       ctx.moveTo(yAxisX, yAxisStartY);
@@ -322,8 +327,16 @@ function AxisOverlay({
 
         ctx.beginPath();
         ctx.moveTo(x, y);
+
         ctx.lineTo(x - 6, y);
         ctx.stroke();
+
+        ctx.strokeStyle = alpha(theme.palette.divider, 0.15);
+        ctx.setLineDash([2]);
+        ctx.lineTo(xAxisEndX, y);
+        ctx.stroke();
+        ctx.strokeStyle = theme.palette.text.primary;
+        ctx.setLineDash([]);
 
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";

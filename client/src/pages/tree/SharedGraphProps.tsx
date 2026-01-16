@@ -9,4 +9,5 @@ export type SharedGraphProps = {
   trackedProperty?: string;
   width?: number;
   height?: number;
+  onExit?: () => void;
 };

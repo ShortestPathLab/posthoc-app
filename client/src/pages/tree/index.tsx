@@ -105,6 +105,12 @@ export function TreePage({ template: Page }: PageContentProps) {
                         step: throttled,
                         layer: key,
                         showAllEdges: layoutModes[mode].showAllEdges,
+                        onExit: () => {
+                          const layer = one.get();
+                          if (!isEmpty(layer?.source?.highlighting)) {
+                            one.set((l) => set(l, "source.highlighting", {}));
+                          }
+                        },
                       };
                       return (
                         <>
@@ -123,20 +129,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                             >
                               {mode !== "plot" ? (
                                 <>
-                                  <TreeGraph
-                                    {...sharedProps}
-                                    tree={tree}
-                                    onExit={() => {
-                                      const layer = one.get();
-                                      if (
-                                        !isEmpty(layer?.source?.highlighting)
-                                      ) {
-                                        one.set((l) =>
-                                          set(l, "source.highlighting", {}),
-                                        );
-                                      }
-                                    }}
-                                  />
+                                  <TreeGraph {...sharedProps} tree={tree} />
                                 </>
                               ) : (
                                 <>

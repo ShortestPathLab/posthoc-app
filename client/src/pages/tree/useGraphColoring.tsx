@@ -98,7 +98,7 @@ export function useGraphColoring(
         zIndex: 0,
         color: neutralColor,
         forceLabel: false,
-        label: truncate(v, { length: 15 }),
+        label: truncate(v, { length: 50 }),
       });
     });
 
@@ -138,7 +138,7 @@ export function useGraphColoring(
           setAttributes(graph, `${graphId}`, "node", {
             zIndex: 1 + i,
             color: finalColor,
-            label: truncate(`${startCase(type)} ${graphId}`, { length: 15 }),
+            label: truncate(`${startCase(type)} ${graphId}`, { length: 50 }),
             forceLabel: step === i,
           });
 
@@ -167,16 +167,19 @@ export function useGraphColoring(
 
     if (highlightEdges && isHighlightEdges) {
       assert(isNumber(highlightEdges?.step), "No step");
-      const current = trace?.events?.[highlightEdges.step];
-      assert(current, "No current event");
-      graph.setNodeAttribute(current.id, "forceLabel", "true");
-      graph.setNodeAttribute(
-        current?.id,
-        "label",
-        `${graph.getNodeAttribute(current.id, "label")} (${startCase(
-          highlightEdges.type,
-        )})`,
-      );
+      const node = trace?.events?.[highlightEdges.step];
+      assert(node, "No current event");
+      const graphId = getGraphId(highlightEdges.step, node);
+      if (graph.hasNode(graphId)) {
+        graph.setNodeAttribute(graphId, "forceLabel", "true");
+        graph.setNodeAttribute(
+          graphId,
+          "label",
+          `${graph.getNodeAttribute(graphId, "label")} (${startCase(
+            highlightEdges.type,
+          )})`,
+        );
+      }
     }
 
     if (
@@ -188,19 +191,24 @@ export function useGraphColoring(
           ?.id;
 
       forEachRight(highlightEdges.path, (stepIdx) => {
-        const node = trace?.events?.[stepIdx].id;
+        assert(trace?.events?.[stepIdx], "No event");
+        const graphId = getGraphId(stepIdx, trace.events[stepIdx]);
         const opt = highlightNodesOptions.find(
           (t) => t.type === highlightEdges.type,
         );
-        if (graph.hasNode(`${node}`)) {
-          graph.setNodeAttribute(`${node}`, "color", getThemeColor(opt?.color));
-          if (node !== prev) {
-            const edge = makeEdgeKey(`${node}`, `${prev}`);
+        if (graph.hasNode(`${graphId}`)) {
+          graph.setNodeAttribute(
+            `${graphId}`,
+            "color",
+            getThemeColor(opt?.color),
+          );
+          if (graphId !== prev) {
+            const edge = makeEdgeKey(`${graphId}`, `${prev}`);
             if (graph.hasEdge(edge)) {
               graph.setEdgeAttribute(edge, "color", getThemeColor(opt?.color));
             }
           }
-          prev = node;
+          prev = graphId;
         }
       });
     }
@@ -218,7 +226,11 @@ export function useGraphColoring(
 
       function iterateSubtree(subtree: Subtree) {
         forOwn(subtree, (childs: Subtree, parent: string | number) => {
-          const pNode = trace?.events?.[Number(parent)].id;
+          assert(trace?.events?.[Number(parent)], "No event");
+          const pNode = getGraphId(
+            Number(parent),
+            trace.events[Number(parent)],
+          );
           if (graph.hasNode(`${pNode}`)) {
             graph.setNodeAttribute(
               `${pNode}`,
@@ -227,7 +239,11 @@ export function useGraphColoring(
             );
           }
           forOwn(childs, (v, child) => {
-            const cNode = trace?.events?.[Number(child)].id;
+            assert(trace?.events?.[Number(child)], "No event");
+            const cNode = getGraphId(
+              Number(child),
+              trace.events[Number(child)],
+            );
             if (graph.hasNode(`${cNode}`)) {
               graph.setNodeAttribute(
                 `${cNode}`,

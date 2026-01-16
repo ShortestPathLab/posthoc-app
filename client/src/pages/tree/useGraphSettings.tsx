@@ -9,6 +9,7 @@ export function useGraphSettings() {
   return useMemo(
     () =>
       ({
+        enableCameraRotation: false,
         zIndex: true,
         stagePadding: 8 * 8,
         allowInvalidContainer: true,

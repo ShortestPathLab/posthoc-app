@@ -80,7 +80,7 @@ export function getScatterPlotUniqueId(
   logicalId: string | number | null | undefined,
   step: number,
 ) {
-  return `${logicalId}-${step}`;
+  return `${logicalId} (Step ${step})`;
 }
 
 export type Bounds = { xMin: number; xMax: number; yMin: number; yMax: number };
