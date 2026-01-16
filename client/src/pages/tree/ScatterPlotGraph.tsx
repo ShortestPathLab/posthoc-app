@@ -1,18 +1,17 @@
 import { useLoadGraph } from "@react-sigma/core";
 import { MultiDirectedGraph } from "graphology";
+import { isEmpty } from "lodash-es";
+import { TraceEvent } from "protocol/Trace-v140";
 import { useEffect, useMemo, useRef } from "react";
-import { ScatterPlotGraphProps } from ".";
 import AxisOverlay, {
   createScatterScale,
   createSymlogScatterScale,
 } from "./Axis";
-import { getScatterPlotUniqueId } from "./buildScatterPlotData";
-import { useGraphColoring } from "./useGraphColoring";
-import { useHighlighting } from "./useHighlighting";
-import { TraceEvent } from "protocol/Trace-v140";
 import { SharedGraphProps } from "./SharedGraphProps";
 import { TreeControls } from "./TreeGraph";
-import { isEmpty } from "lodash-es";
+import { getScatterPlotUniqueId, useComputePlot } from "./useComputePlot";
+import { useGraphColoring } from "./useGraphColoring";
+import { useHighlighting } from "./useHighlighting";
 
 const getScatterPlotGraphId = (step: number, event: TraceEvent): string =>
   getScatterPlotUniqueId(event.id, step);
@@ -22,15 +21,23 @@ const getScatterPlotGraphPId = (step: number, event: TraceEvent): string =>
 export function ScatterPlotGraph({
   width = 1,
   height = 1,
-  processedData,
   logAxis,
   eventTypeFilter,
   step,
   trackedProperty,
   trace,
   layer,
+  traceKey,
+  xMetric,
+  yMetric,
 }: ScatterPlotGraphProps & SharedGraphProps) {
-  "use no memo";
+  const { data: plot } = useComputePlot({
+    key: traceKey,
+    trace: trace,
+    xAxis: xMetric,
+    yAxis: yMetric,
+  });
+
   const highlightEdges = useHighlighting(layer);
   const isHighlightingEnabled = !isEmpty(highlightEdges);
 
@@ -41,27 +48,27 @@ export function ScatterPlotGraph({
   // useNodeCulling(axisBounds);
   const load = useLoadGraph();
   // Initial Graph load
-  const { graph: baseGraph, load: loadGraph } = useMemo(() => {
+  const graph = useMemo(() => {
     const graph = new MultiDirectedGraph();
 
     stepBucketsRef.current = [];
     prevStepRef.current = null;
 
     const points = eventTypeFilter
-      ? processedData.data.filter((p) => p.point.eventType === eventTypeFilter)
-      : processedData.data;
+      ? plot?.data?.filter?.((p) => p.point.eventType === eventTypeFilter)
+      : plot?.data;
 
     const xScale = (logAxis.x ? createSymlogScatterScale : createScatterScale)(
-      processedData.xMin,
-      processedData.xMax,
+      plot?.xMin ?? 0,
+      plot?.xMax ?? 0,
     ).range([-1, 1]);
 
     const yScale = (logAxis.y ? createSymlogScatterScale : createScatterScale)(
-      processedData.yMin,
-      processedData.yMax,
+      plot?.yMin ?? 0,
+      plot?.yMax ?? 0,
     ).range([-1, 1]);
 
-    for (const p of points) {
+    for (const p of points ?? []) {
       const id = p.point.id;
       const s = p.point.step;
 
@@ -78,28 +85,31 @@ export function ScatterPlotGraph({
       });
     }
 
-    return { graph, load };
-  }, [load, processedData, logAxis, eventTypeFilter]);
+    return graph;
+  }, [plot, logAxis, eventTypeFilter]);
 
-  const { graph, graphKey } = useGraphColoring(
-    baseGraph,
+  useGraphColoring(
+    graph,
     { showAllEdges: false, trackedProperty, trace, step },
     highlightEdges,
     getScatterPlotGraphId,
     getScatterPlotGraphPId,
   );
+
   useEffect(() => {
-    loadGraph(graph);
-  }, [loadGraph, graph, graphKey, trackedProperty, step]); // TODO Fix extra deps
+    load(graph);
+  }, [load, graph]);
 
   return (
     <>
-      <AxisOverlay
-        processedData={processedData}
-        width={width}
-        height={height}
-        logAxis={logAxis}
-      />
+      {!!plot && (
+        <AxisOverlay
+          processedData={plot}
+          width={width}
+          height={height}
+          logAxis={logAxis}
+        />
+      )}
       <TreeControls
         layer={layer}
         isHighlightingEnabled={isHighlightingEnabled}
@@ -107,3 +117,9 @@ export function ScatterPlotGraph({
     </>
   );
 }
+export type ScatterPlotGraphProps = {
+  xMetric: string;
+  yMetric: string;
+  logAxis: { x: boolean; y: boolean };
+  eventTypeFilter?: string;
+};

@@ -1,23 +1,21 @@
 import { useTheme } from "@mui/material";
-import { useLoadGraph } from "@react-sigma/core";
 import { MultiDirectedGraph } from "graphology";
 import { forEach } from "lodash-es";
 import { Trace } from "protocol";
 import { useMemo } from "react";
-import { TreeWorkerReturnType } from "./treeLayout.worker";
+import { getFinalParents } from "./getFinalParents";
 import { makeEdgeKey } from "./makeEdgeKey";
 import { isDefined } from "./TreeGraph";
-import { getFinalParents } from "./getFinalParents";
+import { TreeWorkerReturnType } from "./treeLayout.worker";
 
 export function useMultiDirectedGraph(
   trace: Trace | undefined,
   tree: TreeWorkerReturnType | undefined,
-  orientation: "horizontal" | "vertical" = "horizontal"
+  orientation: "horizontal" | "vertical" = "horizontal",
 ) {
   const theme = useTheme();
   const finalParents = useMemo(() => getFinalParents(trace), [trace]);
 
-  const load = useLoadGraph();
   return useMemo(() => {
     const isVertical = orientation === "vertical";
     const graph = new MultiDirectedGraph();
@@ -54,11 +52,18 @@ export function useMultiDirectedGraph(
           graph.updateEdgeAttribute(
             key,
             "size",
-            (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5
+            (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5,
           );
         }
       }
     });
-    return { graph, load };
-  }, [load, trace, tree, finalParents, orientation]);
+
+    return graph;
+  }, [
+    trace,
+    tree,
+    finalParents,
+    orientation,
+    theme.palette.action.disabledBackground,
+  ]);
 }

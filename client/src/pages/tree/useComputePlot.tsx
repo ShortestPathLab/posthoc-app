@@ -1,7 +1,8 @@
-import { ScatterPlotScaleAndData, ScatterPlotOutput, MetricsBag } from ".";
+import { skipToken, useQuery } from "@tanstack/react-query";
+import { Trace } from "protocol/Trace-v140";
 
-export const buildScatterPlotData = (
-  traceData,
+export const compute = (
+  traceData: Trace,
   xMetricName: string,
   yMetricName: string,
 ): ScatterPlotScaleAndData => {
@@ -80,4 +81,52 @@ export function getScatterPlotUniqueId(
   step: number,
 ) {
   return `${logicalId}-${step}`;
+}
+
+export type Bounds = { xMin: number; xMax: number; yMin: number; yMax: number };
+
+export type ScatterPlotScaleAndData = {
+  data: ScatterPlotOutput[];
+  xAxis?: string;
+  yAxis?: string;
+} & Bounds;
+
+export type ScatterPlotOutput = {
+  x: number;
+  y: number;
+  point: ScatterPlot;
+};
+
+export type ScatterPlot = {
+  id: string; // unique id for sigma
+  logicalId: string; // original id for this to work with selection code
+  label: string;
+  step: number;
+  eventType?: string;
+  metrics: MetricsBag;
+};
+
+export type MetricsBag = {
+  [key: string]: number;
+};
+
+export function useComputePlot({
+  key,
+  trace,
+  xAxis,
+  yAxis,
+}: {
+  key?: string;
+  trace?: Trace;
+  xAxis?: string;
+  yAxis?: string;
+}) {
+  return useQuery({
+    queryKey: ["compute/tree/plot/utility", key, xAxis, yAxis],
+    queryFn:
+      !!trace && !!xAxis && !!yAxis
+        ? async () => compute(trace, xAxis, yAxis)
+        : skipToken,
+    staleTime: Infinity,
+  });
 }

@@ -14,7 +14,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useSigma } from "@react-sigma/core";
+import { useLoadGraph, useSigma } from "@react-sigma/core";
 import { MinimisedPlaybackControls } from "components/app-bar/Playback";
 import { Button } from "components/generic/inputs/Button";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
@@ -32,12 +32,11 @@ import {
 } from "lodash-es";
 import { ReactNode, useEffect, useState } from "react";
 import { getShade, useAcrylic, usePaper } from "theme";
-import { TreeWorkerReturnType } from "./treeLayout.worker";
-import { TreeAxis } from "./TreeAxis";
-import { useGraphColoring } from "./useGraphColoring";
-import { useMultiDirectedGraph } from "./useMultiDirectedGraph";
-import { useHighlighting } from "./useHighlighting";
 import { SharedGraphProps } from "./SharedGraphProps";
+import { TreeWorkerReturnType } from "./treeLayout.worker";
+import { useGraphColoring } from "./useGraphColoring";
+import { useHighlighting } from "./useHighlighting";
+import { useMultiDirectedGraph } from "./useMultiDirectedGraph";
 
 export function setAttributes(
   graph: MultiDirectedGraph,
@@ -102,7 +101,7 @@ export type NodeType = { x: number; y: number; label: string; size: number };
 export type EdgeType = { label: string };
 
 export function TreeGraph(props: TreeGraphProps) {
-  const { trace, tree, layer: key, onExit, width, height } = props;
+  const { trace, tree, layer: key, onExit } = props;
 
   const acrylic = useAcrylic();
   const theme = useTheme();
@@ -110,18 +109,16 @@ export function TreeGraph(props: TreeGraphProps) {
   const [orientation, setOrientation] =
     useState<keyof typeof orientationOptions>("vertical");
 
-  const { graph: baseGraph, load } = useMultiDirectedGraph(
-    trace,
-    tree,
-    orientation,
-  );
+  const load = useLoadGraph();
+  const graph = useMultiDirectedGraph(trace, tree, orientation);
 
   const highlightEdges = useHighlighting(key);
-  const graph = useGraphColoring(baseGraph, props, highlightEdges);
+
+  useGraphColoring(graph, props, highlightEdges);
 
   useEffect(() => {
-    load?.(graph.graph);
-  }, [graph, load]);
+    load(graph);
+  }, [load, graph]);
 
   const isHighlightingEnabled = !isEmpty(highlightEdges);
 
@@ -136,14 +133,8 @@ export function TreeGraph(props: TreeGraphProps) {
 
   const event = trace?.events?.[highlightEdges?.step ?? 0];
 
-  // const isAxisEnabled = !isEmpty(trackedProperty);
-  const isAxisEnabled = false;
-
   return (
     <>
-      {isAxisEnabled && (
-        <TreeAxis tree={tree} trace={trace} height={height} width={width} />
-      )}
       <TreeControls
         layer={key}
         isHighlightingEnabled={isHighlightingEnabled}

@@ -18,6 +18,9 @@ import { Heading, Option } from "components/layer-editor/Option";
 import { entries, map, startCase } from "lodash-es";
 import { useState } from "react";
 import { useAcrylic, usePaper } from "theme";
+import { SharedGraphProps } from "./SharedGraphProps";
+import { useComputeLabels, useComputeTypes } from "./TreeUtility";
+import { TreeOptions } from "./useTreeOptions";
 
 const CLEAN_CHECKBOX_SX: SxProps<Theme> = {
   px: 0,
@@ -32,6 +35,8 @@ const CLEAN_CHECKBOX_SX: SxProps<Theme> = {
     transition: "none", // remove icon hover animation
   },
 };
+
+export const SYMBOL_METRIC_STEP = "step";
 
 const GROUP_BY_OPTIONS = [
   {
@@ -60,7 +65,7 @@ const GROUP_BY_OPTIONS = [
     description: "Group by total cost f=g+h (ranges)",
   },
   {
-    id: "step",
+    id: SYMBOL_METRIC_STEP,
     name: "Step",
     description: "Group by exploration step (ranges)",
   },
@@ -88,51 +93,38 @@ export const layoutModes = {
 };
 
 export function ScatterPlotControls({
-  eventTypes,
-  scatterplotMode,
-  handleAxisChange,
-  handleEventTypeChange,
-  handleGroupByChange,
-  formInput,
+  trackedProperty,
+  trace,
+  traceKey,
+  setAxis,
+  setTypeFilter,
+  setGroupByAttribute,
+  axis,
   groupByAttribute,
-  eventTypeFilter,
+  typeFilter,
   logAxis,
-  properties,
   setLogAxis,
   mode,
   setMode,
-  trackedProperty,
   setTrackedProperty,
-}: {
-  mode: string;
-  setMode: (value: keyof typeof layoutModes) => void;
-  trackedProperty: string;
-  setTrackedProperty: (value: string) => void;
-  eventTypes: string[];
-  properties: Record<string, { type: string }>;
-  scatterplotMode: boolean;
-  handleAxisChange: (axis: "xMetric" | "yMetric") => (value: string) => void;
-  handleEventTypeChange: (value: string) => void;
-  handleGroupByChange: (value: string) => void;
-  formInput: {
-    xMetric: string;
-    yMetric: string;
-  };
-  groupByAttribute: string;
-  eventTypeFilter: string;
-  logAxis: {
-    x: boolean;
-    y: boolean;
-  };
-  setLogAxis: (
-    value: (prev: { x: boolean; y: boolean }) => { x: boolean; y: boolean },
-  ) => void;
-}) {
+}: SharedGraphProps & TreeOptions) {
+  const { data: properties } = useComputeLabels({
+    trace: trace,
+    key: traceKey,
+  });
+
+  const { data: types = [] } = useComputeTypes({
+    trace: trace,
+    key: traceKey,
+  });
   const [open, setOpen] = useState(true);
   // Combined dropdown
   const scatterPlotAxis = [
-    { id: "", name: "Off" },
-    { id: "step", name: "Step", value: "step" },
+    {
+      id: SYMBOL_METRIC_STEP,
+      name: "Step",
+      value: SYMBOL_METRIC_STEP,
+    },
     ...map(
       entries(properties).filter(
         ([, v]) => !v.type.toLowerCase().includes("text"),
@@ -189,51 +181,44 @@ export function ScatterPlotControls({
             }
           </IconButton>
         </Stack>
-        {map(
-          [
-            {
-              icon: <ModeStandbyOutlined />,
-              label: "Layout",
-              value: mode,
-              onChange: setMode,
-              items: map(entries(layoutModes), ([k, v]) => ({
+        <Option
+          label="Layout"
+          content={
+            <FeaturePicker
+              paper
+              icon={<ModeStandbyOutlined />}
+              label="Layout"
+              value={mode}
+              items={map(entries(layoutModes), ([k, v]) => ({
                 id: k,
                 ...v,
-              })),
-            },
-            {
-              icon: <TimelineOutlined />,
-              label: "Colouring",
-              value: trackedProperty,
-              onChange: setTrackedProperty,
-              items: [
+              }))}
+              onChange={(e) => setMode(e as keyof typeof layoutModes)}
+              arrow
+            />
+          }
+        />
+        <Option
+          label="Colouring"
+          content={
+            <FeaturePicker
+              paper
+              icon={<TimelineOutlined />}
+              label="Colouring"
+              value={trackedProperty}
+              items={[
                 { id: "", name: "Event Type" },
                 ...map(entries(properties), ([k, v]) => ({
                   id: k,
                   name: `$${k}`,
                   description: v.type,
                 })),
-              ],
-            },
-          ],
-          ({ icon, label, value, items, onChange }) => (
-            <Option
-              key={label}
-              label={label}
-              content={
-                <FeaturePicker
-                  paper
-                  icon={icon}
-                  label={label}
-                  value={value}
-                  items={items}
-                  onChange={onChange}
-                  arrow
-                />
-              }
+              ]}
+              onChange={setTrackedProperty}
+              arrow
             />
-          ),
-        )}
+          }
+        />
         <Collapse in={open}>
           <Stack>
             <Heading label="Plot Options" />
@@ -243,10 +228,10 @@ export function ScatterPlotControls({
                 <FeaturePicker
                   paper
                   disabled={mode !== "plot"}
-                  label={formInput.xMetric ? `$.${formInput.xMetric}` : "Auto"}
-                  value={formInput.xMetric}
+                  label={axis.xMetric ? `$.${axis.xMetric}` : "Auto"}
+                  value={axis.xMetric}
                   items={scatterPlotAxis}
-                  onChange={handleAxisChange("xMetric")}
+                  onChange={setAxis("xMetric")}
                   arrow
                   itemOrientation="horizontal"
                 />
@@ -258,10 +243,10 @@ export function ScatterPlotControls({
                 <FeaturePicker
                   paper
                   disabled={mode !== "plot"}
-                  label={formInput.yMetric ? `$.${formInput.yMetric}` : "Auto"}
-                  value={formInput.yMetric}
+                  label={axis.yMetric ? `$.${axis.yMetric}` : "Auto"}
+                  value={axis.yMetric}
                   items={scatterPlotAxis}
-                  onChange={handleAxisChange("yMetric")}
+                  onChange={setAxis("yMetric")}
                   arrow
                   itemOrientation="horizontal"
                 />
@@ -304,19 +289,19 @@ export function ScatterPlotControls({
                   disabled={mode !== "plot"}
                   ButtonProps={{ fullWidth: true }}
                   label={
-                    eventTypeFilter
-                      ? `Event: ${startCase(eventTypeFilter)}`
+                    typeFilter
+                      ? `Event: ${startCase(typeFilter)}`
                       : "Event type"
                   }
-                  value={eventTypeFilter}
+                  value={typeFilter}
                   items={[
                     { id: "", name: "All Events" },
-                    ...eventTypes.map((t) => ({
+                    ...types.map((t) => ({
                       id: t,
                       name: startCase(t),
                     })),
                   ]}
-                  onChange={handleEventTypeChange}
+                  onChange={setTypeFilter}
                   arrow
                   itemOrientation="horizontal"
                 />
@@ -337,7 +322,7 @@ export function ScatterPlotControls({
                   }
                   value={groupByAttribute}
                   items={GROUP_BY_OPTIONS}
-                  onChange={handleGroupByChange}
+                  onChange={setGroupByAttribute}
                   arrow
                   itemOrientation="horizontal"
                 />

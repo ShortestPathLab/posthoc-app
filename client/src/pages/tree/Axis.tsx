@@ -2,7 +2,9 @@ import { alpha, useTheme } from "@mui/material";
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
 import { scaleLinear, scaleSymlog } from "d3-scale";
 import { useEffect, useState } from "react";
-import { ScatterPlotScaleAndData } from ".";
+import { Sigma } from "sigma";
+import { Bounds, ScatterPlotScaleAndData } from "./useComputePlot";
+
 const MIN_SPAN = 1e-6;
 
 export function createScatterScale(min: number, max: number) {
@@ -107,21 +109,21 @@ type TickLabel = {
 };
 
 type ScatterPlotTickGenerationArgs = {
-  processedData: ScatterPlotScaleAndData;
-  sigma: any;
+  bounds: Bounds;
+  sigma: Sigma;
   logAxis: { x: boolean; y: boolean };
 };
 
 // Dynamic tick generation based on zoom factor
-function ScatterPlotAxisTickGeneration({
-  processedData,
+function createTicks({
+  bounds,
   sigma,
   logAxis,
 }: ScatterPlotTickGenerationArgs): {
   xAxisTickValues: TickLabel[];
   yAxisTickValues: TickLabel[];
 } {
-  const { xMin, xMax, yMin, yMax } = processedData;
+  const { xMin, xMax, yMin, yMax } = bounds;
 
   const camera = sigma.getCamera();
   const { ratio } = camera.getState();
@@ -146,20 +148,16 @@ function ScatterPlotAxisTickGeneration({
     Math.min(100, Math.round(baseTickCount * zoomFactor)),
   );
 
-  const xValues = xDataScale.ticks(countX);
-  const yValues = yDataScale.ticks(countY);
-
-  const xAxisTickValues: TickLabel[] = xValues.map((value) => ({
-    value,
-    label: formatTickValue(value),
-  }));
-
-  const yAxisTickValues: TickLabel[] = yValues.map((value) => ({
-    value,
-    label: formatTickValue(value),
-  }));
-
-  return { xAxisTickValues, yAxisTickValues };
+  return {
+    xAxisTickValues: xDataScale.ticks(countX).map((value) => ({
+      value,
+      label: formatTickValue(value),
+    })),
+    yAxisTickValues: yDataScale.ticks(countY).map((value) => ({
+      value,
+      label: formatTickValue(value),
+    })),
+  };
 }
 
 // Draw arrow at the end of the lines
@@ -199,21 +197,19 @@ function AxisOverlay({
 
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
 
-  const xAxisLabel = processedData.xAxis ?? "X axis";
-  const yAxisLabel = processedData.yAxis ?? "Y axis";
+  const { x: logAxisX, y: logAxisY } = logAxis;
+  const { xMin, xMax, yMin, yMax, xAxis, yAxis } = processedData;
 
   useEffect(() => {
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas?.getContext?.("2d");
     if (!ctx) return;
+    const xAxisLabel = xAxis ?? "X axis";
+    const yAxisLabel = yAxis ?? "Y axis";
 
     const drawAxis = () => {
       const dpr = window.devicePixelRatio || 1;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
-
-      const { xMin, xMax, yMin, yMax } = processedData;
 
       ctx.fillStyle = alpha(theme.palette.background.paper, 0.8);
       ctx.fillRect(0, 0, Y_AXIS_WIDTH, height);
@@ -228,11 +224,11 @@ function AxisOverlay({
         return;
       }
 
-      const xDataScale = logAxis.x
+      const xDataScale = logAxisX
         ? createSymlogScatterScale(xMin, xMax)
         : createScatterScale(xMin, xMax);
 
-      const yDataScale = logAxis.y
+      const yDataScale = logAxisY
         ? createSymlogScatterScale(yMin, yMax)
         : createScatterScale(yMin, yMax);
 
@@ -245,17 +241,16 @@ function AxisOverlay({
       const xAxisDataY = yLo <= 0 && 0 <= yHi ? 0 : yLo;
       const yAxisDataX = xLo <= 0 && 0 <= xHi ? 0 : xLo;
 
-      const { xAxisTickValues, yAxisTickValues } =
-        ScatterPlotAxisTickGeneration({
-          processedData,
-          sigma,
-          logAxis,
-        });
+      const { xAxisTickValues, yAxisTickValues } = createTicks({
+        bounds: { xMin, xMax, yMin, yMax },
+        sigma,
+        logAxis: { x: logAxisX, y: logAxisY },
+      });
 
       ctx.strokeStyle = theme.palette.text.secondary;
       ctx.fillStyle = theme.palette.text.primary;
       ctx.lineWidth = 1;
-      ctx.font = "12px Inter, system-ui, sans-serif";
+      ctx.font = `${theme.typography.fontSize}px ${theme.typography.fontFamily}`;
 
       // X axis line
       const { x: xAxisStartX, y: xAxisYRaw } = sigma.graphToViewport({
@@ -354,14 +349,14 @@ function AxisOverlay({
     canvas,
     width,
     height,
-    processedData.xMin,
-    processedData.xMax,
-    processedData.yMin,
-    processedData.yMax,
-    processedData.xAxis,
-    processedData.yAxis,
-    logAxis.x,
-    logAxis.y,
+    xMin,
+    xMax,
+    yMin,
+    yMax,
+    xAxis,
+    yAxis,
+    logAxisX,
+    logAxisY,
     sigma,
     theme,
     registerEvents,

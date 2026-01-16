@@ -23,8 +23,10 @@ import {
   truncate,
 } from "lodash-es";
 import memoizee from "memoizee";
+import { TraceEvent } from "protocol/Trace-v140";
 import { useMemo } from "react";
 import { AccentColor, getShade } from "theme";
+import { assert } from "utils/assert";
 import { makeEdgeKey } from "./makeEdgeKey";
 import {
   isDefined,
@@ -32,8 +34,7 @@ import {
   SEVEN_CLASS_GNBU,
   TreeGraphProps,
 } from "./TreeGraph";
-import { assert } from "utils/assert";
-import { TraceEvent } from "protocol/Trace-v140";
+import { useSigma } from "@react-sigma/core";
 
 const getGradient = memoizee(
   (from: string, to: string) => {
@@ -78,6 +79,7 @@ export function useGraphColoring(
   const backgroundHex = theme.palette.background.paper;
   const foregroundHex = theme.palette.text.primary;
 
+  const sigma = useSigma();
   return useMemo(() => {
     const isHighlightEdges = !isEmpty(highlightEdges);
     const pastSteps = 400;
@@ -278,8 +280,11 @@ export function useGraphColoring(
       });
     }
 
-    return { graph, graphKey: step };
+    sigma.scheduleRefresh({
+      layoutUnchange: true,
+    });
   }, [
+    sigma,
     getGraphId,
     getGraphPId,
     graph,

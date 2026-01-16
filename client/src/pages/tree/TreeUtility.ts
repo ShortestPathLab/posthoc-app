@@ -3,12 +3,15 @@ import { treeToDict } from "hooks/useBreakPoints";
 import {
   entries,
   every,
+  filter,
   flatMap,
   groupBy,
   head,
   isInteger,
   isPlainObject,
+  map,
   mapValues,
+  uniq,
   uniqBy,
 } from "lodash-es";
 import { Trace } from "protocol/Trace";
@@ -19,6 +22,7 @@ import {
   TreeWorkerReturnType,
 } from "./treeUtility.worker";
 import treeWorkerUrl from "./treeUtility.worker.ts?worker&url";
+import { TraceEvent } from "protocol/Trace-v140";
 export class TreeWorker extends Worker {
   constructor() {
     super(treeWorkerUrl, { type: "module" });
@@ -55,7 +59,7 @@ function computeLabelsOne(t: unknown, root: string = ""): Y[] {
     case "object":
       if (isPlainObject(t))
         return flatMap(entries(t!), ([k, v]) =>
-          computeLabelsOne(v, `${root}.${k}`)
+          computeLabelsOne(v, `${root}.${k}`),
         );
   }
   return [{ path: root, type: "mixed", value: undefined }];
@@ -85,8 +89,33 @@ function computeLabels(labels?: unknown[]) {
     labels ?? [],
     (t) => t.flatMap((v) => computeLabelsOne(v)),
     (t) => groupBy(t, "path"),
-    (t) => mapValues(t, (v) => ({ type: resolveType(v) }))
+    (t) => mapValues(t, (v) => ({ type: resolveType(v) })),
   );
+}
+
+export function computeTypes(events?: TraceEvent[]) {
+  return _(
+    events,
+    (s) => map(s, (a, b) => [a, b] as const),
+    (s) => map(s, ([e]) => e?.type ?? ""),
+    (s) => filter(s),
+    uniq,
+  );
+}
+
+export function useComputeTypes({
+  key,
+  trace,
+}: {
+  key?: string;
+  trace?: Trace;
+}) {
+  return useQuery({
+    queryKey: ["compute/types", key],
+    queryFn: async () => computeTypes(trace?.events),
+    enabled: !!key,
+    staleTime: Infinity,
+  });
 }
 
 export function useComputeLabels({

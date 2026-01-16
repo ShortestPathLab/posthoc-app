@@ -1,10 +1,8 @@
 import { useTheme } from "@mui/material";
-import { SigmaContainer, useSigma } from "@react-sigma/core";
+import { SigmaContainer } from "@react-sigma/core";
 import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
-import { ComponentProps, useEffect, useMemo } from "react";
+import { ComponentProps, useMemo } from "react";
 import { EdgeArrowProgram } from "sigma/rendering";
-import { AxisBounds } from ".";
-import { getGraphColorHex } from "./useGraphColoring";
 
 export function useGraphSettings() {
   const theme = useTheme();
@@ -32,54 +30,4 @@ export function useGraphSettings() {
       }) as ComponentProps<typeof SigmaContainer>["settings"],
     [theme],
   );
-}
-
-export function useNodeCulling(stableAxisBounds?: AxisBounds | null) {
-  const sigma = useSigma();
-  const theme = useTheme();
-
-  useEffect(() => {
-    const graph = sigma?.getGraph();
-    if (!graph) return;
-
-    const backgroundHex = theme.palette.background.paper;
-    const foregroundHex = theme.palette.text.primary;
-
-    if (!stableAxisBounds) {
-      return;
-    }
-
-    const { xMin, xMax, yMin, yMax } = stableAxisBounds;
-
-    const xRange = xMax - xMin;
-    const yRange = yMax - yMin;
-    const actualXMin = xMin + xRange * 0.09;
-    const actualYMin = yMin + yRange * 0.05;
-
-    graph.forEachNode((node, attrs) => {
-      const insideX = attrs.x >= actualXMin && attrs.x <= xMax;
-      const insideY = attrs.y >= actualYMin && attrs.y <= yMax;
-      const isInside = insideX && insideY;
-
-      if (!isInside) {
-        if (!attrs.storedColor) {
-          graph.setNodeAttribute(node, "storedColor", attrs.color);
-        }
-        const grayColor = getGraphColorHex(
-          attrs.eventType || "neutral",
-          0.15,
-          backgroundHex,
-          foregroundHex,
-        );
-        graph.setNodeAttribute(node, "color", grayColor);
-      } else {
-        if (attrs.storedColor) {
-          graph.setNodeAttribute(node, "color", attrs.storedColor);
-          graph.setNodeAttribute(node, "storedColor", undefined);
-        }
-      }
-    });
-
-    sigma.refresh();
-  }, [sigma, stableAxisBounds, theme]);
 }
