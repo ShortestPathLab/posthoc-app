@@ -39,7 +39,7 @@ import { ServerListEditor } from "components/settings-editor/ServerListEditor";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { useSm } from "hooks/useSmallDisplay";
 import { produce } from "immer";
-import { findLast, keys, map, round, startCase } from "lodash-es";
+import { findLast, isArray, keys, map, round, startCase } from "lodash-es";
 import { ReactNode, Ref, useMemo, useRef, useState } from "react";
 import { useMeasure, useRafLoop } from "react-use";
 import { slice } from "slices";
@@ -251,12 +251,12 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                         formatLabel(round(Math.pow(10, v) / baseRate, 2))
                       }
                       valueLabelDisplay="auto"
-                      defaultValue={playbackRate}
+                      defaultValue={Math.log10(playbackRate)}
                       onChangeCommitted={(_, v) =>
                         slice.settings.set((f) => {
                           f["playback/playbackRate"] = Math.pow(
                             10,
-                            v as number,
+                            isArray(v) ? v[0] : v,
                           );
                         })
                       }
