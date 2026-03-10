@@ -39,7 +39,7 @@ import { ServerListEditor } from "components/settings-editor/ServerListEditor";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { useSm } from "hooks/useSmallDisplay";
 import { produce } from "immer";
-import { findLast, keys, map, startCase } from "lodash-es";
+import { findLast, keys, map, round, startCase } from "lodash-es";
 import { ReactNode, Ref, useMemo, useRef, useState } from "react";
 import { useMeasure, useRafLoop } from "react-use";
 import { slice } from "slices";
@@ -240,19 +240,24 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                   >
                     <Slider
                       sx={{ width: "fill-available", mx: 2, maxWidth: 320 }}
-                      marks={[1, 2, 5, 10].map((v) => ({
-                        value: v * baseRate,
+                      marks={[1, 2, 10, 100, 1000].map((v) => ({
+                        value: Math.log10(v * baseRate),
                         label: formatLabel(v),
                       }))}
-                      step={1 * baseRate}
-                      min={1 * baseRate}
-                      max={10 * baseRate}
-                      valueLabelFormat={(v) => formatLabel(v / baseRate)}
+                      step={0.01}
+                      min={Math.log10(1 * baseRate)}
+                      max={Math.log10(1000 * baseRate)}
+                      valueLabelFormat={(v) =>
+                        formatLabel(round(Math.pow(10, v) / baseRate, 2))
+                      }
                       valueLabelDisplay="auto"
                       defaultValue={playbackRate}
                       onChangeCommitted={(_, v) =>
                         slice.settings.set((f) => {
-                          f["playback/playbackRate"] = +v;
+                          f["playback/playbackRate"] = Math.pow(
+                            10,
+                            v as number,
+                          );
                         })
                       }
                     />
