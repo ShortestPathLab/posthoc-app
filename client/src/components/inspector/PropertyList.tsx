@@ -50,8 +50,7 @@ const sortEventKeys = (e: PropertyListProps["event"]) =>
     e,
     (v) => entries(v),
     (v) => filter(v, ([, v]) => !isUndefined(v)),
-    (v) =>
-      sortBy(v, ([k]) => indexOf(ALL_PROPS, k) + 1 || Number.MAX_SAFE_INTEGER),
+    (v) => sortBy(v, ([k]) => indexOf(ALL_PROPS, k) + 1 || Number.MAX_SAFE_INTEGER),
   );
 
 type PropertyListProps = {
@@ -79,12 +78,7 @@ export function EventProperties({ event }: Pick<PropertyListProps, "event">) {
   ].map(({ name, props }, i) => (
     <Fragment key={name}>
       {!!i && <Divider sx={{ mb: 1 }} />}
-      <Typography
-        component="div"
-        variant="overline"
-        color="textSecondary"
-        sx={{ px: sm ? 2 : 3 }}
-      >
+      <Typography component="div" variant="overline" color="textSecondary" sx={{ px: sm ? 2 : 3 }}>
         {startCase(name)}
       </Typography>
       <Box
@@ -121,18 +115,11 @@ export function PropertyList({
     <Block {...rest}>
       {_(
         sorted,
-        (v) =>
-          filter(v, primitives ? ([, v]) => isPrimitive(v) : constant(true)),
+        (v) => filter(v, primitives ? ([, v]) => isPrimitive(v) : constant(true)),
         (v) => slice(v, 0, max),
         (v) =>
           map(v, ([k, v], i) => (
-            <Property
-              label={k}
-              value={v}
-              key={i}
-              type={{ variant }}
-              simple={simple}
-            />
+            <Property label={k} value={v} key={i} type={{ variant }} simple={simple} />
           )),
       )}
       {sorted.length > max && !simple && (

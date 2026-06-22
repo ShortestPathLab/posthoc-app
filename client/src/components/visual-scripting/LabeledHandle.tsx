@@ -28,15 +28,10 @@ export function LabeledHandle({
       />
 
       <Tooltip title={description}>
-        {!isUndefined(value) ?
-          <TextField
-            size="small"
-            variant="filled"
-            label={label}
-            defaultValue={value}
-            fullWidth
-          />
-        : <Typography
+        {!isUndefined(value) ? (
+          <TextField size="small" variant="filled" label={label} defaultValue={value} fullWidth />
+        ) : (
+          <Typography
             variant="body2"
             sx={{
               color: (t) => t.palette.text.secondary,
@@ -45,7 +40,7 @@ export function LabeledHandle({
           >
             {label}
           </Typography>
-        }
+        )}
       </Tooltip>
     </Stack>
   );

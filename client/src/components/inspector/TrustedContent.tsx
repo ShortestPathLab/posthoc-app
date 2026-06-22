@@ -1,8 +1,4 @@
-import {
-  CheckOutlined,
-  DoneAllOutlined,
-  ShieldOutlined,
-} from "@mui-symbols-material/w300";
+import { CheckOutlined, DoneAllOutlined, ShieldOutlined } from "@mui-symbols-material/w300";
 import { Link, Stack } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
 import { ReactNode } from "react";
@@ -13,41 +9,42 @@ import { useUntrustedLayers as useUntrustedLayer } from "./useUntrustedLayers";
 export function TrustedContent({ children }: { children?: ReactNode }) {
   const { isTrusted, origin } = useUntrustedLayer();
 
-  return isTrusted ?
-      <>{children}</>
-    : <Placeholder
-        icon={<ShieldOutlined />}
-        label={
-          origin ?
-            <>
-              Trust <Link href={origin}>{origin}</Link>?
-            </>
-          : <>Trust this workspace?</>
-        }
-        secondary={`To enable custom views and advanced debugger features, you must trust this workspace first to allow third-party code to run.`}
-        action={
-          <Stack direction="column" sx={{ gap: 2, alignItems: "center" }}>
+  return isTrusted ? (
+    <>{children}</>
+  ) : (
+    <Placeholder
+      icon={<ShieldOutlined />}
+      label={
+        origin ? (
+          <>
+            Trust <Link href={origin}>{origin}</Link>?
+          </>
+        ) : (
+          <>Trust this workspace?</>
+        )
+      }
+      secondary={`To enable custom views and advanced debugger features, you must trust this workspace first to allow third-party code to run.`}
+      action={
+        <Stack direction="column" sx={{ gap: 2, alignItems: "center" }}>
+          <Button onClick={() => slice.ui.isTrusted.set(true)} startIcon={<CheckOutlined />}>
+            Trust this time
+          </Button>
+          {!!origin && (
             <Button
-              onClick={() => slice.ui.isTrusted.set(true)}
-              startIcon={<CheckOutlined />}
+              variant="text"
+              startIcon={<DoneAllOutlined />}
+              onClick={() => {
+                slice.settings.set((f) => {
+                  f.trustedOrigins = f.trustedOrigins ?? [];
+                  f.trustedOrigins?.push(origin);
+                });
+              }}
             >
-              Trust this time
+              Always trust workspaces from this origin
             </Button>
-            {!!origin && (
-              <Button
-                variant="text"
-                startIcon={<DoneAllOutlined />}
-                onClick={() => {
-                  slice.settings.set((f) => {
-                    f.trustedOrigins = f.trustedOrigins ?? [];
-                    f.trustedOrigins?.push(origin);
-                  });
-                }}
-              >
-                Always trust workspaces from this origin
-              </Button>
-            )}
-          </Stack>
-        }
-      />;
+          )}
+        </Stack>
+      }
+    />
+  );
 }

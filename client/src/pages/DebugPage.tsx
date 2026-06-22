@@ -19,8 +19,7 @@ import { BreakpointListEditor } from "../components/breakpoint-editor/Breakpoint
 import { PageContentProps } from "./PageMeta";
 import { useOne } from "slices/useOne";
 
-const stepsLayerGuard = (l: Layer<unknown>): l is Layer<DebugLayerData> =>
-  !!getController(l).steps;
+const stepsLayerGuard = (l: Layer<unknown>): l is Layer<DebugLayerData> => !!getController(l).steps;
 
 const divider = (
   <Divider
@@ -36,8 +35,7 @@ function useDebugPageState(key?: string) {
 }
 
 export function DebugPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state, dragHandle, isViewTree } =
-    useViewTreeContext();
+  const { controls, onChange, state, dragHandle, isViewTree } = useViewTreeContext();
 
   const [tab, setTab] = useState("standard");
 
@@ -65,7 +63,7 @@ export function DebugPage({ template: Page }: PageContentProps) {
           </TabList>
         </Page.Options>
         <Page.Content>
-          {layer ?
+          {layer ? (
             <Scroll y>
               <Box sx={{ pt: 6, height: "100%" }}>
                 <TabPanel value="standard" sx={{ p: 2 }}>
@@ -77,20 +75,19 @@ export function DebugPage({ template: Page }: PageContentProps) {
                   <TrustedContent>
                     <ScriptEditor
                       code={code ?? makeTemplate(values(templates))}
-                      onChange={(v) =>
-                        layer && one.set((l) => set(l, "source.code", v))
-                      }
+                      onChange={(v) => layer && one.set((l) => set(l, "source.code", v))}
                     />
                   </TrustedContent>
                 </TabPanel>
               </Box>
             </Scroll>
-          : <Placeholder
+          ) : (
+            <Placeholder
               icon={<BugReportOutlined />}
               label="Debugger"
               secondary="Configure breakpoints and other debugging options here. First, you'll need to load a trace."
             />
-          }
+          )}
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>
       </Page>

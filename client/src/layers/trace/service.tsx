@@ -19,10 +19,7 @@ export const service = withProduce(({ value, produce }) => {
   const { result: trace, loading } = useTraceContent(value?.source?.trace);
   // Set playback
   useEffect(() => {
-    produce(
-      (l) =>
-        void set(l, "source.playbackTo", trace?.content?.events?.length ?? 0),
-    );
+    produce((l) => void set(l, "source.playbackTo", trace?.content?.events?.length ?? 0));
   }, [trace?.key]);
   const { isTrusted } = useUntrustedLayers();
   // Make the trace parser
@@ -37,9 +34,7 @@ export const service = withProduce(({ value, produce }) => {
         },
         color: {
           ...colorsHex,
-          ...mapValues(accentColors, (_, v: AccentColor) =>
-            getShade(v, palette.mode, 500, 400),
-          ),
+          ...mapValues(accentColors, (_, v: AccentColor) => getShade(v, palette.mode, 500, 400)),
         },
         themeAccent: palette.primary.main,
         themeTextPrimary: palette.text.primary,

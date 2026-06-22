@@ -26,9 +26,7 @@ export function useFileImport() {
           await usingBusyState(
             async () => {
               const layer = await outcome.layer(notify);
-              slice.layers.set(
-                (l) => void l.push({ key: id(), source: { type, ...layer } }),
-              );
+              slice.layers.set((l) => void l.push({ key: id(), source: { type, ...layer } }));
             },
             `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`,
           );
@@ -40,9 +38,7 @@ export function useFileImport() {
     if (totalClaimed) return;
     const success = await loadWorkspace(head(fs));
     if (success) return;
-    notify(
-      `Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`,
-    );
+    notify(`Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`);
   };
 }
 
@@ -58,10 +54,7 @@ export function FileDropZone() {
       onDragLeave={() => setItemCount(0)}
       onDrop={(f) => f && importFiles(Array.from(f))}
     >
-      <Backdrop
-        sx={{ ...acrylic, zIndex: (t) => t.zIndex.tooltip + 1 }}
-        open={!!itemCount}
-      >
+      <Backdrop sx={{ ...acrylic, zIndex: (t) => t.zIndex.tooltip + 1 }} open={!!itemCount}>
         <Stack spacing={4} sx={{ alignItems: "center" }}>
           <WorkspacesOutlined />
           <Type component="div" variant="body2" color="textSecondary">

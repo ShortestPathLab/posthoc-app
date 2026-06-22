@@ -1,12 +1,4 @@
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  Popover,
-  Stack,
-  rgbToHex,
-  useTheme,
-} from "@mui/material";
+import { Box, Checkbox, FormControlLabel, Popover, Stack, rgbToHex, useTheme } from "@mui/material";
 import interpolate from "color-interpolate";
 import { EditorProps } from "components/Editor";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
@@ -61,9 +53,7 @@ export function SymbolColorPicker({
                   borderRadius: 4,
                 }}
               />
-              {value ?
-                startCase(getClosestColor(value)?.name ?? "Custom")
-              : "Auto"}
+              {value ? startCase(getClosestColor(value)?.name ?? "Custom") : "Auto"}
             </Stack>
           </FeaturePickerButton>
           <Popover
@@ -77,9 +67,7 @@ export function SymbolColorPicker({
                 control={
                   <Checkbox
                     defaultChecked={!value}
-                    onChange={(_, checked) =>
-                      setValue?.(checked ? undefined : autoValue)
-                    }
+                    onChange={(_, checked) => setValue?.(checked ? undefined : autoValue)}
                   />
                 }
                 label="Choose Automatically"
@@ -104,9 +92,7 @@ export function SymbolColorPicker({
   );
 }
 
-export const editor: MapEditor<{ symbols?: Record<string, string> }> = async (
-  map?: string,
-) => {
+export const editor: MapEditor<{ symbols?: Record<string, string> }> = async (map?: string) => {
   if (map) {
     const { symbols } = await getGridSymbolsAsync({ map });
     return withProduce(({ produce, value }) => {
@@ -124,9 +110,7 @@ export const editor: MapEditor<{ symbols?: Record<string, string> }> = async (
               content={
                 <SymbolColorPicker
                   value={value?.symbols?.[key]}
-                  autoValue={gradient(
-                    find(symbols, { symbol: key })?.value ?? 0,
-                  )}
+                  autoValue={gradient(find(symbols, { symbol: key })?.value ?? 0)}
                   onChange={(v) =>
                     produce((prev) => {
                       set(prev, `symbols["${key}"]`, v);

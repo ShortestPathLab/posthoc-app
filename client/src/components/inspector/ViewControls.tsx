@@ -49,10 +49,7 @@ export function ViewControls({
           <MuiStack sx={{ m: 1 }}>
             <Tooltip title="Panel Options">
               <IconButton size="small" {...bindTrigger(state)}>
-                <MoreIcon
-                  fontSize="small"
-                  sx={{ color: (t) => t.palette.text.secondary }}
-                />
+                <MoreIcon fontSize="small" sx={{ color: (t) => t.palette.text.secondary }} />
               </IconButton>
             </Tooltip>
           </MuiStack>
@@ -84,10 +81,7 @@ export function ViewControls({
               disabled={splitHorizontalDisabled}
             >
               <ListItemIcon>
-                <SplitIcon
-                  fontSize="small"
-                  sx={{ transform: "rotate(90deg)" }}
-                />
+                <SplitIcon fontSize="small" sx={{ transform: "rotate(90deg)" }} />
               </ListItemIcon>
               <ListItemText>Split horizontal</ListItemText>
             </MenuItem>

@@ -40,11 +40,7 @@ export function RendererListEditor() {
         }
         onFocus={(key) => {
           const element = head(document.getElementsByClassName(key));
-          if (
-            element &&
-            "click" in element &&
-            typeof element.click === "function"
-          ) {
+          if (element && "click" in element && typeof element.click === "function") {
             element.click();
           }
         }}

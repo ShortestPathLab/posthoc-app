@@ -81,10 +81,7 @@ export function AboutContent() {
               <ListItemIcon>
                 <GitHub />
               </ListItemIcon>
-              <ListItemText
-                primary="Repository"
-                secondary={parseUrl(repository)}
-              />
+              <ListItemText primary="Repository" secondary={parseUrl(repository)} />
             </ListItemButton>
           </List>
         </>,

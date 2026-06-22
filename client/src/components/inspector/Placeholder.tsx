@@ -1,8 +1,4 @@
-import {
-  CancelOutlined,
-  RefreshOutlined,
-  WidgetsOutlined,
-} from "@mui-symbols-material/w300";
+import { CancelOutlined, RefreshOutlined, WidgetsOutlined } from "@mui-symbols-material/w300";
 import { Box, Button, Typography as Type } from "@mui/material";
 import { Block, BlockProps } from "components/generic/Block";
 import { ComponentProps, ReactElement, ReactNode } from "react";
@@ -61,11 +57,7 @@ export function ErrorPlaceholder({
     <Placeholder
       icon={<CancelOutlined />}
       action={
-        <Button
-          variant="text"
-          onClick={() => onReset?.()}
-          startIcon={<RefreshOutlined />}
-        >
+        <Button variant="text" onClick={() => onReset?.()} startIcon={<RefreshOutlined />}>
           Reload
         </Button>
       }

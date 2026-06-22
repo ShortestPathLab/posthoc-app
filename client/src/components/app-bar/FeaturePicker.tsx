@@ -1,10 +1,4 @@
-import {
-  ButtonProps,
-  Stack,
-  SxProps,
-  Typography as Type,
-  useTheme,
-} from "@mui/material";
+import { ButtonProps, Stack, SxProps, Typography as Type, useTheme } from "@mui/material";
 import { Select } from "components/generic/inputs/Select";
 import { Space } from "components/generic/Space";
 import { filter, find, map, startCase, truncate } from "es-toolkit/compat";
@@ -67,9 +61,9 @@ export function FeaturePicker({
           icon={selected?.icon ? getIcon(selected.icon, selected.color) : icon}
           arrow={arrow}
         >
-          {renderItem && selected ?
-            renderItem(selected)
-          : truncate(selected?.name ?? label, { length: ellipsis })}
+          {renderItem && selected
+            ? renderItem(selected)
+            : truncate(selected?.name ?? label, { length: ellipsis })}
         </FeaturePickerButton>
       )}
       items={map(items, ({ id, name, description, hidden, icon, color }) => ({
@@ -78,14 +72,14 @@ export function FeaturePicker({
           <Stack
             direction={itemOrientation === "vertical" ? "column" : "row"}
             sx={{
-              alignItems:
-                itemOrientation === "vertical" ? "flex-start" : "center",
+              alignItems: itemOrientation === "vertical" ? "flex-start" : "center",
             }}
           >
             <Type>
-              {renderItem ?
+              {renderItem ? (
                 renderItem({ id, name, description })
-              : <>
+              ) : (
+                <>
                   <Type component="span">
                     {name}
                     <Space />
@@ -94,7 +88,7 @@ export function FeaturePicker({
                     {description}
                   </Type>
                 </>
-              }
+              )}
             </Type>
           </Stack>
         ),

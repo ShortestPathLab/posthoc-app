@@ -18,16 +18,7 @@ import { Surface } from "components/generic/surface";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController, getControllers } from "layers/layerControllers";
 import { isEqual } from "es-toolkit";
-import {
-  debounce,
-  head,
-  keys,
-  merge,
-  omit,
-  pick,
-  startCase,
-  truncate,
-} from "es-toolkit/compat";
+import { debounce, head, keys, merge, omit, pick, startCase, truncate } from "es-toolkit/compat";
 import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
 import { slice } from "slices";
 import { Layer, WithLayer } from "slices/layers";
@@ -82,15 +73,10 @@ export function useDraft<T>(
   const [state, setState] = useState(initial);
   useEffect(() => {
     if (initial) {
-      requestIdleCallback(() =>
-        setState(merge({}, state, omit(initial, ...stayDraft))),
-      );
+      requestIdleCallback(() => setState(merge({}, state, omit(initial, ...stayDraft))));
     }
   }, [setState, initial]);
-  const handleChange = useMemo(
-    () => debounce((v: T) => commit?.(v), ms),
-    [commit, ms],
-  );
+  const handleChange = useMemo(() => debounce((v: T) => commit?.(v), ms), [commit, ms]);
   return [
     state,
     (value: (prev: T) => T) => {
@@ -127,13 +113,7 @@ export function Label({ children }: { children: ReactNode }) {
   );
 }
 
-export function Option({
-  label,
-  option,
-}: {
-  label: ReactNode;
-  option: ReactNode;
-}) {
+export function Option({ label, option }: { label: ReactNode; option: ReactNode }) {
   return (
     <Block sx={{ alignItems: "center" }}>
       <Label>{label}</Label>
@@ -148,10 +128,8 @@ const options = (a: string[]) => a.map((c) => ({ id: c, name: startCase(c) }));
 export function LayerEditor({ layer: key }: LayerEditorProps) {
   const one = slice.layers.one(key);
   const layer = useLayerProperties(key);
-  const [
-    { name, transparency, displayMode, source: { type } = {} } = {},
-    setOptimistic,
-  ] = useOptimisticTransaction(layer!, (f) => idle(() => one.set(f), 1000));
+  const [{ name, transparency, displayMode, source: { type } = {} } = {}, setOptimistic] =
+    useOptimisticTransaction(layer!, (f) => idle(() => one.set(f), 1000));
 
   const selectedType = type ?? head(keys(getControllers())) ?? "";
 
@@ -175,16 +153,11 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               variant="filled"
               label="Layer Name"
               defaultValue={name ?? ""}
-              onChange={(e) =>
-                setOptimistic((d) => set(d, "name", e.target.value))
-              }
+              onChange={(e) => setOptimistic((d) => set(d, "name", e.target.value))}
             />
           )}
         </WithLayer>
-        <Stack
-          direction="row"
-          sx={{ gap: 1, width: "100%", "> *": { flex: 1 } }}
-        >
+        <Stack direction="row" sx={{ gap: 1, width: "100%", "> *": { flex: 1 } }}>
           {keys(getControllers()).map((s) => (
             <Button
               value={s}
@@ -193,19 +166,16 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               sx={{
                 "& svg": { color: (t) => t.palette.text.secondary },
                 "& *": { color: (t) => t.palette.text.secondary },
-                ...(selectedType === s ?
-                  {
-                    "& *": { color: (t) => t.palette.text.primary },
-                    borderWidth: 1,
-                    borderColor: (t) =>
-                      `${t.palette.inversePrimary.main} !important`,
-                    backgroundColor: (t) => t.palette.primaryContainer.main,
-                  }
-                : {}),
+                ...(selectedType === s
+                  ? {
+                      "& *": { color: (t) => t.palette.text.primary },
+                      borderWidth: 1,
+                      borderColor: (t) => `${t.palette.inversePrimary.main} !important`,
+                      backgroundColor: (t) => t.palette.primaryContainer.main,
+                    }
+                  : {}),
               }}
-              onClick={() =>
-                setOptimistic((d) => set(d, "source", { type: s }))
-              }
+              onClick={() => setOptimistic((d) => set(d, "source", { type: s }))}
             >
               {startCase(s)}
             </Button>
@@ -237,9 +207,7 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               paper
               value={transparency ?? "0"}
               arrow
-              onChange={(e) =>
-                setOptimistic((d) => set(d, "transparency", e as any))
-              }
+              onChange={(e) => setOptimistic((d) => set(d, "transparency", e as any))}
             />
           }
         />
@@ -253,9 +221,7 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               value={displayMode ?? "source-over"}
               items={options(compositeOperations)}
               onChange={(e) =>
-                setOptimistic((d) =>
-                  set(d, "displayMode", e as GlobalCompositeOperation),
-                )
+                setOptimistic((d) => set(d, "displayMode", e as GlobalCompositeOperation))
               }
             />
           }

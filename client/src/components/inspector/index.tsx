@@ -51,12 +51,9 @@ export function Inspector(props: BlockProps) {
             }}
             canPopOut={(leaf) => !!pages[leaf.content!.type!]?.allowFullscreen}
             root={view}
-            onChange={(v) =>
-              slice.view.set((l) => void (l.view = produce(l.view, v)))
-            }
+            onChange={(v) => slice.view.set((l) => void (l.view = produce(l.view, v)))}
             renderLeaf={({ content }) => {
-              const Content =
-                pages[content?.type ?? ""]?.content ?? PlaceholderPage;
+              const Content = pages[content?.type ?? ""]?.content ?? PlaceholderPage;
               return (
                 <Box sx={{ width: "100%", height: "100%" }}>
                   <ErrorBoundary
@@ -65,9 +62,7 @@ export function Inspector(props: BlockProps) {
                         sx={{ width: "100%", height: "100%" }}
                         label={`An error occurred`}
                         secondary={
-                          error instanceof Error ?
-                            error.message
-                          : "Couldn't render this view"
+                          error instanceof Error ? error.message : "Couldn't render this view"
                         }
                         onReset={resetErrorBoundary}
                       />

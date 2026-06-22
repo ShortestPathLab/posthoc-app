@@ -1,9 +1,6 @@
 import { MoreVertOutlined } from "@mui-symbols-material/w300";
 import { Box, IconButton, Tooltip } from "@mui/material";
-import {
-  AddItemButton,
-  ListEditor,
-} from "components/generic/list-editor/ListEditor";
+import { AddItemButton, ListEditor } from "components/generic/list-editor/ListEditor";
 import { DebugLayerData } from "hooks/DebugLayerData";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { isEqual } from "es-toolkit";
@@ -27,27 +24,17 @@ type BreakpointListEditorProps = {
 function useBreakpoints(key?: string) {
   const one = slice.layers.one<Layer<DebugLayerData>>(key);
   const breakpoints = useOne(one, (l) => l?.source?.breakpoints, isEqual);
-  const [optimistic, setOptimistic] = useOptimisticTransaction(
-    breakpoints ?? [],
-    (f) =>
-      idle(() =>
-        startTransition(() =>
-          one.set((l) =>
-            set(
-              l,
-              "source.breakpoints",
-              produce(l.source?.breakpoints ?? [], f),
-            ),
-          ),
-        ),
+  const [optimistic, setOptimistic] = useOptimisticTransaction(breakpoints ?? [], (f) =>
+    idle(() =>
+      startTransition(() =>
+        one.set((l) => set(l, "source.breakpoints", produce(l.source?.breakpoints ?? [], f))),
       ),
+    ),
   );
   return [optimistic, setOptimistic] as const;
 }
 
-export function BreakpointListEditor({
-  layer: key,
-}: BreakpointListEditorProps) {
+export function BreakpointListEditor({ layer: key }: BreakpointListEditorProps) {
   const [breakpoints, setBreakpoints] = useBreakpoints(key);
 
   return (

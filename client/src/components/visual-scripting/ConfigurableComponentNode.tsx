@@ -51,13 +51,7 @@ export function ConfigurableComponentNode(props: NodeProps<ConfigurableComponent
           height: ITEM_HEIGHT,
           render: ({ y }: ItemOptions) => (
             <>
-              <Handle
-                type="target"
-                position={Position.Left}
-                id="in"
-                key="in"
-                style={{ top: y }}
-              />
+              <Handle type="target" position={Position.Left} id="in" key="in" style={{ top: y }} />
               <Handle
                 type="target"
                 position={Position.Right}

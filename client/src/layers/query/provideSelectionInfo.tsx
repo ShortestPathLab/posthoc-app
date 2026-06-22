@@ -25,9 +25,7 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
           if (!isMapLayer(l)) return;
           const { parsedMap } = l?.source ?? {};
           if (!parsedMap || !event) return;
-          const hydratedMap = getParser(l?.source?.map?.format)?.hydrate?.(
-            parsedMap,
-          );
+          const hydratedMap = getParser(l?.source?.map?.format)?.hydrate?.(parsedMap);
           if (!hydratedMap) return;
           const point = event?.world && hydratedMap.snap(event.world);
           if (!point) return;

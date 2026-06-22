@@ -1,8 +1,4 @@
-import {
-  OpenInNewOutlined,
-  SearchOutlined,
-  WorkspacesOutlined,
-} from "@mui-symbols-material/w300";
+import { OpenInNewOutlined, SearchOutlined, WorkspacesOutlined } from "@mui-symbols-material/w300";
 import {
   alpha,
   Box,
@@ -126,11 +122,7 @@ export const TitleBarPlaceholder = () => {
       }}
     >
       {times(4, () => (
-        <Skeleton
-          variant="text"
-          animation={false}
-          sx={{ opacity: 0.5, width: 48 }}
-        />
+        <Skeleton variant="text" animation={false} sx={{ opacity: 0.5, width: 48 }} />
       ))}
     </Stack>
   );
@@ -292,12 +284,7 @@ export const TitleBar = () => {
                   { type: "divider" },
                   {
                     type: "action",
-                    name: (
-                      <MenuEntry
-                        label="Publish workspace"
-                        endIcon={<OpenInNewOutlined />}
-                      />
-                    ),
+                    name: <MenuEntry label="Publish workspace" endIcon={<OpenInNewOutlined />} />,
                     key: "workspace-save-metadata",
                     action: () => openModal({}),
                   },

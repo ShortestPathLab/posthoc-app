@@ -46,11 +46,7 @@ import { useMeasure, useRafLoop } from "react-use";
 import { slice } from "slices";
 import { useBusyState } from "slices/busy";
 import { Transaction } from "slices/selector";
-import {
-  defaultPlaybackRate as baseRate,
-  defaults,
-  Settings,
-} from "slices/settings";
+import { defaultPlaybackRate as baseRate, defaults, Settings } from "slices/settings";
 import { AccentColor, getShade, usePaper } from "theme";
 import { idle } from "utils/idle";
 import { Get, get } from "utils/set";
@@ -110,8 +106,7 @@ function Item({
 }
 
 export function SettingsPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state, dragHandle, isViewTree } =
-    useViewTreeContext();
+  const { controls, onChange, state, dragHandle, isViewTree } = useViewTreeContext();
   const sm = useSm();
   const push = useSnackbar();
   const usingBusyState = useBusyState("reset");
@@ -131,8 +126,8 @@ export function SettingsPage({ template: Page }: PageContentProps) {
     ({ onClose }: SurfaceContentProps) => (
       <Stack sx={{ p: sm ? 2 : 3, pt: 2, gap: 4 }}>
         <Typography component="div" color="textSecondary">
-          If something&apos;s not working correctly, you can try to reset all
-          settings and extensions. This cannot be undone.
+          If something&apos;s not working correctly, you can try to reset all settings and
+          extensions. This cannot be undone.
         </Typography>
         <Stack
           direction={sm ? "column-reverse" : "row"}
@@ -180,14 +175,9 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   const [generalTab, setGeneralTab] = useState("Playback");
   useRafLoop(() => {
     if (!(items.current && menu.current)) return;
-    const itemLabels = Array.from(
-      items.current.querySelectorAll<HTMLElement>("[data-label]"),
-    );
+    const itemLabels = Array.from(items.current.querySelectorAll<HTMLElement>("[data-label]"));
     const menuTop = menu.current.getBoundingClientRect().top;
-    const firstTop = findLast(
-      itemLabels,
-      (l) => l.getBoundingClientRect().top < menuTop + 9,
-    );
+    const firstTop = findLast(itemLabels, (l) => l.getBoundingClientRect().top < menuTop + 9);
     setGeneralTab(firstTop?.dataset.label ?? "Playback");
   });
   return (
@@ -197,10 +187,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
         <Page.Title>Settings</Page.Title>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
-          <TabList
-            onChange={(_, v) => setTab(v)}
-            sx={{ mx: 0, "& button": { minWidth: 0 } }}
-          >
+          <TabList onChange={(_, v) => setTab(v)} sx={{ mx: 0, "& button": { minWidth: 0 } }}>
             <Tab label="General" value="general" />
             <Tab label="Extensions" value="connections" />
             <Tab label="Security" value="security" />
@@ -245,9 +232,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           label={name}
                           value={name}
                           onClick={() => {
-                            const el = document.querySelector(
-                              `[data-label="${name}"]`,
-                            );
+                            const el = document.querySelector(`[data-label="${name}"]`);
                             if (el) {
                               el.scrollIntoView({
                                 block: "start",
@@ -277,17 +262,12 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                       step={0.01}
                       min={Math.log10(1 * baseRate)}
                       max={Math.log10(1000 * baseRate)}
-                      valueLabelFormat={(v) =>
-                        formatLabel(round(Math.pow(10, v) / baseRate, 2))
-                      }
+                      valueLabelFormat={(v) => formatLabel(round(Math.pow(10, v) / baseRate, 2))}
                       valueLabelDisplay="auto"
                       defaultValue={Math.log10(playbackRate)}
                       onChangeCommitted={(_, v) =>
                         slice.settings.set((f) => {
-                          f["playback/playbackRate"] = Math.pow(
-                            10,
-                            isArray(v) ? v[0] : v,
-                          );
+                          f["playback/playbackRate"] = Math.pow(10, isArray(v) ? v[0] : v);
                         })
                       }
                     />
@@ -465,23 +445,13 @@ export function SettingsPage({ template: Page }: PageContentProps) {
             <TabPanel value="security" sx={{ p: 2 }}>
               {renderHeading("Trusted origins")}
               <Box sx={{ maxWidth: 480 }}>
-                <Typography
-                  component="div"
-                  color="textSecondary"
-                  variant="caption"
-                  sx={{ pt: 2 }}
-                >
-                  Rendering traces in the viewport and using advanced debugger
-                  features sometimes requires running third-party code.
+                <Typography component="div" color="textSecondary" variant="caption" sx={{ pt: 2 }}>
+                  Rendering traces in the viewport and using advanced debugger features sometimes
+                  requires running third-party code.
                 </Typography>
-                <Typography
-                  component="div"
-                  color="textSecondary"
-                  variant="caption"
-                  sx={{ pt: 2 }}
-                >
-                  You&apos;ll be prompted to add origins when necessary, and you
-                  can stop trusting origins by removing them from this list.
+                <Typography component="div" color="textSecondary" variant="caption" sx={{ pt: 2 }}>
+                  You&apos;ll be prompted to add origins when necessary, and you can stop trusting
+                  origins by removing them from this list.
                 </Typography>
               </Box>
               <Box sx={{ pt: 2 }}>
@@ -522,10 +492,7 @@ export function useSetting<TPath extends keyof Settings>(
 
 export function TrustedOriginListEditor() {
   const [trustedOrigins, setTrustedOrigins] = useSetting("trustedOrigins", []);
-  const b = useMemo(
-    () => map(trustedOrigins, (t) => ({ key: t })),
-    [trustedOrigins],
-  );
+  const b = useMemo(() => map(trustedOrigins, (t) => ({ key: t })), [trustedOrigins]);
   return (
     // <List>
     //   {keys(mapParsers).map((c) => (
@@ -579,10 +546,7 @@ export function MapParserListEditor() {
         renderEditor={({ props: { id: key }, handle, extras }) => (
           <>
             {handle}
-            <ListItemText
-              primary={startCase(key)}
-              secondary={`Support for *.${key} maps`}
-            />
+            <ListItemText primary={startCase(key)} secondary={`Support for *.${key} maps`} />
             {extras}
           </>
         )}

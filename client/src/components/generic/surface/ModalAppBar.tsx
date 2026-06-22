@@ -16,9 +16,7 @@ export function ModalAppBar({
   position = "sticky",
 }: ModalAppBarProps) {
   function renderTitle(label: ReactNode) {
-    return typeof label === "string" ?
-        <AppBarTitle>{label}</AppBarTitle>
-      : label;
+    return typeof label === "string" ? <AppBarTitle>{label}</AppBarTitle> : label;
   }
 
   return (
@@ -33,11 +31,7 @@ export function ModalAppBar({
       }}
     >
       <Toolbar>
-        <IconButton
-          sx={{ mr: (t) => t.spacing(1) }}
-          edge="start"
-          onClick={onClose}
-        >
+        <IconButton sx={{ mr: (t) => t.spacing(1) }} edge="start" onClick={onClose}>
           <ArrowBack />
         </IconButton>
 

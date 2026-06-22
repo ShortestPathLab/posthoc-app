@@ -12,21 +12,19 @@ export const getSources = ((layer) => {
       name: "Query",
       language: "yaml",
       readonly: true,
-      content: dump(
-        {
-          algorithm,
-          instances: [{ start, end }],
-          mapURI: "(...)",
-          format: "(...)",
-          ...mapValuesDeep(query, (t) =>
-            typeof t === "string"
-              ? t.length > maxStringPropLength
-                ? `${truncate(t, { length: maxStringPropLength })} (${t.length} characters)`
-                : t
-              : t,
-          ),
-        },
-      ),
+      content: dump({
+        algorithm,
+        instances: [{ start, end }],
+        mapURI: "(...)",
+        format: "(...)",
+        ...mapValuesDeep(query, (t) =>
+          typeof t === "string"
+            ? t.length > maxStringPropLength
+              ? `${truncate(t, { length: maxStringPropLength })} (${t.length} characters)`
+              : t
+            : t,
+        ),
+      }),
     },
   ];
 }) satisfies Controller["getSources"];

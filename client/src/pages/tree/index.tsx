@@ -47,28 +47,17 @@ export function TreePage({ template: Page }: PageContentProps) {
   // ─── Options ─────────────────────────────────────────────────────────
 
   const options = useTreeOptions(key);
-  const {
-    mode,
-    isLoading: isOptionsLoading,
-    trackedProperty,
-    logAxis,
-    axis,
-    typeFilter,
-  } = options;
+  const { mode, isLoading: isOptionsLoading, trackedProperty, logAxis, axis, typeFilter } = options;
   // ─── Playback ────────────────────────────────────────────────────────
 
   const throttled = useThrottle(step ?? 0, 1000 / 24);
 
   // ─── Panel Data ──────────────────────────────────────────────────────
 
-  const { controls, onChange, state, dragHandle } =
-    useViewTreeContext<TreePageContext>();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext<TreePageContext>();
   const size = useSurfaceAvailableCssSize();
 
-  const { point, selected, selection, setSelection } = useSelection(
-    throttled,
-    trace?.content,
-  );
+  const { point, selected, selection, setSelection } = useSelection(throttled, trace?.content);
 
   // ─────────────────────────────────────────────────────────────────────
 
@@ -91,7 +80,7 @@ export function TreePage({ template: Page }: PageContentProps) {
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Block sx={size}>
-          {trace ?
+          {trace ? (
             <>
               {
                 <>
@@ -115,11 +104,11 @@ export function TreePage({ template: Page }: PageContentProps) {
                       };
                       return (
                         <>
-                          {isLoading ?
+                          {isLoading ? (
                             <Box sx={size}>
                               <Spinner message="Generating layout" />
                             </Box>
-                          : tree?.length ?
+                          ) : tree?.length ? (
                             <SigmaContainer
                               style={{
                                 ...size,
@@ -128,11 +117,12 @@ export function TreePage({ template: Page }: PageContentProps) {
                               graph={MultiDirectedGraph}
                               settings={graphSettings}
                             >
-                              {mode !== "plot" ?
+                              {mode !== "plot" ? (
                                 <>
                                   <TreeGraph {...sharedProps} tree={tree} />
                                 </>
-                              : <>
+                              ) : (
+                                <>
                                   <ScatterPlotGraph
                                     {...sharedProps}
                                     logAxis={logAxis}
@@ -141,7 +131,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                                     yMetric={axis.yMetric}
                                   />
                                 </>
-                              }
+                              )}
                               <GraphEvents
                                 layerKey={key}
                                 onSelection={(e) => {
@@ -150,7 +140,8 @@ export function TreePage({ template: Page }: PageContentProps) {
                                 }}
                               />
                             </SigmaContainer>
-                          : <>
+                          ) : (
+                            <>
                               <WithLayer<TreeLayer> layer={key}>
                                 {(l) => (
                                   <Placeholder
@@ -161,7 +152,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                                 )}
                               </WithLayer>
                             </>
-                          }
+                          )}
 
                           <ScatterPlotControls {...sharedProps} {...options} />
                         </>
@@ -183,12 +174,13 @@ export function TreePage({ template: Page }: PageContentProps) {
                 </>
               }
             </>
-          : <Placeholder
+          ) : (
+            <Placeholder
               icon={<AccountTreeOutlined />}
               label="Graph"
               secondary="When you load a trace that has tree-like data, you'll see it here as a decision tree."
             />
-          }
+          )}
         </Block>
       </Page.Content>
       <Page.Options>

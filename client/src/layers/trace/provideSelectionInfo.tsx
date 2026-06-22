@@ -1,11 +1,5 @@
-import {
-  ArrowOutwardRounded,
-  DataObjectOutlined,
-} from "@mui-symbols-material/w300";
-import {
-  PropertyList,
-  showEventProperties,
-} from "components/inspector/PropertyList";
+import { ArrowOutwardRounded, DataObjectOutlined } from "@mui-symbols-material/w300";
+import { PropertyList, showEventProperties } from "components/inspector/PropertyList";
 import { inferLayerName } from "layers";
 import { isUndefined, last, negate } from "es-toolkit";
 import { keyBy, map, startCase } from "es-toolkit/compat";
@@ -52,9 +46,7 @@ export const provideSelectionInfo = (({ layer: key, event, children }) => {
             items: {
               properties: {
                 index: -2,
-                primary: (
-                  <PropertyList event={event} vertical simple primitives />
-                ),
+                primary: <PropertyList event={event} vertical simple primitives />,
               },
               propertiesDetails: {
                 index: -1,

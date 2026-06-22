@@ -1,11 +1,4 @@
-import {
-  CircularProgress,
-  CssBaseline,
-  Fade,
-  Stack,
-  ThemeProvider,
-  useTheme,
-} from "@mui/material";
+import { CircularProgress, CssBaseline, Fade, Stack, ThemeProvider, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { GlobalSurface } from "components/generic/surface";
@@ -54,19 +47,20 @@ function App() {
             height: "100dvh",
           }}
         >
-          {minimal || isMobile ?
+          {minimal || isMobile ? (
             <>
               <TitleBarPlaceholder />
               <Placeholder icon={<CircularProgress />} />
             </>
-          : <>
+          ) : (
+            <>
               <TitleBarPlaceholder />
               <Stack direction="row" sx={{ flex: 1 }}>
                 <SidebarPlaceholder />
                 <Placeholder icon={<></>} />
               </Stack>
             </>
-          }
+          )}
         </Stack>
       </Fade>
     </Block>
@@ -75,8 +69,7 @@ function App() {
 
 function ThemedApp() {
   const mode = useOne(slice.settings, (s) => s["appearance/theme"]) ?? "dark";
-  const accent =
-    useOne(slice.settings, (s) => s["appearance/accentColor"]) ?? "teal";
+  const accent = useOne(slice.settings, (s) => s["appearance/accentColor"]) ?? "teal";
   const theme = useMemo(() => makeTheme(mode, accent), [mode, accent]);
   return (
     <ThemeProvider theme={theme}>

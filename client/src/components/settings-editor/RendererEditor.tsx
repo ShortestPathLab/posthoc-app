@@ -1,21 +1,8 @@
-import {
-  Box,
-  Chip,
-  Switch,
-  TextField,
-  Tooltip,
-  Typography as Type,
-} from "@mui/material";
+import { Box, Chip, Switch, TextField, Tooltip, Typography as Type } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { Surface } from "components/generic/surface";
 import { SelectField as Select } from "components/generic/inputs/Select";
-import {
-  find,
-  join,
-  omit,
-  startCase,
-  toPairs as entries,
-} from "es-toolkit/compat";
+import { find, join, omit, startCase, toPairs as entries } from "es-toolkit/compat";
 import { transports } from "services/RendererService";
 import { slice } from "slices";
 import { merge } from "slices/reducers";
@@ -36,10 +23,7 @@ type RendererEditorProps = {
   onChange?: (e: Renderer) => void;
 };
 
-export function RendererEditor({
-  value,
-  onChange: onValueChange,
-}: RendererEditorProps) {
+export function RendererEditor({ value, onChange: onValueChange }: RendererEditorProps) {
   assert(value, "renderer is defined");
 
   const renderers = useOne(slice.renderers);
@@ -51,10 +35,7 @@ export function RendererEditor({
     onValueChange?.(merge(value, next));
   }
 
-  const status =
-    value.disabled ? "disabled"
-    : current?.renderer ? "connected"
-    : "error";
+  const status = value.disabled ? "disabled" : current?.renderer ? "connected" : "error";
 
   return (
     <Block sx={{ alignItems: "center", py: 1 }}>
@@ -81,19 +62,16 @@ export function RendererEditor({
               }}
             >
               <Type component="div">
-                {current?.renderer ?
-                  `${current?.renderer?.meta?.name} ${current.renderer?.meta?.version}`
-                : startCase(status)}
+                {current?.renderer
+                  ? `${current?.renderer?.meta?.name} ${current.renderer?.meta?.version}`
+                  : startCase(status)}
               </Type>
               {!!current?.renderer && (
                 <Type component="div" variant="body2" color="textSecondary">
                   <>
                     <span>{current.renderer?.meta?.description}</span>
                     <br />
-                    <span>
-                      Contributes{" "}
-                      {join(current.renderer?.meta?.components, ", ")}
-                    </span>
+                    <span>Contributes {join(current.renderer?.meta?.components, ", ")}</span>
                   </>
                 </Type>
               )}
@@ -115,9 +93,7 @@ export function RendererEditor({
               size="small"
               label={startCase(status)}
             />
-            <Tooltip
-              title={`${value.disabled ? "Enable" : "Disable"} Renderer`}
-            >
+            <Tooltip title={`${value.disabled ? "Enable" : "Disable"} Renderer`}>
               <Switch
                 sx={{ mr: 0 }}
                 checked={!value.disabled}

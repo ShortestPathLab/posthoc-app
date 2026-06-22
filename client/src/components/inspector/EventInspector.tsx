@@ -22,12 +22,7 @@ import { omit, pick, startCase } from "es-toolkit/compat";
 import { TraceEvent } from "protocol/Trace";
 import { ReactNode, useMemo } from "react";
 import { useCss } from "react-use";
-import {
-  ESSENTIAL_PROPS,
-  EventProperties,
-  OMIT_PROPS,
-  PropertyList,
-} from "./PropertyList";
+import { ESSENTIAL_PROPS, EventProperties, OMIT_PROPS, PropertyList } from "./PropertyList";
 import { ITEM_HEIGHT } from "pages/steps/constants";
 
 type EventInspectorProps = {
@@ -48,13 +43,7 @@ function Dot({ label }: { label?: ReactNode }) {
   );
 }
 
-export function EventInspector({
-  event,
-  index,
-  selected,
-  label,
-  ...props
-}: EventInspectorProps) {
+export function EventInspector({ event, index, selected, label, ...props }: EventInspectorProps) {
   const { open } = useSurface(EventProperties, { title: "Event properties" });
   const { spacing } = useTheme();
 
@@ -115,10 +104,7 @@ function EventInspectorContents({
 }: Pick<EventInspectorProps, "event" | "index" | "label">) {
   const [essentialProps, extraProps] = useMemo(() => {
     const omitProps = omit(event, ...OMIT_PROPS);
-    return [
-      pick(omitProps, ...ESSENTIAL_PROPS),
-      omit(omitProps, ...ESSENTIAL_PROPS),
-    ];
+    return [pick(omitProps, ...ESSENTIAL_PROPS), omit(omitProps, ...ESSENTIAL_PROPS)];
   }, [event]);
   return (
     <>
@@ -152,10 +138,7 @@ function EventInspectorContents({
           },
         }}
         secondary={
-          <Stack
-            direction="row"
-            sx={{ justifyContent: "flex-start", "> *": { flex: 0 } }}
-          >
+          <Stack direction="row" sx={{ justifyContent: "flex-start", "> *": { flex: 0 } }}>
             <PropertyList event={essentialProps} simple />
             <PropertyList event={extraProps} simple />
           </Stack>

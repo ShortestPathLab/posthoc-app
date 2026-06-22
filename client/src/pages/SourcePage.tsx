@@ -55,8 +55,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   const sources = useSources();
 
-  const { controls, onChange, state, dragHandle } =
-    useViewTreeContext<SourceLayerState>();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext<SourceLayerState>();
 
   const { result: instance } = useAsync(() => load(), []);
 
@@ -66,10 +65,8 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   const selected = useMemo(
     () =>
-      find(
-        sources,
-        (c) => c && c.source.id === state?.source && c.layer === state?.layer,
-      ) ?? head(sources),
+      find(sources, (c) => c && c.source.id === state?.source && c.layer === state?.layer) ??
+      head(sources),
     [sources, state?.source, state?.layer],
   );
   const handleEditorContentChange = useMemo(
@@ -84,11 +81,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
             produce(
               layer,
               async (l) =>
-                void (await getController(l)?.onEditSource?.(
-                  l,
-                  selected.source.id,
-                  value,
-                )),
+                void (await getController(l)?.onEditSource?.(l, selected.source.id, value)),
             ),
           );
           assert(!a.error, a.error!);
@@ -114,7 +107,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
       <Page.Title>Source</Page.Title>
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
-        {sources?.length ?
+        {sources?.length ? (
           <Block sx={{ pt: 6 }}>
             <AutoSize
               renderProp={({ width = 0, height = 0 }) =>
@@ -123,9 +116,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
                     onMount={(_, m) => setMonaco(m)}
                     // Refresh the editor when the id changes
                     key={`${selected?.layer}::${selected?.source?.id}`}
-                    theme={
-                      theme.palette.mode === "dark" ? "posthoc-dark" : "light"
-                    }
+                    theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
                     options={{
                       hover: { above: false },
                       fixedOverflowWidgets: true,
@@ -145,7 +136,9 @@ export function SourcePage({ template: Page }: PageContentProps) {
               }
             />
           </Block>
-        : <Placeholder icon={<CodeOutlined />} label="Source" />}
+        ) : (
+          <Placeholder icon={<CodeOutlined />} label="Source" />
+        )}
       </Page.Content>
       <Page.Options>
         {!!sources?.length && (
@@ -162,11 +155,13 @@ export function SourcePage({ template: Page }: PageContentProps) {
             {map(sources, ({ source, layer }) => (
               <Tab
                 label={
-                  source.readonly ?
+                  source.readonly ? (
                     <span>
                       <span>{source.name}</span> <i>(Read-only)</i>
                     </span>
-                  : source.name
+                  ) : (
+                    source.name
+                  )
                 }
                 value={`${source.id}::${layer}`}
               />

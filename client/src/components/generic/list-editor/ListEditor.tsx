@@ -3,17 +3,7 @@ import { AddOutlined as Add } from "@mui-symbols-material/w300";
 import { Box, ButtonProps, Collapse, Stack, Typography } from "@mui/material";
 
 import { last, noop } from "es-toolkit";
-import {
-  defer,
-  filter,
-  find,
-  findIndex,
-  map,
-  pick,
-  pull,
-  set,
-  sortBy,
-} from "es-toolkit/compat";
+import { defer, filter, find, findIndex, map, pick, pull, set, sortBy } from "es-toolkit/compat";
 import { nanoid as id } from "nanoid";
 
 import { EditorProps } from "components/Editor";
@@ -40,10 +30,7 @@ export type Props<T> = {
   extras?: (value?: T) => ReactNode;
   items?: Item<T>[];
   addItemLabel?: ReactNode;
-  renderAddItem?: (
-    create: (c: Partial<T>) => void,
-    button: ReactElement,
-  ) => ReactNode;
+  renderAddItem?: (create: (c: Partial<T>) => void, button: ReactElement) => ReactNode;
   addItemExtras?: ReactNode;
   sortable?: boolean;
   toggleable?: boolean;
@@ -208,10 +195,7 @@ function CustomAddItemButton<T>({
   render: (onAdd: (c?: Partial<T>) => void, button: ReactElement) => ReactNode;
   onAdd: (c?: Partial<T>) => void;
 }) {
-  return render(
-    onAdd,
-    <AddItemButton onClick={() => onAdd()}>{label}</AddItemButton>,
-  );
+  return render(onAdd, <AddItemButton onClick={() => onAdd()}>{label}</AddItemButton>);
 }
 
 export function ListEditor<T extends { key: Key }>({
@@ -238,9 +222,7 @@ export function ListEditor<T extends { key: Key }>({
         onChange?.((xs) => void xs.push({ ...(create?.() as T), ...t, key }));
         defer(() => onFocus?.(key));
       }}
-      onDeleteItem={(k) =>
-        onChange?.((xs) => void pull(xs, find(xs, { key: k })))
-      }
+      onDeleteItem={(k) => onChange?.((xs) => void pull(xs, find(xs, { key: k })))}
       onChangeItem={(k, v) =>
         onChange?.(
           (xs) =>

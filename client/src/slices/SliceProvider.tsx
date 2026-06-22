@@ -25,9 +25,7 @@ export function SliceProvider({ slices, children, services = [] }: SliceProvider
         (prev, next) => cloneElement(next, {}, prev),
         <>
           {children}
-          {map(services.toReversed(), (s, i) =>
-            createElement(ServiceRunner, { key: i, use: s }),
-          )}
+          {map(services.toReversed(), (s, i) => createElement(ServiceRunner, { key: i, use: s }))}
         </>,
       )}
     </>

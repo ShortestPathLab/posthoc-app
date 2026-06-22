@@ -12,12 +12,10 @@ export function TracePreview({ trace, language = "yaml" }: { trace?: Trace; lang
         language={language}
         value={
           trace
-            ? dump(
-                {
-                  ...trace,
-                  events: take(trace.events, 10),
-                },
-              )
+            ? dump({
+                ...trace,
+                events: take(trace.events, 10),
+              })
             : "No data"
         }
       />

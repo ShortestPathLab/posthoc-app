@@ -29,10 +29,9 @@ export function FeaturePickerMulti({
 }: Props) {
   const selected = filter(items, ({ id }) => !!(value?.[id] ?? defaultChecked));
 
-  const buttonLabel =
-    selected.length ?
-      selected.length === 1 ?
-        head(selected)?.name
+  const buttonLabel = selected.length
+    ? selected.length === 1
+      ? head(selected)?.name
       : `${selected.length} Selected`
     : label;
 
@@ -41,12 +40,7 @@ export function FeaturePickerMulti({
       defaultChecked
       placeholder={startCase(label)}
       trigger={(props) => (
-        <FeaturePickerButton
-          {...props}
-          disabled={!items?.length}
-          icon={icon}
-          arrow={showArrow}
-        >
+        <FeaturePickerButton {...props} disabled={!items?.length} icon={icon} arrow={showArrow}>
           {truncate(buttonLabel, { length: ellipsis })}
         </FeaturePickerButton>
       )}

@@ -3,10 +3,7 @@ import {
   CenterFocusWeakOutlined,
   TimesOneMobiledataOutlined,
 } from "@mui-symbols-material/w300";
-import {
-  BlurCircularOutlined,
-  LayersOutlined,
-} from "@mui-symbols-material/w300";
+import { BlurCircularOutlined, LayersOutlined } from "@mui-symbols-material/w300";
 import { Box, Divider, Stack, SxProps, Theme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
@@ -47,22 +44,18 @@ export function autoSelectRenderer(
 }
 
 export function ViewportPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state, dragHandle } =
-    useViewTreeContext<ViewportPageContext>();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext<ViewportPageContext>();
   const renderers = useOne(slice.renderers);
   const paper = usePaper();
   const acrylic = useAcrylic();
   const layers = useOne(slice.layers);
-  const [layerSet, setLayerSet] = useState<Record<string, boolean | undefined>>(
-    {},
-  );
+  const [layerSet, setLayerSet] = useState<Record<string, boolean | undefined>>({});
   const selectedLayers = useMemo(
     () => filter(layers, (l) => layerSet?.[l.key] ?? true),
     [layerSet, layers, layers?.length],
   );
 
-  const [rendererInstance, setRendererInstance] =
-    useState<RendererInstance | null>();
+  const [rendererInstance, setRendererInstance] = useState<RendererInstance | null>();
 
   const { selected, auto } = useRendererResolver(state?.renderer);
 
@@ -77,10 +70,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
         ),
       );
     }, 150);
-  }, [
-    rendererInstance,
-    _(selectedLayers, (s) => map(s, "key").sort().join(".")),
-  ]);
+  }, [rendererInstance, _(selectedLayers, (s) => map(s, "key").sort().join("."))]);
 
   const size = useSurfaceAvailableCssSize();
 

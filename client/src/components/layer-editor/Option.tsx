@@ -15,13 +15,7 @@ export const Label = ({ label }: { label?: Node }) => (
   </Type>
 );
 
-export const Option = ({
-  label,
-  content,
-}: {
-  label?: Node;
-  content?: Node;
-}) => (
+export const Option = ({ label, content }: { label?: Node; content?: Node }) => (
   <Block sx={{ alignItems: "center" }}>
     <Label label={label} />
     <Space sx={{ flex: 1 }} />
