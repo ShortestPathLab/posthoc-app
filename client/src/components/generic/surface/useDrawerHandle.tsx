@@ -7,11 +7,15 @@ const VELOCITY_THRESHOLD = 1;
 
 export function useDrawerHandle(close?: () => void) {
   const theme = useTheme();
-  const [paper, setPaper] = useState<HTMLDivElement | null>(null);
   const [scroll, setScroll] = useState<HTMLDivElement | null>(null);
   const [handle, setHandle] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (!(handle && paper && scroll)) return;
+    if (!(handle && scroll)) return;
+    // The MUI Paper slot no longer accepts a forwarded `ref` we can reach (its
+    // own internal ref would clobber ours), so resolve it from the handle, which
+    // renders as a child of the drawer's Paper element.
+    const paper = handle.closest<HTMLElement>(".MuiDrawer-paper");
+    if (!paper) return;
     let initial: number | null = null;
     let now: number | null = null;
     let timeNow: number | null = null;
@@ -103,6 +107,6 @@ export function useDrawerHandle(close?: () => void) {
       ),
     );
     return () => controller.abort();
-  }, [handle, paper, theme, close]);
-  return { setPaper, setHandle, setScroll };
+  }, [handle, scroll, theme, close]);
+  return { setHandle, setScroll };
 }

@@ -1,10 +1,10 @@
 import {
   Box,
   ModalProps,
-  PaperProps,
   Stack,
   StackProps,
   SwipeableDrawer,
+  Theme,
   useTheme,
 } from "@mui/material";
 import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
@@ -75,22 +75,13 @@ export function DrawerSurface({
   // ─────────────────────────────────────────────────────────────────────
 
   const theme = useTheme();
-  const { setHandle, setPaper, setScroll } = useDrawerHandle(state.close);
+  const { setHandle, setScroll } = useDrawerHandle(state.close);
   const [ref, { width }] = useMeasure();
   const maxHeight = `calc(100dvh - ${gap + 32}px)`;
 
   return (
     <SwipeableDrawer
       transitionDuration={{ enter: 500, exit: 500 }}
-      slotProps={{
-        transition: {
-          mountOnEnter: true,
-          easing: {
-            enter: theme.transitions.easing.easeOut,
-            exit: theme.transitions.easing.easeOut,
-          },
-        },
-      }}
       anchor="bottom"
       disableSwipeToOpen
       disableDiscovery
@@ -98,6 +89,29 @@ export function DrawerSurface({
       {...bindDialog(state)}
       {...merge(
         {
+          slotProps: {
+            transition: {
+              mountOnEnter: true,
+              easing: {
+                enter: theme.transitions.easing.easeOut,
+                exit: theme.transitions.easing.easeOut,
+              },
+            },
+            backdrop: { sx: { transform: "scale(2)" } },
+            paper: {
+              sx: {
+                overflow: "hidden",
+                maxWidth: "min(640px, 100%)",
+                mx: "auto",
+                bgcolor: "background.paper",
+                "--Paper-overlay": "none !important",
+                borderTopLeftRadius: (t: Theme) => Number(t.shape.borderRadius) * 2,
+                borderTopRightRadius: (t: Theme) => Number(t.shape.borderRadius) * 2,
+                maxHeight: `calc(100dvh - ${gap}px)`,
+                boxShadow: (t: Theme) => `0 ${t.spacing(4)} 0px 0px ${t.palette.background.paper} `,
+              },
+            },
+          },
           ModalProps: {
             keepMounted: false,
             sx: {
@@ -110,24 +124,7 @@ export function DrawerSurface({
             },
           } as ModalProps,
         },
-        { BackdropProps: { sx: { transform: "scale(2)" } } },
-        {
-          PaperProps: {
-            ref: setPaper,
-            sx: {
-              overflow: "hidden",
-              maxWidth: "min(640px, 100%)",
-              mx: "auto",
-              bgcolor: "background.paper",
-              "--Paper-overlay": "none !important",
-              borderTopLeftRadius: (t) => Number(t.shape.borderRadius) * 2,
-              borderTopRightRadius: (t) => Number(t.shape.borderRadius) * 2,
-              maxHeight: `calc(100dvh - ${gap}px)`,
-              boxShadow: (t) => `0 ${t.spacing(4)} 0px 0px ${t.palette.background.paper} `,
-            },
-          } as PaperProps,
-        },
-        { PaperProps: slotProps?.paper },
+        { slotProps: { paper: slotProps?.paper } },
         slotProps?.drawer,
       )}
     >
