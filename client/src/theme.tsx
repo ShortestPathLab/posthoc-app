@@ -16,7 +16,7 @@ import {
   MaterialDynamicColors,
   SchemeTonalSpot,
 } from "@material/material-color-utilities";
-import { constant, floor, times } from "es-toolkit/compat";
+import { constant, times } from "es-toolkit/compat";
 import {
   createMaterialYouTheme,
   type MaterialYouSchemeExported,

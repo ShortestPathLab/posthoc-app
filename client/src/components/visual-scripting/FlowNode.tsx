@@ -1,14 +1,5 @@
 /* eslint-disable react/display-name */
-import {
-  Checkbox,
-  FormControl,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-  MenuItem,
-  InputLabel,
-} from "@mui/material";
+import { Checkbox, Stack, TextField, Typography, MenuItem } from "@mui/material";
 import { type Node, type NodeProps, useReactFlow } from "@xyflow/react";
 
 import { isUndefined } from "es-toolkit";
@@ -19,9 +10,9 @@ import { ItemOptions, NodeBase } from "./NodeBase";
 import { resolveNodeConfig } from "./NodeConfigs";
 
 export function FlowNode(props: NodeProps<Node<FlowData<string, Properties>>>) {
-  const { fields, key, type } = props.data;
+  const { fields, type } = props.data;
 
-  const { id, data } = props;
+  const { id } = props;
 
   const rf = useReactFlow();
 

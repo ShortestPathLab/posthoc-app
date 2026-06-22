@@ -39,7 +39,6 @@ export default function TransformationMenu({ variable }: TransformationMenuProps
 
 function FlowPopup({
   nodeName,
-  onNodeChange,
 }: {
   nodeName?: string;
   onNodeChange?: (node: Node) => void;
@@ -66,10 +65,9 @@ type TransformationCanvasProps = {
 function TransformationCanvas({ source }: TransformationCanvasProps) {
   const id = useMemo(() => nanoid(), []);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([source]);
+  const [nodes, , onNodesChange] = useNodesState([source]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const onConnect = React.useCallback<OnConnect>((c) => setEdges((e) => addEdge(c, e)), []);
-  const initialNodes = [source];
   const theme = useTheme();
   return (
     <ReactFlowProvider>

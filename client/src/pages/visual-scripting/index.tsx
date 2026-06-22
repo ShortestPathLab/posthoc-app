@@ -255,7 +255,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
                             [
                               ...entries(transforms),
                               ...entries(content?.views).map(
-                                ([k, v]) =>
+                                ([k]) =>
                                   [
                                     k,
                                     () => ({

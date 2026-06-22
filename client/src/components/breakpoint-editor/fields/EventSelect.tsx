@@ -1,6 +1,5 @@
 import { SelectField as Select } from "components/generic/inputs/Select";
 import { DebugLayerData } from "hooks/useBreakPoints";
-import { Steps } from "layers/LayerController";
 import { getController } from "layers/layerControllers";
 import { uniq } from "es-toolkit";
 import { map, startCase } from "es-toolkit/compat";

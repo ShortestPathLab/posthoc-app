@@ -7,7 +7,6 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Avatar,
   Box,
-  Card,
   CardHeader,
   CardProps,
   Checkbox,
@@ -45,7 +44,7 @@ import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
-import { useOne, useOne as useSelector } from "slices/useOne";
+import { useOne as useSelector } from "slices/useOne";
 
 const paths = import.meta.glob<boolean, string, string>("/public/recipes/*.workspace", {
   query: "?url",
@@ -170,9 +169,7 @@ export function FeatureCard({
   children,
   ...rest
 }: Partial<PosthocMetaData> & CardProps & { onOpenClick?: () => void; loading?: boolean }) {
-  const { "appearance/acrylic": acrylic } = useOne(slice.settings);
   const paper = usePaper();
-  const theme = useTheme();
 
   const { name: authorName, avatar } = useMemo(() => getAuthor(author), [author]);
 

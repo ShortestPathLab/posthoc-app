@@ -55,7 +55,7 @@ declare const events: LoggedEvent[];
  *
  * _Search trace_
  */
-declare const events: LoggedEvent[];
+declare const event: LoggedEvent;
 /**
  * The current step number.
  *

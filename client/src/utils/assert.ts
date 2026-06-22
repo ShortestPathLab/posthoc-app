@@ -7,7 +7,7 @@ export class AssertionError extends Error {
   }
 }
 
-export function cast<T>(o: unknown): asserts o is T {}
+export function cast<T>(_o: unknown): asserts _o is T {}
 
 /**
  * Asserts a condition. If the condition is false, throws the given error.

@@ -10,7 +10,7 @@ import { useMemo } from "react";
 import { slice } from "slices";
 import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { formatByte, useBusyState } from "slices/busy";
-import { Layer, layers } from "slices/layers";
+import { Layer } from "slices/layers";
 import { generateUsername as id } from "unique-username-generator";
 import { cast } from "utils/assert";
 import {

@@ -7,7 +7,6 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { flattenSubtree } from "hooks/useHighlight";
 import { computed } from "hooks/usePlaybackState";
-import { Steps } from "layers";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
 import { isEqual, isUndefined, uniq } from "es-toolkit";

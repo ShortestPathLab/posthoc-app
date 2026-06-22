@@ -8,7 +8,6 @@ import { useComputeLabels } from "pages/tree/TreeUtility";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { id } from "slices/selector";
-import { UploadedTrace } from "slices/UIState";
 import { BreakpointFieldProps } from "../breakpoints/Breakpoint";
 import { useOne } from "slices/useOne";
 

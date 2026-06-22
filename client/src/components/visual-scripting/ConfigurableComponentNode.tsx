@@ -1,21 +1,12 @@
 /* eslint-disable react/display-name */
-import { Box, Card, Checkbox, Stack, TextField, Typography } from "@mui/material";
-import { Handle, NodeResizer, Position, type Node, type NodeProps } from "@xyflow/react";
-import { useSurface } from "components/generic/surface";
+import { Stack, Typography } from "@mui/material";
+import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import * as React from "react";
-import { Fragment, useCallback } from "react";
-import { useAcrylic, usePaper } from "theme";
 
 import { keys, map } from "es-toolkit/compat";
-import { LabeledHandle, LabeledHandleProps } from "./LabeledHandle";
 import TransformationMenu from "./TransformationMenu";
 import { ItemOptions, NodeBase } from "./NodeBase";
 import { FlowData, Properties } from "./flow";
-
-// Optional: don’t shadow MUI’s Dialog type name
-function SurfaceDialogStub() {
-  return <div>Dialog</div>;
-}
 
 export type ComponentNodeConfig = {
   title: string;
@@ -27,7 +18,7 @@ type ConfigurableComponentNode = Node<FlowData<string, Properties>>;
 const ITEM_HEIGHT = 56;
 
 export function ConfigurableComponentNode(props: NodeProps<ConfigurableComponentNode>) {
-  const { fields, type, key } = props.data;
+  const { fields, type } = props.data;
 
   const config: ComponentNodeConfig = {
     title: type,

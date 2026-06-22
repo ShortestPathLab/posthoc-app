@@ -1,4 +1,4 @@
-import { EqualityChecker, StoreApi } from "@davstack/store";
+import { EqualityChecker } from "@davstack/store";
 
 /**
  * React compiler compatible version of `StoreApi.use`.
