@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "migrate": {
+      "source": "toss/es-toolkit",
+      "sourceType": "github",
+      "skillPath": "es-toolkit-plugin/skills/migrate/SKILL.md",
+      "computedHash": "a96e1c90b5648192f21403467d76dfd2eef7a4664c8dd54ff8e501776a99f2d8"
+    },
+    "recommend": {
+      "source": "toss/es-toolkit",
+      "sourceType": "github",
+      "skillPath": "es-toolkit-plugin/skills/recommend/SKILL.md",
+      "computedHash": "635cf892797a95fb765fbb9c015b815e8704de5395401393938f54e60cc572fe"
+    }
+  }
+}

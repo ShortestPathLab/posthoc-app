@@ -92,7 +92,7 @@
   },
   "scripts": {
     "start": "bunx --bun vite --host",
-    "build": "bunx --bun vite@5 build --emptyOutDir",
+    "build": "bunx --bun vite build --emptyOutDir",
     "package": "sh ./package.sh",
     "test": "vitest"
   },
@@ -138,7 +138,7 @@
     "globals": "^15.15.0",
     "jsdom": "^26.1.0",
     "typescript-eslint": "^8.48.1",
-    "vite": "^7.2.6",
+    "vite": "^8.0.16",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "vitest-canvas-mock": "^0.3.3"
