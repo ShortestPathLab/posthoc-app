@@ -14,9 +14,10 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
-    "paths": { "*": ["./src/*"] }
+    "paths": { "*": ["./src/*"] },
+    "composite": true
   },
+  "exclude": ["src/public", "src/public-dev", "node_modules"],
   "include": ["src", "src/components/app-bar/Title.test.tsx"]
 }

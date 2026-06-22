@@ -13,6 +13,7 @@
   "homepage": "posthoc.pathfinding.ai",
   "license": "ISC",
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "start": "cd client && bun start",
     "build:all": "cd client && bun run build"
   },

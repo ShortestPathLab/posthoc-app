@@ -9,3 +9,5 @@ node_modules
 /client/dist
 
 /dist
+
+*.tsbuildinfo
