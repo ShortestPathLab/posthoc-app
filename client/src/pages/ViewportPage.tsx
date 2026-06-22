@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
 import { slice } from "slices";
-import { Renderer, useRenderers } from "slices/renderers";
+import { Renderer } from "slices/renderers";
 import { PanelState } from "slices/view";
 import { useAcrylic, usePaper } from "theme";
 import { generateUsername as id } from "unique-username-generator";
@@ -47,7 +47,7 @@ export function autoSelectRenderer(
 
 export function ViewportPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext<ViewportPageContext>();
-  const [renderers] = useRenderers();
+  const renderers = useOne(slice.renderers);
   const paper = usePaper();
   const acrylic = useAcrylic();
   const layers = useOne(slice.layers);

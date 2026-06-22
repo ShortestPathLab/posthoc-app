@@ -1,20 +1,27 @@
+import { store } from "@davstack/store";
 import { useMemo } from "react";
 import { CloudStorageProvider, cloudStorageProviders } from "services/cloud-storage";
-import { useAuth } from "./auth";
-import { createSlice } from "./createSlice";
+import { auth } from "./auth";
+import { useOne } from "./useOne";
 
 type CloudStorageServiceSlice = {
   instance?: CloudStorageProvider<keyof typeof cloudStorageProviders, unknown>;
 };
-export const [useCloudStorageService, CloudStorageServiceProvider] =
-  createSlice<CloudStorageServiceSlice>({});
+
+export const cloudStorage = store<CloudStorageServiceSlice>(
+  {},
+  {
+    name: "cloud-storage",
+    devtools: { enabled: import.meta.env.DEV },
+  },
+);
 
 /**
  * Returns the current CloudStorageProviderMeta and CloudStorageProvider instance.
  * If the instance is not available, returns undefined.
  *
  * @example
- * const { meta, instance } = useCloudStorage() ?? {}
+ * const { meta, instance } = useCloudStorageInstance() ?? {}
  * if (instance) {
  *   const file = await instance.getFile("FILE_ID")
  *   // ...
@@ -22,8 +29,8 @@ export const [useCloudStorageService, CloudStorageServiceProvider] =
  *
  */
 export function useCloudStorageInstance() {
-  const [{ instance }] = useCloudStorageService();
-  const [authState] = useAuth();
+  const instance = useOne(cloudStorage, (s) => s.instance);
+  const authState = useOne(auth);
   return useMemo(() => {
     if (instance)
       return {

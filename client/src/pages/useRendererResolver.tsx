@@ -1,9 +1,10 @@
 import { head } from "es-toolkit/compat";
 import { useMemo } from "react";
-import { useRenderers } from "slices/renderers";
+import { slice } from "slices";
+import { useOne } from "slices/useOne";
 
 export function useRendererResolver(renderer?: string) {
-  const [renderers] = useRenderers();
+  const renderers = useOne(slice.renderers);
 
   const autoRenderer = useMemo(() => head(renderers), [renderers]);
 

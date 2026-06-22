@@ -2,7 +2,7 @@ import { getTransport } from "client";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useEffect } from "react";
 import { slice } from "slices";
-import { Connection, useConnections } from "slices/connections";
+import { Connection } from "slices/connections";
 import { useLoadingState } from "slices/loading";
 import { useOne } from "slices/useOne";
 import { timed } from "utils/timed";
@@ -10,7 +10,6 @@ import { timed } from "utils/timed";
 export function ConnectionsService() {
   const notify = useSnackbar();
   const { remote } = useOne(slice.settings);
-  const [, setConnections] = useConnections();
   const usingLoadingState = useLoadingState("connections");
 
   useEffect(() => {
@@ -38,7 +37,7 @@ export function ConnectionsService() {
               ];
             } else await tp.disconnect();
           }
-          if (!aborted) setConnections(() => cs);
+          if (!aborted) slice.connections.set(cs);
         }
         if (!aborted) notify(`Connected to ${cs.length} of ${remote.length} solvers`);
       }
@@ -47,7 +46,7 @@ export function ConnectionsService() {
       aborted = true;
       cs.map((c) => c.transport().disconnect());
     };
-  }, [JSON.stringify(remote), setConnections, notify, usingLoadingState]);
+  }, [JSON.stringify(remote), notify, usingLoadingState]);
 
   return <></>;
 }

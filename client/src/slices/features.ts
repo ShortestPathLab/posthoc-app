@@ -1,5 +1,5 @@
+import { store } from "@davstack/store";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
-import { createSlice } from "./createSlice";
 
 type FeatureDescriptorWithSource = FeatureDescriptor & {
   source: string;
@@ -12,9 +12,15 @@ export type Features = {
   traces: FeatureDescriptorWithSource[];
 };
 
-export const [useFeatures, FeaturesProvider] = createSlice<Features>({
-  algorithms: [],
-  maps: [],
-  formats: [],
-  traces: [],
-});
+export const features = store<Features>(
+  {
+    algorithms: [],
+    maps: [],
+    formats: [],
+    traces: [],
+  },
+  {
+    name: "features",
+    devtools: { enabled: import.meta.env.DEV },
+  },
+);

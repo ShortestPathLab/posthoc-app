@@ -4,8 +4,6 @@ import { find, get, startCase } from "es-toolkit/compat";
 import { slice } from "slices";
 import { Map, UploadedTrace } from "slices/UIState";
 import { LARGE_FILE_B, formatByte, useBusyState } from "slices/busy";
-import { useConnections } from "slices/connections";
-import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { EditorProps } from "../Editor";
 import { FeaturePicker } from "./FeaturePicker";
@@ -26,8 +24,8 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("layers");
   const usingBusyState = useBusyState("layers");
-  const [connections] = useConnections();
-  const [{ maps, formats }] = useFeatures();
+  const connections = useOne(slice.connections);
+  const { maps, formats } = useOne(slice.features);
   const loading = useLoading();
   return (
     <FeaturePicker
@@ -80,8 +78,8 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace & { e
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("layers");
   const usingBusyState = useBusyState("layers");
-  const [connections] = useConnections();
-  const [{ traces }] = useFeatures();
+  const connections = useOne(slice.connections);
+  const { traces } = useOne(slice.features);
   const loading = useLoading();
   return (
     <FeaturePicker

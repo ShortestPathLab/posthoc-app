@@ -1,21 +1,16 @@
-import { createSlice } from "./createSlice";
+import { store } from "@davstack/store";
 
-type LogEntry = {
+export type LogEntry = {
   content: string;
   timestamp?: string;
 };
 
-type Log = LogEntry[];
+export type Log = LogEntry[];
 
-type LogAction = { action: "append"; log: LogEntry } | { action: "clear" };
-
-export const [useLog, LogProvider] = createSlice<Log, LogAction>([], {
-  reduce: (prev, next) => {
-    switch (next.action) {
-      case "append":
-        return [next.log, ...prev];
-      case "clear":
-        return [];
-    }
-  },
-});
+export const log = store<Log>([], {
+  name: "log",
+  devtools: { enabled: import.meta.env.DEV },
+}).actions((a) => ({
+  append: (entry: LogEntry) => a.set((l) => void l.unshift(entry)),
+  clear: () => a.set([]),
+}));

@@ -1,5 +1,5 @@
+import { store } from "@davstack/store";
 import { AccessToken } from "services/cloud-storage/CloudStorage";
-import { createSlice, withLocalStorage } from "./createSlice";
 
 export type AuthState<T extends AccessToken> = {
   authenticated?: boolean;
@@ -8,6 +8,12 @@ export type AuthState<T extends AccessToken> = {
   user?: { name?: string; profile?: string };
 };
 
-export const [useAuth, AuthProvider] = createSlice<{
+export const auth = store<{
   [K in string]: AuthState<unknown>;
-}>({}, withLocalStorage("authState", {}));
+}>(
+  {},
+  {
+    name: "authState",
+    persist: { enabled: true },
+  },
+);

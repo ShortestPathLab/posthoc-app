@@ -7,9 +7,9 @@ import { inferLayerName } from "layers";
 import { MapLayerData } from "layers/map";
 import { find } from "es-toolkit/compat";
 import { withProduce } from "produce";
-import { useConnections } from "slices/connections";
-import { useFeatures } from "slices/features";
+import { slice } from "slices";
 import { Layer, WithLayer, useLayerPicker } from "slices/layers";
+import { useOne } from "slices/useOne";
 import { set } from "utils/set";
 import { Controller } from ".";
 import { isMapLayer } from "./isMapLayer";
@@ -17,8 +17,8 @@ import { isMapLayer } from "./isMapLayer";
 export const editor = withProduce(({ value, produce }) => {
   const { algorithm } = value?.source ?? {};
   const { key: mapLayerKey } = useLayerPicker(isMapLayer);
-  const [{ algorithms }] = useFeatures();
-  const [connections] = useConnections();
+  const { algorithms } = useOne(slice.features);
+  const connections = useOne(slice.connections);
   return (
     <>
       <Option

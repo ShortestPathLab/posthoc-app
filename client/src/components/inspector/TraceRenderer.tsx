@@ -11,8 +11,6 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { useDebounce } from "react-use";
 import { Renderer, RendererEvent } from "renderer";
 import { slice } from "slices";
-import { useRenderers } from "slices/renderers";
-import { useScreenshots } from "slices/screenshots";
 import { Placeholder } from "./Placeholder";
 import { SelectionMenu } from "./SelectionMenu";
 import { TrustedContent } from "./TrustedContent";
@@ -44,7 +42,7 @@ export function useRendererInstance() {
 
 function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
   const theme = useTheme();
-  const [renderers] = useRenderers();
+  const renderers = useOne(slice.renderers);
   const ref = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState("");
   const [instance, setInstance] = useState<Renderer>();
@@ -126,7 +124,6 @@ function useAnyLayerPlaying() {
 export function TraceRenderer({ width, height, renderer, rendererRef, layers }: RendererProps) {
   const key = useMemo(() => nanoid(), []);
   const { instance, error, ref } = useRenderer(renderer, { width, height });
-  const [, setScreenshots] = useScreenshots();
 
   const playing = useAnyLayerPlaying();
 
@@ -152,10 +149,8 @@ export function TraceRenderer({ width, height, renderer, rendererRef, layers }: 
 
   useEffect(() => {
     const f = async () => await instance?.toDataUrl?.();
-    setScreenshots(() => ({
-      [key]: f,
-    }));
-    return () => setScreenshots(() => ({ [key]: undefined }));
+    slice.screenshots.set((s) => void (s[key] = f));
+    return () => slice.screenshots.set((s) => void delete s[key]);
   }, [key, instance]);
 
   useEffect(() => {

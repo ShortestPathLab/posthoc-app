@@ -3,9 +3,10 @@ import { find } from "es-toolkit/compat";
 import memo from "memoizee";
 import { useMemo } from "react";
 import { useAsync } from "react-async-hook";
+import { slice } from "slices";
 import { UploadedTrace } from "slices/UIState";
-import { useFeatures } from "slices/features";
 import { useLoadingState } from "slices/loading";
+import { useOne } from "slices/useOne";
 import { useConnectionResolver } from "./useConnectionResolver";
 import objectHash from "object-hash";
 
@@ -13,7 +14,7 @@ export function useTraceContent(trace?: UploadedTrace) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("layers");
   const resolve = useConnectionResolver();
-  const [{ traces }] = useFeatures();
+  const { traces } = useOne(slice.features);
 
   const getTrace = useMemo(
     () =>

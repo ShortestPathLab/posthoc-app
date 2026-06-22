@@ -3,7 +3,7 @@ import { Button, IconButton, Snackbar } from "@mui/material";
 import { noop } from "es-toolkit";
 import { filter } from "es-toolkit/compat";
 import { Label } from "./Label";
-import { useLog } from "slices/log";
+import { slice } from "slices";
 import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 
 type Options = {
@@ -44,8 +44,6 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<SnackbarMessage | undefined>(undefined);
 
-  const [, appendLog] = useLog();
-
   useEffect(() => {
     if (snackPack.length && !current) {
       setCurrent({ ...snackPack[0] });
@@ -67,13 +65,10 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
           key: new Date().getTime(),
         },
       ]);
-      appendLog(() => ({
-        action: "append",
-        log: {
-          content: filter([message, secondary]).join(", "),
-          timestamp: `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
-        },
-      }));
+      slice.log.append({
+        content: filter([message, secondary]).join(", "),
+        timestamp: `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
+      });
       if (options.error) {
         console.error(`${message}, ${secondary}`);
       }

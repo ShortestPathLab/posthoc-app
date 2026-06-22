@@ -2,7 +2,7 @@ import renderers from "internal-renderers";
 import { useAsync } from "react-async-hook";
 import { RendererDefinition, RendererEvents, RendererOptions } from "renderer";
 import { slice } from "slices";
-import { Renderer, useRenderers } from "slices/renderers";
+import { Renderer } from "slices/renderers";
 import { useOne } from "slices/useOne";
 import url from "url-parse";
 
@@ -38,7 +38,6 @@ export const transports: Record<string, RendererTransportEntry> = {
 
 export function RendererService() {
   const { renderer } = useOne(slice.settings);
-  const [, setRenderers] = useRenderers();
 
   useAsync(async () => {
     const rs: Renderer[] = [];
@@ -52,8 +51,8 @@ export function RendererService() {
         });
       }
     }
-    setRenderers(() => rs);
-  }, [JSON.stringify(renderer), setRenderers]);
+    slice.renderers.set(rs);
+  }, [JSON.stringify(renderer)]);
 
   return <></>;
 }

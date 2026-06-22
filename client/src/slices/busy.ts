@@ -1,8 +1,6 @@
-import { isUndefined } from "es-toolkit";
-import { delay, omitBy } from "es-toolkit/compat";
+import { store } from "@davstack/store";
+import { delay } from "es-toolkit/compat";
 import { useCallback } from "react";
-import { createSlice } from "./createSlice";
-import { merge } from "./reducers";
 
 export const LARGE_FILE_B = 20 * 1024 * 1024;
 
@@ -10,9 +8,12 @@ type Busy = {
   [K in string]?: string;
 };
 
-export const [useBusy, BusyProvider] = createSlice<Busy>(
+export const busy = store<Busy>(
   {},
-  { reduce: (a, b) => omitBy(merge(a, b), isUndefined) },
+  {
+    name: "busy",
+    devtools: { enabled: import.meta.env.DEV },
+  },
 );
 
 function wait(ms: number) {
@@ -20,17 +21,15 @@ function wait(ms: number) {
 }
 
 export function useBusyState(key: string) {
-  const [, dispatch] = useBusy();
-
   return useCallback(
     async <T>(task: () => Promise<T>, description: string) => {
-      dispatch(() => ({ [key]: description }));
+      busy.set((s) => void (s[key] = description));
       wait(300);
       const out = await task();
-      dispatch(() => ({ [key]: undefined }));
+      busy.set((s) => void delete s[key]);
       return out;
     },
-    [key, dispatch],
+    [key],
   );
 }
 

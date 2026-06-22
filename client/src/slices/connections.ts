@@ -1,7 +1,6 @@
-import { CheckConnectionResponse } from "protocol/CheckConnection";
-import { createSlice } from "./createSlice";
-import { replace } from "./reducers";
+import { store } from "@davstack/store";
 import { Transport } from "client/Transport";
+import { CheckConnectionResponse } from "protocol/CheckConnection";
 
 export type Connection = CheckConnectionResponse["result"] & {
   transport: () => Transport;
@@ -9,6 +8,7 @@ export type Connection = CheckConnectionResponse["result"] & {
   ping: number;
 };
 
-export const [useConnections, ConnectionsProvider] = createSlice<Connection[]>([], {
-  reduce: replace,
+export const connections = store<Connection[]>([], {
+  name: "connections",
+  devtools: { enabled: import.meta.env.DEV },
 });

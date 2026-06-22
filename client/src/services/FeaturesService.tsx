@@ -13,9 +13,11 @@ import {
 } from "es-toolkit/compat";
 import { map as mapAsync } from "promise-tools";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
-import { Connection, useConnections } from "slices/connections";
-import { Features, useFeatures } from "slices/features";
+import { slice } from "slices";
+import { Connection } from "slices/connections";
+import { Features } from "slices/features";
 import { useLoadingState } from "slices/loading";
+import { useOne } from "slices/useOne";
 import { timed } from "utils/timed";
 import { _ } from "utils/chain";
 function withSource<T>(source: string) {
@@ -34,8 +36,7 @@ const getFeatures = async ({ transport, url }: Connection) => {
 };
 
 export function FeaturesService() {
-  const [connections] = useConnections();
-  const [, setFeatures] = useFeatures();
+  const connections = useOne(slice.connections);
   const loading = useConnectionsLoading();
   const usingLoadingState = useLoadingState("features");
 
@@ -63,7 +64,7 @@ export function FeaturesService() {
                 ),
               ),
             );
-            setFeatures(() => merged);
+            slice.features.set(merged as Features);
           }
         };
         for (const connection of connections) {
@@ -76,7 +77,7 @@ export function FeaturesService() {
         }
       });
     },
-    [connections, getFeatures, setFeatures, loading],
+    [connections, getFeatures, loading],
   );
 
   return <></>;

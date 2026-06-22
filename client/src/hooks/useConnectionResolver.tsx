@@ -1,9 +1,11 @@
 import { find } from "es-toolkit/compat";
 import { useCallback } from "react";
-import { Connection, useConnections } from "slices/connections";
+import { slice } from "slices";
+import { Connection } from "slices/connections";
+import { useOne } from "slices/useOne";
 
 export function useConnectionResolver() {
-  const [connections] = useConnections();
+  const connections = useOne(slice.connections);
   return useCallback((model?: Partial<Connection>) => find(connections, model), [connections]);
 }
 

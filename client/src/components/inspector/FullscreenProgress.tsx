@@ -1,10 +1,11 @@
 import { Backdrop, CircularProgress, Stack, Typography as Type } from "@mui/material";
 import { values } from "es-toolkit/compat";
-import { useBusy } from "slices/busy";
+import { slice } from "slices";
+import { useOne } from "slices/useOne";
 import { useAcrylic } from "theme";
 
 export function FullscreenProgress() {
-  const [busy] = useBusy();
+  const busy = useOne(slice.busy);
   const acrylic = useAcrylic();
 
   const messages = values(busy);

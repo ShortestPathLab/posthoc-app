@@ -6,13 +6,14 @@ import { Scroll } from "components/generic/Scrollbars";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { map } from "es-toolkit/compat";
-import { useLog } from "slices/log";
+import { slice } from "slices";
+import { useOne } from "slices/useOne";
 import { PageContentProps } from "./PageMeta";
 
 export function InfoPage({ template: Page }: PageContentProps) {
   const { controls, onChange, state, dragHandle } = useViewTreeContext();
 
-  const [log, setLog] = useLog();
+  const log = useOne(slice.log);
   return (
     <Page onChange={onChange} stack={state}>
       <Page.Key>info</Page.Key>
@@ -22,7 +23,7 @@ export function InfoPage({ template: Page }: PageContentProps) {
         <FeaturePickerButton
           disabled={!log.length}
           icon={<CloseOutlined />}
-          onClick={() => setLog(() => ({ action: "clear" }))}
+          onClick={() => slice.log.clear()}
         >
           Clear
         </FeaturePickerButton>

@@ -3,7 +3,8 @@ import { Box, ListItemText, Stack, TextField } from "@mui/material";
 import copy from "clipboard-copy";
 import { useSm } from "hooks/useSmallDisplay";
 import { useEffect, useState } from "react";
-import { useCloudStorageService } from "slices/cloudStorage";
+import { slice } from "slices";
+import { useOne } from "slices/useOne";
 import { usePaper } from "theme";
 import { useSnackbar } from "./generic/Snackbar";
 import { Button } from "./generic/inputs/Button";
@@ -12,7 +13,7 @@ import { Surface } from "./generic/surface";
 import { WorkspaceMeta } from "slices/UIState";
 
 export const FileShareSurface = ({ file }: { file: WorkspaceMeta }) => {
-  const [{ instance: cloudService }] = useCloudStorageService();
+  const cloudService = useOne(slice.cloudStorage, (s) => s.instance);
   const sm = useSm();
   const paper = usePaper();
   const notify = useSnackbar();

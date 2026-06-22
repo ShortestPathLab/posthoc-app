@@ -9,8 +9,6 @@ import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";
 import { slice } from "slices";
-import { useConnections } from "slices/connections";
-import { useFeatures } from "slices/features";
 import { set } from "utils/set";
 import { Controller } from ".";
 import { findConnection } from "./findConnection";
@@ -22,8 +20,8 @@ export const service = withProduce(({ value, produce, onChange }) => {
   const notify = useSnackbar();
   const { algorithm, mapLayerKey, start, end } = value?.source ?? {};
   const layers = useOne(slice.layers);
-  const [connections] = useConnections();
-  const [{ algorithms }] = useFeatures();
+  const connections = useOne(slice.connections);
+  const { algorithms } = useOne(slice.features);
   const mapLayer = useMemo(() => {
     if (mapLayerKey && algorithm) {
       return find(layers, {

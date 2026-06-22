@@ -4,9 +4,10 @@ import { Surface } from "components/generic/surface";
 import { SelectField as Select } from "components/generic/inputs/Select";
 import { find, join, omit, startCase, toPairs as entries } from "es-toolkit/compat";
 import { transports } from "services/RendererService";
+import { slice } from "slices";
 import { merge } from "slices/reducers";
-import { useRenderers } from "slices/renderers";
 import { Renderer } from "slices/settings";
+import { useOne } from "slices/useOne";
 import { usePaper } from "theme";
 import { assert } from "utils/assert";
 
@@ -25,7 +26,7 @@ type RendererEditorProps = {
 export function RendererEditor({ value, onChange: onValueChange }: RendererEditorProps) {
   assert(value, "renderer is defined");
 
-  const [renderers] = useRenderers();
+  const renderers = useOne(slice.renderers);
   const paper = usePaper();
 
   const current = find(renderers, { key: value.key });

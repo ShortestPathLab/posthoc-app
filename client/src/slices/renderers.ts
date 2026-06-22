@@ -1,6 +1,5 @@
+import { store } from "@davstack/store";
 import { RendererDefinition, RendererEvents, RendererOptions } from "renderer";
-import { createSlice } from "./createSlice";
-import { replace } from "./reducers";
 
 export type Renderer = {
   key: string;
@@ -8,6 +7,7 @@ export type Renderer = {
   renderer: RendererDefinition<RendererOptions, RendererEvents, { $: string }>;
 };
 
-export const [useRenderers, RendererProvider] = createSlice<Renderer[]>([], {
-  reduce: replace,
+export const renderers = store<Renderer[]>([], {
+  name: "renderers",
+  devtools: { enabled: import.meta.env.DEV },
 });

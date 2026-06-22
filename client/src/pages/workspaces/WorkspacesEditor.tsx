@@ -29,13 +29,15 @@ import { FeatureCard } from "pages/ExplorePage";
 import { Ref, useCallback, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useMeasure } from "react-use";
+import { slice } from "slices";
 import { WorkspaceMeta } from "slices/UIState";
-import { useCloudStorageInstance, useCloudStorageService } from "slices/cloudStorage";
+import { useCloudStorageInstance } from "slices/cloudStorage";
 import { useLoadingState } from "slices/loading";
+import { useOne } from "slices/useOne";
 
 const FileList = ({ fileMetaDataList }: { fileMetaDataList: WorkspaceMeta[] }) => {
   const usingLoadingState = useLoadingState();
-  const [{ instance: cloudService }] = useCloudStorageService();
+  const cloudService = useOne(slice.cloudStorage, (s) => s.instance);
   const notify = useSnackbar();
   const { load } = useWorkspace();
 

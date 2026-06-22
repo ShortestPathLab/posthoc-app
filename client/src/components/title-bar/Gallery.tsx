@@ -4,7 +4,8 @@ import { head, values } from "es-toolkit/compat";
 import { ReactNode, useEffect } from "react";
 import { useAsync } from "react-async-hook";
 import { useMap } from "react-use";
-import { useScreenshots } from "slices/screenshots";
+import { slice } from "slices";
+import { useOne } from "slices/useOne";
 import { usePaper } from "theme";
 
 const defaultScreenshotRenderer = (s?: string) => <img src={s} />;
@@ -22,7 +23,7 @@ function Screenshot({
 }
 export function Gallery({ onChange }: { onChange?: (screenshots: string[]) => void }) {
   const paper = usePaper();
-  const [screenshots] = useScreenshots();
+  const screenshots = useOne(slice.screenshots);
   const [selected, { set, remove }] = useMap<{
     [K in string]: string;
   }>();
