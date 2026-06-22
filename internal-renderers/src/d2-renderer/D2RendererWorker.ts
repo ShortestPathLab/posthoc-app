@@ -1,5 +1,4 @@
 import interpolate from "color-interpolate";
-import combinate from "combinate";
 import {
   ceil,
   floor,
@@ -24,6 +23,7 @@ import { nanoid } from "nanoid";
 import type { Bounds, Point, Size } from "protocol";
 import { ComponentEntry } from "renderer";
 import { Bush } from "./Bush";
+import { combinate } from "./combinate";
 import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 import {
   D2RendererEvents,
