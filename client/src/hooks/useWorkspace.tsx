@@ -138,7 +138,7 @@ export function useWorkspace() {
         return size * (raw ? 1 : LZ_COMPRESSION_RATIO);
       }),
     };
-  }, [layers]);
+  }, []);
 }
 
 function isCompressedFile(f: File) {

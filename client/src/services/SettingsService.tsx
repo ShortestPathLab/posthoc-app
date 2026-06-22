@@ -10,6 +10,6 @@ export function SettingsService() {
     if (!minimal && showOnStart && !workspace) {
       slice.ui.fullscreenModal.set(showOnStart);
     }
-  }, [minimal]);
+  }, []);
   return <></>;
 }

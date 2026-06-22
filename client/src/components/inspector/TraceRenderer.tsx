@@ -84,7 +84,14 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
         }
       }
     }
-  }, [ref.current, hasSize, renderer, renderers, theme, setError, setInstance]);
+  }, [
+	hasSize,
+	renderer,
+	renderers,
+	theme,
+	setError,
+	setInstance
+]);
 
   useDebounce(
     () => {

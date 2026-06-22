@@ -34,7 +34,7 @@ export function FlowNode(props: NodeProps<Node<FlowData<string, Properties>>>) {
               data: {
                 ...n.data,
                 fields: {
-                  ...(n.data?.fields ?? {}),
+                  ...n.data?.fields,
                   [key]: value,
                 },
               },
