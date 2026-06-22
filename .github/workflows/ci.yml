@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - gh-pages
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: Format (oxfmt)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun i
+      - run: bun run format:check
+        working-directory: client
+
+  lint:
+    name: Lint (oxlint + react-compiler)
+    runs-on: ubuntu-latest
+    # NOTE: report-only for now. The repo has pre-existing react-compiler
+    # rule violations (the rule is set to "error" in client/.oxlintrc.json).
+    # Remove this line to make lint a required gate once that backlog is cleared.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun i
+      - run: bun run lint
+        working-directory: client
+
+  test:
+    name: Test (vitest)
+    runs-on: ubuntu-latest
+    # NOTE: report-only for now. The renderer/parser test suites have
+    # pre-existing failures unrelated to app behaviour. Remove this line
+    # to make tests a required gate once those are fixed.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun i
+      - run: bunx vitest run
+        working-directory: client
