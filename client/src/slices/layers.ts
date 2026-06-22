@@ -45,15 +45,21 @@ export function useLayerPicker<T extends Record<string, unknown>>(
 
   const [key, setKey] = useState<string>();
 
+  const guardedHash = hash(guarded);
+
   // Set key to a default layer
   useEffect(() => {
     if (guarded.length && (!key || !guarded.includes(key))) setKey(head(guarded));
-  }, [key, hash(guarded)]);
+    // `guarded` is read fresh; changes are tracked via `guardedHash`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, guardedHash]);
 
   // Reset key if layer was removed
   useEffect(() => {
     if (key && !guarded.includes(key)) setKey(undefined);
-  }, [key, hash(guarded)]);
+    // `guarded` is read fresh; changes are tracked via `guardedHash`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, guardedHash]);
 
   return { key, guarded, all, setKey };
 }

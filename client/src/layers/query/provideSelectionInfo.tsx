@@ -33,7 +33,7 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
           return { point, node, key: l.key, name: inferLayerName(l) };
         })
         .filter(identity),
-    [layers],
+    [layers, event],
   );
   const menu = useMemo(
     () =>
@@ -76,7 +76,7 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
           },
         },
       },
-    [mapLayerData, layer, layers, setLayer],
+    [mapLayerData, layer, setLayer, key],
   );
   return (
     <TraceLayerSelectionInfoProvider event={event} layer={key}>

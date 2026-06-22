@@ -84,14 +84,10 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
         }
       }
     }
-  }, [
-	hasSize,
-	renderer,
-	renderers,
-	theme,
-	setError,
-	setInstance
-]);
+    // `width`/`height` are intentionally omitted: the instance is (re)created when
+    // `hasSize` flips, while live resizing is handled by the debounced `setOptions` below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSize, renderer, renderers, theme, setError, setInstance]);
 
   useDebounce(
     () => {

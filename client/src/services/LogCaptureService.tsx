@@ -25,6 +25,6 @@ export function LogCaptureService() {
         cc.stop();
       };
     }
-  }, []);
+  }, [notify]);
   return <></>;
 }

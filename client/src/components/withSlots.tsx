@@ -89,7 +89,7 @@ const createResultComponent = (
     const { children, propagateSlotProps, slotKeys = [], ...otherProps } = props;
 
     // Find and get out all childProps
-    const slotProps = useMemo(() => getSlotProps(children), [slotKeys, children]);
+    const slotProps = useMemo(() => getSlotProps(children), [children]);
     // Clean children from childProps components
     const cleanChildren = useMemo(() => getCleanChildren(children, slotKeys), [slotKeys, children]);
 

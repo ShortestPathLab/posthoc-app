@@ -112,6 +112,9 @@ export function FullscreenModalHost() {
     if (key) {
       popupState.open();
     }
+    // Open only in response to `key` changing; `popupState` identity changes on
+    // open/close and would otherwise re-trigger this.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   const value = useMemo(() => ({ close: state.close }), [state]);
@@ -132,7 +135,7 @@ export function FullscreenModalHost() {
       ),
     );
     return <PageContent template={FullScreenPageTemplate} />;
-  }, [key, page]);
+  }, [page]);
 
   return (
     <FullscreenModalContext.Provider {...{ value }}>

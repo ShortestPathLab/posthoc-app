@@ -36,7 +36,10 @@ export function useBreakPoints2(key?: string) {
   const layer = useOne(slice.layers.one<Layer<DebugLayerData>>(key));
   const { code = "" } = layer?.source ?? {};
   const { isTrusted } = useUntrustedLayers();
-  const events = layer?.source?.trace?.content?.events ?? [];
+  const events = useMemo(
+    () => layer?.source?.trace?.content?.events ?? [],
+    [layer?.source?.trace?.content?.events],
+  );
   const { data: { dict } = {} } = useComputeTree({
     trace: layer?.source?.trace?.content,
     step: layer?.source?.trace?.content?.events?.length,
@@ -71,7 +74,7 @@ export function useBreakPoints2(key?: string) {
 
       return steps?.[`${step}`];
     };
-  }, [layer, layer?.source?.breakpointOutput, code, isTrusted, events]);
+  }, [layer, code, isTrusted, events, dict]);
 
   return {
     shouldBreak,

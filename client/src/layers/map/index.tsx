@@ -124,7 +124,7 @@ export const controller = {
           },
         })),
       ],
-      [nodes, index, layer?.transparency, layer?.displayMode],
+      [nodes, index, layer?.key, layer?.transparency, layer?.displayMode],
     );
     return <NodeList nodes={nodes2} />;
   },
@@ -161,7 +161,7 @@ export const controller = {
         }
       }
       return {};
-    }, [parsedMap, event]);
+    }, [parsedMap, event, layer?.source?.map?.format]);
     const menu = useMemo(
       () => ({
         ...(layer &&

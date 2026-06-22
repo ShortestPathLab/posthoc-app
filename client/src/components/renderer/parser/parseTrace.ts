@@ -38,6 +38,6 @@ export function useTraceParser(params: ParseTraceWorkerParameters) {
           }
         }
       }),
-    [params],
+    [params, usingLoadingState, push],
   );
 }

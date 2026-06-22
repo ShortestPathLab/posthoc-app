@@ -9,6 +9,8 @@ export const useEffectWhen = <T, U>(effect: () => void, deps: T[], watch: U[]) =
     if (!allSame(watch, prev)) {
       effect();
     }
+    // `effect` is intentionally omitted: this hook re-runs only when `watch` changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deps, watch, prev]);
 };
 

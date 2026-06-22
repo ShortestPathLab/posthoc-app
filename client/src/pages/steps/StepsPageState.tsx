@@ -13,7 +13,7 @@ export function useStepsPageState(
   onChange?: (r: Transaction<StepsPageState & { type: string }>) => void,
 ) {
   const { key, setKey: setLocalKey } = useLayerPicker(isStepsLayer);
-  useEffect(() => setLocalKey(state?.layer), [state?.layer]);
+  useEffect(() => setLocalKey(state?.layer), [state?.layer, setLocalKey]);
 
   const [selectedType, setLocalSelectedType] = useState(state?.selectedType);
 

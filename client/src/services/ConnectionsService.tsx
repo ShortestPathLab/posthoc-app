@@ -11,6 +11,7 @@ export function ConnectionsService() {
   const notify = useSnackbar();
   const { remote } = useOne(slice.settings);
   const usingLoadingState = useLoadingState("connections");
+  const remoteKey = JSON.stringify(remote);
 
   useEffect(() => {
     let aborted = false;
@@ -46,7 +47,9 @@ export function ConnectionsService() {
       aborted = true;
       cs.map((c) => c.transport().disconnect());
     };
-  }, [JSON.stringify(remote), notify, usingLoadingState]);
+    // Reconnect when the remote list changes by value; `remote` is read fresh inside.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remoteKey, notify, usingLoadingState]);
 
   return <></>;
 }

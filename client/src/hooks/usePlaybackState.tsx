@@ -132,5 +132,5 @@ export function usePlaybackControls(key?: string) {
           },
         ),
     };
-  }, [key, shouldBreak]);
+  }, [key, shouldBreak, notify]);
 }

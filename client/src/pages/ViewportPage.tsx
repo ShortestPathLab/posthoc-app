@@ -52,13 +52,14 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   const [layerSet, setLayerSet] = useState<Record<string, boolean | undefined>>({});
   const selectedLayers = useMemo(
     () => filter(layers, (l) => layerSet?.[l.key] ?? true),
-    [layerSet, layers, layers?.length],
+    [layerSet, layers],
   );
 
   const [rendererInstance, setRendererInstance] = useState<RendererInstance | null>();
 
   const { selected, auto } = useRendererResolver(state?.renderer);
 
+  const selectedLayerKeys = _(selectedLayers, (s) => map(s, "key").sort().join("."));
   useEffect(() => {
     delay(() => {
       rendererInstance?.fitCamera?.((b) =>
@@ -70,7 +71,9 @@ export function ViewportPage({ template: Page }: PageContentProps) {
         ),
       );
     }, 150);
-  }, [rendererInstance, _(selectedLayers, (s) => map(s, "key").sort().join("."))]);
+    // Re-run when the set of visible layer keys changes; `selectedLayers` is read fresh.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rendererInstance, selectedLayerKeys]);
 
   const size = useSurfaceAvailableCssSize();
 

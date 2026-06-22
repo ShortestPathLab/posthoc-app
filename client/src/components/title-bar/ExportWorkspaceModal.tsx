@@ -74,7 +74,7 @@ export function ExportWorkspace({
   const usingLoadingState = useLoadingState("general");
   const notify = useSnackbar();
   // const storage = useCloudStorageInstance();
-  const workspaceSize = useMemo(() => estimateWorkspaceSize(), []);
+  const workspaceSize = useMemo(() => estimateWorkspaceSize(), [estimateWorkspaceSize]);
   const [uploading, setUploading] = useState(false);
   async function getFields(size: number, lastModified: number): Promise<WorkspaceMeta> {
     return {

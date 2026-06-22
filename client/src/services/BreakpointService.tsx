@@ -9,7 +9,7 @@ import { groupBy, values } from "es-toolkit/compat";
 import memo from "memoizee";
 import objectHash from "object-hash";
 import { useComputeTree } from "pages/tree/TreeUtility";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useAsyncAbortable } from "react-async-hook";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
@@ -56,7 +56,7 @@ const processBreakpoint = memo(
 );
 
 export function BreakpointService({ value }: { value?: string }) {
-  const one = slice.layers.one<Layer<DebugLayerData>>(value);
+  const one = useMemo(() => slice.layers.one<Layer<DebugLayerData>>(value), [value]);
 
   const usingLoadingState = useLoadingState("general");
 
@@ -116,7 +116,7 @@ export function BreakpointService({ value }: { value?: string }) {
           ),
         ),
     );
-  }, [outputs]);
+  }, [outputs, one]);
 
   return <></>;
 }

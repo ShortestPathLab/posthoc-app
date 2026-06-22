@@ -43,7 +43,7 @@ export function GraphEvents({
         document.body.style.cursor = "";
       },
     });
-  }, [layerKey, registerEvents, sigma]);
+  }, [layerKey, registerEvents, sigma, onSelection]);
 
   return null;
 }

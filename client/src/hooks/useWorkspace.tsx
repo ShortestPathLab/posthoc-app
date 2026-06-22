@@ -138,7 +138,7 @@ export function useWorkspace() {
         return size * (raw ? 1 : LZ_COMPRESSION_RATIO);
       }),
     };
-  }, []);
+  }, [notify, usingBusyState]);
 }
 
 function isCompressedFile(f: File) {

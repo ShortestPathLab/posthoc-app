@@ -215,7 +215,7 @@ export function ViewLeaf<T extends Record<string, unknown>>({
             }),
         } satisfies ViewTreeContextType<T>)
       : {};
-  }, [onChange, onClose, depth, root, drag]);
+  }, [onChange, onClose, depth, root, drag, onMaximise, defaultContent, canPopOut, onPopOut]);
 
   const portal = view[root.key];
 

@@ -10,6 +10,9 @@ export function SettingsService() {
     if (!minimal && showOnStart && !workspace) {
       slice.ui.fullscreenModal.set(showOnStart);
     }
+    // Show the start modal once on mount only; later toggles of the setting
+    // should not reopen it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return <></>;
 }

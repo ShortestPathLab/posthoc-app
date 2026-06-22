@@ -20,7 +20,10 @@ export const service = withProduce(({ value, produce }) => {
   // Set playback
   useEffect(() => {
     produce((l) => void set(l, "source.playbackTo", trace?.content?.events?.length ?? 0));
-  }, [trace?.key]);
+    // `produce` is recreated every render, so it's intentionally omitted to avoid
+    // re-running on every render; this reacts to the trace and its event count.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trace?.key, trace?.content?.events?.length]);
   const { isTrusted } = useUntrustedLayers();
   // Make the trace parser
   const parseTrace = useTraceParser(

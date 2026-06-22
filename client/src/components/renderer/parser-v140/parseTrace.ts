@@ -73,6 +73,6 @@ export function useTraceParser(
     } else {
       return undefined;
     }
-    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
   }, deps);
 }

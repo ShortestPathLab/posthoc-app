@@ -29,6 +29,9 @@ export function Gallery({ onChange }: { onChange?: (screenshots: string[]) => vo
   }>();
   useEffect(() => {
     onChange?.(values(selected));
+    // Fire only when the selection changes; `onChange` is a caller-provided
+    // callback whose identity may change every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
   function handleChange(i: number, v: boolean, s?: string) {
     if (v && s) {

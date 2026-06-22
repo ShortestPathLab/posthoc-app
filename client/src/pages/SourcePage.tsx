@@ -88,7 +88,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
           one.set(a.result);
         }),
       ),
-    [selected?.layer, selected?.source?.id],
+    [selected?.layer, selected?.source?.id, progress],
   );
 
   const [value, setValue] = useOptimistic(selected?.source?.content, (v) =>

@@ -24,7 +24,7 @@ export function SyncService() {
   const isFocused = useWindowFocus();
   const { isOnly, isPrimary, loading } = useSyncStatus();
   // Init query
-  useEffect(() => void (!loading && !isOnly && sysend.broadcast("sync")), [loading]);
+  useEffect(() => void (!loading && !isOnly && sysend.broadcast("sync")), [loading, isOnly]);
   // Init response
   useEffect(() => {
     if (loading) return;
@@ -57,6 +57,7 @@ export function SyncService() {
 
 export function useActive() {
   const { participants } = useSyncStatus();
+  const participantsKey = JSON.stringify(participants);
   const [isActive, setActive] = useState(false);
   const isFocused = useWindowFocus();
   useEffect(() => {
@@ -71,6 +72,8 @@ export function useActive() {
     };
     sysend.on("active", f);
     return () => sysend.off("active", f);
-  }, [JSON.stringify(participants)]);
+    // Re-subscribe when the participant set changes by value; `participants` is read fresh.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [participantsKey]);
   return isActive;
 }

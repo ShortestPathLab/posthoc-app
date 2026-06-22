@@ -87,7 +87,7 @@ function Scroller({ style, children, ref, ...rest }: ComponentProps<"div">) {
         },
       });
     }
-  }, [initialize]);
+  }, [initialize, ref]);
 
   const refSetter = useCallback(
     (node: HTMLDivElement | null) => {
@@ -128,7 +128,7 @@ export function WhenIdle({ children }: { children: ReactElement }) {
       timeout: 150,
     });
     return () => cancelIdleCallback(id);
-  }, []);
+  }, [toggle]);
   return current && children;
 }
 

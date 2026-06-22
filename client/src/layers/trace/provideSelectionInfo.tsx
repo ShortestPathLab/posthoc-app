@@ -11,7 +11,7 @@ import { Controller } from "./types";
 import { useOne } from "slices/useOne";
 
 export const provideSelectionInfo = (({ layer: key, event, children }) => {
-  const one = slice.layers.one<TraceLayer>(key);
+  const one = useMemo(() => slice.layers.one<TraceLayer>(key), [key]);
   const layer = useOne(one);
   const menu = useMemo(() => {
     const events = layer?.source?.parsedTrace?.content?.events ?? [];
@@ -67,6 +67,6 @@ export const provideSelectionInfo = (({ layer: key, event, children }) => {
       }
     }
     return {};
-  }, [layer, event]);
+  }, [layer, event, one]);
   return <>{children?.(menu)}</>;
 }) satisfies Controller["provideSelectionInfo"];

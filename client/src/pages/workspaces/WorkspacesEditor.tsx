@@ -155,7 +155,7 @@ const WorkspacesEditor = () => {
         setSavedFilesMetaData(false);
       }
     }
-  }, [storage?.instance, storage]);
+  }, [storage]);
   useAsync(f, [f]);
   const padding = sm || isViewTree ? 2 : 3;
   const dual = width > 740;

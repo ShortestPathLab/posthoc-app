@@ -97,7 +97,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
         }
         return {};
       }).result ?? {},
-    [rawSteps, _selectedType, highlighting, showHighlighting],
+    [rawSteps, _selectedType, highlighting, showHighlighting, isHighlighting],
   );
 
   useEffect(() => {
@@ -126,7 +126,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
         });
       }
     }
-  }, [step, ref, scrollerRef, stepToFilteredStep, playing]);
+  }, [step, ref, scrollerRef, stepToFilteredStep, playing, spacing]);
 
   return (
     <>

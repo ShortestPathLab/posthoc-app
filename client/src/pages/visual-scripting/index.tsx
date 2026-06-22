@@ -95,12 +95,15 @@ export function VisualPage({ template: Page }: PageContentProps) {
   );
 
   const tabs = keys(content?.views);
+  const tabsKey = JSON.stringify(tabs);
 
   useEffect(() => {
     if (tabs.length) {
       onChange?.((v) => void (v.tab = head(tabs)!));
     }
-  }, [JSON.stringify(tabs)]);
+    // Run only when the set of tabs changes (compared by value); `onChange` is read fresh.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabsKey]);
 
   const { loading } = useAsync(async () => {
     const a = content?.views?.[tab];
@@ -121,21 +124,21 @@ export function VisualPage({ template: Page }: PageContentProps) {
       onChange?.((v) => {
         v.nodes = applyNodeChanges(changes, v.nodes ?? []);
       }),
-    [],
+    [onChange],
   );
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) =>
       onChange?.((v) => {
         v.edges = applyEdgeChanges(changes, v.edges ?? []);
       }),
-    [],
+    [onChange],
   );
   const onConnect = useCallback(
     (params: Connection) =>
       onChange?.((v) => {
         v.edges = addEdge(params, v.edges ?? []);
       }),
-    [],
+    [onChange],
   );
 
   const onSave = useCallback(() => {
@@ -162,14 +165,14 @@ export function VisualPage({ template: Page }: PageContentProps) {
     };
 
     restoreFlow();
-  }, [rfInstance]);
+  }, [rfInstance, onChange]);
 
   const context = useMemo(
     () => ({
       hasDefinition: (s: string) => !!content?.views?.[s],
       goToDefinition: (s: string) => onChange?.((v) => void (v.tab = s)),
     }),
-    [content],
+    [content, onChange],
   );
 
   const theme = useTheme();

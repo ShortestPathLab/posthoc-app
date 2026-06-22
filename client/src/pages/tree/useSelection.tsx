@@ -24,6 +24,6 @@ export function useSelection(step: number, trace: Trace | undefined) {
       (c) => `${c.event.id}` === selection?.node,
     );
     return { events, current: findLast(events, (c) => c.step <= step) };
-  }, [selection, step]);
+  }, [selection, step, trace?.events]);
   return { selection, setSelection, point, selected };
 }

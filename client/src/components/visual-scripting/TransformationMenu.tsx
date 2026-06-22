@@ -67,7 +67,7 @@ function TransformationCanvas({ source }: TransformationCanvasProps) {
 
   const [nodes, , onNodesChange] = useNodesState([source]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const onConnect = React.useCallback<OnConnect>((c) => setEdges((e) => addEdge(c, e)), []);
+  const onConnect = React.useCallback<OnConnect>((c) => setEdges((e) => addEdge(c, e)), [setEdges]);
   const theme = useTheme();
   return (
     <ReactFlowProvider>

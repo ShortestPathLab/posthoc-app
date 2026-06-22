@@ -71,6 +71,9 @@ export function useDraft<T>(
     if (initial) {
       requestIdleCallback(() => setState(merge({}, state, omit(initial, ...stayDraft))));
     }
+    // Reset the draft from `initial` only; `state` is read at apply-time and
+    // depending on it would loop, and `stayDraft` is a fresh array each render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setState, initial]);
   const handleChange = useMemo(() => debounce((v: T) => commit?.(v), ms), [commit, ms]);
   return [

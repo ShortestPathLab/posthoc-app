@@ -87,7 +87,7 @@ export function useHighlightNodes(key?: string): {
         set(l, "source.highlighting", path.length > 1 ? { type: "backtracking", step, path } : {}),
       );
     },
-    [layer?.source?.highlighting, trace],
+    [trace, setLayer],
   );
 
   const groupedTraceById = index(trace?.events, "index");
@@ -143,7 +143,9 @@ export function useHighlightNodes(key?: string): {
         );
       }
     },
-    [layer?.source?.highlighting, trace],
+    // `getPrecedentEvents` is derived from `trace`, which is already a dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [trace, setLayer],
   );
 
   const groupedTraceBypId = index(trace?.events, "index", "pId");
@@ -185,7 +187,9 @@ export function useHighlightNodes(key?: string): {
         }),
       );
     },
-    [layer?.source?.highlighting, trace],
+    // `getAllSubtreeNodes` is derived from `trace`, which is already a dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [trace, setLayer],
   );
 
   return {
