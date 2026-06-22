@@ -39,5 +39,8 @@
   ],
   "dependencies": {
     "typescript": "^7.0.1-rc"
+  },
+  "overrides": {
+    "immer": "11.1.8"
   }
 }
