@@ -14,6 +14,7 @@ import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import download from "downloadjs";
 import { inferLayerName } from "layers/inferLayerName";
+import { isEqual, pick } from "es-toolkit";
 import { delay, every, filter, find, keyBy, map } from "es-toolkit/compat";
 import { useEffect, useState } from "react";
 import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
@@ -27,6 +28,7 @@ import { PageContentProps } from "./PageMeta";
 import { useRendererResolver } from "./useRendererResolver";
 import { flow } from "utils/flow";
 import { useOne } from "slices/useOne";
+import { useEffectWhen } from "hooks/useEffectWhen";
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 type ViewportPageContext = PanelState & { renderer?: string };
@@ -48,30 +50,42 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   const renderers = useOne(slice.renderers);
   const paper = usePaper();
   const acrylic = useAcrylic();
-  const layers = useOne(slice.layers);
+  // Narrow, stable projection for the layer picker: only re-derives a new
+  // reference when keys/names actually change (deep equality), so Page.Options
+  // doesn't re-render on every timestep/playback tick (when `layers` churns).
+  const layerOptions = useOne(
+    slice.layers,
+    (ls) => map(ls, (c) => ({ id: c?.key, name: inferLayerName(c) })),
+    isEqual,
+  );
   const [layerSet, setLayerSet] = useState<Record<string, boolean | undefined>>({});
-  // No manual useMemo: the React Compiler bails out of the whole component if it
-  // can't preserve a hand-written memo ("CannotPreserveMemoization"). Letting the
-  // compiler auto-memoize this keeps the component (incl. Page.Options) optimized.
-  const selectedLayers = filter(layers, (l) => layerSet?.[l.key] ?? true);
+
+  const selectedLayers = useOne(slice.layers, (l1) =>
+    l1.filter?.((l) => layerSet?.[l.key] ?? true),
+  );
+  const selectedLayerIdentities = useOne(
+    slice.layers,
+    (l1) =>
+      l1.filter?.((l) => layerSet?.[l.key] ?? true)?.map?.((l) => pick(l, ["key", "viewKey"])),
+    isEqual,
+  );
 
   const [rendererInstance, setRendererInstance] = useState<RendererInstance | null>();
 
   const { selected, auto } = useRendererResolver(state?.renderer);
 
-  const selectedLayerKeys = flow(selectedLayers, (s) => map(s, "key").sort().join("."));
   useEffect(() => {
     delay(() => {
       rendererInstance?.fitCamera?.((b) =>
         flow(
-          selectedLayers,
+          selectedLayerIdentities,
           (s) => filter(s, "viewKey"),
           (s) => map(s, "key"),
           (s) => s.includes(b.meta?.sourceLayer ?? ""),
         ),
       );
     }, 150);
-  }, [rendererInstance, selectedLayerKeys, selectedLayers]);
+  }, [rendererInstance, selectedLayerIdentities]);
 
   const size = useSurfaceAvailableCssSize();
 
@@ -173,10 +187,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
             icon={<LayersOutlined />}
             value={layerSet}
             onChange={setLayerSet}
-            items={map(layers, (c) => ({
-              id: c?.key,
-              name: inferLayerName(c),
-            }))}
+            items={layerOptions}
             showArrow
             ellipsis={12}
           />
