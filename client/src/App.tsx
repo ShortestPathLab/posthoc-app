@@ -1,6 +1,7 @@
 import { CircularProgress, CssBaseline, Fade, Stack, ThemeProvider, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { SnackbarProvider } from "components/generic/Snackbar";
+import { GlobalSurface } from "components/generic/surface";
 import { Inspector } from "components/inspector";
 import { Placeholder } from "components/inspector/Placeholder";
 import { TitleBar, TitleBarPlaceholder } from "components/title-bar/TitleBar";
@@ -82,6 +83,7 @@ function ThemedApp() {
         <SnackbarProvider>
           <EnvironmentProvider services={services}>
             <App />
+            <GlobalSurface />
           </EnvironmentProvider>
         </SnackbarProvider>
       </CssBaseline>

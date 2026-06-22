@@ -211,6 +211,7 @@
         "protocol": "workspace:*",
         "react": "^19.2.7",
         "react-async-hook": "^4.0.0",
+        "react-call": "^2.0.2",
         "react-colorful": "^5.7.0",
         "react-dnd": "^16.0.1",
         "react-dnd-html5-backend": "^16.0.1",
@@ -2151,6 +2152,8 @@
     "react": ["react@19.2.7", "", {}, "sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ=="],
 
     "react-async-hook": ["react-async-hook@4.0.0", "", { "peerDependencies": { "react": ">=16.8" } }, "sha512-97lgjFkOcHCTYSrsKBpsXg3iVWM0LnzedB749iP76sb3/8Ouu4nHIkCLEOrQWHVYqrYxjF05NN6GHoXWFkB3Kw=="],
+
+    "react-call": ["react-call@2.0.2", "", { "peerDependencies": { "react": ">=18", "react-dom": ">=18", "vite": ">=8" }, "optionalPeers": ["react-dom", "vite"] }, "sha512-egXLdccpWeRq+6XmR+jm/4Lg0w5zLAe/2jMzYdWtQkfe5qgfUJReZWdLWyPIfzZt215FBF6wFOZPaqne6MhNNw=="],
 
     "react-colorful": ["react-colorful@5.7.0", "", { "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-fuesYIemttah97XmsIHmz4OORDHiSFzyc9HMAIrCHJou2jaRQmL8cFJ76K4zQhhj8jzwOBlOi4BaGTjjOZCfTg=="],
 

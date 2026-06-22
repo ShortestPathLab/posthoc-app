@@ -8,7 +8,7 @@ import { useOne } from "slices/useOne";
 import { usePaper } from "theme";
 import { useSnackbar } from "./generic/Snackbar";
 import { Button } from "./generic/inputs/Button";
-import { Surface } from "./generic/surface";
+import { useSurface } from "./generic/surface";
 
 import { WorkspaceMeta } from "slices/UIState";
 
@@ -18,6 +18,17 @@ export const FileShareSurface = ({ file }: { file: WorkspaceMeta }) => {
   const paper = usePaper();
   const notify = useSnackbar();
   const [link, setLink] = useState("");
+  const { open: openLink } = useSurface(
+    () => (
+      <Stack sx={{ p: sm ? 2 : 3, gap: 1, pb: 6 }} direction="row">
+        <TextField sx={{ flex: 1 }} label="Link" variant="filled" value={link} autoFocus />
+        <Button variant="outlined" onClick={handleCopy}>
+          Copy
+        </Button>
+      </Stack>
+    ),
+    { title: "Shareable link" },
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -66,31 +77,15 @@ export const FileShareSurface = ({ file }: { file: WorkspaceMeta }) => {
       <Box sx={{ width: 128, height: 128, ...paper(1) }} />
       <ListItemText primary={file.name} secondary={file.author} />
       <Stack sx={{ gap: 1 }}>
-        <Surface
-          title="Shareable link"
-          trigger={({ open }) => {
-            return (
-              <Button
-                variant="filled"
-                startIcon={<LinkOutlined color="primary" />}
-                onClick={() => {
-                  if (link) {
-                    open();
-                  }
-                }}
-              >
-                Get shareable link
-              </Button>
-            );
+        <Button
+          variant="filled"
+          startIcon={<LinkOutlined color="primary" />}
+          onClick={() => {
+            if (link) openLink({});
           }}
         >
-          <Stack sx={{ p: sm ? 2 : 3, gap: 1, pb: 6 }} direction="row">
-            <TextField sx={{ flex: 1 }} label="Link" variant="filled" value={link} autoFocus />
-            <Button variant="outlined" onClick={handleCopy}>
-              Copy
-            </Button>
-          </Stack>
-        </Surface>
+          Get shareable link
+        </Button>
         <Button
           disabled={!navigator.share}
           variant="text"

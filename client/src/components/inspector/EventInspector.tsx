@@ -43,7 +43,7 @@ function Dot({ label }: { label?: ReactNode }) {
 }
 
 export function EventInspector({ event, index, selected, label, ...props }: EventInspectorProps) {
-  const { open, dialog } = useSurface(EventProperties, {
+  const { open } = useSurface(EventProperties, {
     title: "Event properties",
   });
   const { spacing } = useTheme();
@@ -52,50 +52,47 @@ export function EventInspector({ event, index, selected, label, ...props }: Even
   const extrasCls = useCss({});
 
   return (
-    <>
-      <Box
+    <Box
+      sx={{
+        position: "relative",
+        [`> .${extrasCls}`]: { opacity: 0 },
+        [`&:hover > .${extrasCls}`]: { opacity: 1 },
+        [`&:hover > .${buttonCls}`]: { pr: 8 },
+      }}
+    >
+      <ListItemButton
+        className={buttonCls}
+        selected={selected}
+        {...props}
         sx={{
-          position: "relative",
-          [`> .${extrasCls}`]: { opacity: 0 },
-          [`&:hover > .${extrasCls}`]: { opacity: 1 },
-          [`&:hover > .${buttonCls}`]: { pr: 8 },
+          height: 80,
+          borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
+          ...props.sx,
         }}
       >
-        <ListItemButton
-          className={buttonCls}
-          selected={selected}
-          {...props}
-          sx={{
-            height: 80,
-            borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
-            ...props.sx,
-          }}
-        >
-          <EventInspectorContents event={event} index={index} label={label} />
-        </ListItemButton>
-        <Stack
-          className={extrasCls}
-          direction="row"
-          sx={{
-            p: 1,
-            justifyContent: "center",
-            position: "absolute",
-            right: 0,
-            alignItems: "center",
-            top: 0,
-            height: "100%",
-          }}
-        >
-          <IconButton
-            onClick={() => open({ event })}
-            sx={{ p: 1.5, color: "text.secondary" }}
-            label="See All Properties"
-            icon={<DataObjectOutlined fontSize="small" />}
-          />
-        </Stack>
-      </Box>
-      {dialog}
-    </>
+        <EventInspectorContents event={event} index={index} label={label} />
+      </ListItemButton>
+      <Stack
+        className={extrasCls}
+        direction="row"
+        sx={{
+          p: 1,
+          justifyContent: "center",
+          position: "absolute",
+          right: 0,
+          alignItems: "center",
+          top: 0,
+          height: "100%",
+        }}
+      >
+        <IconButton
+          onClick={() => open({ event })}
+          sx={{ p: 1.5, color: "text.secondary" }}
+          label="See All Properties"
+          icon={<DataObjectOutlined fontSize="small" />}
+        />
+      </Stack>
+    </Box>
   );
 }
 

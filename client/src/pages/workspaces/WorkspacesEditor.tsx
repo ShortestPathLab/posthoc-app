@@ -18,7 +18,7 @@ import { FileShareSurface } from "components/FileShareSurface";
 import { useSnackbar } from "components/generic/Snackbar";
 import { Button } from "components/generic/inputs/Button";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
-import { Surface, useSurface } from "components/generic/surface";
+import { useSurface } from "components/generic/surface";
 import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfaceSize";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { ExportWorkspace } from "components/title-bar/ExportWorkspaceModal";
@@ -40,6 +40,9 @@ const FileList = ({ fileMetaDataList }: { fileMetaDataList: WorkspaceMeta[] }) =
   const cloudService = useOne(slice.cloudStorage, (s) => s.instance);
   const notify = useSnackbar();
   const { load } = useWorkspace();
+  const { open: openWorkspaceDetails } = useSurface(FileShareSurface, {
+    title: "Workspace details",
+  });
 
   const handleView = async (fileId: string) => {
     usingLoadingState(async () => {
@@ -72,16 +75,14 @@ const FileList = ({ fileMetaDataList }: { fileMetaDataList: WorkspaceMeta[] }) =
           onOpenClick={() => handleView(file.id)}
           loading={false}
         >
-          <Surface
-            title="Workspace details"
-            trigger={({ open }) => (
-              <Button sx={{ mt: -1 }} variant="text" startIcon={<InfoOutlined />} onClick={open}>
-                Workspace details
-              </Button>
-            )}
+          <Button
+            sx={{ mt: -1 }}
+            variant="text"
+            startIcon={<InfoOutlined />}
+            onClick={() => openWorkspaceDetails({ file })}
           >
-            <FileShareSurface file={file} />
-          </Surface>
+            Workspace details
+          </Button>
         </FeatureCard>
       ))}
     </Stack>
@@ -92,13 +93,12 @@ const UploadWorkspace = () => {
   const [uploading, setUploading] = useState(false);
   const notify = useSnackbar();
   const storage = useCloudStorageInstance();
-  const {
-    open: openUploadWorkspaceModal,
-    dialog: uploadWorkspaceDialog,
-    close: closeUploadWorkspaceDialog,
-  } = useSurface(ExportWorkspace, {
-    title: "Upload Workspace",
-  });
+  const { open: openUploadWorkspaceModal, close: closeUploadWorkspaceDialog } = useSurface(
+    ExportWorkspace,
+    {
+      title: "Upload Workspace",
+    },
+  );
 
   const handleUpload = async () => {
     try {
@@ -128,7 +128,6 @@ const UploadWorkspace = () => {
       >
         {uploading ? "Saving" : "Upload current workspace"}
       </Button>
-      {uploadWorkspaceDialog}
     </Stack>
   );
 };

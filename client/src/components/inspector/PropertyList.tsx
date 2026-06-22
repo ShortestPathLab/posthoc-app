@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Block, BlockProps } from "components/generic/Block";
 import { Property, renderProperty } from "components/generic/Property";
-import { Surface, SurfaceProps } from "components/generic/surface";
+import { SurfaceProps, useSurface } from "components/generic/surface";
 import { useSm } from "hooks/useSmallDisplay";
 import { isNumber, isString, isUndefined } from "es-toolkit";
 import {
@@ -106,36 +106,25 @@ export function PropertyDialog({
   ...rest
 }: Omit<PropertyListProps, "variant" | "simple" | "primitives"> & Partial<SurfaceProps>) {
   const sorted = sortEventKeys(event);
+  const { open } = useSurface(EventProperties, merge({ title: "Event Properties" }, rest));
   return (
-    <Surface
-      {...merge(
-        {
-          title: "Event Properties",
-          trigger: ({ open }) => (
-            <Button
-              variant="text"
-              sx={{
-                mx: -1,
-                minWidth: 0,
-                width: "fit-content",
-                color: (t) => t.palette.text.secondary,
-                justifyContent: "left",
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                open(e);
-              }}
-            >
-              {sorted.length - max} more
-            </Button>
-          ),
-        } as SurfaceProps,
-        rest,
-      )}
+    <Button
+      variant="text"
+      sx={{
+        mx: -1,
+        minWidth: 0,
+        width: "fit-content",
+        color: (t) => t.palette.text.secondary,
+        justifyContent: "left",
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        open({ event });
+      }}
     >
-      <EventProperties event={event} />
-    </Surface>
+      {sorted.length - max} more
+    </Button>
   );
 }
 

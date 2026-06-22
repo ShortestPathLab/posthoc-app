@@ -21,7 +21,7 @@ type TransformationMenuProps = {
 };
 
 export default function TransformationMenu({ variable }: TransformationMenuProps) {
-  const { dialog, open } = useSurface(FlowPopup, {
+  const { open } = useSurface(FlowPopup, {
     title: `Value graph: ${variable}`,
     slotProps: {
       paper: {
@@ -31,12 +31,9 @@ export default function TransformationMenu({ variable }: TransformationMenuProps
   });
 
   return (
-    <>
-      <Button onClick={() => open({ nodeName: variable })} size="small">
-        Open transformation menu
-      </Button>
-      {dialog}
-    </>
+    <Button onClick={() => open({ nodeName: variable })} size="small">
+      Open transformation menu
+    </Button>
   );
 }
 

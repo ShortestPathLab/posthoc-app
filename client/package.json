@@ -82,6 +82,7 @@
     "protocol": "workspace:*",
     "react": "^19.2.7",
     "react-async-hook": "^4.0.0",
+    "react-call": "^2.0.2",
     "react-colorful": "^5.7.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",

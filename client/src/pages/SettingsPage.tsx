@@ -30,7 +30,7 @@ import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Button } from "components/generic/inputs/Button";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
 import { useSnackbar } from "components/generic/Snackbar";
-import { Surface } from "components/generic/surface";
+import { SurfaceContentProps, useSurface } from "components/generic/surface";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { shades } from "components/renderer/colors";
 import { mapParsers } from "components/renderer/map-parser";
@@ -122,6 +122,41 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   } = useOne(slice.settings);
   const [tab, setTab] = useState("general");
   const [ref, { width }] = useMeasure();
+  const { open: openReset } = useSurface(
+    ({ onClose }: SurfaceContentProps) => (
+      <Stack sx={{ p: sm ? 2 : 3, pt: 2, gap: 4 }}>
+        <Typography component="div" color="text.secondary">
+          If something&apos;s not working correctly, you can try to reset all settings and
+          extensions. This cannot be undone.
+        </Typography>
+        <Stack
+          direction={sm ? "column-reverse" : "row"}
+          sx={{ justifyContent: "flex-end", gap: sm ? 1 : 2 }}
+        >
+          <Button variant="text" onClick={() => onClose()}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              usingBusyState(async () => {
+                await wait(300);
+                slice.settings.set(() => defaults);
+                onClose();
+                slice.ui.sidebarOpen.set(false);
+                slice.ui.fullscreenModal.set(undefined);
+                push("Reset complete");
+              }, "Resetting settings and extensions");
+            }}
+            color="error"
+            startIcon={<RestartAltOutlined />}
+          >
+            Reset settings and extensions
+          </Button>
+        </Stack>
+      </Stack>
+    ),
+    { title: "Reset settings and extensions" },
+  );
   function renderHeading(label: ReactNode) {
     return (
       <Type
@@ -386,58 +421,15 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                     icon={<RestartAltRounded />}
                     description="If something's not working correctly, you can try to reset all settings and extensions. This cannot be undone."
                   >
-                    <Surface
-                      trigger={({ open }) => (
-                        <Button
-                          size="small"
-                          sx={{ minWidth: "max-content" }}
-                          color="error"
-                          startIcon={<RestartAltOutlined />}
-                          onClick={open}
-                        >
-                          Reset now
-                        </Button>
-                      )}
-                      title="Reset settings and extensions"
+                    <Button
+                      size="small"
+                      sx={{ minWidth: "max-content" }}
+                      color="error"
+                      startIcon={<RestartAltOutlined />}
+                      onClick={() => openReset({})}
                     >
-                      {({ close }) => (
-                        <Stack sx={{ p: sm ? 2 : 3, pt: 2, gap: 4 }}>
-                          <Typography component="div" color="text.secondary">
-                            If something&apos;s not working correctly, you can try to reset all
-                            settings and extensions. This cannot be undone.
-                          </Typography>
-                          <Stack
-                            direction={sm ? "column-reverse" : "row"}
-                            sx={{ justifyContent: "flex-end", gap: sm ? 1 : 2 }}
-                          >
-                            <Button
-                              variant="text"
-                              onClick={() => {
-                                close();
-                              }}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              onClick={() => {
-                                usingBusyState(async () => {
-                                  await wait(300);
-                                  slice.settings.set(() => defaults);
-                                  close();
-                                  slice.ui.sidebarOpen.set(false);
-                                  slice.ui.fullscreenModal.set(undefined);
-                                  push("Reset complete");
-                                }, "Resetting settings and extensions");
-                              }}
-                              color="error"
-                              startIcon={<RestartAltOutlined />}
-                            >
-                              Reset settings and extensions
-                            </Button>
-                          </Stack>
-                        </Stack>
-                      )}
-                    </Surface>
+                      Reset now
+                    </Button>
                   </Item>
                 </Stack>
               </Stack>
