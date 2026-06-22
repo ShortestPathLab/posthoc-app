@@ -1,8 +1,5 @@
 import { LayersOutlined } from "@mui-symbols-material/w400";
-import {
-  FeaturePicker,
-  FeaturePickerProps,
-} from "components/app-bar/FeaturePicker";
+import { FeaturePicker, FeaturePickerProps } from "components/app-bar/FeaturePicker";
 import { EditorProps } from "components/Editor";
 import { inferLayerName } from "layers/inferLayerName";
 import { Layer, LayerGuard, useLayers } from "slices/layers";
@@ -41,9 +38,7 @@ export function LayerPicker<T extends Record<string, unknown>>({
         id: c,
         hidden: !guarded.includes(c),
       }))}
-      renderItem={(c) => (
-        <WithLayer layer={c.id}>{(l) => inferLayerName(l)}</WithLayer>
-      )}
+      renderItem={(c) => <WithLayer layer={c.id}>{(l) => inferLayerName(l)}</WithLayer>}
       onChange={onChange}
     />
   );

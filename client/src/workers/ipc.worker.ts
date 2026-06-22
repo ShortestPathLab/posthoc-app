@@ -20,10 +20,7 @@ const init = once(async (url: string = "") => {
   }
 });
 
-const process = async ({
-  method,
-  params,
-}: Request): Promise<Partial<Response>> => {
+const process = async ({ method, params }: Request): Promise<Partial<Response>> => {
   try {
     const call = await init();
     return call

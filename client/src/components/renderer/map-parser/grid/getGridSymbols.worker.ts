@@ -10,9 +10,7 @@ export type GetGridSymbolsReturnType = {
 
 export type GetGridSymbolsParameters = Pick<ParseGridWorkerParameters, "map">;
 
-export function getGridSymbols({
-  map: m,
-}: GetGridSymbolsParameters): GetGridSymbolsReturnType {
+export function getGridSymbols({ map: m }: GetGridSymbolsParameters): GetGridSymbolsReturnType {
   const lines = m.split(/\r?\n/);
   const [, , , , ...grid] = lines;
   return {
@@ -26,12 +24,11 @@ export function getGridSymbols({
         map(g, (symbol) => ({
           symbol,
           value: getValue(symbol),
-        }))
+        })),
     ),
   };
 }
 
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<GetGridSymbolsParameters>) =>
-    getGridSymbols(data)
+onmessage = usingMessageHandler(async ({ data }: MessageEvent<GetGridSymbolsParameters>) =>
+  getGridSymbols(data),
 );

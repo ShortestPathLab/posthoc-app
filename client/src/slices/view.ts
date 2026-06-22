@@ -4,25 +4,20 @@ import { minimal, page } from "services/SyncParticipant";
 
 export type Node = { size?: number; key: string; hidden?: boolean };
 
-export type Branch<
-  T extends Record<string, unknown> = Record<string, unknown>
-> = Node & {
+export type Branch<T extends Record<string, unknown> = Record<string, unknown>> = Node & {
   type: "branch";
   orientation: "vertical" | "horizontal";
   children: Root<T>[];
   locked?: boolean;
 };
 
-export type Leaf<T extends Record<string, unknown> = Record<string, unknown>> =
-  Node & {
-    type: "leaf";
-    acceptDrop?: boolean;
-    content?: T;
-  };
+export type Leaf<T extends Record<string, unknown> = Record<string, unknown>> = Node & {
+  type: "leaf";
+  acceptDrop?: boolean;
+  content?: T;
+};
 
-export type Root<T extends Record<string, unknown> = Record<string, unknown>> =
-  | Branch<T>
-  | Leaf<T>;
+export type Root<T extends Record<string, unknown> = Record<string, unknown>> = Branch<T> | Leaf<T>;
 
 export type ViewTreeState = { view: Root<PanelState> };
 
@@ -43,7 +38,7 @@ export const viewStore = store<ViewTreeState>(
           content: { type: page },
         },
       }
-    : getDefaultViewTree()
+    : getDefaultViewTree(),
 );
 
 export function getDefaultViewTree(): ViewTreeState {

@@ -18,21 +18,14 @@ const map = {
 const server = createServer((req, res) => {
   // extract URL path
   let pathname1 = `./${
-    _parse(
-      join(app.isPackaged ? join(app.getAppPath(), "dist") : "dist", req.url),
-    ).pathname
+    _parse(join(app.isPackaged ? join(app.getAppPath(), "dist") : "dist", req.url)).pathname
   }`;
   pathname1 = existsSync(pathname1)
     ? pathname1
     : existsSync(resolve(__dirname, pathname1))
       ? resolve(__dirname, pathname1)
-      : `./${
-          _parse(join(app.isPackaged ? "resources/app/dist" : "dist", req.url))
-            .pathname
-        }`;
-  let pathname = existsSync(pathname1)
-    ? pathname1
-    : resolve(__dirname, pathname1);
+      : `./${_parse(join(app.isPackaged ? "resources/app/dist" : "dist", req.url)).pathname}`;
+  let pathname = existsSync(pathname1) ? pathname1 : resolve(__dirname, pathname1);
   // based on the URL path, extract the file extension. e.g. .js, .doc, ...
   const ext = parse(pathname).ext;
 
@@ -86,9 +79,7 @@ server.listen(0, () => {
       win.webContents.setZoomFactor(0.9);
     });
     ipcMain.handle("title-bar", (_e, background, foreground) => {
-      const win2 = BrowserWindow.getAllWindows().find(
-        (c) => c.webContents.id === _e.sender.id,
-      );
+      const win2 = BrowserWindow.getAllWindows().find((c) => c.webContents.id === _e.sender.id);
       if (win2 && "setTitleBarOverlay" in win2) {
         win2.setTitleBarOverlay({
           color: background,

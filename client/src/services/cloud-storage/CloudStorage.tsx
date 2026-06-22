@@ -17,10 +17,7 @@ export type PosthocMetaData = FeatureDescriptor & {
   size?: number;
 };
 // Current
-export interface CloudStorageProvider<
-  K extends string,
-  A extends AccessToken = unknown,
-> {
+export interface CloudStorageProvider<K extends string, A extends AccessToken = unknown> {
   id: K;
   authenticate: () => Promise<AuthState<A>>;
   login: () => Promise<void>;
@@ -38,10 +35,9 @@ export interface CloudStorageProvider<
 }
 
 // Proposal
-export interface CloudStorageProviderProposal<K extends string>
-  extends TypedEmitter<{
-    indexChanged: () => void;
-  }> {
+export interface CloudStorageProviderProposal<K extends string> extends TypedEmitter<{
+  indexChanged: () => void;
+}> {
   id: K;
   /**
    * Returns the current authentication state.
@@ -78,18 +74,12 @@ export interface CloudStorageProviderProposal<K extends string>
   getIndex: () => Promise<WorkspaceMeta[]>;
 }
 
-export type ProviderFactory<
-  K extends string,
-  A extends AccessToken = unknown,
-> = (
+export type ProviderFactory<K extends string, A extends AccessToken = unknown> = (
   getAuthState: () => Promise<AuthState<A>>,
   setAuthState: (v: AuthState<A>) => Promise<void>,
 ) => CloudStorageProvider<K, A>;
 
-export type CloudStorageProviderMeta<
-  K extends string,
-  A extends AccessToken = unknown,
-> = {
+export type CloudStorageProviderMeta<K extends string, A extends AccessToken = unknown> = {
   id: K;
   create: ProviderFactory<K, A>;
   loginUI?: (cloudService: CloudStorageProvider<string, A>) => ReactNode;

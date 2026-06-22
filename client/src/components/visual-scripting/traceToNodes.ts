@@ -42,7 +42,7 @@ export const traceToNodes = (view: TraceComponent[]) => {
           // Special handling for $info
           k === "$info"
             ? undefined
-            : v
+            : v,
         ),
         key: `${i}`,
       } as ComponentData,
@@ -56,15 +56,11 @@ export const traceToNodes = (view: TraceComponent[]) => {
     .groupBy(
       // Deduplicate by value
       // We just want one expression node per value
-      ([, , value]) => value
+      ([, , value]) => value,
     )
     .forEach((vs, i) => {
       const [, property, value] = vs[0];
-      if (
-        !hasExpression(value) &&
-        property !== "$for" &&
-        property !== "$info"
-      ) {
+      if (!hasExpression(value) && property !== "$for" && property !== "$info") {
         // Does not need nodes if a constant
         return;
       }
@@ -141,12 +137,10 @@ export const traceToNodes = (view: TraceComponent[]) => {
       target: `viewport`,
       sourceHandle: "result",
       targetHandle: "components",
-    })
+    }),
   );
   v.nodes.forEach((n) => {
-    n.height = getHeight(
-      resolveNodeConfig(n.data.type as string)(n.data.fields as Properties)
-    );
+    n.height = getHeight(resolveNodeConfig(n.data.type as string)(n.data.fields as Properties));
   });
   return v;
 };

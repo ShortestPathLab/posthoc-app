@@ -1,7 +1,4 @@
-import {
-  BlurOnOutlined as DisabledIcon,
-  ViewInArOutlined,
-} from "@mui-symbols-material/w400";
+import { BlurOnOutlined as DisabledIcon, ViewInArOutlined } from "@mui-symbols-material/w400";
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { RenderLayer } from "layers/RenderLayer";
@@ -9,14 +6,7 @@ import { clamp, find, floor, get, map, some } from "lodash-es";
 import { nanoid } from "nanoid";
 import { isStepsLayer } from "pages/steps/StepsLayer";
 import { Size } from "protocol";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "react-use";
 import { Renderer, RendererEvent } from "renderer";
 import { slice } from "slices";
@@ -124,8 +114,7 @@ function TraceRendererCircularProgress() {
   ) : null;
 }
 
-const VIEWPORT_PAGE_DESCRIPTION =
-  "When you create a layer, you'll see it visualised here.";
+const VIEWPORT_PAGE_DESCRIPTION = "When you create a layer, you'll see it visualised here.";
 
 function useAnyLayerPlaying() {
   return useOne(slice.layers, (l) =>
@@ -133,13 +122,7 @@ function useAnyLayerPlaying() {
   );
 }
 
-export function TraceRenderer({
-  width,
-  height,
-  renderer,
-  rendererRef,
-  layers,
-}: RendererProps) {
+export function TraceRenderer({ width, height, renderer, rendererRef, layers }: RendererProps) {
   const key = useMemo(() => nanoid(), []);
   const { instance, error, ref } = useRenderer(renderer, { width, height });
   const [, setScreenshots] = useScreenshots();
@@ -217,13 +200,7 @@ export function TraceRenderer({
                   }}
                 >
                   {layers.map((l, i) => (
-                    <RenderLayer
-                      index={i}
-                      key={l.key}
-                      layer={l}
-                      width={width}
-                      height={height}
-                    />
+                    <RenderLayer index={i} key={l.key} layer={l} width={width} height={height} />
                   ))}
                 </Box>
               )}
@@ -239,10 +216,7 @@ export function TraceRenderer({
           )}
         </Box>
       </TraceRendererContext.Provider>
-      <SelectionMenu
-        selection={selection}
-        onClose={() => setSelection(undefined)}
-      />
+      <SelectionMenu selection={selection} onClose={() => setSelection(undefined)} />
     </>
   );
 }

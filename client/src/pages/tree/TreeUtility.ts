@@ -17,10 +17,7 @@ import {
 import { Trace } from "protocol/Trace";
 import { _ } from "utils/chain";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
-import {
-  TreeWorkerParameters,
-  TreeWorkerReturnType,
-} from "./treeUtility.worker";
+import { TreeWorkerParameters, TreeWorkerReturnType } from "./treeUtility.worker";
 import treeWorkerUrl from "./treeUtility.worker.ts?worker&url";
 import { TraceEvent } from "protocol/Trace-v140";
 export class TreeWorker extends Worker {
@@ -29,10 +26,9 @@ export class TreeWorker extends Worker {
   }
 }
 
-export const treeAsync = usingMemoizedWorkerTask<
-  TreeWorkerParameters,
-  TreeWorkerReturnType
->(TreeWorker);
+export const treeAsync = usingMemoizedWorkerTask<TreeWorkerParameters, TreeWorkerReturnType>(
+  TreeWorker,
+);
 
 type X = "text" | "number" | "boolean" | "mixed";
 
@@ -58,9 +54,7 @@ function computeLabelsOne(t: unknown, root: string = ""): Y[] {
       throw Error("Non-serialisable function");
     case "object":
       if (isPlainObject(t))
-        return flatMap(entries(t!), ([k, v]) =>
-          computeLabelsOne(v, `${root}.${k}`),
-        );
+        return flatMap(entries(t!), ([k, v]) => computeLabelsOne(v, `${root}.${k}`));
   }
   return [{ path: root, type: "mixed", value: undefined }];
 }
@@ -73,9 +67,7 @@ function computeLabels(labels?: unknown[]) {
       switch (type) {
         case "text":
           // Infer categorical if more than 50% of labels are reused
-          return v.length > unique.length * 2
-            ? ("text/categorical" as const)
-            : ("text" as const);
+          return v.length > unique.length * 2 ? ("text/categorical" as const) : ("text" as const);
         case "number":
           return every(v, (c) => isInteger(c.value))
             ? ("number/discrete" as const)
@@ -103,13 +95,7 @@ export function computeTypes(events?: TraceEvent[]) {
   );
 }
 
-export function useComputeTypes({
-  key,
-  trace,
-}: {
-  key?: string;
-  trace?: Trace;
-}) {
+export function useComputeTypes({ key, trace }: { key?: string; trace?: Trace }) {
   return useQuery({
     queryKey: ["compute/types", key],
     queryFn: async () => computeTypes(trace?.events),
@@ -118,13 +104,7 @@ export function useComputeTypes({
   });
 }
 
-export function useComputeLabels({
-  key,
-  trace,
-}: {
-  key?: string;
-  trace?: Trace;
-}) {
+export function useComputeLabels({ key, trace }: { key?: string; trace?: Trace }) {
   return useQuery({
     queryKey: ["compute/labels", key],
     queryFn: async () => computeLabels(trace?.events),

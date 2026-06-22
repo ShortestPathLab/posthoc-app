@@ -4,8 +4,7 @@ import { ComponentEntry } from "renderer";
 import { _ } from "utils/chain";
 import { normalizeConstant } from "./normalize";
 import { parse as parseComponents } from "./parse";
-const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
-  x === undefined || x === null;
+const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> => x === undefined || x === null;
 type Key = string | number;
 type KeyRef = Key | null | undefined;
 const isPersistent = (c: CompiledComponent<string, Record<string, any>>) =>
@@ -19,15 +18,14 @@ export function parse({
 }: ParseTraceWorkerParameters): ParseTraceWorkerReturnType {
   const parsed = parseComponents(
     trace?.render?.views?.[view]?.components ?? [],
-    trace?.render?.components ?? {}
+    trace?.render?.components ?? {},
   );
 
   const isVisible = (c: CompiledComponent<string, { alpha?: number }>) =>
     c && Object.hasOwn(c, "alpha") ? c!.alpha! > 0 : true;
 
   const makeEntryIteratee =
-    (step: number) =>
-    (component: CompiledComponent<string, Record<string, unknown>>) => {
+    (step: number) => (component: CompiledComponent<string, Record<string, unknown>>) => {
       return {
         component,
         meta: { source: "trace", step: from + step, info: component.$info },
@@ -37,7 +35,7 @@ export function parse({
   const r = _(
     trace?.events ?? [],
     (t) => t.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
-    (t) => groupBy(t, "id")
+    (t) => groupBy(t, "id"),
   );
 
   const steps = range(from, to)
@@ -54,7 +52,7 @@ export function parse({
             : esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0],
           event: e,
           events: esx,
-        })
+        }),
       );
       const persistent = component.filter(isPersistent);
       const transient = component.filter(negate(isPersistent));

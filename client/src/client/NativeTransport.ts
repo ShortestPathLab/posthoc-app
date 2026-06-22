@@ -5,10 +5,7 @@ import { internal } from "./internal";
 import { Transport, TransportEvents, TransportOptions } from "./Transport";
 import { EventEmitter } from "./EventEmitter";
 
-export class NativeTransport
-  extends EventEmitter<TransportEvents>
-  implements Transport
-{
+export class NativeTransport extends EventEmitter<TransportEvents> implements Transport {
   handler: Transport["call"];
   constructor(readonly options: TransportOptions) {
     super();
@@ -22,7 +19,7 @@ export class NativeTransport
 
   async call<T extends keyof NameMethodMap>(
     name: T,
-    params?: RequestOf<NameMethodMap[T]>["params"]
+    params?: RequestOf<NameMethodMap[T]>["params"],
   ): Promise<ResponseOf<NameMethodMap[T]>["result"]> {
     return await this.handler(name, params);
   }

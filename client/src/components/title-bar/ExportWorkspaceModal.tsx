@@ -10,10 +10,7 @@ import { ceil, entries, kebabCase, reduce } from "lodash-es";
 import { nanoid as id } from "nanoid";
 import { map } from "promise-tools";
 import { useMemo, useState } from "react";
-import {
-  CloudStorageProvider,
-  cloudStorageProviders,
-} from "services/cloud-storage";
+import { CloudStorageProvider, cloudStorageProviders } from "services/cloud-storage";
 import { useLoadingState } from "slices/loading";
 import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
@@ -31,13 +28,8 @@ const replacements = {
 
 function getFilename(name: string = "") {
   return (
-    kebabCase(
-      reduce(
-        entries(replacements),
-        (prev, [a, b]) => prev.replace(a, ` ${b} `),
-        name,
-      ),
-    ) || "untitled"
+    kebabCase(reduce(entries(replacements), (prev, [a, b]) => prev.replace(a, ` ${b} `), name)) ||
+    "untitled"
   );
 }
 
@@ -47,15 +39,10 @@ async function resizeImage(s: string) {
   const base64String = s.split(",")[1];
   if (!base64String) throw new Error("Invalid base64 image data");
 
-  const binaryData = Uint8Array.from(atob(base64String), (c) =>
-    c.charCodeAt(0),
-  );
+  const binaryData = Uint8Array.from(atob(base64String), (c) => c.charCodeAt(0));
 
   const a = await Jimp.read(binaryData.buffer);
-  const b =
-    a.width < a.height
-      ? a.resize({ w: imageSize })
-      : a.resize({ h: imageSize });
+  const b = a.width < a.height ? a.resize({ w: imageSize }) : a.resize({ h: imageSize });
   return await b
     .crop({
       x: (b.width - imageSize) / 2,
@@ -69,10 +56,7 @@ async function resizeImage(s: string) {
 export function ExportWorkspace({
   uploadFile,
 }: {
-  uploadFile?: CloudStorageProvider<
-    keyof typeof cloudStorageProviders,
-    unknown
-  >["saveFile"];
+  uploadFile?: CloudStorageProvider<keyof typeof cloudStorageProviders, unknown>["saveFile"];
 } & SurfaceContentProps) {
   const paper = usePaper();
   const fields = useOne(workspaceMeta);
@@ -82,10 +66,7 @@ export function ExportWorkspace({
   // const storage = useCloudStorageInstance();
   const workspaceSize = useMemo(() => estimateWorkspaceSize(), []);
   const [uploading, setUploading] = useState(false);
-  async function getFields(
-    size: number,
-    lastModified: number,
-  ): Promise<WorkspaceMeta> {
+  async function getFields(size: number, lastModified: number): Promise<WorkspaceMeta> {
     return {
       ...fields,
       id: id(),
@@ -113,9 +94,7 @@ export function ExportWorkspace({
           minRows={3}
           defaultValue={fields.description}
           size="small"
-          onChange={(e) =>
-            workspaceMeta.assign({ description: e.target.value })
-          }
+          onChange={(e) => workspaceMeta.assign({ description: e.target.value })}
           label="Description"
           fullWidth
           multiline
@@ -139,14 +118,10 @@ export function ExportWorkspace({
 
                 setUploading(true);
                 const { file } = await generateWorkspaceFile(name);
-                const posthocMetadata = JSON.stringify(
-                  await getFields(file.size, Date.now()),
-                );
-                const posthocMetaFile = new File(
-                  [posthocMetadata],
-                  `${name}.workspace.meta`,
-                  { type: "application/json" },
-                );
+                const posthocMetadata = JSON.stringify(await getFields(file.size, Date.now()));
+                const posthocMetaFile = new File([posthocMetadata], `${name}.workspace.meta`, {
+                  type: "application/json",
+                });
 
                 if (uploadFile) {
                   await uploadFile(posthocMetaFile);

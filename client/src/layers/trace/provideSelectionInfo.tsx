@@ -1,17 +1,6 @@
-import {
-  ArrowOutwardRounded,
-  DataObjectOutlined,
-} from "@mui-symbols-material/w400";
-import {
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Typography,
-} from "@mui/material";
-import {
-  PropertyDialog,
-  PropertyList,
-} from "components/inspector/PropertyList";
+import { ArrowOutwardRounded, DataObjectOutlined } from "@mui-symbols-material/w400";
+import { ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material";
+import { PropertyDialog, PropertyList } from "components/inspector/PropertyList";
 import { inferLayerName } from "layers";
 import { isUndefined, keyBy, last, map, negate, startCase } from "lodash-es";
 import { useMemo } from "react";
@@ -57,9 +46,7 @@ export const provideSelectionInfo = (({ layer: key, event, children }) => {
             items: {
               properties: {
                 index: -2,
-                primary: (
-                  <PropertyList event={event} vertical simple primitives />
-                ),
+                primary: <PropertyList event={event} vertical simple primitives />,
               },
               propertiesDetails: {
                 index: -1,
@@ -71,14 +58,8 @@ export const provideSelectionInfo = (({ layer: key, event, children }) => {
                         <ListItemIcon>
                           <DataObjectOutlined />
                         </ListItemIcon>
-                        <ListItemText sx={{ mr: 4 }}>
-                          See properties
-                        </ListItemText>
-                        <Typography
-                          component="div"
-                          variant="body2"
-                          color="text.secondary"
-                        >
+                        <ListItemText sx={{ mr: 4 }}>See properties</ListItemText>
+                        <Typography component="div" variant="body2" color="text.secondary">
                           Step {step}
                         </Typography>
                       </MenuItem>

@@ -14,11 +14,7 @@ export type NodeList2Props = {
 
 export type LazyNodeListProps = NodeListProps;
 
-export function NodeList({
-  nodes,
-  start = 0,
-  end: step = nodes?.length ?? 0,
-}: NodeListProps) {
+export function NodeList({ nodes, start = 0, end: step = nodes?.length ?? 0 }: NodeListProps) {
   const { renderer } = useRendererInstance();
   useEffect(() => {
     if (renderer && nodes?.length) {
@@ -46,10 +42,7 @@ export function LazyNodeList({ nodes, end }: LazyNodeListProps) {
   const threshold = floor((end ?? 0) / cacheSize) * cacheSize;
 
   const cached = useMemo(() => slice(nodes, 0, threshold), [nodes, threshold]);
-  const uncached = useMemo(
-    () => slice(nodes, threshold, (end ?? 0) + 1),
-    [nodes, threshold, end]
-  );
+  const uncached = useMemo(() => slice(nodes, threshold, (end ?? 0) + 1), [nodes, threshold, end]);
   return (
     <>
       {!!threshold && <NodeList nodes={cached} />}

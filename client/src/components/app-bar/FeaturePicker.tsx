@@ -1,10 +1,4 @@
-import {
-  ButtonProps,
-  Stack,
-  SxProps,
-  Typography as Type,
-  useTheme,
-} from "@mui/material";
+import { ButtonProps, Stack, SxProps, Typography as Type, useTheme } from "@mui/material";
 import { Select } from "components/generic/inputs/Select";
 import { Space } from "components/generic/Space";
 import { filter, find, map, startCase, truncate } from "lodash-es";
@@ -80,9 +74,7 @@ export function FeaturePicker({
         value: id,
         label: (
           <Stack
-            alignItems={
-              itemOrientation === "vertical" ? "flex-start" : "center"
-            }
+            alignItems={itemOrientation === "vertical" ? "flex-start" : "center"}
             direction={itemOrientation === "vertical" ? "column" : "row"}
           >
             <Type>

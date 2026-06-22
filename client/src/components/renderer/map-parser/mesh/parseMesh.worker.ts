@@ -13,29 +13,21 @@ export type ParseMeshWorkerParameters = {
   options: Options;
 };
 
-export type ParseMeshWorkerReturnType = Pick<
-  ParsedMap,
-  "log" | "bounds" | "nodes"
->;
+export type ParseMeshWorkerReturnType = Pick<ParsedMap, "log" | "bounds" | "nodes">;
 
-const minAt = (c: Record<string, number>[], index: string) =>
-  minBy(c, index)?.[index];
+const minAt = (c: Record<string, number>[], index: string) => minBy(c, index)?.[index];
 
-const maxAt = (c: Record<string, number>[], index: string) =>
-  maxBy(c, index)?.[index];
+const maxAt = (c: Record<string, number>[], index: string) => maxBy(c, index)?.[index];
 
 function aabb(verts: Point[]) {
   const [[minX, minY], [maxX, maxY]] = [minAt, maxAt].map((f) =>
-    ["x", "y"].map((i) => f(verts, i) ?? 0)
+    ["x", "y"].map((i) => f(verts, i) ?? 0),
   );
   const [width, height] = [maxX - minX, maxY - minY];
   return { width, height, minX, minY, maxX, maxY };
 }
 
-function parseMesh({
-  map: m,
-  options: { color = "#151d2f" },
-}: ParseMeshWorkerParameters) {
+function parseMesh({ map: m, options: { color = "#151d2f" } }: ParseMeshWorkerParameters) {
   const lines = m.split(/\r?\n/);
 
   const [, , counts, ...rest] = lines.filter(identity);
@@ -73,6 +65,6 @@ function parseMesh({
   };
 }
 
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<ParseMeshWorkerParameters>) => parseMesh(data)
+onmessage = usingMessageHandler(async ({ data }: MessageEvent<ParseMeshWorkerParameters>) =>
+  parseMesh(data),
 );

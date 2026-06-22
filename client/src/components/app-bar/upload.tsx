@@ -10,10 +10,7 @@ import { cast } from "utils/assert";
 
 const customId = "internal/custom";
 
-export const custom = (
-  resource?: Partial<Pick<Feature, "id" | "name">>,
-  name = "resource",
-) => ({
+export const custom = (resource?: Partial<Pick<Feature, "id" | "name">>, name = "resource") => ({
   name:
     resource?.id === customId
       ? `Imported ${startCase(name)} - ${resource?.name}`
@@ -31,9 +28,7 @@ export type FileHandle<T> = {
   read: () => Promise<T>;
 };
 
-export async function uploadTrace(): Promise<
-  FileHandle<UploadedTrace | undefined> | undefined
-> {
+export async function uploadTrace(): Promise<FileHandle<UploadedTrace | undefined> | undefined> {
   const f = await file({
     accept: EXTENSIONS.map((c) => `.${c}`),
     strict: true,
@@ -62,9 +57,7 @@ export function readUploadedTrace(f: File) {
           key: id(),
         };
       }
-      throw new Error(
-        `The file should have one of these extensions: ${FORMATS.join(", ")}`,
-      );
+      throw new Error(`The file should have one of these extensions: ${FORMATS.join(", ")}`);
     },
   };
 }
@@ -75,9 +68,7 @@ export function isTraceFormat(f: File) {
 
 export async function uploadMap(
   accept: FeatureDescriptor[],
-): Promise<
-  FileHandle<(FeatureDescriptor & { content?: string }) | undefined> | undefined
-> {
+): Promise<FileHandle<(FeatureDescriptor & { content?: string }) | undefined> | undefined> {
   const f = await file({
     accept: accept.map(({ id }) => `.${id}`),
     strict: true,

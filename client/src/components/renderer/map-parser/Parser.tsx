@@ -7,9 +7,7 @@ import { EditorSetterProps } from "components/Editor";
 
 export type MapParser = (map?: string, options?: any) => Promise<ParsedMap>;
 export type ParsedMapHydrator = (result: ParsedMap) => ParsedMap & MapUtils;
-export type MapEditor<Options> = (
-  map?: string
-) => Promise<FC<EditorSetterProps<Options>>>;
+export type MapEditor<Options> = (map?: string) => Promise<FC<EditorSetterProps<Options>>>;
 
 export type ParsedMap = {
   content?: string;

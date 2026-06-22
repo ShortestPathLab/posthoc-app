@@ -51,16 +51,10 @@ export function useTitleBar(color: string) {
     if (current !== target) {
       const mixed = interpolate([current, target])(0.5);
       requestAnimationFrame(() => {
-        document
-          .querySelector('meta[name="theme-color"]')!
-          .setAttribute("content", mixed);
+        document.querySelector('meta[name="theme-color"]')!.setAttribute("content", mixed);
         document.title = name;
         if (window.electron) {
-          window.electron.invoke(
-            "title-bar",
-            "#00000000",
-            getForegroundColor(mixed),
-          );
+          window.electron.invoke("title-bar", "#00000000", getForegroundColor(mixed));
         }
         setCurrent(mixed);
       });

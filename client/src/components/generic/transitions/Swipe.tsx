@@ -1,14 +1,7 @@
 import { useForkRef, useTheme } from "@mui/material";
 import { TransitionProps as MuiTransitionProps } from "@mui/material/transitions";
 import { get } from "lodash-es";
-import {
-  cloneElement,
-  CSSProperties,
-  ElementType,
-  isValidElement,
-  Ref,
-  useRef,
-} from "react";
+import { cloneElement, CSSProperties, ElementType, isValidElement, Ref, useRef } from "react";
 import { Transition } from "react-transition-group";
 import { EnterHandler, ExitHandler } from "react-transition-group/Transition";
 
@@ -30,10 +23,7 @@ interface TransitionProps {
   delay: string | undefined;
 }
 
-export function getTransitionProps(
-  props: ComponentProps1,
-  options: Options,
-): TransitionProps {
+export function getTransitionProps(props: ComponentProps1, options: Options): TransitionProps {
   const { timeout, easing, style = {} } = props;
 
   return {
@@ -97,11 +87,7 @@ const Swipe = (
   const handleRef = useForkRef(nodeRef, get(children, "ref"), ref);
 
   const normalizedTransitionCallback =
-    (
-      callback?:
-        | EnterHandler<HTMLElement | undefined>
-        | ExitHandler<HTMLElement | undefined>,
-    ) =>
+    (callback?: EnterHandler<HTMLElement | undefined> | ExitHandler<HTMLElement | undefined>) =>
     (maybeIsAppearing: boolean) => {
       if (callback) {
         const node = nodeRef.current;
@@ -118,26 +104,21 @@ const Swipe = (
 
   const handleEntering = normalizedTransitionCallback(onEntering);
 
-  const handleEnter = normalizedTransitionCallback(
-    (node: HTMLElement, isAppearing: boolean) => {
-      reflow(node); // So the animation always start from the start.
-      const transitionProps = getTransitionProps(
-        { style, timeout, easing },
-        {
-          mode: "enter",
-        },
-      );
+  const handleEnter = normalizedTransitionCallback((node: HTMLElement, isAppearing: boolean) => {
+    reflow(node); // So the animation always start from the start.
+    const transitionProps = getTransitionProps(
+      { style, timeout, easing },
+      {
+        mode: "enter",
+      },
+    );
 
-      node.style.transition = theme.transitions.create(
-        ["opacity", "transform"],
-        transitionProps,
-      );
+    node.style.transition = theme.transitions.create(["opacity", "transform"], transitionProps);
 
-      if (onEnter) {
-        onEnter(node, isAppearing);
-      }
-    },
-  );
+    if (onEnter) {
+      onEnter(node, isAppearing);
+    }
+  });
 
   const handleEntered = normalizedTransitionCallback(onEntered);
 
@@ -151,10 +132,7 @@ const Swipe = (
       },
     );
 
-    node.style.transition = theme.transitions.create(
-      ["opacity", "transform"],
-      transitionProps,
-    );
+    node.style.transition = theme.transitions.create(["opacity", "transform"], transitionProps);
 
     if (onExit) {
       onExit(node);

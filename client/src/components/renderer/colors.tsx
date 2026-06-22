@@ -1,22 +1,6 @@
-import {
-  amber,
-  blue,
-  deepPurple,
-  green,
-  orange,
-  pink,
-  red,
-} from "@mui/material/colors";
+import { amber, blue, deepPurple, green, orange, pink, red } from "@mui/material/colors";
 import { ColorTranslator } from "colortranslator";
-import {
-  entries,
-  keys,
-  lowerCase,
-  mapValues,
-  sortBy,
-  thru,
-  values,
-} from "lodash-es";
+import { entries, keys, lowerCase, mapValues, sortBy, thru, values } from "lodash-es";
 import { EventTypeColors } from "protocol";
 import { TraceEventType } from "protocol/Trace";
 import { AccentColor, accentColors, getShade } from "theme";
@@ -57,7 +41,7 @@ export const searchEventAliases = thru(
       for (const v1 of v) out[v1] = k;
     }
     return out;
-  }
+  },
 );
 
 export const colorsHex: EventTypeColors = {
@@ -70,14 +54,11 @@ export const colorsHex: EventTypeColors = {
   end: blue.A400,
 };
 
-export const colors: { [K in TraceEventType]: number } = mapValues(
-  colorsHex,
-  hex
-);
+export const colors: { [K in TraceEventType]: number } = mapValues(colorsHex, hex);
 
 export const shades = sortBy(
   keys(accentColors) as AccentColor[],
-  (c) => new ColorTranslator(getShade(c, "dark")).H
+  (c) => new ColorTranslator(getShade(c, "dark")).H,
 );
 
 export function getColor(key?: TraceEventType) {

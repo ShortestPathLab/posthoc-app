@@ -5,10 +5,7 @@ import { IPCWorker } from "workers";
 import { EventEmitter } from "./EventEmitter";
 import { Transport, TransportEvents, TransportOptions } from "./Transport";
 
-export class IPCTransport
-  extends EventEmitter<TransportEvents>
-  implements Transport
-{
+export class IPCTransport extends EventEmitter<TransportEvents> implements Transport {
   worker: IPCWorker;
   rpc: JSONRPCClient;
 
@@ -44,7 +41,7 @@ export class IPCTransport
 
   async call<T extends keyof NameMethodMap>(
     name: T,
-    params?: RequestOf<NameMethodMap[T]>["params"]
+    params?: RequestOf<NameMethodMap[T]>["params"],
   ): Promise<ResponseOf<NameMethodMap[T]>["result"]> {
     return await this.rpc.request(name, params);
   }

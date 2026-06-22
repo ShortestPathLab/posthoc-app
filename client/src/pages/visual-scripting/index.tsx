@@ -13,14 +13,7 @@ import { LayerPicker } from "components/generic/LayerPicker";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { FlowNode } from "components/visual-scripting/FlowNode";
 import { transforms } from "components/visual-scripting/NodeConfigs";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Layer, useLayerPicker } from "slices/layers";
 import { PageContentProps } from "../PageMeta";
 
@@ -76,8 +69,7 @@ export const VisualScriptingContext = createContext<{
   goToDefinition: () => {},
 });
 
-export const useVisualScriptingContext = () =>
-  useContext(VisualScriptingContext);
+export const useVisualScriptingContext = () => useContext(VisualScriptingContext);
 
 const nodeTypes = {
   flow: FlowNode,
@@ -208,7 +200,9 @@ export function VisualPage({ template: Page }: PageContentProps) {
               "& button": { minWidth: 0 },
             }}
           >
-            {tabs?.map?.((t) => <Tab label={`View: ${t}`} value={t} key={t} />)}
+            {tabs?.map?.((t) => (
+              <Tab label={`View: ${t}`} value={t} key={t} />
+            ))}
           </TabList>
         </Page.Options>
         <Page.Content>
@@ -232,10 +226,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
                         fitView
                       >
                         <Controls />
-                        <Background
-                          id={id}
-                          bgColor={theme.palette.background.paper}
-                        />
+                        <Background id={id} bgColor={theme.palette.background.paper} />
                       </ReactFlow>
                     </ReactFlowProvider>
                   )}
@@ -264,10 +255,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
                         },
                       }}
                       trigger={(state) => (
-                        <Button
-                          {...bindTrigger(state)}
-                          startIcon={<AddOutlined />}
-                        >
+                        <Button {...bindTrigger(state)} startIcon={<AddOutlined />}>
                           Add node
                         </Button>
                       )}
@@ -294,9 +282,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
                             .map((vs, group) => (
                               <>
                                 <MenuItem disabled>
-                                  <Typography variant="overline">
-                                    {startCase(group)}
-                                  </Typography>
+                                  <Typography variant="overline">{startCase(group)}</Typography>
                                 </MenuItem>
                                 {map(vs, ([k, v], i) => (
                                   <MenuItem
@@ -321,10 +307,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
                                       });
                                     }}
                                   >
-                                    <ListItemText
-                                      primary={v.title}
-                                      secondary={v.description}
-                                    />
+                                    <ListItemText primary={v.title} secondary={v.description} />
                                   </MenuItem>
                                 ))}
                               </>

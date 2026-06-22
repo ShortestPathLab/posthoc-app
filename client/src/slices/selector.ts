@@ -14,10 +14,7 @@ export function id<T, U = T>(
 }
 
 export type SelectorApi<T> = {
-  use: <R = T>(
-    selector?: (t: T) => R,
-    eq?: EqualityChecker<R | undefined>,
-  ) => R | undefined;
+  use: <R = T>(selector?: (t: T) => R, eq?: EqualityChecker<R | undefined>) => R | undefined;
   set: (m: Setter<T>) => void;
   get: <O = T>(selector?: (l: T) => O) => O | undefined;
 };
@@ -28,9 +25,7 @@ export type Transaction<T> = (u: T) => T | undefined | void;
 
 export type Setter<T> = Transaction<T> | T;
 
-export const createSelector = <Item extends { key: string }>(
-  store: StoreApi<Item[]>,
-) =>
+export const createSelector = <Item extends { key: string }>(store: StoreApi<Item[]>) =>
   (<T extends Item>(key?: string) => ({
     use: function useItem<R = T>(
       selector: (t: T) => R = identity,

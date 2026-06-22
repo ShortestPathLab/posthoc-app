@@ -1,8 +1,5 @@
 import { useSm } from "hooks/useSmallDisplay";
-import {
-  PopupState as State,
-  usePopupState,
-} from "material-ui-popup-state/hooks";
+import { PopupState as State, usePopupState } from "material-ui-popup-state/hooks";
 import { ReactElement, ReactNode } from "react";
 import { DrawerSurface } from "./DrawerSurface";
 import { DrawerTitle } from "./DrawerTitle";
@@ -45,8 +42,7 @@ export function SurfaceBase({
 }: SurfaceBaseProps) {
   const sm = useSm();
   const isPopover = popover && !sm;
-  const children =
-    typeof _children === "function" ? _children(state) : _children;
+  const children = typeof _children === "function" ? _children(state) : _children;
   const type = isPopover ? "popover" : "drawer";
   const SurfaceVariant = {
     drawer: DrawerSurface,
@@ -71,8 +67,6 @@ export function SurfaceBase({
     ),
     popover: children,
   }[type];
-  const element = (
-    <SurfaceVariant {...{ slotProps, state, children: childrenVariant }} />
-  );
+  const element = <SurfaceVariant {...{ slotProps, state, children: childrenVariant }} />;
   return <>{portal ? createPortal(element, portal) : element}</>;
 }

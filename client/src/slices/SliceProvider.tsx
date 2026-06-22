@@ -1,10 +1,5 @@
 import { flow, map, reduce } from "lodash-es";
-import {
-  cloneElement,
-  createElement,
-  FunctionComponent,
-  ReactNode,
-} from "react";
+import { cloneElement, createElement, FunctionComponent, ReactNode } from "react";
 
 type SliceProviderProps = {
   slices?: FunctionComponent[];
@@ -12,11 +7,7 @@ type SliceProviderProps = {
   children?: ReactNode;
 };
 
-export function SliceProvider({
-  slices,
-  children,
-  services = [],
-}: SliceProviderProps) {
+export function SliceProvider({ slices, children, services = [] }: SliceProviderProps) {
   return (
     <>
       {reduce(
@@ -27,10 +18,10 @@ export function SliceProvider({
           {map(services.toReversed(), (s, i) =>
             createElement(
               flow(s, (b) => b ?? null),
-              { key: i }
-            )
+              { key: i },
+            ),
           )}
-        </>
+        </>,
       )}
     </>
   );

@@ -1,11 +1,4 @@
-import {
-  Box,
-  Chip,
-  Switch,
-  TextField,
-  Tooltip,
-  Typography as Type,
-} from "@mui/material";
+import { Box, Chip, Switch, TextField, Tooltip, Typography as Type } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { Surface } from "components/generic/surface";
 import { SelectField as Select } from "components/generic/inputs/Select";
@@ -29,10 +22,7 @@ type RendererEditorProps = {
   onChange?: (e: Renderer) => void;
 };
 
-export function RendererEditor({
-  value,
-  onChange: onValueChange,
-}: RendererEditorProps) {
+export function RendererEditor({ value, onChange: onValueChange }: RendererEditorProps) {
   assert(value, "renderer is defined");
 
   const [renderers] = useRenderers();
@@ -44,11 +34,7 @@ export function RendererEditor({
     onValueChange?.(merge(value, next));
   }
 
-  const status = value.disabled
-    ? "disabled"
-    : current?.renderer
-      ? "connected"
-      : "error";
+  const status = value.disabled ? "disabled" : current?.renderer ? "connected" : "error";
 
   return (
     <Block alignItems="center" py={1}>
@@ -86,10 +72,7 @@ export function RendererEditor({
                   <>
                     <span>{current.renderer?.meta?.description}</span>
                     <br />
-                    <span>
-                      Contributes{" "}
-                      {join(current.renderer?.meta?.components, ", ")}
-                    </span>
+                    <span>Contributes {join(current.renderer?.meta?.components, ", ")}</span>
                   </>
                 </Type>
               )}
@@ -111,9 +94,7 @@ export function RendererEditor({
               size="small"
               label={startCase(status)}
             />
-            <Tooltip
-              title={`${value.disabled ? "Enable" : "Disable"} Renderer`}
-            >
+            <Tooltip title={`${value.disabled ? "Enable" : "Disable"} Renderer`}>
               <Switch
                 sx={{ mr: 0 }}
                 checked={!value.disabled}

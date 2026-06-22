@@ -1,7 +1,4 @@
-import {
-  ParsePolyWorkerParameters,
-  ParsePolyWorkerReturnType,
-} from "./parsePoly.worker";
+import { ParsePolyWorkerParameters, ParsePolyWorkerReturnType } from "./parsePoly.worker";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import parsePolyWorkerUrl from "./parsePoly.worker.ts?worker&url";
 

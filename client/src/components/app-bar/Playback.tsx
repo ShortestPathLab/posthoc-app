@@ -49,10 +49,7 @@ function usePlaybackServiceState(layer?: string) {
   };
 }
 
-export function PlaybackService({
-  children,
-  value,
-}: EditorSetterProps<Layer<PlaybackLayerData>>) {
+export function PlaybackService({ children, value }: EditorSetterProps<Layer<PlaybackLayerData>>) {
   const { playing, step = 0, end = 0 } = usePlaybackServiceState(value?.key);
 
   const { pause, stepWithBreakpointCheck } = usePlaybackControls(value?.key);
@@ -104,14 +101,8 @@ function usePlaybackControlsState(layer?: string) {
 }
 
 export function Playback({ layer }: { layer?: string }) {
-  const {
-    canPause,
-    canStepBackward,
-    canStepForward,
-    canStop,
-    playing,
-    canPlay,
-  } = usePlaybackControlsState(layer);
+  const { canPause, canStepBackward, canStepForward, canStop, playing, canPlay } =
+    usePlaybackControlsState(layer);
 
   const { pause, play, stepBackward, stepForward, findBreakpoint, stepTo } =
     usePlaybackControls(layer);
@@ -169,10 +160,7 @@ export function Playback({ layer }: { layer?: string }) {
 }
 
 export function useStep(layer?: string) {
-  return useOne(
-    slice.layers.one<Layer<PlaybackLayerData>>(layer),
-    computed("step"),
-  );
+  return useOne(slice.layers.one<Layer<PlaybackLayerData>>(layer), computed("step"));
 }
 
 function JumpToStep({ layer }: { layer?: string }) {
@@ -204,11 +192,7 @@ function JumpToStep({ layer }: { layer?: string }) {
               {step}
             </Typography>
           </Button>
-          <Popover
-            {...bindPopover(state)}
-            anchorOrigin={centered}
-            transformOrigin={centered}
-          >
+          <Popover {...bindPopover(state)} anchorOrigin={centered} transformOrigin={centered}>
             <TextField
               autoFocus
               onChange={(e) => setStepInput(e.target.value)}
@@ -218,9 +202,7 @@ function JumpToStep({ layer }: { layer?: string }) {
               slotProps={{
                 input: {
                   sx: { fontSize: "0.875rem" },
-                  startAdornment: (
-                    <InputAdornment position="start">Step</InputAdornment>
-                  ),
+                  startAdornment: <InputAdornment position="start">Step</InputAdornment>,
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
@@ -228,9 +210,7 @@ function JumpToStep({ layer }: { layer?: string }) {
                         label="Go"
                         size="small"
                         color="inherit"
-                        disabled={
-                          !parsedStepInputValid || parsedStepInput === step
-                        }
+                        disabled={!parsedStepInputValid || parsedStepInput === step}
                         onClick={() => {
                           stepTo(parsedStepInput);
                           state.close();
@@ -262,9 +242,7 @@ export function MinimisedPlaybackControls({ layer: key }: { layer?: string }) {
           <IconButton
             size="small"
             onClick={state.toggle}
-            label={
-              state.isOpen ? "Hide Playback Controls" : "Show Playback Controls"
-            }
+            label={state.isOpen ? "Hide Playback Controls" : "Show Playback Controls"}
             sx={{
               mx: -1,
               color: (t) => t.palette.text.secondary,

@@ -1,11 +1,4 @@
-import {
-  CircularProgress,
-  CssBaseline,
-  Fade,
-  Stack,
-  ThemeProvider,
-  useTheme,
-} from "@mui/material";
+import { CircularProgress, CssBaseline, Fade, Stack, ThemeProvider, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { SnackbarProvider } from "components/generic/Snackbar";
 import { Inspector } from "components/inspector";
@@ -80,10 +73,9 @@ function App() {
 }
 
 function ThemedApp() {
-  const {
-    "appearance/theme": mode = "dark",
-    "appearance/accentColor": accent = "teal",
-  } = useOne(slice.settings);
+  const { "appearance/theme": mode = "dark", "appearance/accentColor": accent = "teal" } = useOne(
+    slice.settings,
+  );
   const theme = useMemo(() => makeTheme(mode, accent), [mode, accent]);
   return (
     <ThemeProvider theme={theme}>

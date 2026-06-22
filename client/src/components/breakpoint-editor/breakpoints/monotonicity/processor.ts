@@ -3,11 +3,7 @@ import { TraceEvent } from "protocol";
 import { BreakpointProcessor } from "../Breakpoint";
 import { Fields } from "./Fields";
 
-export const processor: BreakpointProcessor<Fields> = async (
-  data,
-  trace,
-  trees
-) => {
+export const processor: BreakpointProcessor<Fields> = async (data, trace, trees) => {
   const { property } = data;
   const propertyValue = property ?? "f";
 

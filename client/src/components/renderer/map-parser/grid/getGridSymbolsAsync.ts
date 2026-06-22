@@ -1,8 +1,5 @@
 import { usingWorkerTask } from "workers/usingWorker";
-import {
-  GetGridSymbolsParameters,
-  GetGridSymbolsReturnType,
-} from "./getGridSymbols.worker";
+import { GetGridSymbolsParameters, GetGridSymbolsReturnType } from "./getGridSymbols.worker";
 import getGridSymbolsUrl from "./getGridSymbols.worker.ts?worker&url";
 
 export class GetGridSymbolsWorker extends Worker {

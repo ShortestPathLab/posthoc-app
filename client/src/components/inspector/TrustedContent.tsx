@@ -1,8 +1,4 @@
-import {
-  CheckOutlined,
-  DoneAllOutlined,
-  ShieldOutlined,
-} from "@mui-symbols-material/w400";
+import { CheckOutlined, DoneAllOutlined, ShieldOutlined } from "@mui-symbols-material/w400";
 import { Link, Stack } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
 import { ReactNode } from "react";
@@ -30,10 +26,7 @@ export function TrustedContent({ children }: { children?: ReactNode }) {
       secondary={`To enable custom views and advanced debugger features, you must trust this workspace first to allow third-party code to run.`}
       action={
         <Stack direction="column" gap={2} alignItems="center">
-          <Button
-            onClick={() => slice.ui.isTrusted.set(true)}
-            startIcon={<CheckOutlined />}
-          >
+          <Button onClick={() => slice.ui.isTrusted.set(true)} startIcon={<CheckOutlined />}>
             Trust this time
           </Button>
           {!!origin && (

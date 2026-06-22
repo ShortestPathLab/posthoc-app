@@ -7,10 +7,8 @@ export const parseToken = (token: string): Prop<any> => {
     f(
       new Proxy(normalize(ctx), {
         get(target, prop: string) {
-          return typeof target?.[prop] === "function"
-            ? target[prop]({})
-            : target?.[prop];
+          return typeof target?.[prop] === "function" ? target[prop]({}) : target?.[prop];
         },
-      })
+      }),
     );
 };

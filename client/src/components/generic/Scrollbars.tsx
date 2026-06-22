@@ -61,7 +61,7 @@ export function Scroll({
         }
       }
     },
-    [ref]
+    [ref],
   );
   return (
     <OverlayScrollbarsComponent

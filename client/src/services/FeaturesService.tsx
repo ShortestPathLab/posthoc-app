@@ -25,18 +25,12 @@ function withSource<T>(source: string) {
 
 const getFeatures = async ({ transport, url }: Connection) => {
   return _(
-    await mapAsync(
-      ["algorithms", "formats", "maps", "traces"] as const,
-      async (prop) => {
-        const { result } = await timed(
-          () => transport().call(`features/${prop}`),
-          1000
-        );
-        return { prop, result: map(result, withSource(url)) };
-      }
-    ),
+    await mapAsync(["algorithms", "formats", "maps", "traces"] as const, async (prop) => {
+      const { result } = await timed(() => transport().call(`features/${prop}`), 1000);
+      return { prop, result: map(result, withSource(url)) };
+    }),
     (v) => keyBy(v, "prop"),
-    (v) => mapValues(v, "result")
+    (v) => mapValues(v, "result"),
   ) as Features;
 };
 
@@ -66,9 +60,9 @@ export function FeaturesService() {
             const merged = _(features, values, (v) =>
               reduce(v, (prev, next) =>
                 mergeWith({}, prev, next, (obj, src) =>
-                  isArray(obj) ? uniqBy([...obj, ...src], "id") : undefined
-                )
-              )
+                  isArray(obj) ? uniqBy([...obj, ...src], "id") : undefined,
+                ),
+              ),
             );
             setFeatures(() => merged);
           }
@@ -83,7 +77,7 @@ export function FeaturesService() {
         }
       });
     },
-    [connections, getFeatures, setFeatures, loading]
+    [connections, getFeatures, setFeatures, loading],
   );
 
   return <></>;

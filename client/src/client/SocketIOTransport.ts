@@ -5,10 +5,7 @@ import { Socket, io } from "socket.io-client";
 import { EventEmitter } from "./EventEmitter";
 import { Transport, TransportEvents, TransportOptions } from "./Transport";
 
-export class SocketIOTransport
-  extends EventEmitter<TransportEvents>
-  implements Transport
-{
+export class SocketIOTransport extends EventEmitter<TransportEvents> implements Transport {
   client: JSONRPCClient;
   socket: Socket;
 
@@ -42,7 +39,7 @@ export class SocketIOTransport
 
   async call<T extends keyof NameMethodMap>(
     name: T,
-    params?: RequestOf<NameMethodMap[T]>["params"]
+    params?: RequestOf<NameMethodMap[T]>["params"],
   ): Promise<ResponseOf<NameMethodMap[T]>["result"]> {
     return await this.client.request(name, params);
   }

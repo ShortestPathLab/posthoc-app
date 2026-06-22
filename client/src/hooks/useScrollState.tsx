@@ -22,10 +22,7 @@ export function useScrollState(threshold: number = 128) {
           }
         }
         if (lastTop.current - target.scrollTop) {
-          if (
-            Math.abs(lastTop.current - target.scrollTop) > 2 &&
-            lastTop.current >= 0
-          ) {
+          if (Math.abs(lastTop.current - target.scrollTop) > 2 && lastTop.current >= 0) {
             setShowControls(lastTop.current > target.scrollTop);
           }
           lastTop.current = target.scrollTop;
@@ -37,11 +34,5 @@ export function useScrollState(threshold: number = 128) {
       };
     }
   }, [target, isTop, isAbsoluteTop, lastTop, threshold]);
-  return [
-    showControls || isTop,
-    isTop,
-    isAbsoluteTop,
-    target,
-    setTarget,
-  ] as const;
+  return [showControls || isTop, isTop, isAbsoluteTop, target, setTarget] as const;
 }

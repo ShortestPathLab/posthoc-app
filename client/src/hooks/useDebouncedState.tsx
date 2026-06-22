@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 export function useDebouncedState<T>(
   defaultValue: T,
   onChange: (v: T) => void = noop,
-  wait: number = 300
+  wait: number = 300,
 ) {
   const [state, setState] = useState(defaultValue);
   const head = useRef(now());
@@ -19,7 +19,7 @@ export function useDebouncedState<T>(
             head.current = commit;
           }
         },
-        { timeout: wait }
+        { timeout: wait },
       );
       setState(a);
     },
@@ -28,7 +28,7 @@ export function useDebouncedState<T>(
 export function useDebouncedState2<T>(
   defaultValue: T,
   onChange: (v: (prev: T) => T) => void = noop,
-  wait: number = 300
+  wait: number = 300,
 ) {
   const [state, setState] = useState(defaultValue);
   const head = useRef(now());
@@ -43,7 +43,7 @@ export function useDebouncedState2<T>(
             head.current = commit;
           }
         },
-        { timeout: wait }
+        { timeout: wait },
       );
       setState(a(state));
     },

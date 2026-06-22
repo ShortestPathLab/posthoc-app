@@ -14,9 +14,7 @@ export type Layer<T = Record<string, unknown>> = {
   viewKey?: string;
 };
 
-export type LayerGuard<T> = (
-  l: Layer<Record<string, unknown> | unknown>,
-) => l is Layer<T>;
+export type LayerGuard<T> = (l: Layer<Record<string, unknown> | unknown>) => l is Layer<T>;
 
 export const defaultGuard = ((l) => !!l) as LayerGuard<never>;
 
@@ -30,9 +28,7 @@ export const layers = store<Layer[]>([], {
 });
 
 export const WithLayer = createOne(layers.one);
-export function useLayers<T extends Record<string, unknown>>(
-  guard: LayerGuard<T> = defaultGuard,
-) {
+export function useLayers<T extends Record<string, unknown>>(guard: LayerGuard<T> = defaultGuard) {
   const all = useOne(layers, (c) => map(c, "key"), isEqual);
   const guarded = filter(all, (k) => {
     const l = layers.one(k).get();
@@ -50,8 +46,7 @@ export function useLayerPicker<T extends Record<string, unknown>>(
 
   // Set key to a default layer
   useEffect(() => {
-    if (guarded.length && (!key || !guarded.includes(key)))
-      setKey(head(guarded));
+    if (guarded.length && (!key || !guarded.includes(key))) setKey(head(guarded));
   }, [key, hash(guarded)]);
 
   // Reset key if layer was removed

@@ -45,10 +45,7 @@ export type Props<T> = {
   extras?: (value?: T) => ReactNode;
   items?: Item<T>[];
   addItemLabel?: ReactNode;
-  renderAddItem?: (
-    create: (c: Partial<T>) => void,
-    button: ReactElement
-  ) => ReactNode;
+  renderAddItem?: (create: (c: Partial<T>) => void, button: ReactElement) => ReactNode;
   addItemExtras?: ReactNode;
   sortable?: boolean;
   toggleable?: boolean;
@@ -166,7 +163,7 @@ export default function Editor<T extends { key: Key }>(props: Props<T>) {
                       autoFocus={autoFocus && item.id === last(xs)?.id}
                     />
                   </Collapse>
-                )
+                ),
               )}
               {provided.placeholder}
             </div>
@@ -213,10 +210,7 @@ function CustomAddItemButton<T>({
   render: (onAdd: (c?: Partial<T>) => void, button: ReactElement) => ReactNode;
   onAdd: (c?: Partial<T>) => void;
 }) {
-  return render(
-    onAdd,
-    <AddItemButton onClick={() => onAdd()}>{label}</AddItemButton>
-  );
+  return render(onAdd, <AddItemButton onClick={() => onAdd()}>{label}</AddItemButton>);
 }
 
 export function ListEditor<T extends { key: Key }>({
@@ -246,17 +240,15 @@ export function ListEditor<T extends { key: Key }>({
         onChange?.((xs) => void xs.push({ ...(create?.() as T), ...t, key }));
         defer(() => onFocus?.(key));
       }}
-      onDeleteItem={(k) =>
-        onChange?.((xs) => void pull(xs, find(xs, { key: k })))
-      }
+      onDeleteItem={(k) => onChange?.((xs) => void pull(xs, find(xs, { key: k })))}
       onChangeItem={(k, v) =>
         onChange?.(
           (xs) =>
             void set(
               xs,
               findIndex(xs, (x) => x.key === k),
-              v
-            )
+              v,
+            ),
         )
       }
       onChange={(k) => onChange?.(k)}

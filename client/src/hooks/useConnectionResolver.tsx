@@ -4,10 +4,7 @@ import { Connection, useConnections } from "slices/connections";
 
 export function useConnectionResolver() {
   const [connections] = useConnections();
-  return useCallback(
-    (model?: Partial<Connection>) => find(connections, model),
-    [connections]
-  );
+  return useCallback((model?: Partial<Connection>) => find(connections, model), [connections]);
 }
 
 export function useConnection(url: string) {

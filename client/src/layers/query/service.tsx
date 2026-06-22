@@ -38,16 +38,10 @@ export const service = withProduce(({ value, produce, onChange }) => {
         const { format } = mapLayer?.source?.map ?? {};
         const { content } = mapContent ?? {};
         if (format && content) {
-          const connection = await findConnection(
-            connections,
-            algorithm,
-            format,
-          );
+          const connection = await findConnection(connections, algorithm, format);
           const algorithmInfo = find(algorithms, { id: algorithm });
           if (connection) {
-            notify(
-              `Executing ${inferLayerName(value)} using ${connection.name}...`,
-            );
+            notify(`Executing ${inferLayerName(value)} using ${connection.name}...`);
             const args = {
               format,
               instances: [
@@ -59,9 +53,7 @@ export const service = withProduce(({ value, produce, onChange }) => {
               mapURI: `map:${encodeURIComponent(content)}` as const,
               algorithm,
             };
-            const result = await connection
-              .transport()
-              .call("solve/pathfinding", args);
+            const result = await connection.transport().call("solve/pathfinding", args);
             if (!signal.aborted) {
               produce((v) => {
                 set(v, "source.trace", {
@@ -79,17 +71,7 @@ export const service = withProduce(({ value, produce, onChange }) => {
         }
       }
     },
-    [
-      mapLayer,
-      connections,
-      algorithm,
-      start,
-      end,
-      produce,
-      notify,
-      value,
-      algorithms,
-    ],
+    [mapLayer, connections, algorithm, start, end, produce, notify, value, algorithms],
     [mapLayer, mapContent, connections, algorithm, start, end],
   );
   return <>{<TraceLayerService value={value} onChange={onChange} />}</>;

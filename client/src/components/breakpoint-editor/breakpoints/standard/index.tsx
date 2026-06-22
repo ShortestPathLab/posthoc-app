@@ -1,12 +1,7 @@
 import { map } from "lodash-es";
 import { BreakpointHandler } from "../Breakpoint";
 import { comparators } from "../../comparators";
-import {
-  ConditionSelect,
-  EventSelect,
-  PropertiesSelect,
-  ReferenceInput,
-} from "../../fields";
+import { ConditionSelect, EventSelect, PropertiesSelect, ReferenceInput } from "../../fields";
 import { Fields } from "./Fields";
 import { processor } from "./processor";
 
@@ -19,9 +14,7 @@ export const breakpointHandler: BreakpointHandler<"breakpoint", Fields> = {
     { key: "property", component: <PropertiesSelect /> },
     {
       key: "condition",
-      component: (
-        <ConditionSelect conditions={map(comparators, (v) => v.key)} />
-      ),
+      component: <ConditionSelect conditions={map(comparators, (v) => v.key)} />,
     },
     { key: "reference", component: <ReferenceInput /> },
   ],

@@ -31,20 +31,13 @@ export function ServerListEditor() {
           disabled: true,
         })}
         addItemExtras={
-          <FeaturePickerButton
-            icon={<ResetIcon />}
-            onClick={() => setRemote(() => defaultRemotes)}
-          >
+          <FeaturePickerButton icon={<ResetIcon />} onClick={() => setRemote(() => defaultRemotes)}>
             Reset
           </FeaturePickerButton>
         }
         onFocus={(key) => {
           const element = head(document.getElementsByClassName(key));
-          if (
-            element &&
-            "click" in element &&
-            typeof element.click === "function"
-          ) {
+          if (element && "click" in element && typeof element.click === "function") {
             element.click();
           }
         }}

@@ -11,9 +11,8 @@ const getUrl = (key: string) =>
 const getIcon = memo(async (key: string) => {
   if (!(key && isSanitised(key))) return;
   const response = await request.get({ path: getUrl(key), result: "text" });
-  const svg = (
-    new DOMParser().parseFromString(response, "image/svg+xml") as XMLDocument
-  ).firstChild as SVGElement;
+  const svg = (new DOMParser().parseFromString(response, "image/svg+xml") as XMLDocument)
+    .firstChild as SVGElement;
   svg.setAttribute("width", "100%");
   svg.setAttribute("height", "100%");
   svg.setAttribute("stroke-width", "16");
@@ -32,11 +31,7 @@ type LawniconProps = {
  * @see https://github.com/LawnchairLauncher/lawnicons
  */
 
-export const Lawnicon = ({
-  children,
-  color,
-  ...props
-}: LawniconProps & IconProps) => {
+export const Lawnicon = ({ children, color, ...props }: LawniconProps & IconProps) => {
   const [ref, setRef] = useState<HTMLSpanElement | null>(null);
   const b = (!!ref && getComputedStyle(ref)?.fontSize) ?? 24;
   const { result } = useAsync(() => getIcon(children), [children]);

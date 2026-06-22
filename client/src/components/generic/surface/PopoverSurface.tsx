@@ -20,18 +20,9 @@ export function PopoverSurface({
     <Popover
       onMouseDown={stopPropagation}
       onTouchStart={stopPropagation}
-      {...merge(
-        bindPopover(state),
-        { slotProps: { paper: { sx: acrylic } } },
-        slotProps?.popover
-      )}
+      {...merge(bindPopover(state), { slotProps: { paper: { sx: acrylic } } }, slotProps?.popover)}
     >
-      <Box
-        {...merge(
-          { sx: { width: 360, ...acrylic, ...paper(1) } },
-          slotProps?.paper
-        )}
-      >
+      <Box {...merge({ sx: { width: 360, ...acrylic, ...paper(1) } }, slotProps?.paper)}>
         {children}
       </Box>
     </Popover>

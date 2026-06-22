@@ -115,10 +115,7 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) =>
       },
     },
     shape: { borderRadius: 8 },
-    shadows: [
-      "none",
-      ...times(24, constant(shadow)),
-    ] as ThemeOptions["shadows"],
+    shadows: ["none", ...times(24, constant(shadow))] as ThemeOptions["shadows"],
   });
 
 export function useAcrylic(color?: string) {
@@ -127,8 +124,7 @@ export function useAcrylic(color?: string) {
     acrylic
       ? {
           backdropFilter: "blur(16px)",
-          background: ({ palette }) =>
-            alpha(color ?? palette.background.paper, 0.75),
+          background: ({ palette }) => alpha(color ?? palette.background.paper, 0.75),
         }
       : {
           backdropFilter: "blur(0px)",
@@ -141,12 +137,9 @@ export function usePaper() {
   return (elevation: number = 1) =>
     ({
       borderRadius: 1,
-      transition: ({ transitions }) =>
-        transitions.create(["background-color", "box-shadow"]),
+      transition: ({ transitions }) => transitions.create(["background-color", "box-shadow"]),
       boxShadow: ({ shadows, palette }) =>
-        palette.mode === "dark"
-          ? shadows[1]
-          : shadows[Math.max(floor(elevation) - 1, 0)],
+        palette.mode === "dark" ? shadows[1] : shadows[Math.max(floor(elevation) - 1, 0)],
       backgroundColor: ({ palette }) =>
         palette.mode === "dark"
           ? alpha(palette.action.disabledBackground, elevation * 0.02)

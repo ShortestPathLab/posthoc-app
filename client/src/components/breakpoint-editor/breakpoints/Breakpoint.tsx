@@ -39,12 +39,9 @@ export type BreakpointProcessorOutput = Promise<
 >;
 
 export type BreakpointProcessor<P extends KeyValueTuple> = (
-  data: Pipe<
-    P,
-    [Tuples.Map<MapKeyValueFn>, Tuples.ToUnion, Objects.FromEntries]
-  >,
+  data: Pipe<P, [Tuples.Map<MapKeyValueFn>, Tuples.ToUnion, Objects.FromEntries]>,
   trace: UploadedTrace,
-  trees: TreeDict
+  trees: TreeDict,
 ) => BreakpointProcessorOutput;
 type Field<K, R> = {
   key: K;
@@ -56,7 +53,7 @@ interface ToFieldsFn extends Fn {
 
 export type BreakpointHandler<
   T extends string = string,
-  P extends KeyValueTuple = KeyValueTuple
+  P extends KeyValueTuple = KeyValueTuple,
 > = {
   id: T;
   processor: BreakpointProcessor<P>;

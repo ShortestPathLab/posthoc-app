@@ -7,16 +7,11 @@ import { normalizeConstant } from "./normalize";
 import { parse as parseComponents } from "./parse";
 
 type C = CompiledComponent<string, Record<string, unknown>>;
-const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
-  x === undefined || x === null;
+const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> => x === undefined || x === null;
 type Key = string | number;
 type KeyRef = Key | null | undefined;
 const getPersistence = (c: C) =>
-  !c.clear
-    ? "persistent"
-    : typeof c.clear === "string"
-      ? "special"
-      : "transient";
+  !c.clear ? "persistent" : typeof c.clear === "string" ? "special" : "transient";
 type Persistence = ReturnType<typeof getPersistence>;
 function mergePrototype<T>(target: T, source: object) {
   Object.setPrototypeOf(target, source);
@@ -37,10 +32,7 @@ export function parse({
   from = 0,
   to = trace?.events?.length ?? 0,
 }: ParseTraceWorkerParameters): ParseTraceWorkerSlaveReturnType {
-  const parsed = parseComponents(
-    trace?.views?.[view] ?? [],
-    trace?.views ?? {}
-  );
+  const parsed = parseComponents(trace?.views?.[view] ?? [], trace?.views ?? {});
 
   const makeEntryIteratee = (step: number) => (component: C) => {
     return {
@@ -52,7 +44,7 @@ export function parse({
   const r = _(
     trace?.events ?? [],
     (r) => r.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
-    (r) => groupBy(r, "id")
+    (r) => groupBy(r, "id"),
   );
 
   return range(from, to)
@@ -75,9 +67,9 @@ export function parse({
                 event: e,
               },
             },
-            e
-          )
-        )
+            e,
+          ),
+        ),
       );
       return {
         event: e,

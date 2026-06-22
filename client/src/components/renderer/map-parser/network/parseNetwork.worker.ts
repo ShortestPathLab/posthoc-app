@@ -1,14 +1,4 @@
-import {
-  clamp,
-  first,
-  groupBy,
-  last,
-  mapValues,
-  maxBy,
-  mean,
-  minBy,
-  noop,
-} from "lodash-es";
+import { clamp, first, groupBy, last, mapValues, maxBy, mean, minBy, noop } from "lodash-es";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
@@ -26,20 +16,15 @@ export type ParseNetworkWorkerParameters = {
   options: Options;
 };
 
-export type ParseNetworkWorkerReturnType = Pick<
-  ParsedMap,
-  "log" | "bounds" | "nodes"
->;
+export type ParseNetworkWorkerReturnType = Pick<ParsedMap, "log" | "bounds" | "nodes">;
 
-const minAt = (c: Record<string, number>[], index: string) =>
-  minBy(c, index)?.[index];
+const minAt = (c: Record<string, number>[], index: string) => minBy(c, index)?.[index];
 
-const maxAt = (c: Record<string, number>[], index: string) =>
-  maxBy(c, index)?.[index];
+const maxAt = (c: Record<string, number>[], index: string) => maxBy(c, index)?.[index];
 
 function aabb(verts: Point[]) {
   const [[minX, minY], [maxX, maxY]] = [minAt, maxAt].map((f) =>
-    ["x", "y"].map((i) => f(verts, i) ?? 0)
+    ["x", "y"].map((i) => f(verts, i) ?? 0),
   );
   const [width, height] = [maxX - minX, maxY - minY];
   return { width, height, minX, minY, maxX, maxY };
@@ -69,12 +54,12 @@ function optimizeNetworkEdges(segments: number[][]) {
     const byHead = _(
       xs,
       (x) => groupBy(x, first),
-      (x) => mapValues(x, toSet)
+      (x) => mapValues(x, toSet),
     );
     const byTail = _(
       xs,
       (x) => groupBy(x, last),
-      (x) => mapValues(x, toSet)
+      (x) => mapValues(x, toSet),
     );
     const merged: Set<number[]> = new Set();
     for (const x of xs) {
@@ -137,13 +122,10 @@ function parseNetwork({
   return {
     bounds: ab,
     log: [
-      `${verts.length} vertices, ${pluralize(
-        "edge",
-        optimizedEdges.length,
-        true
-      )}, ${((optimizedEdges.length * 100) / (edges.length ?? 1)).toFixed(
-        2
-      )}% of original`,
+      `${verts.length} vertices, ${pluralize("edge", optimizedEdges.length, true)}, ${(
+        (optimizedEdges.length * 100) /
+        (edges.length ?? 1)
+      ).toFixed(2)}% of original`,
     ],
     nodes: optimizedEdges
       .map((points) => ({
@@ -159,7 +141,6 @@ function parseNetwork({
   };
 }
 
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<ParseNetworkWorkerParameters>) =>
-    parseNetwork(data)
+onmessage = usingMessageHandler(async ({ data }: MessageEvent<ParseNetworkWorkerParameters>) =>
+  parseNetwork(data),
 );

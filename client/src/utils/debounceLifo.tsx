@@ -13,7 +13,7 @@ import { debounce } from "lodash-es";
  */
 export function debounceLifo<T extends (...args: any[]) => Promise<any>>(
   f: T,
-  wait: number = 1000
+  wait: number = 1000,
 ): T {
   let isRunning = false;
   let scheduledArgs: Parameters<T> | null = null;

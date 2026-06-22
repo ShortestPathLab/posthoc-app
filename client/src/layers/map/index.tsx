@@ -12,17 +12,7 @@ import { useMapContent } from "hooks/useMapContent";
 import { useMapOptions } from "hooks/useMapOptions";
 import { useParsedMap } from "hooks/useParsedMap";
 import { LayerController, inferLayerName } from "layers";
-import {
-  entries,
-  get,
-  isUndefined,
-  keys,
-  map,
-  pick,
-  round,
-  set,
-  startCase,
-} from "lodash-es";
+import { entries, get, isUndefined, keys, map, pick, round, set, startCase } from "lodash-es";
 import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";
@@ -113,14 +103,7 @@ export const controller = {
               <Editor
                 value={value?.source?.options}
                 onChange={(v) =>
-                  produce(
-                    (prev) =>
-                      void set(
-                        prev,
-                        "source.options",
-                        v(prev.source?.options ?? {}),
-                      ),
-                  )
+                  produce((prev) => void set(prev, "source.options", v(prev.source?.options ?? {})))
                 }
               />
             ) : (
@@ -152,10 +135,7 @@ export const controller = {
   },
   service: withProduce(({ value, produce }) => {
     const { result: mapContent } = useMapContent(value?.source?.map);
-    const { result: parsedMap, loading } = useParsedMap(
-      mapContent,
-      value?.source?.options,
-    );
+    const { result: parsedMap, loading } = useParsedMap(mapContent, value?.source?.options);
     useEffectWhen(
       () => {
         if (!loading) {
@@ -176,9 +156,7 @@ export const controller = {
     const { parsedMap } = layer?.source ?? {};
     const { point, node } = useMemo(() => {
       if (parsedMap && event) {
-        const hydratedMap = getParser(layer?.source?.map?.format)?.hydrate?.(
-          parsedMap,
-        );
+        const hydratedMap = getParser(layer?.source?.map?.format)?.hydrate?.(parsedMap);
         if (hydratedMap) {
           const point = event?.world && hydratedMap.snap(event.world);
           if (point) {

@@ -1,16 +1,5 @@
 import EventEmitter from "eventemitter3";
-import {
-  filter,
-  find,
-  indexOf,
-  isEqual,
-  map,
-  min,
-  now,
-  sortBy,
-  throttle,
-  uniq,
-} from "lodash-es";
+import { filter, find, indexOf, isEqual, map, min, now, sortBy, throttle, uniq } from "lodash-es";
 import sysend from "sysend";
 
 export const instance = sysend.id;
@@ -18,8 +7,7 @@ export const instance = sysend.id;
 export const age = now();
 
 export const minimal = !!new URLSearchParams(location.search).get("minimal");
-export const channel =
-  new URLSearchParams(location.search).get("channel") || instance;
+export const channel = new URLSearchParams(location.search).get("channel") || instance;
 export const page = new URLSearchParams(location.search).get("page") || "";
 
 export const rpc = sysend.rpc({
@@ -69,13 +57,11 @@ export class SyncParticipant extends EventEmitter<"sync"> {
           }
         }
       };
-      const peers = filter(
-        await Promise.all(map(await sysend.list(), (p) => getChannel(p.id)))
-      );
+      const peers = filter(await Promise.all(map(await sysend.list(), (p) => getChannel(p.id))));
       const participants = filter(peers, { channel });
       const channels = sortBy(
         uniq([channel, ...map(peers, "channel")]),
-        (id) => find(peers, { id })?.age ?? age
+        (id) => find(peers, { id })?.age ?? age,
       );
       const new2 = {
         loading: false,

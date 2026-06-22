@@ -9,6 +9,6 @@ export function getValue(char: string) {
     gradient,
     (v) => split(v, ""),
     (v) => indexOf(v, char),
-    (n) => Math.max(n - 3, 0) / gradient.length
+    (n) => Math.max(n - 3, 0) / gradient.length,
   );
 }

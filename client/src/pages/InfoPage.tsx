@@ -35,10 +35,7 @@ export function InfoPage({ template: Page }: PageContentProps) {
                 {map(log, (l, i) => (
                   <div key={i}>
                     <ListItem>
-                      <ListItemText
-                        primary={l.content}
-                        secondary={l.timestamp}
-                      />
+                      <ListItemText primary={l.content} secondary={l.timestamp} />
                     </ListItem>
                     <Divider />
                   </div>

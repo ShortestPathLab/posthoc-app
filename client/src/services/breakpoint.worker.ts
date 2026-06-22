@@ -17,6 +17,4 @@ async function run({
   return await processor(inputs, trace, dict);
 }
 
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<any>) => await run(data)
-);
+onmessage = usingMessageHandler(async ({ data }: MessageEvent<any>) => await run(data));

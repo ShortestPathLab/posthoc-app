@@ -13,7 +13,7 @@ export const parse: MapParser = memo(
       map: m,
       options,
     }),
-  { normalizer: (args) => objectHash([...args]) }
+  { normalizer: (args) => objectHash([...args]) },
 );
 
 export const hydrate: ParsedMapHydrator = (result) => ({
@@ -26,12 +26,7 @@ export const hydrate: ParsedMapHydrator = (result) => ({
 
 // eslint-disable-next-line react/display-name
 export const editor: MapEditor<unknown> = async () => () => (
-  <Type
-    component="div"
-    variant="body2"
-    color="text.secondary"
-    sx={{ mb: 1, mt: 1 }}
-  >
+  <Type component="div" variant="body2" color="text.secondary" sx={{ mb: 1, mt: 1 }}>
     No options available.
   </Type>
 );

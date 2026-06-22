@@ -21,14 +21,12 @@ export const getSources = ((layer) => {
           ...mapValuesDeep(query, (t) =>
             typeof t === "string"
               ? t.length > maxStringPropLength
-                ? `${truncate(t, { length: maxStringPropLength })} (${
-                    t.length
-                  } characters)`
+                ? `${truncate(t, { length: maxStringPropLength })} (${t.length} characters)`
                 : t
-              : t
+              : t,
           ),
         },
-        { noCompatMode: true }
+        { noCompatMode: true },
       ),
     },
   ];

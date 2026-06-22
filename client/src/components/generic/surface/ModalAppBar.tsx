@@ -16,11 +16,7 @@ export function ModalAppBar({
   position = "sticky",
 }: ModalAppBarProps) {
   function renderTitle(label: ReactNode) {
-    return typeof label === "string" ? (
-      <AppBarTitle>{label}</AppBarTitle>
-    ) : (
-      label
-    );
+    return typeof label === "string" ? <AppBarTitle>{label}</AppBarTitle> : label;
   }
 
   return (

@@ -11,11 +11,7 @@ export function useOverlayWindowControls() {
       };
       navigator.windowControlsOverlay.addEventListener("geometrychange", f);
       f();
-      return () =>
-        navigator.windowControlsOverlay.removeEventListener(
-          "geometrychange",
-          f
-        );
+      return () => navigator.windowControlsOverlay.removeEventListener("geometrychange", f);
     }
   }, [setVisible]);
   return { visible, rect };

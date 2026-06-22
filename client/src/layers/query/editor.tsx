@@ -34,19 +34,12 @@ export const editor = withProduce(({ value, produce }) => {
               ...c,
               description: find(connections, { url: c.source })?.name,
             }))}
-            onChange={async (v) =>
-              produce((p) => void set(p, "source.algorithm", v))
-            }
+            onChange={async (v) => produce((p) => void set(p, "source.algorithm", v))}
           />
         }
       />
       {!algorithms?.length && (
-        <Type
-          component="div"
-          variant="body2"
-          color="warning.main"
-          sx={{ mb: 1 }}
-        >
+        <Type component="div" variant="body2" color="warning.main" sx={{ mb: 1 }}>
           No connected solver has declared support for running algorithms
         </Type>
       )}
@@ -63,14 +56,8 @@ export const editor = withProduce(({ value, produce }) => {
       />
       <WithLayer<Layer<MapLayerData>> layer={mapLayerKey}>
         {(l) => (
-          <Type
-            component="div"
-            variant="body2"
-            color="text.secondary"
-            sx={{ mb: 1, mt: 1 }}
-          >
-            Define source and destination nodes by clicking on valid regions on{" "}
-            {inferLayerName(l)}
+          <Type component="div" variant="body2" color="text.secondary" sx={{ mb: 1, mt: 1 }}>
+            Define source and destination nodes by clicking on valid regions on {inferLayerName(l)}
           </Type>
         )}
       </WithLayer>

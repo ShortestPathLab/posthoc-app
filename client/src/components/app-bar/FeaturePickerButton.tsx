@@ -22,8 +22,7 @@ export function FeaturePickerButton({
             sx={{
               ml: -0.5,
               color: "text.secondary",
-              opacity: (t) =>
-                props.disabled ? t.palette.action.disabledOpacity : 1,
+              opacity: (t) => (props.disabled ? t.palette.action.disabledOpacity : 1),
             }}
           />
         )
@@ -32,8 +31,7 @@ export function FeaturePickerButton({
       <Box
         sx={{
           color: "text.primary",
-          opacity: (t) =>
-            props.disabled ? t.palette.action.disabledOpacity : 1,
+          opacity: (t) => (props.disabled ? t.palette.action.disabledOpacity : 1),
         }}
       >
         {children}

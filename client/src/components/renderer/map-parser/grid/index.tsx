@@ -1,12 +1,4 @@
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  Popover,
-  Stack,
-  rgbToHex,
-  useTheme,
-} from "@mui/material";
+import { Box, Checkbox, FormControlLabel, Popover, Stack, rgbToHex, useTheme } from "@mui/material";
 import interpolate from "color-interpolate";
 import { EditorProps } from "components/Editor";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
@@ -39,7 +31,7 @@ export const parse: MapParser = memo(
       })),
     };
   },
-  { normalizer: (args) => objectHash([...args]) }
+  { normalizer: (args) => objectHash([...args]) },
 );
 
 export function SymbolColorPicker({
@@ -66,9 +58,7 @@ export function SymbolColorPicker({
                   borderRadius: 4,
                 }}
               />
-              {value
-                ? startCase(getClosestColor(value)?.name ?? "Custom")
-                : "Auto"}
+              {value ? startCase(getClosestColor(value)?.name ?? "Custom") : "Auto"}
             </Stack>
           </FeaturePickerButton>
           <Popover
@@ -84,9 +74,7 @@ export function SymbolColorPicker({
                 control={
                   <Checkbox
                     defaultChecked={!value}
-                    onChange={(_, checked) =>
-                      setValue?.(checked ? undefined : autoValue)
-                    }
+                    onChange={(_, checked) => setValue?.(checked ? undefined : autoValue)}
                   />
                 }
                 label="Choose Automatically"
@@ -120,7 +108,7 @@ export const editor: MapEditor<{
       const { palette } = useTheme();
       const gradient = flow(
         interpolate([palette.background.paper, palette.text.primary]),
-        rgbToHex
+        rgbToHex,
       );
       return (
         <>
@@ -131,9 +119,7 @@ export const editor: MapEditor<{
               content={
                 <SymbolColorPicker
                   value={value?.symbols?.[key]}
-                  autoValue={gradient(
-                    find(symbols, { symbol: key })?.value ?? 0
-                  )}
+                  autoValue={gradient(find(symbols, { symbol: key })?.value ?? 0)}
                   onChange={(v) =>
                     produce((prev) => {
                       set(prev, `symbols["${key}"]`, v);

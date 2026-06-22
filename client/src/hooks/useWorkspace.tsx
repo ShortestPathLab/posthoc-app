@@ -71,9 +71,7 @@ export function useWorkspace() {
     };
     const generateFile = async (raw?: boolean, name?: string) => {
       notify("Saving workspace...");
-      const content = JSON.stringify(
-        minimise(workspaceMeta.get(), slice.layers.get())
-      );
+      const content = JSON.stringify(minimise(workspaceMeta.get(), slice.layers.get()));
       const filename = name ?? id("-");
       if (raw) {
         const name = `${filename}.workspace.json`;
@@ -90,7 +88,7 @@ export function useWorkspace() {
         notify("Workspace saved", name);
         return {
           name,
-          content:compressed as Uint8Array<ArrayBuffer>,
+          content: compressed as Uint8Array<ArrayBuffer>,
           size: compressed.byteLength,
           type: "application/octet-stream",
         };
@@ -115,33 +113,24 @@ export function useWorkspace() {
               if (error) throw error;
               cast<Workspace | undefined>(parsed);
               if (!parsed) return;
-              for (const l of parsed?.layers?.layers ?? [])
-                setLayerSource(l, origin);
+              for (const l of parsed?.layers?.layers ?? []) setLayerSource(l, origin);
               slice.layers.set(parsed?.layers.layers);
               workspaceMeta.set(parsed?.UIState?.workspaceMeta ?? {});
               slice.ui.isTrusted.set(false);
             },
-            `Opening workspace (${formatByte(f.size)})`
+            `Opening workspace (${formatByte(f.size)})`,
           );
           return true;
         }
         return false;
       },
       save: async (raw?: boolean, name?: string) => {
-        const {
-          content,
-          size,
-          type,
-          name: filename,
-        } = await generateFile(raw, name);
+        const { content, size, type, name: filename } = await generateFile(raw, name);
         download(content, filename, type);
         return { name, size };
       },
       generateWorkspaceFile: async (suggestedName?: string) => {
-        const { content, name, type } = await generateFile(
-          false,
-          suggestedName
-        );
+        const { content, name, type } = await generateFile(false, suggestedName);
         return { file: new File([new Blob([content])], name, { type }) };
       },
       estimateWorkspaceSize: memo((raw?: boolean) => {

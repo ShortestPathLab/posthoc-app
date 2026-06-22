@@ -1,11 +1,4 @@
-import {
-  ListItemIcon,
-  Menu,
-  MenuItem,
-  TextField,
-  TextFieldProps,
-  Tooltip,
-} from "@mui/material";
+import { ListItemIcon, Menu, MenuItem, TextField, TextFieldProps, Tooltip } from "@mui/material";
 import { map } from "lodash-es";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { ReactElement, ReactNode } from "react";
@@ -65,9 +58,7 @@ export function Select<T extends string>({
                   }}
                 >
                   {icon && (
-                    <ListItemIcon
-                      sx={{ transform: "scale(0.8)", fontSize: 24 }}
-                    >
+                    <ListItemIcon sx={{ transform: "scale(0.8)", fontSize: 24 }}>
                       {icon}
                     </ListItemIcon>
                   )}
@@ -82,10 +73,7 @@ export function Select<T extends string>({
   );
 }
 
-export type SelectFieldProps<T extends string> = Pick<
-  SelectProps<T>,
-  "items" | "onChange"
-> &
+export type SelectFieldProps<T extends string> = Pick<SelectProps<T>, "items" | "onChange"> &
   Omit<TextFieldProps, "onChange">;
 
 export function SelectField<T extends string>(props: SelectFieldProps<T>) {

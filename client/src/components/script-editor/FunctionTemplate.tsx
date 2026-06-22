@@ -5,22 +5,15 @@ type TypeKeywordMap = {
   boolean: boolean;
 };
 
-export type TypeOf<T> = T extends keyof TypeKeywordMap
-  ? TypeKeywordMap[T]
-  : never;
+export type TypeOf<T> = T extends keyof TypeKeywordMap ? TypeKeywordMap[T] : never;
 
 export type KeywordOf<T> =
   | keyof {
-      [K in keyof TypeKeywordMap as T extends TypeKeywordMap[K]
-        ? K
-        : never]: TypeKeywordMap[K];
+      [K in keyof TypeKeywordMap as T extends TypeKeywordMap[K] ? K : never]: TypeKeywordMap[K];
     }
   | "any";
 
-export type FunctionTemplate<
-  Params extends [...unknown[]] = [],
-  ReturnType = void
-> = {
+export type FunctionTemplate<Params extends [...unknown[]] = [], ReturnType = void> = {
   name: string;
   description: string;
   params: {

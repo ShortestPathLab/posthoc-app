@@ -4,13 +4,7 @@ import { dump } from "js-yaml";
 import { take } from "lodash-es";
 import { Trace } from "protocol";
 
-export function TracePreview({
-  trace,
-  language = "yaml",
-}: {
-  trace?: Trace;
-  language?: string;
-}) {
+export function TracePreview({ trace, language = "yaml" }: { trace?: Trace; language?: string }) {
   return (
     <Box sx={{ width: "100%", height: "100%" }}>
       <ScriptViewer
@@ -23,7 +17,7 @@ export function TracePreview({
                   ...trace,
                   events: take(trace.events, 10),
                 },
-                { noCompatMode: true }
+                { noCompatMode: true },
               )
             : "No data"
         }

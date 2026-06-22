@@ -54,8 +54,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   const sources = useSources();
 
-  const { controls, onChange, state, dragHandle } =
-    useViewTreeContext<SourceLayerState>();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext<SourceLayerState>();
 
   const { result: instance } = useAsync(() => load(), []);
 
@@ -65,10 +64,8 @@ export function SourcePage({ template: Page }: PageContentProps) {
 
   const selected = useMemo(
     () =>
-      find(
-        sources,
-        (c) => c && c.source.id === state?.source && c.layer === state?.layer,
-      ) ?? first(sources),
+      find(sources, (c) => c && c.source.id === state?.source && c.layer === state?.layer) ??
+      first(sources),
     [sources, state?.source, state?.layer],
   );
   const handleEditorContentChange = useMemo(
@@ -83,11 +80,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
             produce(
               layer,
               async (l) =>
-                void (await getController(l)?.onEditSource?.(
-                  l,
-                  selected.source.id,
-                  value,
-                )),
+                void (await getController(l)?.onEditSource?.(l, selected.source.id, value)),
             ),
           );
           assert(!a.error, a.error!);
@@ -122,9 +115,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
                     onMount={(_, m) => setMonaco(m)}
                     // Refresh the editor when the id changes
                     key={`${selected?.layer}::${selected?.source?.id}`}
-                    theme={
-                      theme.palette.mode === "dark" ? "posthoc-dark" : "light"
-                    }
+                    theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
                     options={{
                       hover: { above: false },
                       fixedOverflowWidgets: true,

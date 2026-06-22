@@ -3,11 +3,7 @@ import { useEffect, useState } from "react";
 import { useAsyncAbortable } from "react-async-hook";
 import { usePrevious } from "react-use";
 
-export const useEffectWhen = <T, U>(
-  effect: () => void,
-  deps: T[],
-  watch: U[],
-) => {
+export const useEffectWhen = <T, U>(effect: () => void, deps: T[], watch: U[]) => {
   const prev = usePrevious(watch);
   return useEffect(() => {
     if (!allSame(watch, prev)) {
@@ -35,8 +31,5 @@ export const useEffectWhenAsync = <T, U>(
     }
   }, [deps, whenDeps, prevWhenDeps]);
 
-  return useAsyncAbortable<void, (T | U)[]>(effect, [
-    ...prevDeps,
-    ...prevWhenDeps,
-  ]);
+  return useAsyncAbortable<void, (T | U)[]>(effect, [...prevDeps, ...prevWhenDeps]);
 };

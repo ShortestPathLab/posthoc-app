@@ -11,13 +11,9 @@ import { id } from "slices/selector";
 import { BreakpointFieldProps } from "../breakpoints/Breakpoint";
 import { useOne } from "slices/useOne";
 
-export const EventSelect = ({
-  layer,
-  ...props
-}: BreakpointFieldProps<string>) => {
+export const EventSelect = ({ layer, ...props }: BreakpointFieldProps<string>) => {
   const one = slice.layers.one<Layer<DebugLayerData>>(layer);
-  const { steps } =
-    useOne(one, (l) => getController(l)?.steps?.(l), id("key")) ?? {};
+  const { steps } = useOne(one, (l) => getController(l)?.steps?.(l), id("key")) ?? {};
   const types = useMemo(() => _(steps, (v) => map(v, "type"), uniq), [steps]);
   return (
     <Select

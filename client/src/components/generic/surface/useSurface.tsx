@@ -9,7 +9,7 @@ export type SurfaceContentProps = {
 };
 export function useSurface<T>(
   Content?: (props: T & SurfaceContentProps) => ReactNode,
-  props: SurfaceProps = {}
+  props: SurfaceProps = {},
 ) {
   const popupState = usePopupState({ variant: "dialog" });
   const [state, setState] = useState<T & SurfaceContentProps>();

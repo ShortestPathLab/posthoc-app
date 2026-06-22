@@ -1,16 +1,7 @@
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { makePathIndex, Node } from "layers/trace/makePathIndex";
 import { TraceLayerData } from "layers/trace/TraceLayer";
-import {
-  find,
-  findLastIndex,
-  forEach,
-  forOwn,
-  groupBy,
-  isUndefined,
-  keys,
-  noop,
-} from "lodash-es";
+import { find, findLastIndex, forEach, forOwn, groupBy, isUndefined, keys, noop } from "lodash-es";
 import { useCallback } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
@@ -38,8 +29,7 @@ export const highlightNodesOptions = [
   {
     type: "backtracking",
     color: "cyan" satisfies AccentColor,
-    description:
-      "Show all events from the root to the currently selected event",
+    description: "Show all events from the root to the currently selected event",
   },
   {
     type: "precedent",
@@ -93,11 +83,7 @@ export function useHighlightNodes(key?: string): {
       const { getPath } = makePathIndex(trace);
       const path: number[] = getPath(step);
       setLayer((l) =>
-        set(
-          l,
-          "source.highlighting",
-          path.length > 1 ? { type: "backtracking", step, path } : {},
-        ),
+        set(l, "source.highlighting", path.length > 1 ? { type: "backtracking", step, path } : {}),
       );
     },
     [layer?.source?.highlighting, trace],
@@ -105,10 +91,7 @@ export function useHighlightNodes(key?: string): {
 
   const groupedTraceById = index(trace?.events, "index");
 
-  const getPrecedentEvents = (
-    root: Node,
-    visited = new Set<number | string>(),
-  ) => {
+  const getPrecedentEvents = (root: Node, visited = new Set<number | string>()) => {
     if (visited.has(root.step)) {
       return {};
     }
@@ -126,10 +109,7 @@ export function useHighlightNodes(key?: string): {
         const event = find(parent, (c) => c.step <= root!.step);
         if (event && !precedentTree[event.step]) {
           // Use lodash findLastIndex to make TypeScript happy
-          const index = findLastIndex(
-            trace?.events,
-            (e) => e?.id === event.pId,
-          );
+          const index = findLastIndex(trace?.events, (e) => e?.id === event.pId);
           if (!isUndefined(index) && index >= 0) {
             const pEvent = { ...trace?.events?.[index], step: index } as Node;
             precedentTree[pEvent.step] = getPrecedentEvents(pEvent, visited);
@@ -167,10 +147,7 @@ export function useHighlightNodes(key?: string): {
 
   const groupedTraceBypId = index(trace?.events, "index", "pId");
 
-  const getAllSubtreeNodes = (
-    root: Node,
-    visited = new Set<number | string>(),
-  ): Subtree => {
+  const getAllSubtreeNodes = (root: Node, visited = new Set<number | string>()): Subtree => {
     if (visited.has(root.id)) {
       return {};
     }

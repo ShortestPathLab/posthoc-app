@@ -3,11 +3,7 @@ import { slice } from "slices";
 import { useConnectionResolver } from "./useConnectionResolver";
 import { useOne } from "slices/useOne";
 
-export type ConnectionStatus =
-  | "connected"
-  | "connecting"
-  | "error"
-  | "not-connected";
+export type ConnectionStatus = "connected" | "connecting" | "error" | "not-connected";
 
 export function useConnectionsLoading() {
   return useOne(slice.loading, (l) => !!l.connections);

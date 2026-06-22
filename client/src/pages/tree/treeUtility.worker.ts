@@ -1,12 +1,4 @@
-import {
-  clone,
-  entries,
-  find,
-  forEach,
-  groupBy,
-  sumBy,
-  times,
-} from "lodash-es";
+import { clone, entries, find, forEach, groupBy, sumBy, times } from "lodash-es";
 import { arrayToTree } from "performant-array-to-tree";
 import { Trace, TraceEvent } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";
@@ -36,9 +28,7 @@ export function degreeSeparation(tree: EventTree, radius: number) {
   });
   function prune(node: EventTree, depth = startingDepth) {
     if (depth >= 0) {
-      forEach(node.children, (c) =>
-        prune(c, path.has(c.id) ? depth + 1 : depth - 1)
-      );
+      forEach(node.children, (c) => prune(c, path.has(c.id) ? depth + 1 : depth - 1));
     } else {
       node.children = [];
     }
@@ -90,10 +80,8 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
         id: k,
         name: k,
         events: v,
-        pId:
-          find(v, (s) => !!s.pId && s.step <= step)?.pId ||
-          find(v, (s) => !!s.pId)?.pId,
-      }))
+        pId: find(v, (s) => !!s.pId && s.step <= step)?.pId || find(v, (s) => !!s.pId)?.pId,
+      })),
   );
 
   const tree = arrayToTree(nodes, {
@@ -110,7 +98,7 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
       if (t.id != null) {
         idToNode[t.id] = t;
       }
-    }, tr)
+    }, tr),
   );
 
   forEach(tree, addChildCount);
@@ -132,6 +120,6 @@ export type TreeWorkerReturnType =
     }
   | undefined;
 
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<TreeWorkerParameters>) => parse(data)
+onmessage = usingMessageHandler(async ({ data }: MessageEvent<TreeWorkerParameters>) =>
+  parse(data),
 );

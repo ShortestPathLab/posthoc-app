@@ -64,7 +64,7 @@ export function AboutContent() {
               </ListItemButton>
             ))}
           </List>
-        </>
+        </>,
       )}
       {renderSection(
         "Resources",
@@ -80,13 +80,10 @@ export function AboutContent() {
               <ListItemIcon>
                 <GitHub />
               </ListItemIcon>
-              <ListItemText
-                primary="Repository"
-                secondary={parseUrl(repository)}
-              />
+              <ListItemText primary="Repository" secondary={parseUrl(repository)} />
             </ListItemButton>
           </List>
-        </>
+        </>,
       )}
     </Box>
   );

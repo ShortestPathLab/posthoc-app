@@ -99,7 +99,7 @@ function Scroller({ style, children, ref, ...rest }: ComponentProps<"div">) {
         }
       }
     },
-    [ref]
+    [ref],
   );
 
   return (

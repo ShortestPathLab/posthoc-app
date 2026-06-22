@@ -2,10 +2,7 @@ import { SegmentOutlined } from "@mui-symbols-material/w400";
 import { Stack, SxProps, Theme, useTheme } from "@mui/material";
 import { Playback } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";
-import {
-  LazyList as List,
-  LazyListHandle as ListHandle,
-} from "components/generic/LazyList";
+import { LazyList as List, LazyListHandle as ListHandle } from "components/generic/LazyList";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { flattenSubtree } from "hooks/useHighlight";
@@ -13,15 +10,7 @@ import { computed } from "hooks/usePlaybackState";
 import { Steps } from "layers";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController } from "layers/layerControllers";
-import {
-  filter,
-  findIndex,
-  isEqual,
-  isUndefined,
-  reduce,
-  sortBy,
-  uniq,
-} from "lodash-es";
+import { filter, findIndex, isEqual, isUndefined, reduce, sortBy, uniq } from "lodash-es";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { slice } from "slices";
 import { WithLayer } from "slices/layers";
@@ -43,22 +32,17 @@ export function PageContent({ layer: key }: { layer?: string }) {
   const paper = usePaper();
   const acrylic = useAcrylic();
   const ref = useRef<ListHandle | null>(null);
-  const [scrollerRef, setScrollerRef] = useState<HTMLElement | Window | null>(
-    null,
-  );
+  const [scrollerRef, setScrollerRef] = useState<HTMLElement | Window | null>(null);
 
-  const {
-    isViewTree,
-    state: { selectedType: _selectedType, showHighlighting } = {},
-  } = useViewTreeContext<StepsPageState>();
+  const { isViewTree, state: { selectedType: _selectedType, showHighlighting } = {} } =
+    useViewTreeContext<StepsPageState>();
 
   const one = slice.layers.one<StepsLayer>(key);
 
   const step = useOne(one, computed("step"));
   const playing = useOne(one, computed("playing"));
 
-  const { steps: rawSteps } =
-    useOne(one, (c) => getController(c)?.steps?.(c), id("key")) ?? {};
+  const { steps: rawSteps } = useOne(one, (c) => getController(c)?.steps?.(c), id("key")) ?? {};
 
   // TODO: low performance `isEqual`
   const highlighting = useOne(one, (c) => c?.source?.highlighting, isEqual);
@@ -80,11 +64,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
 
           const path = highlighting?.path;
 
-          const highlighted = path
-            ? path instanceof Array
-              ? path
-              : flattenSubtree(path)
-            : [];
+          const highlighted = path ? (path instanceof Array ? path : flattenSubtree(path)) : [];
 
           const highlightedSet = new Set(highlighted);
 
@@ -112,8 +92,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
           return {
             steps: filtered,
             stepToFilteredStep: (i: number) => stepMap[i],
-            isDisabled: (i: number) =>
-              isHighlighting ? !highlightedSet.has(i) : false,
+            isDisabled: (i: number) => (isHighlighting ? !highlightedSet.has(i) : false),
           };
         }
         return {};
@@ -127,8 +106,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
       if (playing) {
         let cancelled = false;
         const f = (timestamp: DOMHighResTimeStamp) => {
-          if (cancelled || !("scrollTop" in scrollerRef) || isUndefined(step))
-            return;
+          if (cancelled || !("scrollTop" in scrollerRef) || isUndefined(step)) return;
           const { scrollTop } = scrollerRef;
           const offset = i * ITEM_HEIGHT;
           ref.current?.scrollTo?.({
@@ -178,19 +156,11 @@ export function PageContent({ layer: key }: { layer?: string }) {
             <Placeholder
               icon={<SegmentOutlined />}
               label="Events"
-              secondary={
-                <WithLayer key={key}>
-                  {(l) => description(inferLayerName(l))}
-                </WithLayer>
-              }
+              secondary={<WithLayer key={key}>{(l) => description(inferLayerName(l))}</WithLayer>}
             />
           )
         ) : (
-          <Placeholder
-            icon={<SegmentOutlined />}
-            label="Events"
-            secondary={description()}
-          />
+          <Placeholder icon={<SegmentOutlined />} label="Events" secondary={description()} />
         )}
       </Block>
       {!!steps?.length && (

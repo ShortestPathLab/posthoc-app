@@ -1,9 +1,5 @@
 import { Edge, Node } from "@xyflow/react";
-import ELK, {
-  ElkExtendedEdge,
-  ElkNode,
-  LayoutOptions,
-} from "elkjs/lib/elk.bundled.js";
+import ELK, { ElkExtendedEdge, ElkNode, LayoutOptions } from "elkjs/lib/elk.bundled.js";
 
 const elk = new ELK();
 
@@ -19,11 +15,7 @@ const elkOptions: LayoutOptions = {
   "elk.spacing.nodeNode": "80",
 };
 
-export const getLayoutedElements = async (
-  nodes: Node[],
-  edges: Edge[],
-  o: LayoutOptions = {}
-) => {
+export const getLayoutedElements = async (nodes: Node[], edges: Edge[], o: LayoutOptions = {}) => {
   const options: LayoutOptions = { ...o, ...elkOptions };
   const graph: ElkNode = {
     id: "root",

@@ -39,7 +39,7 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
       debounce((next: Partial<Remote>) => {
         onChange?.(merge(value, next));
       }, 300),
-    [onChange, value]
+    [onChange, value],
   );
 
   return (
@@ -75,16 +75,10 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
                   }}
                 >
                   <Type component="div">
-                    {connection
-                      ? `${connection.name} ${connection.version}`
-                      : startCase(status)}
+                    {connection ? `${connection.name} ${connection.version}` : startCase(status)}
                   </Type>
                   {!!connection?.description && (
-                    <Type
-                      component="div"
-                      variant="body2"
-                      color="text.secondary"
-                    >
+                    <Type component="div" variant="body2" color="text.secondary">
                       {connection.description}
                     </Type>
                   )}
@@ -107,9 +101,7 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
                   label={startCase(status)}
                 />
               </Stack>
-              <Tooltip
-                title={`${value.disabled ? "Enable" : "Disable"} adapter`}
-              >
+              <Tooltip title={`${value.disabled ? "Enable" : "Disable"} adapter`}>
                 <Box>
                   <Switch
                     defaultChecked={!value.disabled}

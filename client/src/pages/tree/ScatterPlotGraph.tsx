@@ -3,10 +3,7 @@ import { MultiDirectedGraph } from "graphology";
 import { isEmpty } from "lodash-es";
 import { TraceEvent } from "protocol/Trace-v140";
 import { useEffect, useMemo, useRef } from "react";
-import AxisOverlay, {
-  createScatterScale,
-  createSymlogScatterScale,
-} from "./Axis";
+import AxisOverlay, { createScatterScale, createSymlogScatterScale } from "./Axis";
 import { SharedGraphProps } from "./SharedGraphProps";
 import { FocusedView, TreeControls } from "./TreeGraph";
 import { getScatterPlotUniqueId, useComputePlot } from "./useComputePlot";
@@ -18,9 +15,7 @@ const getScatterPlotGraphId = (step: number, event: TraceEvent): string =>
 const getScatterPlotGraphPId = (step: number, event: TraceEvent): string =>
   getScatterPlotUniqueId(event.pId, step);
 
-export function ScatterPlotGraph(
-  props: ScatterPlotGraphProps & SharedGraphProps,
-) {
+export function ScatterPlotGraph(props: ScatterPlotGraphProps & SharedGraphProps) {
   const {
     width = 1,
     height = 1,
@@ -106,17 +101,9 @@ export function ScatterPlotGraph(
   return (
     <>
       {!!plot && (
-        <AxisOverlay
-          processedData={plot}
-          width={width}
-          height={height}
-          logAxis={logAxis}
-        />
+        <AxisOverlay processedData={plot} width={width} height={height} logAxis={logAxis} />
       )}
-      <TreeControls
-        layer={layer}
-        isHighlightingEnabled={isHighlightingEnabled}
-      />
+      <TreeControls layer={layer} isHighlightingEnabled={isHighlightingEnabled} />
       <FocusedView {...props} />
     </>
   );

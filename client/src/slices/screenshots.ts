@@ -5,7 +5,7 @@ import { merge } from "./reducers";
 const removeUndefinedValues = <T extends Record<string, unknown>>(obj: T) =>
   omit(
     obj,
-    filter(keys(obj), (key) => isUndefined(obj[key]))
+    filter(keys(obj), (key) => isUndefined(obj[key])),
   );
 
 export const [useScreenshots, ScreenshotsProvider] = createSlice<
@@ -14,5 +14,5 @@ export const [useScreenshots, ScreenshotsProvider] = createSlice<
   {},
   {
     reduce: flow(merge, removeUndefinedValues),
-  }
+  },
 );

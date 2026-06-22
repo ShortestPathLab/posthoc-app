@@ -123,10 +123,7 @@ export function useComputePlot({
 }) {
   return useQuery({
     queryKey: ["compute/tree/plot/utility", key, xAxis, yAxis],
-    queryFn:
-      !!trace && !!xAxis && !!yAxis
-        ? async () => compute(trace, xAxis, yAxis)
-        : skipToken,
+    queryFn: !!trace && !!xAxis && !!yAxis ? async () => compute(trace, xAxis, yAxis) : skipToken,
     staleTime: Infinity,
   });
 }

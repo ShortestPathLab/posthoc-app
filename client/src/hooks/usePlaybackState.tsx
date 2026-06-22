@@ -21,11 +21,7 @@ function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
 const stepBy = (l: Layer<PlaybackLayerData>, n: number) => {
   const { playbackTo, step = 0 } = l?.source ?? {};
   const [start, end] = [0, (l?.source?.playbackTo ?? 1) - 1];
-  set(
-    l,
-    "source.step",
-    clamp((min([playbackTo ?? 0, step]) ?? 0) + n, start, end),
-  );
+  set(l, "source.step", clamp((min([playbackTo ?? 0, step]) ?? 0) + n, start, end));
 };
 
 type ComputedPlaybackLayerProperties = {
@@ -40,9 +36,7 @@ type ComputedPlaybackLayerProperties = {
   playing: boolean;
 };
 
-export function computed<T extends keyof ComputedPlaybackLayerProperties>(
-  k: T,
-) {
+export function computed<T extends keyof ComputedPlaybackLayerProperties>(k: T) {
   return (l?: Layer<PlaybackLayerData>) => {
     const { playback, playbackTo, step: _step } = l?.source ?? {};
 
@@ -73,10 +67,7 @@ export function usePlaybackControls(key?: string) {
   return useMemo(() => {
     const one = slice.layers.one<Layer<PlaybackLayerData>>(key);
 
-    function get<T extends keyof PlaybackLayerData>(
-      key: T,
-      fallback: PlaybackLayerData[T],
-    ) {
+    function get<T extends keyof PlaybackLayerData>(key: T, fallback: PlaybackLayerData[T]) {
       return (one.get((l) => l.source?.[key]) ?? fallback)!;
     }
 
@@ -131,16 +122,10 @@ export function usePlaybackControls(key?: string) {
           },
           ({ result, offset, error }) => {
             if (error) {
-              notify(
-                `${trimEnd(error, ".")}`,
-                `Step ${get("step", 0) + offset}`,
-              );
+              notify(`${trimEnd(error, ".")}`, `Step ${get("step", 0) + offset}`);
               pause();
             } else if (result) {
-              notify(
-                `Breakpoint hit: ${result}`,
-                `Step ${get("step", 0) + offset}`,
-              );
+              notify(`Breakpoint hit: ${result}`, `Step ${get("step", 0) + offset}`);
               pause(offset);
             } else tick(count);
           },

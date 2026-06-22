@@ -1,19 +1,6 @@
 /* eslint-disable react/display-name */
-import {
-  Box,
-  Card,
-  Checkbox,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import {
-  Handle,
-  NodeResizer,
-  Position,
-  type Node,
-  type NodeProps,
-} from "@xyflow/react";
+import { Box, Card, Checkbox, Stack, TextField, Typography } from "@mui/material";
+import { Handle, NodeResizer, Position, type Node, type NodeProps } from "@xyflow/react";
 import { useSurface } from "components/generic/surface";
 import * as React from "react";
 import { Fragment, useCallback } from "react";
@@ -37,9 +24,7 @@ export type ComponentNodeConfig = {
 
 type ConfigurableComponentNode = Node<FlowData<string, Properties>>;
 
-export function ConfigurableComponentNode(
-  props: NodeProps<ConfigurableComponentNode>
-) {
+export function ConfigurableComponentNode(props: NodeProps<ConfigurableComponentNode>) {
   const { fields, type, key } = props.data;
 
   return (

@@ -10,10 +10,7 @@ import {
   ParseTraceWorkerReturnType as ParseTraceWorkerLegacyReturnType,
 } from "../parser/ParseTraceSlaveWorker";
 import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
-import {
-  ParseTraceWorkerParameters,
-  ParseTraceWorkerReturnType,
-} from "./ParseTraceSlaveWorker";
+import { ParseTraceWorkerParameters, ParseTraceWorkerReturnType } from "./ParseTraceSlaveWorker";
 
 export class ParseTraceWorker extends Worker {
   constructor() {
@@ -39,7 +36,7 @@ export const parseTraceLegacyAsync = usingMemoizedWorkerTask<
 export function useTraceParser(
   params: ParseTraceWorkerParameters | ParseTraceWorkerLegacyParameters,
   trusted: boolean,
-  deps: any[]
+  deps: any[],
 ) {
   const push = useSnackbar();
   const usingLoadingState = useLoadingState("layers");
@@ -52,16 +49,9 @@ export function useTraceParser(
               try {
                 const output =
                   params.trace?.version === "1.4.0"
-                    ? await parseTraceAsync(
-                        params as ParseTraceWorkerParameters
-                      )
-                    : await parseTraceLegacyAsync(
-                        params as ParseTraceWorkerLegacyParameters
-                      );
-                push(
-                  "Trace loaded",
-                  pluralize("step", output?.stepsPersistent?.length ?? 0, true)
-                );
+                    ? await parseTraceAsync(params as ParseTraceWorkerParameters)
+                    : await parseTraceLegacyAsync(params as ParseTraceWorkerLegacyParameters);
+                push("Trace loaded", pluralize("step", output?.stepsPersistent?.length ?? 0, true));
                 return { components: output, content: params.trace };
               } catch (e) {
                 console.error(e);
@@ -71,10 +61,7 @@ export function useTraceParser(
             })
         : () =>
             usingLoadingState(async () => {
-              push(
-                "Trace loaded",
-                pluralize("step", params.trace?.events?.length ?? 0, true)
-              );
+              push("Trace loaded", pluralize("step", params.trace?.events?.length ?? 0, true));
               return {
                 content: params.trace,
                 components: {

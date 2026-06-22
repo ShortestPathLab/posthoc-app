@@ -36,7 +36,7 @@ function transformOne(component: TraceComponent<string, Record<string, any>>) {
 }
 
 type Compiled<T extends string> = (
-  context: Context
+  context: Context,
 ) => Compiled<T>[] | CompiledComponent<T, Record<string, any>>[];
 
 /**
@@ -47,27 +47,24 @@ type Compiled<T extends string> = (
  */
 export function parse<T extends IntrinsicComponentMap>(
   definition: ComponentDefinition<string, Record<string, any>>,
-  components: ComponentDefinitionMap
-): (
-  context: Context
-) => CompiledComponent<Extract<keyof T, string>, Record<string, any>>[] {
+  components: ComponentDefinitionMap,
+): (context: Context) => CompiledComponent<Extract<keyof T, string>, Record<string, any>>[] {
   const parseOne = (element: TraceComponent<string, Record<string, any>>) => {
     const { $ } = element;
     const scoped = transformOne(element);
     return $ in components
-      ? (context: Context) =>
-          flatMap(scoped(context), (elem) => flatMap(store[$], (f) => f(elem)))
+      ? (context: Context) => flatMap(scoped(context), (elem) => flatMap(store[$], (f) => f(elem)))
       : (context: Context) =>
           map(scoped(context), (elem) =>
             Object.setPrototypeOf(
               mapProperties(elem, (prop) => prop(elem)),
-              null
-            )
+              null,
+            ),
           );
   };
   const store: Record<string, Compiled<Extract<keyof T, string>>[]> = mapValues(
     components,
-    (elements) => map(elements, parseOne)
+    (elements) => map(elements, parseOne),
   );
   const entry = flatMap(definition, parseOne);
   return (context) => flatMap(entry, (e) => e(context));

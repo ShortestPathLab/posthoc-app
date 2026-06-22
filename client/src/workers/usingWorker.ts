@@ -54,7 +54,7 @@ export const usingMemoizedWorkerTask = <T, R>(
   o: memoize.Options<(t: T) => Promise<R>> = {
     async: true,
     length: 1,
-  }
+  },
 ) => memoize(usingWorkerTask(w), o);
 
 export const usingMessageHandler =

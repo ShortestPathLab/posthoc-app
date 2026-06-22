@@ -1,8 +1,6 @@
 import type { default as Monaco, languages } from "monaco-editor";
 
-export const languageConfig = (
-  monaco: typeof Monaco
-): languages.LanguageConfiguration => {
+export const languageConfig = (monaco: typeof Monaco): languages.LanguageConfiguration => {
   return {
     comments: {
       lineComment: "#",

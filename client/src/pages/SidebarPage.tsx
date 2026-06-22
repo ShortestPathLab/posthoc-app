@@ -28,9 +28,7 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
       }
     >
       <Block vertical>
-        <PageContent sx={{ bgcolor: bg }}>
-          {slotProps?.Content?.children}
-        </PageContent>
+        <PageContent sx={{ bgcolor: bg }}>{slotProps?.Content?.children}</PageContent>
         <Block sx={{ height: (t) => t.spacing(6) }}>
           <Block
             sx={{
@@ -55,10 +53,7 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
                 }}
               >
                 {/* {slotProps.Handle?.children} */}
-                <Typography
-                  component="div"
-                  sx={{ p: 1, color: "text.secondary" }}
-                >
+                <Typography component="div" sx={{ p: 1, color: "text.secondary" }}>
                   {slotProps.Title?.children}
                 </Typography>
                 {slotProps.Options?.children && (
@@ -76,12 +71,7 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
               }}
               size="small"
               sx={{ m: 1 }}
-              icon={
-                <FullscreenOutlined
-                  sx={{ color: "text.secondary" }}
-                  fontSize="small"
-                />
-              }
+              icon={<FullscreenOutlined sx={{ color: "text.secondary" }} fontSize="small" />}
               label="Maximise"
             />
           </Block>

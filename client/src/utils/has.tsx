@@ -11,7 +11,7 @@ export function has<
   K extends string,
   O extends {
     [K in string]: unknown;
-  }
+  },
 >(object: O, key: K): key is Extract<keyof O, K> {
   return key in object;
 }

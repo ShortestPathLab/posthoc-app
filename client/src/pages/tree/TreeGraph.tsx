@@ -22,14 +22,7 @@ import { Scroll } from "components/generic/Scrollbars";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
 import { highlightNodesOptions } from "hooks/useHighlight";
-import {
-  forOwn,
-  isEmpty,
-  isNull,
-  isUndefined,
-  pick,
-  startCase,
-} from "lodash-es";
+import { forOwn, isEmpty, isNull, isUndefined, pick, startCase } from "lodash-es";
 import { ReactNode, useEffect, useState } from "react";
 import { getShade, useAcrylic, usePaper } from "theme";
 import { SharedGraphProps } from "./SharedGraphProps";
@@ -64,9 +57,7 @@ export const orientationOptions = {
 
 export const isDefined = (a: unknown) => !isUndefined(a) && !isNull(a);
 
-export const divider = (
-  <Divider orientation="vertical" flexItem sx={{ m: 1 }} />
-);
+export const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 /**
  * @see https://colorbrewer2.org/#type=sequential&scheme=GnBu&n=9
@@ -102,8 +93,7 @@ export type EdgeType = { label: string };
 export function TreeGraph(props: TreeGraphProps) {
   const { trace, tree, layer: key } = props;
 
-  const [orientation, setOrientation] =
-    useState<keyof typeof orientationOptions>("vertical");
+  const [orientation, setOrientation] = useState<keyof typeof orientationOptions>("vertical");
 
   const load = useLoadGraph();
   const graph = useMultiDirectedGraph(trace, tree, orientation);
@@ -142,9 +132,7 @@ export function FocusedView(props: SharedGraphProps) {
   const isHighlightingEnabled = !isEmpty(highlightEdges);
 
   const bg = getShade(
-    highlightNodesOptions.find(
-      (highlight) => highlight.type === highlightEdges?.type,
-    )?.color,
+    highlightNodesOptions.find((highlight) => highlight.type === highlightEdges?.type)?.color,
     theme.palette.mode,
     500,
     400,
@@ -194,8 +182,7 @@ export function FocusedView(props: SharedGraphProps) {
               <Typography variant="overline">
                 {startCase(highlightEdges?.type)}{" "}
                 <Box sx={{ opacity: 0.7 }} component="span">
-                  <Dot color={getColorHex(event?.type)} />{" "}
-                  {startCase(event?.type)} {event?.id}
+                  <Dot color={getColorHex(event?.type)} /> {startCase(event?.type)} {event?.id}
                   {", "}
                   Step {highlightEdges?.step}{" "}
                 </Box>
@@ -269,9 +256,7 @@ export function TreeControls({
             <IconButtonWithTooltip
               color="primary"
               onClick={() => {
-                setOrientation?.(
-                  orientation === "vertical" ? "horizontal" : "vertical",
-                );
+                setOrientation?.(orientation === "vertical" ? "horizontal" : "vertical");
               }}
               label="Rotate"
               icon={<RotateIcon />}

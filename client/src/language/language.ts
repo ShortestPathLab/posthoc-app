@@ -9,18 +9,7 @@ export const language: languages.IMonarchLanguage = {
     { token: "delimiter.square", open: "[", close: "]" },
   ],
 
-  keywords: [
-    "true",
-    "True",
-    "TRUE",
-    "false",
-    "False",
-    "FALSE",
-    "null",
-    "Null",
-    "Null",
-    "~",
-  ],
+  keywords: ["true", "True", "TRUE", "false", "False", "FALSE", "null", "Null", "Null", "~"],
 
   numberInteger: /(?:0|[+-]?[0-9]+)/,
   numberFloat: /(?:0|[+-]?[0-9]+)(?:\.[0-9]+)?(?:e[-+][1-9][0-9]*)?/,
@@ -28,8 +17,7 @@ export const language: languages.IMonarchLanguage = {
   numberHex: /0x[0-9a-fA-F]+/,
   numberInfinity: /[+-]?\.(?:inf|Inf|INF)/,
   numberNaN: /\.(?:nan|Nan|NAN)/,
-  numberDate:
-    /\d{4}-\d\d-\d\d([Tt ]\d\d:\d\d:\d\d(\.\d+)?(( ?[+-]\d\d?(:\d\d)?)|Z)?)?/,
+  numberDate: /\d{4}-\d\d-\d\d([Tt ]\d\d:\d\d:\d\d(\.\d+)?(( ?[+-]\d\d?(:\d\d)?)|Z)?)?/,
 
   escapes: /\\(?:[btnfr\\"']|[0-7][0-7]?|[0-3][0-7]{2})/,
 
@@ -63,10 +51,7 @@ export const language: languages.IMonarchLanguage = {
       [/@numberDate(?![ \t]*\S+)/, "number.date"],
 
       // Key:Value pair
-      [
-        /(".*?"|'.*?'|[^#'"]*?)([ \t]*)(:)( |$)/,
-        ["type", "white", "operators", "white"],
-      ],
+      [/(".*?"|'.*?'|[^#'"]*?)([ \t]*)(:)( |$)/, ["type", "white", "operators", "white"]],
 
       { include: "@flowScalars" },
       [/^/, "string"],
@@ -172,12 +157,7 @@ export const language: languages.IMonarchLanguage = {
       [/./, "string"],
     ],
 
-    javascript: [
-      [
-        /\}\}/,
-        { token: "delimiter.template", next: "@pop", nextEmbedded: "@pop" },
-      ],
-    ],
+    javascript: [[/\}\}/, { token: "delimiter.template", next: "@pop", nextEmbedded: "@pop" }]],
 
     // Flow Collection: Flow Sequence
     array: [
@@ -216,17 +196,11 @@ export const language: languages.IMonarchLanguage = {
 
     // First line of a Block Style
     multiString: [
-      [
-        /^( +)(?=.+$)/,
-        { token: "string-multiline-header", next: "@multiStringFirst.$1" },
-      ],
+      [/^( +)(?=.+$)/, { token: "string-multiline-header", next: "@multiStringFirst.$1" }],
     ],
     multiStringFirst: [
       { include: "@templateStringBase" },
-      [
-        /^/,
-        { token: "string-multiline-first", next: "@multiStringContinued.$S2" },
-      ],
+      [/^/, { token: "string-multiline-first", next: "@multiStringContinued.$S2" }],
       [/./, "string"],
     ],
     // Further lines of a Block Style

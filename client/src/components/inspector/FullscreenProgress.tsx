@@ -1,9 +1,4 @@
-import {
-  Backdrop,
-  CircularProgress,
-  Stack,
-  Typography as Type,
-} from "@mui/material";
+import { Backdrop, CircularProgress, Stack, Typography as Type } from "@mui/material";
 import { values } from "lodash-es";
 import { useBusy } from "slices/busy";
 import { useAcrylic } from "theme";
@@ -25,12 +20,7 @@ export function FullscreenProgress() {
       <Stack alignItems="center" spacing={4}>
         <CircularProgress />
         {messages.map((v, message) => (
-          <Type
-            component="div"
-            key={message}
-            variant="body2"
-            color="textSecondary"
-          >
+          <Type component="div" key={message} variant="body2" color="textSecondary">
             {v}
           </Type>
         ))}

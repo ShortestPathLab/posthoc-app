@@ -52,10 +52,7 @@ export function SelectMulti<T extends string>({
                 }}
               >
                 <ListItemIcon>
-                  <Checkbox
-                    sx={{ p: 0 }}
-                    checked={!!(value?.[v] ?? defaultChecked)}
-                  />
+                  <Checkbox sx={{ p: 0 }} checked={!!(value?.[v] ?? defaultChecked)} />
                 </ListItemIcon>
                 {label}
               </MenuItem>

@@ -15,11 +15,7 @@ const makeKey = (id: string | number = "", condition: string | number = "") =>
   `${id}::::${condition}`;
 
 export const getPersistence = (c: C) =>
-  !c.clear
-    ? "persistent"
-    : typeof c.clear === "string"
-      ? "special"
-      : "transient";
+  !c.clear ? "persistent" : typeof c.clear === "string" ? "special" : "transient";
 
 const isVisible = ({ component: c }: ComponentEntry) =>
   c && Object.hasOwn(c, "alpha") ? get(c, "alpha")! > 0 : true;
@@ -38,7 +34,7 @@ const parseTraceWorker = usingWorkerTask<
     constructor() {
       super(parseTraceWorkerUrl, { type: "module" });
     }
-  }
+  },
 );
 
 async function parse({
@@ -58,9 +54,9 @@ async function parse({
           view,
           from: i,
           to: min(i + chunkSize, trace?.events?.length ?? 0),
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );
 
   const stack: Record<string, ComponentEntry[]> = {};
@@ -90,6 +86,5 @@ async function parse({
 }
 
 onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<ParseTraceWorkerParameters>) =>
-    await parse(data)
+  async ({ data }: MessageEvent<ParseTraceWorkerParameters>) => await parse(data),
 );

@@ -21,7 +21,7 @@ self.MonacoEnvironment = {
 
       return new editorWorker();
     },
-    { normalizer: ([, label]) => label }
+    { normalizer: ([, label]) => label },
   ),
 };
 

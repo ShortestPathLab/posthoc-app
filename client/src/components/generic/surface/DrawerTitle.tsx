@@ -6,19 +6,10 @@ import { AppBarTitle as Title } from "./AppBarTitle";
 
 export const drawerTitleHeight = 56;
 
-export function DrawerTitle({
-  children,
-  onClose,
-}: {
-  children?: ReactNode;
-  onClose?: () => void;
-}) {
+export function DrawerTitle({ children, onClose }: { children?: ReactNode; onClose?: () => void }) {
   const sm = useSm();
   return children ? (
-    <Stack
-      direction="row"
-      sx={{ px: sm ? 2 : 3, alignItems: "center", gap: 1, pb: 2 }}
-    >
+    <Stack direction="row" sx={{ px: sm ? 2 : 3, alignItems: "center", gap: 1, pb: 2 }}>
       <IconButton edge="start" onClick={onClose}>
         <CloseOutlined color="action" />
       </IconButton>

@@ -10,8 +10,6 @@ export function useRendererResolver(renderer?: string) {
   return {
     auto: autoRenderer,
     selected:
-      renderer && renderer !== "internal:auto"
-        ? renderer
-        : autoRenderer?.renderer?.meta?.id,
+      renderer && renderer !== "internal:auto" ? renderer : autoRenderer?.renderer?.meta?.id,
   };
 }

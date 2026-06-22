@@ -4,9 +4,5 @@ import { useOne } from "slices/useOne";
 import { TreeLayer } from "./TreeLayer";
 
 export function useHighlighting(key?: string) {
-  return useOne(
-    layers.one<TreeLayer>(key),
-    (l) => l.source?.highlighting,
-    isEqual,
-  );
+  return useOne(layers.one<TreeLayer>(key), (l) => l.source?.highlighting, isEqual);
 }

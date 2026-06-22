@@ -41,9 +41,5 @@ export type LayerController<K extends string = string, Data = never> = {
   >;
   getSources?: (layer?: Layer<Data>) => LayerSource[];
   compress?: (data?: Data) => any;
-  onEditSource?: (
-    layer: Layer<Data>,
-    id?: string,
-    content?: string,
-  ) => Promise<void>;
+  onEditSource?: (layer: Layer<Data>, id?: string, content?: string) => Promise<void>;
 };

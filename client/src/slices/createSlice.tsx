@@ -19,7 +19,7 @@ type Slice<T, U = T> = [
     /**
      * Whether to increment the current commit id.
      */
-    dontCommit?: boolean
+    dontCommit?: boolean,
   ) => void,
   /**
    * Whether the slice has been initialised.
@@ -39,14 +39,9 @@ type Options<T, U> = {
 
 export function createSlice<T, U = T>(
   initialState: T,
-  { init, effect, reduce = merge }: Options<T, U> = {}
+  { init, effect, reduce = merge }: Options<T, U> = {},
 ) {
-  const Store = createContext<Slice<T, U>>([
-    initialState,
-    noop,
-    false,
-    nanoid(),
-  ]);
+  const Store = createContext<Slice<T, U>>([initialState, noop, false, nanoid()]);
   return [
     // Hook
     () => useContext(Store),
@@ -69,11 +64,11 @@ export function createSlice<T, U = T>(
             set(next);
           }
         },
-        [get, reduceCommit]
+        [get, reduceCommit],
       );
       const slice = useMemo<Slice<T, U>>(
         () => [get(), reduceSlice, initialised, commit],
-        [get(), reduceSlice, initialised, commit]
+        [get(), reduceSlice, initialised, commit],
       );
       useAsync(async () => {
         const r = await init?.();

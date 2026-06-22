@@ -12,7 +12,7 @@ export function useSyncStatus() {
       participant.on("sync", cb);
       return () => participant.off("sync", cb);
     },
-    () => participant.current
+    () => participant.current,
   );
 }
 
@@ -24,10 +24,7 @@ export function SyncService() {
   const isFocused = useWindowFocus();
   const { isOnly, isPrimary, loading } = useSyncStatus();
   // Init query
-  useEffect(
-    () => void (!loading && !isOnly && sysend.broadcast("sync")),
-    [loading]
-  );
+  useEffect(() => void (!loading && !isOnly && sysend.broadcast("sync")), [loading]);
   // Init response
   useEffect(() => {
     if (loading) return;
@@ -44,18 +41,13 @@ export function SyncService() {
   // Broadcast
   useEffect(() => {
     if (isOnly) return;
-    return slice.layers.onChange((layers) =>
-      sysend.broadcast("update", { layers })
-    );
+    return slice.layers.onChange((layers) => sysend.broadcast("update", { layers }));
   }, [isOnly]);
   // Receive
   useEffect(() => {
     if (isOnly) return;
     if (isFocused) return;
-    const f = throttle(
-      ({ layers }: Data) => slice.layers.set(layers),
-      1000 / 24
-    );
+    const f = throttle(({ layers }: Data) => slice.layers.set(layers), 1000 / 24);
     sysend.on("update", f);
     return () => sysend.off("update", f);
   }, [isOnly, isFocused]);

@@ -1,0 +1,3 @@
+{
+  "ignorePatterns": ["dist", "public", "public-dev"]
+}

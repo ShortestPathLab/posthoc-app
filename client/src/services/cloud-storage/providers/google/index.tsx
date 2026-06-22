@@ -31,16 +31,12 @@ const googleUserInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
 const oauthTokenUrl = "https://oauth2.googleapis.com";
 type GoogleDriveFileList = { files: WorkspaceMeta[] };
 
-const getFilePath = (fileId: string) =>
-  `https://drive.google.com/uc?export=download&id=${fileId}`;
+const getFilePath = (fileId: string) => `https://drive.google.com/uc?export=download&id=${fileId}`;
 
 const isAuthenticated = (t: AuthState<unknown>): t is AuthState<string> =>
   !!t.authenticated && isString(t.accessToken);
 
-export const createGoogleStorageService: ProviderFactory<typeof id> = (
-  getState,
-  setState
-) => {
+export const createGoogleStorageService: ProviderFactory<typeof id> = (getState, setState) => {
   //
   // ─── Create Http Clients ─────────────────────────────────────────────
 
@@ -53,7 +49,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
     const state = await getState();
     assert(
       isAuthenticated(state),
-      new AuthError("User not authenticated (did you call initialise?)")
+      new AuthError("User not authenticated (did you call initialise?)"),
     );
     return { Authorization: `Bearer ${state.accessToken}` };
   };
@@ -63,10 +59,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
   const oauthClient = createClient(oauthTokenUrl, async () => {
     return {};
   });
-  const multiPartApiClient = createClient<HeaderOptions>(
-    driveMultiPartApiUrl,
-    getHeaders
-  );
+  const multiPartApiClient = createClient<HeaderOptions>(driveMultiPartApiUrl, getHeaders);
 
   // ─────────────────────────────────────────────────────────────────────
 
@@ -116,7 +109,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
             await setState({
               ...(await getState()),
               user: await getUserInfo(),
-            })
+            }),
         );
       }
     }
@@ -235,7 +228,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
               parents: [parentId],
             }),
           ],
-          { type: "application/json" }
+          { type: "application/json" },
         ),
         file,
       };
@@ -272,7 +265,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (
               return f.name!.startsWith(baseName) && !f.name!.endsWith(".meta");
             })?.id ?? null;
           return { ...metadata, id: posthocFileGoogleId };
-        }
+        },
       );
     },
     getFileLink: async (fileId: string) => {

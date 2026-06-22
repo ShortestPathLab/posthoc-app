@@ -1,5 +1,5 @@
 export async function resultAsync<A, E>(
-  f: () => Promise<A>
+  f: () => Promise<A>,
 ): Promise<{ result: A; error?: never } | { error: E; result?: never }> {
   try {
     return { result: await f() };
@@ -9,7 +9,7 @@ export async function resultAsync<A, E>(
 }
 
 export function result<A, E>(
-  f: () => A
+  f: () => A,
 ): { result: A; error?: never } | { error: E; result?: never } {
   try {
     return { result: f() };

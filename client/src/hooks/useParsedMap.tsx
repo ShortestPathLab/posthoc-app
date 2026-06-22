@@ -26,10 +26,7 @@ export function useParsedMap(map?: Map, options?: Record<string, any>) {
               ...options,
             })) ?? { nodes: [] };
 
-            notify(
-              "Map loaded",
-              `${parsedMap.nodes.length} elements, ${parsedMap.log.join(", ")}`
-            );
+            notify("Map loaded", `${parsedMap.nodes.length} elements, ${parsedMap.log.join(", ")}`);
             return { ...map, ...parsedMap };
           } catch (e) {
             console.error(e);
@@ -38,6 +35,6 @@ export function useParsedMap(map?: Map, options?: Record<string, any>) {
           }
         }
       }),
-    [format, content, theme, objectHash(options ?? {})]
+    [format, content, theme, objectHash(options ?? {})],
   );
 }

@@ -26,9 +26,7 @@ export function RenderLayer({
             height,
           }}
           label={`An error occurred with ${inferLayerName(layer)}`}
-          secondary={
-            "message" in error ? error.message : "Couldn't render your data"
-          }
+          secondary={"message" in error ? error.message : "Couldn't render your data"}
           onReset={resetErrorBoundary}
         />
       )}

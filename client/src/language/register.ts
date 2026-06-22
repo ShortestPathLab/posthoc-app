@@ -1,10 +1,5 @@
 import { flatMap, isUndefined, join, map, once } from "lodash-es";
-import {
-  MarkerSeverity,
-  type default as Monaco,
-  Range,
-  type editor,
-} from "monaco-editor";
+import { MarkerSeverity, type default as Monaco, Range, type editor } from "monaco-editor";
 import { registerMarkerDataProvider } from "monaco-marker-data-provider";
 import { configureMonacoYaml } from "monaco-yaml";
 import { map as mapAsync } from "promise-tools";
@@ -19,11 +14,7 @@ import posthocDts from "./posthoc.d.ts?raw";
 import { schema } from "./schema";
 import traceDts from "./trace.d.ts?raw";
 
-async function generateDts(
-  monaco: typeof Monaco,
-  model: editor.ITextModel,
-  id: string = "global"
-) {
+async function generateDts(monaco: typeof Monaco, model: editor.ITextModel, id: string = "global") {
   createFile(monaco, model, `${id}-trace-dts`, traceDts, ".d.ts");
   createFile(monaco, model, `${id}-posthoc-dts`, posthocDts, ".d.ts");
 }
@@ -76,16 +67,10 @@ export const register = once((monaco: typeof Monaco) => {
       const expr = getExpression(model, position);
       if (isUndefined(expr)) return { suggestions: [] };
       generateDts(monaco, model);
-      const { uri, worker, dispose } = await getInstance(
-        monaco,
-        model,
-        "completion",
-        expr.match
-      );
-      const suggestions = (await worker.getCompletionsAtPosition(
-        uri.toString(),
-        expr.at + 1
-      )) as CompletionInfo | undefined;
+      const { uri, worker, dispose } = await getInstance(monaco, model, "completion", expr.match);
+      const suggestions = (await worker.getCompletionsAtPosition(uri.toString(), expr.at + 1)) as
+        | CompletionInfo
+        | undefined;
       assert(suggestions, "suggestions is defined");
       const word = model.getWordUntilPosition(position);
       dispose();
@@ -93,16 +78,13 @@ export const register = once((monaco: typeof Monaco) => {
         suggestions: suggestions.entries.map((suggestion) => ({
           insertText: suggestion.name,
           sortText: suggestion.sortText,
-          kind: get(
-            completionItemKind,
-            suggestion.kind as keyof typeof completionItemKind
-          ),
+          kind: get(completionItemKind, suggestion.kind as keyof typeof completionItemKind),
           label: suggestion.name,
           range: new Range(
             position.lineNumber,
             word.startColumn,
             position.lineNumber,
-            word.endColumn
+            word.endColumn,
           ),
         })),
       };
@@ -114,16 +96,10 @@ export const register = once((monaco: typeof Monaco) => {
       const expr = getExpression(model, position);
       if (isUndefined(expr)) return { contents: [] };
       generateDts(monaco, model);
-      const { worker, uri, dispose } = await getInstance(
-        monaco,
-        model,
-        "hover",
-        expr.match
-      );
-      const info = (await worker.getQuickInfoAtPosition(
-        uri.toString(),
-        expr.at + 1
-      )) as QuickInfo | undefined;
+      const { worker, uri, dispose } = await getInstance(monaco, model, "hover", expr.match);
+      const info = (await worker.getQuickInfoAtPosition(uri.toString(), expr.at + 1)) as
+        | QuickInfo
+        | undefined;
       if (!info) return { contents: [] };
       dispose();
       return {
@@ -131,7 +107,7 @@ export const register = once((monaco: typeof Monaco) => {
           {
             value: `\`\`\`ts\n${join(
               map(info.displayParts, "text"),
-              ""
+              "",
             )}\n\`\`\`\n${join(map(info.documentation, "text"), "\n")}`,
           },
         ],
@@ -147,12 +123,7 @@ export const register = once((monaco: typeof Monaco) => {
       generateDts(monaco, model);
       const out = flatMap(
         await mapAsync(allMatches, async ({ value, line, column }) => {
-          const { worker, uri, dispose } = await getInstance(
-            monaco,
-            model,
-            "diagnostics",
-            value
-          );
+          const { worker, uri, dispose } = await getInstance(monaco, model, "diagnostics", value);
           const a = await worker.getSyntacticDiagnostics(uri.toString());
           const b = await worker.getSemanticDiagnostics(uri.toString());
           const c = await worker.getSuggestionDiagnostics(uri.toString());
@@ -163,7 +134,7 @@ export const register = once((monaco: typeof Monaco) => {
           map(diagnostics, (d) => ({
             diagnostic: d,
             source: rest,
-          }))
+          })),
       );
       return map(out, ({ diagnostic, source }) => ({
         severity: MarkerSeverity.Error,
@@ -172,8 +143,7 @@ export const register = once((monaco: typeof Monaco) => {
         startLineNumber: source.line,
         endLineNumber: source.line,
         startColumn: source.column + (diagnostic.start ?? 0),
-        endColumn:
-          source.column + (diagnostic.start ?? 0) + (diagnostic.length ?? 0),
+        endColumn: source.column + (diagnostic.start ?? 0) + (diagnostic.length ?? 0),
       }));
     },
   });

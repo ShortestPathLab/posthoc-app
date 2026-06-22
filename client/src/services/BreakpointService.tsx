@@ -21,10 +21,7 @@ import { set } from "utils/set";
 import { usingWorkerTask } from "workers/usingWorker";
 import workerUrl from "./breakpoint.worker.ts?worker&url";
 import { useOne } from "slices/useOne";
-async function attempt<T, U>(
-  f: () => Promise<T>,
-  c: (e: unknown) => U,
-): Promise<T | U> {
+async function attempt<T, U>(f: () => Promise<T>, c: (e: unknown) => U): Promise<T | U> {
   try {
     return await f();
   } catch (e) {
@@ -50,8 +47,7 @@ export const processBreakpointAsync = usingWorkerTask<
 >(BreakpointWorker);
 
 const processBreakpoint = memo(
-  (breakpoint, key, trace, tree, dict) =>
-    processBreakpointAsync({ breakpoint, trace, dict }),
+  (breakpoint, key, trace, tree, dict) => processBreakpointAsync({ breakpoint, trace, dict }),
   {
     normalizer: ([a, b]) => objectHash({ breakpoint: a, key: b }),
     primitive: true,
@@ -88,20 +84,11 @@ export function BreakpointService({ value }: { value?: string }) {
             if (signal.aborted) return;
             one.set(
               (l) =>
-                void set(
-                  l,
-                  `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
-                  res,
-                ),
+                void set(l, `source.breakpointOutput.${breakpoint.key as NonEmptyString}`, res),
             );
           } else {
             one.set(
-              (l) =>
-                void set(
-                  l,
-                  `source.breakpointOutput.${breakpoint.key as NonEmptyString}`,
-                  [],
-                ),
+              (l) => void set(l, `source.breakpointOutput.${breakpoint.key as NonEmptyString}`, []),
             );
           }
         }

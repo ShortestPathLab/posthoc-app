@@ -54,17 +54,14 @@ type FullscreenModalState = {
   depth?: number;
 };
 
-export type UIState = BusyState &
-  FullscreenModalState &
-  SidebarState &
-  TrustedState;
+export type UIState = BusyState & FullscreenModalState & SidebarState & TrustedState;
 
 export const workspaceMeta = store<WorkspaceMeta>(
   { id: id(), name: "", description: "", screenshots: [], author: "", size: 0 },
   {
     devtools: { enabled: import.meta.env.DEV },
     name: "workspace-meta",
-  }
+  },
 );
 
 export const UI = store<Required<UIState>>(
@@ -79,5 +76,5 @@ export const UI = store<Required<UIState>>(
   {
     devtools: { enabled: import.meta.env.DEV },
     name: "ui-state",
-  }
+  },
 );

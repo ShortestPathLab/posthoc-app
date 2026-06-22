@@ -16,17 +16,7 @@ import { Space } from "components/generic/Space";
 import { Surface } from "components/generic/surface";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController, getControllers } from "layers/layerControllers";
-import {
-  debounce,
-  head,
-  isEqual,
-  keys,
-  merge,
-  omit,
-  pick,
-  startCase,
-  truncate,
-} from "lodash-es";
+import { debounce, head, isEqual, keys, merge, omit, pick, startCase, truncate } from "lodash-es";
 import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
 import { slice } from "slices";
 import { Layer, WithLayer } from "slices/layers";
@@ -80,15 +70,10 @@ export function useDraft<T>(
   const [state, setState] = useState(initial);
   useEffect(() => {
     if (initial) {
-      requestIdleCallback(() =>
-        setState(merge({}, state, omit(initial, ...stayDraft))),
-      );
+      requestIdleCallback(() => setState(merge({}, state, omit(initial, ...stayDraft))));
     }
   }, [setState, initial]);
-  const handleChange = useMemo(
-    () => debounce((v: T) => commit?.(v), ms),
-    [commit, ms],
-  );
+  const handleChange = useMemo(() => debounce((v: T) => commit?.(v), ms), [commit, ms]);
   return [
     state,
     (value: (prev: T) => T) => {
@@ -111,12 +96,7 @@ function useLayerProperties(layer?: string) {
 
 export function Heading({ children }: { children: ReactNode }) {
   return (
-    <Type
-      component="div"
-      variant="overline"
-      color="text.secondary"
-      sx={{ pt: 1 }}
-    >
+    <Type component="div" variant="overline" color="text.secondary" sx={{ pt: 1 }}>
       {children}
     </Type>
   );
@@ -130,13 +110,7 @@ export function Label({ children }: { children: ReactNode }) {
   );
 }
 
-export function Option({
-  label,
-  option,
-}: {
-  label: ReactNode;
-  option: ReactNode;
-}) {
+export function Option({ label, option }: { label: ReactNode; option: ReactNode }) {
   return (
     <Block alignItems="center">
       <Label>{label}</Label>
@@ -155,10 +129,8 @@ const options = (a: string[]) =>
 export function LayerEditor({ layer: key }: LayerEditorProps) {
   const one = slice.layers.one(key);
   const layer = useLayerProperties(key);
-  const [
-    { name, transparency, displayMode, source: { type } = {} } = {},
-    setOptimistic,
-  ] = useOptimisticTransaction(layer!, (f) => idle(() => one.set(f), 1000));
+  const [{ name, transparency, displayMode, source: { type } = {} } = {}, setOptimistic] =
+    useOptimisticTransaction(layer!, (f) => idle(() => one.set(f), 1000));
 
   return (
     <Surface
@@ -182,18 +154,14 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               variant="filled"
               label="Layer Name"
               defaultValue={name ?? ""}
-              onChange={(e) =>
-                setOptimistic((d) => set(d, "name", e.target.value))
-              }
+              onChange={(e) => setOptimistic((d) => set(d, "name", e.target.value))}
             />
           )}
         </WithLayer>
         <Box sx={{ mx: -2, pb: 1 }}>
           <Tabs
             variant="fullWidth"
-            onChange={(_, v) =>
-              setOptimistic((d) => set(d, "source", { type: v }))
-            }
+            onChange={(_, v) => setOptimistic((d) => set(d, "source", { type: v }))}
             value={type ?? head(keys(getControllers())) ?? ""}
           >
             {keys(getControllers()).map((s) => (
@@ -227,9 +195,7 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               }))}
               value={transparency ?? "0"}
               arrow
-              onChange={(e) =>
-                setOptimistic((d) => set(d, "transparency", e as any))
-              }
+              onChange={(e) => setOptimistic((d) => set(d, "transparency", e as any))}
             />
           }
         />
@@ -242,9 +208,7 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               value={displayMode ?? "source-over"}
               items={options(compositeOperations)}
               onChange={(e) =>
-                setOptimistic((d) =>
-                  set(d, "displayMode", e as GlobalCompositeOperation),
-                )
+                setOptimistic((d) => set(d, "displayMode", e as GlobalCompositeOperation))
               }
             />
           }

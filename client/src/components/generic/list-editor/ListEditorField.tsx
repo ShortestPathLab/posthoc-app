@@ -4,14 +4,7 @@ import {
   DragHandleOutlined,
   EditOutlined as EditIcon,
 } from "@mui-symbols-material/w400";
-import {
-  Box,
-  ButtonBase,
-  IconButton,
-  InputBase,
-  Stack,
-  Switch,
-} from "@mui/material";
+import { Box, ButtonBase, IconButton, InputBase, Stack, Switch } from "@mui/material";
 import { ReactNode, useState } from "react";
 import { useAcrylic, usePaper } from "theme";
 import { Block } from "../Block";
@@ -22,34 +15,22 @@ import { ComponentProps, forwardRef } from "react";
 
 export const DefaultListEditorInput = forwardRef(function StyledInputBase(
   props: ComponentProps<typeof InputBase>,
-  ref
+  ref,
 ) {
-  return (
-    <InputBase
-      fullWidth
-      {...props}
-      placeholder="Untitled item"
-      inputRef={ref}
-    />
-  );
+  return <InputBase fullWidth {...props} placeholder="Untitled item" inputRef={ref} />;
 });
 type ListEditorFieldProps = {
   isPlaceholder?: boolean;
   i?: number;
 };
-const defaultEditorRenderer: Props<unknown>["renderEditor"] = ({
-  handle,
-  props,
-  extras,
-}) => (
+const defaultEditorRenderer: Props<unknown>["renderEditor"] = ({ handle, props, extras }) => (
   <>
     {handle}
     <DefaultListEditorInput {...props} />
     {extras}
   </>
 );
-export type ListEditorFieldProps1<T> = Props<T> &
-  ListEditorFieldProps & { item: Item<T> };
+export type ListEditorFieldProps1<T> = Props<T> & ListEditorFieldProps & { item: Item<T> };
 
 export function DraggableListItem<T extends { key: Key }>({
   toggleable,
@@ -125,10 +106,7 @@ function ListItem<T extends { key: Key }>({
   const acrylic = useAcrylic();
   const paper = usePaper();
   return (
-    <Box
-      component={button ? ButtonBase : "div"}
-      sx={{ width: "100%", textAlign: "left" }}
-    >
+    <Box component={button ? ButtonBase : "div"} sx={{ width: "100%", textAlign: "left" }}>
       <Stack
         direction="row"
         alignItems="center"

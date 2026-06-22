@@ -20,16 +20,14 @@ export function useMapContent(map?: Map) {
             const connection = resolve({ url: source });
             if (connection) {
               notify("Fetching map...");
-              const result = await connection
-                .transport()
-                .call("features/map", { id });
+              const result = await connection.transport().call("features/map", { id });
               return result?.content;
             }
           }
         },
-        { normalizer: (args) => objectHash([...args]) }
+        { normalizer: (args) => objectHash([...args]) },
       ),
-    [resolve, notify]
+    [resolve, notify],
   );
 
   const { content, source, id } = map ?? {};
@@ -43,6 +41,6 @@ export function useMapContent(map?: Map) {
             content: content ? content : await getMap({ source, id }),
           };
       }),
-    [getMap, content, source, id]
+    [getMap, content, source, id],
   );
 }

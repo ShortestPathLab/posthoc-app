@@ -14,7 +14,6 @@ function SurfaceDialogStub() {
   return <div>Dialog</div>;
 }
 
-
 type Data = {
   id: string;
   label?: string;
@@ -52,7 +51,7 @@ export function TextUpdaterNode(props: NodeProps<Data>) {
       position: { x: positionAbsoluteX ?? 0, y: positionAbsoluteY ?? 0 },
       type: props.type,
     }),
-    [id, data, positionAbsoluteX, positionAbsoluteY, props.type]
+    [id, data, positionAbsoluteX, positionAbsoluteY, props.type],
   );
 
   return (
@@ -72,10 +71,8 @@ export function TextUpdaterNode(props: NodeProps<Data>) {
         className="nodrag"
       />
 
-
       {/* Optional “inline” transformation menu (e.g. kebab menu) */}
       <TransformationMenu node={node} />
-
 
       {/* Handles — fixed the incorrect Position on the left handle */}
       <Handle type="source" position={Position.Top} id="top" />

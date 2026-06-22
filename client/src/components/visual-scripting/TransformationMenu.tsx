@@ -20,9 +20,7 @@ type TransformationMenuProps = {
   variable: string;
 };
 
-export default function TransformationMenu({
-  variable,
-}: TransformationMenuProps) {
+export default function TransformationMenu({ variable }: TransformationMenuProps) {
   const { dialog, open } = useSurface(FlowPopup, {
     title: `Value graph: ${variable}`,
     slotProps: {
@@ -73,10 +71,7 @@ function TransformationCanvas({ source }: TransformationCanvasProps) {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([source]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const onConnect = React.useCallback<OnConnect>(
-    (c) => setEdges((e) => addEdge(c, e)),
-    []
-  );
+  const onConnect = React.useCallback<OnConnect>((c) => setEdges((e) => addEdge(c, e)), []);
   const initialNodes = [source];
   const theme = useTheme();
   return (

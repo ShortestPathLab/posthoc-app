@@ -71,11 +71,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
                         {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
                         {primary && (
                           <ListItem sx={{ py: 0 }}>
-                            <Typography
-                              component="div"
-                              color="text.secondary"
-                              variant="overline"
-                            >
+                            <Typography component="div" color="text.secondary" variant="overline">
                               {primary}
                             </Typography>
                           </ListItem>
@@ -85,59 +81,43 @@ export function SelectionMenu({ selection, onClose }: Props) {
                           entries,
                           (v) => sortBy(v, ([, v]) => v.index),
                           (v) =>
-                            map(
-                              v,
-                              ([
-                                k,
-                                { action, icon, primary, secondary, extras },
-                              ]) => (
-                                <>
-                                  {!!(action || primary || secondary) &&
-                                    (action ? (
-                                      <MenuItem
-                                        key={k}
-                                        onClick={() => {
-                                          action?.();
-                                          onClose?.();
-                                        }}
+                            map(v, ([k, { action, icon, primary, secondary, extras }]) => (
+                              <>
+                                {!!(action || primary || secondary) &&
+                                  (action ? (
+                                    <MenuItem
+                                      key={k}
+                                      onClick={() => {
+                                        action?.();
+                                        onClose?.();
+                                      }}
+                                    >
+                                      {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                                      <ListItemText primary={primary} sx={{ mr: 4 }} />
+                                      <Typography
+                                        component="div"
+                                        variant="body2"
+                                        color="text.secondary"
                                       >
-                                        {icon && (
-                                          <ListItemIcon>{icon}</ListItemIcon>
-                                        )}
-                                        <ListItemText
-                                          primary={primary}
-                                          sx={{ mr: 4 }}
-                                        />
-                                        <Typography
-                                          component="div"
-                                          variant="body2"
-                                          color="text.secondary"
-                                        >
-                                          {secondary}
-                                        </Typography>
-                                      </MenuItem>
-                                    ) : (
-                                      <ListItem key={k}>
-                                        {icon && (
-                                          <ListItemIcon>{icon}</ListItemIcon>
-                                        )}
-                                        <ListItemText
-                                          primary={primary}
-                                          sx={{ mr: 4 }}
-                                        />
-                                        <Typography
-                                          component="div"
-                                          variant="body2"
-                                          color="text.secondary"
-                                        >
-                                          {secondary}
-                                        </Typography>
-                                      </ListItem>
-                                    ))}
-                                  {!!extras && extras}
-                                </>
-                              ),
-                            ),
+                                        {secondary}
+                                      </Typography>
+                                    </MenuItem>
+                                  ) : (
+                                    <ListItem key={k}>
+                                      {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                                      <ListItemText primary={primary} sx={{ mr: 4 }} />
+                                      <Typography
+                                        component="div"
+                                        variant="body2"
+                                        color="text.secondary"
+                                      >
+                                        {secondary}
+                                      </Typography>
+                                    </ListItem>
+                                  ))}
+                                {!!extras && extras}
+                              </>
+                            )),
                         )}
                       </>
                     )),
@@ -159,9 +139,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
 
 type SelectionInfoProviderProps = ComponentProps<SelectionInfoProvider>;
 
-const identity = ({ children }: SelectionInfoProviderProps) => (
-  <>{children?.({})}</>
-);
+const identity = ({ children }: SelectionInfoProviderProps) => <>{children?.({})}</>;
 
 function useSelectionMenu() {
   const layers = useOne(slice.layers, (s) =>
@@ -179,9 +157,7 @@ function useSelectionMenu() {
           // eslint-disable-next-line react/display-name
           return ({ children, event }: SelectionInfoProviderProps) => (
             <B layer={l.key} event={event}>
-              {(a: SelectionMenuContent) => (
-                <A event={event}>{(b) => children?.(merge(a, b))}</A>
-              )}
+              {(a: SelectionMenuContent) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}
             </B>
           );
         },

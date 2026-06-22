@@ -13,29 +13,21 @@ export type ParsePolyWorkerParameters = {
   options: Options;
 };
 
-export type ParsePolyWorkerReturnType = Pick<
-  ParsedMap,
-  "log" | "bounds" | "nodes"
->;
+export type ParsePolyWorkerReturnType = Pick<ParsedMap, "log" | "bounds" | "nodes">;
 
-const minAt = (c: Record<string, number>[], index: string) =>
-  minBy(c, index)?.[index];
+const minAt = (c: Record<string, number>[], index: string) => minBy(c, index)?.[index];
 
-const maxAt = (c: Record<string, number>[], index: string) =>
-  maxBy(c, index)?.[index];
+const maxAt = (c: Record<string, number>[], index: string) => maxBy(c, index)?.[index];
 
 function aabb(verts: Point[]) {
   const [[minX, minY], [maxX, maxY]] = [minAt, maxAt].map((f) =>
-    ["x", "y"].map((i) => f(verts, i) ?? 0)
+    ["x", "y"].map((i) => f(verts, i) ?? 0),
   );
   const [width, height] = [maxX - minX, maxY - minY];
   return { width, height, minX, minY, maxX, maxY };
 }
 
-function parsePoly({
-  map: m,
-  options: { color = "#151d2f" },
-}: ParsePolyWorkerParameters) {
+function parsePoly({ map: m, options: { color = "#151d2f" } }: ParsePolyWorkerParameters) {
   const lines = m.split(/\r?\n/);
 
   const [, counts, ...rest] = lines.filter(identity);
@@ -71,6 +63,6 @@ function parsePoly({
   };
 }
 
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<ParsePolyWorkerParameters>) => parsePoly(data)
+onmessage = usingMessageHandler(async ({ data }: MessageEvent<ParsePolyWorkerParameters>) =>
+  parsePoly(data),
 );

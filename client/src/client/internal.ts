@@ -30,11 +30,10 @@ const getFileInfo = memoizee(
       format: ext(k),
     };
   },
-  { normalizer: ([k]) => k }
+  { normalizer: ([k]) => k },
 );
 
-const getFiles = async () =>
-  await Promise.all(map(entries(paths), (e) => getFileInfo(...e)));
+const getFiles = async () => await Promise.all(map(entries(paths), (e) => getFileInfo(...e)));
 
 export function parseURI(uri: string) {
   const { protocol, pathname } = url(uri);

@@ -4,7 +4,7 @@ import { Fields } from "./Fields";
 // processor.ts
 export const processor: BreakpointProcessor<Fields> = async (
   data,
-  trace
+  trace,
 ): Promise<{ result: string; step: number }[] | { error: string }> => {
   const idSet = new Set();
   const violations: { step: number; result: string }[] = [];

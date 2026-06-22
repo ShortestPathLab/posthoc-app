@@ -6,8 +6,7 @@ import { processor } from "./processor";
 export const monotonicityHandler: BreakpointHandler<"monotonicity", Fields> = {
   id: "monotonicity",
   name: "Monotonicity",
-  description:
-    "Check if the values of a property are strictly increasing or decreasing",
+  description: "Check if the values of a property are strictly increasing or decreasing",
   fields: [
     { key: "property", component: <PropertiesSelect /> },
     {

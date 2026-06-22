@@ -115,11 +115,7 @@ type ScatterPlotTickGenerationArgs = {
 };
 
 // Dynamic tick generation based on zoom factor
-function createTicks({
-  bounds,
-  sigma,
-  logAxis,
-}: ScatterPlotTickGenerationArgs): {
+function createTicks({ bounds, sigma, logAxis }: ScatterPlotTickGenerationArgs): {
   xAxisTickValues: TickLabel[];
   yAxisTickValues: TickLabel[];
 } {
@@ -139,14 +135,8 @@ function createTicks({
   const zoomFactor = 1 / Math.max(ratio, 1e-10);
   const baseTickCount = 10;
 
-  const countX = Math.max(
-    2,
-    Math.min(100, Math.round(baseTickCount * zoomFactor)),
-  );
-  const countY = Math.max(
-    2,
-    Math.min(100, Math.round(baseTickCount * zoomFactor)),
-  );
+  const countX = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
+  const countY = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
 
   return {
     xAxisTickValues: xDataScale.ticks(countX).map((value) => ({
@@ -161,13 +151,7 @@ function createTicks({
 }
 
 // Draw arrow at the end of the lines
-function drawArrow(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  angle: number,
-  size = 8,
-) {
+function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, angle: number, size = 8) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);
@@ -185,12 +169,7 @@ function drawArrow(
 const X_AXIS_HEIGHT = 64;
 const Y_AXIS_WIDTH = 80;
 
-function AxisOverlay({
-  width,
-  height,
-  processedData,
-  logAxis,
-}: AxisOverlayProps) {
+function AxisOverlay({ width, height, processedData, logAxis }: AxisOverlayProps) {
   const theme = useTheme();
   const sigma = useSigma();
   const registerEvents = useRegisterEvents();
@@ -215,12 +194,7 @@ function AxisOverlay({
       ctx.fillRect(0, 0, Y_AXIS_WIDTH, height);
       ctx.fillRect(Y_AXIS_WIDTH, height - X_AXIS_HEIGHT, width, height);
 
-      if (
-        xMin === undefined ||
-        xMax === undefined ||
-        yMin === undefined ||
-        yMax === undefined
-      ) {
+      if (xMin === undefined || xMax === undefined || yMin === undefined || yMax === undefined) {
         return;
       }
 

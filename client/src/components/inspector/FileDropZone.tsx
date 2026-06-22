@@ -31,10 +31,10 @@ export function useFileImport() {
                   void l.push({
                     key: id(),
                     source: { type, ...layer },
-                  })
+                  }),
               );
             },
-            `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`
+            `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`,
           );
           totalClaimed++;
           continue;
@@ -44,9 +44,7 @@ export function useFileImport() {
     if (totalClaimed) return;
     const success = await loadWorkspace(head(fs));
     if (success) return;
-    notify(
-      `Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`
-    );
+    notify(`Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`);
   };
 }
 

@@ -1,9 +1,4 @@
-import {
-  BoxProps,
-  ModalProps,
-  PopoverProps,
-  SwipeableDrawerProps,
-} from "@mui/material";
+import { BoxProps, ModalProps, PopoverProps, SwipeableDrawerProps } from "@mui/material";
 import { ScrollProps } from "../Scrollbars";
 import { ModalAppBarProps } from "./ModalAppBar";
 

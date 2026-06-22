@@ -1,8 +1,4 @@
-import {
-  OpenInNewOutlined,
-  SearchOutlined,
-  WorkspacesOutlined,
-} from "@mui-symbols-material/w400";
+import { OpenInNewOutlined, SearchOutlined, WorkspacesOutlined } from "@mui-symbols-material/w400";
 import {
   alpha,
   Box,
@@ -82,9 +78,7 @@ const WorkspaceChip = () => {
   const color = getShade(shade, theme.palette.mode);
   return (
     <Tooltip
-      title={`${isPrimary ? "Primary" : "Secondary"} window, ${
-        participants.length + 1
-      } in group`}
+      title={`${isPrimary ? "Primary" : "Secondary"} window, ${participants.length + 1} in group`}
     >
       <Collapse
         in={!!peers.length}
@@ -128,11 +122,7 @@ export const TitleBarPlaceholder = () => {
       }}
     >
       {times(4, () => (
-        <Skeleton
-          variant="text"
-          animation={false}
-          sx={{ opacity: 0.5, width: 48 }}
-        />
+        <Skeleton variant="text" animation={false} sx={{ opacity: 0.5, width: 48 }} />
       ))}
     </Stack>
   );
@@ -293,12 +283,7 @@ export const TitleBar = () => {
                     { type: "divider" },
                     {
                       type: "action",
-                      name: (
-                        <MenuEntry
-                          label="Publish workspace"
-                          endIcon={<OpenInNewOutlined />}
-                        />
-                      ),
+                      name: <MenuEntry label="Publish workspace" endIcon={<OpenInNewOutlined />} />,
                       key: "workspace-save-metadata",
                       action: () => openModal({}),
                     },

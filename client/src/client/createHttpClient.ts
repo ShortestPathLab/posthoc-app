@@ -21,22 +21,15 @@ export type RequestOptions<T = string> = {
   body?: null | FormData | Record<string, unknown>;
 };
 
-type RequestHandler<
-  O extends Record<string, unknown> = Record<string, unknown>,
-> = {
+type RequestHandler<O extends Record<string, unknown> = Record<string, unknown>> = {
   (options: O & RequestOptions<"raw">): Response | Promise<Response>;
   (options: O & RequestOptions<"blob">): Promise<Blob>;
   (options: O & RequestOptions<"text">): Promise<string>;
   <R>(options: O & RequestOptions<"json">): Promise<R>;
 };
 
-type Key = Exclude<
-  Parameters<Overloads<RequestHandler>>[0]["result"],
-  undefined
->;
-type Result<K> = ReturnType<
-  Extract<Overloads<RequestHandler>, (o: RequestOptions<K>) => unknown>
->;
+type Key = Exclude<Parameters<Overloads<RequestHandler>>[0]["result"], undefined>;
+type Result<K> = ReturnType<Extract<Overloads<RequestHandler>, (o: RequestOptions<K>) => unknown>>;
 
 const extractions = {
   raw: (r) => r,
@@ -75,11 +68,9 @@ type Method = "get" | "post" | "put" | "delete" | "patch" | "head" | "options";
  * `ResponseCodeError` is thrown. If the promise rejects for any other reason,
  * an `Error` is thrown with the original error as the `cause` property.
  */
-export const createClient = <
-  O extends Record<string, unknown> = Record<string, unknown>,
->(
+export const createClient = <O extends Record<string, unknown> = Record<string, unknown>>(
   base: string,
-  getHeaders: (options: O & RequestOptions) => Promise<Record<string, string>>
+  getHeaders: (options: O & RequestOptions) => Promise<Record<string, string>>,
 ) =>
   new Proxy(
     (method: Method) =>
@@ -98,8 +89,8 @@ export const createClient = <
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify(body),
                     }
-                : {}
-            )
+                : {},
+            ),
           );
           console.log(`'${label}' returned with status ${response.status}`);
           if (!response.ok) throw new ResponseCodeError(response);
@@ -112,7 +103,7 @@ export const createClient = <
       },
     {
       get: (target, method: Method) => target(method),
-    }
+    },
   ) as unknown as { [K in Method]: RequestHandler<O> };
 
 export const request = createClient("", async () => ({}));

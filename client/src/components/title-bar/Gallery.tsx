@@ -1,11 +1,4 @@
-import {
-  Box,
-  Checkbox,
-  CircularProgress,
-  FormControlLabel,
-  Stack,
-  alpha,
-} from "@mui/material";
+import { Box, Checkbox, CircularProgress, FormControlLabel, Stack, alpha } from "@mui/material";
 import { Scroll } from "components/generic/Scrollbars";
 import { head, values } from "lodash-es";
 import { ReactNode, useEffect } from "react";
@@ -27,11 +20,7 @@ function Screenshot({
   }, [screenshot]);
   return renderScreenshot(result, loading);
 }
-export function Gallery({
-  onChange,
-}: {
-  onChange?: (screenshots: string[]) => void;
-}) {
+export function Gallery({ onChange }: { onChange?: (screenshots: string[]) => void }) {
   const paper = usePaper();
   const [screenshots] = useScreenshots();
   const [selected, { set, remove }] = useMap<{
@@ -72,16 +61,14 @@ export function Gallery({
                     "&:not(:last-child)": { pr: 1 },
                   }}
                 >
-                  <Box
-                    sx={{ position: "relative", ...paper(1), height: "100%" }}
-                  >
+                  <Box sx={{ position: "relative", ...paper(1), height: "100%" }}>
                     {!!screenshot && (
                       <Box
                         sx={{
                           backgroundImage: (t) =>
                             `linear-gradient(to bottom, ${alpha(
                               t.palette.background.paper,
-                              0.5
+                              0.5,
                             )}, transparent), url("${screenshot}")`,
                           width: "100%",
                           height: "100%",
@@ -106,9 +93,7 @@ export function Gallery({
                       />
                     </Box>
                     {loading && (
-                      <Box
-                        sx={{ position: "absolute", m: 2, top: 0, right: 0 }}
-                      >
+                      <Box sx={{ position: "absolute", m: 2, top: 0, right: 0 }}>
                         <CircularProgress />
                       </Box>
                     )}

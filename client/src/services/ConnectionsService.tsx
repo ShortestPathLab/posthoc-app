@@ -40,8 +40,7 @@ export function ConnectionsService() {
           }
           if (!aborted) setConnections(() => cs);
         }
-        if (!aborted)
-          notify(`Connected to ${cs.length} of ${remote.length} solvers`);
+        if (!aborted) notify(`Connected to ${cs.length} of ${remote.length} solvers`);
       }
     });
     return () => {

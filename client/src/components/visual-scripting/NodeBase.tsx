@@ -35,7 +35,7 @@ export function NodeBase({ items, width = 240 }: NodeBaseProps) {
         },
       ],
     }),
-    { y: 0, items: [] as T1[] }
+    { y: 0, items: [] as T1[] },
   );
   return (
     <>

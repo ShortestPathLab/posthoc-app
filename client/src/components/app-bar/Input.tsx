@@ -56,10 +56,7 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
                   notify("Opening map...");
                   const output =
                     f.file.size > LARGE_FILE_B
-                      ? await usingBusyState(
-                          f.read,
-                          `Opening map (${formatByte(f.file.size)})`,
-                        )
+                      ? await usingBusyState(f.read, `Opening map (${formatByte(f.file.size)})`)
                       : await f.read();
                   if (output) {
                     onChange?.(output);
@@ -79,10 +76,7 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
   );
 }
 
-export function TracePicker({
-  onChange,
-  value,
-}: EditorProps<UploadedTrace & { error?: string }>) {
+export function TracePicker({ onChange, value }: EditorProps<UploadedTrace & { error?: string }>) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("layers");
   const usingBusyState = useBusyState("layers");

@@ -40,12 +40,7 @@ export function FeaturePickerMulti({
       defaultChecked
       placeholder={startCase(label)}
       trigger={(props) => (
-        <FeaturePickerButton
-          {...props}
-          disabled={!items?.length}
-          icon={icon}
-          arrow={showArrow}
-        >
+        <FeaturePickerButton {...props} disabled={!items?.length} icon={icon} arrow={showArrow}>
           {truncate(buttonLabel, { length: ellipsis })}
         </FeaturePickerButton>
       )}

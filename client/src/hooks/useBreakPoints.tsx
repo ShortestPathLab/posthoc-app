@@ -16,10 +16,7 @@ export type DebugLayerData = {
   monotonicF?: boolean;
   monotonicG?: boolean;
   breakpoints?: Breakpoint[];
-  breakpointOutput?: Record<
-    string,
-    { step: number; result: string }[] | { error: string }
-  >;
+  breakpointOutput?: Record<string, { step: number; result: string }[] | { error: string }>;
   breakpointOutputDict: Record<string, { step: number; result: string }[]>;
   trace?: UploadedTrace;
 };
@@ -30,9 +27,7 @@ export function useBreakpoint3(key?: string) {
   return useMemo(() => {
     return {
       shouldBreak: (step: number): { result?: string; error?: string } =>
-        dict?.[step]?.length
-          ? { result: map(dict[step], "result").join(", ") }
-          : {},
+        dict?.[step]?.length ? { result: map(dict[step], "result").join(", ") } : {},
     };
   }, [dict]);
 }
@@ -83,10 +78,7 @@ export function useBreakPoints2(key?: string) {
   };
 }
 
-export function treeToDict(
-  trees: EventTree[] = [],
-  dict: TreeDict = {},
-): TreeDict {
+export function treeToDict(trees: EventTree[] = [], dict: TreeDict = {}): TreeDict {
   for (const tree of trees) {
     for (const event of tree.events) {
       dict[event.step] = tree;

@@ -2,11 +2,7 @@ import { useTheme } from "@mui/material";
 import interpolate from "color-interpolate";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
-import {
-  Highlighting,
-  highlightNodesOptions,
-  Subtree,
-} from "hooks/useHighlight";
+import { Highlighting, highlightNodesOptions, Subtree } from "hooks/useHighlight";
 import {
   forEach,
   forEachRight,
@@ -28,12 +24,7 @@ import { useMemo } from "react";
 import { AccentColor, getShade } from "theme";
 import { assert } from "utils/assert";
 import { makeEdgeKey } from "./makeEdgeKey";
-import {
-  isDefined,
-  setAttributes,
-  SEVEN_CLASS_GNBU,
-  TreeGraphProps,
-} from "./TreeGraph";
+import { isDefined, setAttributes, SEVEN_CLASS_GNBU, TreeGraphProps } from "./TreeGraph";
 import { useSigma } from "@react-sigma/core";
 
 const getGradient = memoizee(
@@ -117,53 +108,37 @@ export function useGraphColoring(
     const isSet: Record<string, boolean> = {};
 
     // Walk events up to current step and apply fading color
-    (showAllEdges ? forEach : forEachRight)(
-      slice(trace?.events, 0, step + 1),
-      (event, i) => {
-        const { type } = event;
-        const graphId = getGraphId(i, event);
-        const graphPId = getGraphPId(i, event);
-        const strength = isHighlightEdges
-          ? 0.1
-          : max([1 - (step - i) / pastSteps, 0.3])!;
+    (showAllEdges ? forEach : forEachRight)(slice(trace?.events, 0, step + 1), (event, i) => {
+      const { type } = event;
+      const graphId = getGraphId(i, event);
+      const graphPId = getGraphPId(i, event);
+      const strength = isHighlightEdges ? 0.1 : max([1 - (step - i) / pastSteps, 0.3])!;
 
-        const finalColor = getGraphColorHex(
-          type!,
-          strength,
-          backgroundHex,
-          foregroundHex,
-        );
+      const finalColor = getGraphColorHex(type!, strength, backgroundHex, foregroundHex);
 
-        if (graph.hasNode(`${graphId}`) && !isSetNode[graphId]) {
-          setAttributes(graph, `${graphId}`, "node", {
-            zIndex: 1 + i,
-            color: finalColor,
-            label: truncate(`${startCase(type)} ${graphId}`, { length: 50 }),
+      if (graph.hasNode(`${graphId}`) && !isSetNode[graphId]) {
+        setAttributes(graph, `${graphId}`, "node", {
+          zIndex: 1 + i,
+          color: finalColor,
+          label: truncate(`${startCase(type)} ${graphId}`, { length: 50 }),
+          forceLabel: step === i,
+        });
+
+        const a = makeEdgeKey(graphId, graphPId);
+        if (isDefined(graphPId) && graph.hasNode(`${graphPId}`) && graph.hasEdge(a) && !isSet[a]) {
+          setAttributes(graph, a, "edge", {
             forceLabel: step === i,
+            color: finalColor,
+            label: `Step ${i}`,
+            hidden: false,
           });
-
-          const a = makeEdgeKey(graphId, graphPId);
-          if (
-            isDefined(graphPId) &&
-            graph.hasNode(`${graphPId}`) &&
-            graph.hasEdge(a) &&
-            !isSet[a]
-          ) {
-            setAttributes(graph, a, "edge", {
-              forceLabel: step === i,
-              color: finalColor,
-              label: `Step ${i}`,
-              hidden: false,
-            });
-            if (!showAllEdges) isSet[a] = true;
-          }
-          if (!showAllEdges) isSetNode[graphId] = true;
+          if (!showAllEdges) isSet[a] = true;
         }
-      },
-    );
+        if (!showAllEdges) isSetNode[graphId] = true;
+      }
+    });
 
-    const getThemeColor = (c: AccentColor = "grey") =>
-      getShade(c, theme.palette.mode);
+    const getThemeColor = (c: AccentColor = "grey") => getShade(c, theme.palette.mode);
 
     if (highlightEdges && isHighlightEdges) {
       assert(isNumber(highlightEdges?.step), "No step");
@@ -175,33 +150,20 @@ export function useGraphColoring(
         graph.setNodeAttribute(
           graphId,
           "label",
-          `${graph.getNodeAttribute(graphId, "label")} (${startCase(
-            highlightEdges.type,
-          )})`,
+          `${graph.getNodeAttribute(graphId, "label")} (${startCase(highlightEdges.type)})`,
         );
       }
     }
 
-    if (
-      highlightEdges?.type === "backtracking" &&
-      Array.isArray(highlightEdges.path)
-    ) {
-      let prev =
-        trace?.events?.[highlightEdges?.path?.[highlightEdges?.path.length - 1]]
-          ?.id;
+    if (highlightEdges?.type === "backtracking" && Array.isArray(highlightEdges.path)) {
+      let prev = trace?.events?.[highlightEdges?.path?.[highlightEdges?.path.length - 1]]?.id;
 
       forEachRight(highlightEdges.path, (stepIdx) => {
         assert(trace?.events?.[stepIdx], "No event");
         const graphId = getGraphId(stepIdx, trace.events[stepIdx]);
-        const opt = highlightNodesOptions.find(
-          (t) => t.type === highlightEdges.type,
-        );
+        const opt = highlightNodesOptions.find((t) => t.type === highlightEdges.type);
         if (graph.hasNode(`${graphId}`)) {
-          graph.setNodeAttribute(
-            `${graphId}`,
-            "color",
-            getThemeColor(opt?.color),
-          );
+          graph.setNodeAttribute(`${graphId}`, "color", getThemeColor(opt?.color));
           if (graphId !== prev) {
             const edge = makeEdgeKey(`${graphId}`, `${prev}`);
             if (graph.hasEdge(edge)) {
@@ -214,51 +176,30 @@ export function useGraphColoring(
     }
 
     if (
-      (highlightEdges?.type === "subtree" ||
-        highlightEdges?.type === "precedent") &&
+      (highlightEdges?.type === "subtree" || highlightEdges?.type === "precedent") &&
       typeof highlightEdges?.path === "object" &&
       !Array.isArray(highlightEdges?.path)
     ) {
-      const opt = highlightNodesOptions.find(
-        (t) => t.type === highlightEdges.type,
-      );
+      const opt = highlightNodesOptions.find((t) => t.type === highlightEdges.type);
       const isSubtree = highlightEdges?.type === "subtree";
 
       function iterateSubtree(subtree: Subtree) {
         forOwn(subtree, (childs: Subtree, parent: string | number) => {
           assert(trace?.events?.[Number(parent)], "No event");
-          const pNode = getGraphId(
-            Number(parent),
-            trace.events[Number(parent)],
-          );
+          const pNode = getGraphId(Number(parent), trace.events[Number(parent)]);
           if (graph.hasNode(`${pNode}`)) {
-            graph.setNodeAttribute(
-              `${pNode}`,
-              "color",
-              getThemeColor(opt?.color),
-            );
+            graph.setNodeAttribute(`${pNode}`, "color", getThemeColor(opt?.color));
           }
           forOwn(childs, (v, child) => {
             assert(trace?.events?.[Number(child)], "No event");
-            const cNode = getGraphId(
-              Number(child),
-              trace.events[Number(child)],
-            );
+            const cNode = getGraphId(Number(child), trace.events[Number(child)]);
             if (graph.hasNode(`${cNode}`)) {
-              graph.setNodeAttribute(
-                `${cNode}`,
-                "color",
-                getThemeColor(opt?.color),
-              );
+              graph.setNodeAttribute(`${cNode}`, "color", getThemeColor(opt?.color));
               const edge = isSubtree
                 ? makeEdgeKey(`${cNode}`, `${pNode}`)
                 : makeEdgeKey(`${pNode}`, `${cNode}`);
               if (graph.hasEdge(edge)) {
-                graph.setEdgeAttribute(
-                  edge,
-                  "color",
-                  getThemeColor(opt?.color),
-                );
+                graph.setEdgeAttribute(edge, "color", getThemeColor(opt?.color));
                 graph.setEdgeAttribute(edge, "hidden", false);
               }
             }

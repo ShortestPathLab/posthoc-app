@@ -1,11 +1,11 @@
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
 
 //TODO: implement menu for adding nodes
 export default function NodeMenu() {
-    return (
+  return (
     <Fab color="primary" aria-label="add">
-    <AddIcon />
+      <AddIcon />
     </Fab>
-    );
+  );
 }

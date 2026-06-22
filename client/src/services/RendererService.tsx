@@ -9,9 +9,7 @@ import url from "url-parse";
 type RendererTransportOptions = { url: string };
 
 interface RendererTransport {
-  get(): Promise<
-    RendererDefinition<RendererOptions, RendererEvents, { $: string }>
-  >;
+  get(): Promise<RendererDefinition<RendererOptions, RendererEvents, { $: string }>>;
 }
 
 export type RendererTransportConstructor = new (

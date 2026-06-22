@@ -21,7 +21,7 @@ export function useSelection(step: number, trace: Trace | undefined) {
   const selected = useMemo(() => {
     const events = filter(
       map(trace?.events, (c, i) => ({ event: c, step: i })),
-      (c) => `${c.event.id}` === selection?.node
+      (c) => `${c.event.id}` === selection?.node,
     );
     return { events, current: findLast(events, (c) => c.step <= step) };
   }, [selection, step]);

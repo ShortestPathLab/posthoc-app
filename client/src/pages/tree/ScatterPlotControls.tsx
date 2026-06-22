@@ -1,17 +1,6 @@
 import { KeyboardArrowDownOutlined } from "@mui-symbols-material/w300";
-import {
-  ModeStandbyOutlined,
-  TimelineOutlined,
-} from "@mui-symbols-material/w400";
-import {
-  Checkbox,
-  Collapse,
-  IconButton,
-  Stack,
-  SxProps,
-  Theme,
-  Typography,
-} from "@mui/material";
+import { ModeStandbyOutlined, TimelineOutlined } from "@mui-symbols-material/w400";
+import { Checkbox, Collapse, IconButton, Stack, SxProps, Theme, Typography } from "@mui/material";
 import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Heading, Option } from "components/layer-editor/Option";
@@ -126,9 +115,7 @@ export function ScatterPlotControls({
       value: SYMBOL_METRIC_STEP,
     },
     ...map(
-      entries(properties).filter(
-        ([, v]) => !v.type.toLowerCase().includes("text"),
-      ),
+      entries(properties).filter(([, v]) => !v.type.toLowerCase().includes("text")),
       ([k, v]) => ({
         id: k,
         name: `$${k}`,
@@ -259,9 +246,7 @@ export function ScatterPlotControls({
                   disabled={mode !== "plot"}
                   size="small"
                   checked={logAxis.x}
-                  onChange={(e) =>
-                    setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
-                  }
+                  onChange={(e) => setLogAxis((prev) => ({ ...prev, x: e.target.checked }))}
                   sx={CLEAN_CHECKBOX_SX}
                 />
               }
@@ -273,9 +258,7 @@ export function ScatterPlotControls({
                   size="small"
                   disabled={mode !== "plot"}
                   checked={logAxis.y}
-                  onChange={(e) =>
-                    setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
-                  }
+                  onChange={(e) => setLogAxis((prev) => ({ ...prev, y: e.target.checked }))}
                   sx={CLEAN_CHECKBOX_SX}
                 />
               }
@@ -288,11 +271,7 @@ export function ScatterPlotControls({
                   paper
                   disabled={mode !== "plot"}
                   ButtonProps={{ fullWidth: true }}
-                  label={
-                    typeFilter
-                      ? `Event: ${startCase(typeFilter)}`
-                      : "Event type"
-                  }
+                  label={typeFilter ? `Event: ${startCase(typeFilter)}` : "Event type"}
                   value={typeFilter}
                   items={[
                     { id: "", name: "All Events" },
@@ -315,11 +294,7 @@ export function ScatterPlotControls({
                   paper
                   disabled={mode !== "plot"}
                   ButtonProps={{ fullWidth: true }}
-                  label={
-                    groupByAttribute
-                      ? `Group by: ${startCase(groupByAttribute)}`
-                      : "Group by"
-                  }
+                  label={groupByAttribute ? `Group by: ${startCase(groupByAttribute)}` : "Group by"}
                   value={groupByAttribute}
                   items={GROUP_BY_OPTIONS}
                   onChange={setGroupByAttribute}

@@ -2,9 +2,7 @@ import { NameMethodMap } from "protocol";
 import { RequestOf, ResponseOf } from "protocol/Message";
 import TypedEmitter from "typed-emitter";
 export type TransportEvents = {
-  [K in keyof NameMethodMap]: (
-    params: RequestOf<NameMethodMap[K]>["params"]
-  ) => void;
+  [K in keyof NameMethodMap]: (params: RequestOf<NameMethodMap[K]>["params"]) => void;
 };
 
 export interface Transport extends TypedEmitter<TransportEvents> {
@@ -12,7 +10,7 @@ export interface Transport extends TypedEmitter<TransportEvents> {
   disconnect(): Promise<void>;
   call<T extends keyof NameMethodMap>(
     name: T,
-    params?: RequestOf<NameMethodMap[T]>["params"]
+    params?: RequestOf<NameMethodMap[T]>["params"],
   ): Promise<ResponseOf<NameMethodMap[T]>["result"]>;
 }
 

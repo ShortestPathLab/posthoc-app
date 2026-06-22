@@ -3,14 +3,7 @@ import { Button, IconButton, Snackbar } from "@mui/material";
 import { filter, noop } from "lodash-es";
 import { Label } from "./Label";
 import { useLog } from "slices/log";
-import {
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 
 type Options = {
   error?: boolean;
@@ -23,7 +16,7 @@ type ClearSnackbarCallback = () => void;
 type SnackbarCallback = (
   message?: string,
   secondary?: string,
-  options?: Options
+  options?: Options,
 ) => ClearSnackbarCallback;
 
 const SnackbarContext = createContext<SnackbarCallback>(() => noop);
@@ -48,9 +41,7 @@ export function useSnackbar() {
 export function SnackbarProvider({ children }: { children?: ReactNode }) {
   const [snackPack, setSnackPack] = useState<readonly SnackbarMessage[]>([]);
   const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState<SnackbarMessage | undefined>(
-    undefined
-  );
+  const [current, setCurrent] = useState<SnackbarMessage | undefined>(undefined);
 
   const [, appendLog] = useLog();
 
@@ -87,7 +78,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
       }
       return () => handleClose("");
     },
-    [setSnackPack]
+    [setSnackPack],
   );
 
   const handleClose = (_: unknown, reason?: string) => {
@@ -98,9 +89,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
 
   return (
     <>
-      <SnackbarContext.Provider value={handleMessage}>
-        {children}
-      </SnackbarContext.Provider>
+      <SnackbarContext.Provider value={handleMessage}>{children}</SnackbarContext.Provider>
       <Snackbar
         sx={{
           "> .MuiPaper-root": {
@@ -135,12 +124,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
                 {current?.actionLabel}
               </Button>
             )}
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              sx={{ p: 0.5 }}
-              onClick={handleClose}
-            >
+            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleClose}>
               <CloseIcon />
             </IconButton>
           </>

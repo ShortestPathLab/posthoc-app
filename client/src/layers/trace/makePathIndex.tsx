@@ -2,8 +2,7 @@ import { index } from "hooks/useHighlight";
 import { findLast, forEach, isNull, isUndefined, last } from "lodash-es";
 import { Trace } from "protocol/Trace";
 
-const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> =>
-  isUndefined(x) || isNull(x);
+const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> => isUndefined(x) || isNull(x);
 
 type Key = string | number;
 

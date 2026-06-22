@@ -33,18 +33,9 @@ export function LabeledHandle({
 
       <Tooltip title={description}>
         {!isUndefined(value) ? (
-          <TextField
-            size="small"
-            variant="filled"
-            label={label}
-            defaultValue={value}
-            fullWidth
-          />
+          <TextField size="small" variant="filled" label={label} defaultValue={value} fullWidth />
         ) : (
-          <Typography
-            variant="body2"
-            sx={{ color: "text.secondary", whiteSpace: "nowrap" }}
-          >
+          <Typography variant="body2" sx={{ color: "text.secondary", whiteSpace: "nowrap" }}>
             {label}
           </Typography>
         )}

@@ -2,6 +2,20 @@
   "name": "client",
   "version": "1.2.5-2",
   "private": true,
+  "homepage": ".",
+  "type": "module",
+  "main": "main.mjs",
+  "scripts": {
+    "start": "bunx --bun vite --host",
+    "build": "bunx --bun vite build --emptyOutDir",
+    "package": "sh ./package.sh",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.8",
     "@davstack/store": "^1.4.6",
@@ -33,7 +47,6 @@
     "d3-scale": "^4.0.2",
     "downloadjs": "^1.4.7",
     "elkjs": "^0.11.0",
-    "eslint-plugin-react-hooks": "^7.0.1",
     "eventemitter3": "^5.0.1",
     "file-select-dialog": "^1.5.4",
     "graphology": "^0.26.0",
@@ -84,32 +97,13 @@
     "string-template-parser": "^1.2.6",
     "sysend": "^1.17.5",
     "typed-emitter": "^2.1.0",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "unique-username-generator": "^1.5.1",
     "url-parse": "^1.5.10",
     "use-window-focus": "^1.4.4",
     "zustand": "^5.0.9"
   },
-  "scripts": {
-    "start": "bunx --bun vite --host",
-    "build": "bunx --bun vite build --emptyOutDir",
-    "package": "sh ./package.sh",
-    "test": "vitest"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -125,25 +119,28 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-virtualized-auto-sizer": "^1.0.8",
     "@types/url-parse": "^1.4.11",
-    "@typescript-eslint/eslint-plugin": "^8.48.1",
-    "@typescript-eslint/parser": "^8.48.1",
     "@vitejs/plugin-react": "^4.7.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "electron": "^34.5.8",
     "electron-packager": "^17.1.2",
-    "eslint": "^9.39.1",
-    "eslint-plugin-only-warn": "^1.1.0",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-compiler": "^19.1.0-rc.2",
-    "globals": "^15.15.0",
     "jsdom": "^26.1.0",
-    "typescript-eslint": "^8.48.1",
+    "oxfmt": "^0.55.0",
+    "oxlint": "^1.70.0",
     "vite": "^8.0.16",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4",
-    "vitest-canvas-mock": "^0.3.3"
+    "vitest": "^4.1.9",
+    "vitest-canvas-mock": "^1.1.4"
   },
-  "homepage": ".",
-  "main": "main.mjs",
-  "type": "module"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

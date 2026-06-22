@@ -17,10 +17,7 @@ export function cast<T>(o: unknown): asserts o is T {}
  * @param message the error to throw if the condition is false
  */
 
-export function assert(
-  condition: unknown,
-  message: string | Error
-): asserts condition {
+export function assert(condition: unknown, message: string | Error): asserts condition {
   if (!condition) {
     throw isString(message) ? new AssertionError(message) : message;
   }
@@ -35,7 +32,7 @@ export function assert(
  */
 export function required<T>(
   item: T | null | undefined,
-  message: string | Error = "Object is undefined"
+  message: string | Error = "Object is undefined",
 ): T {
   assert(!isNull(item) && !isUndefined(item), message);
   return item;

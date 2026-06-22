@@ -6,10 +6,7 @@ import { useCallback } from "react";
 import { useLoadingState } from "slices/loading";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
-import {
-  ParseTraceWorkerParameters,
-  ParseTraceWorkerReturnType,
-} from "./ParseTraceSlaveWorker";
+import { ParseTraceWorkerParameters, ParseTraceWorkerReturnType } from "./ParseTraceSlaveWorker";
 
 export class ParseTraceWorker extends Worker {
   constructor() {
@@ -32,10 +29,7 @@ export function useTraceParser(params: ParseTraceWorkerParameters) {
           push("Processing trace...");
           try {
             const output = await parseTraceAsync(params);
-            push(
-              "Trace loaded",
-              pluralize("step", output?.stepsPersistent?.length ?? 0, true)
-            );
+            push("Trace loaded", pluralize("step", output?.stepsPersistent?.length ?? 0, true));
             return { components: output, content: params.trace };
           } catch (e) {
             console.error(e);
@@ -44,6 +38,6 @@ export function useTraceParser(params: ParseTraceWorkerParameters) {
           }
         }
       }),
-    [params]
+    [params],
   );
 }

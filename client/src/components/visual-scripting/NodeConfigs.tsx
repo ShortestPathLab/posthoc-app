@@ -1,10 +1,5 @@
 import { entries } from "lodash-es";
-import {
-  createFlowNodeDefinition,
-  FlowData,
-  Properties,
-  TransformationNodeConfig,
-} from "./flow";
+import { createFlowNodeDefinition, FlowData, Properties, TransformationNodeConfig } from "./flow";
 import { GoToDefinitionButton } from "./GoToDefinitionButton";
 
 export type MathData = FlowData<
@@ -17,7 +12,6 @@ export type MathData = FlowData<
     enabled: boolean;
   }
 >;
-
 
 export const math = createFlowNodeDefinition<MathData>(() => ({
   key: "math",
@@ -127,42 +121,40 @@ export const viewport = createFlowNodeDefinition(() => ({
   ],
 }));
 
-export const component = createFlowNodeDefinition<ComponentData>(
-  ({ $, ...rest } = {}) => ({
-    key: "component",
-    group: "hidden",
-    title: $ ? (
-      <>
-        {`View (${$})`}
-        <GoToDefinitionButton
-          edge="end"
-          sx={{
-            ml: "auto",
-          }}
-          size="small"
-          $={$}
-        />
-      </>
-    ) : (
-      "View"
-    ),
-    inputs: entries(rest).map(([key, value]) => ({
-      key,
-      label: key,
+export const component = createFlowNodeDefinition<ComponentData>(({ $, ...rest } = {}) => ({
+  key: "component",
+  group: "hidden",
+  title: $ ? (
+    <>
+      {`View (${$})`}
+      <GoToDefinitionButton
+        edge="end"
+        sx={{
+          ml: "auto",
+        }}
+        size="small"
+        $={$}
+      />
+    </>
+  ) : (
+    "View"
+  ),
+  inputs: entries(rest).map(([key, value]) => ({
+    key,
+    label: key,
+    type: "any",
+    value,
+  })),
+  outputs: [
+    {
+      key: "result",
+      label: "Views",
+      description: "The output views",
       type: "any",
-      value,
-    })),
-    outputs: [
-      {
-        key: "result",
-        label: "Views",
-        description: "The output views",
-        type: "any",
-      },
-    ],
-    fields: [],
-  })
-);
+    },
+  ],
+  fields: [],
+}));
 
 export type LoopData = FlowData<
   "loop",
@@ -267,6 +259,6 @@ export const transforms = {
 
 export function resolveNodeConfig(t: string) {
   return transforms[t as keyof typeof transforms] as (
-    v?: Properties
+    v?: Properties,
   ) => TransformationNodeConfig<string, Properties> | undefined;
 }

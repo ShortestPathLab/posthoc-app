@@ -105,6 +105,6 @@ export type TreeWorkerReturnType =
   | { x: number; y: number; label: string; size: number }[]
   | undefined;
 
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<TreeWorkerParameters>) => parse(data)
+onmessage = usingMessageHandler(async ({ data }: MessageEvent<TreeWorkerParameters>) =>
+  parse(data),
 );

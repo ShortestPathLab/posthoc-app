@@ -9,7 +9,6 @@ export type Connection = CheckConnectionResponse["result"] & {
   ping: number;
 };
 
-export const [useConnections, ConnectionsProvider] = createSlice<Connection[]>(
-  [],
-  { reduce: replace }
-);
+export const [useConnections, ConnectionsProvider] = createSlice<Connection[]>([], {
+  reduce: replace,
+});

@@ -17,10 +17,7 @@ function useData(layer?: string) {
   return useComputeLabels({ key: trace?.key, trace: trace?.content });
 }
 
-export const PropertiesSelect = ({
-  layer,
-  ...props
-}: BreakpointFieldProps<string>) => {
+export const PropertiesSelect = ({ layer, ...props }: BreakpointFieldProps<string>) => {
   const { data } = useData(layer);
   return (
     <Select

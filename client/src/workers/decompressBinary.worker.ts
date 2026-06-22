@@ -9,9 +9,7 @@ onmessage = usingMessageHandler(
       while (!(result = await reader.read()).done) {
         chunks.push(result.value);
       }
-      const completeData = new Uint8Array(
-        chunks.reduce((acc, chunk) => acc + chunk.length, 0)
-      );
+      const completeData = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
       let offset = 0;
       for (const chunk of chunks) {
         completeData.set(chunk, offset);
@@ -21,5 +19,5 @@ onmessage = usingMessageHandler(
     } else {
       decompress(data);
     }
-  }
+  },
 );

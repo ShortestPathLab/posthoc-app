@@ -1,7 +1,4 @@
-import {
-  Typography as Type,
-  TypographyProps as TypeProps,
-} from "@mui/material";
+import { Typography as Type, TypographyProps as TypeProps } from "@mui/material";
 import beautify from "json-beautify";
 import { get, isNull, round, truncate } from "lodash-es";
 import { CSSProperties, ReactNode } from "react";
@@ -46,9 +43,7 @@ export function renderProperty(obj: unknown, simple: boolean = false) {
       return "null";
     default:
       return simple ? (
-        <code>
-          {isNull(obj) ? "null" : (get(obj, "constructor.name") ?? typeof obj)}
-        </code>
+        <code>{isNull(obj) ? "null" : (get(obj, "constructor.name") ?? typeof obj)}</code>
       ) : (
         <code style={{ whiteSpace: "pre" }}>
           {truncate(beautify(obj, undefined as unknown as object, 2), {
@@ -68,12 +63,7 @@ export function Property({ label, value, type, simple }: Props) {
       key={`${label}::${renderProperty(value)}`}
       alignItems="baseline"
     >
-      <Type
-        component="div"
-        variant="body2"
-        {...type}
-        sx={{ opacity: 0.54, ...type?.sx }}
-      >
+      <Type component="div" variant="body2" {...type} sx={{ opacity: 0.54, ...type?.sx }}>
         {label}
       </Type>
       <Space />

@@ -7,16 +7,11 @@ import { BreakpointProcessor } from "../Breakpoint";
 export const processor: BreakpointProcessor<Fields> = async (
   data,
   trace,
-  trees
+  trees,
 ): Promise<{ result: string; step: number }[]> => {
   const result: { result: string; step: number }[] = [];
   if (trace?.content?.events) {
-    const {
-      condition,
-      eventType: type,
-      property = "",
-      reference = 0,
-    } = data ?? {};
+    const { condition, eventType: type, property = "", reference = 0 } = data ?? {};
 
     assert(condition, "condition is required");
     const comparator = find(comparators, (c) => c.key === condition);

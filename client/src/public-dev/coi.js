@@ -13,16 +13,13 @@ let coepCredentialless = !1;
               .then((e) => {
                 e.forEach((e) => e.navigate(e.url));
               })
-          : "coepCredentialless" === e.data.type &&
-            (coepCredentialless = e.data.value));
+          : "coepCredentialless" === e.data.type && (coepCredentialless = e.data.value));
     }),
     self.addEventListener("fetch", function (e) {
       const r = e.request;
       if ("only-if-cached" === r.cache && "same-origin" !== r.mode) return;
       const s =
-        coepCredentialless && "no-cors" === r.mode
-          ? new Request(r, { credentials: "omit" })
-          : r;
+        coepCredentialless && "no-cors" === r.mode ? new Request(r, { credentials: "omit" }) : r;
       e.respondWith(
         fetch(s)
           .then((e) => {
@@ -31,10 +28,9 @@ let coepCredentialless = !1;
             return (
               r.set(
                 "Cross-Origin-Embedder-Policy",
-                coepCredentialless ? "credentialless" : "require-corp"
+                coepCredentialless ? "credentialless" : "require-corp",
               ),
-              coepCredentialless ||
-                r.set("Cross-Origin-Resource-Policy", "cross-origin"),
+              coepCredentialless || r.set("Cross-Origin-Resource-Policy", "cross-origin"),
               r.set("Cross-Origin-Opener-Policy", "same-origin"),
               new Response(e.body, {
                 status: e.status,
@@ -43,61 +39,52 @@ let coepCredentialless = !1;
               })
             );
           })
-          .catch((e) => console.error(e))
+          .catch((e) => console.error(e)),
       );
     }))
   : (() => {
       const e = {
           shouldRegister: () => !0,
           shouldDeregister: () => !1,
-          coepCredentialless: () =>
-            window.chrome !== undefined || window.netscape !== undefined,
+          coepCredentialless: () => window.chrome !== undefined || window.netscape !== undefined,
           doReload: () => window.location.reload(),
           quiet: !1,
           ...window.coi,
         },
         r = navigator;
-      r.serviceWorker &&
+      (r.serviceWorker &&
         r.serviceWorker.controller &&
         (r.serviceWorker.controller.postMessage({
           type: "coepCredentialless",
           value: e.coepCredentialless(),
         }),
-        e.shouldDeregister() &&
-          r.serviceWorker.controller.postMessage({ type: "deregister" })),
+        e.shouldDeregister() && r.serviceWorker.controller.postMessage({ type: "deregister" })),
         !1 === window.crossOriginIsolated &&
           e.shouldRegister() &&
           (window.isSecureContext
             ? r.serviceWorker &&
               r.serviceWorker.register(window.document.currentScript.src).then(
                 (s) => {
-                  !e.quiet &&
-                    console.log("COOP/COEP Service Worker registered", s.scope),
+                  (!e.quiet && console.log("COOP/COEP Service Worker registered", s.scope),
                     s.addEventListener("updatefound", () => {
-                      !e.quiet &&
+                      (!e.quiet &&
                         console.log(
-                          "Reloading page to make use of updated COOP/COEP Service Worker."
+                          "Reloading page to make use of updated COOP/COEP Service Worker.",
                         ),
-                        e.doReload();
+                        e.doReload());
                     }),
                     s.active &&
                       !r.serviceWorker.controller &&
                       (!e.quiet &&
-                        console.log(
-                          "Reloading page to make use of COOP/COEP Service Worker."
-                        ),
-                      e.doReload());
+                        console.log("Reloading page to make use of COOP/COEP Service Worker."),
+                      e.doReload()));
                 },
                 (r) => {
-                  !e.quiet &&
-                    console.error(
-                      "COOP/COEP Service Worker failed to register:",
-                      r
-                    );
-                }
+                  !e.quiet && console.error("COOP/COEP Service Worker failed to register:", r);
+                },
               )
             : !e.quiet &&
               console.log(
-                "COOP/COEP Service Worker not registered, a secure context is required."
-              ));
+                "COOP/COEP Service Worker not registered, a secure context is required.",
+              )));
     })();

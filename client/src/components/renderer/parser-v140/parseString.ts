@@ -26,5 +26,5 @@ export const parseString = memo(
       ? (ctx) => evaluateTemplate(parsed, {}, {}, (v) => parseToken(v)(ctx))
       : parseToken(parsed.variables[0].name);
   },
-  { primitive: true }
+  { primitive: true },
 );

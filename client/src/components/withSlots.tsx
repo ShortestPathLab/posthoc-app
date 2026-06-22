@@ -1,14 +1,7 @@
 /* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Children,
-  ComponentType,
-  createElement,
-  isValidElement,
-  memo,
-  useMemo,
-} from "react";
+import { Children, ComponentType, createElement, isValidElement, memo, useMemo } from "react";
 
 // Extendable type
 type SlotPropsExtends = Record<string, Record<string, any>>;
@@ -36,10 +29,7 @@ type ResultComponent<
 
 // Main function interface
 export type WithSlot = {
-  <
-    Slots extends SlotPropsExtends,
-    Props extends OwnPropsExtends = OwnPropsExtends,
-  >(
+  <Slots extends SlotPropsExtends, Props extends OwnPropsExtends = OwnPropsExtends>(
     Component: WrappedComponent<Props, Slots>,
   ): ResultComponent<Slots, Props>;
 };
@@ -90,31 +80,18 @@ const getCleanChildren = (children: any, slotKeys: string[]) => {
 };
 
 const isComponentName = (name: any) =>
-  typeof name === "string" &&
-  !EXCLUDED_NAMES.includes(name) &&
-  name.match(/^[A-Z0-9]/);
+  typeof name === "string" && !EXCLUDED_NAMES.includes(name) && name.match(/^[A-Z0-9]/);
 
 const createResultComponent = (
   Component: WrappedComponent<any, any>,
 ): WrappedComponent<any, any> => {
   const ResultComponent: WrappedComponent<any, any> = memo((props) => {
-    const {
-      children,
-      propagateSlotProps,
-      slotKeys = [],
-      ...otherProps
-    } = props;
+    const { children, propagateSlotProps, slotKeys = [], ...otherProps } = props;
 
     // Find and get out all childProps
-    const slotProps = useMemo(
-      () => getSlotProps(children),
-      [slotKeys, children],
-    );
+    const slotProps = useMemo(() => getSlotProps(children), [slotKeys, children]);
     // Clean children from childProps components
-    const cleanChildren = useMemo(
-      () => getCleanChildren(children, slotKeys),
-      [slotKeys, children],
-    );
+    const cleanChildren = useMemo(() => getCleanChildren(children, slotKeys), [slotKeys, children]);
 
     const passProps = useMemo(
       () => ({
@@ -135,9 +112,7 @@ const createResultComponent = (
 
 export const withSlots: WithSlot = (Component) => {
   const ResultComponent = memo(createResultComponent(Component));
-  ResultComponent.displayName = `WithSlots(${
-    Component.displayName || Component.name
-  })`;
+  ResultComponent.displayName = `WithSlots(${Component.displayName || Component.name})`;
 
   const ProxyComponent = new Proxy(ResultComponent, {
     get(target: any, key, receiver) {

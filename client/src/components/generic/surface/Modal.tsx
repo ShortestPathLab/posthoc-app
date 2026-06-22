@@ -33,12 +33,7 @@ export function Modal({
   const { depth } = useModalDepth(props.open);
   const mt = 95 - 5 * depth;
 
-  const {
-    overflow,
-    contentHeight,
-    setModal: setTarget,
-    setContent,
-  } = useModalOverflow(height);
+  const { overflow, contentHeight, setModal: setTarget, setContent } = useModalOverflow(height);
 
   const useVariant = variant === "submodal" && sm;
 
@@ -63,9 +58,7 @@ export function Modal({
         ref: (e: HTMLElement | null) => setTarget(e),
         sx: {
           ...(sm && {
-            borderRadius: `${theme.shape.borderRadius * 2}px ${
-              theme.shape.borderRadius * 2
-            }px 0 0`,
+            borderRadius: `${theme.shape.borderRadius * 2}px ${theme.shape.borderRadius * 2}px 0 0`,
           }),
           background: theme.palette.background.paper,
           overflow: "hidden",
@@ -73,10 +66,10 @@ export function Modal({
             height && !sm
               ? height
               : sm
-              ? `${mt}dvh`
-              : overflow
-              ? "100%"
-              : contentHeight || "fit-content",
+                ? `${mt}dvh`
+                : overflow
+                  ? "100%"
+                  : contentHeight || "fit-content",
           position: "relative",
           maxWidth: "none",
           marginTop: sm ? `${100 - mt}dvh` : 0,

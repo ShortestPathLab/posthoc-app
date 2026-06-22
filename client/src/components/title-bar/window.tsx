@@ -13,6 +13,6 @@ export function openWindow({
   window.open(
     url,
     "_blank",
-    "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=no, copyhistory=yes, width=800, height=600"
+    "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=no, copyhistory=yes, width=800, height=600",
   );
 }

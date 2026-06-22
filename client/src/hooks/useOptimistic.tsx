@@ -30,8 +30,7 @@ function useOptimisticState<T>(value: T) {
 }
 
 export function useOptimistic<T>(value: T, update: (f: T) => Promise<void>) {
-  const { enabled, optimistic, start, end, setOptimistic, latest } =
-    useOptimisticState(value);
+  const { enabled, optimistic, start, end, setOptimistic, latest } = useOptimisticState(value);
   return [
     enabled ? optimistic : value,
     async (f: T) => {
@@ -47,10 +46,9 @@ export function useOptimistic<T>(value: T, update: (f: T) => Promise<void>) {
 
 export function useOptimisticTransaction<T>(
   value: T,
-  update: (f: Transaction<T>) => Promise<void>
+  update: (f: Transaction<T>) => Promise<void>,
 ) {
-  const { enabled, optimistic, start, end, setOptimistic, latest } =
-    useOptimisticState(value);
+  const { enabled, optimistic, start, end, setOptimistic, latest } = useOptimisticState(value);
 
   return [
     enabled ? optimistic : value,

@@ -77,8 +77,7 @@ declare type ConvenienceColor =
   | "closing"
   | "end";
 
-declare type AccentColors = Record<AccentColor, CSSColor> &
-  Record<ConvenienceColor, CSSColor>;
+declare type AccentColors = Record<AccentColor, CSSColor> & Record<ConvenienceColor, CSSColor>;
 
 /**
  * General-purpose colors provided by Posthoc.

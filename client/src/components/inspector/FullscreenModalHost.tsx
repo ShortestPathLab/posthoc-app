@@ -7,14 +7,7 @@ import { useSm } from "hooks/useSmallDisplay";
 import { usePopupState } from "material-ui-popup-state/hooks";
 import { pages } from "pages";
 import { PageSlots } from "pages/Page";
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from "react";
 import { slice } from "slices";
 import { useOne } from "slices/useOne";
 import { PanelState } from "slices/view";
@@ -33,73 +26,69 @@ export type FullscreenPageProps = {
   children?: ReactNode;
 };
 
-export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(
-  ({ slotProps }) => {
-    const sm = useSm();
-    const acrylic = useAcrylic();
-    return (
-      <Stack sx={{ height: "auto", minHeight: "70dvh" }}>
-        {!!slotProps.Options?.children && (
-          <Stack
-            sx={{
-              minHeight: (t) => t.spacing(6),
-              flex: 0,
-              position: "sticky",
-              top: 0,
-              zIndex: 1,
-              width: "100%",
-              height: (t) => t.spacing(6),
-            }}
-          >
-            <Stack
-              direction="row"
-              sx={{
-                p: 0,
-                zIndex: 1,
-                width: "100%",
-                borderBottom: 1,
-                borderColor: "divider",
-                alignItems: "center",
-                pr: sm ? 0 : 6,
-                ...acrylic,
-                background: (t) =>
-                  `linear-gradient(to bottom, ${
-                    t.palette.background.paper
-                  }, ${alpha(t.palette.background.paper, 0.75)})`,
-              }}
-            >
-              <Scroll x>
-                <Block
-                  sx={{
-                    width: "max-content",
-                    height: (t) => t.spacing(6),
-                    alignItems: "center",
-                    py: 0,
-                    px: sm ? 1.25 : 2.25,
-                  }}
-                >
-                  {slotProps.Options?.children && (
-                    <>{slotProps.Options.children}</>
-                  )}
-                </Block>
-              </Scroll>
-              {slotProps.Extras?.children}
-            </Stack>
-          </Stack>
-        )}
-        <Box
+export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(({ slotProps }) => {
+  const sm = useSm();
+  const acrylic = useAcrylic();
+  return (
+    <Stack sx={{ height: "auto", minHeight: "70dvh" }}>
+      {!!slotProps.Options?.children && (
+        <Stack
           sx={{
-            bgcolor: "background.paper",
-            mt: slotProps.Options?.children ? -6 : 0,
-            flex: 1,
+            minHeight: (t) => t.spacing(6),
+            flex: 0,
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+            width: "100%",
+            height: (t) => t.spacing(6),
           }}
         >
-          {slotProps.Content?.children}
-        </Box>
-      </Stack>
-    );
-  },
-);
+          <Stack
+            direction="row"
+            sx={{
+              p: 0,
+              zIndex: 1,
+              width: "100%",
+              borderBottom: 1,
+              borderColor: "divider",
+              alignItems: "center",
+              pr: sm ? 0 : 6,
+              ...acrylic,
+              background: (t) =>
+                `linear-gradient(to bottom, ${
+                  t.palette.background.paper
+                }, ${alpha(t.palette.background.paper, 0.75)})`,
+            }}
+          >
+            <Scroll x>
+              <Block
+                sx={{
+                  width: "max-content",
+                  height: (t) => t.spacing(6),
+                  alignItems: "center",
+                  py: 0,
+                  px: sm ? 1.25 : 2.25,
+                }}
+              >
+                {slotProps.Options?.children && <>{slotProps.Options.children}</>}
+              </Block>
+            </Scroll>
+            {slotProps.Extras?.children}
+          </Stack>
+        </Stack>
+      )}
+      <Box
+        sx={{
+          bgcolor: "background.paper",
+          mt: slotProps.Options?.children ? -6 : 0,
+          flex: 1,
+        }}
+      >
+        {slotProps.Content?.children}
+      </Box>
+    </Stack>
+  );
+});
 
 export function FullscreenModalHost() {
   const sm = useSm();
@@ -136,15 +125,9 @@ export function FullscreenModalHost() {
     const FullScreenPageTemplate = withSlots<PageSlots, FullscreenPageProps>(
       ({ slotProps, ...props }) => (
         <FullscreenPage {...props}>
-          <FullscreenPage.Content>
-            {slotProps!.Content?.children}
-          </FullscreenPage.Content>
-          <FullscreenPage.Options>
-            {slotProps!.Options?.children}
-          </FullscreenPage.Options>
-          <FullscreenPage.Extras>
-            {slotProps!.Extras?.children}
-          </FullscreenPage.Extras>
+          <FullscreenPage.Content>{slotProps!.Content?.children}</FullscreenPage.Content>
+          <FullscreenPage.Options>{slotProps!.Options?.children}</FullscreenPage.Options>
+          <FullscreenPage.Extras>{slotProps!.Extras?.children}</FullscreenPage.Extras>
         </FullscreenPage>
       ),
     );

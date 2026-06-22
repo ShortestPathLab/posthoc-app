@@ -11,11 +11,7 @@ import { getControllers } from "layers/layerControllers";
 import { useOne } from "slices/useOne";
 
 export function LayerListEditor() {
-  const layers = useOne(
-    slice.layers,
-    (l) => map(l, (l) => pick(l, "key")),
-    isEqual,
-  );
+  const layers = useOne(slice.layers, (l) => map(l, (l) => pick(l, "key")), isEqual);
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>
       <Box sx={{ mb: 2 }}>
@@ -41,11 +37,7 @@ export function LayerListEditor() {
           placeholder={<Box pt={2}>Get started by adding a layer.</Box>}
           onFocus={(key) => {
             const element = head(document.getElementsByClassName(key));
-            if (
-              element &&
-              "click" in element &&
-              typeof element.click === "function"
-            ) {
+            if (element && "click" in element && typeof element.click === "function") {
               element.click();
             }
           }}
@@ -78,12 +70,7 @@ function LayerListEditorExtras({ layer }: { layer?: string }) {
                   key: "fit-layer",
                   action: () =>
                     slice.layers.set(
-                      (l) =>
-                        void each(
-                          l,
-                          (s) =>
-                            (s.viewKey = s.key === layer ? id() : undefined),
-                        ),
+                      (l) => void each(l, (s) => (s.viewKey = s.key === layer ? id() : undefined)),
                     ),
                 },
               ].map(({ name, key, action }) => (
@@ -99,10 +86,7 @@ function LayerListEditorExtras({ layer }: { layer?: string }) {
               ))}
             </MenuList>
           </Menu>
-          <IconButton
-            {...bindTrigger(state)}
-            sx={{ color: (t) => t.palette.text.secondary }}
-          >
+          <IconButton {...bindTrigger(state)} sx={{ color: (t) => t.palette.text.secondary }}>
             <MoreVertOutlined />
           </IconButton>
         </>

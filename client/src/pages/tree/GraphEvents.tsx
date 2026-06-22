@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 export type Selection = {
   event: MouseEvent | TouchEvent;
-  node: string;       // will be logicalId if available
+  node: string; // will be logicalId if available
 };
 
 export function GraphEvents({
@@ -21,16 +21,13 @@ export function GraphEvents({
     // added logical node for scatter plot colouring
     registerEvents({
       clickNode: (e) => {
-        const sigmaNodeKey = e.node; 
+        const sigmaNodeKey = e.node;
         let logicalId = sigmaNodeKey;
 
         if (graph.hasNode(sigmaNodeKey)) {
-          const maybeLogicalId = graph.getNodeAttribute(
-            sigmaNodeKey,
-            "logicalId"
-          );
+          const maybeLogicalId = graph.getNodeAttribute(sigmaNodeKey, "logicalId");
           if (maybeLogicalId !== undefined && maybeLogicalId !== null) {
-            logicalId = String(maybeLogicalId); 
+            logicalId = String(maybeLogicalId);
           }
         }
 

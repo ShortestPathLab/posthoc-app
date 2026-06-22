@@ -79,10 +79,7 @@ export function ViewControls({
               disabled={splitHorizontalDisabled}
             >
               <ListItemIcon>
-                <SplitIcon
-                  fontSize="small"
-                  sx={{ transform: "rotate(90deg)" }}
-                />
+                <SplitIcon fontSize="small" sx={{ transform: "rotate(90deg)" }} />
               </ListItemIcon>
               <ListItemText>Split horizontal</ListItemText>
             </MenuItem>

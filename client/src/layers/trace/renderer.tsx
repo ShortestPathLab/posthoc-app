@@ -28,16 +28,10 @@ export const renderer = (({ layer, index }) => {
               sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
               sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
             },
-          })
-        )
+          }),
+        ),
       ),
-    [
-      parsedTrace?.stepsPersistent,
-      layer?.key,
-      layer?.transparency,
-      layer?.displayMode,
-      index,
-    ]
+    [parsedTrace?.stepsPersistent, layer?.key, layer?.transparency, layer?.displayMode, index],
   );
   const steps1 = useMemo(
     () =>
@@ -50,16 +44,10 @@ export const renderer = (({ layer, index }) => {
               sourceLayerAlpha: 1 - 0.01 * +(layer?.transparency ?? 0),
               sourceLayerDisplayMode: layer?.displayMode ?? "source-over",
             },
-          })
-        )
+          }),
+        ),
       ),
-    [
-      parsedTrace?.stepsTransient,
-      layer?.key,
-      layer?.transparency,
-      layer?.displayMode,
-      index,
-    ]
+    [parsedTrace?.stepsTransient, layer?.key, layer?.transparency, layer?.displayMode, index],
   );
   const transientSteps = useMemo(() => [steps1[step] ?? []], [steps1, step]);
   return (

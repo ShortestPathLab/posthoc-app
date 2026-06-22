@@ -1,8 +1,5 @@
 import { useMemo } from "react";
-import {
-  CloudStorageProvider,
-  cloudStorageProviders,
-} from "services/cloud-storage";
+import { CloudStorageProvider, cloudStorageProviders } from "services/cloud-storage";
 import { useAuth } from "./auth";
 import { createSlice } from "./createSlice";
 

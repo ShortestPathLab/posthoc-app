@@ -17,7 +17,7 @@ export const hashAsync = memoizee(usingWorkerTask<string, string>(HashWorker), {
 
 export const compressAsync = usingWorkerTask<string, string>(CompressWorker);
 export const compressBinaryAsync = usingWorkerTask<string, Uint8Array<ArrayBuffer>>(
-  CompressBinaryWorker
+  CompressBinaryWorker,
 );
 export const decompressBinaryAsync = usingWorkerTask<
   ReadableStream<Uint8Array<ArrayBuffer>> | Uint8Array<ArrayBuffer>,
@@ -26,14 +26,11 @@ export const decompressBinaryAsync = usingWorkerTask<
 
 export const parseYamlAsync = usingWorkerTask<
   { content: string; schema?: Schema },
-  | { result: unknown; error: undefined }
-  | { error: YAMLException; result: undefined }
+  { result: unknown; error: undefined } | { error: YAMLException; result: undefined }
 >(ParseYamlWorker) as <T>({
   content,
   schema,
 }: {
   content: string;
   schema?: Schema;
-}) => Promise<
-  { result: T; error: undefined } | { error: YAMLException; result: undefined }
->;
+}) => Promise<{ result: T; error: undefined } | { error: YAMLException; result: undefined }>;

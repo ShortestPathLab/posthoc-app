@@ -4,8 +4,7 @@ import { LayerListEditor } from "components/layer-editor/LayerListEditor";
 import { PageContentProps } from "./PageMeta";
 
 export function LayersPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state, dragHandle, isViewTree } =
-    useViewTreeContext();
+  const { controls, onChange, state, dragHandle, isViewTree } = useViewTreeContext();
 
   return (
     <Page onChange={onChange} stack={state}>

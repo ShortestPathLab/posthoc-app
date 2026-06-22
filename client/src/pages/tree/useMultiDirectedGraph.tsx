@@ -49,21 +49,11 @@ export function useMultiDirectedGraph(
           });
         }
         if (graph.hasDirectedEdge(key)) {
-          graph.updateEdgeAttribute(
-            key,
-            "size",
-            (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5,
-          );
+          graph.updateEdgeAttribute(key, "size", (s) => Math.log(Math.E ** (s - 0.5) + 0.5) + 0.5);
         }
       }
     });
 
     return graph;
-  }, [
-    trace,
-    tree,
-    finalParents,
-    orientation,
-    theme.palette.action.disabledBackground,
-  ]);
+  }, [trace, tree, finalParents, orientation, theme.palette.action.disabledBackground]);
 }

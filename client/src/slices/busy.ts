@@ -11,7 +11,7 @@ type Busy = {
 
 export const [useBusy, BusyProvider] = createSlice<Busy>(
   {},
-  { reduce: (a, b) => omitBy(merge(a, b), isUndefined) }
+  { reduce: (a, b) => omitBy(merge(a, b), isUndefined) },
 );
 
 function wait(ms: number) {
@@ -29,7 +29,7 @@ export function useBusyState(key: string) {
       dispatch(() => ({ [key]: undefined }));
       return out;
     },
-    [key, dispatch]
+    [key, dispatch],
   );
 }
 

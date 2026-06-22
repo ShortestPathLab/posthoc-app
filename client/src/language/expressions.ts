@@ -28,9 +28,7 @@ export function getExpression(model: editor.ITextModel, position: Position) {
   return undefined;
 }
 
-export function getExpressions(
-  text: string
-): { value: string; line: number; column: number }[] {
+export function getExpressions(text: string): { value: string; line: number; column: number }[] {
   const matches: { value: string; line: number; column: number }[] = [];
   const regex = /\$\{\{(.*?)\}\}/g;
   const lines = text.split(/\r?\n/);

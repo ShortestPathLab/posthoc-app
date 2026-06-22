@@ -47,28 +47,17 @@ export function TreePage({ template: Page }: PageContentProps) {
   // ─── Options ─────────────────────────────────────────────────────────
 
   const options = useTreeOptions(key);
-  const {
-    mode,
-    isLoading: isOptionsLoading,
-    trackedProperty,
-    logAxis,
-    axis,
-    typeFilter,
-  } = options;
+  const { mode, isLoading: isOptionsLoading, trackedProperty, logAxis, axis, typeFilter } = options;
   // ─── Playback ────────────────────────────────────────────────────────
 
   const throttled = useThrottle(step ?? 0, 1000 / 24);
 
   // ─── Panel Data ──────────────────────────────────────────────────────
 
-  const { controls, onChange, state, dragHandle } =
-    useViewTreeContext<TreePageContext>();
+  const { controls, onChange, state, dragHandle } = useViewTreeContext<TreePageContext>();
   const size = useSurfaceAvailableCssSize();
 
-  const { point, selected, selection, setSelection } = useSelection(
-    throttled,
-    trace?.content,
-  );
+  const { point, selected, selection, setSelection } = useSelection(throttled, trace?.content);
 
   // ─────────────────────────────────────────────────────────────────────
 

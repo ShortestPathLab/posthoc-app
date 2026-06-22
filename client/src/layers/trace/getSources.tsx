@@ -9,9 +9,7 @@ export const getSources = ((layer) => {
       id: "trace",
       name: `${trace?.name ?? inferLayerName(layer) ?? "Untitled trace"}`,
       language: "yaml",
-      content: trace?.content
-        ? dump(trace.content, { noCompatMode: true })
-        : "",
+      content: trace?.content ? dump(trace.content, { noCompatMode: true }) : "",
     },
   ];
 }) satisfies Controller["getSources"];

@@ -23,16 +23,14 @@ export function useTraceContent(trace?: UploadedTrace) {
             const connection = resolve({ url: source });
             if (connection) {
               notify("Fetching trace...");
-              const result = await connection
-                .transport()
-                .call("features/trace", { id });
+              const result = await connection.transport().call("features/trace", { id });
               return result?.content;
             }
           }
         },
-        { normalizer: (args) => objectHash([...args]) }
+        { normalizer: (args) => objectHash([...args]) },
       ),
-    [resolve, notify]
+    [resolve, notify],
   );
 
   const { content, source, id, key } = trace ?? {};
@@ -53,6 +51,6 @@ export function useTraceContent(trace?: UploadedTrace) {
           }
         }
       }),
-    [getTrace, !!content, key, source, id, lastModified]
+    [getTrace, !!content, key, source, id, lastModified],
   );
 }
