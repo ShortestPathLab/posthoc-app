@@ -26,17 +26,26 @@ function useOptimisticState<T>(value: T) {
 
   const latest = useRef<Promise<void> | null>(null);
 
-  return { latest, end, start, enabled, optimistic, setOptimistic };
+  return {
+    latest,
+    end,
+    start,
+    enabled,
+    optimistic,
+    setOptimistic,
+    setLatest: (e: Promise<void>) => (latest.current = e),
+  };
 }
 
 export function useOptimistic<T>(value: T, update: (f: T) => Promise<void>) {
-  const { enabled, optimistic, start, end, setOptimistic, latest } = useOptimisticState(value);
+  const { enabled, optimistic, start, end, setOptimistic, latest, setLatest } =
+    useOptimisticState(value);
   return [
     enabled ? optimistic : value,
     async (f: T) => {
       start();
       const job = update(f);
-      latest.current = job;
+      setLatest(job);
       setOptimistic(f);
       await job;
       if (latest.current === job) end();
@@ -48,14 +57,15 @@ export function useOptimisticTransaction<T>(
   value: T,
   update: (f: Transaction<T>) => Promise<void>,
 ) {
-  const { enabled, optimistic, start, end, setOptimistic, latest } = useOptimisticState(value);
+  const { enabled, optimistic, start, end, setOptimistic, latest, setLatest } =
+    useOptimisticState(value);
 
   return [
     enabled ? optimistic : value,
     async (f: Transaction<T>) => {
       start();
       const job = update(f);
-      latest.current = job;
+      setLatest(job);
       setOptimistic((l) => produce(l, f));
       await job;
       if (latest.current === job) end();

@@ -7,7 +7,7 @@ import { find, floor, get, some } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 import { isStepsLayer } from "pages/steps/StepsLayer";
 import { Size } from "protocol";
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "react-use";
 import { Renderer, RendererEvent } from "renderer";
 import { slice } from "slices";
@@ -40,43 +40,33 @@ export function useRendererInstance() {
 function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
   const theme = useTheme();
   const renderers = useOne(slice.renderers);
-  const ref = useRef<HTMLDivElement | null>(null);
+  const [ref, setRef] = useState<HTMLElement | null>(null);
   const [error, setError] = useState("");
   const [instance, setInstance] = useState<Renderer>();
 
-  // Whether a real, non-zero size has been measured. The renderer instance is
-  // (re)created when this flips true — not on every pixel of resize, which is
-  // handled by the debounced `setOptions` below. AutoSizer v2 renders with an
-  // undefined size on first paint, so without this the instance would never be
-  // created when the size arrives asynchronously (blank panel until something
-  // else forces the effect to re-run).
-  const hasSize = !!(width && height);
-
   useEffect(() => {
-    if (ref.current && hasSize && renderer) {
+    if (ref && renderer) {
       const entry = find(renderers, (r) => r.renderer.meta.id === renderer);
       if (entry) {
         try {
           const instance = new entry.renderer.constructor();
           instance.setup({
             ...rendererOptions,
-            screenSize: { width, height },
+            screenSize: { width: 256, height: 256 },
             backgroundColor: theme.palette.background.paper,
             accentColor: theme.palette.primary.main,
           });
-          ref.current.append(instance.getView()!);
+          ref.append(instance.getView()!);
           setInstance(instance);
           setError("");
-          const storedRef = ref.current;
           return () => {
             try {
-              storedRef.removeChild(instance.getView()!);
+              ref.removeChild(instance.getView()!);
               setInstance(undefined);
             } catch (e) {
               console.warn(e);
-            } finally {
-              instance.destroy();
             }
+            instance.destroy();
           };
         } catch (e) {
           setError(`${entry.renderer.meta.name}: ${get(e, "message")}`);
@@ -84,10 +74,7 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
         }
       }
     }
-    // `width`/`height` are intentionally omitted: the instance is (re)created when
-    // `hasSize` flips, while live resizing is handled by the debounced `setOptions` below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasSize, renderer, renderers, theme, setError, setInstance]);
+  }, [ref, theme.palette.primary.main, theme.palette.background.paper, renderer, renderers]);
 
   useDebounce(
     () => {
@@ -98,7 +85,7 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
     theme.transitions.duration.standard,
     [instance, width, height],
   );
-  return { instance, ref, error };
+  return { instance, ref, error, setRef };
 }
 
 function useLoading() {
@@ -128,7 +115,7 @@ function useAnyLayerPlaying() {
 
 export function TraceRenderer({ width, height, renderer, rendererRef, layers }: RendererProps) {
   const key = useMemo(() => nanoid(), []);
-  const { instance, error, ref } = useRenderer(renderer, { width, height });
+  const { instance, error, setRef } = useRenderer(renderer, { width, height });
 
   const playing = useAnyLayerPlaying();
 
@@ -191,7 +178,7 @@ export function TraceRenderer({ width, height, renderer, rendererRef, layers }: 
                 </Box>
               ) : (
                 <Box
-                  ref={ref}
+                  ref={setRef}
                   sx={{
                     "> canvas": { position: "absolute" },
                     animation: "fadeIn 75ms linear 450ms both",

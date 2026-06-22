@@ -15,7 +15,7 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import download from "downloadjs";
 import { inferLayerName } from "layers/inferLayerName";
 import { delay, every, filter, find, keyBy, map } from "es-toolkit/compat";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
 import { slice } from "slices";
@@ -50,10 +50,10 @@ export function ViewportPage({ template: Page }: PageContentProps) {
   const acrylic = useAcrylic();
   const layers = useOne(slice.layers);
   const [layerSet, setLayerSet] = useState<Record<string, boolean | undefined>>({});
-  const selectedLayers = useMemo(
-    () => filter(layers, (l) => layerSet?.[l.key] ?? true),
-    [layerSet, layers],
-  );
+  // No manual useMemo: the React Compiler bails out of the whole component if it
+  // can't preserve a hand-written memo ("CannotPreserveMemoization"). Letting the
+  // compiler auto-memoize this keeps the component (incl. Page.Options) optimized.
+  const selectedLayers = filter(layers, (l) => layerSet?.[l.key] ?? true);
 
   const [rendererInstance, setRendererInstance] = useState<RendererInstance | null>();
 
@@ -71,9 +71,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
         ),
       );
     }, 150);
-    // Re-run when the set of visible layer keys changes; `selectedLayers` is read fresh.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rendererInstance, selectedLayerKeys]);
+  }, [rendererInstance, selectedLayerKeys, selectedLayers]);
 
   const size = useSurfaceAvailableCssSize();
 
