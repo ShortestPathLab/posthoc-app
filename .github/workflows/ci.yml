@@ -27,10 +27,10 @@ jobs:
   lint:
     name: Lint (oxlint + react-compiler)
     runs-on: ubuntu-latest
-    # NOTE: report-only for now. The repo has pre-existing react-compiler
-    # rule violations (the rule is set to "error" in client/.oxlintrc.json).
-    # Remove this line to make lint a required gate once that backlog is cleared.
-    continue-on-error: true
+    # Required gate. The react-compiler rule is set to "warn" in
+    # client/.oxlintrc.json, so its pre-existing findings surface in the logs
+    # without failing CI; only genuine oxlint errors block. Tighten with
+    # `oxlint --max-warnings=N` once the react-compiler backlog is burned down.
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2

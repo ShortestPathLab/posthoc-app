@@ -6,7 +6,7 @@
   "env": { "browser": true, "es2024": true },
   "settings": { "react": { "version": "19.0.0" } },
   "rules": {
-    "react-compiler/react-compiler": "error"
+    "react-compiler/react-compiler": "warn"
   },
   "ignorePatterns": ["dist", "public", "public-dev"]
 }
