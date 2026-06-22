@@ -26,7 +26,11 @@ export type FullscreenPageProps = {
   children?: ReactNode;
 };
 
-export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(({ slotProps }) => {
+// Named function so the React Compiler optimizes it (it skips anonymous
+// components passed straight to a HOC like withSlots).
+function FullscreenPageTemplate({
+  slotProps,
+}: FullscreenPageProps & { slotProps: Partial<PageSlots> }) {
   const sm = useSm();
   const acrylic = useAcrylic();
   return (
@@ -88,7 +92,9 @@ export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(({ slotP
       </Box>
     </Stack>
   );
-});
+}
+
+export const FullscreenPage = withSlots<PageSlots, FullscreenPageProps>(FullscreenPageTemplate);
 
 export function FullscreenModalHost() {
   const sm = useSm();

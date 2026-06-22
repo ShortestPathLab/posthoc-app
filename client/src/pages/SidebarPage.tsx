@@ -10,7 +10,9 @@ import { slice } from "slices";
 import { useAcrylic } from "theme";
 import { PageContent, PageProps, PageSlots, divider } from "./Page";
 
-export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
+// Named function so the React Compiler optimizes it (it skips anonymous
+// components passed straight to a HOC like withSlots).
+function SidebarPageTemplate({ slotProps }: PageProps & { slotProps: Partial<PageSlots> }) {
   const bg = useSidebarBackground();
   const acrylic = useAcrylic(bg);
   return (
@@ -84,4 +86,6 @@ export const SidebarPage = withSlots<PageSlots, PageProps>(({ slotProps }) => {
       </Block>
     </ErrorBoundary>
   );
-});
+}
+
+export const SidebarPage = withSlots<PageSlots, PageProps>(SidebarPageTemplate);

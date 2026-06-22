@@ -64,7 +64,13 @@ export type PageSlots = {
   Handle: { children: React.ReactNode };
 };
 
-export const Page = withSlots<PageSlots, PageProps>(({ slotProps, onChange, stack }) => {
+// A named function (not an inline arrow) so the React Compiler optimizes it:
+// it skips anonymous components passed straight to a HOC like withSlots.
+function PageTemplate({
+  slotProps,
+  onChange,
+  stack,
+}: PageProps & { slotProps: Partial<PageSlots> }) {
   const acrylic = useAcrylic();
   const settings = useOne(slice.settings);
   return (
@@ -160,4 +166,6 @@ export const Page = withSlots<PageSlots, PageProps>(({ slotProps, onChange, stac
       </Block>
     </ErrorBoundary>
   );
-});
+}
+
+export const Page = withSlots<PageSlots, PageProps>(PageTemplate);
