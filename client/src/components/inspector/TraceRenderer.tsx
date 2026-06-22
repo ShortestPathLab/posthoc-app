@@ -3,7 +3,7 @@ import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { RenderLayer } from "layers/RenderLayer";
 import { clamp } from "es-toolkit";
-import { find, floor, get, map, some } from "es-toolkit/compat";
+import { find, floor, get, some } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 import { isStepsLayer } from "pages/steps/StepsLayer";
 import { Size } from "protocol";
@@ -47,8 +47,16 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
   const [error, setError] = useState("");
   const [instance, setInstance] = useState<Renderer>();
 
+  // Whether a real, non-zero size has been measured. The renderer instance is
+  // (re)created when this flips true — not on every pixel of resize, which is
+  // handled by the debounced `setOptions` below. AutoSizer v2 renders with an
+  // undefined size on first paint, so without this the instance would never be
+  // created when the size arrives asynchronously (blank panel until something
+  // else forces the effect to re-run).
+  const hasSize = !!(width && height);
+
   useEffect(() => {
-    if (ref.current && width && height && renderer) {
+    if (ref.current && hasSize && renderer) {
       const entry = find(renderers, (r) => r.renderer.meta.id === renderer);
       if (entry) {
         try {
@@ -82,7 +90,7 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
         }
       }
     }
-  }, [ref.current, map, renderer, renderers, theme, setError, setInstance]);
+  }, [ref.current, hasSize, renderer, renderers, theme, setError, setInstance]);
 
   useDebounce(
     () => {
