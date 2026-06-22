@@ -1,8 +1,12 @@
 {
   "$schema": "../node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "typescript", "unicorn", "oxc"],
+  "jsPlugins": ["eslint-plugin-react-compiler"],
   "categories": { "correctness": "warn" },
   "env": { "browser": true, "es2024": true },
   "settings": { "react": { "version": "19.0.0" } },
+  "rules": {
+    "react-compiler/react-compiler": "error"
+  },
   "ignorePatterns": ["dist", "public", "public-dev"]
 }

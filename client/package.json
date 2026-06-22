@@ -130,6 +130,7 @@
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "electron": "^34.5.8",
     "electron-packager": "^17.1.2",
+    "eslint-plugin-react-compiler": "^19.1.0-rc.2",
     "jsdom": "^26.1.0",
     "oxfmt": "^0.55.0",
     "oxlint": "^1.70.0",
