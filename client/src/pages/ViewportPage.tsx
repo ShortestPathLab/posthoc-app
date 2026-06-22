@@ -25,7 +25,7 @@ import { useAcrylic, usePaper } from "theme";
 import { generateUsername as id } from "unique-username-generator";
 import { PageContentProps } from "./PageMeta";
 import { useRendererResolver } from "./useRendererResolver";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { useOne } from "slices/useOne";
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
@@ -59,11 +59,11 @@ export function ViewportPage({ template: Page }: PageContentProps) {
 
   const { selected, auto } = useRendererResolver(state?.renderer);
 
-  const selectedLayerKeys = _(selectedLayers, (s) => map(s, "key").sort().join("."));
+  const selectedLayerKeys = flow(selectedLayers, (s) => map(s, "key").sort().join("."));
   useEffect(() => {
     delay(() => {
       rendererInstance?.fitCamera?.((b) =>
-        _(
+        flow(
           selectedLayers,
           (s) => filter(s, "viewKey"),
           (s) => map(s, "key"),

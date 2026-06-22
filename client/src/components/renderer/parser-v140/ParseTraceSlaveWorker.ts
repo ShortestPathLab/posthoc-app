@@ -2,7 +2,7 @@ import { findLast, groupBy, mapValues, range } from "es-toolkit/compat";
 import { CompiledComponent, EventContext, TraceEvent } from "protocol";
 import { Trace } from "protocol/Trace-v140";
 import { ComponentEntry } from "renderer";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { normalizeConstant } from "./normalize";
 import { parse as parseComponents } from "./parse";
 
@@ -41,7 +41,7 @@ export function parse({
     };
   };
 
-  const r = _(
+  const r = flow(
     trace?.events ?? [],
     (r) => r.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
     (r) => groupBy(r, "id"),

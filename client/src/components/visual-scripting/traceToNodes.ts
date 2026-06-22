@@ -1,7 +1,7 @@
 import { Edge, Node } from "@xyflow/react";
 import { parser } from "components/renderer/parser-v140/parseString";
 import { toPairs as entries, flatMap, forEach, groupBy, mapValues } from "es-toolkit/compat";
-import { flow } from "utils/chain";
+import { flow } from "utils/flow";
 import { TraceComponent } from "protocol/Trace-v140";
 import { Properties } from "./flow";
 import { getHeight } from "./FlowNode";

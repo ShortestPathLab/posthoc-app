@@ -15,7 +15,7 @@ import { nanoid } from "nanoid";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { id } from "slices/selector";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { result } from "utils/result";
 import { PageContentProps } from "../PageMeta";
 import { PageContent } from "./PageContent";
@@ -50,7 +50,7 @@ export function StepsPage({ template: Page }: PageContentProps) {
     () =>
       result(() => {
         if (steps) {
-          const stepTypes = _(
+          const stepTypes = flow(
             steps,
             (s) => s.map((a, b) => [a, b] as const),
             (s) => s.map(([e]) => e?.type),

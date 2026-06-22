@@ -39,7 +39,7 @@ import { PosthocMetaData } from "services/cloud-storage";
 import { slice } from "slices";
 import { useLoadingState } from "slices/loading";
 import { textFieldProps, usePaper } from "theme";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { parse, stringify } from "yaml";
 import { Button } from "../components/generic/inputs/Button";
 import { Image } from "./Image";
@@ -76,7 +76,7 @@ async function getMeta(k: string) {
 const getFileInfo = memoizee(
   async (k: string, f: () => Promise<string>) => {
     return {
-      name: _(k, basename, stripExtension, startCase),
+      name: flow(k, basename, stripExtension, startCase),
       path: await f(),
       ...(await getMeta(k)),
     };

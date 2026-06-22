@@ -15,7 +15,7 @@ import {
   uniqBy,
 } from "es-toolkit/compat";
 import { Trace } from "protocol/Trace";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";
 import { TreeWorkerParameters, TreeWorkerReturnType } from "./treeUtility.worker";
 import treeWorkerUrl from "./treeUtility.worker.ts?worker&url";
@@ -77,7 +77,7 @@ function computeLabels(labels?: unknown[]) {
     return "mixed" as const;
   }
 
-  return _(
+  return flow(
     labels ?? [],
     (t) => t.flatMap((v) => computeLabelsOne(v)),
     (t) => groupBy(t, "path"),
@@ -86,7 +86,7 @@ function computeLabels(labels?: unknown[]) {
 }
 
 export function computeTypes(events?: TraceEvent[]) {
-  return _(
+  return flow(
     events,
     (s) => map(s, (a, b) => [a, b] as const),
     (s) => map(s, ([e]) => e?.type ?? ""),

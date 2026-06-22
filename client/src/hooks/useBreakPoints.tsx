@@ -10,7 +10,7 @@ import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { UploadedTrace } from "slices/UIState";
 import { useOne } from "slices/useOne";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 export type DebugLayerData = {
   code?: string;
   monotonicF?: boolean;
@@ -48,7 +48,7 @@ export function useBreakPoints2(key?: string) {
 
   const shouldBreak = useMemo(() => {
     if (!dict) return;
-    const steps = _(
+    const steps = flow(
       layer?.source?.breakpointOutput,
       (b) => map(b, (s) => values(s)),
       (b) => flattenDepth(b, 2),

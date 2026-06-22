@@ -23,7 +23,7 @@ import { ITEM_HEIGHT, PADDING_TOP, pxToInt } from "./constants";
 import { StepsLayer } from "./StepsLayer";
 import { StepsPageState } from "./StepsPageState";
 import { Item } from "./Item";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { result } from "utils/result";
 import { useOne } from "slices/useOne";
 
@@ -53,7 +53,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
       result(() => {
         if (rawSteps) {
           const steps = rawSteps.map((a, b) => [a, b] as const);
-          const stepTypes = _(
+          const stepTypes = flow(
             steps,
             (s) => s.map(([e]) => e?.type),
             (s) => filter(s),

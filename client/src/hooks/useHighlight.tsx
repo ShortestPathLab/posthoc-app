@@ -8,14 +8,14 @@ import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { AccentColor } from "theme";
 import { set } from "utils/set";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { TraceEvent } from "protocol";
 export const index = <T extends TraceEvent>(
   a: T[] = [],
   id: "step" | "index" = "step",
   by: "id" | "pId" = "id",
 ) =>
-  _(
+  flow(
     a,
     (c) =>
       c.map((c, i) => ({

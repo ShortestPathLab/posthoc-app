@@ -3,7 +3,7 @@ import { DebugLayerData } from "hooks/useBreakPoints";
 import { getController } from "layers/layerControllers";
 import { uniq } from "es-toolkit";
 import { map, startCase } from "es-toolkit/compat";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
@@ -14,7 +14,7 @@ import { useOne } from "slices/useOne";
 export const EventSelect = ({ layer, ...props }: BreakpointFieldProps<string>) => {
   const one = slice.layers.one<Layer<DebugLayerData>>(layer);
   const { steps } = useOne(one, (l) => getController(l)?.steps?.(l), id("key")) ?? {};
-  const types = useMemo(() => _(steps, (v) => map(v, "type"), uniq), [steps]);
+  const types = useMemo(() => flow(steps, (v) => map(v, "type"), uniq), [steps]);
   return (
     <Select
       disabled={props.disabled}

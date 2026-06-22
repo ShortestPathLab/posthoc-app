@@ -4,7 +4,7 @@ import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
 import { usingMessageHandler } from "workers/usingWorker";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 
 export type Options = {
   color?: string;
@@ -52,12 +52,12 @@ function optimizeNetworkEdges(segments: number[][]) {
   // let xs = uniqBy(segments, join);
 
   while (true) {
-    const byHead = _(
+    const byHead = flow(
       xs,
       (x) => groupBy(x, head),
       (x) => mapValues(x, toSet),
     );
-    const byTail = _(
+    const byTail = flow(
       xs,
       (x) => groupBy(x, last),
       (x) => mapValues(x, toSet),

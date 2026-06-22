@@ -16,7 +16,7 @@ import { Layer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
 import { id } from "slices/selector";
 import { UploadedTrace } from "slices/UIState";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { NonEmptyString } from "utils/Char";
 import { set } from "utils/set";
 import { usingWorkerTask } from "workers/usingWorker";
@@ -105,7 +105,7 @@ export function BreakpointService({ value }: { value?: string }) {
         void set(
           l,
           "source.breakpointOutputDict",
-          _(
+          flow(
             outputs,
             values,
             (s) =>

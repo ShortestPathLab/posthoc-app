@@ -49,8 +49,6 @@ export function flow<T>(t: T, ...args: ((t: any) => any)[]): any {
   return current;
 }
 
-export const _ = flow;
-
 type MaybePromise<T> = T | Promise<T>;
 
 // Each step may return a value or a promise; the next step receives the awaited
@@ -109,6 +107,3 @@ export async function flowAsync<T>(t: T, ...args: ((t: any) => any)[]): Promise<
   }
   return current;
 }
-
-export const chainAsync = flowAsync;
-export const chain = flow;

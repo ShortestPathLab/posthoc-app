@@ -24,7 +24,7 @@ import {
   toPairs as entries,
 } from "es-toolkit/compat";
 import { Fragment } from "react";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 
 /** Open the full event-properties surface at the app root. */
 export function showEventProperties(event?: Record<string, unknown>) {
@@ -46,7 +46,7 @@ export const HEURISTIC_PROPS = ["f", "g", "h"];
 const ALL_PROPS = [...OMIT_PROPS, ...GRAPH_PROPS, ...HEURISTIC_PROPS];
 
 const sortEventKeys = (e: PropertyListProps["event"]) =>
-  _(
+  flow(
     e,
     (v) => entries(v),
     (v) => filter(v, ([, v]) => !isUndefined(v)),
@@ -113,7 +113,7 @@ export function PropertyList({
   const closeMenu = useMenuClose();
   return (
     <Block {...rest}>
-      {_(
+      {flow(
         sorted,
         (v) => filter(v, primitives ? ([, v]) => isPrimitive(v) : constant(true)),
         (v) => slice(v, 0, max),

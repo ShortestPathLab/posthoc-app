@@ -1,5 +1,5 @@
 import { find, map, startCase, toPairs as entries } from "es-toolkit/compat";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import memoizee from "memoizee";
 import { Scheme } from "protocol/SolveTask";
 import url from "url-parse";
@@ -25,7 +25,7 @@ const getFileInfo = memoizee(
   async (k: string, f: () => Promise<string>) => {
     return {
       id: `basic-maps${k}`,
-      name: _(k, basename, stripExtension, startCase),
+      name: flow(k, basename, stripExtension, startCase),
       path: await f(),
       format: ext(k),
     };

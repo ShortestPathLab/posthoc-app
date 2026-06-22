@@ -14,7 +14,7 @@ import { useCss, useMap } from "react-use";
 import { Transaction } from "slices/selector";
 import { Leaf, Root } from "slices/view";
 import { assert } from "utils/assert";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { ViewControls } from "./ViewControls";
 
 type TreeNode<S extends TreeNode = never> = { children?: S[] } | object;
@@ -284,7 +284,7 @@ export function ViewBranch<T extends Record<string, unknown>>(props: ViewBranchP
   }
 
   function share(n?: number, root: Root<T>[] = []) {
-    const all = _(
+    const all = flow(
       root,
       (r) => r.map((c) => (isUndefined(c.size) || isNaN(c.size) ? 0 : c.size)),
       sum,

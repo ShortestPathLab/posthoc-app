@@ -42,7 +42,7 @@ import { TraceLayerData } from "layers/trace/TraceLayer";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 
 import { groupBy, head, keys, map, omitBy, startCase, toPairs as entries } from "es-toolkit/compat";
-import { flow } from "utils/chain";
+import { flow } from "utils/flow";
 import { bindTrigger } from "material-ui-popup-state";
 import { nanoid } from "nanoid";
 import { TraceComponent } from "protocol/Trace-v140";

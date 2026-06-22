@@ -17,7 +17,7 @@ import { toPairs as entries, map, merge, reduce, sortBy } from "es-toolkit/compa
 import { ComponentProps, ReactNode, useMemo } from "react";
 import { slice } from "slices";
 import { useOne } from "slices/useOne";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 type Props = { selection?: RendererSelectEvent; onClose?: () => void };
 
 export type SelectionMenuEntry = {
@@ -58,7 +58,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
               {(menu) => {
                 const entries2 = entries(menu);
                 return entries2.length ? (
-                  _(
+                  flow(
                     entries2,
                     (v) => sortBy(v, ([, v]) => v.index),
                     (v) =>
@@ -72,7 +72,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
                               </Typography>
                             </ListItem>
                           )}
-                          {_(
+                          {flow(
                             items,
                             entries,
                             (v) => sortBy(v, ([, v]) => v.index),

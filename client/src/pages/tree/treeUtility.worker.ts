@@ -3,7 +3,7 @@ import { toPairs as entries, find, forEach, groupBy, sumBy, times } from "es-too
 import { arrayToTree } from "performant-array-to-tree";
 import { Trace, TraceEvent } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 export type EventTree = {
   id: Key;
   name: string;
@@ -71,7 +71,7 @@ function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
     return tree;
   }
   if (!trace) return;
-  const nodes = _(
+  const nodes = flow(
     trace.events ?? [],
     (t) => t.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
     (t) => groupBy(t, "id"),

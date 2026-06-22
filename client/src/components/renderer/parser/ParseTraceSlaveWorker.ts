@@ -2,7 +2,7 @@ import { negate } from "es-toolkit";
 import { findLast, groupBy, map, mapValues, range } from "es-toolkit/compat";
 import { CompiledComponent, EventContext, Trace } from "protocol";
 import { ComponentEntry } from "renderer";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { normalizeConstant } from "./normalize";
 import { parse as parseComponents } from "./parse";
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> => x === undefined || x === null;
@@ -33,7 +33,7 @@ export function parse({
       };
     };
 
-  const r = _(
+  const r = flow(
     trace?.events ?? [],
     (t) => t.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
     (t) => groupBy(t, "id"),

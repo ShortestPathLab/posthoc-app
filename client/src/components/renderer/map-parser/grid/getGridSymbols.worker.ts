@@ -1,4 +1,4 @@
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 import { getValue } from "./gradient";
 import { ParseGridWorkerParameters } from "./parseGrid.worker";
 import { usingMessageHandler } from "workers/usingWorker";
@@ -15,7 +15,7 @@ export function getGridSymbols({ map: m }: GetGridSymbolsParameters): GetGridSym
   const lines = m.split(/\r?\n/);
   const [, , , , ...grid] = lines;
   return {
-    symbols: _(
+    symbols: flow(
       grid,
       (g) => join(g, ""),
       trim,

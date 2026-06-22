@@ -19,13 +19,13 @@ import { Features } from "slices/features";
 import { useLoadingState } from "slices/loading";
 import { useOne } from "slices/useOne";
 import { timed } from "utils/timed";
-import { _ } from "utils/chain";
+import { flow } from "utils/flow";
 function withSource<T>(source: string) {
   return (v: T) => ({ ...v, source });
 }
 
 const getFeatures = async ({ transport, url }: Connection) => {
-  return _(
+  return flow(
     await mapAsync(["algorithms", "formats", "maps", "traces"] as const, async (prop) => {
       const { result } = await timed(() => transport().call(`features/${prop}`), 1000);
       return { prop, result: map(result, withSource(url)) };
@@ -57,7 +57,7 @@ export function FeaturesService() {
         };
         const reload = () => {
           if (!signal.aborted) {
-            const merged = _(features, values, (v) =>
+            const merged = flow(features, values, (v) =>
               reduce(v, (prev, next) =>
                 mergeWith({}, prev, next, (obj, src) =>
                   isArray(obj) ? uniqBy([...obj, ...src], "id") : undefined,
