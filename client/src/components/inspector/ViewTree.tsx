@@ -10,7 +10,7 @@ import { Context, createContext, ReactNode, Ref, useContext, useEffect, useMemo 
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { createHtmlPortalNode, HtmlPortalNode, InPortal, OutPortal } from "react-reverse-portal";
-import { useCss, useMap } from "react-use";
+import { useCss, useLatest, useMap } from "react-use";
 import { Transaction } from "slices/selector";
 import { Leaf, Root } from "slices/view";
 import { assert } from "utils/assert";
@@ -164,25 +164,39 @@ export function ViewLeaf<T extends Record<string, unknown>>({
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
   }));
 
-  const context = useMemo(() => {
-    const handleSplit = (orientation: "vertical" | "horizontal") =>
-      onChange?.((l) => ({
-        key: nanoid(),
-        type: "branch",
-        orientation,
-        children: [
-          { ...clone(l), size: 50, key: root.key },
-          {
-            type: "leaf",
-            acceptDrop: true,
-            content: defaultContent,
-            size: 50,
-            key: nanoid(),
-          },
-        ],
-      }));
-    return root.type === "leaf"
-      ? ({
+  // `onChange` is a fresh inline arrow on every render (it's rebuilt at each level
+  // of the ViewBranch recursion), so anything closing over it changes identity
+  // constantly. Read the latest one through a stable ref and expose
+  // constant-identity handlers, so the `onChange` every page consumes from context
+  // never changes — consumers (e.g. page option pickers) aren't re-rendered just
+  // because an ancestor re-rendered. No manual useMemo: the React Compiler
+  // memoizes these (a closure over only a ref has no reactive deps -> stable).
+  const onChangeRef = useLatest(onChange);
+  const handleContentChange = (c: Transaction<T>) =>
+    onChangeRef.current?.((l) => {
+      assert(l.type === "leaf", "onChange is from leaf");
+      l.content = produce(l?.content ?? ({} as T), c);
+    });
+  const handleSplit = (orientation: "vertical" | "horizontal") =>
+    onChangeRef.current?.((l) => ({
+      key: nanoid(),
+      type: "branch",
+      orientation,
+      children: [
+        { ...clone(l), size: 50, key: root.key },
+        {
+          type: "leaf",
+          acceptDrop: true,
+          content: defaultContent,
+          size: 50,
+          key: nanoid(),
+        },
+      ],
+    }));
+
+  const context: ViewTreeContextType<T> =
+    root.type === "leaf"
+      ? {
           isViewTree: true,
           state: root.content,
           controls: (
@@ -212,14 +226,9 @@ export function ViewLeaf<T extends Record<string, unknown>>({
               />
             </Box>
           ),
-          onChange: (c: Transaction<T>) =>
-            onChange?.((l) => {
-              assert(l.type === "leaf", "onChange is from leaf");
-              l.content = produce(l?.content ?? ({} as T), c);
-            }),
-        } satisfies ViewTreeContextType<T>)
+          onChange: handleContentChange,
+        }
       : {};
-  }, [onChange, onClose, depth, root, drag, onMaximise, defaultContent, canPopOut, onPopOut]);
 
   const portal = view[root.key];
 
