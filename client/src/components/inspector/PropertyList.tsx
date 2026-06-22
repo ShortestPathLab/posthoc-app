@@ -23,7 +23,7 @@ import {
   startCase,
   toPairs as entries,
 } from "es-toolkit/compat";
-import { Fragment } from "react";
+import { Fragment, ReactElement } from "react";
 import { _ } from "utils/chain";
 
 export const COMMON_PROPS = ["type"];
@@ -100,31 +100,35 @@ export function EventProperties({ event }: Pick<PropertyListProps, "event">) {
   ));
 }
 
-export function PropertyDialog({
-  event,
-  max = 10,
-  ...rest
-}: Omit<PropertyListProps, "variant" | "simple" | "primitives"> & Partial<SurfaceProps>) {
+export type PropertyDialogProps = Omit<PropertyListProps, "variant" | "simple" | "primitives"> &
+  Omit<Partial<SurfaceProps>, "trigger"> & {
+    trigger?: (props: { open: () => void }) => ReactElement;
+  };
+
+export function PropertyDialog({ event, max = 10, trigger, ...rest }: PropertyDialogProps) {
   const sorted = sortEventKeys(event);
   const { open } = useSurface(EventProperties, merge({ title: "Event Properties" }, rest));
+  const handleOpen = () => open({ event });
   return (
-    <Button
-      variant="text"
-      sx={{
-        mx: -1,
-        minWidth: 0,
-        width: "fit-content",
-        color: (t) => t.palette.text.secondary,
-        justifyContent: "left",
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        open({ event });
-      }}
-    >
-      {sorted.length - max} more
-    </Button>
+    trigger?.({ open: handleOpen }) ?? (
+      <Button
+        variant="text"
+        sx={{
+          mx: -1,
+          minWidth: 0,
+          width: "fit-content",
+          color: (t) => t.palette.text.secondary,
+          justifyContent: "left",
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          handleOpen();
+        }}
+      >
+        {sorted.length - max} more
+      </Button>
+    )
   );
 }
 

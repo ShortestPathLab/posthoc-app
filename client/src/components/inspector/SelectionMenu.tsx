@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer";
 import { useCache } from "hooks/useCache";
+import { MenuCloseContext } from "hooks/useMenuClose";
 import { SelectionInfoProvider } from "layers/LayerController";
 import { getController } from "layers/layerControllers";
 import { toPairs as entries, map, merge, reduce, sortBy } from "es-toolkit/compat";
@@ -56,83 +57,85 @@ export function SelectionMenu({ selection, onClose }: Props) {
       onClose={onClose}
       keepMounted
     >
-      <MenuList dense sx={{ py: 0 }}>
-        {
-          <MenuContent event={cache}>
-            {(menu) => {
-              const entries2 = entries(menu);
-              return entries2.length ? (
-                _(
-                  entries2,
-                  (v) => sortBy(v, ([, v]) => v.index),
-                  (v) =>
-                    map(v, ([, { items, primary }], i) => (
-                      <>
-                        {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
-                        {primary && (
-                          <ListItem sx={{ py: 0 }}>
-                            <Typography component="div" color="text.secondary" variant="overline">
-                              {primary}
-                            </Typography>
-                          </ListItem>
-                        )}
-                        {_(
-                          items,
-                          entries,
-                          (v) => sortBy(v, ([, v]) => v.index),
-                          (v) =>
-                            map(v, ([k, { action, icon, primary, secondary, extras }]) => (
-                              <>
-                                {!!(action || primary || secondary) &&
-                                  (action ? (
-                                    <MenuItem
-                                      key={k}
-                                      onClick={() => {
-                                        action?.();
-                                        onClose?.();
-                                      }}
-                                    >
-                                      {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                                      <ListItemText primary={primary} sx={{ mr: 4 }} />
-                                      <Typography
-                                        component="div"
-                                        variant="body2"
-                                        color="text.secondary"
+      <MenuCloseContext.Provider value={onClose}>
+        <MenuList dense sx={{ py: 0 }}>
+          {
+            <MenuContent event={cache}>
+              {(menu) => {
+                const entries2 = entries(menu);
+                return entries2.length ? (
+                  _(
+                    entries2,
+                    (v) => sortBy(v, ([, v]) => v.index),
+                    (v) =>
+                      map(v, ([, { items, primary }], i) => (
+                        <>
+                          {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
+                          {primary && (
+                            <ListItem sx={{ py: 0 }}>
+                              <Typography component="div" color="text.secondary" variant="overline">
+                                {primary}
+                              </Typography>
+                            </ListItem>
+                          )}
+                          {_(
+                            items,
+                            entries,
+                            (v) => sortBy(v, ([, v]) => v.index),
+                            (v) =>
+                              map(v, ([k, { action, icon, primary, secondary, extras }]) => (
+                                <>
+                                  {!!(action || primary || secondary) &&
+                                    (action ? (
+                                      <MenuItem
+                                        key={k}
+                                        onClick={() => {
+                                          action?.();
+                                          onClose?.();
+                                        }}
                                       >
-                                        {secondary}
-                                      </Typography>
-                                    </MenuItem>
-                                  ) : (
-                                    <ListItem key={k}>
-                                      {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                                      <ListItemText primary={primary} sx={{ mr: 4 }} />
-                                      <Typography
-                                        component="div"
-                                        variant="body2"
-                                        color="text.secondary"
-                                      >
-                                        {secondary}
-                                      </Typography>
-                                    </ListItem>
-                                  ))}
-                                {!!extras && extras}
-                              </>
-                            )),
-                        )}
-                      </>
-                    )),
-                )
-              ) : (
-                <>
-                  <ListItem>
-                    <Typography component="div">No info to show.</Typography>
-                  </ListItem>
-                </>
-              );
-            }}
-          </MenuContent>
-        }
-      </MenuList>
+                                        {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                                        <ListItemText primary={primary} sx={{ mr: 4 }} />
+                                        <Typography
+                                          component="div"
+                                          variant="body2"
+                                          color="text.secondary"
+                                        >
+                                          {secondary}
+                                        </Typography>
+                                      </MenuItem>
+                                    ) : (
+                                      <ListItem key={k}>
+                                        {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                                        <ListItemText primary={primary} sx={{ mr: 4 }} />
+                                        <Typography
+                                          component="div"
+                                          variant="body2"
+                                          color="text.secondary"
+                                        >
+                                          {secondary}
+                                        </Typography>
+                                      </ListItem>
+                                    ))}
+                                  {!!extras && extras}
+                                </>
+                              )),
+                          )}
+                        </>
+                      )),
+                  )
+                ) : (
+                  <>
+                    <ListItem>
+                      <Typography component="div">No info to show.</Typography>
+                    </ListItem>
+                  </>
+                );
+              }}
+            </MenuContent>
+          }
+        </MenuList>
+      </MenuCloseContext.Provider>
     </Menu>
   );
 }
