@@ -16,7 +16,7 @@ import { useMemo } from "react";
 import { useSyncStatus } from "services/SyncService";
 import { slice } from "slices";
 import { useOne } from "slices/useOne";
-import { accentColors, getShade, usePaper } from "theme";
+import { usePaper } from "theme";
 
 export function useSidebarBackground() {
   const { palette } = useTheme();
@@ -121,11 +121,7 @@ export function Sidebar() {
                       sx={{
                         alignItems: "center",
                         display: "flex",
-                        "> svg": {
-                          width: 20,
-                          height: 20,
-                          fill: (t) => getShade(c.color, t.palette.mode),
-                        },
+                        "> svg": { width: 20, height: 20 },
                         "> svg > path": { strokeWidth: 1 },
                       }}
                     >
