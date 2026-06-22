@@ -35,7 +35,7 @@ export function LayerListEditor() {
           })}
           onChange={(v) => startTransition(() => slice.layers.set(v))}
           addItemLabel="Layer"
-          placeholder={<Box pt={2}>Get started by adding a layer.</Box>}
+          placeholder={<Box sx={{ pt: 2 }}>Get started by adding a layer.</Box>}
           onFocus={(key) => {
             const element = head(document.getElementsByClassName(key));
             if (element && "click" in element && typeof element.click === "function") {

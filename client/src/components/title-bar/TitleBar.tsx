@@ -54,7 +54,7 @@ function MenuEntry({
   label: ReactNode;
 }) {
   return (
-    <Stack direction="row" gap={1}>
+    <Stack direction="row" sx={{ gap: 1 }}>
       {!!startIcon &&
         cloneElement(startIcon as ReactElement<IconProps>, {
           fontSize: "small",
@@ -190,9 +190,7 @@ export const TitleBar = () => {
             <Stack
               direction="row"
               spacing={1}
-              sx={{ height: "100%" }}
-              alignItems="center"
-              justifyContent="flex-start"
+              sx={{ height: "100%", alignItems: "center", justifyContent: "flex-start" }}
             >
               {(!visible || rect.x === 0) && (
                 // Hide for macos style windows

@@ -38,8 +38,8 @@ function App() {
       {!loading && (
         <Stack>
           <TitleBar />
-          <Block flex={1}>
-            <Inspector flex={1} />
+          <Block sx={{ flex: 1 }}>
+            <Inspector sx={{ flex: 1 }} />
           </Block>
         </Stack>
       )}

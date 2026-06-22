@@ -82,11 +82,13 @@ export function DrawerSurface({
   return (
     <SwipeableDrawer
       transitionDuration={{ enter: 500, exit: 500 }}
-      SlideProps={{
-        mountOnEnter: true,
-        easing: {
-          enter: theme.transitions.easing.easeOut,
-          exit: theme.transitions.easing.easeOut,
+      slotProps={{
+        transition: {
+          mountOnEnter: true,
+          easing: {
+            enter: theme.transitions.easing.easeOut,
+            exit: theme.transitions.easing.easeOut,
+          },
         },
       }}
       anchor="bottom"
@@ -118,8 +120,8 @@ export function DrawerSurface({
               mx: "auto",
               bgcolor: "background.paper",
               "--Paper-overlay": "none !important",
-              borderTopLeftRadius: (t) => t.shape.borderRadius * 2,
-              borderTopRightRadius: (t) => t.shape.borderRadius * 2,
+              borderTopLeftRadius: (t) => Number(t.shape.borderRadius) * 2,
+              borderTopRightRadius: (t) => Number(t.shape.borderRadius) * 2,
               maxHeight: `calc(100dvh - ${gap}px)`,
               boxShadow: (t) => `0 ${t.spacing(4)} 0px 0px ${t.palette.background.paper} `,
             },

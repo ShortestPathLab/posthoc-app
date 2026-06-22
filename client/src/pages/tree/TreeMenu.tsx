@@ -74,16 +74,18 @@ export function TreeMenu({
     <Menu
       keepMounted
       {...props}
-      PaperProps={{
-        sx: {
-          width: MENU_WIDTH,
-          maxHeight: MENU_MAX_HEIGHT,
-          overflow: "hidden",
+      slotProps={{
+        paper: {
+          sx: {
+            width: MENU_WIDTH,
+            maxHeight: MENU_MAX_HEIGHT,
+            overflow: "hidden",
+          },
+          onWheel: stop,
+          onMouseDown: stop,
+          onClick: stop,
+          onTouchMove: stop,
         },
-        onWheel: stop,
-        onMouseDown: stop,
-        onClick: stop,
-        onTouchMove: stop,
       }}
     >
       <MenuList
@@ -182,12 +184,12 @@ export function TreeMenu({
                     </Typography>
                   </ListItem>
 
-                  <Box px={2} pb={1}>
+                  <Box sx={{ px: 2, pb: 1 }}>
                     <Typography variant="body2">{startCase(type)}</Typography>
                   </Box>
 
                   {!!idProps.length && (
-                    <Box px={2} pb={1}>
+                    <Box sx={{ px: 2, pb: 1 }}>
                       {idProps.map(([k, v]) => (
                         <Row key={k} k={k} v={v} />
                       ))}
@@ -200,7 +202,7 @@ export function TreeMenu({
                     </Typography>
                   </ListItem>
 
-                  <Box px={2} py={1}>
+                  <Box sx={{ px: 2, py: 1 }}>
                     {otherProps.length ? (
                       otherProps.map(([k, v]) => <Row key={k} k={k} v={v} />)
                     ) : (

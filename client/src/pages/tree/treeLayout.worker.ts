@@ -24,7 +24,7 @@ export type EventTree = {
 export type Key = string | number | null | undefined;
 
 function parse({ trace, mode, orientation }: TreeWorkerParameters) {
-  const g = new graphlib.Graph<{ size: number }>();
+  const g = new graphlib.Graph();
 
   // Set an object for the graph label
   g.setGraph({});

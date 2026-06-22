@@ -49,7 +49,7 @@ export function SymbolColorPicker({
       {(state) => (
         <>
           <FeaturePickerButton {...bindTrigger(state)}>
-            <Stack direction="row" gap={1} alignItems="center">
+            <Stack direction="row" sx={{ gap: 1, alignItems: "center" }}>
               <Box
                 sx={{
                   width: 16,

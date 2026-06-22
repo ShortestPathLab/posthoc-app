@@ -74,8 +74,8 @@ export function FeaturePicker({
         value: id,
         label: (
           <Stack
-            alignItems={itemOrientation === "vertical" ? "flex-start" : "center"}
             direction={itemOrientation === "vertical" ? "column" : "row"}
+            sx={{ alignItems: itemOrientation === "vertical" ? "flex-start" : "center" }}
           >
             <Type>
               {renderItem ? (

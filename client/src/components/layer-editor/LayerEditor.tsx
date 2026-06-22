@@ -113,9 +113,9 @@ export function Label({ children }: { children: ReactNode }) {
 
 export function Option({ label, option }: { label: ReactNode; option: ReactNode }) {
   return (
-    <Block alignItems="center">
+    <Block sx={{ alignItems: "center" }}>
       <Label>{label}</Label>
-      <Space flex={1} />
+      <Space sx={{ flex: 1 }} />
       {option}
     </Block>
   );
@@ -143,7 +143,7 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
       }}
       trigger={({ open }) => <Item onClick={open} layer={key} />}
     >
-      <Box p={2}>
+      <Box sx={{ p: 2 }}>
         <WithLayer layer={key}>
           {(l) => (
             <TextField
@@ -240,7 +240,7 @@ function Item({ layer, ...props }: { layer?: string } & StackProps) {
       }}
       {...props}
     >
-      <Stack alignItems="center" direction="row" gap={2}>
+      <Stack direction="row" sx={{ alignItems: "center", gap: 2 }}>
         <Stack
           sx={{
             ...paper(0.5),

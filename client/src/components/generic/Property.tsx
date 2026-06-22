@@ -58,11 +58,13 @@ export function renderProperty(obj: unknown, simple: boolean = false) {
 export function Property({ label, value, type, simple }: Props) {
   return (
     <Block
-      width="auto"
-      mr={2}
-      mb={0.5}
       key={`${label}::${renderProperty(value)}`}
-      alignItems="baseline"
+      sx={{
+        width: "auto",
+        mr: 2,
+        mb: 0.5,
+        alignItems: "baseline",
+      }}
     >
       <Type component="div" variant="body2" {...type} sx={{ opacity: 0.54, ...type?.sx }}>
         {label}

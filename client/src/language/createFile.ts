@@ -1,4 +1,5 @@
 import type { default as Monaco, editor } from "monaco-editor";
+import { getTypeScriptWorker } from "monaco-editor/esm/vs/language/typescript/monaco.contribution";
 
 export function createFile(
   monaco: typeof Monaco,
@@ -21,7 +22,7 @@ export async function getInstance(
   contents: string,
 ) {
   const uri = createFile(monaco, model, id, contents);
-  const worker = await (await monaco.languages.typescript.getTypeScriptWorker())(uri);
+  const worker = await (await getTypeScriptWorker())(uri);
   return {
     uri,
     worker,

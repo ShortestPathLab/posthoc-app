@@ -217,7 +217,11 @@ export class D2RendererWorker extends EventEmitter<
         "local('Inter'), local('Inter UI'), url('/fonts/inter.woff2') format('woff2'), url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2) format('woff2'), local('-apple-system'), local('BlinkMacSystemFont'), local('Arial'), local('Helvetica'), local('sans-serif')"
       );
       // add it to the list of fonts our worker supports
-      self.fonts.add(fontFace);
+      // `self.fonts` is the FontFaceSet on the WorkerGlobalScope (this code runs
+      // inside a web worker). The client's tsconfig lacks the `webworker` lib so
+      // `self` is typed as `Window`, which doesn't expose `fonts`; reference the
+      // FontFaceSet through a typed view of the global scope instead.
+      (self as unknown as { fonts: FontFaceSet }).fonts.add(fontFace);
       // load the font
       await fontFace.load();
     } catch (e) {

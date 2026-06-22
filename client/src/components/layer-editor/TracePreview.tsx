@@ -17,7 +17,6 @@ export function TracePreview({ trace, language = "yaml" }: { trace?: Trace; lang
                   ...trace,
                   events: take(trace.events, 10),
                 },
-                { noCompatMode: true },
               )
             : "No data"
         }

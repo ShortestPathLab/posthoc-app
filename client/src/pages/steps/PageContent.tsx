@@ -131,7 +131,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
 
   return (
     <>
-      <Block vertical alignItems="center">
+      <Block vertical sx={{ alignItems: "center" }}>
         {steps ? (
           steps.length ? (
             <List

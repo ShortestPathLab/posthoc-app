@@ -12,7 +12,7 @@ export function useMultiDirectedGraph(
   trace: Trace | undefined,
   tree: TreeWorkerReturnType | undefined,
   orientation: "horizontal" | "vertical" = "horizontal",
-) {
+): MultiDirectedGraph {
   const theme = useTheme();
   const finalParents = useMemo(() => getFinalParents(trace), [trace]);
 

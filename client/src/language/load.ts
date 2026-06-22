@@ -27,4 +27,4 @@ self.MonacoEnvironment = {
 
 loader.config({ monaco });
 
-export const load = once(() => loader.init());
+export const load: () => Promise<typeof monaco> = once(() => loader.init());

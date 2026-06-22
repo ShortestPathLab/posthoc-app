@@ -109,7 +109,7 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
         open={open}
         autoHideDuration={6000}
         onClose={handleClose}
-        TransitionProps={{ onExited: handleExited }}
+        slotProps={{ transition: { onExited: handleExited } }}
         message={current?.message}
         action={
           <>

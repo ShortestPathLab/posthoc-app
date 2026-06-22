@@ -5,13 +5,16 @@ import { useSnackbar } from "components/generic/Snackbar";
 import { SurfaceContentProps } from "components/generic/surface";
 import download from "downloadjs";
 import { useWorkspace } from "hooks/useWorkspace";
-import { Jimp } from "jimp";
 import { kebabCase } from "es-toolkit";
 import { ceil, toPairs as entries, reduce } from "es-toolkit/compat";
+import pica from "pica";
 import { nanoid as id } from "nanoid";
 import { map } from "promise-tools";
 import { useMemo, useState } from "react";
-import { CloudStorageProvider, cloudStorageProviders } from "services/cloud-storage";
+import {
+  CloudStorageProvider,
+  cloudStorageProviders,
+} from "services/cloud-storage";
 import { useLoadingState } from "slices/loading";
 import { workspaceMeta, WorkspaceMeta } from "slices/UIState";
 import { textFieldProps, usePaper } from "theme";
@@ -29,35 +32,54 @@ const replacements = {
 
 function getFilename(name: string = "") {
   return (
-    kebabCase(reduce(entries(replacements), (prev, [a, b]) => prev.replace(a, ` ${b} `), name)) ||
-    "untitled"
+    kebabCase(
+      reduce(
+        entries(replacements),
+        (prev, [a, b]) => prev.replace(a, ` ${b} `),
+        name,
+      ),
+    ) || "untitled"
   );
 }
 
 const imageSize = 64;
 
+const resizer = pica();
+
 async function resizeImage(s: string) {
   const base64String = s.split(",")[1];
   if (!base64String) throw new Error("Invalid base64 image data");
 
-  const binaryData = Uint8Array.from(atob(base64String), (c) => c.charCodeAt(0));
+  const binaryData = Uint8Array.from(atob(base64String), (c) =>
+    c.charCodeAt(0),
+  );
 
-  const a = await Jimp.read(binaryData.buffer);
-  const b = a.width < a.height ? a.resize({ w: imageSize }) : a.resize({ h: imageSize });
-  return await b
-    .crop({
-      x: (b.width - imageSize) / 2,
-      y: (b.height - imageSize) / 2,
-      w: imageSize,
-      h: imageSize,
-    })
-    .getBase64("image/jpeg");
+  const source = await createImageBitmap(new Blob([binaryData.buffer]));
+
+  // Scale so the shorter edge becomes `imageSize` (cover), then centre-crop.
+  const scale = imageSize / Math.min(source.width, source.height);
+  const cover = document.createElement("canvas");
+  cover.width = Math.round(source.width * scale);
+  cover.height = Math.round(source.height * scale);
+  await resizer.resize(source, cover);
+
+  const cropped = document.createElement("canvas");
+  cropped.width = imageSize;
+  cropped.height = imageSize;
+  cropped
+    .getContext("2d")!
+    .drawImage(cover, (cover.width - imageSize) / 2, (cover.height - imageSize) / 2);
+
+  return cropped.toDataURL("image/jpeg");
 }
 
 export function ExportWorkspace({
   uploadFile,
 }: {
-  uploadFile?: CloudStorageProvider<keyof typeof cloudStorageProviders, unknown>["saveFile"];
+  uploadFile?: CloudStorageProvider<
+    keyof typeof cloudStorageProviders,
+    unknown
+  >["saveFile"];
 } & SurfaceContentProps) {
   const paper = usePaper();
   const fields = useOne(workspaceMeta);
@@ -67,7 +89,10 @@ export function ExportWorkspace({
   // const storage = useCloudStorageInstance();
   const workspaceSize = useMemo(() => estimateWorkspaceSize(), []);
   const [uploading, setUploading] = useState(false);
-  async function getFields(size: number, lastModified: number): Promise<WorkspaceMeta> {
+  async function getFields(
+    size: number,
+    lastModified: number,
+  ): Promise<WorkspaceMeta> {
     return {
       ...fields,
       id: id(),
@@ -82,7 +107,7 @@ export function ExportWorkspace({
       <Box>
         <Gallery onChange={(v) => workspaceMeta.assign({ screenshots: v })} />
       </Box>
-      <Stack p={2} gap={2}>
+      <Stack sx={{ p: 2, gap: 2 }}>
         <TextField
           {...textFieldProps}
           defaultValue={fields.name}
@@ -95,7 +120,9 @@ export function ExportWorkspace({
           minRows={3}
           defaultValue={fields.description}
           size="small"
-          onChange={(e) => workspaceMeta.assign({ description: e.target.value })}
+          onChange={(e) =>
+            workspaceMeta.assign({ description: e.target.value })
+          }
           label="Description"
           fullWidth
           multiline
@@ -119,10 +146,14 @@ export function ExportWorkspace({
 
                 setUploading(true);
                 const { file } = await generateWorkspaceFile(name);
-                const posthocMetadata = JSON.stringify(await getFields(file.size, Date.now()));
-                const posthocMetaFile = new File([posthocMetadata], `${name}.workspace.meta`, {
-                  type: "application/json",
-                });
+                const posthocMetadata = JSON.stringify(
+                  await getFields(file.size, Date.now()),
+                );
+                const posthocMetaFile = new File(
+                  [posthocMetadata],
+                  `${name}.workspace.meta`,
+                  { type: "application/json" },
+                );
 
                 if (uploadFile) {
                   await uploadFile(posthocMetaFile);
@@ -144,7 +175,7 @@ export function ExportWorkspace({
             startIcon={<UploadOutlined />}
             size="large"
           >
-            <Stack sx={{ ml: 1 }} alignItems="baseline">
+            <Stack sx={{ ml: 1, alignItems: "baseline" }}>
               {fields.name || "Untitled"}
               <Typography component="div" color="text.secondary">
                 {getFilename(fields.name)}.workspace

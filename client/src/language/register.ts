@@ -3,8 +3,8 @@ import { flatMap, join, map } from "es-toolkit/compat";
 import { MarkerSeverity, type default as Monaco, Range, type editor } from "monaco-editor";
 import { registerMarkerDataProvider } from "monaco-marker-data-provider";
 import { configureMonacoYaml } from "monaco-yaml";
+import { typescriptDefaults } from "monaco-editor/esm/vs/language/typescript/monaco.contribution";
 import { map as mapAsync } from "promise-tools";
-import type { CompletionInfo, QuickInfo } from "typescript";
 import { assert } from "utils/assert";
 import { get } from "utils/set";
 import { createFile, getInstance } from "./createFile";
@@ -57,8 +57,8 @@ export const register = once((monaco: typeof Monaco) => {
     method: monaco.languages.CompletionItemKind.Method,
   };
 
-  monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-    ...monaco.languages.typescript.typescriptDefaults.getCompilerOptions(),
+  typescriptDefaults.setCompilerOptions({
+    ...typescriptDefaults.getCompilerOptions(),
     lib: ["esnext"],
   });
 
@@ -69,9 +69,7 @@ export const register = once((monaco: typeof Monaco) => {
       if (isUndefined(expr)) return { suggestions: [] };
       generateDts(monaco, model);
       const { uri, worker, dispose } = await getInstance(monaco, model, "completion", expr.match);
-      const suggestions = (await worker.getCompletionsAtPosition(uri.toString(), expr.at + 1)) as
-        | CompletionInfo
-        | undefined;
+      const suggestions = await worker.getCompletionsAtPosition(uri.toString(), expr.at + 1);
       assert(suggestions, "suggestions is defined");
       const word = model.getWordUntilPosition(position);
       dispose();
@@ -98,9 +96,7 @@ export const register = once((monaco: typeof Monaco) => {
       if (isUndefined(expr)) return { contents: [] };
       generateDts(monaco, model);
       const { worker, uri, dispose } = await getInstance(monaco, model, "hover", expr.match);
-      const info = (await worker.getQuickInfoAtPosition(uri.toString(), expr.at + 1)) as
-        | QuickInfo
-        | undefined;
+      const info = await worker.getQuickInfoAtPosition(uri.toString(), expr.at + 1);
       if (!info) return { contents: [] };
       dispose();
       return {

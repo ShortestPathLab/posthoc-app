@@ -26,7 +26,6 @@ export const getSources = ((layer) => {
               : t,
           ),
         },
-        { noCompatMode: true },
       ),
     },
   ];

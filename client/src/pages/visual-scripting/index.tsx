@@ -274,6 +274,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
                                       key: "component",
                                       title: k,
                                       group: "components",
+                                      description: undefined as string | undefined,
                                     }),
                                   ] as const,
                               ),
@@ -320,11 +321,11 @@ export function VisualPage({ template: Page }: PageContentProps) {
                       )}
                     </Surface>
 
-                    <Button variant="contained" onClick={onRestore}>
+                    <Button variant="filled" onClick={onRestore}>
                       Restore
                     </Button>
 
-                    <Button variant="contained" onClick={onSave}>
+                    <Button variant="filled" onClick={onSave}>
                       Save
                     </Button>
                   </Stack>

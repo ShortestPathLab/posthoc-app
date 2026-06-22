@@ -120,7 +120,7 @@ const UploadWorkspace = () => {
       </Typography>
       <Button
         disabled={uploading}
-        variant="contained"
+        variant="filled"
         onClick={handleUpload}
         startIcon={<UploadOutlined color="primary" />}
       >
@@ -167,7 +167,6 @@ const WorkspacesEditor = () => {
         (storage?.auth?.authenticated ? (
           <Stack
             direction={dual ? "row" : "column"}
-            gap={dual ? 2 : 0}
             sx={{
               visibility: width ? "visible" : "hidden",
               px: padding,

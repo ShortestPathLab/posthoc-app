@@ -10,7 +10,7 @@ import { getController } from "layers/layerControllers";
 import { isEqual } from "es-toolkit";
 import { find, flatMap, head, isObject, map } from "es-toolkit/compat";
 import { useEffect, useMemo, useState } from "react";
-import AutoSize from "react-virtualized-auto-sizer";
+import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
@@ -108,9 +108,9 @@ export function SourcePage({ template: Page }: PageContentProps) {
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         {sources?.length ? (
-          <Block pt={6}>
-            <AutoSize>
-              {(size: { width: number; height: number }) =>
+          <Block sx={{ pt: 6 }}>
+            <AutoSize
+              renderProp={({ width = 0, height = 0 }) =>
                 instance && (
                   <Editor
                     onMount={(_, m) => setMonaco(m)}
@@ -127,13 +127,14 @@ export function SourcePage({ template: Page }: PageContentProps) {
                     }}
                     language={selected?.source?.language}
                     loading={<CircularProgress variant="indeterminate" />}
-                    {...size}
+                    width={width}
+                    height={height}
                     defaultValue={value}
                     onChange={setValue}
                   />
                 )
               }
-            </AutoSize>
+            />
           </Block>
         ) : (
           <Placeholder icon={<CodeOutlined />} label="Source" />

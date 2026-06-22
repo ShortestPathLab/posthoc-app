@@ -37,7 +37,7 @@ export function RendererEditor({ value, onChange: onValueChange }: RendererEdito
   const status = value.disabled ? "disabled" : current?.renderer ? "connected" : "error";
 
   return (
-    <Block alignItems="center" py={1}>
+    <Block sx={{ alignItems: "center", py: 1 }}>
       <Surface
         slotProps={{
           paper: { sx: { width: 480 } },
@@ -51,8 +51,8 @@ export function RendererEditor({ value, onChange: onValueChange }: RendererEdito
             <Box
               className={value.key}
               onClick={open}
-              flex={1}
               sx={{
+                flex: 1,
                 width: 0,
                 overflow: "hidden",
                 "> *": {
@@ -105,7 +105,7 @@ export function RendererEditor({ value, onChange: onValueChange }: RendererEdito
         )}
         title="Edit Renderer"
       >
-        <Box p={2.5}>
+        <Box sx={{ p: 2.5 }}>
           <TextField
             autoFocus
             defaultValue={value.url}

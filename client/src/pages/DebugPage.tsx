@@ -68,9 +68,9 @@ export function DebugPage({ template: Page }: PageContentProps) {
         <Page.Content>
           {layer ? (
             <Scroll y>
-              <Box pt={6} height="100%">
+              <Box sx={{ pt: 6, height: "100%" }}>
                 <TabPanel value="standard" sx={{ p: 2 }}>
-                  <Box mx={-2}>
+                  <Box sx={{ mx: -2 }}>
                     <BreakpointListEditor layer={layer?.key} />
                   </Box>
                 </TabPanel>

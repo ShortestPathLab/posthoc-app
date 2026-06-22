@@ -70,7 +70,7 @@ export const FileShareSurface = ({ file }: { file: WorkspaceMeta }) => {
           trigger={({ open }) => {
             return (
               <Button
-                variant="contained"
+                variant="filled"
                 startIcon={<LinkOutlined color="primary" />}
                 onClick={() => {
                   if (link) {

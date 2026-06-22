@@ -43,7 +43,7 @@ export function InfoPage({ template: Page }: PageContentProps) {
               </List>
             </Scroll>
           ) : (
-            <Placeholder pt={6} label="Logs" icon={<ListOutlined />} />
+            <Placeholder sx={{ pt: 6 }} label="Logs" icon={<ListOutlined />} />
           )}
         </Block>
       </Page.Content>

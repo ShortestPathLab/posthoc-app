@@ -1,8 +1,14 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["vite/client"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "types": [
+      "vite/client"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -15,9 +21,21 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "paths": { "*": ["./src/*"] },
-    "composite": true
+    "paths": {
+      "*": [
+        "./src/*"
+      ]
+    },
+    "composite": true,
+    "noEmit": true
   },
-  "exclude": ["src/public", "src/public-dev", "node_modules"],
-  "include": ["src", "src/components/app-bar/Title.test.tsx"]
+  "exclude": [
+    "src/public",
+    "src/public-dev",
+    "node_modules"
+  ],
+  "include": [
+    "src",
+    "src/components/app-bar/Title.test.tsx"
+  ]
 }

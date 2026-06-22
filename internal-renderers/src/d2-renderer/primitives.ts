@@ -170,10 +170,10 @@ export const path: Primitive<"path"> = {
     /// version < 1.4.0 compat
     const w = c["line-width"] ?? c.lineWidth;
     return {
-      left: (minBy(c.points, "x")?.x ?? 0 - w ?? 0) - 1,
-      right: (maxBy(c.points, "x")?.x ?? 0 + w ?? 0) + 1,
-      top: (minBy(c.points, "y")?.y ?? 0 - w ?? 0) - 1,
-      bottom: (maxBy(c.points, "y")?.y ?? 0 + w ?? 0) + 1,
+      left: ((minBy(c.points, "x")?.x ?? 0) - w) - 1,
+      right: ((maxBy(c.points, "x")?.x ?? 0) + w) + 1,
+      top: ((minBy(c.points, "y")?.y ?? 0) - w) - 1,
+      bottom: ((maxBy(c.points, "y")?.y ?? 0) + w) + 1,
     };
   },
   narrow(c, p) {

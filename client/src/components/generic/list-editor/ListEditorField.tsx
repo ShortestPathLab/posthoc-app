@@ -109,8 +109,8 @@ function ListItem<T extends { key: Key }>({
     <Box component={button ? ButtonBase : "div"} sx={{ width: "100%", textAlign: "left" }}>
       <Stack
         direction="row"
-        alignItems="center"
         sx={{
+          alignItems: "center",
           width: "100%",
           ...(button && {
             transition: (t) => t.transitions.create("background"),

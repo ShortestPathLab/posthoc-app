@@ -37,45 +37,51 @@ export function Modal({
 
   const useVariant = variant === "submodal" && sm;
 
+  const { ref: _paperRef, ...paperSlotProps } =
+    (typeof props.slotProps?.paper === "object" ? props.slotProps.paper : undefined) ?? {};
+  const borderRadius = Number(theme.shape.borderRadius);
+
   return (
     <Dialog
       fullScreen={sm}
       {...props}
       open={sm ? props.open && !!depth : props.open}
       keepMounted={false}
-      TransitionComponent={sm ? Swipe : undefined}
-      TransitionProps={{
-        unmountOnExit: true,
-        mountOnEnter: true,
-      }}
+      slots={{ transition: sm ? Swipe : undefined }}
       sx={{
         ...(useVariant && {
           paddingTop: theme.spacing(8),
         }),
         ...props.sx,
       }}
-      PaperProps={{
-        ref: (e: HTMLElement | null) => setTarget(e),
-        sx: {
-          ...(sm && {
-            borderRadius: `${theme.shape.borderRadius * 2}px ${theme.shape.borderRadius * 2}px 0 0`,
-          }),
-          background: theme.palette.background.paper,
-          overflow: "hidden",
-          height:
-            height && !sm
-              ? height
-              : sm
-                ? `${mt}dvh`
-                : overflow
-                  ? "100%"
-                  : contentHeight || "fit-content",
-          position: "relative",
-          maxWidth: "none",
-          marginTop: sm ? `${100 - mt}dvh` : 0,
-          ...props.PaperProps?.style,
+      slotProps={{
+        transition: {
+          unmountOnExit: true,
+          mountOnEnter: true,
         },
-        ...props.PaperProps,
+        paper: {
+          ref: (e: HTMLElement | null) => setTarget(e),
+          sx: {
+            ...(sm && {
+              borderRadius: `${borderRadius * 2}px ${borderRadius * 2}px 0 0`,
+            }),
+            background: theme.palette.background.paper,
+            overflow: "hidden",
+            height:
+              height && !sm
+                ? height
+                : sm
+                  ? `${mt}dvh`
+                  : overflow
+                    ? "100%"
+                    : contentHeight || "fit-content",
+            position: "relative",
+            maxWidth: "none",
+            marginTop: sm ? `${100 - mt}dvh` : 0,
+            ...paperSlotProps?.style,
+          },
+          ...paperSlotProps,
+        },
       }}
     >
       <Scroll

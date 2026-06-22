@@ -14,7 +14,7 @@ import { isEmpty } from "es-toolkit/compat";
 import { Size } from "protocol";
 import { useState } from "react";
 import { useThrottle } from "react-use";
-import AutoSize from "react-virtualized-auto-sizer";
+import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
 import { slice } from "slices";
 import { useLayerPicker, WithLayer } from "slices/layers";
 import { PanelState } from "slices/view";
@@ -84,8 +84,9 @@ export function TreePage({ template: Page }: PageContentProps) {
             <>
               {
                 <>
-                  <AutoSize>
-                    {(size: Size) => {
+                  <AutoSize
+                    renderProp={({ width = 0, height = 0 }) => {
+                      const size: Size = { width, height };
                       const sharedProps: SharedGraphProps = {
                         ...size,
                         trace: trace?.content,
@@ -157,7 +158,7 @@ export function TreePage({ template: Page }: PageContentProps) {
                         </>
                       );
                     }}
-                  </AutoSize>
+                  />
                   {menuOpen && (
                     <TreeMenu
                       onClose={() => setMenuOpen(false)}

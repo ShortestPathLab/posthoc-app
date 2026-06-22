@@ -288,7 +288,7 @@ export default {
       <Button
         sx={{ width: 360, maxWidth: "100%" }}
         onClick={cloudService.login}
-        variant="contained"
+        variant="filled"
         color="primary"
         startIcon={<GoogleLogo />}
       >

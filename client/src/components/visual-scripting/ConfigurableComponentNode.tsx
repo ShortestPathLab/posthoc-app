@@ -6,10 +6,10 @@ import * as React from "react";
 import { Fragment, useCallback } from "react";
 import { useAcrylic, usePaper } from "theme";
 
-import { map } from "es-toolkit/compat";
+import { keys, map } from "es-toolkit/compat";
 import { LabeledHandle, LabeledHandleProps } from "./LabeledHandle";
 import TransformationMenu from "./TransformationMenu";
-import { NodeBase } from "./NodeBase";
+import { ItemOptions, NodeBase } from "./NodeBase";
 import { FlowData, Properties } from "./flow";
 
 // Optional: don’t shadow MUI’s Dialog type name
@@ -24,51 +24,71 @@ export type ComponentNodeConfig = {
 
 type ConfigurableComponentNode = Node<FlowData<string, Properties>>;
 
+const ITEM_HEIGHT = 56;
+
 export function ConfigurableComponentNode(props: NodeProps<ConfigurableComponentNode>) {
   const { fields, type, key } = props.data;
+
+  const config: ComponentNodeConfig = {
+    title: type,
+    vars: keys(fields),
+  };
 
   return (
     <NodeBase
       items={[
-        () => (
-          <Stack>
-            <Typography key="title" variant="subtitle2" sx={{}}>
-              {config.title}
-            </Typography>
-          </Stack>
-        ),
-        () => (
-          <>
-            <Handle
-              type="target"
-              position={Position.Left}
-              id="in"
-              key="in"
-              style={{ top: ITEM_HEIGHT }}
-            />
-            <Handle
-              type="target"
-              position={Position.Right}
-              id="out"
-              key="out"
-              style={{ top: ITEM_HEIGHT }}
-            />
-          </>
-        ),
-        ...map(config.vars, (varName) => (idy: number) => (
-          // use TransformationMenu, should be var name on the left with transformation menu button on the right
-          // dont use a handle, just text is fine
-          <Stack
-            key={varName}
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{ top: ITEM_HEIGHT * (idy + 0.5), px: 1, columnGap: 2 }}
-          >
-            <Typography variant="body2">{`${varName}: `} </Typography>
-            <TransformationMenu variable={varName} />
-          </Stack>
-        )),
+        {
+          height: ITEM_HEIGHT,
+          render: () => (
+            <Stack>
+              <Typography key="title" variant="subtitle2" sx={{}}>
+                {config.title}
+              </Typography>
+            </Stack>
+          ),
+        },
+        {
+          height: ITEM_HEIGHT,
+          render: ({ y }: ItemOptions) => (
+            <>
+              <Handle
+                type="target"
+                position={Position.Left}
+                id="in"
+                key="in"
+                style={{ top: y }}
+              />
+              <Handle
+                type="target"
+                position={Position.Right}
+                id="out"
+                key="out"
+                style={{ top: y }}
+              />
+            </>
+          ),
+        },
+        ...map(config.vars, (varName) => ({
+          height: ITEM_HEIGHT,
+          render: ({ y, height }: ItemOptions) => (
+            // use TransformationMenu, should be var name on the left with transformation menu button on the right
+            // dont use a handle, just text is fine
+            <Stack
+              key={varName}
+              direction="row"
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                top: y + height * 0.5,
+                px: 1,
+                columnGap: 2,
+              }}
+            >
+              <Typography variant="body2">{`${varName}: `} </Typography>
+              <TransformationMenu variable={varName} />
+            </Stack>
+          ),
+        })),
       ]}
     />
   );

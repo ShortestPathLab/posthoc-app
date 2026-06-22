@@ -66,11 +66,11 @@ class Tile extends PIXI.Sprite {
 }
 
 export class D2Renderer extends D2RendererBase {
-  protected app?: PIXI.Application<HTMLCanvasElement>;
+  protected declare app?: PIXI.Application<HTMLCanvasElement>;
   protected options: D2RendererOptions = defaultD2RendererOptions;
   protected system: Bush<CompiledD2IntrinsicComponent> = new Bush(9);
-  protected viewport?: Viewport;
-  protected overlay?: PIXI.Graphics;
+  protected declare viewport?: Viewport;
+  protected declare overlay?: PIXI.Graphics;
 
   #resolved: Record<string, boolean> = {};
   #tiles?: PIXI.Container<Tile>;

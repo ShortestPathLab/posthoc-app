@@ -15,14 +15,12 @@ function SurfaceDialogStub() {
 }
 
 type Data = {
-  id: string;
   label?: string;
   description?: string;
-  position: XYPosition;
-  data: Record<string, unknown>;
+  [key: string]: unknown;
 };
 
-export function TextUpdaterNode(props: NodeProps<Data>) {
+export function TextUpdaterNode(props: NodeProps<Node<Data>>) {
   const { id, data, positionAbsoluteX, positionAbsoluteY } = props;
 
   // If you use useSurface elsewhere, you can still keep it:
@@ -72,7 +70,7 @@ export function TextUpdaterNode(props: NodeProps<Data>) {
       />
 
       {/* Optional “inline” transformation menu (e.g. kebab menu) */}
-      <TransformationMenu node={node} />
+      <TransformationMenu variable={node.id} />
 
       {/* Handles — fixed the incorrect Position on the left handle */}
       <Handle type="source" position={Position.Top} id="top" />

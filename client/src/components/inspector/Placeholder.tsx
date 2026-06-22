@@ -17,13 +17,13 @@ export function Placeholder({
 } & BlockProps) {
   return (
     <Block
-      justifyContent="center"
-      alignItems="center"
-      color="text.secondary"
       {...rest}
-      textAlign="center"
       vertical
       sx={{
+        justifyContent: "center",
+        alignItems: "center",
+        color: "text.secondary",
+        textAlign: "center",
         gap: 2,
         p: 6,
         pt: 12,
@@ -44,7 +44,7 @@ export function Placeholder({
           {secondary}
         </Type>
       )}
-      {!!action && <Box pt={2}>{action}</Box>}
+      {!!action && <Box sx={{ pt: 2 }}>{action}</Box>}
     </Block>
   );
 }

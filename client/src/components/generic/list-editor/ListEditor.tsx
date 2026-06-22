@@ -159,13 +159,13 @@ export default function Editor<T extends { key: Key }>(props: Props<T>) {
           )}
         </Droppable>
         <Collapse in={isEmpty}>
-          <Box ml={2} my={1}>
+          <Box sx={{ ml: 2, my: 1 }}>
             <Typography component="div" color="text.secondary">
               {placeholder ?? "No items"}
             </Typography>
           </Box>
         </Collapse>
-        <Stack p={2} pt={2} gap={2} direction="row">
+        <Stack direction="row" sx={{ p: 2, pt: 2, gap: 2 }}>
           {addable && (
             <CustomAddItemButton
               label={addItemLabel}

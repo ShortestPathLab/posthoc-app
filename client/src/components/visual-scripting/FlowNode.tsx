@@ -127,9 +127,9 @@ function getItems(
                 />
               ),
               checkbox: () => (
-                <Stack flexDirection="row" sx={{ gap: 1 }}>
+                <Stack sx={{ flexDirection: "row", gap: 1 }}>
                   <Checkbox
-                    defaultChecked={field.value}
+                    defaultChecked={Boolean(field.value)}
                     size="small"
                     sx={{
                       p: 0,
@@ -143,15 +143,15 @@ function getItems(
                   className="nodrag nowheel"
                   select
                   variant="filled"
-                  labelId={`select-${field.key}`}
+                  id={`select-${String(field.key)}`}
                   label={field.label}
-                  value={field.value ?? ""}
+                  value={(field.value as string | number | undefined) ?? ""}
                   fullWidth
                   onChange={(e) => updateField?.(String(field.key), e.target.value)}
                 >
                   {field.options?.length ? (
                     field.options.map((opt) => (
-                      <MenuItem key={String(opt.value)} value={opt.value}>
+                      <MenuItem key={String(opt.value)} value={opt.value as string | number}>
                         {opt.label}
                       </MenuItem>
                     ))

@@ -36,8 +36,9 @@ export type TransformationNodeConfig<
   fields?: {
     key: keyof V;
     label: string;
-    type: "text" | "number" | "checkbox";
+    type: "text" | "number" | "checkbox" | "select";
     value: unknown;
+    options?: { label: string; value: unknown }[];
   }[];
 };
 

@@ -408,8 +408,7 @@ export function SettingsPage({ template: Page }: PageContentProps) {
                           </Typography>
                           <Stack
                             direction={sm ? "column-reverse" : "row"}
-                            justifyContent="flex-end"
-                            gap={sm ? 1 : 2}
+                            sx={{ justifyContent: "flex-end", gap: sm ? 1 : 2 }}
                           >
                             <Button
                               variant="text"

@@ -132,16 +132,17 @@ function EventInspectorContents({
             {startCase(event?.type ?? "event")} {event?.id ?? "-"}
           </Box>
         }
-        secondaryTypographyProps={{
-          component: "div",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
+        slotProps={{
+          secondary: {
+            component: "div",
+            sx: { whiteSpace: "nowrap", overflow: "hidden" },
+          },
         }}
         secondary={
           <Stack
             direction="row"
-            justifyContent="flex-start"
             sx={{
+              justifyContent: "flex-start",
               "> *": { flex: 0 },
             }}
           >

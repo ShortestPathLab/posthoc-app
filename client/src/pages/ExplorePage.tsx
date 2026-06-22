@@ -241,7 +241,7 @@ export function FeatureCard({
           title={loading ? <Skeleton /> : name || "Untitled"}
           subheaderTypographyProps={ellipsisProps}
           subheader={
-            <Stack gap={2} sx={{ pt: 1 }}>
+            <Stack sx={{ gap: 2, pt: 1 }}>
               <Type
                 component="div"
                 sx={{
@@ -259,7 +259,7 @@ export function FeatureCard({
                   ? map([80, 30], (v) => <Skeleton key={v} width={`${v}%`} />)
                   : description || "No description"}
               </Type>
-              <Stack direction="row" alignItems="center" gap={1}>
+              <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
                 {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
                 <Type component="div" variant="caption">
                   {loading ? <Skeleton width={120} /> : authorName}
@@ -271,7 +271,7 @@ export function FeatureCard({
                 startIcon={<WorkspacesOutlined />}
                 sx={paper(1)}
               >
-                <Stack direction="row" gap={1}>
+                <Stack direction="row" sx={{ gap: 1 }}>
                   <Type component="div">Open</Type>
                   {!!size && (
                     <Type component="div" color="text.secondary">
@@ -385,9 +385,9 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       }
                 }
               >
-                <Box pt={6}>
+                <Box sx={{ pt: 6 }}>
                   <TabPanel value="explore" sx={{ p: 0 }}>
-                    <Box p={4} sx={{ textAlign: "center" }}>
+                    <Box sx={{ p: 4, textAlign: "center" }}>
                       <Type component="div" variant={narrow ? "h6" : "h4"}>
                         Examples
                       </Type>
@@ -396,7 +396,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       </Type>
                     </Box>
                     {theme.palette.mode === "dark" && blur()}
-                    <Box px={2} pb={4} sx={{ textAlign: "center" }}>
+                    <Box sx={{ px: 2, pb: 4, textAlign: "center" }}>
                       <TextField
                         {...textFieldProps}
                         size={narrow ? "small" : "medium"}
@@ -438,7 +438,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                     </Box>
                   </TabPanel>
                   <TabPanel value="guides" sx={{ p: 0 }}>
-                    <Box p={4} sx={{ textAlign: "center" }}>
+                    <Box sx={{ p: 4, textAlign: "center" }}>
                       <Type component="div" variant={narrow ? "h6" : "h4"}>
                         Guides
                       </Type>
@@ -453,8 +453,8 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                         mx: "auto",
                         textAlign: "center",
                         alignItems: "center",
+                        gap: 2,
                       }}
-                      gap={2}
                     >
                       <Type component="div">
                         We&apos;re still working on this feature. Check out our documentation

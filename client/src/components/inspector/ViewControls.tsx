@@ -54,7 +54,7 @@ export function ViewControls({
             </Tooltip>
           </MuiStack>
           <Menu
-            TransitionProps={{ mountOnEnter: true, unmountOnExit: true }}
+            slotProps={{ transition: { mountOnEnter: true, unmountOnExit: true } }}
             {...bindMenu(state)}
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "top" }}

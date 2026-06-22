@@ -3,7 +3,7 @@ import { CircularProgress, Theme, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { debounce } from "es-toolkit/compat";
 import { ComponentProps } from "react";
-import AutoSize from "react-virtualized-auto-sizer";
+import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
 
 const DELAY = 2500;
 
@@ -19,9 +19,9 @@ export function ScriptEditor({
   useMonacoTheme(theme);
 
   return (
-    <Block height="100%" overflow="hidden">
-      <AutoSize>
-        {({ width, height }) => (
+    <Block sx={{ height: "100%", overflow: "hidden" }}>
+      <AutoSize
+        renderProp={({ width, height }) => (
           <Editor
             theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
             width={width}
@@ -37,7 +37,7 @@ export function ScriptEditor({
             }}
           />
         )}
-      </AutoSize>
+      />
     </Block>
   );
 }
@@ -58,9 +58,9 @@ export function ScriptViewer(props: ComponentProps<typeof Editor>) {
   const theme = useTheme();
   useMonacoTheme(theme);
   return (
-    <Block height="100%" overflow="hidden">
-      <AutoSize>
-        {({ width, height }) => (
+    <Block sx={{ height: "100%", overflow: "hidden" }}>
+      <AutoSize
+        renderProp={({ width, height }) => (
           <Editor
             theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
             width={width}
@@ -76,7 +76,7 @@ export function ScriptViewer(props: ComponentProps<typeof Editor>) {
             }}
           />
         )}
-      </AutoSize>
+      />
     </Block>
   );
 }

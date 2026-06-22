@@ -57,7 +57,7 @@ export function Inspector(props: BlockProps) {
                     <ErrorPlaceholder
                       sx={{ width: "100%", height: "100%" }}
                       label={`An error occurred`}
-                      secondary={"message" in error ? error.message : "Couldn't render this view"}
+                      secondary={error instanceof Error ? error.message : "Couldn't render this view"}
                       onReset={resetErrorBoundary}
                     />
                   )}

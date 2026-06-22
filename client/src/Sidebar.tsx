@@ -66,7 +66,7 @@ export function Sidebar() {
         }}
       >
         <TabList
-          TabIndicatorProps={{ sx: { left: 0, right: "auto" } }}
+          slotProps={{ indicator: { sx: { left: 0, right: "auto" } } }}
           onChange={(_, t) => {
             slice.ui.fullscreenModal.set(t);
           }}

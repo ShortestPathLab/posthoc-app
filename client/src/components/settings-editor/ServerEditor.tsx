@@ -44,7 +44,7 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
 
   return (
     <>
-      <Block alignItems="center">
+      <Block sx={{ alignItems: "center" }}>
         <Surface
           slotProps={{
             paper: { sx: { width: 480 } },
@@ -54,17 +54,16 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
           }}
           popover
           trigger={({ open }) => (
-            <Stack direction="row" flex={1} alignItems="center" sx={{ py: 1 }}>
+            <Stack direction="row" sx={{ flex: 1, alignItems: "center", py: 1 }}>
               <Stack
                 className={value.key}
                 direction="row"
-                flex={1}
-                alignItems="center"
                 onClick={open}
+                sx={{ flex: 1, alignItems: "center" }}
               >
                 <Box
-                  flex={1}
                   sx={{
+                    flex: 1,
                     width: 0,
                     overflow: "hidden",
                     "> *": {
@@ -113,7 +112,7 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
           )}
           title="Edit Adapter"
         >
-          <Box p={2.5}>
+          <Box sx={{ p: 2.5 }}>
             <TextField
               autoFocus
               defaultValue={value.url}

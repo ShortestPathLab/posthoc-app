@@ -109,14 +109,14 @@ export function BreakpointEditor({
     handler && (
       <Scroll x>
         <Block vertical sx={{ py: 2 }}>
-          <Stack direction="row" alignItems="center" sx={{ gap: 1 }}>
+          <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
             <Block
               sx={{
                 gap: 1,
                 flex: 0,
                 minWidth: 180,
+                alignItems: "center",
               }}
-              alignItems="center"
             >
               <Checkbox
                 sx={{ ml: -1.5 }}
@@ -163,7 +163,7 @@ export function BreakpointEditor({
               </Stack>
             </Block>
             <Divider orientation="vertical" flexItem sx={{ m: 1 }} />
-            <Stack direction="row" alignItems="center" sx={{ gap: 1, px: 1 }}>
+            <Stack direction="row" sx={{ alignItems: "center", gap: 1, px: 1 }}>
               {handler.fields.length ? (
                 map(
                   handler.fields,

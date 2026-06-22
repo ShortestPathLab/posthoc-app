@@ -210,8 +210,7 @@ export function TraceRenderer({ width, height, renderer, rendererRef, layers }: 
             <Placeholder
               icon={<ViewInArOutlined />}
               label="Viewport"
-              width={width}
-              height={height}
+              sx={{ width, height }}
               secondary={VIEWPORT_PAGE_DESCRIPTION}
             />
           )}

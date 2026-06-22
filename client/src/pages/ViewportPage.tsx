@@ -16,7 +16,7 @@ import download from "downloadjs";
 import { inferLayerName } from "layers/inferLayerName";
 import { delay, every, filter, find, keyBy, map } from "es-toolkit/compat";
 import { useEffect, useMemo, useState } from "react";
-import AutoSize from "react-virtualized-auto-sizer";
+import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
 import { slice } from "slices";
 import { Renderer, useRenderers } from "slices/renderers";
@@ -83,8 +83,8 @@ export function ViewportPage({ template: Page }: PageContentProps) {
       <Page.Handle>{dragHandle}</Page.Handle>
       <Page.Content>
         <Block sx={size}>
-          <AutoSize>
-            {(size) => (
+          <AutoSize
+            renderProp={(size) => (
               <Box>
                 <TraceRenderer
                   {...size}
@@ -141,7 +141,7 @@ export function ViewportPage({ template: Page }: PageContentProps) {
                 </Stack>
               </Box>
             )}
-          </AutoSize>
+          />
         </Block>
       </Page.Content>
       <Page.Options>

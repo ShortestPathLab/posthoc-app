@@ -4,7 +4,7 @@ import { EdgeCurvedArrowProgram } from "@sigma/edge-curve";
 import { ComponentProps, useMemo } from "react";
 import { EdgeArrowProgram } from "sigma/rendering";
 
-export function useGraphSettings() {
+export function useGraphSettings(): ComponentProps<typeof SigmaContainer>["settings"] {
   const theme = useTheme();
   return useMemo(
     () =>
