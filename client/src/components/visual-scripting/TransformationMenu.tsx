@@ -37,12 +37,7 @@ export default function TransformationMenu({ variable }: TransformationMenuProps
   );
 }
 
-function FlowPopup({
-  nodeName,
-}: {
-  nodeName?: string;
-  onNodeChange?: (node: Node) => void;
-}) {
+function FlowPopup({ nodeName }: { nodeName?: string; onNodeChange?: (node: Node) => void }) {
   const size = useSurfaceAvailableCssSize();
   const sourceNode: Node = nodeName
     ? {

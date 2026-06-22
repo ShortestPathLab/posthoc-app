@@ -31,15 +31,13 @@ export function getExpression(model: editor.ITextModel, position: Position) {
 }
 
 export function getExpressions(text: string): { value: string; line: number; column: number }[] {
-  return flow(
-    text.split(/\r?\n/),
-    (lines) =>
-      flatMap(lines, (line, lineIndex) =>
-        map([...line.matchAll(/\$\{\{(.*?)\}\}/g)], (match) => ({
-          value: match[1],
-          line: lineIndex + 1, // Convert to 1-based index
-          column: match.index! + 3 + 1, // Convert to 1-based index
-        })),
-      ),
+  return flow(text.split(/\r?\n/), (lines) =>
+    flatMap(lines, (line, lineIndex) =>
+      map([...line.matchAll(/\$\{\{(.*?)\}\}/g)], (match) => ({
+        value: match[1],
+        line: lineIndex + 1, // Convert to 1-based index
+        column: match.index! + 3 + 1, // Convert to 1-based index
+      })),
+    ),
   );
 }
