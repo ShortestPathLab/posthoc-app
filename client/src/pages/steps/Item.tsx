@@ -7,8 +7,8 @@ import { useItemState } from "./useItemState";
 
 export function Item({
   layer,
-  index = 0,
-  event: eventIndex = 0,
+  index: indexProp,
+  event: eventProp,
   disabled,
 }: {
   index?: number;
@@ -16,6 +16,11 @@ export function Item({
   layer?: string;
   event?: number;
 }) {
+  // Defaults are applied in the body rather than in the destructure: an
+  // object-destructuring default (`index = 0`) makes babel-plugin-react-compiler
+  // bail out of optimizing the whole component, so this stays un-memoized otherwise.
+  const index = indexProp ?? 0;
+  const eventIndex = eventProp ?? 0;
   const { spacing } = useTheme();
 
   const { stepTo, playing } = useItemPlaybackState(layer);
@@ -35,9 +40,7 @@ export function Item({
           <Skeleton event={event} />
         ) : (
           <EventInspector
-            sx={{
-              opacity: disabled ? 0.25 : 1,
-            }}
+            sx={{ opacity: disabled ? 0.25 : 1 }}
             event={event}
             index={eventIndex}
             selected={isSelected}

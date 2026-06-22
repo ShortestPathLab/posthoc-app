@@ -127,7 +127,7 @@
     "@types/react-transition-group": "^4.4.12",
     "@types/url-parse": "^1.4.11",
     "@vitejs/plugin-react": "^6.0.2",
-    "babel-plugin-react-compiler": "^1.0.0",
+    "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "electron": "^34.5.8",
     "electron-packager": "^17.1.2",
     "jsdom": "^26.1.0",

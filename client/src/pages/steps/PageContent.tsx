@@ -34,8 +34,10 @@ export function PageContent({ layer: key }: { layer?: string }) {
   const ref = useRef<ListHandle | null>(null);
   const [scrollerRef, setScrollerRef] = useState<HTMLElement | Window | null>(null);
 
-  const { isViewTree, state: { selectedType: _selectedType, showHighlighting } = {} } =
-    useViewTreeContext<StepsPageState>();
+  // Avoid a destructuring default (`state: {...} = {}`) here: it makes
+  // babel-plugin-react-compiler bail out of optimizing this whole component.
+  const { isViewTree, state } = useViewTreeContext<StepsPageState>();
+  const { selectedType: _selectedType, showHighlighting } = state ?? {};
 
   const one = slice.layers.one<StepsLayer>(key);
 
