@@ -1,0 +1,1 @@
+var e=``+new URL(`polyanya-C56rFS5l.workspace`,import.meta.url).href;export{e as default};

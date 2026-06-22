@@ -1,0 +1,1 @@
+var e=``+new URL(`maze-small-BxIHT4ds.grid`,import.meta.url).href;export{e as default};

@@ -1,0 +1,1 @@
+var e=``+new URL(`dynamic-star-craft-D_8XXsZt.workspace`,import.meta.url).href;export{e as default};
