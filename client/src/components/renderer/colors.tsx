@@ -1,9 +1,19 @@
 import { amber, blue, deepPurple, green, orange, pink, red } from "@mui/material/colors";
 import { ColorTranslator } from "colortranslator";
 import { lowerCase } from "es-toolkit";
-import { toPairs as entries, keys, mapValues, sortBy, values } from "es-toolkit/compat";
+import {
+  flatMap,
+  fromPairs,
+  toPairs as entries,
+  keys,
+  map,
+  mapValues,
+  sortBy,
+  values,
+} from "es-toolkit/compat";
 import { EventTypeColors } from "protocol";
 import { TraceEventType } from "protocol/Trace";
+import { flow } from "utils/flow";
 import { AccentColor, accentColors, getShade } from "theme";
 
 function hash(str: string) {
@@ -26,13 +36,12 @@ export function hex(h: string) {
   return parseInt(h.replace("#", "0x"));
 }
 
-export const searchEventAliases = ((dict: Record<string, string[]>) => {
-  const out: Record<string, string> = {};
-  for (const [k, v] of entries(dict)) {
-    for (const v1 of v) out[v1] = k;
-  }
-  return out;
-})({
+export const searchEventAliases = ((dict: Record<string, string[]>) =>
+  flow(
+    entries(dict),
+    (pairs) => flatMap(pairs, ([k, v]) => map(v, (alias) => [alias, k])),
+    fromPairs,
+  ))({
   source: ["source", "start"],
   destination: ["destination", "goal", "finish"],
   updating: ["update", "updating"],

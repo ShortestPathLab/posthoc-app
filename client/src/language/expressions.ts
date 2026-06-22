@@ -1,5 +1,7 @@
 import { last } from "es-toolkit";
+import { flatMap, map } from "es-toolkit/compat";
 import { type editor, Position } from "monaco-editor";
+import { flow } from "utils/flow";
 
 export function getExpression(model: editor.ITextModel, position: Position) {
   const preRange = model.getValueInRange({
@@ -29,20 +31,15 @@ export function getExpression(model: editor.ITextModel, position: Position) {
 }
 
 export function getExpressions(text: string): { value: string; line: number; column: number }[] {
-  const matches: { value: string; line: number; column: number }[] = [];
-  const regex = /\$\{\{(.*?)\}\}/g;
-  const lines = text.split(/\r?\n/);
-
-  lines.forEach((line, lineIndex) => {
-    let match: RegExpExecArray | null;
-    while ((match = regex.exec(line)) !== null) {
-      matches.push({
-        value: match[1],
-        line: lineIndex + 1, // Convert to 1-based index
-        column: match.index + 3 + 1, // Convert to 1-based index
-      });
-    }
-  });
-
-  return matches;
+  return flow(
+    text.split(/\r?\n/),
+    (lines) =>
+      flatMap(lines, (line, lineIndex) =>
+        map([...line.matchAll(/\$\{\{(.*?)\}\}/g)], (match) => ({
+          value: match[1],
+          line: lineIndex + 1, // Convert to 1-based index
+          column: match.index! + 3 + 1, // Convert to 1-based index
+        })),
+      ),
+  );
 }
