@@ -1,6 +1,5 @@
 import { noop } from "es-toolkit";
 import { merge } from "es-toolkit/compat";
-import { useMenuClose } from "hooks/useMenuClose";
 import { PopupState as State, usePopupState } from "material-ui-popup-state/hooks";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { createCallable } from "react-call";
@@ -79,12 +78,7 @@ export function useSurface<T>(
   props: SurfaceProps = {},
 ) {
   const ref = useRef<ReturnType<typeof openSurface> | null>(null);
-  // Close the menu this opener lives in (if any) before showing the surface.
-  // Safe because the surface is hosted at the app root, so the menu unmounting
-  // no longer tears the surface down with it.
-  const closeMenu = useMenuClose();
   const open = (s: T & Partial<SurfaceContentProps>) => {
-    closeMenu?.();
     ref.current = openSurface(
       ({ onClose, onProps }) =>
         Content ? (

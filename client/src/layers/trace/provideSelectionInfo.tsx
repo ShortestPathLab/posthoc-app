@@ -1,6 +1,5 @@
 import { ArrowOutwardRounded, DataObjectOutlined } from "@mui-symbols-material/w400";
-import { ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material";
-import { PropertyDialog, PropertyList } from "components/inspector/PropertyList";
+import { PropertyList, showEventProperties } from "components/inspector/PropertyList";
 import { inferLayerName } from "layers";
 import { isUndefined, last, negate } from "es-toolkit";
 import { keyBy, map, startCase } from "es-toolkit/compat";
@@ -51,22 +50,10 @@ export const provideSelectionInfo = (({ layer: key, event, children }) => {
               },
               propertiesDetails: {
                 index: -1,
-                extras: (
-                  <PropertyDialog
-                    {...{ event }}
-                    trigger={({ open }) => (
-                      <MenuItem onClick={open}>
-                        <ListItemIcon>
-                          <DataObjectOutlined />
-                        </ListItemIcon>
-                        <ListItemText sx={{ mr: 4 }}>See properties</ListItemText>
-                        <Typography component="div" variant="body2" color="text.secondary">
-                          Step {step}
-                        </Typography>
-                      </MenuItem>
-                    )}
-                  />
-                ),
+                primary: "See properties",
+                secondary: `Step ${step}`,
+                icon: <DataObjectOutlined />,
+                action: () => showEventProperties(event),
               },
               [`${event}`]: {
                 primary: `Go to step ${step}`,

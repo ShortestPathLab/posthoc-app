@@ -9,7 +9,8 @@ import {
 } from "@mui/material";
 import { Block, BlockProps } from "components/generic/Block";
 import { Property, renderProperty } from "components/generic/Property";
-import { SurfaceProps, useSurface } from "components/generic/surface";
+import { openSurface } from "components/generic/surface";
+import { useMenuClose } from "hooks/useMenuClose";
 import { useSm } from "hooks/useSmallDisplay";
 import { isNumber, isString, isUndefined } from "es-toolkit";
 import {
@@ -17,14 +18,18 @@ import {
   filter,
   indexOf,
   map,
-  merge,
   slice,
   sortBy,
   startCase,
   toPairs as entries,
 } from "es-toolkit/compat";
-import { Fragment, ReactElement } from "react";
+import { Fragment } from "react";
 import { _ } from "utils/chain";
+
+/** Open the full event-properties surface at the app root. */
+export function showEventProperties(event?: Record<string, unknown>) {
+  return openSurface(() => <EventProperties event={event} />, { title: "Event Properties" });
+}
 
 export const COMMON_PROPS = ["type"];
 
@@ -100,38 +105,6 @@ export function EventProperties({ event }: Pick<PropertyListProps, "event">) {
   ));
 }
 
-export type PropertyDialogProps = Omit<PropertyListProps, "variant" | "simple" | "primitives"> &
-  Omit<Partial<SurfaceProps>, "trigger"> & {
-    trigger?: (props: { open: () => void }) => ReactElement;
-  };
-
-export function PropertyDialog({ event, max = 10, trigger, ...rest }: PropertyDialogProps) {
-  const sorted = sortEventKeys(event);
-  const { open } = useSurface(EventProperties, merge({ title: "Event Properties" }, rest));
-  const handleOpen = () => open({ event });
-  return (
-    trigger?.({ open: handleOpen }) ?? (
-      <Button
-        variant="text"
-        sx={{
-          mx: -1,
-          minWidth: 0,
-          width: "fit-content",
-          color: (t) => t.palette.text.secondary,
-          justifyContent: "left",
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          handleOpen();
-        }}
-      >
-        {sorted.length - max} more
-      </Button>
-    )
-  );
-}
-
 export function PropertyList({
   event,
   variant = "body2",
@@ -141,6 +114,7 @@ export function PropertyList({
   ...rest
 }: PropertyListProps & BlockProps) {
   const sorted = sortEventKeys(event);
+  const closeMenu = useMenuClose();
   return (
     <Block {...rest}>
       {_(
@@ -152,7 +126,26 @@ export function PropertyList({
             <Property label={k} value={v} key={i} type={{ variant }} simple={simple} />
           )),
       )}
-      {sorted.length > max && !simple && <PropertyDialog event={event} max={max} />}
+      {sorted.length > max && !simple && (
+        <Button
+          variant="text"
+          sx={{
+            mx: -1,
+            minWidth: 0,
+            width: "fit-content",
+            color: (t) => t.palette.text.secondary,
+            justifyContent: "left",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            closeMenu?.();
+            showEventProperties(event);
+          }}
+        >
+          {sorted.length - max} more
+        </Button>
+      )}
     </Block>
   );
 }

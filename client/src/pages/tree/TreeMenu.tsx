@@ -16,7 +16,7 @@ import {
 import "@react-sigma/core/lib/style.css";
 import { useStep } from "components/app-bar/Playback";
 import { Label } from "components/generic/Label";
-import { PropertyDialog } from "components/inspector/PropertyList";
+import { showEventProperties } from "components/inspector/PropertyList";
 import { getColorHex } from "components/renderer/colors";
 import { highlightNodesOptions, useHighlightNodes } from "hooks/useHighlight";
 import { usePlaybackControls } from "hooks/usePlaybackState";
@@ -136,25 +136,20 @@ export function TreeMenu({
               </Tooltip>
 
               <Box sx={{ flex: 0 }}>
-                <PropertyDialog
-                  event={entry.event}
-                  trigger={({ open }) => (
-                    <Tooltip title="See all properties" placement="right">
-                      <MenuItem
-                        selected={isSelected}
-                        onClick={(e) => {
-                          open();
-                          props?.onClose?.(e, "backdropClick");
-                        }}
-                        sx={{ pr: 0, flexShrink: 0 }}
-                      >
-                        <ListItemIcon>
-                          <DataObjectOutlined />
-                        </ListItemIcon>
-                      </MenuItem>
-                    </Tooltip>
-                  )}
-                />
+                <Tooltip title="See all properties" placement="right">
+                  <MenuItem
+                    selected={isSelected}
+                    onClick={(e) => {
+                      showEventProperties(entry.event);
+                      props?.onClose?.(e, "backdropClick");
+                    }}
+                    sx={{ pr: 0, flexShrink: 0 }}
+                  >
+                    <ListItemIcon>
+                      <DataObjectOutlined />
+                    </ListItemIcon>
+                  </MenuItem>
+                </Tooltip>
               </Box>
             </Stack>
           );
