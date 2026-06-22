@@ -1,4 +1,4 @@
-import { CloseOutlined as CloseIcon } from "@mui-symbols-material/w400";
+import { CloseOutlined as CloseIcon } from "@mui-symbols-material/w300";
 import { Button, IconButton, Snackbar } from "@mui/material";
 import { noop } from "es-toolkit";
 import { filter } from "es-toolkit/compat";

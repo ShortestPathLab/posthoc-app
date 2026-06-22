@@ -1,4 +1,4 @@
-import { ArrowBackOutlined as ArrowBack } from "@mui-symbols-material/w400";
+import { ArrowBackOutlined as ArrowBack } from "@mui-symbols-material/w300";
 import { AppBar, AppBarProps, IconButton, Toolbar } from "@mui/material";
 import { ReactNode } from "react";
 import { AppBarTitle } from "./AppBarTitle";

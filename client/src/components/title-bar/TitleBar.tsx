@@ -2,7 +2,7 @@ import {
   OpenInNewOutlined,
   SearchOutlined,
   WorkspacesOutlined,
-} from "@mui-symbols-material/w400";
+} from "@mui-symbols-material/w300";
 import {
   alpha,
   Box,

@@ -1,4 +1,4 @@
-import { ErrorOutlined, WidgetsOutlined } from "@mui-symbols-material/w400";
+import { ErrorOutlined, WidgetsOutlined } from "@mui-symbols-material/w300";
 import { Box, BoxProps, Divider, Stack } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Block } from "components/generic/Block";

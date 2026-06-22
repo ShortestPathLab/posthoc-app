@@ -1,4 +1,4 @@
-import { DataObjectOutlined } from "@mui-symbols-material/w400";
+import { DataObjectOutlined } from "@mui-symbols-material/w300";
 import {
   Box,
   Divider,

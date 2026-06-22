@@ -1,4 +1,4 @@
-import { CloseOutlined, ListOutlined } from "@mui-symbols-material/w400";
+import { CloseOutlined, ListOutlined } from "@mui-symbols-material/w300";
 import { Divider, List, ListItem, ListItemText } from "@mui/material";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
 import { Block } from "components/generic/Block";
@@ -30,22 +30,23 @@ export function InfoPage({ template: Page }: PageContentProps) {
       </Page.Options>
       <Page.Content>
         <Block vertical>
-          {log.length ? (
+          {log.length ?
             <Scroll y>
               <List sx={{ pt: 6 }}>
                 {map(log, (l, i) => (
                   <div key={i}>
                     <ListItem>
-                      <ListItemText primary={l.content} secondary={l.timestamp} />
+                      <ListItemText
+                        primary={l.content}
+                        secondary={l.timestamp}
+                      />
                     </ListItem>
                     <Divider />
                   </div>
                 ))}
               </List>
             </Scroll>
-          ) : (
-            <Placeholder sx={{ pt: 6 }} label="Logs" icon={<ListOutlined />} />
-          )}
+          : <Placeholder sx={{ pt: 6 }} label="Logs" icon={<ListOutlined />} />}
         </Block>
       </Page.Content>
       <Page.Extras>{controls}</Page.Extras>

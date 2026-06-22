@@ -1,4 +1,4 @@
-import { WorkspacesOutlined } from "@mui-symbols-material/w400";
+import { WorkspacesOutlined } from "@mui-symbols-material/w300";
 import { Backdrop, Stack, Typography as Type } from "@mui/material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useWorkspace } from "hooks/useWorkspace";

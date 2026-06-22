@@ -1,4 +1,4 @@
-import { ReplayOutlined as ResetIcon } from "@mui-symbols-material/w400";
+import { ReplayOutlined as ResetIcon } from "@mui-symbols-material/w300";
 import { Box } from "@mui/material";
 import { defaultTransport } from "client";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
@@ -31,13 +31,20 @@ export function ServerListEditor() {
           disabled: true,
         })}
         addItemExtras={
-          <FeaturePickerButton icon={<ResetIcon />} onClick={() => setRemote(() => defaultRemotes)}>
+          <FeaturePickerButton
+            icon={<ResetIcon />}
+            onClick={() => setRemote(() => defaultRemotes)}
+          >
             Reset
           </FeaturePickerButton>
         }
         onFocus={(key) => {
           const element = head(document.getElementsByClassName(key));
-          if (element && "click" in element && typeof element.click === "function") {
+          if (
+            element &&
+            "click" in element &&
+            typeof element.click === "function"
+          ) {
             element.click();
           }
         }}

@@ -1,4 +1,8 @@
-import { CloseOutlined, LinkOutlined, OpenInNewOutlined } from "@mui-symbols-material/w400";
+import {
+  CloseOutlined,
+  LinkOutlined,
+  OpenInNewOutlined,
+} from "@mui-symbols-material/w300";
 import { Box, ListItemText, Stack, TextField } from "@mui/material";
 import copy from "clipboard-copy";
 import { useSm } from "hooks/useSmallDisplay";
@@ -21,7 +25,13 @@ export const FileShareSurface = ({ file }: { file: WorkspaceMeta }) => {
   const { open: openLink } = useSurface(
     () => (
       <Stack sx={{ p: sm ? 2 : 3, gap: 1, pb: 6 }} direction="row">
-        <TextField sx={{ flex: 1 }} label="Link" variant="filled" value={link} autoFocus />
+        <TextField
+          sx={{ flex: 1 }}
+          label="Link"
+          variant="filled"
+          value={link}
+          autoFocus
+        />
         <Button variant="outlined" onClick={handleCopy}>
           Copy
         </Button>

@@ -1,4 +1,4 @@
-import { MoreVertOutlined } from "@mui-symbols-material/w400";
+import { MoreVertOutlined } from "@mui-symbols-material/w300";
 import { Box, IconButton, Menu, MenuItem, MenuList } from "@mui/material";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
 import { isEqual } from "es-toolkit";

@@ -1,6 +1,17 @@
 import { KeyboardArrowDownOutlined } from "@mui-symbols-material/w300";
-import { ModeStandbyOutlined, TimelineOutlined } from "@mui-symbols-material/w400";
-import { Checkbox, Collapse, IconButton, Stack, SxProps, Theme, Typography } from "@mui/material";
+import {
+  ModeStandbyOutlined,
+  TimelineOutlined,
+} from "@mui-symbols-material/w300";
+import {
+  Checkbox,
+  Collapse,
+  IconButton,
+  Stack,
+  SxProps,
+  Theme,
+  Typography,
+} from "@mui/material";
 import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Heading, Option } from "components/layer-editor/Option";
@@ -28,16 +39,8 @@ const CLEAN_CHECKBOX_SX: SxProps<Theme> = {
 export const SYMBOL_METRIC_STEP = "step";
 
 const GROUP_BY_OPTIONS = [
-  {
-    id: "",
-    name: "No Grouping",
-    description: "Show all nodes individually",
-  },
-  {
-    id: "type",
-    name: "Type",
-    description: "Group by node type/status",
-  },
+  { id: "", name: "No Grouping", description: "Show all nodes individually" },
+  { id: "type", name: "Type", description: "Group by node type/status" },
   {
     id: "g",
     name: "g-value",
@@ -102,53 +105,26 @@ export function ScatterPlotControls({
     key: traceKey,
   });
 
-  const { data: types = [] } = useComputeTypes({
-    trace: trace,
-    key: traceKey,
-  });
+  const { data: types = [] } = useComputeTypes({ trace: trace, key: traceKey });
   const [open, setOpen] = useState(true);
   // Combined dropdown
   const scatterPlotAxis = [
-    {
-      id: SYMBOL_METRIC_STEP,
-      name: "Step",
-      value: SYMBOL_METRIC_STEP,
-    },
+    { id: SYMBOL_METRIC_STEP, name: "Step", value: SYMBOL_METRIC_STEP },
     ...map(
-      entries(properties).filter(([, v]) => !v.type.toLowerCase().includes("text")),
-      ([k, v]) => ({
-        id: k,
-        name: `$${k}`,
-        description: v.type,
-      }),
+      entries(properties).filter(
+        ([, v]) => !v.type.toLowerCase().includes("text"),
+      ),
+      ([k, v]) => ({ id: k, name: `$${k}`, description: v.type }),
     ),
   ];
   const paper = usePaper();
   const acrylic = useAcrylic();
   return (
-    <Stack
-      sx={{
-        p: 2,
-        position: "absolute",
-        bottom: 0,
-        right: 0,
-      }}
-    >
-      <Stack
-        sx={{
-          minWidth: 300,
-          px: 2,
-          py: 1,
-          ...acrylic,
-          ...paper(1),
-        }}
-      >
+    <Stack sx={{ p: 2, position: "absolute", bottom: 0, right: 0 }}>
+      <Stack sx={{ minWidth: 300, px: 2, py: 1, ...acrylic, ...paper(1) }}>
         <Stack
           direction="row"
-          sx={{
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
+          sx={{ justifyContent: "space-between", alignItems: "center" }}
         >
           <Typography>Display Options</Typography>
           <IconButton
@@ -176,10 +152,7 @@ export function ScatterPlotControls({
               icon={<ModeStandbyOutlined />}
               label="Layout"
               value={mode}
-              items={map(entries(layoutModes), ([k, v]) => ({
-                id: k,
-                ...v,
-              }))}
+              items={map(entries(layoutModes), ([k, v]) => ({ id: k, ...v }))}
               onChange={(e) => setMode(e as keyof typeof layoutModes)}
               arrow
             />
@@ -246,7 +219,9 @@ export function ScatterPlotControls({
                   disabled={mode !== "plot"}
                   size="small"
                   checked={logAxis.x}
-                  onChange={(e) => setLogAxis((prev) => ({ ...prev, x: e.target.checked }))}
+                  onChange={(e) =>
+                    setLogAxis((prev) => ({ ...prev, x: e.target.checked }))
+                  }
                   sx={CLEAN_CHECKBOX_SX}
                 />
               }
@@ -258,7 +233,9 @@ export function ScatterPlotControls({
                   size="small"
                   disabled={mode !== "plot"}
                   checked={logAxis.y}
-                  onChange={(e) => setLogAxis((prev) => ({ ...prev, y: e.target.checked }))}
+                  onChange={(e) =>
+                    setLogAxis((prev) => ({ ...prev, y: e.target.checked }))
+                  }
                   sx={CLEAN_CHECKBOX_SX}
                 />
               }
@@ -271,14 +248,15 @@ export function ScatterPlotControls({
                   paper
                   disabled={mode !== "plot"}
                   ButtonProps={{ fullWidth: true }}
-                  label={typeFilter ? `Event: ${startCase(typeFilter)}` : "Event type"}
+                  label={
+                    typeFilter ?
+                      `Event: ${startCase(typeFilter)}`
+                    : "Event type"
+                  }
                   value={typeFilter}
                   items={[
                     { id: "", name: "All Events" },
-                    ...types.map((t) => ({
-                      id: t,
-                      name: startCase(t),
-                    })),
+                    ...types.map((t) => ({ id: t, name: startCase(t) })),
                   ]}
                   onChange={setTypeFilter}
                   arrow
@@ -294,7 +272,11 @@ export function ScatterPlotControls({
                   paper
                   disabled={mode !== "plot"}
                   ButtonProps={{ fullWidth: true }}
-                  label={groupByAttribute ? `Group by: ${startCase(groupByAttribute)}` : "Group by"}
+                  label={
+                    groupByAttribute ?
+                      `Group by: ${startCase(groupByAttribute)}`
+                    : "Group by"
+                  }
                   value={groupByAttribute}
                   items={GROUP_BY_OPTIONS}
                   onChange={setGroupByAttribute}

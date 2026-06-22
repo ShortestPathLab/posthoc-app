@@ -1,4 +1,4 @@
-import { FileOpenOutlined } from "@mui-symbols-material/w400";
+import { FileOpenOutlined } from "@mui-symbols-material/w300";
 import { useSnackbar } from "components/generic/Snackbar";
 import { find, get, startCase } from "es-toolkit/compat";
 import { slice } from "slices";
@@ -53,9 +53,12 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
                 usingLoadingState(async () => {
                   notify("Opening map...");
                   const output =
-                    f.file.size > LARGE_FILE_B
-                      ? await usingBusyState(f.read, `Opening map (${formatByte(f.file.size)})`)
-                      : await f.read();
+                    f.file.size > LARGE_FILE_B ?
+                      await usingBusyState(
+                        f.read,
+                        `Opening map (${formatByte(f.file.size)})`,
+                      )
+                    : await f.read();
                   if (output) {
                     onChange?.(output);
                   }
@@ -74,7 +77,10 @@ export function MapPicker({ onChange, value }: EditorProps<Map>) {
   );
 }
 
-export function TracePicker({ onChange, value }: EditorProps<UploadedTrace & { error?: string }>) {
+export function TracePicker({
+  onChange,
+  value,
+}: EditorProps<UploadedTrace & { error?: string }>) {
   const notify = useSnackbar();
   const usingLoadingState = useLoadingState("layers");
   const usingBusyState = useBusyState("layers");
@@ -109,12 +115,12 @@ export function TracePicker({ onChange, value }: EditorProps<UploadedTrace & { e
                     notify("Opening trace...");
                     try {
                       const output =
-                        f.file.size > LARGE_FILE_B
-                          ? await usingBusyState(
-                              f.read,
-                              `Opening trace (${formatByte(f.file.size)})`,
-                            )
-                          : await f.read();
+                        f.file.size > LARGE_FILE_B ?
+                          await usingBusyState(
+                            f.read,
+                            `Opening trace (${formatByte(f.file.size)})`,
+                          )
+                        : await f.read();
                       if (output) {
                         onChange?.(output);
                       }

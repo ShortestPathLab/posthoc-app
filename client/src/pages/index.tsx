@@ -21,7 +21,7 @@ import {
   AccountTreeOutlined as TreeIcon,
   ViewInArOutlined as ViewportIcon,
   WorkspacesOutlined as WorkspaceIcon,
-} from "@mui-symbols-material/w400";
+} from "@mui-symbols-material/w300";
 import { DebugPage } from "./DebugPage";
 import { ExplorePage } from "./ExplorePage";
 import { InfoPage } from "./InfoPage";

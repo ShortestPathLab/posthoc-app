@@ -1,7 +1,7 @@
 import {
   LocationOnOutlined as DestinationIcon,
   TripOriginOutlined as StartIcon,
-} from "@mui-symbols-material/w400";
+} from "@mui-symbols-material/w300";
 import { getParser } from "components/renderer";
 import { inferLayerName } from "layers";
 import { controller as traceController } from "layers/trace";
@@ -25,17 +25,14 @@ export const provideSelectionInfo = (({ children, event, layer: key }) => {
           if (!isMapLayer(l)) return;
           const { parsedMap } = l?.source ?? {};
           if (!parsedMap || !event) return;
-          const hydratedMap = getParser(l?.source?.map?.format)?.hydrate?.(parsedMap);
+          const hydratedMap = getParser(l?.source?.map?.format)?.hydrate?.(
+            parsedMap,
+          );
           if (!hydratedMap) return;
           const point = event?.world && hydratedMap.snap(event.world);
           if (!point) return;
           const node = event?.world && hydratedMap.nodeAt(point);
-          return {
-            point,
-            node,
-            key: l.key,
-            name: inferLayerName(l),
-          };
+          return { point, node, key: l.key, name: inferLayerName(l) };
         })
         .filter(identity),
     [layers],

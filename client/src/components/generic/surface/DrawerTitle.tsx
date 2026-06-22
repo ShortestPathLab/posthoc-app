@@ -1,4 +1,4 @@
-import { CloseOutlined } from "@mui-symbols-material/w400";
+import { CloseOutlined } from "@mui-symbols-material/w300";
 import { IconButton, Stack } from "@mui/material";
 import { useSm } from "hooks/useSmallDisplay";
 import { ReactNode } from "react";

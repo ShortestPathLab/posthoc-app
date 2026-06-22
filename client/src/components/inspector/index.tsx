@@ -18,6 +18,7 @@ import { FullscreenProgress } from "./FullscreenProgress";
 import { ErrorPlaceholder } from "./Placeholder";
 import { ViewTree } from "./ViewTree";
 import { useOne } from "slices/useOne";
+import { usePaper } from "theme";
 
 function useView() {
   return useOne(slice.view, (v) => v.view, isEqual);
@@ -26,48 +27,59 @@ function useView() {
 export function Inspector(props: BlockProps) {
   const loading = useAnyLoading();
   const view = useView();
+  const paper = usePaper();
   return (
     <>
       <Block
         {...props}
         sx={{
           flexDirection: isMobile ? "column-reverse" : "row",
+          gap: 0.5,
+          p: 0.5,
+          pt: 0,
         }}
       >
         <Sidebar />
-        <ViewTree<PanelState>
-          defaultContent={{ type: "" }}
-          onPopOut={(leaf) => {
-            openWindow({
-              page: leaf.content?.type,
-            });
-          }}
-          onMaximise={(leaf) => {
-            slice.ui.fullscreenModal.set(leaf.content?.type);
-          }}
-          canPopOut={(leaf) => !!pages[leaf.content!.type!]?.allowFullscreen}
-          root={view}
-          onChange={(v) => slice.view.set((l) => void (l.view = produce(l.view, v)))}
-          renderLeaf={({ content }) => {
-            const Content = pages[content?.type ?? ""]?.content ?? PlaceholderPage;
-            return (
-              <Box sx={{ width: "100%", height: "100%" }}>
-                <ErrorBoundary
-                  fallbackRender={({ error, resetErrorBoundary }) => (
-                    <ErrorPlaceholder
-                      sx={{ width: "100%", height: "100%" }}
-                      label={`An error occurred`}
-                      secondary={error instanceof Error ? error.message : "Couldn't render this view"}
-                      onReset={resetErrorBoundary}
-                    />
-                  )}
-                >
-                  <Content template={Page} />
-                </ErrorBoundary>
-              </Box>
-            );
-          }}
-        />
+        <Box sx={{ flex: 1, ...paper(), overflow: "hidden", border: "none" }}>
+          <ViewTree<PanelState>
+            defaultContent={{ type: "" }}
+            onPopOut={(leaf) => {
+              openWindow({ page: leaf.content?.type });
+            }}
+            onMaximise={(leaf) => {
+              slice.ui.fullscreenModal.set(leaf.content?.type);
+            }}
+            canPopOut={(leaf) => !!pages[leaf.content!.type!]?.allowFullscreen}
+            root={view}
+            onChange={(v) =>
+              slice.view.set((l) => void (l.view = produce(l.view, v)))
+            }
+            renderLeaf={({ content }) => {
+              const Content =
+                pages[content?.type ?? ""]?.content ?? PlaceholderPage;
+              return (
+                <Box sx={{ width: "100%", height: "100%" }}>
+                  <ErrorBoundary
+                    fallbackRender={({ error, resetErrorBoundary }) => (
+                      <ErrorPlaceholder
+                        sx={{ width: "100%", height: "100%" }}
+                        label={`An error occurred`}
+                        secondary={
+                          error instanceof Error ?
+                            error.message
+                          : "Couldn't render this view"
+                        }
+                        onReset={resetErrorBoundary}
+                      />
+                    )}
+                  >
+                    <Content template={Page} />
+                  </ErrorBoundary>
+                </Box>
+              );
+            }}
+          />
+        </Box>
       </Block>
       <Fade in={loading}>
         <LinearProgress

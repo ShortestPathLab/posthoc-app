@@ -1,7 +1,7 @@
 import {
   BlurOnOutlined as DisabledIcon,
   ViewInArOutlined,
-} from "@mui-symbols-material/w400";
+} from "@mui-symbols-material/w300";
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { RenderLayer } from "layers/RenderLayer";

@@ -1,4 +1,4 @@
-import { RouteOutlined } from "@mui-symbols-material/w400";
+import { RouteOutlined } from "@mui-symbols-material/w300";
 import { claimImportedFile } from "./claimImportedFile";
 import { compress } from "./compress";
 import { editor } from "./editor";

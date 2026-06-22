@@ -16,6 +16,7 @@ import { useMemo } from "react";
 import { useSyncStatus } from "services/SyncService";
 import { slice } from "slices";
 import { useOne } from "slices/useOne";
+import { accentColors, getShade, usePaper } from "theme";
 
 export function useSidebarBackground() {
   const { palette } = useTheme();
@@ -34,12 +35,12 @@ export function SidebarPlaceholder() {
   return (
     <Stack
       sx={{
-        minWidth: 64,
-        width: 64,
+        minWidth: 56,
+        width: 56,
         flex: 0,
         height: "100%",
         bgcolor,
-        gap: 2,
+        gap: 1,
         p: 2,
       }}
     >
@@ -47,7 +48,7 @@ export function SidebarPlaceholder() {
         <Skeleton
           variant="circular"
           animation={false}
-          sx={{ opacity: 0.5, height: 32 }}
+          sx={{ opacity: 0.5, height: 24 }}
         />
       ))}
     </Stack>
@@ -55,12 +56,13 @@ export function SidebarPlaceholder() {
 }
 
 function Divider2() {
-  return <Divider sx={{ mx: 2, my: 1 }} />;
+  return <Divider sx={{ mx: 2, my: 0, transform: "translateY(-1px)" }} />;
 }
 
 export function Sidebar() {
   const { isPrimary } = useSyncStatus();
   const bgcolor = useSidebarBackground();
+  const paper = usePaper();
   const sm2 = isMobile;
   const sm = !isPrimary || sm2;
   const settings = useOne(slice.settings);
@@ -68,15 +70,17 @@ export function Sidebar() {
     <TabContext value={false as unknown as string}>
       <Stack
         sx={{
+          overflow: "hidden",
+          ...paper(),
           display: isPrimary ? "flex" : "none",
           direction: sm ? "row" : "column",
-          width: sm ? "100%" : 64,
-          height: sm ? 64 : "100%",
+          width: sm ? "100%" : (t) => t.spacing(6),
+          height: sm ? (t) => t.spacing(6) : "100%",
           alignItems: "center",
-          p: 1,
-          gap: sm ? 0 : 1,
+          p: 0,
+          gap: 0.5,
           bgcolor,
-          borderTop: (t) => (sm ? `1px solid ${t.palette.divider}` : "none"),
+          border: "none",
         }}
       >
         <TabList
@@ -117,7 +121,12 @@ export function Sidebar() {
                       sx={{
                         alignItems: "center",
                         display: "flex",
-                        "> svg > path": { strokeWidth: 1, stroke: bgcolor },
+                        "> svg": {
+                          width: 20,
+                          height: 20,
+                          fill: (t) => getShade(c.color, t.palette.mode),
+                        },
+                        "> svg > path": { strokeWidth: 1 },
                       }}
                     >
                       {c.iconThin ?? c.icon}

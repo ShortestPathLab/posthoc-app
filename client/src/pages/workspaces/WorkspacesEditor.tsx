@@ -2,7 +2,7 @@ import {
   InfoOutlined,
   MoreVertOutlined,
   UploadOutlined,
-} from "@mui-symbols-material/w400";
+} from "@mui-symbols-material/w300";
 import share from "./share.svg";
 import {
   Avatar,

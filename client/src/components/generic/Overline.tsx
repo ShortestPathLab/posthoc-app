@@ -1,22 +1,12 @@
-import { FiberManualRecordOutlined as Dot } from "@mui-symbols-material/w400";
+import { FiberManualRecordOutlined as Dot } from "@mui-symbols-material/w300";
 import { Typography as Type, TypographyProps } from "@mui/material";
 import { ComponentProps, ReactNode } from "react";
 
 export function OverlineDot(props: ComponentProps<typeof Dot>) {
-  return (
-    <Dot
-      {...props}
-      sx={{
-        fontSize: 12,
-        ...props.sx,
-      }}
-    />
-  );
+  return <Dot {...props} sx={{ fontSize: 12, ...props.sx }} />;
 }
 
-type Props = {
-  children?: ReactNode;
-} & TypographyProps;
+type Props = { children?: ReactNode } & TypographyProps;
 
 export function Overline({ children, ...props }: Props) {
   return (

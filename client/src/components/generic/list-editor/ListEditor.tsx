@@ -1,5 +1,5 @@
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
-import { AddOutlined as Add } from "@mui-symbols-material/w400";
+import { AddOutlined as Add } from "@mui-symbols-material/w300";
 import { Box, ButtonProps, Collapse, Stack, Typography } from "@mui/material";
 
 import { last, noop } from "es-toolkit";

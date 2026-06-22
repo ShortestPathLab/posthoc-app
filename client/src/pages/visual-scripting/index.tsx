@@ -13,10 +13,17 @@ import { LayerPicker } from "components/generic/LayerPicker";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { FlowNode } from "components/visual-scripting/FlowNode";
 import { transforms } from "components/visual-scripting/NodeConfigs";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Layer, useLayerPicker } from "slices/layers";
 import { PageContentProps } from "../PageMeta";
-import { AddOutlined } from "@mui-symbols-material/w400";
+import { AddOutlined } from "@mui-symbols-material/w300";
 import { TabContext, TabList } from "@mui/lab";
 import {
   addEdge,
@@ -41,7 +48,15 @@ import { traceToNodes } from "components/visual-scripting/traceToNodes";
 import { TraceLayerData } from "layers/trace/TraceLayer";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 
-import { groupBy, head, keys, map, omitBy, startCase, toPairs as entries } from "es-toolkit/compat";
+import {
+  groupBy,
+  head,
+  keys,
+  map,
+  omitBy,
+  startCase,
+  toPairs as entries,
+} from "es-toolkit/compat";
 import { flow } from "utils/chain";
 import { bindTrigger } from "material-ui-popup-state";
 import { nanoid } from "nanoid";
@@ -65,16 +80,12 @@ const divider = (
 export const VisualScriptingContext = createContext<{
   hasDefinition: (s: string) => boolean;
   goToDefinition: (s: string) => void;
-}>({
-  hasDefinition: () => false,
-  goToDefinition: () => {},
-});
+}>({ hasDefinition: () => false, goToDefinition: () => {} });
 
-export const useVisualScriptingContext = () => useContext(VisualScriptingContext);
+export const useVisualScriptingContext = () =>
+  useContext(VisualScriptingContext);
 
-const nodeTypes = {
-  flow: FlowNode,
-};
+const nodeTypes = { flow: FlowNode };
 
 /**
  * VisualPage renders a ReactFlow graph for visualizing the debug data from a layer.
@@ -90,11 +101,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
     state: { tab = "", edges, nodes, ...state } = { type: "" },
     dragHandle,
     isViewTree,
-  } = useViewTreeContext<{
-    tab?: string;
-    edges?: Edge[];
-    nodes?: Node[];
-  }>();
+  } = useViewTreeContext<{ tab?: string; edges?: Edge[]; nodes?: Node[] }>();
 
   const { key, setKey } = useLayerPicker(isTraceLayer);
 
@@ -157,8 +164,9 @@ export function VisualPage({ template: Page }: PageContentProps) {
 
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
-      const flow = localStorage.getItem(flowKey)
-        ? JSON.parse(localStorage.getItem(flowKey)!)
+      const flow =
+        localStorage.getItem(flowKey) ?
+          JSON.parse(localStorage.getItem(flowKey)!)
         : null;
       if (flow) {
         const { x = 0, y = 0, zoom = 1 } = flow.viewport;
@@ -196,10 +204,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
           {divider}
           <TabList
             onChange={(_, v) => onChange?.((s) => void (s.tab = v))}
-            sx={{
-              mx: isViewTree ? 0 : -1,
-              "& button": { minWidth: 0 },
-            }}
+            sx={{ mx: isViewTree ? 0 : -1, "& button": { minWidth: 0 } }}
           >
             {tabs?.map?.((t) => (
               <Tab label={`View: ${t}`} value={t} key={t} />
@@ -207,14 +212,13 @@ export function VisualPage({ template: Page }: PageContentProps) {
           </TabList>
         </Page.Options>
         <Page.Content>
-          {content ? (
-            content?.version === "1.4.0" ? (
+          {content ?
+            content?.version === "1.4.0" ?
               <VisualScriptingContext.Provider value={context}>
                 <Box sx={{ width: "100%", height: "100%" }} key={tab}>
-                  {loading ? (
+                  {loading ?
                     <Spinner message="Loading graph" />
-                  ) : (
-                    <ReactFlowProvider>
+                  : <ReactFlowProvider>
                       <ReactFlow
                         colorMode={theme.palette.mode}
                         nodes={nodes}
@@ -227,10 +231,13 @@ export function VisualPage({ template: Page }: PageContentProps) {
                         fitView
                       >
                         <Controls />
-                        <Background id={id} bgColor={theme.palette.background.paper} />
+                        <Background
+                          id={id}
+                          bgColor={theme.palette.background.paper}
+                        />
                       </ReactFlow>
                     </ReactFlowProvider>
-                  )}
+                  }
                   <Stack
                     direction="row-reverse"
                     spacing={1}
@@ -256,7 +263,10 @@ export function VisualPage({ template: Page }: PageContentProps) {
                         },
                       }}
                       trigger={(state) => (
-                        <Button {...bindTrigger(state)} startIcon={<AddOutlined />}>
+                        <Button
+                          {...bindTrigger(state)}
+                          startIcon={<AddOutlined />}
+                        >
                           Add node
                         </Button>
                       )}
@@ -274,19 +284,24 @@ export function VisualPage({ template: Page }: PageContentProps) {
                                       key: "component",
                                       title: k,
                                       group: "components",
-                                      description: undefined as string | undefined,
+                                      description: undefined as
+                                        | string
+                                        | undefined,
                                     }),
                                   ] as const,
                               ),
                             ],
                             (xs) => xs.map(([k, v]) => [k, v()] as const),
                             (xs) => groupBy(xs, ([, v]) => v.group),
-                            (groups) => omitBy(groups, (vs, k) => k === "hidden"),
+                            (groups) =>
+                              omitBy(groups, (vs, k) => k === "hidden"),
                             (groups) =>
                               map(groups, (vs, group) => (
                                 <>
                                   <MenuItem disabled>
-                                    <Typography variant="overline">{startCase(group)}</Typography>
+                                    <Typography variant="overline">
+                                      {startCase(group)}
+                                    </Typography>
                                   </MenuItem>
                                   {map(vs, ([k, v], i) => (
                                     <MenuItem
@@ -299,10 +314,7 @@ export function VisualPage({ template: Page }: PageContentProps) {
                                           s.nodes?.push?.({
                                             id,
                                             type: "flow",
-                                            data: {
-                                              type: k,
-                                              key: id,
-                                            },
+                                            data: { type: k, key: id },
                                             position: {
                                               x: Math.random() * 400,
                                               y: Math.random() * 400,
@@ -311,7 +323,10 @@ export function VisualPage({ template: Page }: PageContentProps) {
                                         });
                                       }}
                                     >
-                                      <ListItemText primary={v.title} secondary={v.description} />
+                                      <ListItemText
+                                        primary={v.title}
+                                        secondary={v.description}
+                                      />
                                     </MenuItem>
                                   ))}
                                 </>
@@ -331,18 +346,16 @@ export function VisualPage({ template: Page }: PageContentProps) {
                   </Stack>
                 </Box>
               </VisualScriptingContext.Provider>
-            ) : (
-              <Placeholder
+            : <Placeholder
                 label="Unsupported trace version"
                 secondary="The visual scripting editor only supports trace version 1.4.0"
               />
-            )
-          ) : (
-            <Placeholder
+
+          : <Placeholder
               label="Open a trace"
               secondary="Open a trace to use the visual scripting editor"
             />
-          )}
+          }
         </Page.Content>
         <Page.Extras>{controls}</Page.Extras>
       </Page>

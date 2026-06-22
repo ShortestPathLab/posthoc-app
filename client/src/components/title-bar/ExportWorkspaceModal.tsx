@@ -1,4 +1,4 @@
-import { UploadOutlined } from "@mui-symbols-material/w400";
+import { UploadOutlined } from "@mui-symbols-material/w300";
 import { Box, Stack, TextField, Typography } from "@mui/material";
 import { Button } from "components/generic/inputs/Button";
 import { useSnackbar } from "components/generic/Snackbar";

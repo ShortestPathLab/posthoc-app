@@ -1,4 +1,4 @@
-import { SegmentOutlined } from "@mui-symbols-material/w400";
+import { SegmentOutlined } from "@mui-symbols-material/w300";
 import { Stack, SxProps, Theme, useTheme } from "@mui/material";
 import { Playback } from "components/app-bar/Playback";
 import { Block } from "components/generic/Block";

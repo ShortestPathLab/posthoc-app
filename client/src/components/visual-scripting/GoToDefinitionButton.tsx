@@ -1,4 +1,4 @@
-import { NetworkNodeOutlined } from "@mui-symbols-material/w400";
+import { NetworkNodeOutlined } from "@mui-symbols-material/w300";
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,

@@ -1,4 +1,4 @@
-import { KeyboardArrowDownOutlined } from "@mui-symbols-material/w400";
+import { KeyboardArrowDownOutlined } from "@mui-symbols-material/w300";
 import { Box, Button, ButtonProps } from "@mui/material";
 import { FeaturePickerProps } from "./FeaturePicker";
 

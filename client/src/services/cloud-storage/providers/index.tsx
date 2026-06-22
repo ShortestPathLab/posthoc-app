@@ -1,5 +1,8 @@
-import { FolderOutlined } from "@mui-symbols-material/w400";
-import { CloudStorageProviderMeta, ProviderFactory } from "services/cloud-storage";
+import { FolderOutlined } from "@mui-symbols-material/w300";
+import {
+  CloudStorageProviderMeta,
+  ProviderFactory,
+} from "services/cloud-storage";
 import google from "./google";
 
 const providers = {

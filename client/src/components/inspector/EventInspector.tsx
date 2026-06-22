@@ -1,7 +1,7 @@
 import {
   DataObjectOutlined,
   FiberManualRecordFilledOutlined as FiberManualRecord,
-} from "@mui-symbols-material/w400";
+} from "@mui-symbols-material/w300";
 import {
   Box,
   ListItem,

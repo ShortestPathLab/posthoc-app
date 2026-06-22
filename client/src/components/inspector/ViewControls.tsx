@@ -4,7 +4,7 @@ import {
   MoreVertOutlined as MoreIcon,
   OpenInNewOutlined as PopOutIcon,
   ViewAgendaOutlined as SplitIcon,
-} from "@mui-symbols-material/w400";
+} from "@mui-symbols-material/w300";
 import {
   Box,
   Divider,

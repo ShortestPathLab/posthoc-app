@@ -1,4 +1,4 @@
-import { FiberManualRecordOutlined } from "@mui-symbols-material/w400";
+import { FiberManualRecordOutlined } from "@mui-symbols-material/w300";
 import { Box, Divider } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
@@ -29,7 +29,8 @@ const SYMBOL_ALL = nanoid();
 export const SYMBOL_HIGHLIGHTED = nanoid();
 
 export function StepsPage({ template: Page }: PageContentProps) {
-  const { controls, onChange, state, dragHandle } = useViewTreeContext<StepsPageState>();
+  const { controls, onChange, state, dragHandle } =
+    useViewTreeContext<StepsPageState>();
 
   const size = useSurfaceAvailableCssSize();
 
@@ -41,7 +42,8 @@ export function StepsPage({ template: Page }: PageContentProps) {
   } = useStepsPageState(state, onChange);
 
   const one = slice.layers.one<StepsLayer>(key);
-  const { steps } = useOne(one, (c) => getController(c)?.steps?.(c), id<Steps>("key")) ?? {};
+  const { steps } =
+    useOne(one, (c) => getController(c)?.steps?.(c), id<Steps>("key")) ?? {};
 
   // TODO: low performance `isEqual`
   const highlighting = useOne(one, (c) => c?.source?.highlighting, isEqual);
@@ -63,11 +65,10 @@ export function StepsPage({ template: Page }: PageContentProps) {
 
           return {
             types: stepTypes,
-            selectedType: showHighlighting
-              ? SYMBOL_HIGHLIGHTED
-              : allSelected
-                ? SYMBOL_ALL
-                : _selectedType,
+            selectedType:
+              showHighlighting ? SYMBOL_HIGHLIGHTED
+              : allSelected ? SYMBOL_ALL
+              : _selectedType,
             isHighlighting: !isUndefined(highlighting?.path),
           };
         }
@@ -101,11 +102,13 @@ export function StepsPage({ template: Page }: PageContentProps) {
             <FiberManualRecordOutlined
               sx={{
                 color:
-                  selectedType === SYMBOL_ALL ||
-                  selectedType === SYMBOL_HIGHLIGHTED ||
-                  !selectedType
-                    ? grey[tint]
-                    : getColorHex(selectedType),
+                  (
+                    selectedType === SYMBOL_ALL ||
+                    selectedType === SYMBOL_HIGHLIGHTED ||
+                    !selectedType
+                  ) ?
+                    grey[tint]
+                  : getColorHex(selectedType),
               }}
             />
           }
@@ -116,8 +119,9 @@ export function StepsPage({ template: Page }: PageContentProps) {
             {
               id: SYMBOL_HIGHLIGHTED,
               name: "Focused Events",
-              description: isHighlighting
-                ? `${startCase(highlighting?.type)}, ${startCase(
+              description:
+                isHighlighting ?
+                  `${startCase(highlighting?.type)}, ${startCase(
                     steps?.[highlighting?.step ?? 0]?.type,
                   )} ${steps?.[highlighting?.step ?? 0]?.id}, Step ${highlighting?.step}`
                 : undefined,

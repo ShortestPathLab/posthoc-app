@@ -1,4 +1,4 @@
-import { FullscreenOutlined } from "@mui-symbols-material/w400";
+import { FullscreenOutlined } from "@mui-symbols-material/w300";
 import { Box, Typography } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";

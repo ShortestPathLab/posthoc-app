@@ -2,7 +2,7 @@ import {
   CancelOutlined,
   RefreshOutlined,
   WidgetsOutlined,
-} from "@mui-symbols-material/w400";
+} from "@mui-symbols-material/w300";
 import { Box, Button, Typography as Type } from "@mui/material";
 import { Block, BlockProps } from "components/generic/Block";
 import { ComponentProps, ReactElement, ReactNode } from "react";

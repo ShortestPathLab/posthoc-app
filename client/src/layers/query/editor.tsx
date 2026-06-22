@@ -1,4 +1,4 @@
-import { CodeOutlined } from "@mui-symbols-material/w400";
+import { CodeOutlined } from "@mui-symbols-material/w300";
 import { Typography as Type } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { LayerPicker } from "components/generic/LayerPicker";

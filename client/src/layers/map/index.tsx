@@ -1,4 +1,4 @@
-import { MapOutlined } from "@mui-symbols-material/w400";
+import { MapOutlined } from "@mui-symbols-material/w300";
 import { CircularProgress, Typography } from "@mui/material";
 import { MapPicker } from "components/app-bar/Input";
 import { custom, readUploadedMap } from "components/app-bar/upload";
@@ -13,7 +13,15 @@ import { useMapOptions } from "hooks/useMapOptions";
 import { useParsedMap } from "hooks/useParsedMap";
 import { LayerController, inferLayerName } from "layers";
 import { isUndefined, round } from "es-toolkit";
-import { get, keys, map, pick, set, startCase, toPairs as entries } from "es-toolkit/compat";
+import {
+  get,
+  keys,
+  map,
+  pick,
+  set,
+  startCase,
+  toPairs as entries,
+} from "es-toolkit/compat";
 import { nanoid as id } from "nanoid";
 import { withProduce } from "produce";
 import { useMemo } from "react";
@@ -35,40 +43,38 @@ export const controller = {
   key: "map",
   icon: <MapOutlined />,
   inferName: (layer) =>
-    layer?.source?.map
-      ? `${layer.source.map.name} (${startCase(layer.source.map.format)})`
-      : "Untitled Map",
+    layer?.source?.map ?
+      `${layer.source.map.name} (${startCase(layer.source.map.format)})`
+    : "Untitled Map",
   error: (layer) => layer?.source?.parsedMap?.error,
   compress: (layer) => pick(layer, ["map", "options"]),
   claimImportedFile: async (file) =>
-    file && keys(mapParsers).includes(ext(file.name))
-      ? {
-          claimed: true,
-          layer: async (notify) => {
-            notify("Opening map...");
-            try {
-              const output = readUploadedMap(
-                file,
-                entries(mapParsers).map(([k]) => ({
-                  id: k,
-                })),
-              );
-              return { map: { ...(await output.read()) } };
-            } catch (e) {
-              console.error(e);
-              notify(`Error opening, ${get(e, "message")}`);
-              return {
-                map: {
-                  key: id(),
-                  id: custom().id,
-                  error: get(e, "message"),
-                  name: startCase(name(file.name)),
-                },
-              };
-            }
-          },
-        }
-      : { claimed: false },
+    file && keys(mapParsers).includes(ext(file.name)) ?
+      {
+        claimed: true,
+        layer: async (notify) => {
+          notify("Opening map...");
+          try {
+            const output = readUploadedMap(
+              file,
+              entries(mapParsers).map(([k]) => ({ id: k })),
+            );
+            return { map: { ...(await output.read()) } };
+          } catch (e) {
+            console.error(e);
+            notify(`Error opening, ${get(e, "message")}`);
+            return {
+              map: {
+                key: id(),
+                id: custom().id,
+                error: get(e, "message"),
+                name: startCase(name(file.name)),
+              },
+            };
+          }
+        },
+      }
+    : { claimed: false },
   editor: withProduce(({ value, produce }) => {
     const parsedMap = value?.source?.parsedMap;
     const { result: Editor } = useMapOptions(parsedMap);
@@ -88,11 +94,7 @@ export const controller = {
             component="div"
             variant="body2"
             color="error"
-            sx={{
-              whiteSpace: "pre-wrap",
-              mb: 1,
-              mt: 1,
-            }}
+            sx={{ whiteSpace: "pre-wrap", mb: 1, mt: 1 }}
           >
             <code>{parsedMap?.error}</code>
           </Typography>
@@ -100,16 +102,21 @@ export const controller = {
         {!!parsedMap && (
           <>
             <Heading label="Map Options" />
-            {Editor ? (
+            {Editor ?
               <Editor
                 value={value?.source?.options}
                 onChange={(v) =>
-                  produce((prev) => void set(prev, "source.options", v(prev.source?.options ?? {})))
+                  produce(
+                    (prev) =>
+                      void set(
+                        prev,
+                        "source.options",
+                        v(prev.source?.options ?? {}),
+                      ),
+                  )
                 }
               />
-            ) : (
-              <CircularProgress sx={{ mt: 2 }} />
-            )}
+            : <CircularProgress sx={{ mt: 2 }} />}
           </>
         )}
       </>
@@ -136,7 +143,10 @@ export const controller = {
   },
   service: withProduce(({ value, produce }) => {
     const { result: mapContent } = useMapContent(value?.source?.map);
-    const { result: parsedMap, loading } = useParsedMap(mapContent, value?.source?.options);
+    const { result: parsedMap, loading } = useParsedMap(
+      mapContent,
+      value?.source?.options,
+    );
     useEffectWhen(
       () => {
         if (!loading) {
@@ -157,7 +167,9 @@ export const controller = {
     const { parsedMap } = layer?.source ?? {};
     const { point, node } = useMemo(() => {
       if (parsedMap && event) {
-        const hydratedMap = getParser(layer?.source?.map?.format)?.hydrate?.(parsedMap);
+        const hydratedMap = getParser(layer?.source?.map?.format)?.hydrate?.(
+          parsedMap,
+        );
         if (hydratedMap) {
           const point = event?.world && hydratedMap.snap(event.world);
           if (point) {

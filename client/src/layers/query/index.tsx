@@ -1,4 +1,4 @@
-import { RouteOutlined } from "@mui-symbols-material/w400";
+import { RouteOutlined } from "@mui-symbols-material/w300";
 import { LayerController } from "layers";
 import { controller as traceController } from "layers/trace";
 import { TraceLayerData } from "layers/trace/TraceLayer";
