@@ -20,7 +20,10 @@ export type NodeBaseProps = {
   items?: T1[];
 };
 
-export function NodeBase({ items, width = 240 }: NodeBaseProps) {
+export function NodeBase({ items, width: widthProp }: NodeBaseProps) {
+  // Defaults moved out of destructures (here and in the map below) to avoid a
+  // React Compiler bailout caused by object-destructuring defaults.
+  const width = widthProp ?? 240;
   const acrylic = useAcrylic();
   const paper = usePaper();
   const computed = reduce(
@@ -57,21 +60,24 @@ export function NodeBase({ items, width = 240 }: NodeBaseProps) {
           p: 0,
         }}
       >
-        {computed.items?.map?.(({ render, height, y = 0 }, i) => (
-          <Stack
-            key={i}
-            direction="row"
-            sx={{
-              maxHeight: height,
-              height,
-              width: "100%",
-              alignItems: "center",
-              px: 2,
-            }}
-          >
-            {render({ y, height })}
-          </Stack>
-        ))}
+        {computed.items?.map?.(({ render, height, y: yProp }, i) => {
+          const y = yProp ?? 0;
+          return (
+            <Stack
+              key={i}
+              direction="row"
+              sx={{
+                maxHeight: height,
+                height,
+                width: "100%",
+                alignItems: "center",
+                px: 2,
+              }}
+            >
+              {render({ y, height })}
+            </Stack>
+          );
+        })}
       </Card>
     </>
   );

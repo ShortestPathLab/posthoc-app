@@ -34,17 +34,19 @@ export function useBreakpoint3(key?: string) {
 
 export function useBreakPoints2(key?: string) {
   const layer = useOne(slice.layers.one<Layer<DebugLayerData>>(key));
-  const { code = "" } = layer?.source ?? {};
+  // Defaults pulled out of destructures to avoid a React Compiler bailout.
+  const code = layer?.source?.code ?? "";
   const { isTrusted } = useUntrustedLayers();
   const events = useMemo(
     () => layer?.source?.trace?.content?.events ?? [],
     [layer?.source?.trace?.content?.events],
   );
-  const { data: { dict } = {} } = useComputeTree({
+  const { data } = useComputeTree({
     trace: layer?.source?.trace?.content,
     step: layer?.source?.trace?.content?.events?.length,
     radius: undefined,
   });
+  const { dict } = data ?? {};
 
   const shouldBreak = useMemo(() => {
     if (!dict) return;

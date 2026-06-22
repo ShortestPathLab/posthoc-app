@@ -33,6 +33,6 @@ function useCloudStorageManager(provider: keyof typeof providers) {
 }
 
 export function CloudStorageService() {
-  const { cloudStorageType = defaultCloudStorage } = useOne(slice.settings);
-  useCloudStorageManager(cloudStorageType);
+  const { cloudStorageType } = useOne(slice.settings);
+  useCloudStorageManager(cloudStorageType ?? defaultCloudStorage);
 }

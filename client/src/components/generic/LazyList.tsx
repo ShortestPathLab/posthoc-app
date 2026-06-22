@@ -133,11 +133,14 @@ export function WhenIdle({ children }: { children: ReactElement }) {
 }
 
 export function LazyList<T>({
-  items = [],
+  items: itemsProp,
   renderItem,
   listOptions: options,
   ...props
 }: LazyListProps<T>) {
+  // Default moved out of the destructure: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const items = itemsProp ?? [];
   return (
     <Box {...props}>
       <List

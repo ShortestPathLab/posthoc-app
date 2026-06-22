@@ -103,12 +103,15 @@ export function EventProperties({ event }: Pick<PropertyListProps, "event">) {
 
 export function PropertyList({
   event,
-  variant = "body2",
-  max = 10,
+  variant: variantProp,
+  max: maxProp,
   simple,
   primitives,
   ...rest
 }: PropertyListProps & BlockProps) {
+  // Defaults moved out of destructure to avoid React Compiler bailout.
+  const variant = variantProp ?? "body2";
+  const max = maxProp ?? 10;
   const sorted = sortEventKeys(event);
   const closeMenu = useMenuClose();
   return (

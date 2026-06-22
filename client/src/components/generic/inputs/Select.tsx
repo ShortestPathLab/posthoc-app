@@ -25,8 +25,11 @@ export function Select<T extends string>({
   value,
   onChange,
   showTooltip,
-  placeholder = "Select Option",
+  placeholder: placeholderProp,
 }: SelectProps<T>) {
+  // Default moved out of the destructure: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const placeholder = placeholderProp ?? "Select Option";
   return (
     <State variant="popover">
       {(state) => (
@@ -77,7 +80,10 @@ export type SelectFieldProps<T extends string> = Pick<SelectProps<T>, "items" | 
   Omit<TextFieldProps, "onChange">;
 
 export function SelectField<T extends string>(props: SelectFieldProps<T>) {
-  const { placeholder, value, items = [], onChange } = props;
+  // Default split out of the destructure: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const { placeholder, value, items: itemsProp, onChange } = props;
+  const items = itemsProp ?? [];
   return (
     <TextField
       sx={{ minWidth: 120 }}

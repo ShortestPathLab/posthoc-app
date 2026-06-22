@@ -19,12 +19,16 @@ export type ModalProps = {
 export function Modal({
   children,
   actions,
-  width = 480,
+  width: widthProp,
   height,
-  variant = "default",
-  scrollable = true,
+  variant: variantProp,
+  scrollable: scrollableProp,
   ...props
 }: ModalProps & ComponentProps<typeof Dialog>) {
+  // Defaults moved off the destructure: `{ a = D }` makes React Compiler bail.
+  const width = widthProp ?? 480;
+  const variant = variantProp ?? "default";
+  const scrollable = scrollableProp ?? true;
   const theme = useTheme();
   const sm = useSm();
 

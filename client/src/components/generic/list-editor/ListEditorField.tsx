@@ -32,17 +32,24 @@ export type ListEditorFieldProps1<T> = Props<T> & ListEditorFieldProps & { item:
 export function DraggableListItem<T extends { key: Key }>({
   toggleable,
   deletable,
-  editable = true,
-  onChangeItem = noop,
-  onDeleteItem = noop,
+  editable: editableProp,
+  onChangeItem: onChangeItemProp,
+  onDeleteItem: onDeleteItemProp,
   extras: getExtras,
   item,
-  i = 0,
+  i: iProp,
   autoFocus,
   sortable,
-  button = true,
-  renderEditor = defaultEditorRenderer as Props<T>["renderEditor"],
+  button: buttonProp,
+  renderEditor: renderEditorProp,
 }: ListEditorFieldProps1<T>) {
+  // Defaults moved off the destructure: `{ a = D }` makes React Compiler bail.
+  const editable = editableProp ?? true;
+  const onChangeItem = onChangeItemProp ?? noop;
+  const onDeleteItem = onDeleteItemProp ?? noop;
+  const i = iProp ?? 0;
+  const button = buttonProp ?? true;
+  const renderEditor = renderEditorProp ?? (defaultEditorRenderer as Props<T>["renderEditor"]);
   return (
     <Draggable index={i} draggableId={`${item?.id}`}>
       {(provided, snapshot) => (

@@ -14,7 +14,11 @@ export type NodeList2Props = {
 
 export type LazyNodeListProps = NodeListProps;
 
-export function NodeList({ nodes, start = 0, end: step = nodes?.length ?? 0 }: NodeListProps) {
+export function NodeList({ nodes, start: startProp, end: stepProp }: NodeListProps) {
+  // Defaults moved out of the destructure: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const start = startProp ?? 0;
+  const step = stepProp ?? nodes?.length ?? 0;
   const { renderer } = useRendererInstance();
   useEffect(() => {
     if (renderer && nodes?.length) {

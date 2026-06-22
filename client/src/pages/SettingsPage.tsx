@@ -110,16 +110,17 @@ export function SettingsPage({ template: Page }: PageContentProps) {
   const sm = useSm();
   const push = useSnackbar();
   const usingBusyState = useBusyState("reset");
-  const {
-    "playback/playbackRate": playbackRate = 1,
-    "appearance/acrylic": acrylic,
-    "appearance/theme": theme = "light",
-    "appearance/accentColor": accentColor = "teal",
-    "behaviour/showOnStart": showOnStart,
-    "performance/workerCount": workerCount = 1,
-    "experiments/cloudStorage": cloudStorage = false,
-    "experiments/visualScripting": visualScripting = false,
-  } = useOne(slice.settings);
+  // Defaults applied via `??` instead of destructure defaults, which would make
+  // the React Compiler bail out of optimizing this component.
+  const settings = useOne(slice.settings);
+  const playbackRate = settings["playback/playbackRate"] ?? 1;
+  const acrylic = settings["appearance/acrylic"];
+  const theme = settings["appearance/theme"] ?? "light";
+  const accentColor = settings["appearance/accentColor"] ?? "teal";
+  const showOnStart = settings["behaviour/showOnStart"];
+  const workerCount = settings["performance/workerCount"] ?? 1;
+  const cloudStorage = settings["experiments/cloudStorage"] ?? false;
+  const visualScripting = settings["experiments/visualScripting"] ?? false;
   const [tab, setTab] = useState("general");
   const [ref, { width }] = useMeasure();
   const { open: openReset } = useSurface(

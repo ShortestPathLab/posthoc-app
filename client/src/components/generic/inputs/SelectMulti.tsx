@@ -19,9 +19,12 @@ export function SelectMulti<T extends string>({
   items,
   value,
   onChange,
-  placeholder = "Select Options",
+  placeholder: placeholderProp,
   defaultChecked,
 }: SelectProps<T>) {
+  // Default moved out of the destructure: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const placeholder = placeholderProp ?? "Select Options";
   return (
     <State variant="popover">
       {(state) => (

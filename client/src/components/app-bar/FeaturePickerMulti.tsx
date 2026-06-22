@@ -25,8 +25,11 @@ export function FeaturePickerMulti({
   icon,
   showArrow,
   defaultChecked,
-  ellipsis = Infinity,
+  ellipsis: ellipsisProp,
 }: Props) {
+  // Default moved out of the destructure: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const ellipsis = ellipsisProp ?? Infinity;
   const selected = filter(items, ({ id }) => !!(value?.[id] ?? defaultChecked));
 
   const buttonLabel = selected.length

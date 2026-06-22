@@ -127,8 +127,12 @@ const options = (a: string[]) => a.map((c) => ({ id: c, name: startCase(c) }));
 export function LayerEditor({ layer: key }: LayerEditorProps) {
   const one = slice.layers.one(key);
   const layer = useLayerProperties(key);
-  const [{ name, transparency, displayMode, source: { type } = {} } = {}, setOptimistic] =
-    useOptimisticTransaction(layer!, (f) => idle(() => one.set(f), 1000));
+  // Defaults moved out of destructure to avoid React Compiler bailout.
+  const [layerValue, setOptimistic] = useOptimisticTransaction(layer!, (f) =>
+    idle(() => one.set(f), 1000),
+  );
+  const { name, transparency, displayMode, source } = layerValue ?? {};
+  const { type } = source ?? {};
 
   const selectedType = type ?? head(keys(getControllers())) ?? "";
 

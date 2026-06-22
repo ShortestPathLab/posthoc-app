@@ -130,17 +130,21 @@ export function ViewTree<T extends Record<string, unknown>>(props: ViewTreeProps
 }
 
 export function ViewLeaf<T extends Record<string, unknown>>({
-  root = { type: "leaf", key: "" },
+  root: rootProp,
   onChange,
   onClose,
   onPopOut,
   onMaximise,
   canPopOut,
-  depth = 0,
+  depth: depthProp,
   onSwap,
   onDrop,
   defaultContent,
 }: ViewLeafProps<T>) {
+  // Defaults moved out of destructure to avoid React Compiler bailout.
+  // Memoize so the fallback object keeps a stable identity across renders.
+  const root = useMemo(() => rootProp ?? { type: "leaf" as const, key: "" }, [rootProp]);
+  const depth = depthProp ?? 0;
   const view = useContext(ViewTreePortalsContext);
   const [{ isOver }, drop] = useDrop<Leaf<Record<string, unknown>>, void, { isOver: boolean }>(
     () => ({
@@ -246,7 +250,10 @@ export function ViewLeaf<T extends Record<string, unknown>>({
 }
 
 export function ViewBranch<T extends Record<string, unknown>>(props: ViewBranchProps<T>) {
-  const { root = { type: "leaf", key: "" }, onChange, depth = 0 } = props;
+  // Defaults moved out of destructure to avoid React Compiler bailout.
+  const { root: rootProp, onChange, depth: depthProp } = props;
+  const root = rootProp ?? { type: "leaf" as const, key: "" };
+  const depth = depthProp ?? 0;
   const { palette, spacing, transitions } = useTheme();
   const isLocked = root.type === "branch" && root.locked;
 

@@ -24,7 +24,9 @@ interface TransitionProps {
 }
 
 export function getTransitionProps(props: ComponentProps1, options: Options): TransitionProps {
-  const { timeout, easing, style = {} } = props;
+  // Default moved off the destructure: `{ a = D }` makes React Compiler bail.
+  const { timeout, easing, style: styleProp } = props;
+  const style = styleProp ?? {};
 
   return {
     duration:
@@ -65,7 +67,7 @@ const Swipe = (
 
   const {
     addEndListener,
-    appear = true,
+    appear: appearProp,
     children,
     easing,
     in: inProp,
@@ -76,11 +78,15 @@ const Swipe = (
     onExited,
     onExiting,
     style,
-    timeout = defaultTimeout,
-    TransitionComponent = Transition,
+    timeout: timeoutProp,
+    TransitionComponent: TransitionComponentProp,
     ref,
     ...other
   } = props;
+  // Defaults moved off the destructure: `{ a = D }` makes React Compiler bail.
+  const appear = appearProp ?? true;
+  const timeout = timeoutProp ?? defaultTimeout;
+  const TransitionComponent = TransitionComponentProp ?? Transition;
 
   const enableStrictModeCompat = true;
   const nodeRef = useRef<HTMLElement>(null);

@@ -21,11 +21,15 @@ export function Scroll({
   children,
   x,
   y,
-  px = 6,
-  py = 0,
+  px: pxProp,
+  py: pyProp,
   ref,
   ...rest
 }: Omit<ScrollProps, "ref"> & { ref?: ForwardedRef<HTMLDivElement> }) {
+  // Defaults moved out of the destructure: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const px = pxProp ?? 6;
+  const py = pyProp ?? 0;
   const { palette, spacing } = useTheme();
   const cls = useCss({
     "--os-padding-perpendicular": "2px",

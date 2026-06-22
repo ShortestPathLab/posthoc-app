@@ -94,7 +94,8 @@ export function ScatterPlotControls({
     key: traceKey,
   });
 
-  const { data: types = [] } = useComputeTypes({ trace: trace, key: traceKey });
+  const { data: typesData } = useComputeTypes({ trace: trace, key: traceKey });
+  const types = typesData ?? [];
   const [open, setOpen] = useState(true);
   // Combined dropdown
   const scatterPlotAxis = [

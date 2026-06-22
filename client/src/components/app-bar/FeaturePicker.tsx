@@ -33,11 +33,15 @@ export function FeaturePicker({
   disabled,
   ButtonProps,
   showTooltip,
-  itemOrientation = "horizontal",
-  ellipsis = Infinity,
+  itemOrientation: itemOrientationProp,
+  ellipsis: ellipsisProp,
   paper: _paper,
   renderItem,
 }: FeaturePickerProps) {
+  // Defaults moved out of the destructure: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const itemOrientation = itemOrientationProp ?? "horizontal";
+  const ellipsis = ellipsisProp ?? Infinity;
   const paper = usePaper();
   const { palette } = useTheme();
 

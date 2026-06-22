@@ -68,19 +68,25 @@ function second<U>(_: unknown, b: U) {
 }
 
 export default function Editor<T extends { key: Key }>(props: Props<T>) {
+  // Defaults moved off the destructure: `{ a = D }` makes React Compiler bail.
   const {
-    addItemLabel = "Add Item",
-    onAddItem = noop,
-    onDeleteItem = noop,
+    addItemLabel: addItemLabelProp,
+    onAddItem: onAddItemProp,
+    onDeleteItem: onDeleteItemProp,
     items,
     placeholder,
     autoFocus,
     order,
     onChange,
     addItemExtras: extras,
-    addable = true,
-    renderAddItem = second,
+    addable: addableProp,
+    renderAddItem: renderAddItemProp,
   } = props;
+  const addItemLabel = addItemLabelProp ?? "Add Item";
+  const onAddItem = onAddItemProp ?? noop;
+  const onDeleteItem = onDeleteItemProp ?? noop;
+  const addable = addableProp ?? true;
+  const renderAddItem = renderAddItemProp ?? second;
   const initial = useInitialRender();
   const [deleting, { set: pushDeleting, remove: pullDeleting }] = useMap();
 

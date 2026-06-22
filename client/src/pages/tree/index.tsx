@@ -85,7 +85,9 @@ export function TreePage({ template: Page }: PageContentProps) {
               {
                 <>
                   <AutoSize
-                    renderProp={({ width = 0, height = 0 }) => {
+                    renderProp={({ width: widthProp, height: heightProp }) => {
+                      const width = widthProp ?? 0;
+                      const height = heightProp ?? 0;
                       const size: Size = { width, height };
                       const sharedProps: SharedGraphProps = {
                         ...size,

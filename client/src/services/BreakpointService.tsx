@@ -64,12 +64,13 @@ export function BreakpointService({ value }: { value?: string }) {
 
   const inputs = useOne(one, (l) => l?.source?.breakpoints, isEqual);
 
-  const { data: { dict, tree } = {} } = useComputeTree({
+  const { data } = useComputeTree({
     key: trace?.key,
     trace: trace?.content,
     step: trace?.content?.events?.length,
     radius: undefined,
   });
+  const { dict, tree } = data ?? {};
 
   useAsyncAbortable(
     (signal) =>

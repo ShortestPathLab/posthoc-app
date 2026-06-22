@@ -5,7 +5,7 @@ import { ComponentProps, ReactElement, ReactNode } from "react";
 
 export function Placeholder({
   label,
-  icon = <WidgetsOutlined />,
+  icon: iconProp,
   secondary,
   action,
   ...rest
@@ -15,6 +15,8 @@ export function Placeholder({
   secondary?: ReactNode;
   action?: ReactNode;
 } & BlockProps) {
+  // Default moved out of destructure to avoid React Compiler bailout.
+  const icon = iconProp ?? <WidgetsOutlined />;
   return (
     <Block
       {...rest}

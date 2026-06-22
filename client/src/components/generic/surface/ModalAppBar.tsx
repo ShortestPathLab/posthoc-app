@@ -9,12 +9,15 @@ export type ModalAppBarProps = {
 } & AppBarProps;
 
 export function ModalAppBar({
-  onClose = () => {},
+  onClose: onCloseProp,
   sx,
   children,
   simple,
-  position = "sticky",
+  position: positionProp,
 }: ModalAppBarProps) {
+  // Defaults moved off the destructure: `{ a = D }` makes React Compiler bail.
+  const onClose = onCloseProp ?? (() => {});
+  const position = positionProp ?? "sticky";
   function renderTitle(label: ReactNode) {
     return typeof label === "string" ? <AppBarTitle>{label}</AppBarTitle> : label;
   }

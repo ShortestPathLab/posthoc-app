@@ -56,7 +56,7 @@ const defaultGetGraphId = (step: number, event: TraceEvent) => event.id;
 const defaultGetGraphPId = (step: number, event: TraceEvent) => event.pId;
 export function useGraphColoring(
   graph: MultiDirectedGraph,
-  { showAllEdges, trackedProperty, trace, step = 0 }: TreeGraphProps,
+  { showAllEdges, trackedProperty, trace, step: stepProp }: TreeGraphProps,
   highlightEdges?: Highlighting,
   getGraphId = defaultGetGraphId,
   getGraphPId = defaultGetGraphPId,
@@ -64,6 +64,7 @@ export function useGraphColoring(
   "use no memo";
   // This hook modifies `graph`, which is against the rules of React.
   // TODO: fix this in the future.
+  const step = stepProp ?? 0;
   const theme = useTheme();
 
   const backgroundHex = theme.palette.background.paper;

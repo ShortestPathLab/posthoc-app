@@ -11,11 +11,13 @@ import { usePaper } from "theme";
 const defaultScreenshotRenderer = (s?: string) => <img src={s} />;
 function Screenshot({
   screenshot,
-  renderScreenshot = defaultScreenshotRenderer,
+  renderScreenshot: renderScreenshotProp,
 }: {
   screenshot?: () => Promise<string | undefined>;
   renderScreenshot: (s?: string, loading?: boolean) => ReactNode;
 }) {
+  // Default moved out of the destructure to avoid a React Compiler bailout.
+  const renderScreenshot = renderScreenshotProp ?? defaultScreenshotRenderer;
   const { result, loading } = useAsync(async () => {
     return await screenshot?.();
   }, [screenshot]);

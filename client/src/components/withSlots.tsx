@@ -82,11 +82,17 @@ const getCleanChildren = (children: any, slotKeys: string[]) => {
 const isComponentName = (name: any) =>
   typeof name === "string" && !EXCLUDED_NAMES.includes(name) && name.match(/^[A-Z0-9]/);
 
+const EMPTY_SLOT_KEYS: string[] = [];
+
 const createResultComponent = (
   Component: WrappedComponent<any, any>,
 ): WrappedComponent<any, any> => {
   const ResultComponent: WrappedComponent<any, any> = memo((props) => {
-    const { children, propagateSlotProps, slotKeys = [], ...otherProps } = props;
+    // Default moved out of the destructure to avoid a React Compiler bailout.
+    // The fallback is a shared stable reference so `slotKeys` keeps a constant
+    // identity across renders (used as a hook dependency below).
+    const { children, propagateSlotProps, slotKeys: slotKeysProp, ...otherProps } = props;
+    const slotKeys = slotKeysProp === undefined ? EMPTY_SLOT_KEYS : slotKeysProp;
 
     // Find and get out all childProps
     const slotProps = useMemo(() => getSlotProps(children), [children]);

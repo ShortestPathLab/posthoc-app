@@ -51,11 +51,16 @@ function usePlaybackServiceState(layer?: string) {
 }
 
 export function PlaybackService({ children, value }: EditorSetterProps<Layer<PlaybackLayerData>>) {
-  const { playing, step = 0, end = 0 } = usePlaybackServiceState(value?.key);
+  // Defaults moved out of the destructures: object-destructuring defaults make
+  // the React Compiler bail out of optimizing this component.
+  const { playing, step: stepValue, end: endValue } = usePlaybackServiceState(value?.key);
+  const step = stepValue ?? 0;
+  const end = endValue ?? 0;
 
   const { pause, stepWithBreakpointCheck } = usePlaybackControls(value?.key);
 
-  const { "playback/playbackRate": playbackRate = 1 } = useOne(slice.settings);
+  const { "playback/playbackRate": playbackRateValue } = useOne(slice.settings);
+  const playbackRate = playbackRateValue ?? 1;
 
   useEffect(() => {
     if (playing) {

@@ -17,7 +17,8 @@ function ServiceRunner({ use }: { use: Service }) {
   return use() ?? null;
 }
 
-export function SliceProvider({ slices, children, services = [] }: SliceProviderProps) {
+export function SliceProvider({ slices, children, services: servicesProp }: SliceProviderProps) {
+  const services = servicesProp ?? [];
   return (
     <>
       {reduce(

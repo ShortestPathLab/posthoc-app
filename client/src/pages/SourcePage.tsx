@@ -110,30 +110,35 @@ export function SourcePage({ template: Page }: PageContentProps) {
         {sources?.length ? (
           <Block sx={{ pt: 6 }}>
             <AutoSize
-              renderProp={({ width = 0, height = 0 }) =>
-                instance && (
-                  <Editor
-                    onMount={(_, m) => setMonaco(m)}
-                    // Refresh the editor when the id changes
-                    key={`${selected?.layer}::${selected?.source?.id}`}
-                    theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
-                    options={{
-                      hover: { above: false },
-                      fixedOverflowWidgets: true,
-                      bracketPairColorization: { enabled: true },
-                      readOnly: !!selected?.source?.readonly,
-                      renderValidationDecorations: "on",
-                      glyphMargin: true,
-                    }}
-                    language={selected?.source?.language}
-                    loading={<CircularProgress variant="indeterminate" />}
-                    width={width}
-                    height={height}
-                    defaultValue={value}
-                    onChange={setValue}
-                  />
-                )
-              }
+              renderProp={({ width: widthProp, height: heightProp }) => {
+                // Defaults moved out of the destructure to avoid a React Compiler bailout.
+                const width = widthProp ?? 0;
+                const height = heightProp ?? 0;
+                return (
+                  instance && (
+                    <Editor
+                      onMount={(_, m) => setMonaco(m)}
+                      // Refresh the editor when the id changes
+                      key={`${selected?.layer}::${selected?.source?.id}`}
+                      theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
+                      options={{
+                        hover: { above: false },
+                        fixedOverflowWidgets: true,
+                        bracketPairColorization: { enabled: true },
+                        readOnly: !!selected?.source?.readonly,
+                        renderValidationDecorations: "on",
+                        glyphMargin: true,
+                      }}
+                      language={selected?.source?.language}
+                      loading={<CircularProgress variant="indeterminate" />}
+                      width={width}
+                      height={height}
+                      defaultValue={value}
+                      onChange={setValue}
+                    />
+                  )
+                );
+              }}
             />
           </Block>
         ) : (

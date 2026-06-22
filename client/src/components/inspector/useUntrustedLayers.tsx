@@ -23,7 +23,9 @@ export function useUntrustedLayers() {
       (l) => !!l?.origin && !trustedOrigins?.includes?.(l?.origin),
     );
     if (untrustedLayer) {
-      const { key, origin = ORIGIN_UNKNOWN } = untrustedLayer;
+      // Default moved out of destructure to avoid React Compiler bailout.
+      const { key, origin: originProp } = untrustedLayer;
+      const origin = originProp ?? ORIGIN_UNKNOWN;
       return { isTrusted: false, key, origin };
     }
   }

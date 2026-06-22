@@ -17,8 +17,8 @@ const getScatterPlotGraphPId = (step: number, event: TraceEvent): string =>
 
 export function ScatterPlotGraph(props: ScatterPlotGraphProps & SharedGraphProps) {
   const {
-    width = 1,
-    height = 1,
+    width: widthProp,
+    height: heightProp,
     logAxis,
     eventTypeFilter,
     step,
@@ -29,6 +29,10 @@ export function ScatterPlotGraph(props: ScatterPlotGraphProps & SharedGraphProps
     xMetric,
     yMetric,
   } = props;
+  // Defaults moved off the destructure: object-destructuring defaults make the
+  // React Compiler bail out of optimizing this component.
+  const width = widthProp ?? 1;
+  const height = heightProp ?? 1;
   const { data: plot } = useComputePlot({
     key: traceKey,
     trace: trace,
