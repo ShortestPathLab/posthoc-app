@@ -2,7 +2,7 @@ import { map, merge } from "es-toolkit/compat";
 import { useMemo } from "react";
 import { useThrottle } from "react-use";
 
-import { LazyNodeList, NodeList } from "components/renderer/NodeList";
+import { NodeList, PersistentNodes } from "components/renderer/NodeList";
 import { TraceLayer } from "./TraceLayer";
 import { Controller } from "./types";
 import { use2DPath } from "./use2DPath";
@@ -52,7 +52,7 @@ export const renderer = (({ layer, index }) => {
   const transientSteps = useMemo(() => [steps1[step] ?? []], [steps1, step]);
   return (
     <>
-      <LazyNodeList end={step} nodes={persistentSteps} />
+      <PersistentNodes step={step} nodes={persistentSteps} />
       <NodeList nodes={transientSteps} />
       {path}
     </>
