@@ -73,9 +73,8 @@ function App() {
 }
 
 function ThemedApp() {
-  const { "appearance/theme": mode = "dark", "appearance/accentColor": accent = "teal" } = useOne(
-    slice.settings,
-  );
+  const mode = useOne(slice.settings, (s) => s["appearance/theme"]) ?? "dark";
+  const accent = useOne(slice.settings, (s) => s["appearance/accentColor"]) ?? "teal";
   const theme = useMemo(() => makeTheme(mode, accent), [mode, accent]);
   return (
     <ThemeProvider theme={theme}>
