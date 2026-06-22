@@ -22,7 +22,13 @@ import { omit, pick, startCase } from "es-toolkit/compat";
 import { TraceEvent } from "protocol/Trace";
 import { ReactNode, useMemo } from "react";
 import { useCss } from "react-use";
-import { ESSENTIAL_PROPS, EventProperties, OMIT_PROPS, PropertyList } from "./PropertyList";
+import {
+  ESSENTIAL_PROPS,
+  EventProperties,
+  OMIT_PROPS,
+  PropertyList,
+} from "./PropertyList";
+import { ITEM_HEIGHT } from "pages/steps/constants";
 
 type EventInspectorProps = {
   event?: TraceEvent;
@@ -42,10 +48,14 @@ function Dot({ label }: { label?: ReactNode }) {
   );
 }
 
-export function EventInspector({ event, index, selected, label, ...props }: EventInspectorProps) {
-  const { open } = useSurface(EventProperties, {
-    title: "Event properties",
-  });
+export function EventInspector({
+  event,
+  index,
+  selected,
+  label,
+  ...props
+}: EventInspectorProps) {
+  const { open } = useSurface(EventProperties, { title: "Event properties" });
   const { spacing } = useTheme();
 
   const buttonCls = useCss({});
@@ -65,7 +75,9 @@ export function EventInspector({ event, index, selected, label, ...props }: Even
         selected={selected}
         {...props}
         sx={{
-          height: 80,
+          height: ITEM_HEIGHT,
+          borderRadius: 0,
+          marginInline: 0,
           borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
           ...props.sx,
         }}
@@ -87,7 +99,7 @@ export function EventInspector({ event, index, selected, label, ...props }: Even
       >
         <IconButton
           onClick={() => open({ event })}
-          sx={{ p: 1.5, color: "text.secondary" }}
+          sx={{ p: 1.5, color: (t) => t.palette.text.secondary }}
           label="See All Properties"
           icon={<DataObjectOutlined fontSize="small" />}
         />
@@ -103,13 +115,16 @@ function EventInspectorContents({
 }: Pick<EventInspectorProps, "event" | "index" | "label">) {
   const [essentialProps, extraProps] = useMemo(() => {
     const omitProps = omit(event, ...OMIT_PROPS);
-    return [pick(omitProps, ...ESSENTIAL_PROPS), omit(omitProps, ...ESSENTIAL_PROPS)];
+    return [
+      pick(omitProps, ...ESSENTIAL_PROPS),
+      omit(omitProps, ...ESSENTIAL_PROPS),
+    ];
   }, [event]);
   return (
     <>
-      <ListItemIcon sx={{ alignItems: "center" }}>
+      <ListItemIcon sx={{ alignItems: "center", mr: 3 }}>
         <Type component="div" variant="body2">
-          {index}
+          <code>{index}</code>
         </Type>
         {label && <Dot label={label} />}
       </ListItemIcon>
@@ -119,11 +134,12 @@ function EventInspectorContents({
         primary={
           <Box
             sx={{
+              color: (t) => t.palette.text.primary,
               overflow: "hidden",
               whiteSpace: "nowrap",
               display: "block",
               textOverflow: "ellipsis",
-              my: 0.5,
+              my: 0.25,
             }}
           >
             {startCase(event?.type ?? "event")} {event?.id ?? "-"}
@@ -138,10 +154,7 @@ function EventInspectorContents({
         secondary={
           <Stack
             direction="row"
-            sx={{
-              justifyContent: "flex-start",
-              "> *": { flex: 0 },
-            }}
+            sx={{ justifyContent: "flex-start", "> *": { flex: 0 } }}
           >
             <PropertyList event={essentialProps} simple />
             <PropertyList event={extraProps} simple />
@@ -157,7 +170,7 @@ export function Skeleton({ event }: EventInspectorProps) {
   return (
     <ListItem
       sx={{
-        height: 80,
+        height: ITEM_HEIGHT,
         borderLeft: `${spacing(0.5)} solid ${getColorHex(event?.type)}`,
       }}
     >

@@ -4,18 +4,24 @@ import { Block } from "components/generic/Block";
 import { Space } from "components/generic/Space";
 
 export const Heading = ({ label }: { label?: Node }) => (
-  <Type component="div" variant="overline" color="text.secondary" sx={{ pt: 1 }}>
+  <Type component="div" variant="overline" color="textPrimary" sx={{ pt: 1 }}>
     {label}
   </Type>
 );
 
 export const Label = ({ label }: { label?: Node }) => (
-  <Type component="div" variant="body1">
+  <Type component="div" variant="body1" color="textSecondary">
     {label}
   </Type>
 );
 
-export const Option = ({ label, content }: { label?: Node; content?: Node }) => (
+export const Option = ({
+  label,
+  content,
+}: {
+  label?: Node;
+  content?: Node;
+}) => (
   <Block sx={{ alignItems: "center" }}>
     <Label label={label} />
     <Space sx={{ flex: 1 }} />

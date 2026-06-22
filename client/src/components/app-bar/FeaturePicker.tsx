@@ -1,4 +1,10 @@
-import { ButtonProps, Stack, SxProps, Typography as Type, useTheme } from "@mui/material";
+import {
+  ButtonProps,
+  Stack,
+  SxProps,
+  Typography as Type,
+  useTheme,
+} from "@mui/material";
 import { Select } from "components/generic/inputs/Select";
 import { Space } from "components/generic/Space";
 import { filter, find, map, startCase, truncate } from "es-toolkit/compat";
@@ -44,9 +50,7 @@ export function FeaturePicker({
   const getIcon = (icon: ReactNode, color?: AccentColor) =>
     icon &&
     cloneElement(icon as ReactElement<SxProps>, {
-      sx: {
-        color: color ? getShade(color, palette.mode) : "primary.main",
-      },
+      sx: { color: color ? getShade(color, palette.mode) : "primary.main" },
     });
 
   const selected = find(items, { id: value });
@@ -58,16 +62,14 @@ export function FeaturePicker({
         <FeaturePickerButton
           {...props}
           {...ButtonProps}
-          sx={_paper ? { ...paper(1), my: 0.5, px: 1.5, py: 0.75 } : {}}
+          sx={_paper ? { ...paper(1), my: 0.5, px: 1.5, py: 0.5 } : {}}
           disabled={!filter(items, (item) => !item.hidden)?.length || disabled}
           icon={selected?.icon ? getIcon(selected.icon, selected.color) : icon}
           arrow={arrow}
         >
-          {renderItem && selected
-            ? renderItem(selected)
-            : truncate(selected?.name ?? label, {
-                length: ellipsis,
-              })}
+          {renderItem && selected ?
+            renderItem(selected)
+          : truncate(selected?.name ?? label, { length: ellipsis })}
         </FeaturePickerButton>
       )}
       items={map(items, ({ id, name, description, hidden, icon, color }) => ({
@@ -75,22 +77,24 @@ export function FeaturePicker({
         label: (
           <Stack
             direction={itemOrientation === "vertical" ? "column" : "row"}
-            sx={{ alignItems: itemOrientation === "vertical" ? "flex-start" : "center" }}
+            sx={{
+              alignItems:
+                itemOrientation === "vertical" ? "flex-start" : "center",
+            }}
           >
             <Type>
-              {renderItem ? (
+              {renderItem ?
                 renderItem({ id, name, description })
-              ) : (
-                <>
+              : <>
                   <Type component="span">
                     {name}
                     <Space />
                   </Type>
-                  <Type component="span" color="text.secondary">
+                  <Type component="span" color="textSecondary">
                     {description}
                   </Type>
                 </>
-              )}
+              }
             </Type>
           </Stack>
         ),

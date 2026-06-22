@@ -13,15 +13,18 @@ import { useCache } from "hooks/useCache";
 import { MenuCloseContext } from "hooks/useMenuClose";
 import { SelectionInfoProvider } from "layers/LayerController";
 import { getController } from "layers/layerControllers";
-import { toPairs as entries, map, merge, reduce, sortBy } from "es-toolkit/compat";
+import {
+  toPairs as entries,
+  map,
+  merge,
+  reduce,
+  sortBy,
+} from "es-toolkit/compat";
 import { ComponentProps, ReactNode, useMemo } from "react";
 import { slice } from "slices";
 import { useOne } from "slices/useOne";
 import { _ } from "utils/chain";
-type Props = {
-  selection?: RendererSelectEvent;
-  onClose?: () => void;
-};
+type Props = { selection?: RendererSelectEvent; onClose?: () => void };
 
 export type SelectionMenuEntry = {
   index?: number;
@@ -50,10 +53,7 @@ export function SelectionMenu({ selection, onClose }: Props) {
     <Menu
       open={!!selection}
       anchorReference="anchorPosition"
-      anchorPosition={{
-        top: client?.y ?? 0,
-        left: client?.x ?? 0,
-      }}
+      anchorPosition={{ top: client?.y ?? 0, left: client?.x ?? 0 }}
       onClose={onClose}
       keepMounted
     >
@@ -63,74 +63,102 @@ export function SelectionMenu({ selection, onClose }: Props) {
             <MenuContent event={cache}>
               {(menu) => {
                 const entries2 = entries(menu);
-                return entries2.length ? (
-                  _(
-                    entries2,
-                    (v) => sortBy(v, ([, v]) => v.index),
-                    (v) =>
-                      map(v, ([, { items, primary }], i) => (
-                        <>
-                          {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
-                          {primary && (
-                            <ListItem sx={{ py: 0 }}>
-                              <Typography component="div" color="text.secondary" variant="overline">
-                                {primary}
-                              </Typography>
-                            </ListItem>
-                          )}
-                          {_(
-                            items,
-                            entries,
-                            (v) => sortBy(v, ([, v]) => v.index),
-                            (v) =>
-                              map(v, ([k, { action, icon, primary, secondary, extras }]) => (
-                                <>
-                                  {!!(action || primary || secondary) &&
-                                    (action ? (
-                                      <MenuItem
-                                        key={k}
-                                        onClick={() => {
-                                          action?.();
-                                          onClose?.();
-                                        }}
-                                      >
-                                        {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                                        <ListItemText primary={primary} sx={{ mr: 4 }} />
-                                        <Typography
-                                          component="div"
-                                          variant="body2"
-                                          color="text.secondary"
-                                        >
-                                          {secondary}
-                                        </Typography>
-                                      </MenuItem>
-                                    ) : (
-                                      <ListItem key={k}>
-                                        {icon && <ListItemIcon>{icon}</ListItemIcon>}
-                                        <ListItemText primary={primary} sx={{ mr: 4 }} />
-                                        <Typography
-                                          component="div"
-                                          variant="body2"
-                                          color="text.secondary"
-                                        >
-                                          {secondary}
-                                        </Typography>
-                                      </ListItem>
-                                    ))}
-                                  {!!extras && extras}
-                                </>
-                              )),
-                          )}
-                        </>
-                      )),
-                  )
-                ) : (
-                  <>
-                    <ListItem>
-                      <Typography component="div">No info to show.</Typography>
-                    </ListItem>
-                  </>
-                );
+                return entries2.length ?
+                    _(
+                      entries2,
+                      (v) => sortBy(v, ([, v]) => v.index),
+                      (v) =>
+                        map(v, ([, { items, primary }], i) => (
+                          <>
+                            {!!i && <Divider sx={{ my: 1, mx: 2 }} />}
+                            {primary && (
+                              <ListItem sx={{ py: 0 }}>
+                                <Typography
+                                  component="div"
+                                  color="textSecondary"
+                                  variant="overline"
+                                >
+                                  {primary}
+                                </Typography>
+                              </ListItem>
+                            )}
+                            {_(
+                              items,
+                              entries,
+                              (v) => sortBy(v, ([, v]) => v.index),
+                              (v) =>
+                                map(
+                                  v,
+                                  ([
+                                    k,
+                                    {
+                                      action,
+                                      icon,
+                                      primary,
+                                      secondary,
+                                      extras,
+                                    },
+                                  ]) => (
+                                    <>
+                                      {!!(action || primary || secondary) &&
+                                        (action ?
+                                          <MenuItem
+                                            key={k}
+                                            onClick={() => {
+                                              action?.();
+                                              onClose?.();
+                                            }}
+                                          >
+                                            {icon && (
+                                              <ListItemIcon>
+                                                {icon}
+                                              </ListItemIcon>
+                                            )}
+                                            <ListItemText
+                                              primary={primary}
+                                              sx={{ mr: 4 }}
+                                            />
+                                            <Typography
+                                              component="div"
+                                              variant="body2"
+                                              color="textSecondary"
+                                            >
+                                              {secondary}
+                                            </Typography>
+                                          </MenuItem>
+                                        : <ListItem key={k}>
+                                            {icon && (
+                                              <ListItemIcon>
+                                                {icon}
+                                              </ListItemIcon>
+                                            )}
+                                            <ListItemText
+                                              primary={primary}
+                                              sx={{ mr: 4 }}
+                                            />
+                                            <Typography
+                                              component="div"
+                                              variant="body2"
+                                              color="textSecondary"
+                                            >
+                                              {secondary}
+                                            </Typography>
+                                          </ListItem>)}
+                                      {!!extras && extras}
+                                    </>
+                                  ),
+                                ),
+                            )}
+                          </>
+                        )),
+                    )
+                  : <>
+                      <ListItem>
+                        <Typography component="div">
+                          No info to show.
+                        </Typography>
+                      </ListItem>
+                    </>;
               }}
             </MenuContent>
           }
@@ -142,14 +170,13 @@ export function SelectionMenu({ selection, onClose }: Props) {
 
 type SelectionInfoProviderProps = ComponentProps<SelectionInfoProvider>;
 
-const identity = ({ children }: SelectionInfoProviderProps) => <>{children?.({})}</>;
+const identity = ({ children }: SelectionInfoProviderProps) => (
+  <>{children?.({})}</>
+);
 
 function useSelectionMenu() {
   const layers = useOne(slice.layers, (s) =>
-    map(s, (l) => ({
-      key: l.key,
-      type: l.source?.type,
-    })),
+    map(s, (l) => ({ key: l.key, type: l.source?.type })),
   );
   return useMemo(
     () =>
@@ -160,7 +187,9 @@ function useSelectionMenu() {
           // eslint-disable-next-line react/display-name
           return ({ children, event }: SelectionInfoProviderProps) => (
             <B layer={l.key} event={event}>
-              {(a: SelectionMenuContent) => <A event={event}>{(b) => children?.(merge(a, b))}</A>}
+              {(a: SelectionMenuContent) => (
+                <A event={event}>{(b) => children?.(merge(a, b))}</A>
+              )}
             </B>
           );
         },

@@ -32,7 +32,9 @@ export function PageContent({ children, ...props }: BoxProps) {
         ref={ref as Ref<HTMLDivElement>}
       >
         <Scroll y style={{ height: "100%", width: "100%" }}>
-          <SurfaceSizeContext.Provider value={size}>{children}</SurfaceSizeContext.Provider>
+          <SurfaceSizeContext.Provider value={size}>
+            {children}
+          </SurfaceSizeContext.Provider>
         </Scroll>
       </Box>
     </Block>
@@ -57,117 +59,111 @@ export type PageProps = {
 
 export type PageSlots = {
   Key: { children: string };
-  Title: {
-    children: React.ReactNode;
-  };
-  Content: {
-    children: React.ReactNode;
-  };
-  Options: {
-    children: React.ReactNode;
-  };
-  Extras: {
-    children: React.ReactNode;
-  };
-  Handle: {
-    children: React.ReactNode;
-  };
+  Title: { children: React.ReactNode };
+  Content: { children: React.ReactNode };
+  Options: { children: React.ReactNode };
+  Extras: { children: React.ReactNode };
+  Handle: { children: React.ReactNode };
 };
 
-export const Page = withSlots<PageSlots, PageProps>(({ slotProps, onChange, stack }) => {
-  const acrylic = useAcrylic();
-  const settings = useOne(slice.settings);
-  return (
-    <ErrorBoundary
-      fallbackRender={(error) => (
-        <Stack
-          sx={{
-            background: (t) => t.palette.background.paper,
-            height: "100%",
-          }}
-        >
+export const Page = withSlots<PageSlots, PageProps>(
+  ({ slotProps, onChange, stack }) => {
+    const acrylic = useAcrylic();
+    const settings = useOne(slice.settings);
+    return (
+      <ErrorBoundary
+        fallbackRender={(error) => (
           <Stack
-            direction="row"
             sx={{
-              height: (t) => t.spacing(6),
-              alignItems: "center",
-              pl: 1,
-              borderBottom: 1,
-              borderColor: "divider",
+              background: (t) => t.palette.background.paper,
+              height: "100%",
             }}
           >
-            {slotProps.Handle?.children}
-            <FeaturePicker
-              // showArrow
-              icon={<WidgetsOutlined />}
-              label="Choose View"
-              onChange={(type) => onChange?.((s) => void (s.type = type))}
-              value={stack?.type}
-              items={values(pages).filter((p) => (p.experiment ? settings[p.experiment] : true))}
-              itemOrientation="vertical"
+            <Stack
+              direction="row"
+              sx={{
+                height: (t) => t.spacing(6),
+                alignItems: "center",
+                pl: 1,
+                borderBottom: 1,
+                borderColor: "divider",
+              }}
+            >
+              {slotProps.Handle?.children}
+              <FeaturePicker
+                // showArrow
+                icon={<WidgetsOutlined />}
+                label="Choose View"
+                onChange={(type) => onChange?.((s) => void (s.type = type))}
+                value={stack?.type}
+                items={values(pages).filter((p) =>
+                  p.experiment ? settings[p.experiment] : true,
+                )}
+                itemOrientation="vertical"
+              />
+              <Space sx={{ mx: "auto" }} />
+              {slotProps.Extras?.children}
+            </Stack>
+            <Placeholder
+              // label="Something went wrong"
+              secondary={`${error.error}`}
+              icon={<ErrorOutlined />}
             />
+          </Stack>
+        )}
+      >
+        <Block vertical>
+          <PageContent>{slotProps?.Content?.children}</PageContent>
+          <Block sx={{ height: (t) => t.spacing(6), alignItems: "center" }}>
+            <Block
+              sx={{
+                p: 0,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                borderBottom: 1,
+                borderColor: "divider",
+                alignItems: "center",
+                pr: 6,
+                ...acrylic,
+              }}
+            >
+              <Scroll x>
+                <Block
+                  sx={{
+                    width: "max-content",
+                    height: (t) => t.spacing(6),
+                    alignItems: "center",
+                    p: 1,
+                  }}
+                >
+                  {slotProps.Handle?.children}
+                  <FeaturePicker
+                    // showArrow
+                    icon={<WidgetsOutlined />}
+                    label="Choose View"
+                    onChange={(type) => onChange?.((s) => void (s.type = type))}
+                    value={stack?.type}
+                    items={values(pages).filter((p) =>
+                      p.experiment ? settings[p.experiment] : true,
+                    )}
+                    itemOrientation="vertical"
+                  />
+                  {slotProps.Options?.children && (
+                    <>
+                      {divider}
+                      {slotProps.Options.children}
+                    </>
+                  )}
+                </Block>
+              </Scroll>
+            </Block>
             <Space sx={{ mx: "auto" }} />
             {slotProps.Extras?.children}
-          </Stack>
-          <Placeholder
-            // label="Something went wrong"
-            secondary={`${error.error}`}
-            icon={<ErrorOutlined />}
-          />
-        </Stack>
-      )}
-    >
-      <Block vertical>
-        <PageContent>{slotProps?.Content?.children}</PageContent>
-        <Block sx={{ height: (t) => t.spacing(6), alignItems: "center" }}>
-          <Block
-            sx={{
-              p: 0,
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              borderBottom: 1,
-              borderColor: "divider",
-              alignItems: "center",
-              pr: 6,
-              ...acrylic,
-            }}
-          >
-            <Scroll x>
-              <Block
-                sx={{
-                  width: "max-content",
-                  height: (t) => t.spacing(6),
-                  alignItems: "center",
-                  p: 1,
-                }}
-              >
-                {slotProps.Handle?.children}
-                <FeaturePicker
-                  // showArrow
-                  icon={<WidgetsOutlined />}
-                  label="Choose View"
-                  onChange={(type) => onChange?.((s) => void (s.type = type))}
-                  value={stack?.type}
-                  items={values(pages).filter((p) =>
-                    p.experiment ? settings[p.experiment] : true,
-                  )}
-                  itemOrientation="vertical"
-                />
-                {slotProps.Options?.children && (
-                  <>
-                    {divider}
-                    {slotProps.Options.children}
-                  </>
-                )}
-              </Block>
-            </Scroll>
           </Block>
-          <Space sx={{ mx: "auto" }} />
-          {slotProps.Extras?.children}
         </Block>
-      </Block>
-    </ErrorBoundary>
-  );
-});
+      </ErrorBoundary>
+    );
+  },
+);

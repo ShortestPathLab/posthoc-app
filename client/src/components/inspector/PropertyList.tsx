@@ -28,7 +28,9 @@ import { _ } from "utils/chain";
 
 /** Open the full event-properties surface at the app root. */
 export function showEventProperties(event?: Record<string, unknown>) {
-  return openSurface(() => <EventProperties event={event} />, { title: "Event Properties" });
+  return openSurface(() => <EventProperties event={event} />, {
+    title: "Event Properties",
+  });
 }
 
 export const COMMON_PROPS = ["type"];
@@ -48,7 +50,8 @@ const sortEventKeys = (e: PropertyListProps["event"]) =>
     e,
     (v) => entries(v),
     (v) => filter(v, ([, v]) => !isUndefined(v)),
-    (v) => sortBy(v, ([k]) => indexOf(ALL_PROPS, k) + 1 || Number.MAX_SAFE_INTEGER),
+    (v) =>
+      sortBy(v, ([k]) => indexOf(ALL_PROPS, k) + 1 || Number.MAX_SAFE_INTEGER),
   );
 
 type PropertyListProps = {
@@ -67,22 +70,21 @@ export function EventProperties({ event }: Pick<PropertyListProps, "event">) {
       name: "common",
       props: filter(sorted, ([k]) => COMMON_PROPS.includes(k)),
     },
-    {
-      name: "Graph",
-      props: filter(sorted, ([k]) => GRAPH_PROPS.includes(k)),
-    },
+    { name: "Graph", props: filter(sorted, ([k]) => GRAPH_PROPS.includes(k)) },
     {
       name: "Heuristic",
       props: filter(sorted, ([k]) => HEURISTIC_PROPS.includes(k)),
     },
-    {
-      name: "other",
-      props: filter(sorted, ([k]) => !ALL_PROPS.includes(k)),
-    },
+    { name: "other", props: filter(sorted, ([k]) => !ALL_PROPS.includes(k)) },
   ].map(({ name, props }, i) => (
     <Fragment key={name}>
       {!!i && <Divider sx={{ mb: 1 }} />}
-      <Typography component="div" variant="overline" color="text.secondary" sx={{ px: sm ? 2 : 3 }}>
+      <Typography
+        component="div"
+        variant="overline"
+        color="textSecondary"
+        sx={{ px: sm ? 2 : 3 }}
+      >
         {startCase(name)}
       </Typography>
       <Box
@@ -119,11 +121,18 @@ export function PropertyList({
     <Block {...rest}>
       {_(
         sorted,
-        (v) => filter(v, primitives ? ([, v]) => isPrimitive(v) : constant(true)),
+        (v) =>
+          filter(v, primitives ? ([, v]) => isPrimitive(v) : constant(true)),
         (v) => slice(v, 0, max),
         (v) =>
           map(v, ([k, v], i) => (
-            <Property label={k} value={v} key={i} type={{ variant }} simple={simple} />
+            <Property
+              label={k}
+              value={v}
+              key={i}
+              type={{ variant }}
+              simple={simple}
+            />
           )),
       )}
       {sorted.length > max && !simple && (

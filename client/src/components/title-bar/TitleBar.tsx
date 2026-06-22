@@ -1,4 +1,8 @@
-import { OpenInNewOutlined, SearchOutlined, WorkspacesOutlined } from "@mui-symbols-material/w400";
+import {
+  OpenInNewOutlined,
+  SearchOutlined,
+  WorkspacesOutlined,
+} from "@mui-symbols-material/w400";
 import {
   alpha,
   Box,
@@ -122,7 +126,11 @@ export const TitleBarPlaceholder = () => {
       }}
     >
       {times(4, () => (
-        <Skeleton variant="text" animation={false} sx={{ opacity: 0.5, width: 48 }} />
+        <Skeleton
+          variant="text"
+          animation={false}
+          sx={{ opacity: 0.5, width: 48 }}
+        />
       ))}
     </Stack>
   );
@@ -189,7 +197,11 @@ export const TitleBar = () => {
           <Stack
             direction="row"
             spacing={1}
-            sx={{ height: "100%", alignItems: "center", justifyContent: "flex-start" }}
+            sx={{
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "flex-start",
+            }}
           >
             {(!visible || rect.x === 0) && (
               // Hide for macos style windows
@@ -280,7 +292,12 @@ export const TitleBar = () => {
                   { type: "divider" },
                   {
                     type: "action",
-                    name: <MenuEntry label="Publish workspace" endIcon={<OpenInNewOutlined />} />,
+                    name: (
+                      <MenuEntry
+                        label="Publish workspace"
+                        endIcon={<OpenInNewOutlined />}
+                      />
+                    ),
                     key: "workspace-save-metadata",
                     action: () => openModal({}),
                   },
@@ -371,9 +388,7 @@ export function CommandsButton() {
         WebkitAppRegion: "no-drag",
         fontSize: 14,
         borderRadius: (t) => t.shape.borderRadius,
-        "&:hover": {
-          bgcolor: "background.paper",
-        },
+        "&:hover": { bgcolor: "background.paper" },
         height: "100%",
         m: 0,
         display: "flex",
@@ -381,7 +396,7 @@ export function CommandsButton() {
         px: 1,
         pr: 2,
         gap: (t) => t.spacing(1),
-        color: "text.secondary",
+        color: (t) => t.palette.text.secondary,
         cursor: "text",
       }}
     >

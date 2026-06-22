@@ -7,11 +7,12 @@ export function Button({ children, sx, size, ...props }: ButtonProps) {
     <MuiButton
       disableElevation
       variant="outlined"
-      color="primary"
+      color="inherit"
       {...props}
       sx={{
         minWidth: 0,
-        borderColor: (t) => alpha(t.palette.text.primary, t.palette.action.activatedOpacity),
+        borderColor: (t) =>
+          alpha(t.palette.text.primary, t.palette.action.activatedOpacity),
         ...(props.variant === "text" ? undefined : paper(1)),
         py: size === "small" ? 0.75 : 1,
         ...sx,
@@ -19,7 +20,7 @@ export function Button({ children, sx, size, ...props }: ButtonProps) {
     >
       <Box
         sx={{
-          color: "text.primary",
+          color: (t) => t.palette.text.primary,
           textOverflow: "ellipsis",
           overflow: "hidden",
           whiteSpace: "nowrap",

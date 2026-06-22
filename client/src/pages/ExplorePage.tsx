@@ -31,7 +31,13 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useSm } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
 import { round } from "es-toolkit";
-import { head, map, startCase, toPairs as entries, upperCase } from "es-toolkit/compat";
+import {
+  head,
+  map,
+  startCase,
+  toPairs as entries,
+  upperCase,
+} from "es-toolkit/compat";
 import memoizee from "memoizee";
 import { docs, name } from "public/manifest.json";
 import { CSSProperties, ReactNode, useMemo, useState } from "react";
@@ -47,15 +53,15 @@ import { Image } from "./Image";
 import { PageContentProps } from "./PageMeta";
 import { useOne, useOne as useSelector } from "slices/useOne";
 
-const paths = import.meta.glob<boolean, string, string>("/public/recipes/*.workspace", {
-  query: "?url",
-  import: "default",
-});
+const paths = import.meta.glob<boolean, string, string>(
+  "/public/recipes/*.workspace",
+  { query: "?url", import: "default" },
+);
 
-const metaPaths = import.meta.glob<boolean, string, string>("/public/recipes/*.workspace.meta", {
-  query: "?url",
-  import: "default",
-});
+const metaPaths = import.meta.glob<boolean, string, string>(
+  "/public/recipes/*.workspace.meta",
+  { query: "?url", import: "default" },
+);
 
 function stripExtension(path: string) {
   return path.split(".")[0];
@@ -86,7 +92,9 @@ const getFileInfo = memoizee(
 );
 
 // eslint-disable-next-line react/display-name
-const makeAvatar = (children?: ReactNode) => (sx: SxProps) => <Avatar sx={sx}>{children}</Avatar>;
+const makeAvatar = (children?: ReactNode) => (sx: SxProps) => (
+  <Avatar sx={sx}>{children}</Avatar>
+);
 
 function getAuthor(s?: string): {
   name: ReactNode;
@@ -100,9 +108,17 @@ function getAuthor(s?: string): {
           return {
             name: pathname,
             avatar: (sx: SxProps) => (
-              <a href={`https://github.com/${pathname}`} target="_blank" rel="noreferrer">
+              <a
+                href={`https://github.com/${pathname}`}
+                target="_blank"
+                rel="noreferrer"
+              >
                 <Avatar sx={sx}>
-                  <Image width="100%" height="100%" src={`https://github.com/${pathname}.png`} />
+                  <Image
+                    width="100%"
+                    height="100%"
+                    src={`https://github.com/${pathname}.png`}
+                  />
                 </Avatar>
               </a>
             ),
@@ -140,23 +156,21 @@ export function FeatureCardLoader({
   }, [entry]);
   const { name, description, screenshots, author, path, size } = result ?? {};
   const match = upperCase(stringify(result)).includes(upperCase(search));
-  return match ? (
-    <Box sx={{ p: 1 }}>
-      <FeatureCard
-        loading={loading}
-        name={name}
-        description={description ?? "No description"}
-        image={head(screenshots)}
-        author={author}
-        onOpenClick={() => {
-          onOpenClick?.(path);
-        }}
-        size={size}
-      />
-    </Box>
-  ) : (
-    <></>
-  );
+  return match ?
+      <Box sx={{ p: 1 }}>
+        <FeatureCard
+          loading={loading}
+          name={name}
+          description={description ?? "No description"}
+          image={head(screenshots)}
+          author={author}
+          onOpenClick={() => {
+            onOpenClick?.(path);
+          }}
+          size={size}
+        />
+      </Box>
+    : <></>;
 }
 
 export function FeatureCard({
@@ -169,44 +183,24 @@ export function FeatureCard({
   loading,
   children,
   ...rest
-}: Partial<PosthocMetaData> & CardProps & { onOpenClick?: () => void; loading?: boolean }) {
+}: Partial<PosthocMetaData> &
+  CardProps & { onOpenClick?: () => void; loading?: boolean }) {
   const { "appearance/acrylic": acrylic } = useOne(slice.settings);
   const paper = usePaper();
   const theme = useTheme();
 
-  const { name: authorName, avatar } = useMemo(() => getAuthor(author), [author]);
+  const { name: authorName, avatar } = useMemo(
+    () => getAuthor(author),
+    [author],
+  );
 
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        ...paper(1),
-        position: "relative",
-        height: "100%",
-      }}
+    <Box
+      variant="filled"
+      sx={{ ...paper(1), position: "relative", height: "100%" }}
       {...rest}
     >
       <>
-        {acrylic && (
-          <Fade in={!loading} timeout={theme.transitions.duration.complex}>
-            <Box>
-              <Box
-                sx={{
-                  zIndex: -1,
-                  filter: "blur(48px)",
-                  opacity: 0.1,
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
-                  backgroundImage: `url("${image}")`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center -52px",
-                }}
-              />
-            </Box>
-          </Fade>
-        )}
         <CardHeader
           sx={{
             flexDirection: "column",
@@ -255,26 +249,28 @@ export function FeatureCard({
                   height: 60,
                 }}
               >
-                {loading
-                  ? map([80, 30], (v) => <Skeleton key={v} width={`${v}%`} />)
-                  : description || "No description"}
+                {loading ?
+                  map([80, 30], (v) => <Skeleton key={v} width={`${v}%`} />)
+                : description || "No description"}
               </Type>
               <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
                 {avatar?.({ width: 18, height: 18, fontSize: "0.8rem" })}
                 <Type component="div" variant="caption">
-                  {loading ? <Skeleton width={120} /> : authorName}
+                  {loading ?
+                    <Skeleton width={120} />
+                  : authorName}
                 </Type>
               </Stack>
               <Button
                 disabled={loading}
                 onClick={onOpenClick}
-                startIcon={<WorkspacesOutlined />}
+                startIcon={<WorkspacesOutlined color="primary" />}
                 sx={paper(1)}
               >
                 <Stack direction="row" sx={{ gap: 1 }}>
                   <Type component="div">Open</Type>
                   {!!size && (
-                    <Type component="div" color="text.secondary">
+                    <Type component="div" color="textSecondary">
                       {round(size / 1024 / 1024, 2)} MB
                     </Type>
                   )}
@@ -285,7 +281,7 @@ export function FeatureCard({
           }
         />
       </>
-    </Card>
+    </Box>
   );
 }
 
@@ -294,10 +290,14 @@ const CONTENT_WIDTH = 740;
 const entries2 = entries(paths);
 
 export function ExplorePage({ template: Page }: PageContentProps) {
-  const showOnStart = useSelector(slice.settings, (s) => s["behaviour/showOnStart"]);
+  const showOnStart = useSelector(
+    slice.settings,
+    (s) => s["behaviour/showOnStart"],
+  );
   const theme = useTheme();
   const notify = useSnackbar();
-  const { controls, onChange, state, dragHandle, isViewTree } = useViewTreeContext();
+  const { controls, onChange, state, dragHandle, isViewTree } =
+    useViewTreeContext();
   const { close: closeModal } = useFullscreenModalContext();
   const sm = useSm();
   const narrow = sm || isViewTree;
@@ -322,9 +322,7 @@ export function ExplorePage({ template: Page }: PageContentProps) {
         // It is correct to not wait for this promise
         load(file, new URL(location.href).origin);
       } catch (e) {
-        notify(`Couldn't load ${basename(path)}`, `${e}`, {
-          error: true,
-        });
+        notify(`Couldn't load ${basename(path)}`, `${e}`, { error: true });
       }
     });
 
@@ -366,7 +364,10 @@ export function ExplorePage({ template: Page }: PageContentProps) {
         <Page.Key>explore</Page.Key>
         <Page.Handle>{dragHandle}</Page.Handle>
         <Page.Options>
-          <TabList onChange={(_, v) => setTab(v)} sx={{ mx: isViewTree ? 0 : -1 }}>
+          <TabList
+            onChange={(_, v) => setTab(v)}
+            sx={{ mx: isViewTree ? 0 : -1 }}
+          >
             <Tab label="Examples" value="explore" />
             <Tab label="Guides" value="guides" />
           </TabList>
@@ -376,13 +377,9 @@ export function ExplorePage({ template: Page }: PageContentProps) {
             <Scroll y>
               <Box
                 sx={
-                  narrow
-                    ? undefined
-                    : {
-                        p: 4,
-                        maxWidth: CONTENT_WIDTH,
-                        mx: "auto",
-                      }
+                  narrow ? undefined : (
+                    { p: 4, maxWidth: CONTENT_WIDTH, mx: "auto" }
+                  )
                 }
               >
                 <Box sx={{ pt: 6 }}>
@@ -391,7 +388,11 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       <Type component="div" variant={narrow ? "h6" : "h4"}>
                         Examples
                       </Type>
-                      <Type component="div" variant="subtitle2" color="text.secondary">
+                      <Type
+                        component="div"
+                        variant="subtitle2"
+                        color="textSecondary"
+                      >
                         Browse a library of included and community-made examples
                       </Type>
                     </Box>
@@ -421,7 +422,8 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                         p: 1,
                         display: "grid",
                         gridAutoFlow: "row",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
+                        gridTemplateColumns:
+                          "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
                       }}
                     >
                       {map(entries2, (entry) => (
@@ -442,7 +444,11 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       <Type component="div" variant={narrow ? "h6" : "h4"}>
                         Guides
                       </Type>
-                      <Type component="div" variant="subtitle2" color="text.secondary">
+                      <Type
+                        component="div"
+                        variant="subtitle2"
+                        color="textSecondary"
+                      >
                         {`Learn how to use ${name} and explore ${name} features`}
                       </Type>
                     </Box>
@@ -457,14 +463,12 @@ export function ExplorePage({ template: Page }: PageContentProps) {
                       }}
                     >
                       <Type component="div">
-                        We&apos;re still working on this feature. Check out our documentation
-                        instead.
+                        We&apos;re still working on this feature. Check out our
+                        documentation instead.
                       </Type>
                       <Button
                         onClick={() => window.open(docs, "_blank")}
-                        sx={{
-                          maxWidth: "min-content",
-                        }}
+                        sx={{ maxWidth: "min-content" }}
                         startIcon={<LaunchOutlined />}
                       >
                         Open Documentation

@@ -38,7 +38,7 @@ e.g.
 
 "background" background.main
 
-"text" text.primary
+"text" textPrimary
 
 - - Custom
 

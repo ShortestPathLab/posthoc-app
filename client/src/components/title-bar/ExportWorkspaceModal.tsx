@@ -68,7 +68,11 @@ async function resizeImage(s: string) {
   cropped.height = imageSize;
   cropped
     .getContext("2d")!
-    .drawImage(cover, (cover.width - imageSize) / 2, (cover.height - imageSize) / 2);
+    .drawImage(
+      cover,
+      (cover.width - imageSize) / 2,
+      (cover.height - imageSize) / 2,
+    );
 
   return cropped.toDataURL("image/jpeg");
 }
@@ -177,10 +181,10 @@ export function ExportWorkspace({
           >
             <Stack sx={{ ml: 1, alignItems: "baseline" }}>
               {fields.name || "Untitled"}
-              <Typography component="div" color="text.secondary">
+              <Typography component="div" color="textSecondary">
                 {getFilename(fields.name)}.workspace
               </Typography>
-              <Typography component="div" color="text.secondary">
+              <Typography component="div" color="textSecondary">
                 {ceil(workspaceSize / 1024 / 1024, 2)} MB
               </Typography>
             </Stack>

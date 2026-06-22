@@ -27,11 +27,7 @@ export function useFileImport() {
             async () => {
               const layer = await outcome.layer(notify);
               slice.layers.set(
-                (l) =>
-                  void l.push({
-                    key: id(),
-                    source: { type, ...layer },
-                  }),
+                (l) => void l.push({ key: id(), source: { type, ...layer } }),
               );
             },
             `${i + 1} of ${fs.length}: Importing ${type} (${formatByte(file.size)})`,
@@ -44,7 +40,9 @@ export function useFileImport() {
     if (totalClaimed) return;
     const success = await loadWorkspace(head(fs));
     if (success) return;
-    notify(`Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`);
+    notify(
+      `Couldn't open ${fs.length} of ${pluralize("file", fs.length, true)}`,
+    );
   };
 }
 
@@ -61,15 +59,12 @@ export function FileDropZone() {
       onDrop={(f) => f && importFiles(Array.from(f))}
     >
       <Backdrop
-        sx={{
-          ...acrylic,
-          zIndex: (t) => t.zIndex.tooltip + 1,
-        }}
+        sx={{ ...acrylic, zIndex: (t) => t.zIndex.tooltip + 1 }}
         open={!!itemCount}
       >
         <Stack spacing={4} sx={{ alignItems: "center" }}>
           <WorkspacesOutlined />
-          <Type component="div" variant="body2" color="text.secondary">
+          <Type component="div" variant="body2" color="textSecondary">
             {itemCount ? `Import ${pluralize("item", itemCount, true)}` : ""}
           </Type>
         </Stack>

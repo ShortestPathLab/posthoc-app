@@ -13,6 +13,8 @@ export function FeaturePickerButton({
       {...props}
       sx={{
         minWidth: "max-content",
+        padding: 1,
+        "& .MuiButton-startIcon": { color: (t) => t.palette.primary.main },
         ...props.sx,
       }}
       startIcon={icon}
@@ -21,8 +23,9 @@ export function FeaturePickerButton({
           <KeyboardArrowDownOutlined
             sx={{
               ml: -0.5,
-              color: "text.secondary",
-              opacity: (t) => (props.disabled ? t.palette.action.disabledOpacity : 1),
+              color: (t) => t.palette.text.secondary,
+              opacity: (t) =>
+                props.disabled ? t.palette.action.disabledOpacity : 1,
             }}
           />
         )
@@ -30,8 +33,9 @@ export function FeaturePickerButton({
     >
       <Box
         sx={{
-          color: "text.primary",
-          opacity: (t) => (props.disabled ? t.palette.action.disabledOpacity : 1),
+          color: (t) => t.palette.text.primary,
+          opacity: (t) =>
+            props.disabled ? t.palette.action.disabledOpacity : 1,
         }}
       >
         {children}

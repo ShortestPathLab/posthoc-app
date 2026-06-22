@@ -48,13 +48,14 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
         <Surface
           slotProps={{
             paper: { sx: { width: 480 } },
-            popover: {
-              anchorOrigin: { horizontal: -18, vertical: "bottom" },
-            },
+            popover: { anchorOrigin: { horizontal: -18, vertical: "bottom" } },
           }}
           popover
           trigger={({ open }) => (
-            <Stack direction="row" sx={{ flex: 1, alignItems: "center", py: 1 }}>
+            <Stack
+              direction="row"
+              sx={{ flex: 1, alignItems: "center", py: 1 }}
+            >
               <Stack
                 className={value.key}
                 direction="row"
@@ -74,14 +75,16 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
                   }}
                 >
                   <Type component="div">
-                    {connection ? `${connection.name} ${connection.version}` : startCase(status)}
+                    {connection ?
+                      `${connection.name} ${connection.version}`
+                    : startCase(status)}
                   </Type>
                   {!!connection?.description && (
-                    <Type component="div" variant="body2" color="text.secondary">
+                    <Type component="div" variant="body2" color="textSecondary">
                       {connection.description}
                     </Type>
                   )}
-                  <Type component="div" variant="body2" color="text.secondary">
+                  <Type component="div" variant="body2" color="textSecondary">
                     {transports[value?.transport]?.name}
                     {": "}
                     {value?.url || "No URL"}
@@ -100,7 +103,9 @@ export function ServerEditor({ value, onChange }: EditorProps<Remote>) {
                   label={startCase(status)}
                 />
               </Stack>
-              <Tooltip title={`${value.disabled ? "Enable" : "Disable"} adapter`}>
+              <Tooltip
+                title={`${value.disabled ? "Enable" : "Disable"} adapter`}
+              >
                 <Box>
                   <Switch
                     defaultChecked={!value.disabled}

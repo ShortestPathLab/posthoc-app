@@ -23,37 +23,50 @@ const reuseCanvas = { canvas: document.createElement("canvas") };
  */
 function getTextWidth(text: string, font: string) {
   // re-use canvas object for better performance
-  const canvas = reuseCanvas.canvas || (reuseCanvas.canvas = document.createElement("canvas"));
+  const canvas =
+    reuseCanvas.canvas ||
+    (reuseCanvas.canvas = document.createElement("canvas"));
   const context = canvas.getContext("2d");
   context!.font = font;
   const metrics = context!.measureText(text);
   return metrics.width;
 }
 const labelSize = 0.8;
-export function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 0) {
+export function use2DPath(
+  layer?: TraceLayer,
+  index: number = 0,
+  step: number = 0,
+) {
   /// version < 1.4.0 compat
   const { palette } = useTheme();
   const { getPath } = useMemo(
     () =>
-      layer?.source?.playback !== "playing" && layer?.source?.parsedTrace?.content
-        ? makePathIndex(layer.source.parsedTrace.content)
-        : { getParent: constant(undefined), getPath: constant([]) },
+      (
+        layer?.source?.playback !== "playing" &&
+        layer?.source?.parsedTrace?.content
+      ) ?
+        makePathIndex(layer.source.parsedTrace.content)
+      : { getParent: constant(undefined), getPath: constant([]) },
     [layer?.source?.parsedTrace?.content, layer?.source?.playback],
   );
   const element = useMemo(() => {
-    const n = interpolate([palette.background.paper, palette.text.primary])(0.05);
+    const n = interpolate([palette.background.paper, palette.text.primary])(
+      0.05,
+    );
     const trace = layer?.source?.parsedTrace?.content as any;
     if (trace?.render?.path || trace?.pivot) {
       const pivot = trace?.render?.path?.pivot ?? trace?.pivot ?? {};
-      const scale = trace?.render?.path?.scale
-        ? trace.render.path.scale * (1 / 0.3)
+      const scale =
+        trace?.render?.path?.scale ?
+          trace.render.path.scale * (1 / 0.3)
         : (trace?.pivot?.scale ?? 1);
       const { x, y } = pivot;
 
       const f =
-        trace?.version === "1.4.0"
-          ? parseProperty
-          : (s: string) => (c: Partial<TraceEvent>) => parsePropertyLegacy(s)({ event: c });
+        trace?.version === "1.4.0" ?
+          parseProperty
+        : (s: string) => (c: Partial<TraceEvent>) =>
+            parsePropertyLegacy(s)({ event: c });
 
       const pivotX = x ? f(x) : (c: Partial<TraceEvent>) => c.x;
       const pivotY = y ? f(y) : (c: Partial<TraceEvent>) => c.y;
@@ -65,7 +78,10 @@ export function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 
       };
       if (events.length) {
         const label = `${startCase(head(events)?.type)} ${head(events)?.id}`;
-        const textWidth = getTextWidth(label, `${labelSize * scale * labelScale}px Inter`);
+        const textWidth = getTextWidth(
+          label,
+          `${labelSize * scale * labelScale}px Inter`,
+        );
         const primitive = [
           {
             $: "circle",
@@ -102,10 +118,7 @@ export function use2DPath(layer?: TraceLayer, index: number = 0, step: number = 
           {
             $: "path",
             points: [
-              {
-                x: e.x,
-                y: e.y,
-              },
+              { x: e.x, y: e.y },
               {
                 x: e.x + (-0.3 - 0.05) * scale * labelScale,
                 y: e.y + (-2 + 1.4) * scale * labelScale,

@@ -103,10 +103,7 @@ type AxisOverlayProps = {
   logAxis: { x: boolean; y: boolean };
 };
 
-type TickLabel = {
-  value: number;
-  label: string;
-};
+type TickLabel = { value: number; label: string };
 
 type ScatterPlotTickGenerationArgs = {
   bounds: Bounds;
@@ -115,7 +112,11 @@ type ScatterPlotTickGenerationArgs = {
 };
 
 // Dynamic tick generation based on zoom factor
-function createTicks({ bounds, sigma, logAxis }: ScatterPlotTickGenerationArgs): {
+function createTicks({
+  bounds,
+  sigma,
+  logAxis,
+}: ScatterPlotTickGenerationArgs): {
   xAxisTickValues: TickLabel[];
   yAxisTickValues: TickLabel[];
 } {
@@ -125,33 +126,45 @@ function createTicks({ bounds, sigma, logAxis }: ScatterPlotTickGenerationArgs):
   const { ratio } = camera.getState();
 
   // Scaling to standardize extreme input ranges
-  const xDataScale = logAxis?.x
-    ? createSymlogScatterScale(xMin, xMax)
+  const xDataScale =
+    logAxis?.x ?
+      createSymlogScatterScale(xMin, xMax)
     : createScatterScale(xMin, xMax);
-  const yDataScale = logAxis?.y
-    ? createSymlogScatterScale(yMin, yMax)
+  const yDataScale =
+    logAxis?.y ?
+      createSymlogScatterScale(yMin, yMax)
     : createScatterScale(yMin, yMax);
 
   const zoomFactor = 1 / Math.max(ratio, 1e-10);
   const baseTickCount = 10;
 
-  const countX = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
-  const countY = Math.max(2, Math.min(100, Math.round(baseTickCount * zoomFactor)));
+  const countX = Math.max(
+    2,
+    Math.min(100, Math.round(baseTickCount * zoomFactor)),
+  );
+  const countY = Math.max(
+    2,
+    Math.min(100, Math.round(baseTickCount * zoomFactor)),
+  );
 
   return {
-    xAxisTickValues: xDataScale.ticks(countX).map((value) => ({
-      value,
-      label: formatTickValue(value),
-    })),
-    yAxisTickValues: yDataScale.ticks(countY).map((value) => ({
-      value,
-      label: formatTickValue(value),
-    })),
+    xAxisTickValues: xDataScale
+      .ticks(countX)
+      .map((value) => ({ value, label: formatTickValue(value) })),
+    yAxisTickValues: yDataScale
+      .ticks(countY)
+      .map((value) => ({ value, label: formatTickValue(value) })),
   };
 }
 
 // Draw arrow at the end of the lines
-function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, angle: number, size = 8) {
+function drawArrow(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  angle: number,
+  size = 8,
+) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(angle);
@@ -169,7 +182,12 @@ function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, angle: n
 const X_AXIS_HEIGHT = 64;
 const Y_AXIS_WIDTH = 80;
 
-function AxisOverlay({ width, height, processedData, logAxis }: AxisOverlayProps) {
+function AxisOverlay({
+  width,
+  height,
+  processedData,
+  logAxis,
+}: AxisOverlayProps) {
   const theme = useTheme();
   const sigma = useSigma();
   const registerEvents = useRegisterEvents();
@@ -194,16 +212,23 @@ function AxisOverlay({ width, height, processedData, logAxis }: AxisOverlayProps
       ctx.fillRect(0, 0, Y_AXIS_WIDTH, height);
       ctx.fillRect(Y_AXIS_WIDTH, height - X_AXIS_HEIGHT, width, height);
 
-      if (xMin === undefined || xMax === undefined || yMin === undefined || yMax === undefined) {
+      if (
+        xMin === undefined ||
+        xMax === undefined ||
+        yMin === undefined ||
+        yMax === undefined
+      ) {
         return;
       }
 
-      const xDataScale = logAxisX
-        ? createSymlogScatterScale(xMin, xMax)
+      const xDataScale =
+        logAxisX ?
+          createSymlogScatterScale(xMin, xMax)
         : createScatterScale(xMin, xMax);
 
-      const yDataScale = logAxisY
-        ? createSymlogScatterScale(yMin, yMax)
+      const yDataScale =
+        logAxisY ?
+          createSymlogScatterScale(yMin, yMax)
         : createScatterScale(yMin, yMax);
 
       const [xLo, xHi] = xDataScale.domain();

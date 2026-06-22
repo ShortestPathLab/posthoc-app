@@ -4,12 +4,34 @@ import { Box, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { produce } from "immer";
 import { clone, isUndefined } from "es-toolkit";
-import { filter, find, flatMap, forEach, map, pick, sum, sumBy } from "es-toolkit/compat";
+import {
+  filter,
+  find,
+  flatMap,
+  forEach,
+  map,
+  pick,
+  sum,
+  sumBy,
+} from "es-toolkit/compat";
 import { nanoid } from "nanoid";
-import { Context, createContext, ReactNode, Ref, useContext, useEffect, useMemo } from "react";
+import {
+  Context,
+  createContext,
+  ReactNode,
+  Ref,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { createHtmlPortalNode, HtmlPortalNode, InPortal, OutPortal } from "react-reverse-portal";
+import {
+  createHtmlPortalNode,
+  HtmlPortalNode,
+  InPortal,
+  OutPortal,
+} from "react-reverse-portal";
 import { useCss, useMap } from "react-use";
 import { Transaction } from "slices/selector";
 import { Leaf, Root } from "slices/view";
@@ -17,14 +39,14 @@ import { assert } from "utils/assert";
 import { _ } from "utils/chain";
 import { ViewControls } from "./ViewControls";
 
-type TreeNode<S extends TreeNode = never> =
-  | {
-      children?: S[];
-    }
-  | object;
+type TreeNode<S extends TreeNode = never> = { children?: S[] } | object;
 
-function findInTree<T extends TreeNode<T>>(data: T, iterator: (a: T) => boolean): T | undefined {
-  const f = (a: T): T[] => ("children" in a && a.children?.length ? flatMap(a.children, f) : [a]);
+function findInTree<T extends TreeNode<T>>(
+  data: T,
+  iterator: (a: T) => boolean,
+): T | undefined {
+  const f = (a: T): T[] =>
+    "children" in a && a.children?.length ? flatMap(a.children, f) : [a];
   return find(f(data), iterator);
 }
 
@@ -39,12 +61,18 @@ type ViewTreeContextType<T = unknown> = {
 const ViewTreeContext = createContext<ViewTreeContextType>({});
 
 export function useViewTreeContext<State = unknown>() {
-  return useContext(ViewTreeContext as Context<ViewTreeContextType<State & { type: string }>>);
+  return useContext(
+    ViewTreeContext as Context<ViewTreeContextType<State & { type: string }>>,
+  );
 }
 
-const ViewTreePortalsContext = createContext<Record<string, HtmlPortalNode | undefined>>({});
+const ViewTreePortalsContext = createContext<
+  Record<string, HtmlPortalNode | undefined>
+>({});
 
-type ViewTreeProps<T extends Record<string, unknown> = Record<string, unknown>> = {
+type ViewTreeProps<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> = {
   defaultContent?: T;
   root?: Root<T>;
   renderLeaf?: (leaf: Leaf<T>) => ReactNode;
@@ -65,7 +93,11 @@ type ViewLeafProps<T extends Record<string, unknown>> = ViewBranchProps<T> & {
   root?: Leaf<T>;
 };
 
-function handleSwap<T extends Record<string, unknown>>(root: Root<T>, a: string, b: string) {
+function handleSwap<T extends Record<string, unknown>>(
+  root: Root<T>,
+  a: string,
+  b: string,
+) {
   const leafA = findInTree(root, (c) => c.key === a);
   const leafB = findInTree(root, (c) => c.key === b);
   if (leafA?.type === "leaf" && leafB?.type === "leaf") {
@@ -77,8 +109,16 @@ function handleSwap<T extends Record<string, unknown>>(root: Root<T>, a: string,
   return root;
 }
 
-function getLeaves<T extends Record<string, unknown>>(root?: Root<T>): Leaf<T>[] {
-  return root ? (root.type === "leaf" ? [root] : flatMap(root.children, getLeaves)) : [];
+function getLeaves<T extends Record<string, unknown>>(
+  root?: Root<T>,
+): Leaf<T>[] {
+  return (
+    root ?
+      root.type === "leaf" ?
+        [root]
+      : flatMap(root.children, getLeaves)
+    : []
+  );
 }
 
 function Panel<T extends Record<string, unknown>>({
@@ -105,15 +145,20 @@ function Panel<T extends Record<string, unknown>>({
   }, [l.key, portal, onChange]);
   return (
     <InPortal node={portal}>
-      <ViewTreeContext.Provider value={{}}>{renderLeaf?.(l)}</ViewTreeContext.Provider>
+      <ViewTreeContext.Provider value={{}}>
+        {renderLeaf?.(l)}
+      </ViewTreeContext.Provider>
     </InPortal>
   );
 }
 
-export function ViewTree<T extends Record<string, unknown>>(props: ViewTreeProps<T>) {
+export function ViewTree<T extends Record<string, unknown>>(
+  props: ViewTreeProps<T>,
+) {
   const { onChange, root, renderLeaf } = props;
   const leaves = getLeaves(root);
-  const [portals, { set }] = useMap<Record<string, HtmlPortalNode | undefined>>();
+  const [portals, { set }] =
+    useMap<Record<string, HtmlPortalNode | undefined>>();
   return (
     <ViewTreePortalsContext.Provider value={portals}>
       <DndProvider backend={HTML5Backend}>
@@ -146,24 +191,27 @@ export function ViewLeaf<T extends Record<string, unknown>>({
   defaultContent,
 }: ViewLeafProps<T>) {
   const view = useContext(ViewTreePortalsContext);
-  const [{ isOver }, drop] = useDrop<Leaf<Record<string, unknown>>, void, { isOver: boolean }>(
-    () => ({
-      accept: ["panel"],
-      collect: (monitor) => ({
-        isOver: monitor.isOver() && monitor.getItem().key !== root.key && !!root.acceptDrop,
-      }),
-      drop: (item) => {
-        onDrop?.(item, root);
-        onSwap?.(item.key, root.key);
-      },
+  const [{ isOver }, drop] = useDrop<
+    Leaf<Record<string, unknown>>,
+    void,
+    { isOver: boolean }
+  >(() => ({
+    accept: ["panel"],
+    collect: (monitor) => ({
+      isOver:
+        monitor.isOver() &&
+        monitor.getItem().key !== root.key &&
+        !!root.acceptDrop,
     }),
-  );
+    drop: (item) => {
+      onDrop?.(item, root);
+      onSwap?.(item.key, root.key);
+    },
+  }));
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "panel",
     item: root,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
   }));
 
   const context = useMemo(() => {
@@ -183,8 +231,8 @@ export function ViewLeaf<T extends Record<string, unknown>>({
           },
         ],
       }));
-    return root.type === "leaf"
-      ? ({
+    return root.type === "leaf" ?
+        ({
           isViewTree: true,
           state: root.content,
           controls: (
@@ -239,7 +287,8 @@ export function ViewLeaf<T extends Record<string, unknown>>({
           right: 0,
           bottom: 0,
           zIndex: 1,
-          boxShadow: (t) => (isOver ? `inset 0 0 0 2px ${t.palette.primary.main}` : "none"),
+          boxShadow: (t) =>
+            isOver ? `inset 0 0 0 2px ${t.palette.primary.main}` : "none",
           transition: (t) => t.transitions.create("box-shadow"),
         },
         transition: (t) => t.transitions.create("opacity"),
@@ -251,7 +300,9 @@ export function ViewLeaf<T extends Record<string, unknown>>({
   );
 }
 
-export function ViewBranch<T extends Record<string, unknown>>(props: ViewBranchProps<T>) {
+export function ViewBranch<T extends Record<string, unknown>>(
+  props: ViewBranchProps<T>,
+) {
   const { root = { type: "leaf", key: "" }, onChange, depth = 0 } = props;
   const { palette, spacing, transitions } = useTheme();
   const isLocked = root.type === "branch" && root.locked;
@@ -270,16 +321,14 @@ export function ViewBranch<T extends Record<string, unknown>>(props: ViewBranchP
   const gutterCls = useCss({
     ...(isLocked && { pointerEvents: "none" }),
     "div&": {
-      background: palette.mode === "dark" ? palette.background.default : palette.divider,
+      background:
+        palette.mode === "dark" ? palette.background.default : palette.divider,
       boxShadow: `inset 0 0 0 1px ${palette.background.paper}`,
       "&:hover, &:active": {
         background: palette.primary.main,
         boxShadow: "none",
       },
-      "&.Horizontal": {
-        padding: 0,
-        width: "3px",
-      },
+      "&.Horizontal": { padding: 0, width: "3px" },
       "&.Vertical": { padding: 0 },
     },
   });
@@ -303,10 +352,9 @@ export function ViewBranch<T extends Record<string, unknown>>(props: ViewBranchP
 
   return (
     <>
-      {root.type === "leaf" ? (
+      {root.type === "leaf" ?
         <ViewLeaf<T> {...(props as ViewLeafProps<T>)} />
-      ) : (
-        <Split
+      : <Split
           gutterClassName={gutterCls}
           draggerClassName={dragCls}
           onResizeFinished={(_, sizes) =>
@@ -329,10 +377,9 @@ export function ViewBranch<T extends Record<string, unknown>>(props: ViewBranchP
           }
         >
           {map(root.children, (c, i) =>
-            c.hidden ? (
+            c.hidden ?
               <Box key="placeholder" />
-            ) : (
-              <ViewBranch
+            : <ViewBranch
                 {...props}
                 key={c.key}
                 depth={depth + 1}
@@ -348,24 +395,26 @@ export function ViewBranch<T extends Record<string, unknown>>(props: ViewBranchP
                     assert(d.type === "branch", "root must be a branch");
                     const d1 = produce(d, (d) => void d.children.splice(i, 1));
                     if (d1.children.length === 1) {
-                      return d1.children[0].type === "leaf"
-                        ? {
+                      return d1.children[0].type === "leaf" ?
+                          {
                             type: "leaf",
                             key: d1.children[0].key,
                             content: d1.children[0].content,
                           }
                         : d1.children[0];
                     } else {
-                      forEach(d1.children, (c, _, all) => (c.size = 100 / all.length));
+                      forEach(
+                        d1.children,
+                        (c, _, all) => (c.size = 100 / all.length),
+                      );
                       return d1;
                     }
                   })
                 }
-              />
-            ),
+              />,
           )}
         </Split>
-      )}
+      }
     </>
   );
 }

@@ -58,7 +58,11 @@ const getSchemeFromSourceColor = (
   source: string,
   mode: "light" | "dark",
 ): MaterialYouSchemeExported => {
-  const scheme = new SchemeTonalSpot(Hct.fromInt(argbFromHex(source)), mode === "dark", 0);
+  const scheme = new SchemeTonalSpot(
+    Hct.fromInt(argbFromHex(source)),
+    mode === "dark",
+    0,
+  );
   const tokens = MaterialDynamicColors as unknown as Record<
     string,
     { getArgb: (s: DynamicScheme) => number }
@@ -66,7 +70,11 @@ const getSchemeFromSourceColor = (
   return Object.fromEntries(
     Object.getOwnPropertyNames(tokens)
       // `*PaletteKeyColor` tokens aren't part of the exported scheme shape.
-      .filter((k) => !k.endsWith("PaletteKeyColor") && typeof tokens[k]?.getArgb === "function")
+      .filter(
+        (k) =>
+          !k.endsWith("PaletteKeyColor") &&
+          typeof tokens[k]?.getArgb === "function",
+      )
       .map((k) => [k, hexFromArgb(tokens[k].getArgb(scheme))]),
   ) as MaterialYouSchemeExported;
 };
@@ -89,13 +97,9 @@ const themeOptions: ThemeOptions = {
     h4: { fontFamily: headingFamily },
     h5: { fontFamily: headingFamily, fontWeight: 400 },
     h6: { fontFamily: headingFamily, fontWeight: 450 },
-    button: {
-      textTransform: "none",
-      fontWeight: 400,
-      letterSpacing: 0,
-      backgroundColor: "background.paper",
-    },
+    button: { textTransform: "none", fontWeight: 400, letterSpacing: 0 },
     subtitle2: { marginTop: 6, fontWeight: 400 },
+    body2: { color: (t) => t.palette.text.secondary },
   },
   shape: { borderRadius: 8 },
   shadows: ["none", ...times(24, constant(shadow))] as ThemeOptions["shadows"],
@@ -108,18 +112,19 @@ const customComponents: ThemeOptions["components"] = {
   MuiPopover: {
     styleOverrides: {
       paper: {
-        backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06))",
+        backgroundImage:
+          "linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06))",
       },
     },
   },
-  MuiTooltip: {
-    styleOverrides: {
-      tooltip: {
-        backgroundImage: "linear-gradient(#1c2128, #1c2128)",
-        fontFamily,
-      },
-    },
-  },
+  // MuiTooltip: {
+  //   styleOverrides: {
+  //     tooltip: {
+  //       backgroundImage: "linear-gradient(#1c2128, #1c2128)",
+  //       fontFamily,
+  //     },
+  //   },
+  // },
   MuiTypography: {
     styleOverrides: {
       body1: { fontWeight: 400, fontSize: "0.875rem" },
@@ -145,10 +150,15 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) => {
   // Keep our bespoke backgrounds and component styles on top of the MY palette.
   return createTheme(base, {
     palette: {
+      divider: mode === "dark" ? "#ffffff22" : "#00000022",
+      text:
+        mode === "dark" ?
+          { primary: "#ffffff", secondary: "#ffffff99" }
+        : { primary: "#000000", secondary: "#00000099" },
       background:
-        mode === "dark"
-          ? { default: "#0a0c10", paper: "#111317" }
-          : { default: "#ebecf1", paper: "#ffffff" },
+        mode === "dark" ?
+          { default: "#0a0c10", paper: "#111317" }
+        : { default: "#ebecf1", paper: "#ffffff" },
     },
     components: customComponents,
   });
@@ -157,33 +167,36 @@ export const makeTheme = (mode: "light" | "dark", theme: AccentColor) => {
 export function useAcrylic(color?: string) {
   const { "appearance/acrylic": acrylic } = useOne(slice.settings);
   return (
-    acrylic
-      ? {
-          backdropFilter: "blur(16px)",
-          background: ({ palette }) => alpha(color ?? palette.background.paper, 0.75),
-        }
-      : {
-          backdropFilter: "blur(0px)",
-          background: ({ palette }) => color ?? palette.background.paper,
-        }
-  ) satisfies SxProps<Theme>;
+    acrylic ?
+      {
+        backdropFilter: "blur(16px)",
+        background: ({ palette }) =>
+          alpha(color ?? palette.background.paper, 0.75),
+      }
+    : {
+        backdropFilter: "blur(0px)",
+        background: ({ palette }) => color ?? palette.background.paper,
+      }) satisfies SxProps<Theme>;
 }
 
 export function usePaper() {
   return (elevation: number = 1) =>
     ({
       borderRadius: 1,
-      transition: ({ transitions }) => transitions.create(["background-color", "box-shadow"]),
-      boxShadow: ({ shadows, palette }) =>
-        palette.mode === "dark" ? shadows[1] : shadows[Math.max(floor(elevation) - 1, 0)],
+      transition: ({ transitions }) =>
+        transitions.create(["background-color", "box-shadow"]),
+      // boxShadow: ({ shadows, palette }) =>
+      //   palette.mode === "dark" ?
+      //     shadows[1]
+      //   : shadows[Math.max(floor(elevation) - 1, 0)],
       backgroundColor: ({ palette }) =>
-        palette.mode === "dark"
-          ? alpha(palette.action.disabledBackground, elevation * 0.02)
-          : palette.background.paper,
+        palette.mode === "dark" ?
+          alpha(palette.action.disabledBackground, elevation * 0.04)
+        : palette.background.paper,
       border: ({ palette }) =>
-        palette.mode === "dark"
-          ? `1px solid ${alpha(palette.text.primary, elevation * 0.08)}`
-          : `1px solid ${alpha(palette.text.primary, elevation * 0.12)}`,
+        palette.mode === "dark" ?
+          `1px solid ${alpha(palette.text.primary, elevation * 0.05)}`
+        : `1px solid ${alpha(palette.text.primary, elevation * 0.12)}`,
     }) satisfies SxProps<Theme>;
 }
 

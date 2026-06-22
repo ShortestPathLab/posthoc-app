@@ -4,13 +4,16 @@ import { noop } from "es-toolkit";
 import { filter } from "es-toolkit/compat";
 import { Label } from "./Label";
 import { slice } from "slices";
-import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-type Options = {
-  error?: boolean;
-  action?: () => void;
-  actionLabel?: string;
-};
+type Options = { error?: boolean; action?: () => void; actionLabel?: string };
 
 type ClearSnackbarCallback = () => void;
 
@@ -42,7 +45,9 @@ export function useSnackbar() {
 export function SnackbarProvider({ children }: { children?: ReactNode }) {
   const [snackPack, setSnackPack] = useState<readonly SnackbarMessage[]>([]);
   const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState<SnackbarMessage | undefined>(undefined);
+  const [current, setCurrent] = useState<SnackbarMessage | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (snackPack.length && !current) {
@@ -85,12 +90,14 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
 
   return (
     <>
-      <SnackbarContext.Provider value={handleMessage}>{children}</SnackbarContext.Provider>
+      <SnackbarContext.Provider value={handleMessage}>
+        {children}
+      </SnackbarContext.Provider>
       <Snackbar
         sx={{
           "> .MuiPaper-root": {
             bgcolor: "background.paper",
-            color: "text.primary",
+            color: (t) => t.palette.text.primary,
             overflow: "hidden",
             "& .MuiSnackbarContent-message": {
               overflow: "hidden",
@@ -120,7 +127,12 @@ export function SnackbarProvider({ children }: { children?: ReactNode }) {
                 {current?.actionLabel}
               </Button>
             )}
-            <IconButton aria-label="close" color="inherit" sx={{ p: 0.5 }} onClick={handleClose}>
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              sx={{ p: 0.5 }}
+              onClick={handleClose}
+            >
               <CloseIcon />
             </IconButton>
           </>

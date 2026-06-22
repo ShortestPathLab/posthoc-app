@@ -8,11 +8,7 @@ import objectHash from "object-hash";
 import { Typography as Type } from "@mui/material";
 
 export const parse: MapParser = memo(
-  async (m = "", options: Options) =>
-    await parseMeshAsync({
-      map: m,
-      options,
-    }),
+  async (m = "", options: Options) => await parseMeshAsync({ map: m, options }),
   { normalizer: (args) => objectHash([...args]) },
 );
 
@@ -26,7 +22,12 @@ export const hydrate: ParsedMapHydrator = (result) => ({
 
 // eslint-disable-next-line react/display-name
 export const editor: MapEditor<unknown> = async () => () => (
-  <Type component="div" variant="body2" color="text.secondary" sx={{ mb: 1, mt: 1 }}>
+  <Type
+    component="div"
+    variant="body2"
+    color="textSecondary"
+    sx={{ mb: 1, mt: 1 }}
+  >
     No options available.
   </Type>
 );

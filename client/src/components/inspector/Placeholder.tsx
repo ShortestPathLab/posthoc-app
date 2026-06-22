@@ -1,4 +1,8 @@
-import { CancelOutlined, RefreshOutlined, WidgetsOutlined } from "@mui-symbols-material/w400";
+import {
+  CancelOutlined,
+  RefreshOutlined,
+  WidgetsOutlined,
+} from "@mui-symbols-material/w400";
 import { Box, Button, Typography as Type } from "@mui/material";
 import { Block, BlockProps } from "components/generic/Block";
 import { ComponentProps, ReactElement, ReactNode } from "react";
@@ -22,7 +26,7 @@ export function Placeholder({
       sx={{
         justifyContent: "center",
         alignItems: "center",
-        color: "text.secondary",
+        color: (t) => t.palette.text.secondary,
         textAlign: "center",
         gap: 2,
         p: 6,
@@ -57,15 +61,16 @@ export function ErrorPlaceholder({
     <Placeholder
       icon={<CancelOutlined />}
       action={
-        <Button variant="text" onClick={() => onReset?.()} startIcon={<RefreshOutlined />}>
+        <Button
+          variant="text"
+          onClick={() => onReset?.()}
+          startIcon={<RefreshOutlined />}
+        >
           Reload
         </Button>
       }
       {...props}
-      sx={{
-        bgcolor: "background.paper",
-        ...props.sx,
-      }}
+      sx={{ bgcolor: "background.paper", ...props.sx }}
     />
   );
 }

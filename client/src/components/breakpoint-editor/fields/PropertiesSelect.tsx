@@ -18,25 +18,24 @@ function useData(layer?: string) {
   return useComputeLabels({ key: trace?.key, trace: trace?.content });
 }
 
-export const PropertiesSelect = ({ layer, ...props }: BreakpointFieldProps<string>) => {
+export const PropertiesSelect = ({
+  layer,
+  ...props
+}: BreakpointFieldProps<string>) => {
   const { data } = useData(layer);
   return (
     <Select
       disabled={props.disabled}
       variant="outlined"
       placeholder="Property"
-      sx={{
-        minWidth: 160,
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-      }}
+      sx={{ minWidth: 160, textOverflow: "ellipsis", whiteSpace: "nowrap" }}
       items={map(entries(data), ([c, v]) => ({
         value: trimStart(c, "."),
         label: (
           <>
             {`$${c}`}
             <Space />
-            <Typography color="text.secondary" variant="body1" component="span">
+            <Typography color="textSecondary" variant="body1" component="span">
               {v.type}
             </Typography>
           </>

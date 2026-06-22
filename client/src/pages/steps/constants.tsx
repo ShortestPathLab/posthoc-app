@@ -1,4 +1,4 @@
-export const ITEM_HEIGHT = 80;
+export const ITEM_HEIGHT = 76;
 
 export const PADDING_TOP = 8;
 

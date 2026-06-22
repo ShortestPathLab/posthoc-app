@@ -33,7 +33,7 @@ export function AboutContent() {
   function renderSection(label: ReactNode, content: ReactNode) {
     return (
       <Box sx={{ pt: 2 }}>
-        <Type component="div" variant="overline" color="text.secondary">
+        <Type component="div" variant="overline" color="textSecondary">
           {label}
         </Type>
         <Type component="div" variant="body2">
@@ -81,7 +81,10 @@ export function AboutContent() {
               <ListItemIcon>
                 <GitHub />
               </ListItemIcon>
-              <ListItemText primary="Repository" secondary={parseUrl(repository)} />
+              <ListItemText
+                primary="Repository"
+                secondary={parseUrl(repository)}
+              />
             </ListItemButton>
           </List>
         </>,

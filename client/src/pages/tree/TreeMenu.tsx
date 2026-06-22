@@ -55,15 +55,16 @@ export function TreeMenu({
 
   const Row = ({ k, v }: { k: string; v: unknown }) => (
     <Stack direction="row" spacing={1} sx={{ py: 0.25, overflowX: "hidden" }}>
-      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80, flexShrink: 0 }}>
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        sx={{ minWidth: 80, flexShrink: 0 }}
+      >
         {k}
       </Typography>
       <Typography
         variant="body2"
-        sx={{
-          overflowWrap: "anywhere",
-          wordBreak: "break-word",
-        }}
+        sx={{ overflowWrap: "anywhere", wordBreak: "break-word" }}
       >
         {formatValue(v)}
       </Typography>
@@ -101,16 +102,21 @@ export function TreeMenu({
         onTouchMove={(e) => e.stopPropagation()}
       >
         <ListItem sx={{ py: 0 }}>
-          <Typography component="div" color="text.secondary" variant="overline">
+          <Typography component="div" color="textSecondary" variant="overline">
             Events at {selection?.node}
           </Typography>
         </ListItem>
 
         {map(selected?.events, (entry, _, es) => {
-          const isSelected = findLast(es, (c) => c.step <= step)?.step === entry.step;
+          const isSelected =
+            findLast(es, (c) => c.step <= step)?.step === entry.step;
 
           return (
-            <Stack key={entry.step} direction="row" sx={{ overflowX: "hidden" }}>
+            <Stack
+              key={entry.step}
+              direction="row"
+              sx={{ overflowX: "hidden" }}
+            >
               <Tooltip title={`Go to step ${entry.step}`} placement="left">
                 <MenuItem
                   selected={isSelected}
@@ -126,9 +132,9 @@ export function TreeMenu({
                     <Label
                       primary={startCase(entry.event.type)}
                       secondary={
-                        isDefined(entry.event.pId)
-                          ? `Step ${entry.step}, from ${entry.event.pId}`
-                          : `Step ${entry.step}`
+                        isDefined(entry.event.pId) ?
+                          `Step ${entry.step}, from ${entry.event.pId}`
+                        : `Step ${entry.step}`
                       }
                     />
                   </Box>
@@ -164,7 +170,9 @@ export function TreeMenu({
               const type = String(event?.type ?? "");
 
               // ID props first in order
-              const idProps = Object.entries(event).filter(([k]) => k !== "type" && isIdLabel(k));
+              const idProps = Object.entries(event).filter(
+                ([k]) => k !== "type" && isIdLabel(k),
+              );
 
               const otherProps = Object.entries(event).filter(
                 ([k]) => k !== "type" && !isIdLabel(k),
@@ -174,7 +182,11 @@ export function TreeMenu({
                 <>
                   {/* Type of event */}
                   <ListItem sx={{ py: 0 }}>
-                    <Typography component="div" color="text.secondary" variant="overline">
+                    <Typography
+                      component="div"
+                      color="textSecondary"
+                      variant="overline"
+                    >
                       Type of event
                     </Typography>
                   </ListItem>
@@ -192,19 +204,22 @@ export function TreeMenu({
                   )}
 
                   <ListItem sx={{ py: 0 }}>
-                    <Typography component="div" color="text.secondary" variant="overline">
+                    <Typography
+                      component="div"
+                      color="textSecondary"
+                      variant="overline"
+                    >
                       Other properties
                     </Typography>
                   </ListItem>
 
                   <Box sx={{ px: 2, py: 1 }}>
-                    {otherProps.length ? (
+                    {otherProps.length ?
                       otherProps.map(([k, v]) => <Row key={k} k={k} v={v} />)
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
+                    : <Typography variant="body2" color="textSecondary">
                         None
                       </Typography>
-                    )}
+                    }
                   </Box>
                 </>
               );
@@ -215,13 +230,22 @@ export function TreeMenu({
         {!!selected?.current && (
           <>
             <ListItem sx={{ py: 0 }}>
-              <Typography component="div" color="text.secondary" variant="overline">
+              <Typography
+                component="div"
+                color="textSecondary"
+                variant="overline"
+              >
                 Focus on
               </Typography>
             </ListItem>
 
             {map(highlightNodesOptions, (highlight) => {
-              const highlightColor = getShade(highlight.color, theme.palette.mode, 500, 400);
+              const highlightColor = getShade(
+                highlight.color,
+                theme.palette.mode,
+                500,
+                400,
+              );
 
               return (
                 <Stack key={highlight.type} direction="row">
@@ -231,7 +255,8 @@ export function TreeMenu({
                         <MenuItem
                           selected={
                             l.source?.highlighting?.type === highlight.type &&
-                            l.source?.highlighting?.step === selected?.current?.step
+                            l.source?.highlighting?.step ===
+                              selected?.current?.step
                           }
                           sx={{
                             height: 32,
@@ -240,7 +265,9 @@ export function TreeMenu({
                             borderLeft: `4px solid ${highlightColor}`,
                           }}
                           onClick={(e) => {
-                            showHighlight[highlight.type](selected!.current!.step!);
+                            showHighlight[highlight.type](
+                              selected!.current!.step!,
+                            );
                             props?.onClose?.(e, "backdropClick");
                           }}
                         >

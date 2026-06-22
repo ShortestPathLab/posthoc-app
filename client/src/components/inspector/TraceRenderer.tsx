@@ -1,4 +1,7 @@
-import { BlurOnOutlined as DisabledIcon, ViewInArOutlined } from "@mui-symbols-material/w400";
+import {
+  BlurOnOutlined as DisabledIcon,
+  ViewInArOutlined,
+} from "@mui-symbols-material/w400";
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { RenderLayer } from "layers/RenderLayer";
@@ -7,7 +10,14 @@ import { find, floor, get, some } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 import { isStepsLayer } from "pages/steps/StepsLayer";
 import { Size } from "protocol";
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDebounce } from "react-use";
 import { Renderer, RendererEvent } from "renderer";
 import { slice } from "slices";
@@ -28,10 +38,7 @@ const rendererOptions = {
   tileSubdivision: isMobile ? 1 : 2,
   // Use 25% of available CPUs
   workerCount: clamp(floor(navigator.hardwareConcurrency / 4), 1, 12),
-  tileResolution: {
-    width: tileSize(),
-    height: tileSize(),
-  },
+  tileResolution: { width: tileSize(), height: tileSize() },
 };
 
 const TraceRendererContext = createContext<{ renderer?: Renderer }>({});
@@ -63,10 +70,7 @@ function useRenderer(renderer?: string, { width, height }: Partial<Size> = {}) {
           const instance = new entry.renderer.constructor();
           instance.setup({
             ...rendererOptions,
-            screenSize: {
-              width,
-              height,
-            },
+            screenSize: { width, height },
             backgroundColor: theme.palette.background.paper,
             accentColor: theme.palette.primary.main,
           });
@@ -110,18 +114,19 @@ function useLoading() {
 
 function TraceRendererCircularProgress() {
   const loading = useLoading();
-  return loading ? (
-    <CircularProgress
-      sx={{
-        position: "absolute",
-        top: (t) => t.spacing(6 + 2),
-        right: (t) => t.spacing(2),
-      }}
-    />
-  ) : null;
+  return loading ?
+      <CircularProgress
+        sx={{
+          position: "absolute",
+          top: (t) => t.spacing(6 + 2),
+          right: (t) => t.spacing(2),
+        }}
+      />
+    : null;
 }
 
-const VIEWPORT_PAGE_DESCRIPTION = "When you create a layer, you'll see it visualised here.";
+const VIEWPORT_PAGE_DESCRIPTION =
+  "When you create a layer, you'll see it visualised here.";
 
 function useAnyLayerPlaying() {
   return useOne(slice.layers, (l) =>
@@ -129,7 +134,13 @@ function useAnyLayerPlaying() {
   );
 }
 
-export function TraceRenderer({ width, height, renderer, rendererRef, layers }: RendererProps) {
+export function TraceRenderer({
+  width,
+  height,
+  renderer,
+  rendererRef,
+  layers,
+}: RendererProps) {
   const key = useMemo(() => nanoid(), []);
   const { instance, error, ref } = useRenderer(renderer, { width, height });
 
@@ -165,10 +176,7 @@ export function TraceRenderer({ width, height, renderer, rendererRef, layers }: 
     if (instance) {
       instance.setOptions({
         // TODO: This is a 2D renderer specific setting
-        tileResolution: {
-          width: tileSize(playing),
-          height: tileSize(playing),
-        },
+        tileResolution: { width: tileSize(playing), height: tileSize(playing) },
       } as any);
     }
   }, [instance, playing]);
@@ -178,9 +186,9 @@ export function TraceRenderer({ width, height, renderer, rendererRef, layers }: 
       <TraceRendererCircularProgress />
       <TraceRendererContext.Provider value={context}>
         <Box sx={{ width, height }}>
-          {layers?.length ? (
+          {layers?.length ?
             <TrustedContent>
-              {error ? (
+              {error ?
                 <Box
                   sx={{
                     display: "flex",
@@ -189,14 +197,13 @@ export function TraceRenderer({ width, height, renderer, rendererRef, layers }: 
                     height,
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "text.secondary",
+                    color: (t) => t.palette.text.secondary,
                   }}
                 >
                   <DisabledIcon sx={{ mb: 2 }} fontSize="large" />
                   {error}
                 </Box>
-              ) : (
-                <Box
+              : <Box
                   ref={ref}
                   sx={{
                     "> canvas": { position: "absolute" },
@@ -204,22 +211,30 @@ export function TraceRenderer({ width, height, renderer, rendererRef, layers }: 
                   }}
                 >
                   {layers.map((l, i) => (
-                    <RenderLayer index={i} key={l.key} layer={l} width={width} height={height} />
+                    <RenderLayer
+                      index={i}
+                      key={l.key}
+                      layer={l}
+                      width={width}
+                      height={height}
+                    />
                   ))}
                 </Box>
-              )}
+              }
             </TrustedContent>
-          ) : (
-            <Placeholder
+          : <Placeholder
               icon={<ViewInArOutlined />}
               label="Viewport"
               sx={{ width, height }}
               secondary={VIEWPORT_PAGE_DESCRIPTION}
             />
-          )}
+          }
         </Box>
       </TraceRendererContext.Provider>
-      <SelectionMenu selection={selection} onClose={() => setSelection(undefined)} />
+      <SelectionMenu
+        selection={selection}
+        onClose={() => setSelection(undefined)}
+      />
     </>
   );
 }

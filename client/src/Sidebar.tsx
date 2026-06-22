@@ -1,5 +1,13 @@
 import { TabContext, TabList } from "@mui/lab";
-import { Box, Divider, Skeleton, Stack, Tab, Tooltip, useTheme } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Skeleton,
+  Stack,
+  Tab,
+  Tooltip,
+  useTheme,
+} from "@mui/material";
 import interpolate from "color-interpolate";
 import { times, values } from "es-toolkit/compat";
 import { isMobile } from "mobile-device-detect";
@@ -13,9 +21,11 @@ export function useSidebarBackground() {
   const { palette } = useTheme();
   return useMemo(() => {
     const dark = palette.mode === "dark";
-    return dark
-      ? interpolate([palette.background.paper, palette.text.primary])(0.025)
-      : interpolate([palette.background.paper, palette.background.default])(0.25);
+    return dark ?
+        interpolate([palette.background.paper, palette.text.primary])(0.025)
+      : interpolate([palette.background.paper, palette.background.default])(
+          0.25,
+        );
   }, [palette]);
 }
 
@@ -34,7 +44,11 @@ export function SidebarPlaceholder() {
       }}
     >
       {times(3, () => (
-        <Skeleton variant="circular" animation={false} sx={{ opacity: 0.5, height: 32 }} />
+        <Skeleton
+          variant="circular"
+          animation={false}
+          sx={{ opacity: 0.5, height: 32 }}
+        />
       ))}
     </Stack>
   );
@@ -76,12 +90,15 @@ export function Sidebar() {
           {values(pages)
             .filter((p) => (p.experiment ? settings[p.experiment] : true))
             .filter((c) =>
-              sm
-                ? c.showInSidebar === "always" || c.showInSidebar === "mobile-only"
-                : c.showInSidebar === "always",
+              sm ?
+                c.showInSidebar === "always" ||
+                c.showInSidebar === "mobile-only"
+              : c.showInSidebar === "always",
             )
             .flatMap((c, i, cx) => [
-              !sm && !!i && c.color !== cx[i - 1].color && <Divider2 key={`divider-${i}`} />,
+              !sm && !!i && c.color !== cx[i - 1].color && (
+                <Divider2 key={`divider-${i}`} />
+              ),
               <Tab
                 key={c.id}
                 value={c.id}
@@ -91,15 +108,16 @@ export function Sidebar() {
                   justifyContent: "center",
                 }}
                 label={
-                  <Tooltip key={c.id} title={c.name} placement={sm ? "top" : "right"}>
+                  <Tooltip
+                    key={c.id}
+                    title={c.name}
+                    placement={sm ? "top" : "right"}
+                  >
                     <Box
                       sx={{
                         alignItems: "center",
                         display: "flex",
-                        "> svg > path": {
-                          strokeWidth: 1,
-                          stroke: bgcolor,
-                        },
+                        "> svg > path": { strokeWidth: 1, stroke: bgcolor },
                       }}
                     >
                       {c.iconThin ?? c.icon}

@@ -6,6 +6,7 @@ import {
   StackProps,
   Tab,
   Tabs,
+  Button as MuiButton,
   TextField,
   Tooltip,
   Typography as Type,
@@ -17,7 +18,16 @@ import { Surface } from "components/generic/surface";
 import { inferLayerName } from "layers/inferLayerName";
 import { getController, getControllers } from "layers/layerControllers";
 import { isEqual } from "es-toolkit";
-import { debounce, head, keys, merge, omit, pick, startCase, truncate } from "es-toolkit/compat";
+import {
+  debounce,
+  head,
+  keys,
+  merge,
+  omit,
+  pick,
+  startCase,
+  truncate,
+} from "es-toolkit/compat";
 import { ReactNode, createElement, useEffect, useMemo, useState } from "react";
 import { slice } from "slices";
 import { Layer, WithLayer } from "slices/layers";
@@ -27,6 +37,7 @@ import { set } from "utils/set";
 import { useOptimisticTransaction } from "hooks/useOptimistic";
 import { idle } from "utils/idle";
 import { useOne } from "slices/useOne";
+import { Button } from "components/generic/inputs/Button";
 
 const compositeOperations = [
   "color",
@@ -71,10 +82,15 @@ export function useDraft<T>(
   const [state, setState] = useState(initial);
   useEffect(() => {
     if (initial) {
-      requestIdleCallback(() => setState(merge({}, state, omit(initial, ...stayDraft))));
+      requestIdleCallback(() =>
+        setState(merge({}, state, omit(initial, ...stayDraft))),
+      );
     }
   }, [setState, initial]);
-  const handleChange = useMemo(() => debounce((v: T) => commit?.(v), ms), [commit, ms]);
+  const handleChange = useMemo(
+    () => debounce((v: T) => commit?.(v), ms),
+    [commit, ms],
+  );
   return [
     state,
     (value: (prev: T) => T) => {
@@ -97,7 +113,7 @@ function useLayerProperties(layer?: string) {
 
 export function Heading({ children }: { children: ReactNode }) {
   return (
-    <Type component="div" variant="overline" color="text.secondary" sx={{ pt: 1 }}>
+    <Type component="div" variant="overline" sx={{ pt: 1 }}>
       {children}
     </Type>
   );
@@ -105,13 +121,19 @@ export function Heading({ children }: { children: ReactNode }) {
 
 export function Label({ children }: { children: ReactNode }) {
   return (
-    <Type component="div" variant="body1">
+    <Type component="div" variant="body1" color="textSecondary">
       {children}
     </Type>
   );
 }
 
-export function Option({ label, option }: { label: ReactNode; option: ReactNode }) {
+export function Option({
+  label,
+  option,
+}: {
+  label: ReactNode;
+  option: ReactNode;
+}) {
   return (
     <Block sx={{ alignItems: "center" }}>
       <Label>{label}</Label>
@@ -121,25 +143,23 @@ export function Option({ label, option }: { label: ReactNode; option: ReactNode 
   );
 }
 
-const options = (a: string[]) =>
-  a.map((c) => ({
-    id: c,
-    name: startCase(c),
-  }));
+const options = (a: string[]) => a.map((c) => ({ id: c, name: startCase(c) }));
 
 export function LayerEditor({ layer: key }: LayerEditorProps) {
   const one = slice.layers.one(key);
   const layer = useLayerProperties(key);
-  const [{ name, transparency, displayMode, source: { type } = {} } = {}, setOptimistic] =
-    useOptimisticTransaction(layer!, (f) => idle(() => one.set(f), 1000));
+  const [
+    { name, transparency, displayMode, source: { type } = {} } = {},
+    setOptimistic,
+  ] = useOptimisticTransaction(layer!, (f) => idle(() => one.set(f), 1000));
+
+  const selectedType = type ?? head(keys(getControllers())) ?? "";
 
   return (
     <Surface
       popover
       slotProps={{
-        popover: {
-          anchorOrigin: { horizontal: -12, vertical: -12 },
-        },
+        popover: { anchorOrigin: { horizontal: -12, vertical: -12 } },
       }}
       trigger={({ open }) => <Item onClick={open} layer={key} />}
     >
@@ -155,22 +175,42 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
               variant="filled"
               label="Layer Name"
               defaultValue={name ?? ""}
-              onChange={(e) => setOptimistic((d) => set(d, "name", e.target.value))}
+              onChange={(e) =>
+                setOptimistic((d) => set(d, "name", e.target.value))
+              }
             />
           )}
         </WithLayer>
-        <Box sx={{ mx: -2, pb: 1 }}>
-          <Tabs
-            variant="fullWidth"
-            onChange={(_, v) => setOptimistic((d) => set(d, "source", { type: v }))}
-            value={type ?? head(keys(getControllers())) ?? ""}
-          >
-            {keys(getControllers()).map((s) => (
-              <Tab label={startCase(s)} value={s} key={s} />
-            ))}
-          </Tabs>
-          <Divider sx={{ width: "100%" }} />
-        </Box>
+        <Stack
+          direction="row"
+          sx={{ gap: 1, width: "100%", "> *": { flex: 1 } }}
+        >
+          {keys(getControllers()).map((s) => (
+            <Button
+              value={s}
+              key={s}
+              startIcon={getController(s)?.icon}
+              sx={{
+                "& svg": { color: (t) => t.palette.text.secondary },
+                "& *": { color: (t) => t.palette.text.secondary },
+                ...(selectedType === s ?
+                  {
+                    "& *": { color: (t) => t.palette.text.primary },
+                    borderWidth: 1,
+                    borderColor: (t) =>
+                      `${t.palette.inversePrimary.main} !important`,
+                    backgroundColor: (t) => t.palette.primaryContainer.main,
+                  }
+                : {}),
+              }}
+              onClick={() =>
+                setOptimistic((d) => set(d, "source", { type: s }))
+              }
+            >
+              {startCase(s)}
+            </Button>
+          ))}
+        </Stack>
 
         <Heading>Source Options</Heading>
 
@@ -194,9 +234,12 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
                 id: c,
                 name: `${c}%`,
               }))}
+              paper
               value={transparency ?? "0"}
               arrow
-              onChange={(e) => setOptimistic((d) => set(d, "transparency", e as any))}
+              onChange={(e) =>
+                setOptimistic((d) => set(d, "transparency", e as any))
+              }
             />
           }
         />
@@ -205,11 +248,14 @@ export function LayerEditor({ layer: key }: LayerEditorProps) {
           option={
             <FeaturePicker
               arrow
+              paper
               label="Display Mode"
               value={displayMode ?? "source-over"}
               items={options(compositeOperations)}
               onChange={(e) =>
-                setOptimistic((d) => set(d, "displayMode", e as GlobalCompositeOperation))
+                setOptimistic((d) =>
+                  set(d, "displayMode", e as GlobalCompositeOperation),
+                )
               }
             />
           }
@@ -232,12 +278,7 @@ function Item({ layer, ...props }: { layer?: string } & StackProps) {
     <Stack
       direction="row"
       className={layer}
-      sx={{
-        flex: 1,
-        display: "block",
-        textAlign: "left",
-        px: 2,
-      }}
+      sx={{ flex: 1, display: "block", textAlign: "left", px: 2 }}
       {...props}
     >
       <Stack direction="row" sx={{ alignItems: "center", gap: 2 }}>
@@ -268,7 +309,7 @@ function Item({ layer, ...props }: { layer?: string } & StackProps) {
           }}
         >
           <Type component="div">{name}</Type>
-          <Type component="div" variant="body2" color="text.secondary">
+          <Type component="div" variant="body2" color="textSecondary">
             {startCase(type)}
           </Type>
         </Box>

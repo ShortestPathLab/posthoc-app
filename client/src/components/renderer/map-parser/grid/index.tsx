@@ -1,4 +1,12 @@
-import { Box, Checkbox, FormControlLabel, Popover, Stack, rgbToHex, useTheme } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Popover,
+  Stack,
+  rgbToHex,
+  useTheme,
+} from "@mui/material";
 import interpolate from "color-interpolate";
 import { EditorProps } from "components/Editor";
 import { FeaturePickerButton } from "components/app-bar/FeaturePickerButton";
@@ -24,13 +32,7 @@ function between(v: number, min: number, max: number) {
 
 export const parse: MapParser = memo(
   async (m = "", options: Options) => {
-    return {
-      content: m,
-      ...(await parseGridAsync({
-        map: m,
-        options,
-      })),
-    };
+    return { content: m, ...(await parseGridAsync({ map: m, options })) };
   },
   { normalizer: (args) => objectHash([...args]) },
 );
@@ -59,23 +61,25 @@ export function SymbolColorPicker({
                   borderRadius: 4,
                 }}
               />
-              {value ? startCase(getClosestColor(value)?.name ?? "Custom") : "Auto"}
+              {value ?
+                startCase(getClosestColor(value)?.name ?? "Custom")
+              : "Auto"}
             </Stack>
           </FeaturePickerButton>
           <Popover
             transformOrigin={{ horizontal: "left", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "top" }}
             {...bindPopover(state)}
-            slotProps={{
-              paper: { sx: { overflow: "visible" } },
-            }}
+            slotProps={{ paper: { sx: { overflow: "visible" } } }}
           >
             <Box sx={{ px: 2, py: 1 }}>
               <FormControlLabel
                 control={
                   <Checkbox
                     defaultChecked={!value}
-                    onChange={(_, checked) => setValue?.(checked ? undefined : autoValue)}
+                    onChange={(_, checked) =>
+                      setValue?.(checked ? undefined : autoValue)
+                    }
                   />
                 }
                 label="Choose Automatically"
@@ -100,9 +104,9 @@ export function SymbolColorPicker({
   );
 }
 
-export const editor: MapEditor<{
-  symbols?: Record<string, string>;
-}> = async (map?: string) => {
+export const editor: MapEditor<{ symbols?: Record<string, string> }> = async (
+  map?: string,
+) => {
   if (map) {
     const { symbols } = await getGridSymbolsAsync({ map });
     return withProduce(({ produce, value }) => {
@@ -120,7 +124,9 @@ export const editor: MapEditor<{
               content={
                 <SymbolColorPicker
                   value={value?.symbols?.[key]}
-                  autoValue={gradient(find(symbols, { symbol: key })?.value ?? 0)}
+                  autoValue={gradient(
+                    find(symbols, { symbol: key })?.value ?? 0,
+                  )}
                   onChange={(v) =>
                     produce((prev) => {
                       set(prev, `symbols["${key}"]`, v);

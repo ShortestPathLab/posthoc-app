@@ -1,4 +1,8 @@
-import { InfoOutlined, MoreVertOutlined, UploadOutlined } from "@mui-symbols-material/w400";
+import {
+  InfoOutlined,
+  MoreVertOutlined,
+  UploadOutlined,
+} from "@mui-symbols-material/w400";
 import share from "./share.svg";
 import {
   Avatar,
@@ -35,7 +39,11 @@ import { useCloudStorageInstance } from "slices/cloudStorage";
 import { useLoadingState } from "slices/loading";
 import { useOne } from "slices/useOne";
 
-const FileList = ({ fileMetaDataList }: { fileMetaDataList: WorkspaceMeta[] }) => {
+const FileList = ({
+  fileMetaDataList,
+}: {
+  fileMetaDataList: WorkspaceMeta[];
+}) => {
   const usingLoadingState = useLoadingState();
   const cloudService = useOne(slice.cloudStorage, (s) => s.instance);
   const notify = useSnackbar();
@@ -50,7 +58,10 @@ const FileList = ({ fileMetaDataList }: { fileMetaDataList: WorkspaceMeta[] }) =
         const file = await cloudService?.getFile(fileId);
         load(file);
       } catch (e: unknown) {
-        notify("Couldn't open file", makeCaughtObjectReportJson(e).message ?? "");
+        notify(
+          "Couldn't open file",
+          makeCaughtObjectReportJson(e).message ?? "",
+        );
       }
     });
   };
@@ -93,12 +104,8 @@ const UploadWorkspace = () => {
   const [uploading, setUploading] = useState(false);
   const notify = useSnackbar();
   const storage = useCloudStorageInstance();
-  const { open: openUploadWorkspaceModal, close: closeUploadWorkspaceDialog } = useSurface(
-    ExportWorkspace,
-    {
-      title: "Upload Workspace",
-    },
-  );
+  const { open: openUploadWorkspaceModal, close: closeUploadWorkspaceDialog } =
+    useSurface(ExportWorkspace, { title: "Upload Workspace" });
 
   const handleUpload = async () => {
     try {
@@ -117,7 +124,7 @@ const UploadWorkspace = () => {
 
   return (
     <Stack sx={{ width: "100%", gap: 2 }}>
-      <Typography variant="overline" color="text.secondary">
+      <Typography variant="overline" color="textSecondary">
         Share this workspace
       </Typography>
       <Button
@@ -165,7 +172,7 @@ const WorkspacesEditor = () => {
   return (
     <Stack ref={ref as Ref<HTMLDivElement>}>
       {!!storage &&
-        (storage?.auth?.authenticated ? (
+        (storage?.auth?.authenticated ?
           <Stack
             direction={dual ? "row" : "column"}
             sx={{
@@ -175,7 +182,8 @@ const WorkspacesEditor = () => {
               gap: padding,
               mx: "auto",
               // Subtract height of app bar
-              minHeight: (t) => `calc(${height} - ${t.spacing(isViewTree ? 0 : 6)})`,
+              minHeight: (t) =>
+                `calc(${height} - ${t.spacing(isViewTree ? 0 : 6)})`,
               width: "100%",
             }}
           >
@@ -192,14 +200,17 @@ const WorkspacesEditor = () => {
                 }),
               }}
             >
-              <Typography variant="overline" color="text.secondary">
+              <Typography variant="overline" color="textSecondary">
                 {storage.meta.name} account
               </Typography>
               <ListItem disablePadding>
                 <ListItemAvatar>
                   <Avatar src={storage?.auth?.user?.profile} />
                 </ListItemAvatar>
-                <ListItemText primary={storage?.auth?.user?.name} secondary="Signed in" />
+                <ListItemText
+                  primary={storage?.auth?.user?.name}
+                  secondary="Signed in"
+                />
                 <PopupState variant="popover">
                   {(state) => (
                     <>
@@ -207,7 +218,9 @@ const WorkspacesEditor = () => {
                         {...bindTrigger(state)}
                         label="Account options"
                         edge="end"
-                        icon={<MoreVertOutlined color="action" fontSize="small" />}
+                        icon={
+                          <MoreVertOutlined color="action" fontSize="small" />
+                        }
                       />
                       <Menu
                         {...bindMenu(state)}
@@ -215,10 +228,7 @@ const WorkspacesEditor = () => {
                           horizontal: "right",
                           vertical: "top",
                         }}
-                        anchorOrigin={{
-                          horizontal: "right",
-                          vertical: "top",
-                        }}
+                        anchorOrigin={{ horizontal: "right", vertical: "top" }}
                       >
                         <MenuItem
                           dense
@@ -238,22 +248,24 @@ const WorkspacesEditor = () => {
               </ListItem>
               <UploadWorkspace />
             </Stack>
-            {dual && <Divider sx={{ my: -2 }} orientation="vertical" flexItem />}
+            {dual && (
+              <Divider sx={{ my: -2 }} orientation="vertical" flexItem />
+            )}
             <Stack sx={{ gap: 2, width: "100%", flex: 1 }}>
-              <Typography variant="overline" color="text.secondary">
+              <Typography variant="overline" color="textSecondary">
                 Available workspaces
               </Typography>
-              {loadingSavedFilesMetaData ? (
+              {loadingSavedFilesMetaData ?
                 <CircularProgress size={30} />
-              ) : list.length ? (
+              : list.length ?
                 <FileList fileMetaDataList={list} />
-              ) : (
-                <Typography color="text.secondary">No workspaces found</Typography>
-              )}
+              : <Typography color="textSecondary">
+                  No workspaces found
+                </Typography>
+              }
             </Stack>
           </Stack>
-        ) : (
-          <Stack
+        : <Stack
             sx={{
               p: sm ? 2 : 3,
               gap: 1,
@@ -261,21 +273,28 @@ const WorkspacesEditor = () => {
               justifyContent: "center",
               pb: 24,
               textAlign: "center",
-              minHeight: (t) => `calc(${height} - ${t.spacing(isViewTree ? 0 : 6)})`,
+              minHeight: (t) =>
+                `calc(${height} - ${t.spacing(isViewTree ? 0 : 6)})`,
             }}
           >
-            <Box sx={{ width: "100%", maxWidth: 380, p: 4 }} component="img" src={share} />
+            <Box
+              sx={{ width: "100%", maxWidth: 380, p: 4 }}
+              component="img"
+              src={share}
+            />
             <Stack sx={{ gap: 1, mb: 8, alignItems: "center", maxWidth: 460 }}>
-              <Typography variant="h6">Store your visualisations in the cloud</Typography>
-              <Typography variant="body1" color="text.secondary">
-                Share, collaborate, and showcase your work effortlessly. Save your workspaces to the
-                cloud to easily share with others—or simply use it for secure file storage.
+              <Typography variant="h6">
+                Store your visualisations in the cloud
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                Share, collaborate, and showcase your work effortlessly. Save
+                your workspaces to the cloud to easily share with others—or
+                simply use it for secure file storage.
               </Typography>
             </Stack>
             {storage.meta.loginUI?.(storage.instance)}
             <Button variant="text">Other sign in options</Button>
-          </Stack>
-        ))}
+          </Stack>)}
     </Stack>
   );
 };

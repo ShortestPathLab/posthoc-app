@@ -12,7 +12,11 @@ import { getControllers } from "layers/layerControllers";
 import { useOne } from "slices/useOne";
 
 export function LayerListEditor() {
-  const layers = useOne(slice.layers, (l) => map(l, (l) => pick(l, "key")), isEqual);
+  const layers = useOne(
+    slice.layers,
+    (l) => map(l, (l) => pick(l, "key")),
+    isEqual,
+  );
   return (
     <Box sx={{ overflow: "auto hidden", width: "100%" }}>
       <Box sx={{ mb: 2 }}>
@@ -30,15 +34,17 @@ export function LayerListEditor() {
               {extras}
             </>
           )}
-          create={() => ({
-            source: { type: head(keys(getControllers())) },
-          })}
+          create={() => ({ source: { type: head(keys(getControllers())) } })}
           onChange={(v) => startTransition(() => slice.layers.set(v))}
           addItemLabel="Layer"
           placeholder={<Box sx={{ pt: 2 }}>Get started by adding a layer.</Box>}
           onFocus={(key) => {
             const element = head(document.getElementsByClassName(key));
-            if (element && "click" in element && typeof element.click === "function") {
+            if (
+              element &&
+              "click" in element &&
+              typeof element.click === "function"
+            ) {
               element.click();
             }
           }}
@@ -55,14 +61,8 @@ function LayerListEditorExtras({ layer }: { layer?: string }) {
         <>
           <Menu
             {...bindMenu(state)}
-            transformOrigin={{
-              horizontal: "right",
-              vertical: "top",
-            }}
-            anchorOrigin={{
-              horizontal: "right",
-              vertical: "bottom",
-            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
             <MenuList dense sx={{ p: 0 }}>
               {[
@@ -72,7 +72,11 @@ function LayerListEditorExtras({ layer }: { layer?: string }) {
                   action: () =>
                     slice.layers.set(
                       (l) =>
-                        void forEach(l, (s) => (s.viewKey = s.key === layer ? id() : undefined)),
+                        void forEach(
+                          l,
+                          (s) =>
+                            (s.viewKey = s.key === layer ? id() : undefined),
+                        ),
                     ),
                 },
               ].map(({ name, key, action }) => (
@@ -88,7 +92,10 @@ function LayerListEditorExtras({ layer }: { layer?: string }) {
               ))}
             </MenuList>
           </Menu>
-          <IconButton {...bindTrigger(state)} sx={{ color: (t) => t.palette.text.secondary }}>
+          <IconButton
+            {...bindTrigger(state)}
+            sx={{ color: (t) => t.palette.text.secondary }}
+          >
             <MoreVertOutlined />
           </IconButton>
         </>

@@ -19,11 +19,7 @@ export function LabeledHandle({
   return (
     <Stack
       direction={type === "source" ? "row-reverse" : "row"}
-      sx={{
-        alignItems: "center",
-        justifyContent: "flex-start",
-        width: "100%",
-      }}
+      sx={{ alignItems: "center", justifyContent: "flex-start", width: "100%" }}
     >
       <Handle
         type={type}
@@ -32,13 +28,24 @@ export function LabeledHandle({
       />
 
       <Tooltip title={description}>
-        {!isUndefined(value) ? (
-          <TextField size="small" variant="filled" label={label} defaultValue={value} fullWidth />
-        ) : (
-          <Typography variant="body2" sx={{ color: "text.secondary", whiteSpace: "nowrap" }}>
+        {!isUndefined(value) ?
+          <TextField
+            size="small"
+            variant="filled"
+            label={label}
+            defaultValue={value}
+            fullWidth
+          />
+        : <Typography
+            variant="body2"
+            sx={{
+              color: (t) => t.palette.text.secondary,
+              whiteSpace: "nowrap",
+            }}
+          >
             {label}
           </Typography>
-        )}
+        }
       </Tooltip>
     </Stack>
   );
