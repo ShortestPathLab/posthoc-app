@@ -1,7 +1,8 @@
 import { MoreVertOutlined } from "@mui-symbols-material/w400";
 import { Box, IconButton, Menu, MenuItem, MenuList } from "@mui/material";
 import { ListEditor } from "components/generic/list-editor/ListEditor";
-import { each, head, isEqual, keys, map, pick } from "lodash-es";
+import { isEqual } from "es-toolkit";
+import { forEach, head, keys, map, pick } from "es-toolkit/compat";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { nanoid as id } from "nanoid";
 import { startTransition } from "react";
@@ -70,7 +71,8 @@ function LayerListEditorExtras({ layer }: { layer?: string }) {
                   key: "fit-layer",
                   action: () =>
                     slice.layers.set(
-                      (l) => void each(l, (s) => (s.viewKey = s.key === layer ? id() : undefined)),
+                      (l) =>
+                        void forEach(l, (s) => (s.viewKey = s.key === layer ? id() : undefined)),
                     ),
                 },
               ].map(({ name, key, action }) => (

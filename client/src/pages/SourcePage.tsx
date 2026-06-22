@@ -7,7 +7,8 @@ import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useMonacoTheme } from "components/script-editor/ScriptEditor";
 import { useOptimistic } from "hooks/useOptimistic";
 import { getController } from "layers/layerControllers";
-import { find, first, flatMap, isEqual, isObject, map } from "lodash-es";
+import { isEqual } from "es-toolkit";
+import { find, flatMap, head, isObject, map } from "es-toolkit/compat";
 import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { slice } from "slices";
@@ -65,7 +66,7 @@ export function SourcePage({ template: Page }: PageContentProps) {
   const selected = useMemo(
     () =>
       find(sources, (c) => c && c.source.id === state?.source && c.layer === state?.layer) ??
-      first(sources),
+      head(sources),
     [sources, state?.source, state?.layer],
   );
   const handleEditorContentChange = useMemo(

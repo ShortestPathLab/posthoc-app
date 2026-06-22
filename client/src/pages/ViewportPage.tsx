@@ -14,7 +14,7 @@ import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import download from "downloadjs";
 import { inferLayerName } from "layers/inferLayerName";
-import { delay, every, filter, find, keyBy, map } from "lodash-es";
+import { delay, every, filter, find, keyBy, map } from "es-toolkit/compat";
 import { useEffect, useMemo, useState } from "react";
 import AutoSize from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";

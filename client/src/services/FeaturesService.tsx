@@ -6,12 +6,11 @@ import {
   keys,
   map,
   mapValues,
-  // map,
   mergeWith,
   reduce,
   uniqBy,
   values,
-} from "lodash-es";
+} from "es-toolkit/compat";
 import { map as mapAsync } from "promise-tools";
 import { useAsyncAbortable as useAsync } from "react-async-hook";
 import { Connection, useConnections } from "slices/connections";

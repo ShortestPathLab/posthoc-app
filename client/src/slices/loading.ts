@@ -1,5 +1,5 @@
 import { store } from "@davstack/store";
-import { some, values } from "lodash-es";
+import { some, values } from "es-toolkit/compat";
 import { useCallback } from "react";
 import { useOne } from "./useOne";
 

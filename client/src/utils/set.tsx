@@ -1,5 +1,5 @@
 import type { $, Booleans, Objects, Strings } from "hotscript";
-import { get as lodashGet } from "lodash-es";
+import { get as lodashGet } from "es-toolkit/compat";
 import type { PlainObject } from "moderndash";
 import { set as moderndashSet } from "moderndash";
 

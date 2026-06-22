@@ -1,4 +1,4 @@
-import { map, merge } from "lodash-es";
+import { map, merge } from "es-toolkit/compat";
 import { useMemo } from "react";
 import { useThrottle } from "react-use";
 

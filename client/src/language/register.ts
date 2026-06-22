@@ -1,4 +1,5 @@
-import { flatMap, isUndefined, join, map, once } from "lodash-es";
+import { isUndefined, once } from "es-toolkit";
+import { flatMap, join, map } from "es-toolkit/compat";
 import { MarkerSeverity, type default as Monaco, Range, type editor } from "monaco-editor";
 import { registerMarkerDataProvider } from "monaco-marker-data-provider";
 import { configureMonacoYaml } from "monaco-yaml";

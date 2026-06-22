@@ -11,7 +11,8 @@ import {
 } from "@mui/material";
 import { type Node, type NodeProps, useReactFlow } from "@xyflow/react";
 
-import { isUndefined, map, sumBy } from "lodash-es";
+import { isUndefined } from "es-toolkit";
+import { map, sumBy } from "es-toolkit/compat";
 import { FlowData, Properties, TransformationNodeConfig } from "./flow";
 import { LabeledHandle } from "./LabeledHandle";
 import { ItemOptions, NodeBase } from "./NodeBase";

@@ -2,7 +2,8 @@ import { BlurOnOutlined as DisabledIcon, ViewInArOutlined } from "@mui-symbols-m
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { RenderLayer } from "layers/RenderLayer";
-import { clamp, find, floor, get, map, some } from "lodash-es";
+import { clamp } from "es-toolkit";
+import { find, floor, get, map, some } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 import { isStepsLayer } from "pages/steps/StepsLayer";
 import { Size } from "protocol";

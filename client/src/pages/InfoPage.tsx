@@ -5,7 +5,7 @@ import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { map } from "lodash-es";
+import { map } from "es-toolkit/compat";
 import { useLog } from "slices/log";
 import { PageContentProps } from "./PageMeta";
 

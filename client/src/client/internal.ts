@@ -1,4 +1,4 @@
-import { entries, find, map, startCase } from "lodash-es";
+import { find, map, startCase, toPairs as entries } from "es-toolkit/compat";
 import { _ } from "utils/chain";
 import memoizee from "memoizee";
 import { Scheme } from "protocol/SolveTask";

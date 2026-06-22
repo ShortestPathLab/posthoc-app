@@ -1,5 +1,5 @@
 import { fileDialog as file } from "file-select-dialog";
-import { find, startCase } from "lodash-es";
+import { find, startCase } from "es-toolkit/compat";
 import { nanoid as id } from "nanoid";
 import { Feature, FeatureDescriptor } from "protocol/FeatureQuery";
 import { Trace } from "protocol/Trace-v140";

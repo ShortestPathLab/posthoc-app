@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { once } from "lodash";
+import { once } from "es-toolkit";
 import { resolve } from "path";
 import { cwd, env } from "process";
 import { parse } from "yaml";

@@ -1,6 +1,6 @@
 import { createServer as createHTTPServer } from "http";
 import { JSONRPCServer } from "json-rpc-2.0";
-import { forEach } from "lodash";
+import { forEach } from "es-toolkit/compat";
 import { Method, Request } from "protocol/Message";
 import { Server as WebSocketServer } from "socket.io";
 import express from "express";

@@ -3,21 +3,20 @@ import interpolate from "color-interpolate";
 import { getColorHex } from "components/renderer/colors";
 import { MultiDirectedGraph } from "graphology";
 import { Highlighting, highlightNodesOptions, Subtree } from "hooks/useHighlight";
+import { isNumber, trimStart } from "es-toolkit";
 import {
   forEach,
   forEachRight,
   forOwn,
   get,
   isEmpty,
-  isNumber,
   map,
   max,
   min,
   slice,
   startCase,
-  trimStart,
   truncate,
-} from "lodash-es";
+} from "es-toolkit/compat";
 import memoizee from "memoizee";
 import { TraceEvent } from "protocol/Trace-v140";
 import { useMemo } from "react";

@@ -1,4 +1,4 @@
-import { throttle } from "lodash-es";
+import { throttle } from "es-toolkit/compat";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { slice } from "slices";
 import sysend from "sysend";

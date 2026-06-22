@@ -1,4 +1,5 @@
-import { clamp, first, groupBy, last, mapValues, maxBy, mean, minBy, noop } from "lodash-es";
+import { clamp, last, mean, noop } from "es-toolkit";
+import { groupBy, head, mapValues, maxBy, minBy } from "es-toolkit/compat";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
@@ -53,7 +54,7 @@ function optimizeNetworkEdges(segments: number[][]) {
   while (true) {
     const byHead = _(
       xs,
-      (x) => groupBy(x, first),
+      (x) => groupBy(x, head),
       (x) => mapValues(x, toSet),
     );
     const byTail = _(

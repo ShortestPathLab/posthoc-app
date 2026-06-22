@@ -1,5 +1,6 @@
 import { writeFile as write } from "fs/promises";
-import { filter, indexOf, lastIndexOf, trimEnd } from "lodash";
+import { trimEnd } from "es-toolkit";
+import { filter, indexOf, lastIndexOf } from "es-toolkit/compat";
 import { Trace } from "protocol";
 import { PathfindingTaskInstance } from "protocol/SolveTask";
 import tempy from "tempy";

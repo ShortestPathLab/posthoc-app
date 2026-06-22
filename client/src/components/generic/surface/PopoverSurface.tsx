@@ -1,5 +1,5 @@
 import { Box, Popover } from "@mui/material";
-import { merge } from "lodash-es";
+import { merge } from "es-toolkit/compat";
 import { bindPopover } from "material-ui-popup-state";
 import { PopupState as State } from "material-ui-popup-state/hooks";
 import { ReactNode } from "react";

@@ -1,4 +1,4 @@
-import { filter, findLast, map } from "lodash-es";
+import { filter, findLast, map } from "es-toolkit/compat";
 import { Trace } from "protocol";
 import { useMemo, useState } from "react";
 import { Selection } from "./GraphEvents";

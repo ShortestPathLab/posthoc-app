@@ -11,20 +11,18 @@ import { Block, BlockProps } from "components/generic/Block";
 import { Property, renderProperty } from "components/generic/Property";
 import { Surface, SurfaceProps } from "components/generic/surface";
 import { useSm } from "hooks/useSmallDisplay";
+import { isNumber, isString, isUndefined } from "es-toolkit";
 import {
   constant,
-  entries,
   filter,
   indexOf,
-  isNumber,
-  isString,
-  isUndefined,
   map,
   merge,
   slice,
   sortBy,
   startCase,
-} from "lodash-es";
+  toPairs as entries,
+} from "es-toolkit/compat";
 import { Fragment } from "react";
 import { _ } from "utils/chain";
 

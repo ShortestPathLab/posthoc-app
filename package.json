@@ -35,5 +35,8 @@
     "adapter-warthog-websocket",
     "adapter-iron-harvest",
     "resources"
-  ]
+  ],
+  "dependencies": {
+    "typescript": "^7.0.1-rc"
+  }
 }

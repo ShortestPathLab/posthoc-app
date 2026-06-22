@@ -1,7 +1,7 @@
 import { Typography as Type } from "@mui/material";
 import { SelectMulti } from "components/generic/inputs/SelectMulti";
 import { Space } from "components/generic/Space";
-import { filter, head, map, startCase, truncate } from "lodash-es";
+import { filter, head, map, startCase, truncate } from "es-toolkit/compat";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactNode } from "react";
 import { FeaturePickerButton } from "./FeaturePickerButton";

@@ -5,7 +5,7 @@ import yamlWorker from "./yaml.worker?worker";
 import * as monaco from "monaco-editor";
 
 import { loader } from "@monaco-editor/react";
-import { once } from "lodash-es";
+import { once } from "es-toolkit";
 import memoizee from "memoizee";
 
 self.MonacoEnvironment = {

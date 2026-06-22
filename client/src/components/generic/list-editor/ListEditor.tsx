@@ -2,19 +2,8 @@ import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { AddOutlined as Add } from "@mui-symbols-material/w400";
 import { Box, ButtonProps, Collapse, Stack, Typography } from "@mui/material";
 
-import {
-  defer,
-  filter,
-  find,
-  findIndex,
-  last,
-  map,
-  noop,
-  pick,
-  pull,
-  set,
-  sortBy,
-} from "lodash-es";
+import { last, noop } from "es-toolkit";
+import { defer, filter, find, findIndex, map, pick, pull, set, sortBy } from "es-toolkit/compat";
 import { nanoid as id } from "nanoid";
 
 import { EditorProps } from "components/Editor";

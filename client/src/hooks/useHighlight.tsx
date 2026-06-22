@@ -1,7 +1,8 @@
 import { isTraceLayer } from "layers/trace/isTraceLayer";
 import { makePathIndex, Node } from "layers/trace/makePathIndex";
 import { TraceLayerData } from "layers/trace/TraceLayer";
-import { find, findLastIndex, forEach, forOwn, groupBy, isUndefined, keys, noop } from "lodash-es";
+import { isUndefined, noop } from "es-toolkit";
+import { find, findLastIndex, forEach, forOwn, groupBy, keys } from "es-toolkit/compat";
 import { useCallback } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";

@@ -1,4 +1,5 @@
-import { lowerFirst, merge } from "lodash-es";
+import { lowerFirst } from "es-toolkit";
+import { merge } from "es-toolkit/compat";
 import { Overloads } from "utils/Overloads";
 import { ResponseCodeError } from "./ResponseCodeError";
 

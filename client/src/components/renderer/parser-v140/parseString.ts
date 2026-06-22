@@ -1,4 +1,4 @@
-import { join } from "lodash-es";
+import { join } from "es-toolkit/compat";
 import memo from "memoizee";
 import {
   evaluateParsedString as evaluateTemplate,

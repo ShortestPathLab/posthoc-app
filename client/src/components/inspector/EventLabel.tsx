@@ -1,4 +1,4 @@
-import { startCase } from "lodash-es";
+import { startCase } from "es-toolkit/compat";
 import { TraceEvent } from "protocol/Trace";
 
 export function EventLabel({ event }: { event?: TraceEvent }) {

@@ -1,5 +1,6 @@
 import { EqualityChecker, StoreApi } from "@davstack/store";
-import { find, findIndex, get, identity, isEqual, isFunction } from "lodash-es";
+import { isEqual, isFunction } from "es-toolkit";
+import { find, findIndex, get, identity } from "es-toolkit/compat";
 import { ReactNode } from "react";
 import { useOne } from "./useOne";
 

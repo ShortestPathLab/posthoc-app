@@ -1,4 +1,4 @@
-import { isEqual } from "lodash-es";
+import { isEqual } from "es-toolkit";
 import { layers } from "slices/layers";
 import { useOne } from "slices/useOne";
 import { TreeLayer } from "./TreeLayer";

@@ -4,7 +4,7 @@ import {
   JSONRPCServer,
   JSONRPCResponse as Response,
 } from "json-rpc-2.0";
-import { forEach, map } from "lodash";
+import { forEach, map } from "es-toolkit/compat";
 import { Method, Request, RequestOf } from "protocol/Message";
 import { Server as WebSocketServer } from "socket.io";
 import express from "express";

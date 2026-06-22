@@ -1,4 +1,4 @@
-import { identity, maxBy, minBy } from "lodash-es";
+import { identity, maxBy, minBy } from "es-toolkit/compat";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";

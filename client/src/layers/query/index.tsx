@@ -2,7 +2,7 @@ import { RouteOutlined } from "@mui-symbols-material/w400";
 import { LayerController } from "layers";
 import { controller as traceController } from "layers/trace";
 import { TraceLayerData } from "layers/trace/TraceLayer";
-import { omit } from "lodash-es";
+import { omit } from "es-toolkit/compat";
 import { compress } from "./compress";
 import { editor } from "./editor";
 import { getSources } from "./getSources";

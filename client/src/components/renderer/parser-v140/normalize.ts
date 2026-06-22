@@ -1,4 +1,4 @@
-import { isFunction } from "lodash-es";
+import { isFunction } from "es-toolkit";
 import { Properties as Props } from "protocol";
 import { Context, PropMap } from "./Context";
 import { mapProperties } from "./mapProperties";

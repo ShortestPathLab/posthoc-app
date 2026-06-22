@@ -1,4 +1,4 @@
-import { indexOf, split } from "lodash-es";
+import { indexOf, split } from "es-toolkit/compat";
 import { _ } from "utils/chain";
 
 export const gradient =

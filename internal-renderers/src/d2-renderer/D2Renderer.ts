@@ -1,17 +1,5 @@
-import {
-  ceil,
-  clamp,
-  defer,
-  find,
-  floor,
-  forEach,
-  isEqual,
-  map,
-  now,
-  once,
-  throttle,
-  times,
-} from "lodash-es";
+import { clamp, isEqual, once } from "es-toolkit";
+import { ceil, defer, find, floor, forEach, map, now, throttle, times } from "es-toolkit/compat";
 import { nanoid, random } from "nanoid";
 import { Viewport } from "pixi-viewport";
 import * as PIXI from "pixi.js";

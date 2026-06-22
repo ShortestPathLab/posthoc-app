@@ -1,5 +1,5 @@
 import { custom, isTraceFormat, readUploadedTrace } from "components/app-bar/upload";
-import { get, startCase } from "lodash-es";
+import { get, startCase } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 import { name } from "utils/path";
 import { Controller } from "./types";

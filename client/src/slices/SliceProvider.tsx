@@ -1,4 +1,5 @@
-import { flow, map, reduce } from "lodash-es";
+import { flow } from "es-toolkit";
+import { map, reduce } from "es-toolkit/compat";
 import { cloneElement, createElement, FunctionComponent, ReactNode } from "react";
 
 type SliceProviderProps = {

@@ -1,4 +1,4 @@
-import { first, keys } from "lodash-es";
+import { head, keys } from "es-toolkit/compat";
 import { IPCTransport } from "./IPCTransport";
 import { NativeTransport } from "./NativeTransport";
 import { SocketIOTransport } from "./SocketIOTransport";
@@ -19,4 +19,4 @@ export function getTransport(key: string) {
   return transports[key].constructor;
 }
 
-export const defaultTransport = first(keys(transports))!;
+export const defaultTransport = head(keys(transports))!;

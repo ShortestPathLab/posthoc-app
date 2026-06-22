@@ -1,4 +1,4 @@
-import { keyBy } from "lodash";
+import { keyBy } from "es-toolkit/compat";
 import { NameMethodMap } from "protocol";
 import { features } from "./methods/features";
 import { general } from "./methods/general";

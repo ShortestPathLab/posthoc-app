@@ -1,27 +1,19 @@
 /// <reference types="vitest/config" />
 
-import react from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import path from "path";
-import { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
-import viteTsconfigPaths from "vite-tsconfig-paths";
-
-const ReactCompilerConfig = {
-  /* ... */
-};
 
 export default defineConfig(({ mode }) => ({
   root: path.join(process.cwd(), "./src"),
   publicDir: mode === "development" ? "public-dev" : "public",
   base: "./",
   build: { outDir: path.join(process.cwd(), "./dist") },
+  resolve: { tsconfigPaths: true },
   plugins: [
-    viteTsconfigPaths(),
-    react({
-      babel: {
-        plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
-      },
-    }) as Plugin[],
+    react(),
+    babel({ presets: [reactCompilerPreset()] }),
     {
       name: "configure-response-headers",
       configureServer: (server) => {
@@ -49,6 +41,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   worker: {
-    plugins: () => [viteTsconfigPaths()],
+    plugins: () => [],
   },
 }));

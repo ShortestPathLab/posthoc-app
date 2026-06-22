@@ -1,5 +1,5 @@
 import { store } from "@davstack/store";
-import { keys } from "lodash-es";
+import { keys } from "es-toolkit/compat";
 import type { pages } from "pages";
 import { cloudStorageProviders } from "services/cloud-storage";
 import { AccentColor } from "theme";

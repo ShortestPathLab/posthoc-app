@@ -1,6 +1,7 @@
 import { CloseOutlined as CloseIcon } from "@mui-symbols-material/w400";
 import { Button, IconButton, Snackbar } from "@mui/material";
-import { filter, noop } from "lodash-es";
+import { noop } from "es-toolkit";
+import { filter } from "es-toolkit/compat";
 import { Label } from "./Label";
 import { useLog } from "slices/log";
 import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";

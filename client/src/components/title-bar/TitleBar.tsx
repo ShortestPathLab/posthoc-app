@@ -26,7 +26,7 @@ import { fileDialog as file } from "file-select-dialog";
 import { useOverlayWindowControls } from "hooks/useOverlayWindowControls";
 import { useTitleBar } from "hooks/useTitleBar";
 import { useWorkspace } from "hooks/useWorkspace";
-import { get, startCase, times } from "lodash-es";
+import { get, startCase, times } from "es-toolkit/compat";
 import PopupState, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { isMobile } from "mobile-device-detect";
 import { nanoid as id } from "nanoid";

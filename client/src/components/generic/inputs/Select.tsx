@@ -1,5 +1,5 @@
 import { ListItemIcon, Menu, MenuItem, TextField, TextFieldProps, Tooltip } from "@mui/material";
-import { map } from "lodash-es";
+import { map } from "es-toolkit/compat";
 import State, { bindMenu, bindTrigger } from "material-ui-popup-state";
 import { ReactElement, ReactNode } from "react";
 

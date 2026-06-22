@@ -1,4 +1,4 @@
-import { map, mapValues } from "lodash-es";
+import { map, mapValues } from "es-toolkit/compat";
 import { Prop } from "./Context";
 import { parseString } from "./parseString";
 /**

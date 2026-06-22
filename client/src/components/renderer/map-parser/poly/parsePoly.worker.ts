@@ -1,4 +1,5 @@
-import { chunk, flatten, identity, maxBy, minBy } from "lodash-es";
+import { chunk, flatten } from "es-toolkit";
+import { identity, maxBy, minBy } from "es-toolkit/compat";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";

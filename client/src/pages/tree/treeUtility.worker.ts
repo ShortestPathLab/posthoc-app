@@ -1,4 +1,5 @@
-import { clone, entries, find, forEach, groupBy, sumBy, times } from "lodash-es";
+import { clone } from "es-toolkit";
+import { toPairs as entries, find, forEach, groupBy, sumBy, times } from "es-toolkit/compat";
 import { arrayToTree } from "performant-array-to-tree";
 import { Trace, TraceEvent } from "protocol";
 import { usingMessageHandler } from "workers/usingWorker";

@@ -1,4 +1,4 @@
-import { findLast, groupBy, mapValues, range } from "lodash-es";
+import { findLast, groupBy, mapValues, range } from "es-toolkit/compat";
 import { CompiledComponent, EventContext, TraceEvent } from "protocol";
 import { Trace } from "protocol/Trace-v140";
 import { ComponentEntry } from "renderer";

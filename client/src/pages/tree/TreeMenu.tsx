@@ -20,7 +20,7 @@ import { PropertyDialog } from "components/inspector/PropertyList";
 import { getColorHex } from "components/renderer/colors";
 import { highlightNodesOptions, useHighlightNodes } from "hooks/useHighlight";
 import { usePlaybackControls } from "hooks/usePlaybackState";
-import { findLast, map, startCase } from "lodash-es";
+import { findLast, map, startCase } from "es-toolkit/compat";
 import { WithLayer } from "slices/layers";
 import { getShade } from "theme";
 import { isDefined } from "./TreeGraph";

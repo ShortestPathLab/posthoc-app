@@ -1,4 +1,4 @@
-import { flatMap, map, mapValues, range } from "lodash-es";
+import { flatMap, map, mapValues, range } from "es-toolkit/compat";
 import {
   CompiledComponent,
   ComponentDefinition,

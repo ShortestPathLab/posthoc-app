@@ -2,7 +2,7 @@ import { Box, Chip, Switch, TextField, Tooltip, Typography as Type } from "@mui/
 import { Block } from "components/generic/Block";
 import { Surface } from "components/generic/surface";
 import { SelectField as Select } from "components/generic/inputs/Select";
-import { entries, find, join, omit, startCase } from "lodash-es";
+import { find, join, omit, startCase, toPairs as entries } from "es-toolkit/compat";
 import { transports } from "services/RendererService";
 import { merge } from "slices/reducers";
 import { useRenderers } from "slices/renderers";

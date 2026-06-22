@@ -1,4 +1,5 @@
-import { first, floor, join, last, map, split } from "lodash";
+import { last } from "es-toolkit";
+import { floor, head, join, map, split } from "es-toolkit/compat";
 import { nanoid as id } from "nanoid";
 import { Trace } from "protocol";
 import { ParamsOf } from "protocol/Message";
@@ -41,7 +42,7 @@ export function grid(m: string, path: string, { instances }: Params) {
 }
 
 function xy(_m: string, _path: string, { instances }: Params) {
-  const instance = first(instances);
+  const instance = head(instances);
   if (instance) {
     const { start = 0, end = 0 } = instance;
     return `p aux sp p2p 1\nq ${start + 1} ${end + 1}\n`;

@@ -5,7 +5,7 @@ import {
 import { getParser } from "components/renderer";
 import { inferLayerName } from "layers";
 import { controller as traceController } from "layers/trace";
-import { identity, merge, reduce } from "lodash-es";
+import { identity, merge, reduce } from "es-toolkit/compat";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { set } from "utils/set";

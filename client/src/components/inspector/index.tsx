@@ -3,7 +3,7 @@ import { Sidebar } from "Sidebar";
 import { Block, BlockProps } from "components/generic/Block";
 import { openWindow } from "components/title-bar/window";
 import { produce } from "immer";
-import { isEqual } from "lodash-es";
+import { isEqual } from "es-toolkit";
 import { isMobile } from "mobile-device-detect";
 import { pages } from "pages";
 import { Page } from "pages/Page";

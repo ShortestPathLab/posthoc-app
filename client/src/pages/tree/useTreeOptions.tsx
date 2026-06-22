@@ -1,5 +1,5 @@
 import { useStateWithKey } from "hooks/useStateWithKey";
-import { has, head, keys } from "lodash-es";
+import { has, head, keys } from "es-toolkit/compat";
 import { useState } from "react";
 import { layoutModes, SYMBOL_METRIC_STEP } from "./ScatterPlotControls";
 import { useComputeLabels } from "./TreeUtility";

@@ -1,4 +1,4 @@
-import { find } from "lodash-es";
+import { find } from "es-toolkit/compat";
 import { Connection } from "slices/connections";
 
 export async function findConnection(connections: Connection[], algorithm: string, format: string) {

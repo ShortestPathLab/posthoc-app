@@ -1,4 +1,4 @@
-import { entries } from "lodash-es";
+import { toPairs as entries } from "es-toolkit/compat";
 import { createFlowNodeDefinition, FlowData, Properties, TransformationNodeConfig } from "./flow";
 import { GoToDefinitionButton } from "./GoToDefinitionButton";
 

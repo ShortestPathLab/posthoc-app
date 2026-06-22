@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { D2Renderer } from "d2-renderer";
-import { times } from "lodash-es";
+import { times } from "es-toolkit/compat";
 
 const { meta, constructor } = D2Renderer;
 

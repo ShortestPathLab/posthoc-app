@@ -2,7 +2,8 @@ import { _ } from "utils/chain";
 import { getValue } from "./gradient";
 import { ParseGridWorkerParameters } from "./parseGrid.worker";
 import { usingMessageHandler } from "workers/usingWorker";
-import { join, map, split, trim, uniq } from "lodash-es";
+import { trim, uniq } from "es-toolkit";
+import { join, map, split } from "es-toolkit/compat";
 
 export type GetGridSymbolsReturnType = {
   symbols: { symbol: string; value: number }[];

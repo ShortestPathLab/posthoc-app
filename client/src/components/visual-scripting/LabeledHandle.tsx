@@ -1,6 +1,6 @@
 import { Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { Handle, HandleProps, Position } from "@xyflow/react";
-import { isUndefined } from "lodash-es";
+import { isUndefined } from "es-toolkit";
 
 export type LabeledHandleProps = Partial<HandleProps> & {
   value?: string;

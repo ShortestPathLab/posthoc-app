@@ -1,5 +1,5 @@
 import { Typography as Type } from "@mui/material";
-import { constant, identity } from "lodash-es";
+import { constant, identity } from "es-toolkit/compat";
 import memo from "memoizee";
 import { byPoint } from "../../NodeMatcher";
 import { MapEditor, MapParser, ParsedMap, ParsedMapHydrator } from "../Parser";

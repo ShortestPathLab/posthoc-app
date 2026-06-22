@@ -1,4 +1,4 @@
-import { once } from "lodash";
+import { once } from "es-toolkit";
 import { resolve } from "path";
 import { env, cwd } from "process";
 import { parse } from "yaml";

@@ -1,5 +1,5 @@
 import { createMethod } from "./createMethod";
-import { entries, keys, map, memoize as memo, startCase } from "lodash";
+import { keys, map, memoize as memo, startCase, toPairs as entries } from "es-toolkit/compat";
 import { algorithms } from "../core/algorithms";
 import { handlers } from "../core/scenario";
 

@@ -1,4 +1,4 @@
-import { noop } from "lodash-es";
+import { noop } from "es-toolkit";
 import { nanoid } from "nanoid";
 import {
   ReactNode,

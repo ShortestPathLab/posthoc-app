@@ -1,5 +1,5 @@
 import { useSnackbar } from "components/generic/Snackbar";
-import { get } from "lodash-es";
+import { get } from "es-toolkit/compat";
 import pluralize from "pluralize";
 import { useMemo } from "react";
 import { useLoadingState } from "slices/loading";

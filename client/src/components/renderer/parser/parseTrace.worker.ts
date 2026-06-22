@@ -1,4 +1,5 @@
-import { ceil, flatMap, flatten, map, range } from "lodash-es";
+import { flatten } from "es-toolkit";
+import { ceil, flatMap, map, range } from "es-toolkit/compat";
 import { usingMessageHandler, usingWorkerTask } from "workers/usingWorker";
 import { ParseTraceWorkerParameters, ParseTraceWorkerReturnType } from "./ParseTraceSlaveWorker";
 import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";

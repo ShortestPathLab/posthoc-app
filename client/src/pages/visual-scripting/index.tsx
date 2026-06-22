@@ -16,7 +16,6 @@ import { transforms } from "components/visual-scripting/NodeConfigs";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Layer, useLayerPicker } from "slices/layers";
 import { PageContentProps } from "../PageMeta";
-
 import { AddOutlined } from "@mui-symbols-material/w400";
 import { TabContext, TabList } from "@mui/lab";
 import {
@@ -41,7 +40,9 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { traceToNodes } from "components/visual-scripting/traceToNodes";
 import { TraceLayerData } from "layers/trace/TraceLayer";
 import { isTraceLayer } from "layers/trace/isTraceLayer";
-import { chain, entries, head, keys, map, startCase } from "lodash-es";
+
+import { groupBy, head, keys, map, omitBy, startCase, toPairs as entries } from "es-toolkit/compat";
+import { flow } from "utils/chain";
 import { bindTrigger } from "material-ui-popup-state";
 import { nanoid } from "nanoid";
 import { TraceComponent } from "protocol/Trace-v140";
@@ -262,57 +263,59 @@ export function VisualPage({ template: Page }: PageContentProps) {
                     >
                       {(state) => (
                         <MenuList>
-                          {chain([
-                            ...entries(transforms),
-                            ...entries(content?.views).map(
-                              ([k, v]) =>
-                                [
-                                  k,
-                                  () => ({
-                                    key: "component",
-                                    title: k,
-                                    group: "components",
-                                  }),
-                                ] as const,
-                            ),
-                          ])
-                            .map(([k, v]) => [k, v()] as const)
-                            .groupBy(([, v]) => v.group)
-                            .omitBy((vs, k) => k === "hidden")
-                            .map((vs, group) => (
-                              <>
-                                <MenuItem disabled>
-                                  <Typography variant="overline">{startCase(group)}</Typography>
-                                </MenuItem>
-                                {map(vs, ([k, v], i) => (
-                                  <MenuItem
-                                    key={i}
-                                    onClick={() => {
-                                      state.close();
-                                      onChange?.((s) => {
-                                        const id = `n${+new Date()}`;
-                                        s.nodes = s.nodes ?? [];
-                                        s.nodes?.push?.({
-                                          id,
-                                          type: "flow",
-                                          data: {
-                                            type: k,
-                                            key: id,
-                                          },
-                                          position: {
-                                            x: Math.random() * 400,
-                                            y: Math.random() * 400,
-                                          },
-                                        });
-                                      });
-                                    }}
-                                  >
-                                    <ListItemText primary={v.title} secondary={v.description} />
+                          {flow(
+                            [
+                              ...entries(transforms),
+                              ...entries(content?.views).map(
+                                ([k, v]) =>
+                                  [
+                                    k,
+                                    () => ({
+                                      key: "component",
+                                      title: k,
+                                      group: "components",
+                                    }),
+                                  ] as const,
+                              ),
+                            ],
+                            (xs) => xs.map(([k, v]) => [k, v()] as const),
+                            (xs) => groupBy(xs, ([, v]) => v.group),
+                            (groups) => omitBy(groups, (vs, k) => k === "hidden"),
+                            (groups) =>
+                              map(groups, (vs, group) => (
+                                <>
+                                  <MenuItem disabled>
+                                    <Typography variant="overline">{startCase(group)}</Typography>
                                   </MenuItem>
-                                ))}
-                              </>
-                            ))
-                            .value()}
+                                  {map(vs, ([k, v], i) => (
+                                    <MenuItem
+                                      key={i}
+                                      onClick={() => {
+                                        state.close();
+                                        onChange?.((s) => {
+                                          const id = `n${+new Date()}`;
+                                          s.nodes = s.nodes ?? [];
+                                          s.nodes?.push?.({
+                                            id,
+                                            type: "flow",
+                                            data: {
+                                              type: k,
+                                              key: id,
+                                            },
+                                            position: {
+                                              x: Math.random() * 400,
+                                              y: Math.random() * 400,
+                                            },
+                                          });
+                                        });
+                                      }}
+                                    >
+                                      <ListItemText primary={v.title} secondary={v.description} />
+                                    </MenuItem>
+                                  ))}
+                                </>
+                              )),
+                          )}
                         </MenuList>
                       )}
                     </Surface>

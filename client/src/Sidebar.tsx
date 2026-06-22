@@ -1,7 +1,7 @@
 import { TabContext, TabList } from "@mui/lab";
 import { Box, Divider, Skeleton, Stack, Tab, Tooltip, useTheme } from "@mui/material";
 import interpolate from "color-interpolate";
-import { times, values } from "lodash-es";
+import { times, values } from "es-toolkit/compat";
 import { isMobile } from "mobile-device-detect";
 import { pages } from "pages";
 import { useMemo } from "react";

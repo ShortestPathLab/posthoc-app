@@ -1,5 +1,5 @@
 import type { Comparator } from "hooks/Comparator";
-import { findLast, get } from "lodash-es";
+import { findLast, get } from "es-toolkit/compat";
 
 export const comparators: Comparator[] = [
   {

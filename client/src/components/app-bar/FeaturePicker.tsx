@@ -1,7 +1,7 @@
 import { ButtonProps, Stack, SxProps, Typography as Type, useTheme } from "@mui/material";
 import { Select } from "components/generic/inputs/Select";
 import { Space } from "components/generic/Space";
-import { filter, find, map, startCase, truncate } from "lodash-es";
+import { filter, find, map, startCase, truncate } from "es-toolkit/compat";
 import { FeatureDescriptor } from "protocol/FeatureQuery";
 import { ReactElement, ReactNode, cloneElement } from "react";
 import { AccentColor, getShade, usePaper } from "theme";

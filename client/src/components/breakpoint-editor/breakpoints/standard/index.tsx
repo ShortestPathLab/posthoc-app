@@ -1,4 +1,4 @@
-import { map } from "lodash-es";
+import { map } from "es-toolkit/compat";
 import { BreakpointHandler } from "../Breakpoint";
 import { comparators } from "../../comparators";
 import { ConditionSelect, EventSelect, PropertiesSelect, ReferenceInput } from "../../fields";

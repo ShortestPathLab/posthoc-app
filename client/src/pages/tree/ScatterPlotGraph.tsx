@@ -1,6 +1,6 @@
 import { useLoadGraph } from "@react-sigma/core";
 import { MultiDirectedGraph } from "graphology";
-import { isEmpty } from "lodash-es";
+import { isEmpty } from "es-toolkit/compat";
 import { TraceEvent } from "protocol/Trace-v140";
 import { useEffect, useMemo, useRef } from "react";
 import AxisOverlay, { createScatterScale, createSymlogScatterScale } from "./Axis";

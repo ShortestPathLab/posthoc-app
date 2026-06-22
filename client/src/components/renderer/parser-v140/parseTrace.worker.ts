@@ -1,4 +1,5 @@
-import { ceil, filter, flatten, get, map, range, values } from "lodash-es";
+import { flatten } from "es-toolkit";
+import { ceil, filter, get, map, range, values } from "es-toolkit/compat";
 import { CompiledComponent } from "protocol";
 import { ComponentEntry } from "renderer";
 import { usingMessageHandler, usingWorkerTask } from "workers/usingWorker";

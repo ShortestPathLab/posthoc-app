@@ -1,5 +1,5 @@
 import { SelectField as Select } from "components/generic/inputs/Select";
-import { head, startCase } from "lodash-es";
+import { head, startCase } from "es-toolkit/compat";
 import { BreakpointFieldProps } from "../breakpoints/Breakpoint";
 
 export const ConditionSelect = (props: BreakpointFieldProps<string>) => {

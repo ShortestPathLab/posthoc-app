@@ -30,7 +30,8 @@ import { useFullscreenModalContext } from "components/inspector/FullscreenModalH
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useSm } from "hooks/useSmallDisplay";
 import { useWorkspace } from "hooks/useWorkspace";
-import { entries, first, map, round, startCase, upperCase } from "lodash-es";
+import { round } from "es-toolkit";
+import { head, map, startCase, toPairs as entries, upperCase } from "es-toolkit/compat";
 import memoizee from "memoizee";
 import { docs, name } from "public/manifest.json";
 import { CSSProperties, ReactNode, useMemo, useState } from "react";
@@ -145,7 +146,7 @@ export function FeatureCardLoader({
         loading={loading}
         name={name}
         description={description ?? "No description"}
-        image={first(screenshots)}
+        image={head(screenshots)}
         author={author}
         onOpenClick={() => {
           onOpenClick?.(path);

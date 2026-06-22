@@ -1,6 +1,6 @@
 import { useTheme } from "@mui/material";
 import { MultiDirectedGraph } from "graphology";
-import { forEach } from "lodash-es";
+import { forEach } from "es-toolkit/compat";
 import { Trace } from "protocol";
 import { useMemo } from "react";
 import { getFinalParents } from "./getFinalParents";

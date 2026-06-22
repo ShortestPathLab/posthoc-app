@@ -12,17 +12,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "es-toolkit": "^1.48.1",
     "json-rpc-2.0": "^0.2.18",
-    "lodash": "^4.17.21",
     "lru-cache": "^6.0.0",
     "md5": "^2.3.0",
     "nanoid": "^5.0.1",
     "protocol": "workspace:*",
-    "typescript": "^4.4.4",
+    "typescript": "^7.0.1-rc",
     "warthog-bin": "github:ShortestPathLab/posthoc-adapter-warthog#wasm-bin"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.5",
     "@types/lru-cache": "^5.1.1",
     "@types/md5": "^2.3.1",
     "gh-pages": "^6.0.0",

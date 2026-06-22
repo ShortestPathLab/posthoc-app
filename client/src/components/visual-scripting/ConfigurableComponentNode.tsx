@@ -6,7 +6,7 @@ import * as React from "react";
 import { Fragment, useCallback } from "react";
 import { useAcrylic, usePaper } from "theme";
 
-import { map } from "lodash-es";
+import { map } from "es-toolkit/compat";
 import { LabeledHandle, LabeledHandleProps } from "./LabeledHandle";
 import TransformationMenu from "./TransformationMenu";
 import { NodeBase } from "./NodeBase";

@@ -1,4 +1,4 @@
-import { isArray, map, isObject, mapValues } from "lodash-es";
+import { isArray, isObject, map, mapValues } from "es-toolkit/compat";
 
 export function mapValuesDeep<T, U>(v: T, callback: (t: unknown) => any): U {
   return isArray(v)

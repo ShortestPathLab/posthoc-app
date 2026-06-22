@@ -1,5 +1,5 @@
 import interpolate from "color-interpolate";
-import { times } from "lodash-es";
+import { times } from "es-toolkit/compat";
 import memo from "memoizee";
 import { name } from "public/manifest.json";
 import { useEffect, useState } from "react";

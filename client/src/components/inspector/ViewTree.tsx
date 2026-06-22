@@ -3,18 +3,8 @@ import { DragIndicatorOutlined } from "@mui-symbols-material/w400";
 import { Box, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
 import { produce } from "immer";
-import {
-  clone,
-  filter,
-  find,
-  flatMap,
-  forEach,
-  isUndefined,
-  map,
-  pick,
-  sum,
-  sumBy,
-} from "lodash-es";
+import { clone, isUndefined } from "es-toolkit";
+import { filter, find, flatMap, forEach, map, pick, sum, sumBy } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 import { Context, createContext, ReactNode, Ref, useContext, useEffect, useMemo } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";

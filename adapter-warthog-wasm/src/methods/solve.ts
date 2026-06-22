@@ -1,4 +1,5 @@
-import { filter, trimEnd } from "lodash";
+import { trimEnd } from "es-toolkit";
+import { filter } from "es-toolkit/compat";
 import { Trace } from "protocol";
 import { PathfindingTaskInstance } from "protocol/SolveTask";
 import { getMap, parseURI } from "core/map";

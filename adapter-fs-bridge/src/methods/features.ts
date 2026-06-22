@@ -2,7 +2,7 @@ import { watch } from "chokidar";
 import { getConfig } from "config";
 import { readFile, stat } from "fs/promises";
 import glob from "glob-promise";
-import { defer, map, startCase } from "lodash";
+import { defer, map, startCase } from "es-toolkit/compat";
 import memo from "memoizee";
 import { resolve as _resolve, isAbsolute, join, parse, relative } from "path";
 import untildify from "untildify";

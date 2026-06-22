@@ -1,4 +1,5 @@
-import { chunk, join, map, split } from "lodash-es";
+import { chunk } from "es-toolkit";
+import { join, map, split } from "es-toolkit/compat";
 import { FunctionTemplate } from "./FunctionTemplate";
 
 type GenericFunctionTemplate = FunctionTemplate<[...any], any>;

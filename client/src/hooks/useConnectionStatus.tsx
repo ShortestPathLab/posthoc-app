@@ -1,4 +1,4 @@
-import { find } from "lodash-es";
+import { find } from "es-toolkit/compat";
 import { slice } from "slices";
 import { useConnectionResolver } from "./useConnectionResolver";
 import { useOne } from "slices/useOne";

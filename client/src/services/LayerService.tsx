@@ -1,5 +1,5 @@
 import { getController } from "layers/layerControllers";
-import { map } from "lodash-es";
+import { map } from "es-toolkit/compat";
 import { createElement, useMemo } from "react";
 import { slice } from "slices";
 import { useActive } from "./SyncService";

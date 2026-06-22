@@ -1,5 +1,6 @@
 import execSh from "exec-sh";
-import { entries, join, trim } from "lodash";
+import { trim } from "es-toolkit";
+import { toPairs as entries, join } from "es-toolkit/compat";
 
 const sh = execSh.promise;
 

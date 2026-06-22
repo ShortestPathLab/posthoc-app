@@ -1,6 +1,6 @@
 import { Box, Checkbox, CircularProgress, FormControlLabel, Stack, alpha } from "@mui/material";
 import { Scroll } from "components/generic/Scrollbars";
-import { head, values } from "lodash-es";
+import { head, values } from "es-toolkit/compat";
 import { ReactNode, useEffect } from "react";
 import { useAsync } from "react-async-hook";
 import { useMap } from "react-use";

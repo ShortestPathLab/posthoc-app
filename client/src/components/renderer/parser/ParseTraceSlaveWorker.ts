@@ -1,4 +1,5 @@
-import { findLast, groupBy, map, mapValues, negate, range } from "lodash-es";
+import { negate } from "es-toolkit";
+import { findLast, groupBy, map, mapValues, range } from "es-toolkit/compat";
 import { CompiledComponent, EventContext, Trace } from "protocol";
 import { ComponentEntry } from "renderer";
 import { _ } from "utils/chain";

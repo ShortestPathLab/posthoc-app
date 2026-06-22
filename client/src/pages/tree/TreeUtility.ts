@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { treeToDict } from "hooks/useBreakPoints";
+import { uniq } from "es-toolkit";
 import {
-  entries,
   every,
   filter,
   flatMap,
@@ -11,9 +11,9 @@ import {
   isPlainObject,
   map,
   mapValues,
-  uniq,
+  toPairs as entries,
   uniqBy,
-} from "lodash-es";
+} from "es-toolkit/compat";
 import { Trace } from "protocol/Trace";
 import { _ } from "utils/chain";
 import { usingMemoizedWorkerTask } from "workers/usingWorker";

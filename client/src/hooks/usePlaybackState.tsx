@@ -1,6 +1,7 @@
 import { PlaybackLayerData } from "components/app-bar/Playback";
 import { useSnackbar } from "components/generic/Snackbar";
-import { clamp, min, range, trimEnd } from "lodash-es";
+import { clamp, trimEnd } from "es-toolkit";
+import { min, range } from "es-toolkit/compat";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";

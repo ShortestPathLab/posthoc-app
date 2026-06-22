@@ -1,7 +1,8 @@
 import { createClient, RequestOptions } from "client/createHttpClient";
 import { Button } from "components/generic/inputs/Button";
 import { Lawnicon } from "components/generic/Lawnicon";
-import { defer, each, head, isString, now, once } from "lodash-es";
+import { isString, once } from "es-toolkit";
+import { defer, forEach, head, now } from "es-toolkit/compat";
 import { map } from "promise-tools";
 import {
   AuthError,
@@ -202,7 +203,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (getState,
         redirect_uri: `${window.location.origin}${window.location.pathname}`,
         client_id: clientId,
       };
-      each(params, (value, key) => {
+      forEach(params, (value, key) => {
         url.searchParams.append(key, value);
       });
       window.location.href = url.toString();
@@ -232,7 +233,7 @@ export const createGoogleStorageService: ProviderFactory<typeof id> = (getState,
         ),
         file,
       };
-      each(metadata, (value, key) => void form.append(key, value));
+      forEach(metadata, (value, key) => void form.append(key, value));
       const data = await multiPartApiClient.post<WorkspaceMeta>({
         label: "Save file",
         path: "?uploadType=multipart",

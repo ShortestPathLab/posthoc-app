@@ -1,5 +1,5 @@
 import { Backdrop, CircularProgress, Stack, Typography as Type } from "@mui/material";
-import { values } from "lodash-es";
+import { values } from "es-toolkit/compat";
 import { useBusy } from "slices/busy";
 import { useAcrylic } from "theme";
 

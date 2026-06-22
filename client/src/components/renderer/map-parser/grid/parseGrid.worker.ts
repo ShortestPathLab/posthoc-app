@@ -1,5 +1,6 @@
 import interpolate from "color-interpolate";
-import { last, map, range } from "lodash-es";
+import { last } from "es-toolkit";
+import { map, range } from "es-toolkit/compat";
 import { Point, Size } from "protocol";
 import { ParsedMap } from "../Parser";
 import { getGridSymbols } from "./getGridSymbols.worker";

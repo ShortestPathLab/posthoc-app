@@ -1,4 +1,5 @@
-import { delay, now, once } from "lodash-es";
+import { once } from "es-toolkit";
+import { delay, now } from "es-toolkit/compat";
 import { Request, Response } from "protocol/Message";
 import { Transport } from "client/Transport";
 

@@ -1,5 +1,6 @@
 import { exec } from "helpers/exec";
-import { constant, first, floor, join, last, map, split } from "lodash";
+import { last } from "es-toolkit";
+import { constant, floor, head, join, map, split } from "es-toolkit/compat";
 import { roadhog, warthog } from "pathfinding-binaries";
 import { Trace } from "protocol";
 import { ParamsOf } from "protocol/Message";
@@ -49,7 +50,7 @@ export const handlers = {
   xy: {
     template: xyTemplate,
     create: (_, { instances }) => {
-      const instance = first(instances);
+      const instance = head(instances);
       if (instance) {
         const { start = 0, end = 0 } = instance;
         return constant(`p aux sp p2p 1\nq ${start + 1} ${end + 1}\n`);

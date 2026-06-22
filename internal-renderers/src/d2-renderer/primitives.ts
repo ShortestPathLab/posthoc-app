@@ -1,7 +1,7 @@
 import { lineString, point } from "@turf/helpers";
 import dist from "@turf/point-to-line-distance";
 import { ColorTranslator } from "colortranslator";
-import { head, maxBy, minBy } from "lodash-es";
+import { head, maxBy, minBy } from "es-toolkit/compat";
 import { Bounds, Point, Size } from "protocol";
 import {
   CompiledD2IntrinsicComponent as CompiledD2Component,

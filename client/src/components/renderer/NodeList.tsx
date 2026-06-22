@@ -1,5 +1,5 @@
 import { useRendererInstance } from "components/inspector/TraceRenderer";
-import { floor, slice } from "lodash-es";
+import { floor, slice } from "es-toolkit/compat";
 import { useEffect, useMemo } from "react";
 import { ComponentEntry } from "renderer";
 

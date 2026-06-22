@@ -1,7 +1,7 @@
 import { useTheme } from "@mui/material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { getParser } from "components/renderer";
-import { get } from "lodash-es";
+import { get } from "es-toolkit/compat";
 import objectHash from "object-hash";
 import { useAsync } from "react-async-hook";
 import { Map } from "slices/UIState";

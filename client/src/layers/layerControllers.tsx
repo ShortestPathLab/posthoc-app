@@ -1,4 +1,4 @@
-import { once } from "lodash-es";
+import { once } from "es-toolkit";
 import { Layer } from "slices/layers";
 import { LayerController } from "./LayerController";
 import { controller as mapController } from "./map";

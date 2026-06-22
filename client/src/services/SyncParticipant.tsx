@@ -1,5 +1,6 @@
 import EventEmitter from "eventemitter3";
-import { filter, find, indexOf, isEqual, map, min, now, sortBy, throttle, uniq } from "lodash-es";
+import { isEqual, uniq } from "es-toolkit";
+import { filter, find, indexOf, map, min, now, sortBy, throttle } from "es-toolkit/compat";
 import sysend from "sysend";
 
 export const instance = sysend.id;

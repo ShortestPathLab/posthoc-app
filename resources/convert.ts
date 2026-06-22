@@ -1,7 +1,8 @@
 import { readFile, writeFile } from "fs/promises";
 import makeDir from "make-dir";
 import { globIterate } from "glob";
-import { endsWith, last } from "lodash";
+import { last } from "es-toolkit";
+import { endsWith } from "es-toolkit/compat";
 import { basename, resolve } from "path";
 import { argv } from "process";
 import beautify from "json-beautify";

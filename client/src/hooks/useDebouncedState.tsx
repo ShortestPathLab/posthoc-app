@@ -1,4 +1,5 @@
-import { noop, now } from "lodash-es";
+import { noop } from "es-toolkit";
+import { now } from "es-toolkit/compat";
 import { useRef, useState } from "react";
 
 export function useDebouncedState<T>(

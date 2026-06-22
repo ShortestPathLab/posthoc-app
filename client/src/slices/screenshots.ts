@@ -1,4 +1,5 @@
-import { filter, flow, isUndefined, keys, omit } from "lodash-es";
+import { flow, isUndefined } from "es-toolkit";
+import { filter, keys, omit } from "es-toolkit/compat";
 import { createSlice } from "./createSlice";
 import { merge } from "./reducers";
 

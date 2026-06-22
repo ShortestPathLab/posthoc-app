@@ -7,7 +7,7 @@ import {
   Theme,
   ThemeOptions,
 } from "@mui/material";
-import { constant, floor, times } from "lodash-es";
+import { constant, floor, times } from "es-toolkit/compat";
 import { slice } from "slices";
 import { useOne } from "slices/useOne";
 

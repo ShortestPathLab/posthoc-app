@@ -1,25 +1,7 @@
 import interpolate from "color-interpolate";
 import combinate from "combinate";
-import {
-  ceil,
-  floor,
-  forEach,
-  get,
-  groupBy,
-  head,
-  identity,
-  isEqual,
-  isNumber,
-  map,
-  once,
-  pick,
-  range,
-  shuffle,
-  sortBy,
-  throttle,
-  truncate,
-  values,
-} from "lodash-es";
+import { isEqual, isNumber, once } from "es-toolkit";
+import { ceil, floor, forEach, get, groupBy, head, identity, map, pick, range, shuffle, sortBy, throttle, truncate, values } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 import type { Bounds, Point, Size } from "protocol";
 import { ComponentEntry } from "renderer";

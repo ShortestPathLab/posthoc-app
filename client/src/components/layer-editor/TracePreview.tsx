@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { ScriptViewer } from "components/script-editor/ScriptEditor";
 import { dump } from "js-yaml";
-import { take } from "lodash-es";
+import { take } from "es-toolkit/compat";
 import { Trace } from "protocol";
 
 export function TracePreview({ trace, language = "yaml" }: { trace?: Trace; language?: string }) {

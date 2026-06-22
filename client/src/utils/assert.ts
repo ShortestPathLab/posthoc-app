@@ -1,4 +1,4 @@
-import { isNull, isString, isUndefined } from "lodash";
+import { isNull, isString, isUndefined } from "es-toolkit";
 
 export class AssertionError extends Error {
   constructor(message: string) {

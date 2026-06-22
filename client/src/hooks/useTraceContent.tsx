@@ -1,5 +1,5 @@
 import { useSnackbar } from "components/generic/Snackbar";
-import { find } from "lodash-es";
+import { find } from "es-toolkit/compat";
 import memo from "memoizee";
 import { useMemo } from "react";
 import { useAsync } from "react-async-hook";

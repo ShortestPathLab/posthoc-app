@@ -11,15 +11,8 @@ import { ComponentEntry, RemoveElementCallback } from "renderer";
 import { Bush } from "../d2-renderer/Bush";
 import { CompiledD2IntrinsicComponent } from "../d2-renderer/D2IntrinsicComponents";
 
-import {
-  constant,
-  debounce,
-  isNaN,
-  once,
-  pickBy,
-  reduce,
-  values,
-} from "lodash-es";
+import { once } from "es-toolkit";
+import { constant, debounce, isNaN, pickBy, reduce, values } from "es-toolkit/compat";
 import * as PIXI from "pixi.js";
 import { primitives } from "../d2-renderer/primitives";
 

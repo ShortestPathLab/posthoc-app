@@ -1,4 +1,4 @@
-import { isFunction } from "lodash-es";
+import { isFunction } from "es-toolkit";
 import { useEffect, useEffectEvent, useState } from "react";
 
 export function useStateWithKey<T>(key: string | undefined, initialiser: T | (() => T)) {

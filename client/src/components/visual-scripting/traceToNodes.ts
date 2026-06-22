@@ -1,6 +1,7 @@
 import { Edge, Node } from "@xyflow/react";
 import { parser } from "components/renderer/parser-v140/parseString";
-import { chain, entries, mapValues } from "lodash-es";
+import { toPairs as entries, flatMap, forEach, groupBy, mapValues } from "es-toolkit/compat";
+import { flow } from "utils/chain";
 import { TraceComponent } from "protocol/Trace-v140";
 import { Properties } from "./flow";
 import { getHeight } from "./FlowNode";
@@ -49,60 +50,60 @@ export const traceToNodes = (view: TraceComponent[]) => {
     });
   });
   // Add expression nodes and edges
-  chain(view)
-    .flatMap((n, i) => entries(n).map(([k, v]) => [i, k, v] as const))
+  flow(
+    view,
+    (v) =>
+      flatMap(v, (n, i) => entries(n).map(([k, val]) => [i, k, val] as [number, string, string])),
     // Don't want a property of "$"
-    .filter(([, property]) => property !== "$")
-    .groupBy(
-      // Deduplicate by value
-      // We just want one expression node per value
-      ([, , value]) => value,
-    )
-    .forEach((vs, i) => {
-      const [, property, value] = vs[0];
-      if (!hasExpression(value) && property !== "$for" && property !== "$info") {
-        // Does not need nodes if a constant
-        return;
-      }
-      if (property !== "$for") {
-        v.edges.push({
+    (vs) => vs.filter(([, property]) => property !== "$"),
+    // Deduplicate by value; we just want one expression node per value
+    (vs) => groupBy(vs, ([, , value]) => value),
+    (groups) =>
+      forEach(groups, (vs, i) => {
+        const [, property, value] = vs[0];
+        if (!hasExpression(value) && property !== "$for" && property !== "$info") {
+          // Does not need nodes if a constant
+          return;
+        }
+        if (property !== "$for") {
+          v.edges.push({
+            id: `expression.${i}`,
+            source: `main`,
+            target: `expression.${i}`,
+          });
+        }
+        vs.forEach(([component, property], j) => {
+          v.edges.push({
+            id: `component.${i}.${j}`,
+            source: `expression.${i}`,
+            target: `component.${component}`,
+            sourceHandle: "output",
+            targetHandle: property,
+          });
+        });
+        v.nodes.push({
           id: `expression.${i}`,
-          source: `main`,
-          target: `expression.${i}`,
+          type: "flow",
+          position: {
+            x: 0,
+            y: 0,
+          },
+          width: 240,
+          data:
+            property === "$for"
+              ? ({
+                  key: `expression.${i}`,
+                  type: "loop",
+                  fields: value,
+                } as unknown as LoopData)
+              : ({
+                  key: `expression.${i}`,
+                  type: "expression",
+                  fields: { property: value, type: "any" },
+                } as ExpressionData),
         });
-      }
-      vs.forEach(([component, property], j) => {
-        v.edges.push({
-          id: `component.${i}.${j}`,
-          source: `expression.${i}`,
-          target: `component.${component}`,
-          sourceHandle: "output",
-          targetHandle: property,
-        });
-      });
-      v.nodes.push({
-        id: `expression.${i}`,
-        type: "flow",
-        position: {
-          x: 0,
-          y: 0,
-        },
-        width: 240,
-        data:
-          property === "$for"
-            ? ({
-                key: `expression.${i}`,
-                type: "loop",
-                fields: value,
-              } as LoopData)
-            : ({
-                key: `expression.${i}`,
-                type: "expression",
-                fields: { property: value, type: "any" },
-              } as ExpressionData),
-      });
-    })
-    .value();
+      }),
+  );
   // Add context
   v.nodes.push({
     id: `main`,

@@ -1,6 +1,7 @@
 import { amber, blue, deepPurple, green, orange, pink, red } from "@mui/material/colors";
 import { ColorTranslator } from "colortranslator";
-import { entries, keys, lowerCase, mapValues, sortBy, thru, values } from "lodash-es";
+import { lowerCase } from "es-toolkit";
+import { toPairs as entries, keys, mapValues, sortBy, values } from "es-toolkit/compat";
 import { EventTypeColors } from "protocol";
 import { TraceEventType } from "protocol/Trace";
 import { AccentColor, accentColors, getShade } from "theme";
@@ -25,24 +26,21 @@ export function hex(h: string) {
   return parseInt(h.replace("#", "0x"));
 }
 
-export const searchEventAliases = thru(
-  {
-    source: ["source", "start"],
-    destination: ["destination", "goal", "finish"],
-    updating: ["update", "updating"],
-    expanding: ["expanding", "expanding"],
-    generating: ["generate", "generating", "open", "opening"],
-    closing: ["close", "closing"],
-    end: ["finish", "end", "solution"],
-  },
-  (dict) => {
-    const out: Record<string, string> = {};
-    for (const [k, v] of entries(dict)) {
-      for (const v1 of v) out[v1] = k;
-    }
-    return out;
-  },
-);
+export const searchEventAliases = ((dict: Record<string, string[]>) => {
+  const out: Record<string, string> = {};
+  for (const [k, v] of entries(dict)) {
+    for (const v1 of v) out[v1] = k;
+  }
+  return out;
+})({
+  source: ["source", "start"],
+  destination: ["destination", "goal", "finish"],
+  updating: ["update", "updating"],
+  expanding: ["expanding", "expanding"],
+  generating: ["generate", "generating", "open", "opening"],
+  closing: ["close", "closing"],
+  end: ["finish", "end", "solution"],
+});
 
 export const colorsHex: EventTypeColors = {
   source: green.A400,

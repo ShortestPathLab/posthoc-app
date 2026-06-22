@@ -1,4 +1,5 @@
-import { delay, isUndefined, omitBy } from "lodash-es";
+import { isUndefined } from "es-toolkit";
+import { delay, omitBy } from "es-toolkit/compat";
 import { useCallback } from "react";
 import { createSlice } from "./createSlice";
 import { merge } from "./reducers";

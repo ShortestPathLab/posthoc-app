@@ -2,7 +2,8 @@ import { ArrowOutwardRounded, DataObjectOutlined } from "@mui-symbols-material/w
 import { ListItemIcon, ListItemText, MenuItem, Typography } from "@mui/material";
 import { PropertyDialog, PropertyList } from "components/inspector/PropertyList";
 import { inferLayerName } from "layers";
-import { isUndefined, keyBy, last, map, negate, startCase } from "lodash-es";
+import { isUndefined, last, negate } from "es-toolkit";
+import { keyBy, map, startCase } from "es-toolkit/compat";
 import { useMemo } from "react";
 import { slice } from "slices";
 import { set } from "utils/set";

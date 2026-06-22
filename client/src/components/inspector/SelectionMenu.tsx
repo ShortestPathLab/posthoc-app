@@ -12,7 +12,7 @@ import { SelectEvent as RendererSelectEvent } from "components/renderer/Renderer
 import { useCache } from "hooks/useCache";
 import { SelectionInfoProvider } from "layers/LayerController";
 import { getController } from "layers/layerControllers";
-import { entries, map, merge, reduce, sortBy } from "lodash-es";
+import { toPairs as entries, map, merge, reduce, sortBy } from "es-toolkit/compat";
 import { ComponentProps, ReactNode, useMemo } from "react";
 import { slice } from "slices";
 import { useOne } from "slices/useOne";

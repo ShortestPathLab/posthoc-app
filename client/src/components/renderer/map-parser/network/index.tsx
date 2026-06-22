@@ -1,4 +1,4 @@
-import { constant, identity } from "lodash-es";
+import { constant, identity } from "es-toolkit/compat";
 import memo from "memoizee";
 import { byPoint } from "../../NodeMatcher";
 import { MapEditor, MapParser, ParsedMapHydrator } from "../Parser";

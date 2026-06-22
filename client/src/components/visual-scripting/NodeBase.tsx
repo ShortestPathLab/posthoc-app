@@ -1,6 +1,6 @@
 import { Card, Stack } from "@mui/material";
 import { NodeResizer } from "@xyflow/react";
-import { reduce } from "lodash-es";
+import { reduce } from "es-toolkit/compat";
 import { ReactNode } from "react";
 import { useAcrylic, usePaper } from "theme";
 

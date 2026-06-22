@@ -4,7 +4,7 @@ import { Checkbox, Collapse, IconButton, Stack, SxProps, Theme, Typography } fro
 import "@react-sigma/core/lib/style.css";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { Heading, Option } from "components/layer-editor/Option";
-import { entries, map, startCase } from "lodash-es";
+import { map, startCase, toPairs as entries } from "es-toolkit/compat";
 import { useState } from "react";
 import { useAcrylic, usePaper } from "theme";
 import { SharedGraphProps } from "./SharedGraphProps";

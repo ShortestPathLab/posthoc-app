@@ -1,5 +1,6 @@
 import { index } from "hooks/useHighlight";
-import { findLast, forEach, isNull, isUndefined, last } from "lodash-es";
+import { isNull, isUndefined, last } from "es-toolkit";
+import { findLast, forEach } from "es-toolkit/compat";
 import { Trace } from "protocol/Trace";
 
 const isNullish = (x: KeyRef): x is Exclude<KeyRef, Key> => isUndefined(x) || isNull(x);

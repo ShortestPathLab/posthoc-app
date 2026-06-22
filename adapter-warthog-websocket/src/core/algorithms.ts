@@ -1,4 +1,4 @@
-import { mapValues, startCase } from "lodash";
+import { mapValues, startCase } from "es-toolkit/compat";
 
 export const algorithms = mapValues(
   {

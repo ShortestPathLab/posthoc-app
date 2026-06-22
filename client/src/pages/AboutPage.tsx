@@ -12,7 +12,8 @@ import {
 import { Block } from "components/generic/Block";
 import { Scroll } from "components/generic/Scrollbars";
 import { useViewTreeContext } from "components/inspector/ViewTree";
-import { head, trimEnd } from "lodash-es";
+import { trimEnd } from "es-toolkit";
+import { head } from "es-toolkit/compat";
 import logo from "public/logo512.png";
 import { homepage, name, repository, version_name } from "public/manifest.json";
 import { ReactNode } from "react";

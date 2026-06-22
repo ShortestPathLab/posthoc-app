@@ -3,7 +3,7 @@ import { Backdrop, Stack, Typography as Type } from "@mui/material";
 import { useSnackbar } from "components/generic/Snackbar";
 import { useWorkspace } from "hooks/useWorkspace";
 import { getControllers } from "layers/layerControllers";
-import { entries, head } from "lodash-es";
+import { head, toPairs as entries } from "es-toolkit/compat";
 import { nanoid as id } from "nanoid";
 import pluralize from "pluralize";
 import { useState } from "react";

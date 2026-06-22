@@ -4,7 +4,8 @@ import {
   TreeDict,
 } from "components/breakpoint-editor/breakpoints/Breakpoint";
 import { DebugLayerData } from "hooks/useBreakPoints";
-import { groupBy, isEqual, values } from "lodash-es";
+import { isEqual } from "es-toolkit";
+import { groupBy, values } from "es-toolkit/compat";
 import memo from "memoizee";
 import objectHash from "object-hash";
 import { useComputeTree } from "pages/tree/TreeUtility";

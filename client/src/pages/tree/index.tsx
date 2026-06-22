@@ -10,7 +10,7 @@ import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { MultiDirectedGraph } from "graphology";
 import { inferLayerName } from "layers/inferLayerName";
-import { isEmpty } from "lodash-es";
+import { isEmpty } from "es-toolkit/compat";
 import { Size } from "protocol";
 import { useState } from "react";
 import { useThrottle } from "react-use";

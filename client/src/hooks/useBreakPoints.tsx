@@ -2,7 +2,7 @@ import { Breakpoint } from "components/breakpoint-editor/BreakpointEditor";
 import { TreeDict } from "components/breakpoint-editor/breakpoints/Breakpoint";
 import { useUntrustedLayers } from "components/inspector/useUntrustedLayers";
 import { call } from "components/script-editor/call";
-import { flattenDepth, groupBy, map, values } from "lodash-es";
+import { flattenDepth, groupBy, map, values } from "es-toolkit/compat";
 import { EventTree } from "pages/tree/treeLayout.worker";
 import { useComputeTree } from "pages/tree/TreeUtility";
 import { useMemo } from "react";

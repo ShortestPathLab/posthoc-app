@@ -1,6 +1,7 @@
 import { Typography as Type, TypographyProps as TypeProps } from "@mui/material";
 import beautify from "json-beautify";
-import { get, isNull, round, truncate } from "lodash-es";
+import { isNull, round } from "es-toolkit";
+import { get, truncate } from "es-toolkit/compat";
 import { CSSProperties, ReactNode } from "react";
 import { Block } from "./Block";
 import { Space } from "./Space";

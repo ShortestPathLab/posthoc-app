@@ -1,4 +1,4 @@
-import { keys, some, startCase } from "lodash";
+import { keys, some, startCase } from "es-toolkit/compat";
 import { parse, relative, resolve } from "path";
 import { getConfig } from "../config";
 

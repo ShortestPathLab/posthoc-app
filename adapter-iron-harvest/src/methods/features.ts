@@ -1,6 +1,6 @@
 import { readFile as read } from "fs/promises";
 import glob from "glob-promise";
-import { filter, first, map, memoize as memo } from "lodash";
+import { filter, head, map, memoize as memo } from "es-toolkit/compat";
 import { resolve } from "path";
 import { getMapDescriptor, mapIsSupported } from "../core/maps";
 import { createMethod } from "./createMethod";
@@ -44,7 +44,7 @@ export const features = [
     memo(
       async ({ id }) => {
         const { maps: mapsPath } = getConfig();
-        const map = first(await glob(resolve(mapsPath, id)));
+        const map = head(await glob(resolve(mapsPath, id)));
         return map
           ? {
               ...(await getMapDescriptor(map)),
