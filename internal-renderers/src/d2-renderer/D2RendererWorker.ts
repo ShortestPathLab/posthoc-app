@@ -1,11 +1,11 @@
 import interpolate from "color-interpolate";
-import combinate from "combinate";
 import { isEqual, isNumber, once } from "es-toolkit";
 import { ceil, floor, forEach, get, groupBy, head, identity, map, pick, range, shuffle, sortBy, throttle, truncate, values } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 import type { Bounds, Point, Size } from "protocol";
 import { ComponentEntry } from "renderer";
 import { Bush } from "./Bush";
+import { combinate } from "./combinate";
 import { CompiledD2IntrinsicComponent } from "./D2IntrinsicComponents";
 import {
   D2RendererEvents,

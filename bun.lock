@@ -274,7 +274,6 @@
         "@turf/point-to-line-distance": "^7.1.0",
         "color-interpolate": "^1.0.5",
         "colortranslator": "^4.1.0",
-        "combinate": "^1.1.11",
         "detect-collisions": "^9.24.0",
         "es-toolkit": "^1.48.1",
         "eventemitter3": "^5.0.1",
@@ -1286,8 +1285,6 @@
     "colord": ["colord@2.9.3", "", {}, "sha512-jeC1axXpnb0/2nn/Y1LPuLdgXBLH7aDcHu4KEKfqw3CUhX7ZpfBSlPKyqXE6btIgEzfWtrX3/tyBCaCvXvMkOw=="],
 
     "colortranslator": ["colortranslator@6.1.1", "", {}, "sha512-SVrXoxIgWm+KZrJgTuV486zKbmjpKX3mt9/mUVL2QV9I5Qw4ItwP0XR6c63EQU2ecHkSgDqJPVPnQSPrzDOteA=="],
-
-    "combinate": ["combinate@1.1.11", "", {}, "sha512-+2MNAQ29HtNejOxkgaTQPC2Bm+pQvFuqf7o18uObl/Bx3daX06kjLUNY/qa9f+YSqzqm/ic3SdrlfN0fvTlw2g=="],
 
     "combined-stream": ["combined-stream@1.0.8", "", { "dependencies": { "delayed-stream": "~1.0.0" } }, "sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg=="],
 
