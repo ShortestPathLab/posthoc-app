@@ -25,63 +25,76 @@ export type ParseTraceWorkerSlaveReturnType = {
   };
 }[];
 const GREY = "#808080";
-export function parse({
+
+export type SingleFrame = ParseTraceWorkerSlaveReturnType[number];
+
+/**
+ * Builds the per-event component generator for a trace. The expensive global
+ * setup (compiling the view's components, indexing events by id) happens once;
+ * the returned function generates the components for a single event index and
+ * is safe to call in *any* order. That order-independence is what lets
+ * generation run strided across workers and jump ahead to the user's current
+ * step.
+ *
+ * Caveat: only the *persistent* output is truly order-independent. The final
+ * *transient* output additionally depends on a sequential fold (the "special"
+ * stack) performed downstream in `parseTrace.worker.ts` / the streaming merge,
+ * so a frame generated out of order is only a partial preview until the
+ * contiguous prefix behind it has been merged.
+ */
+export function createFrameGenerator({
   trace,
   context,
   view = "main",
-  from = 0,
-  to = trace?.events?.length ?? 0,
-}: ParseTraceWorkerParameters): ParseTraceWorkerSlaveReturnType {
+}: ParseTraceWorkerParameters): (i: number) => SingleFrame {
   const parsed = parseComponents(trace?.views?.[view] ?? [], trace?.views ?? {});
-
-  const makeEntryIteratee = (step: number) => (component: C) => {
-    return {
-      component,
-      meta: { source: "trace", step: from + step, info: component.$info },
-    };
-  };
-
-  const r = flow(
-    trace?.events ?? [],
+  const events = trace?.events ?? [];
+  const byId = flow(
+    events,
     (r) => r.map((c, i) => ({ step: i, id: c.id, data: c, pId: c.pId })),
     (r) => groupBy(r, "id"),
   );
-
-  return range(from, to)
-    .map((i) => {
-      const e = trace!.events![i]!;
-      const esx = trace!.events!;
-      const component = parsed(
-        normalizeConstant(
-          mergePrototype(
-            {
-              alpha: 1,
-              fill: GREY,
-              __internal__: {
-                context,
-                step: i,
-                parent: !isNullish(e.pId)
-                  ? esx[findLast(r[e.pId], (x) => x.step <= i)?.step ?? 0]
-                  : undefined,
-                events: esx,
-                event: e,
-              },
+  const makeEntryIteratee = (step: number) => (component: C) => ({
+    component,
+    meta: { source: "trace", step, info: component.$info },
+  });
+  return (i: number) => {
+    const e = events[i]!;
+    const component = parsed(
+      normalizeConstant(
+        mergePrototype(
+          {
+            alpha: 1,
+            fill: GREY,
+            __internal__: {
+              context,
+              step: i,
+              parent: !isNullish(e.pId)
+                ? events[findLast(byId[e.pId], (x) => x.step <= i)?.step ?? 0]
+                : undefined,
+              events,
+              event: e,
             },
-            e,
-          ),
+          },
+          e,
         ),
-      );
-      return {
-        event: e,
-        components: groupBy(component, getPersistence) as {
-          [K in Persistence]: C[];
-        },
-      };
-    })
-    .map((c, i) => ({
-      event: c.event,
-      components: mapValues(c.components, (c2) => c2.map(makeEntryIteratee(i))),
-    }));
+      ),
+    );
+    const entry = makeEntryIteratee(i);
+    return {
+      event: e,
+      components: mapValues(
+        groupBy(component, getPersistence) as { [K in Persistence]: C[] },
+        (c2) => c2.map(entry),
+      ),
+    } as SingleFrame;
+  };
+}
+
+export function parse(params: ParseTraceWorkerParameters): ParseTraceWorkerSlaveReturnType {
+  const { trace, from = 0, to = trace?.events?.length ?? 0 } = params;
+  const gen = createFrameGenerator(params);
+  return range(from, to).map((i) => gen(i));
 }
 
 export type ParseTraceWorkerParameters = {

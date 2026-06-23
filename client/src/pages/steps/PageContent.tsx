@@ -23,6 +23,7 @@ import { ITEM_HEIGHT, PADDING_TOP, pxToInt } from "./constants";
 import { StepsLayer } from "./StepsLayer";
 import { StepsPageState } from "./StepsPageState";
 import { Item } from "./Item";
+import { getStreamBuffers } from "layers/trace/traceStreamStore";
 import { flow } from "utils/flow";
 import { result } from "utils/result";
 import { useOne } from "slices/useOne";
@@ -43,6 +44,19 @@ export function PageContent({ layer: key }: { layer?: string }) {
 
   const step = useOne(one, computed("step"));
   const playing = useOne(one, computed("playing"));
+
+  // Streaming state: dim rows whose frame hasn't been generated yet, like a
+  // video editor showing which frames are rendered. Re-reads on `version`.
+  const streamKey = useOne(one, (c) => (c as any)?.source?.parsedTrace?.stream?.streamKey);
+  const streamVersion = useOne(one, (c) => (c as any)?.source?.parsedTrace?.stream?.version ?? -1);
+  const streamComplete = useOne(one, (c) => (c as any)?.source?.parsedTrace?.stream?.complete ?? false);
+  const isUngenerated = useMemo(() => {
+    const buffers = getStreamBuffers(streamKey);
+    if (!buffers || streamComplete) return () => false;
+    return (eventIndex: number) => !buffers.generated[eventIndex];
+    // streamVersion drives recomputation as frames stream in.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streamKey, streamVersion, streamComplete]);
 
   const { steps: rawSteps } = useOne(one, (c) => getController(c)?.steps?.(c), id("key")) ?? {};
 
@@ -145,7 +159,7 @@ export function PageContent({ layer: key }: { layer?: string }) {
                 totalCount: steps.length,
                 itemContent: (i) => (
                   <Item
-                    disabled={isDisabled(i)}
+                    disabled={isDisabled(i) || isUngenerated(steps[i][1])}
                     key={i}
                     index={i}
                     event={steps[i][1]}

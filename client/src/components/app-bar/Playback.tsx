@@ -47,15 +47,26 @@ function usePlaybackServiceState(layer?: string) {
     playing: useOne(one, computed("playing")),
     step: useOne(one, computed("step")),
     end: useOne(one, computed("end")),
+    // Streaming traces only generate components incrementally; playback must not
+    // race past the contiguous frontier (indices [0, frontier) are ready).
+    streaming: useOne(one, (c) => !!(c as any)?.source?.parsedTrace?.stream),
+    frontier: useOne(one, (c) => (c as any)?.source?.parsedTrace?.stream?.frontier ?? 0),
   };
 }
 
 export function PlaybackService({ children, value }: EditorSetterProps<Layer<PlaybackLayerData>>) {
   // Defaults moved out of the destructures: object-destructuring defaults make
   // the React Compiler bail out of optimizing this component.
-  const { playing, step: stepValue, end: endValue } = usePlaybackServiceState(value?.key);
+  const {
+    playing,
+    step: stepValue,
+    end: endValue,
+    streaming,
+    frontier: frontierValue,
+  } = usePlaybackServiceState(value?.key);
   const step = stepValue ?? 0;
   const end = endValue ?? 0;
+  const frontier = frontierValue ?? 0;
 
   const { pause, stepWithBreakpointCheck } = usePlaybackControls(value?.key);
 
@@ -64,6 +75,9 @@ export function PlaybackService({ children, value }: EditorSetterProps<Layer<Pla
 
   useEffect(() => {
     if (playing) {
+      // Don't advance past the last ready frame; the effect re-runs when
+      // `frontier` advances (it's a dep), resuming playback like a video buffer.
+      const effectiveEnd = streaming ? Math.min(end, frontier - 1) : end;
       let cancelled = false;
       let cancel = noop;
       let prev = Date.now();
@@ -71,8 +85,11 @@ export function PlaybackService({ children, value }: EditorSetterProps<Layer<Pla
         if (!cancelled) {
           const now = Date.now();
           const elapsed = ceil((playbackRate * (now - prev)) / FRAME_TIME_MS);
-          if (step < end) {
+          if (step < effectiveEnd) {
             cancel = stepWithBreakpointCheck(elapsed);
+            prev = now;
+          } else if (streaming && step < end) {
+            // Buffering at the frontier — hold position, keep the loop alive.
             prev = now;
           } else {
             cancelled = true;
@@ -87,7 +104,7 @@ export function PlaybackService({ children, value }: EditorSetterProps<Layer<Pla
         cancelled = true;
       };
     }
-  }, [stepWithBreakpointCheck, playing, end, step, pause, playbackRate]);
+  }, [stepWithBreakpointCheck, playing, end, step, pause, playbackRate, streaming, frontier]);
 
   return <>{children}</>;
 }

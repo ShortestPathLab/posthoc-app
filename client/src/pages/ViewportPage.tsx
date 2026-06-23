@@ -1,9 +1,10 @@
 import {
+  BlurCircularOutlined,
   CameraOutlined,
   CenterFocusWeakOutlined,
+  LayersOutlined,
   TimesOneMobiledataOutlined,
 } from "@mui-symbols-material/w300";
-import { BlurCircularOutlined, LayersOutlined } from "@mui-symbols-material/w300";
 import { Box, Divider, Stack, SxProps, Theme } from "@mui/material";
 import { FeaturePicker } from "components/app-bar/FeaturePicker";
 import { FeaturePickerMulti } from "components/app-bar/FeaturePickerMulti";
@@ -13,22 +14,21 @@ import { useSurfaceAvailableCssSize } from "components/generic/surface/useSurfac
 import { TraceRenderer } from "components/inspector/TraceRenderer";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import download from "downloadjs";
-import { inferLayerName } from "layers/inferLayerName";
 import { isEqual, pick } from "es-toolkit";
 import { delay, every, filter, find, keyBy, map } from "es-toolkit/compat";
+import { inferLayerName } from "layers/inferLayerName";
 import { useEffect, useState } from "react";
 import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
 import { Renderer as RendererInstance } from "renderer";
 import { slice } from "slices";
 import { Renderer } from "slices/renderers";
+import { useOne } from "slices/useOne";
 import { PanelState } from "slices/view";
 import { useAcrylic, usePaper } from "theme";
 import { generateUsername as id } from "unique-username-generator";
+import { flow } from "utils/flow";
 import { PageContentProps } from "./PageMeta";
 import { useRendererResolver } from "./useRendererResolver";
-import { flow } from "utils/flow";
-import { useOne } from "slices/useOne";
-import { useEffectWhen } from "hooks/useEffectWhen";
 const divider = <Divider orientation="vertical" flexItem sx={{ m: 1 }} />;
 
 type ViewportPageContext = PanelState & { renderer?: string };

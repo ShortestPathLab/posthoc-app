@@ -1,5 +1,6 @@
 import { BlurOnOutlined as DisabledIcon, ViewInArOutlined } from "@mui-symbols-material/w300";
-import { Box, CircularProgress, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
+import { StatusBanner } from "components/generic/StatusBanner";
 import { RendererProps, SelectEvent } from "components/renderer/Renderer";
 import { RenderLayer } from "layers/RenderLayer";
 import { clamp } from "es-toolkit";
@@ -92,17 +93,40 @@ function useLoading() {
   return useOne(slice.loading, (l) => !!l.layers);
 }
 
-function TraceRendererCircularProgress() {
-  const loading = useLoading();
-  return loading ? (
-    <CircularProgress
-      sx={{
-        position: "absolute",
-        top: (t) => t.spacing(6 + 2),
-        right: (t) => t.spacing(2),
-      }}
+/**
+ * Aggregate streaming status across all layers:
+ * - "partial": some streaming trace is showing a preview ahead of its frontier
+ *   (the current step isn't fully generated yet).
+ * - "loading": something is generating, but what's shown is correct.
+ * - "idle": nothing in flight.
+ */
+function useTraceStreamStatus(): "idle" | "loading" | "partial" {
+  const oneShot = useLoading();
+  return useOne(slice.layers, (layers) => {
+    let loading = oneShot;
+    let partial = false;
+    for (const l of layers) {
+      const stream = (l as any)?.source?.parsedTrace?.stream;
+      if (stream && !stream.complete) {
+        loading = true;
+        if (((l as any)?.source?.step ?? 0) >= stream.frontier) partial = true;
+      }
+    }
+    return partial ? "partial" : loading ? "loading" : "idle";
+  });
+}
+
+function TraceRendererStatusBanner() {
+  const status = useTraceStreamStatus();
+  if (status === "idle") return null;
+  const partial = status === "partial";
+  return (
+    <StatusBanner
+      color={partial ? "warning" : "info"}
+      label={partial ? "This is a partial preview, processing" : "Processing"}
+
     />
-  ) : null;
+  );
 }
 
 const VIEWPORT_PAGE_DESCRIPTION = "When you create a layer, you'll see it visualised here.";
@@ -156,7 +180,7 @@ export function TraceRenderer({ width, height, renderer, rendererRef, layers }: 
 
   return (
     <>
-      <TraceRendererCircularProgress />
+      <TraceRendererStatusBanner />
       <TraceRendererContext.Provider value={context}>
         <Box sx={{ width, height }}>
           {layers?.length ? (

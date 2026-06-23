@@ -1,6 +1,7 @@
 import babel from "@rolldown/plugin-babel";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import path from "path";
+import { comlink } from "vite-plugin-comlink";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig(({ mode }) => ({
@@ -10,6 +11,9 @@ export default defineConfig(({ mode }) => ({
   build: { outDir: path.join(process.cwd(), "./dist") },
   resolve: { tsconfigPaths: true },
   plugins: [
+    // Comlink must be one of the first plugins so it can transform worker
+    // imports before other plugins touch them.
+    comlink(),
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     {
@@ -39,6 +43,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   worker: {
-    plugins: () => [],
+    plugins: () => [comlink()],
   },
 }));
