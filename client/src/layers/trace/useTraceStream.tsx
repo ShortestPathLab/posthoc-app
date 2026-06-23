@@ -89,7 +89,8 @@ export function useTraceStream({
       set(l, "viewKey", nanoid());
     });
 
-    let cancelled = false;
+    const controller = new AbortController();
+    const { signal } = controller;
     let dirty = false;
     let floorTimer: ReturnType<typeof setTimeout> | undefined;
     let idleHandle: number | undefined;
@@ -97,7 +98,7 @@ export function useTraceStream({
 
     const doCommit = () => {
       idleHandle = undefined;
-      if (cancelled || !dirty) return;
+      if (signal.aborted || !dirty) return;
       dirty = false;
       lastCommit = performance.now();
       advanceMerge(buffers, events);
@@ -111,7 +112,7 @@ export function useTraceStream({
     };
 
     const scheduleCommit = () => {
-      if (cancelled || floorTimer !== undefined || idleHandle !== undefined) return;
+      if (signal.aborted || floorTimer !== undefined || idleHandle !== undefined) return;
       const wait = max(0, COMMIT_FLOOR_MS - (performance.now() - lastCommit));
       floorTimer = setTimeout(() => {
         floorTimer = undefined;
@@ -135,13 +136,13 @@ export function useTraceStream({
 
     if (total === 0) {
       return () => {
-        cancelled = true;
+        controller.abort();
         disposeStreamBuffers(streamKey);
       };
     }
 
     const onBatch = (frames: StreamBatchFrame[]) => {
-      if (cancelled) return;
+      if (signal.aborted) return;
       for (const f of frames) {
         const i = f.index;
         buffers.persistent[i] = visible(f.components.persistent ?? []);
@@ -158,14 +159,15 @@ export function useTraceStream({
       {
         workerCount,
         initialStep: step,
+        signal,
         onBatch,
         onComplete: () => {
-          if (cancelled) return;
+          if (signal.aborted) return;
           dirty = true;
           flushNow();
         },
         onError: (e) => {
-          if (cancelled) return;
+          if (signal.aborted) return;
           console.error(e);
           produceRef.current((l) =>
             set(l, "source.parsedTrace.error", `${e instanceof Error ? e.message : e}`),
@@ -176,10 +178,9 @@ export function useTraceStream({
     streamRef.current = stream;
 
     return () => {
-      cancelled = true;
+      controller.abort();
       if (floorTimer !== undefined) clearTimeout(floorTimer);
       if (idleHandle !== undefined) cancelIdleCallback(idleHandle);
-      stream.dispose();
       streamRef.current = undefined;
       disposeStreamBuffers(streamKey);
     };

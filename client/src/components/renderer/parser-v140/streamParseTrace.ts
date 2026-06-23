@@ -1,4 +1,5 @@
 import { endpointSymbol, proxy } from "vite-plugin-comlink/symbol";
+import { leaseWorkers } from "workers/workerLanes";
 import { ParseTraceWorkerParameters } from "./ParseTraceSlaveWorker";
 import type { StreamBatchFrame } from "./streamParseTrace.worker";
 
@@ -9,8 +10,6 @@ export type { StreamBatchFrame };
 export type TraceStream = {
   /** Push the current playhead so workers prioritise that neighbourhood. */
   setStep: (step: number) => void;
-  /** Cancel all workers and terminate them. Idempotent. */
-  dispose: () => void;
 };
 
 export type TraceStreamOptions = {
@@ -22,6 +21,8 @@ export type TraceStreamOptions = {
   /** Called once every worker has finished generating all of its frames. */
   onComplete?: () => void;
   onError?: (error: unknown) => void;
+  /** Aborting tears down the lease: cancels the wait, terminates + frees workers. */
+  signal: AbortSignal;
 };
 
 const DEFAULT_MARGIN = 64;
@@ -39,55 +40,69 @@ function spawnWorker() {
   return worker;
 }
 
+const terminateWorker = (w: ReturnType<typeof spawnWorker>) => w[endpointSymbol].terminate();
+
 /**
- * Spawns a fleet of long-lived Comlink workers that stream a trace's render
- * components in, strided so worker `owner` owns event indices ≡ `owner` mod N.
+ * Streams a trace's render components in via a fleet of long-lived Comlink
+ * workers (strided so worker `owner` owns event indices ≡ `owner` mod N).
  *
- * NOTE (deferred optimisation): each worker receives its own structured-clone
- * of the full trace, so peak input memory is ~N× the trace. Acceptable for now
- * (parsing is cheap and most traces are small); the fix is to share the trace's
- * source bytes via a SharedArrayBuffer and parse per-worker. See memory note
+ * Workers are leased from the shared `trace-gen` lane rather than spawned
+ * outright, so total live workers across all traces stays bounded: a single
+ * trace greedily takes the whole lane (full performance), while many traces
+ * serialise through it (each waits for ≥1 permit). The lease is released — every
+ * worker terminated, every permit freed — when generation completes, errors, or
+ * `signal` aborts, keeping live workers == held permits.
+ *
+ * NOTE (deferred optimisation): each leased worker still receives its own
+ * structured-clone of the full trace (~workers× the trace). Acceptable for now;
+ * the fix is to share source bytes via a SharedArrayBuffer. See memory note
  * `trace-event-streaming-design`.
  */
 export function createTraceStream(
   params: ParseTraceWorkerParameters,
-  { workerCount, margin = DEFAULT_MARGIN, initialStep = 0, onBatch, onComplete, onError }: TraceStreamOptions,
+  {
+    workerCount,
+    margin = DEFAULT_MARGIN,
+    initialStep = 0,
+    onBatch,
+    onComplete,
+    onError,
+    signal,
+  }: TraceStreamOptions,
 ): TraceStream {
   const total = params.trace?.events?.length ?? 0;
-  // No point spawning more workers than there are events.
-  const n = max(1, min(workerCount, total || 1));
+  // No point holding more workers than there are events.
+  const maxWorkers = max(1, min(workerCount, total || 1));
 
-  const workers: ReturnType<typeof spawnWorker>[] = [];
-  for (let i = 0; i < n; i++) workers.push(spawnWorker());
+  let workers: ReturnType<typeof spawnWorker>[] = [];
+  let latestStep = initialStep;
 
-  let disposed = false;
-
-  Promise.all(
-    workers.map((w, owner) => w.generate(params, owner, n, margin, proxy(onBatch), initialStep)),
-  )
-    .then(() => {
-      if (!disposed) onComplete?.();
-    })
-    .catch((e) => {
-      if (!disposed) onError?.(e);
+  (async () => {
+    const lease = await leaseWorkers("trace-gen", spawnWorker, terminateWorker, {
+      workerCount,
+      min: 1,
+      max: maxWorkers,
+      signal,
     });
+    if (!lease || signal.aborted) return;
+    workers = lease.workers;
+    const n = workers.length;
+    Promise.all(
+      workers.map((w, owner) => w.generate(params, owner, n, margin, proxy(onBatch), latestStep)),
+    )
+      .then(() => {
+        if (!signal.aborted) onComplete?.();
+      })
+      .catch((e) => {
+        if (!signal.aborted) onError?.(e);
+      })
+      .finally(() => lease.release());
+  })();
 
   return {
     setStep: (step) => {
-      if (disposed) return;
+      latestStep = step;
       for (const w of workers) w.setStep(step);
-    },
-    dispose: () => {
-      if (disposed) return;
-      disposed = true;
-      for (const w of workers) {
-        try {
-          w.cancel();
-          w[endpointSymbol].terminate();
-        } catch (e) {
-          console.warn(e);
-        }
-      }
     },
   };
 }
