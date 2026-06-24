@@ -7,7 +7,6 @@ import { useDebouncedState } from "hooks/useDebouncedState";
 import { flow, round } from "es-toolkit";
 import { find, set, sortBy, startCase } from "es-toolkit/compat";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
-import memo from "memoizee";
 import { getClosestColor } from "nearest-pantone";
 import { withProduce } from "produce";
 import { HexColorPicker } from "react-colorful";
@@ -16,18 +15,16 @@ import { MapEditor, MapParser, ParsedMapHydrator } from "../Parser";
 import { getGridSymbolsAsync } from "./getGridSymbolsAsync";
 import { Options } from "./parseGrid.worker";
 import { parseGridAsync } from "./parseGridAsync";
-import objectHash from "object-hash";
 
 function between(v: number, min: number, max: number) {
   return v >= min && v < max;
 }
 
-export const parse: MapParser = memo(
-  async (m = "", options: Options) => {
-    return { content: m, ...(await parseGridAsync({ map: m, options })) };
-  },
-  { normalizer: (args) => objectHash([...args]) },
-);
+// Caching/dedup now lives in React Query (parseGridAsync → queryClient.fetchQuery).
+export const parse: MapParser = async (m = "", options: Options) => ({
+  content: m,
+  ...(await parseGridAsync({ map: m, options })),
+});
 
 export function SymbolColorPicker({
   onChange,

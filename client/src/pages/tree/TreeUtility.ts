@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { treeToDict } from "hooks/useBreakPoints";
 import { uniq } from "es-toolkit";
 import {
@@ -16,7 +16,6 @@ import {
 } from "es-toolkit/compat";
 import { Trace } from "protocol/Trace";
 import { flow } from "utils/flow";
-import memoizee from "memoizee";
 import { endpointSymbol } from "vite-plugin-comlink/symbol";
 import { withWorker } from "workers/workerLanes";
 import { TreeWorkerParameters, TreeWorkerReturnType } from "./treeUtility.worker";
@@ -35,16 +34,13 @@ function spawnWorker() {
 
 const terminate = (w: ReturnType<typeof spawnWorker>) => w[endpointSymbol].terminate();
 
-export const treeAsync = memoizee(
-  (params: TreeWorkerParameters): Promise<TreeWorkerReturnType> =>
-    withWorker(
-      "tree",
-      spawnWorker,
-      terminate,
-      (w) => w.parse(params) as Promise<TreeWorkerReturnType>,
-    ),
-  { async: true, length: 1 },
-);
+const treeAsync = (
+  params: TreeWorkerParameters,
+  signal?: AbortSignal,
+): Promise<TreeWorkerReturnType> =>
+  withWorker("tree", spawnWorker, terminate, (w) => w.parse(params) as Promise<TreeWorkerReturnType>, {
+    signal,
+  });
 
 type X = "text" | "number" | "boolean" | "mixed";
 
@@ -111,34 +107,37 @@ export function computeTypes(events?: TraceEvent[]) {
   );
 }
 
-export function useComputeTypes({ key, trace }: { key?: string; trace?: Trace }) {
-  return useQuery({
+export const computeTypesQuery = ({ key, trace }: { key?: string; trace?: Trace }) =>
+  queryOptions({
     queryKey: ["compute/types", key],
     queryFn: async () => computeTypes(trace?.events),
     enabled: !!key,
     staleTime: Infinity,
   });
+
+export function useComputeTypes(options: { key?: string; trace?: Trace }) {
+  return useQuery(computeTypesQuery(options));
 }
 
-export function useComputeLabels({ key, trace }: { key?: string; trace?: Trace }) {
-  return useQuery({
+export const computeLabelsQuery = ({ key, trace }: { key?: string; trace?: Trace }) =>
+  queryOptions({
     queryKey: ["compute/labels", key],
     queryFn: async () => computeLabels(trace?.events),
     enabled: !!key,
     staleTime: Infinity,
   });
+
+export function useComputeLabels(options: { key?: string; trace?: Trace }) {
+  return useQuery(computeLabelsQuery(options));
 }
 
-export function useComputeTree({
-  key,
-  radius,
-  step,
-  trace,
-}: TreeWorkerParameters & { key?: string }) {
-  return useQuery({
+type ComputeTreeOptions = TreeWorkerParameters & { key?: string };
+
+export const computeTreeQuery = ({ key, radius, step, trace }: ComputeTreeOptions) =>
+  queryOptions({
     queryKey: ["compute/tree/utility", key, radius, step],
-    queryFn: async () => {
-      const tree = await treeAsync({ radius, step, trace });
+    queryFn: async ({ signal }) => {
+      const tree = await treeAsync({ radius, step, trace }, signal);
       if (tree) {
         const dict = treeToDict(tree?.tree ?? []);
 
@@ -148,4 +147,7 @@ export function useComputeTree({
     enabled: !!key,
     staleTime: Infinity,
   });
+
+export function useComputeTree(options: ComputeTreeOptions) {
+  return useQuery(computeTreeQuery(options));
 }

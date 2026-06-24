@@ -1,16 +1,13 @@
 import { constant, identity } from "es-toolkit/compat";
-import memo from "memoizee";
 import { byPoint } from "../../NodeMatcher";
 import { MapEditor, MapParser, ParsedMapHydrator } from "../Parser";
 import { Options } from "./parseNetwork.worker";
 import { parseNetworkAsync } from "./parseNetworkAsync";
 import { Typography as Type } from "@mui/material";
-import objectHash from "object-hash";
 
-export const parse: MapParser = memo(
-  async (m = "", options: Options) => await parseNetworkAsync({ map: m, options }),
-  { normalizer: (args) => objectHash([...args]) },
-);
+// Caching/dedup now lives in React Query (parseNetworkAsync → queryClient.fetchQuery).
+export const parse: MapParser = async (m = "", options: Options) =>
+  await parseNetworkAsync({ map: m, options });
 
 export const hydrate: ParsedMapHydrator = (result) => ({
   ...result,

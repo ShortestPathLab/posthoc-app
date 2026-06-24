@@ -1,7 +1,7 @@
+import { queryOptions } from "@tanstack/react-query";
 import * as Comlink from "comlink";
-import memoizee from "memoizee";
-import objectHash from "object-hash";
 import { Schema } from "ajv";
+import { queryClient } from "query";
 import { endpointSymbol } from "vite-plugin-comlink/symbol";
 import { withWorker } from "workers/workerLanes";
 import type { ParseYamlResult } from "./parseYaml.worker";
@@ -53,11 +53,16 @@ function spawnParseYamlWorker() {
 
 const terminate = (w: { [endpointSymbol]: Worker }) => w[endpointSymbol].terminate();
 
-export const hashAsync = memoizee(
-  (value: string): Promise<string> =>
-    withWorker("hash", spawnHashWorker, terminate, (w) => w.hash(value)),
-  { normalizer: (args) => objectHash([...args]) },
-);
+export const hashQuery = (value: string) =>
+  queryOptions({
+    queryKey: ["hash", value],
+    queryFn: ({ signal }): Promise<string> =>
+      withWorker("hash", spawnHashWorker, terminate, (w) => w.hash(value), { signal }),
+    staleTime: Infinity,
+  });
+
+/** Direct (non-React) entry point; shares the React Query cache + dedup. */
+export const hashAsync = (value: string) => queryClient.fetchQuery(hashQuery(value));
 
 export const compressAsync = (value: string): Promise<string> =>
   withWorker("compress", spawnCompressWorker, terminate, (w) => w.compressString(value));
