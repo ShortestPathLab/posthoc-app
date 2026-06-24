@@ -2,7 +2,6 @@ import { clone } from "es-toolkit";
 import { toPairs as entries, find, forEach, groupBy, sumBy, times } from "es-toolkit/compat";
 import { arrayToTree } from "performant-array-to-tree";
 import { Trace, TraceEvent } from "protocol";
-import { usingMessageHandler } from "workers/usingWorker";
 import { flow } from "utils/flow";
 export type EventTree = {
   id: Key;
@@ -48,7 +47,7 @@ export function degreeSeparation(tree: EventTree, radius: number) {
   return addPathToRoot(pruned);
 }
 
-function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
+export function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
   function addParents(tree: EventTree) {
     forEach(tree.children, (t) => {
       t.parent = tree;
@@ -120,7 +119,3 @@ export type TreeWorkerReturnType =
       tree: EventTree[];
     }
   | undefined;
-
-onmessage = usingMessageHandler(async ({ data }: MessageEvent<TreeWorkerParameters>) =>
-  parse(data),
-);

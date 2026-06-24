@@ -1,7 +1,6 @@
 import { graphlib, layout } from "@dagrejs/dagre";
 import { forEach, pick } from "es-toolkit/compat";
 import { Trace, TraceEvent } from "protocol";
-import { usingMessageHandler } from "workers/usingWorker";
 
 export function getFinalParents(trace: Trace | undefined) {
   const finalParent: Record<string, Key> = {};
@@ -23,7 +22,7 @@ export type EventTree = {
 
 export type Key = string | number | null | undefined;
 
-function parse({ trace, mode, orientation }: TreeWorkerParameters) {
+export function parse({ trace, mode, orientation }: TreeWorkerParameters) {
   const g = new graphlib.Graph();
 
   // Set an object for the graph label
@@ -104,7 +103,3 @@ export type TreeWorkerParameters = {
 export type TreeWorkerReturnType =
   | { x: number; y: number; label: string; size: number }[]
   | undefined;
-
-onmessage = usingMessageHandler(async ({ data }: MessageEvent<TreeWorkerParameters>) =>
-  parse(data),
-);

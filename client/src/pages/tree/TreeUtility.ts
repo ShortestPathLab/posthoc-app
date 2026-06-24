@@ -16,18 +16,34 @@ import {
 } from "es-toolkit/compat";
 import { Trace } from "protocol/Trace";
 import { flow } from "utils/flow";
-import { usingMemoizedWorkerTask } from "workers/usingWorker";
+import memoizee from "memoizee";
+import { endpointSymbol } from "vite-plugin-comlink/symbol";
+import { withWorker } from "workers/workerLanes";
 import { TreeWorkerParameters, TreeWorkerReturnType } from "./treeUtility.worker";
-import treeWorkerUrl from "./treeUtility.worker.ts?worker&url";
 import { TraceEvent } from "protocol/Trace-v140";
-export class TreeWorker extends Worker {
-  constructor() {
-    super(treeWorkerUrl, { type: "module" });
-  }
+
+type WorkerModule = typeof import("./treeUtility.worker");
+
+// vite-plugin-comlink rewrites `new ComlinkWorker(...)` into a statement ending
+// in `;`, so it MUST sit on its own line (not inside an arrow/expression).
+function spawnWorker() {
+  const worker = new ComlinkWorker<WorkerModule>(
+    new URL("./treeUtility.worker.ts", import.meta.url),
+  );
+  return worker;
 }
 
-export const treeAsync = usingMemoizedWorkerTask<TreeWorkerParameters, TreeWorkerReturnType>(
-  TreeWorker,
+const terminate = (w: ReturnType<typeof spawnWorker>) => w[endpointSymbol].terminate();
+
+export const treeAsync = memoizee(
+  (params: TreeWorkerParameters): Promise<TreeWorkerReturnType> =>
+    withWorker(
+      "tree",
+      spawnWorker,
+      terminate,
+      (w) => w.parse(params) as Promise<TreeWorkerReturnType>,
+    ),
+  { async: true, length: 1 },
 );
 
 type X = "text" | "number" | "boolean" | "mixed";
