@@ -3,7 +3,6 @@ import { groupBy, head, mapValues, maxBy, minBy } from "es-toolkit/compat";
 import pluralize from "pluralize";
 import { Point } from "protocol";
 import { ParsedMap } from "../Parser";
-import { usingMessageHandler } from "workers/usingWorker";
 import { flow } from "utils/flow";
 
 export type Options = {
@@ -96,10 +95,10 @@ function optimizeNetworkEdges(segments: number[][]) {
   return xs;
 }
 
-function parseNetwork({
+export function parseNetwork({
   map: m,
   options: { vert = "v", edge = "e", color = "#151d2f" },
-}: ParseNetworkWorkerParameters) {
+}: ParseNetworkWorkerParameters): ParseNetworkWorkerReturnType {
   const lines = m.split(/\r?\n/);
 
   const edges = lines
@@ -141,7 +140,3 @@ function parseNetwork({
       })),
   };
 }
-
-onmessage = usingMessageHandler(async ({ data }: MessageEvent<ParseNetworkWorkerParameters>) =>
-  parseNetwork(data),
-);

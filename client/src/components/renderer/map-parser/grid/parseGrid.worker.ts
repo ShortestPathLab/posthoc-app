@@ -4,7 +4,6 @@ import { map, range } from "es-toolkit/compat";
 import { Point, Size } from "protocol";
 import { ParsedMap } from "../Parser";
 import { getGridSymbols } from "./getGridSymbols.worker";
-import { usingMessageHandler } from "workers/usingWorker";
 
 function map2D<R>(cells: string[], iterator: (t: string) => R) {
   return map(cells, (row) => map(row, (cell) => iterator(cell)));
@@ -98,7 +97,7 @@ export type ParseGridWorkerParameters = {
 
 export type ParseGridWorkerReturnType = Pick<ParsedMap, "log" | "bounds" | "nodes">;
 
-function parseGrid({
+export function parseGrid({
   map: m,
   options: { symbols: colors = {}, color = "#fff", background = "#000" } = {},
 }: ParseGridWorkerParameters): ParseGridWorkerReturnType {
@@ -140,7 +139,3 @@ function parseGrid({
     })),
   };
 }
-
-onmessage = usingMessageHandler(async ({ data }: MessageEvent<ParseGridWorkerParameters>) =>
-  parseGrid(data),
-);

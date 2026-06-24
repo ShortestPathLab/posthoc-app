@@ -1,14 +1,23 @@
+import memoizee from "memoizee";
+import { endpointSymbol } from "vite-plugin-comlink/symbol";
+import { withWorker } from "workers/workerLanes";
 import { ParseMeshWorkerParameters, ParseMeshWorkerReturnType } from "./parseMesh.worker";
-import { usingMemoizedWorkerTask } from "workers/usingWorker";
-import parseMeshWorkerUrl from "./parseMesh.worker.ts?worker&url";
 
-export class ParseMeshWorker extends Worker {
-  constructor() {
-    super(parseMeshWorkerUrl, { type: "module" });
-  }
+type WorkerModule = typeof import("./parseMesh.worker");
+
+// vite-plugin-comlink rewrites `new ComlinkWorker(...)` into a statement ending
+// in `;`, so it MUST sit on its own line (not inside an arrow/expression).
+function spawnWorker() {
+  const worker = new ComlinkWorker<WorkerModule>(
+    new URL("./parseMesh.worker.ts", import.meta.url),
+  );
+  return worker;
 }
 
-export const parseMeshAsync = usingMemoizedWorkerTask<
-  ParseMeshWorkerParameters,
-  ParseMeshWorkerReturnType
->(ParseMeshWorker);
+const terminate = (w: ReturnType<typeof spawnWorker>) => w[endpointSymbol].terminate();
+
+export const parseMeshAsync = memoizee(
+  (params: ParseMeshWorkerParameters): Promise<ParseMeshWorkerReturnType> =>
+    withWorker("map-parse", spawnWorker, terminate, (w) => w.parseMesh(params)),
+  { async: true, length: 1 },
+);

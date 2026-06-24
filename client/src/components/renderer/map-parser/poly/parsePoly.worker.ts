@@ -2,7 +2,6 @@ import { chunk, flatten } from "es-toolkit";
 import { identity, maxBy, minBy } from "es-toolkit/compat";
 import pluralize from "pluralize";
 import { Point } from "protocol";
-import { usingMessageHandler } from "workers/usingWorker";
 import { ParsedMap } from "../Parser";
 
 export type Options = {
@@ -28,7 +27,10 @@ function aabb(verts: Point[]) {
   return { width, height, minX, minY, maxX, maxY };
 }
 
-function parsePoly({ map: m, options: { color = "#151d2f" } }: ParsePolyWorkerParameters) {
+export function parsePoly({
+  map: m,
+  options: { color = "#151d2f" },
+}: ParsePolyWorkerParameters): ParsePolyWorkerReturnType {
   const lines = m.split(/\r?\n/);
 
   const [, counts, ...rest] = lines.filter(identity);
@@ -63,7 +65,3 @@ function parsePoly({ map: m, options: { color = "#151d2f" } }: ParsePolyWorkerPa
     })),
   };
 }
-
-onmessage = usingMessageHandler(async ({ data }: MessageEvent<ParsePolyWorkerParameters>) =>
-  parsePoly(data),
-);

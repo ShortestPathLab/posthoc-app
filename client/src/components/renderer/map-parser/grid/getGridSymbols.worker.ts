@@ -1,7 +1,6 @@
 import { flow } from "utils/flow";
 import { getValue } from "./gradient";
 import { ParseGridWorkerParameters } from "./parseGrid.worker";
-import { usingMessageHandler } from "workers/usingWorker";
 import { trim, uniq } from "es-toolkit";
 import { join, map, split } from "es-toolkit/compat";
 
@@ -29,7 +28,3 @@ export function getGridSymbols({ map: m }: GetGridSymbolsParameters): GetGridSym
     ),
   };
 }
-
-onmessage = usingMessageHandler(async ({ data }: MessageEvent<GetGridSymbolsParameters>) =>
-  getGridSymbols(data),
-);
