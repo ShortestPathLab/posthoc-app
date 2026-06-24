@@ -9,7 +9,6 @@ import { nanoid } from "nanoid";
 import { Trace } from "protocol/Trace-v140";
 import { withProduce } from "produce";
 import { useEffect, useMemo } from "react";
-import { useAsync } from "react-use";
 import { BreakpointService } from "services/BreakpointService";
 import { AccentColor, accentColors, getShade } from "theme";
 import { set } from "utils/set";
@@ -60,21 +59,27 @@ export const service = withProduce(({ value, produce }) => {
     produce,
   });
 
-  // One-shot parser (legacy / untrusted only).
-  const parseTrace = useTraceParser(
-    { trace: trace?.content, context, view: "main" },
-    isTrusted,
-    [trace?.key, palette.mode, isTrusted],
-  );
-  useAsync(async () => {
-    if (parseTrace && !loading && !streaming) {
-      const parsedTrace = await parseTrace();
+  // One-shot parser (legacy / untrusted only). v1.4.0 trusted traces stream.
+  const { data: parsedTrace } = useTraceParser({
+    key: trace?.key,
+    trace: trace?.content,
+    context,
+    view: "main",
+    trusted: isTrusted,
+    contextKey: palette.mode,
+    enabled: !loading && !streaming,
+  });
+  useEffect(() => {
+    if (parsedTrace) {
       produce((l) => {
         set(l, "source.parsedTrace", parsedTrace);
         set(l, "viewKey", nanoid());
       });
     }
-  }, [loading, parseTrace, streaming]);
+    // `produce` is recreated each render, so it's intentionally omitted; this
+    // reacts to a fresh parse result.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parsedTrace]);
   return (
     <>
       <PlaybackService value={value} />
