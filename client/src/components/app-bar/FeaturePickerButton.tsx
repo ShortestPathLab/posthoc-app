@@ -12,9 +12,13 @@ export function FeaturePickerButton({
     <Button
       {...props}
       sx={{
+        borderRadius: 1,
         minWidth: "max-content",
-        padding: 1,
-        "& .MuiButton-startIcon": { color: (t) => t.palette.primary.main },
+        padding: 0.5,
+        "& .MuiButton-startIcon": {
+          color: (t) => t.palette.primary.main,
+          opacity: (t) => (props.disabled ? t.palette.action.disabledOpacity : 1),
+        },
         ...props.sx,
       }}
       startIcon={icon}

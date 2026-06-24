@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { set } from "utils/set";
-import { useBreakpoint3 } from "./useBreakPoints";
+import { useBreakpoint } from "./useBreakPoints";
 
 function cancellable<T = void>(f: () => Promise<T>, g: (result: T) => void) {
   let cancelled = false;
@@ -63,7 +63,7 @@ export function computed<T extends keyof ComputedPlaybackLayerProperties>(k: T) 
 
 export function usePlaybackControls(key?: string) {
   const notify = useSnackbar();
-  const { shouldBreak } = useBreakpoint3(key);
+  const { shouldBreak } = useBreakpoint(key);
 
   return useMemo(() => {
     const one = slice.layers.one<Layer<PlaybackLayerData>>(key);

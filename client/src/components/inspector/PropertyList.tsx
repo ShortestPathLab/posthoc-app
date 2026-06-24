@@ -93,7 +93,13 @@ export function EventProperties({ event }: Pick<PropertyListProps, "event">) {
       >
         {map(props, ([key, value]) => (
           <ListItem key={`${key}::${value}`} sx={{ py: 0.5, px: sm ? -2 : 3 }}>
-            <ListItemText secondary={key} primary={renderProperty(value)} />
+            <ListItemText
+              secondary={key}
+              primary={renderProperty(value)}
+              sx={{
+                color: (t) => t.palette.text.primary,
+              }}
+            />
           </ListItem>
         ))}
       </Box>

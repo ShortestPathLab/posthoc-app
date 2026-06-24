@@ -10,16 +10,19 @@ export function Button({ children, sx, size, ...props }: ButtonProps) {
       color="inherit"
       {...props}
       sx={{
+        borderRadius: 1,
         minWidth: 0,
         borderColor: (t) => alpha(t.palette.text.primary, t.palette.action.activatedOpacity),
         ...(props.variant === "text" ? undefined : paper(1)),
-        py: size === "small" ? 0.75 : 1,
+        py: size === "small" ? 0.25 : 0.75,
+        px: size === "small" ? 1.25 : 1.5,
         ...sx,
       }}
     >
       <Box
         sx={{
           color: (t) => t.palette.text.primary,
+          opacity: (t) => (props.disabled ? t.palette.action.disabledOpacity : 1),
           textOverflow: "ellipsis",
           overflow: "hidden",
           whiteSpace: "nowrap",
