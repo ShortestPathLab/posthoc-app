@@ -19,9 +19,22 @@ import { UploadedTrace } from "slices/UIState";
 import { flow } from "utils/flow";
 import { NonEmptyString } from "utils/Char";
 import { set } from "utils/set";
-import { usingWorkerTask } from "workers/usingWorker";
-import workerUrl from "./breakpoint.worker.ts?worker&url";
+import { endpointSymbol } from "vite-plugin-comlink/symbol";
+import { withWorker } from "workers/workerLanes";
 import { useOne } from "slices/useOne";
+
+type WorkerModule = typeof import("./breakpoint.worker");
+
+// vite-plugin-comlink rewrites `new ComlinkWorker(...)` into a statement ending
+// in `;`, so it MUST sit on its own line (not inside an arrow/expression).
+function spawnWorker() {
+  const worker = new ComlinkWorker<WorkerModule>(
+    new URL("./breakpoint.worker.ts", import.meta.url),
+  );
+  return worker;
+}
+
+const terminate = (w: ReturnType<typeof spawnWorker>) => w[endpointSymbol].terminate();
 async function attempt<T, U>(f: () => Promise<T>, c: (e: unknown) => U): Promise<T | U> {
   try {
     return await f();
@@ -36,16 +49,15 @@ export type BreakpointWorkerParameters = {
   dict: TreeDict;
 };
 
-export class BreakpointWorker extends Worker {
-  constructor() {
-    super(workerUrl, { type: "module" });
-  }
-}
-
-export const processBreakpointAsync = usingWorkerTask<
-  BreakpointWorkerParameters,
-  BreakpointProcessorOutput
->(BreakpointWorker);
+export const processBreakpointAsync = (
+  params: BreakpointWorkerParameters,
+): BreakpointProcessorOutput =>
+  withWorker(
+    "breakpoint",
+    spawnWorker,
+    terminate,
+    (w): BreakpointProcessorOutput => w.run(params),
+  );
 
 const processBreakpoint = memo(
   (breakpoint, key, trace, tree, dict) => processBreakpointAsync({ breakpoint, trace, dict }),
