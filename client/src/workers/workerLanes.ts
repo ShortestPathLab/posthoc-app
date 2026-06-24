@@ -1,4 +1,6 @@
 import { Sema } from "async-sema";
+import { clamp } from "es-toolkit/compat";
+import { settings as settingsStore } from "slices/settings";
 
 /**
  * Generic worker concurrency limiter.
@@ -12,13 +14,33 @@ import { Sema } from "async-sema";
  * meant to separate work that rarely runs simultaneously, so the sum is rarely
  * realised, but it is always finite (unlike the old ungated spawning).
  *
- * This is the substrate for the Comlink migration: today only `trace-gen` is
- * routed through it; other lanes are declared and enrolled as their jobs move
- * onto Comlink.
+ * This is the substrate for the Comlink migration: every short one-shot worker
+ * class is routed through it via `withWorker`, and the streaming `trace-gen`
+ * fleet via `leaseWorkers`.
  */
-export type LaneName = "trace-gen" | "parse" | "tree" | "hash" | "compress";
+export type LaneName =
+  | "trace-gen"
+  | "parse"
+  | "tree"
+  | "hash"
+  | "compress"
+  | "map-parse"
+  | "breakpoint";
 
 const { max, floor } = Math;
+
+/**
+ * The preferred worker count, read live from settings. Mirrors `useTraceStream`:
+ * a configured value ≤1 means "auto" — a fraction of the hardware threads,
+ * clamped to a sane range. Lane callers no longer need to thread this through;
+ * leases resolve it here so every lane is sized consistently.
+ */
+export function resolveWorkerCount(): number {
+  const configured = settingsStore.get((s) => s["performance/workerCount"]);
+  return configured && configured > 1
+    ? configured
+    : clamp(floor(navigator.hardwareConcurrency / 4), 1, 12);
+}
 
 /** Weighted, independent per-lane caps derived from the preferred worker count. */
 function laneCap(name: LaneName, workerCount: number): number {
@@ -28,9 +50,11 @@ function laneCap(name: LaneName, workerCount: number): number {
     case "tree":
       return max(2, floor(workerCount / 2));
     case "parse":
+    case "map-parse":
       return 2;
     case "hash":
     case "compress":
+    case "breakpoint":
       return 1;
   }
 }
@@ -44,7 +68,7 @@ const lanes = new Map<LaneName, { sema: Sema; cap: number }>();
  * harmlessly, so a live settings change is safe (it just takes effect for
  * subsequent leases).
  */
-function laneSema(name: LaneName, workerCount: number): Sema {
+function laneSema(name: LaneName, workerCount: number = resolveWorkerCount()): Sema {
   const cap = laneCap(name, workerCount);
   const existing = lanes.get(name);
   if (existing && existing.cap === cap) return existing.sema;
@@ -61,7 +85,8 @@ export type WorkerLease<T> = {
 };
 
 export type LeaseOptions = {
-  workerCount: number;
+  /** Preferred fleet size; defaults to the live `performance/workerCount` setting. */
+  workerCount?: number;
   /** Permits to acquire blocking before starting (waits for availability). */
   min?: number;
   /** Upper bound on permits; `Infinity` greedily takes all currently free. */
@@ -158,7 +183,7 @@ export async function withWorker<T, R>(
   spawn: () => T,
   terminate: (worker: T) => void,
   task: (worker: T) => Promise<R>,
-  options: Omit<LeaseOptions, "min" | "max">,
+  options: Omit<LeaseOptions, "min" | "max"> = {},
 ): Promise<R> {
   const lease = await leaseWorkers(lane, spawn, terminate, { ...options, min: 1, max: 1 });
   if (!lease) throw new DOMException("Aborted", "AbortError");
