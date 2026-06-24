@@ -1,22 +1,21 @@
 import { Editor, Monaco } from "@monaco-editor/react";
-import { CodeOutlined } from "@mui-symbols-material/w300";
+import { CodeOutlined, SaveOutlined } from "@mui-symbols-material/w300";
 import { CircularProgress, Tab, Tabs, useTheme } from "@mui/material";
 import { Block } from "components/generic/Block";
+import { IconButtonWithTooltip } from "components/generic/inputs/IconButtonWithTooltip";
 import { Placeholder } from "components/inspector/Placeholder";
 import { useViewTreeContext } from "components/inspector/ViewTree";
 import { useMonacoTheme } from "components/script-editor/ScriptEditor";
-import { useOptimistic } from "hooks/useOptimistic";
 import { getController } from "layers/layerControllers";
 import { isEqual } from "es-toolkit";
 import { find, flatMap, head, isObject, map } from "es-toolkit/compat";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AutoSizer as AutoSize } from "react-virtualized-auto-sizer";
 import { slice } from "slices";
 import { Layer } from "slices/layers";
 import { useLoadingState } from "slices/loading";
 import { assert } from "utils/assert";
 import { debounceLifo as lifo } from "utils/debounceLifo";
-import { idle } from "utils/idle";
 import { PageContentProps } from "./PageMeta";
 import { YAMLException } from "js-yaml";
 import { load, register } from "language";
@@ -25,6 +24,7 @@ import { set } from "utils/set";
 import { useAsync } from "react-async-hook";
 import { resultAsync } from "utils/result";
 import { useOne } from "slices/useOne";
+import { Button } from "components/generic/inputs/Button";
 
 export function isYamlException(e: unknown): e is YAMLException {
   return isObject(e) && "name" in e && e.name === "YAMLException";
@@ -91,9 +91,28 @@ export function SourcePage({ template: Page }: PageContentProps) {
     [selected?.layer, selected?.source?.id, progress],
   );
 
-  const [value, setValue] = useOptimistic(selected?.source?.content, (v) =>
-    idle(() => handleEditorContentChange(v)),
-  );
+  const saved = selected?.source?.content;
+  const [draft, setDraft] = useState(saved);
+
+  // Reset the draft when switching to a different source (not on every saved
+  // content change, which would clobber in-progress edits).
+  useEffect(() => {
+    setDraft(saved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.layer, selected?.source?.id]);
+
+  const dirty = draft !== saved;
+
+  const save = () => {
+    if (dirty) handleEditorContentChange(draft);
+  };
+
+  // Keep the latest `save` reachable from the editor's Cmd/Ctrl+S command,
+  // which is bound once on mount and would otherwise capture a stale closure.
+  const saveRef = useRef(save);
+  useEffect(() => {
+    saveRef.current = save;
+  });
 
   useEffect(() => {
     if (monaco) {
@@ -117,7 +136,6 @@ export function SourcePage({ template: Page }: PageContentProps) {
                 return (
                   instance && (
                     <Editor
-                      onMount={(_, m) => setMonaco(m)}
                       // Refresh the editor when the id changes
                       key={`${selected?.layer}::${selected?.source?.id}`}
                       theme={theme.palette.mode === "dark" ? "posthoc-dark" : "light"}
@@ -133,8 +151,15 @@ export function SourcePage({ template: Page }: PageContentProps) {
                       loading={<CircularProgress variant="indeterminate" />}
                       width={width}
                       height={height}
-                      defaultValue={value}
-                      onChange={setValue}
+                      defaultValue={saved}
+                      onChange={setDraft}
+                      onMount={(editor, m) => {
+                        setMonaco(m);
+                        // Cmd/Ctrl+S saves the current source.
+                        editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyS, () =>
+                          saveRef.current(),
+                        );
+                      }}
                     />
                   )
                 );
@@ -174,7 +199,20 @@ export function SourcePage({ template: Page }: PageContentProps) {
           </Tabs>
         )}
       </Page.Options>
-      <Page.Extras>{controls}</Page.Extras>
+      <Page.Extras>
+        {!!sources?.length && !selected?.source?.readonly && (
+          <Button
+            size="small"
+            color="primary"
+            disabled={!dirty}
+            onClick={save}
+            startIcon={<SaveOutlined />}
+          >
+            Save
+          </Button>
+        )}
+        {controls}
+      </Page.Extras>
     </Page>
   );
 }
