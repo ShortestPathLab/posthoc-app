@@ -1,1 +1,0 @@
-var e=``+new URL(`network-bidirectional-a-star-ljUdoOL6.workspace`,import.meta.url).href;export{e as default};
