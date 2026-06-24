@@ -21,7 +21,7 @@ import {
 // Minimum spacing between store commits. We own this floor (rather than relying
 // on requestIdleCallback's `timeout`, which the polyfill ignores) so the commit
 // cadence — and therefore the re-render rate — is bounded on every platform.
-const COMMIT_FLOOR_MS = 1000;
+const COMMIT_FLOOR_MS = 2000;
 
 const { max } = Math;
 
