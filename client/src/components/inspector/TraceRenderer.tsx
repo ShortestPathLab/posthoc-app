@@ -107,7 +107,7 @@ function useTraceStreamStatus(): "idle" | "loading" | "partial" {
     let partial = false;
     for (const l of layers) {
       const stream = (l as any)?.source?.parsedTrace?.stream;
-      if (stream && !stream.complete) {
+      if (stream && !stream.complete && !stream.error) {
         loading = true;
         if (((l as any)?.source?.step ?? 0) >= stream.frontier) partial = true;
       }

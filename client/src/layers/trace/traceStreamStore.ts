@@ -42,6 +42,8 @@ export type TraceStreamHandle = {
   frontier: number;
   version: number;
   complete: boolean;
+  /** Generation failed (e.g. malformed trace). Terminal, like `complete`. */
+  error?: boolean;
 };
 
 const store = new Map<string, StreamBuffers>();

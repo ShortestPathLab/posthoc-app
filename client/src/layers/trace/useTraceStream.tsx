@@ -169,9 +169,13 @@ export function useTraceStream({
         onError: (e) => {
           if (signal.aborted) return;
           console.error(e);
-          produceRef.current((l) =>
-            set(l, "source.parsedTrace.error", `${e instanceof Error ? e.message : e}`),
-          );
+          produceRef.current((l) => {
+            set(l, "source.parsedTrace.error", `${e instanceof Error ? e.message : e}`);
+            // Mark the stream terminal so loading indicators stop — generation
+            // has stopped even though the frontier never reached the end.
+            set(l, "source.parsedTrace.stream.error", true);
+            set(l, "source.parsedTrace.stream.version", (l?.source?.parsedTrace?.stream?.version ?? 0) + 1);
+          });
         },
       },
     );
