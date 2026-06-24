@@ -1,23 +1,31 @@
-// import "nested-worker/window";
 import { useSnackbar } from "components/generic/Snackbar";
 import { get } from "es-toolkit/compat";
+import memoizee from "memoizee";
 import pluralize from "pluralize";
 import { useCallback } from "react";
 import { useLoadingState } from "slices/loading";
-import { usingMemoizedWorkerTask } from "workers/usingWorker";
-import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
+import { endpointSymbol } from "vite-plugin-comlink/symbol";
+import { withWorker } from "workers/workerLanes";
 import { ParseTraceWorkerParameters, ParseTraceWorkerReturnType } from "./ParseTraceSlaveWorker";
 
-export class ParseTraceWorker extends Worker {
-  constructor() {
-    super(parseTraceWorkerUrl, { type: "module" });
-  }
+type WorkerModule = typeof import("./parseTrace.worker");
+
+// vite-plugin-comlink rewrites `new ComlinkWorker(...)` into a statement ending
+// in `;`, so it MUST sit on its own line (not inside an arrow/expression).
+function spawnWorker() {
+  const worker = new ComlinkWorker<WorkerModule>(
+    new URL("./parseTrace.worker.ts", import.meta.url),
+  );
+  return worker;
 }
 
-export const parseTraceAsync = usingMemoizedWorkerTask<
-  ParseTraceWorkerParameters,
-  ParseTraceWorkerReturnType
->(ParseTraceWorker);
+const terminate = (w: ReturnType<typeof spawnWorker>) => w[endpointSymbol].terminate();
+
+export const parseTraceAsync = memoizee(
+  (params: ParseTraceWorkerParameters): Promise<ParseTraceWorkerReturnType> =>
+    withWorker("trace-gen", spawnWorker, terminate, (w) => w.parseTrace(params)),
+  { async: true, length: 1 },
+);
 
 export function useTraceParser(params: ParseTraceWorkerParameters) {
   const push = useSnackbar();

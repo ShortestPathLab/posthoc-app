@@ -1,14 +1,11 @@
-import { flatten } from "es-toolkit";
-import { ceil, filter, get, map, range, values } from "es-toolkit/compat";
+import { filter, get, map, values } from "es-toolkit/compat";
 import { CompiledComponent } from "protocol";
 import { ComponentEntry } from "renderer";
-import { usingMessageHandler, usingWorkerTask } from "workers/usingWorker";
 import {
+  parse as parseFrames,
   ParseTraceWorkerParameters,
   ParseTraceWorkerReturnType,
-  ParseTraceWorkerSlaveReturnType,
 } from "./ParseTraceSlaveWorker";
-import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";
 
 type C = CompiledComponent<string, Record<string, any>>;
 
@@ -23,42 +20,18 @@ const isVisible = ({ component: c }: ComponentEntry) =>
 
 type Persistence = ReturnType<typeof getPersistence>;
 
-const { min } = Math;
-
-const SLAVE_COUNT = 1;
-
-const parseTraceWorker = usingWorkerTask<
-  ParseTraceWorkerParameters,
-  ParseTraceWorkerSlaveReturnType
->(
-  class ParseTraceWorker extends Worker {
-    constructor() {
-      super(parseTraceWorkerUrl, { type: "module" });
-    }
-  },
-);
-
-async function parse({
+/**
+ * One-shot, single-threaded trace parse for the legacy/untrusted path. Generates
+ * every event's components in-process (no nested worker) and folds the
+ * sequential "special" stack to produce the final transient output. The client
+ * leases this whole worker from the `trace-gen` lane.
+ */
+export function parseTrace({
   trace,
   context,
   view = "main",
-}: ParseTraceWorkerParameters): Promise<ParseTraceWorkerReturnType> {
-  const chunkSize = ceil((trace?.events?.length ?? 0) / SLAVE_COUNT);
-  const chunks = range(0, trace?.events?.length, chunkSize);
-
-  const outs = flatten(
-    await Promise.all(
-      map(chunks, (i) =>
-        parseTraceWorker({
-          trace,
-          context,
-          view,
-          from: i,
-          to: min(i + chunkSize, trace?.events?.length ?? 0),
-        }),
-      ),
-    ),
-  );
+}: ParseTraceWorkerParameters): ParseTraceWorkerReturnType {
+  const outs = parseFrames({ trace, context, view });
 
   const stack: Record<string, ComponentEntry[]> = {};
 
@@ -85,7 +58,3 @@ async function parse({
     stepsTransient: map(out, "transient").map((c) => filter(c, isVisible)),
   };
 }
-
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<ParseTraceWorkerParameters>) => await parse(data),
-);

@@ -1,50 +1,15 @@
-import { flatten } from "es-toolkit";
-import { ceil, flatMap, map, range } from "es-toolkit/compat";
-import { usingMessageHandler, usingWorkerTask } from "workers/usingWorker";
-import { ParseTraceWorkerParameters, ParseTraceWorkerReturnType } from "./ParseTraceSlaveWorker";
-import parseTraceWorkerUrl from "./parseTraceSlave.worker.ts?worker&url";
+import {
+  parse,
+  ParseTraceWorkerParameters,
+  ParseTraceWorkerReturnType,
+} from "./ParseTraceSlaveWorker";
 
-const { min } = Math;
-
-const SLAVE_COUNT = 1;
-
-export class ParseTraceWorker extends Worker {
-  constructor() {
-    super(parseTraceWorkerUrl, { type: "module" });
-  }
+/**
+ * One-shot, single-threaded legacy trace parse. The persistent/transient split
+ * here is non-sequential (driven by each component's `display`), so a single
+ * full-range pass is all that's needed — no nested worker. The client leases
+ * this worker from the `trace-gen` lane.
+ */
+export function parseTrace(params: ParseTraceWorkerParameters): ParseTraceWorkerReturnType {
+  return parse(params);
 }
-
-const parseTraceWorker = usingWorkerTask<ParseTraceWorkerParameters, ParseTraceWorkerReturnType>(
-  ParseTraceWorker,
-);
-
-async function parse({
-  trace,
-  context,
-  view = "main",
-}: ParseTraceWorkerParameters): Promise<ParseTraceWorkerReturnType> {
-  const chunkSize = ceil((trace?.events?.length ?? 0) / SLAVE_COUNT);
-  const chunks = range(0, trace?.events?.length, chunkSize);
-  const outs = flatten(
-    await Promise.all(
-      map(chunks, (i) =>
-        parseTraceWorker({
-          trace,
-          context,
-          view,
-          from: i,
-          to: min(i + chunkSize, trace?.events?.length ?? 0),
-        }),
-      ),
-    ),
-  );
-
-  return {
-    stepsPersistent: flatMap(outs, "stepsPersistent"),
-    stepsTransient: flatMap(outs, "stepsTransient"),
-  };
-}
-
-onmessage = usingMessageHandler(
-  async ({ data }: MessageEvent<ParseTraceWorkerParameters>) => await parse(data),
-);

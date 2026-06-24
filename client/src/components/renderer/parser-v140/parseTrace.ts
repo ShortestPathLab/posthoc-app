@@ -1,37 +1,49 @@
 import { useSnackbar } from "components/generic/Snackbar";
 import { get } from "es-toolkit/compat";
+import memoizee from "memoizee";
 import pluralize from "pluralize";
 import { useMemo } from "react";
 import { useLoadingState } from "slices/loading";
-import { usingMemoizedWorkerTask } from "workers/usingWorker";
-import parseTraceWorkerLegacyUrl from "../parser/parseTrace.worker.ts?worker&url";
+import { endpointSymbol } from "vite-plugin-comlink/symbol";
+import { withWorker } from "workers/workerLanes";
 import {
   ParseTraceWorkerParameters as ParseTraceWorkerLegacyParameters,
   ParseTraceWorkerReturnType as ParseTraceWorkerLegacyReturnType,
 } from "../parser/ParseTraceSlaveWorker";
-import parseTraceWorkerUrl from "./parseTrace.worker.ts?worker&url";
 import { ParseTraceWorkerParameters, ParseTraceWorkerReturnType } from "./ParseTraceSlaveWorker";
 
-export class ParseTraceWorker extends Worker {
-  constructor() {
-    super(parseTraceWorkerUrl, { type: "module" });
-  }
-}
-export class ParseTraceWorkerLegacy extends Worker {
-  constructor() {
-    super(parseTraceWorkerLegacyUrl, { type: "module" });
-  }
+type WorkerModule = typeof import("./parseTrace.worker");
+type LegacyWorkerModule = typeof import("../parser/parseTrace.worker");
+
+// vite-plugin-comlink rewrites `new ComlinkWorker(...)` into a statement ending
+// in `;`, so each MUST sit on its own line (not inside an arrow/expression).
+function spawnWorker() {
+  const worker = new ComlinkWorker<WorkerModule>(
+    new URL("./parseTrace.worker.ts", import.meta.url),
+  );
+  return worker;
 }
 
-export const parseTraceAsync = usingMemoizedWorkerTask<
-  ParseTraceWorkerParameters,
-  ParseTraceWorkerReturnType
->(ParseTraceWorker);
+function spawnLegacyWorker() {
+  const worker = new ComlinkWorker<LegacyWorkerModule>(
+    new URL("../parser/parseTrace.worker.ts", import.meta.url),
+  );
+  return worker;
+}
 
-export const parseTraceLegacyAsync = usingMemoizedWorkerTask<
-  ParseTraceWorkerLegacyParameters,
-  ParseTraceWorkerLegacyReturnType
->(ParseTraceWorkerLegacy);
+const terminate = (w: { [endpointSymbol]: Worker }) => w[endpointSymbol].terminate();
+
+export const parseTraceAsync = memoizee(
+  (params: ParseTraceWorkerParameters): Promise<ParseTraceWorkerReturnType> =>
+    withWorker("trace-gen", spawnWorker, terminate, (w) => w.parseTrace(params)),
+  { async: true, length: 1 },
+);
+
+export const parseTraceLegacyAsync = memoizee(
+  (params: ParseTraceWorkerLegacyParameters): Promise<ParseTraceWorkerLegacyReturnType> =>
+    withWorker("trace-gen", spawnLegacyWorker, terminate, (w) => w.parseTrace(params)),
+  { async: true, length: 1 },
+);
 
 export function useTraceParser(
   params: ParseTraceWorkerParameters | ParseTraceWorkerLegacyParameters,
