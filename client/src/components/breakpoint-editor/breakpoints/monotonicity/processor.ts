@@ -12,7 +12,7 @@ export const processor: BreakpointProcessor<Fields> = async (data, trace, trees)
     forEach(trace.content?.events, (cEvent, step) => {
       const cNode = find(trees[step].events, (e) => e.step === step);
       const node = trees[step];
-      if (!cNode || !cNode.pId || !node.parent?.events) return;
+      if (!cNode || cNode.pId == null || !node.parent?.events) return;
 
       let closest = Infinity;
 

@@ -49,7 +49,7 @@ export function makePathIndex(trace: Trace) {
     };
     while (current) {
       const pId = getParent(current.id, current.step);
-      if (pId) {
+      if (!isNullish(pId)) {
         const event = findLast(r[pId], (c) => c.step <= current!.step);
         if (event) {
           path.push(event.step);

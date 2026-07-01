@@ -80,7 +80,9 @@ export function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
         id: k,
         name: k,
         events: v,
-        pId: find(v, (s) => !!s.pId && s.step <= step)?.pId || find(v, (s) => !!s.pId)?.pId,
+        pId:
+          find(v, (s) => s.pId != null && s.step <= step)?.pId ??
+          find(v, (s) => s.pId != null)?.pId,
       })),
   );
 
@@ -103,7 +105,7 @@ export function parse({ trace, step = 0, radius }: TreeWorkerParameters) {
 
   forEach(tree, addChildCount);
   const id = trace?.events?.[step]?.id;
-  if (id && radius !== undefined) {
+  if (id != null && radius !== undefined) {
     const node = idToNode[id];
     return { tree: degreeSeparation(node, radius) };
   } else return { tree };

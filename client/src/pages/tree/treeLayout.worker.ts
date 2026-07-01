@@ -30,7 +30,7 @@ export function parse({ trace, mode, orientation }: TreeWorkerParameters) {
   switch (mode) {
     case "directed-graph":
       forEach(trace?.events, ({ id, pId }) => {
-        if (id) {
+        if (id != null) {
           if (!g.hasNode(`${id}`)) {
             g.setNode(`${id}`, {
               label: `${id}`,
@@ -41,7 +41,7 @@ export function parse({ trace, mode, orientation }: TreeWorkerParameters) {
           } else {
             g.node(`${id}`).size += 1;
           }
-          if (pId) {
+          if (pId != null) {
             if (g.hasNode(`${pId}`)) {
               g.setEdge(`${id}`, `${pId}`, {
                 label: `${id}`,
@@ -59,7 +59,7 @@ export function parse({ trace, mode, orientation }: TreeWorkerParameters) {
         const finalParent: Record<string, Key> = getFinalParents(trace);
 
         forEach(trace?.events, ({ id }) => {
-          if (id) {
+          if (id != null) {
             if (!g.hasNode(`${id}`)) {
               g.setNode(`${id}`, {
                 label: `${id}`,
@@ -71,7 +71,7 @@ export function parse({ trace, mode, orientation }: TreeWorkerParameters) {
               g.node(`${id}`).size += 1;
             }
             const parent = finalParent[id];
-            if (parent) {
+            if (parent != null) {
               if (g.hasNode(`${parent}`)) {
                 g.setEdge(`${id}`, `${parent}`, {
                   label: `${id}`,

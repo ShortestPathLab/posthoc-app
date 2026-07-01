@@ -31,7 +31,7 @@ export function useMultiDirectedGraph(
 
     const numParents: Record<string, Set<string | number>> = {};
     forEach(trace?.events, ({ id, pId }) => {
-      if (id && pId) {
+      if (isDefined(id) && isDefined(pId)) {
         numParents[id] = numParents[id] ?? new Set();
         numParents[id].add(pId);
       }
