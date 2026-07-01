@@ -11,7 +11,7 @@ export const processor: BreakpointProcessor<Fields> = async (
   for (const [step, cEvent] of Object.entries(trace.content?.events ?? {})) {
     idSet.add(cEvent?.id);
 
-    if (!cEvent.pId) continue;
+    if (cEvent.pId == null) continue;
 
     if (!idSet.has(cEvent.pId)) {
       violations.push({
